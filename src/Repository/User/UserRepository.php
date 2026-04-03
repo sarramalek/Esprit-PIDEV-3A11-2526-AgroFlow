@@ -104,4 +104,34 @@ class UserRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+    // ==================== COUNT BY ROLE AND MONTH ====================
+public function countByRoleAndMonth(int $role, \DateTime $date): int
+{
+    $start = (clone $date)->modify('first day of this month')->setTime(0, 0, 0);
+    $end   = (clone $date)->modify('last day of this month')->setTime(23, 59, 59);
+
+    return (int) $this->createQueryBuilder('u')
+        ->select('COUNT(u.cin)')
+        ->andWhere('u.role = :role')
+        ->andWhere('u.dateCreationcpt BETWEEN :start AND :end')
+        ->setParameter('role', $role)
+        ->setParameter('start', $start)
+        ->setParameter('end', $end)
+        ->getQuery()
+        ->getSingleScalarResult();
+}
+
+public function countByMonth(\DateTime $date): int
+{
+    $start = (clone $date)->modify('first day of this month')->setTime(0, 0, 0);
+    $end   = (clone $date)->modify('last day of this month')->setTime(23, 59, 59);
+
+    return (int) $this->createQueryBuilder('u')
+        ->select('COUNT(u.cin)')
+        ->andWhere('u.dateCreationcpt BETWEEN :start AND :end')
+        ->setParameter('start', $start)
+        ->setParameter('end', $end)
+        ->getQuery()
+        ->getSingleScalarResult();
+}
 }
