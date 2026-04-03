@@ -1,0 +1,24 @@
+<style>
+    .btn-agroflow {
+        background-color: #2D5A27; /* Ton Vert Nature */
+        color: white;
+        font-weight: bold;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-transform: uppercase;
+    }
+    .btn-annuler {
+        background-color: white;
+        border: 1px solid #2C3E50; /* Ton Bleu Tech */
+        color: #2C3E50;
+        padding: 10px 20px;
+        border-radius: 5px;
+    }
+</style>
+
+{{ form_start(form) }}
+    {{ form_widget(form) }}
+    <button class="btn-agroflow">{{ button_label|default('Confirmer l\'ajout') }}</button>
+    <a href="{{ path('app_animaux_index') }}" class="btn-annuler">Annuler</a>
+{{ form_end(form) }}
