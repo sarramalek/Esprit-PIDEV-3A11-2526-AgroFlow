@@ -360,11 +360,19 @@
         <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\AboutController"/>
       </call>
     </service>
-    <service id="App\Controller\Animals\AnimauxController" class="App\Controller\Animals\AnimauxController" autowire="true" autoconfigure="true">
-      <tag name="container.error" message="The autoloader expected class &quot;App\Controller\Animals\AnimauxController&quot; to be defined in file &quot;C:\Users\Lenovo\Desktop\PIweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\Controller\Animals\AnimauxController.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
+    <service id="App\Controller\Animals\AnimauxController" class="App\Controller\Animals\AnimauxController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\Animals\AnimauxController"/>
+      </call>
     </service>
-    <service id="App\Controller\Animals\ExamensController" class="App\Controller\Animals\ExamensController" autowire="true" autoconfigure="true">
-      <tag name="container.error" message="The autoloader expected class &quot;App\Controller\Animals\ExamensController&quot; to be defined in file &quot;C:\Users\Lenovo\Desktop\PIweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\Controller\Animals\ExamensController.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
+    <service id="App\Controller\Animals\ExamensController" class="App\Controller\Animals\ExamensController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\Animals\ExamensController"/>
+      </call>
     </service>
     <service id="App\Controller\HomeController" class="App\Controller\HomeController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
@@ -374,16 +382,18 @@
       </call>
     </service>
     <service id="App\Form\Animals\AnimauxType" class="App\Form\Animals\AnimauxType" autowire="true" autoconfigure="true">
-      <tag name="container.error" message="The autoloader expected class &quot;App\Form\Animals\AnimauxType&quot; to be defined in file &quot;C:\Users\Lenovo\Desktop\PIweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\Form\Animals\AnimauxType.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
+      <tag name="form.type"/>
     </service>
     <service id="App\Form\Animals\ExamenType" class="App\Form\Animals\ExamenType" autowire="true" autoconfigure="true">
-      <tag name="container.error" message="The autoloader expected class &quot;App\Form\Animals\ExamenType&quot; to be defined in file &quot;C:\Users\Lenovo\Desktop\PIweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\Form\Animals\ExamenType.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
+      <tag name="form.type"/>
     </service>
     <service id="App\Repository\Animals\AnimauxRepository" class="App\Repository\Animals\AnimauxRepository" autowire="true" autoconfigure="true">
-      <tag name="container.error" message="The autoloader expected class &quot;App\Repository\Animals\AnimauxRepository&quot; to be defined in file &quot;C:\Users\Lenovo\Desktop\PIweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\Repository\Animals\AnimauxRepository.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
+      <tag name="doctrine.repository_service"/>
+      <argument type="service" id="doctrine"/>
     </service>
     <service id="App\Repository\Animals\ExamenRepository" class="App\Repository\Animals\ExamenRepository" autowire="true" autoconfigure="true">
-      <tag name="container.error" message="The autoloader expected class &quot;App\Repository\Animals\ExamenRepository&quot; to be defined in file &quot;C:\Users\Lenovo\Desktop\PIweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\Repository\Animals\ExamenRepository.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
+      <tag name="doctrine.repository_service"/>
+      <argument type="service" id="doctrine"/>
     </service>
     <service id="argument_metadata_factory" class="Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory"/>
     <service id="argument_resolver.backed_enum_resolver" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueResolver">
@@ -412,7 +422,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.HBdvAhp"/>
+      <argument type="service" id=".service_locator.Yj8pLCF"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -1330,9 +1340,12 @@
       <argument type="service" id="form.registry"/>
       <argument type="collection">
         <argument>Symfony\Component\Form\Extension\Core\Type</argument>
+        <argument>App\Form\Animals</argument>
         <argument>Symfony\Bridge\Doctrine\Form\Type</argument>
       </argument>
       <argument type="collection">
+        <argument>App\Form\Animals\AnimauxType</argument>
+        <argument>App\Form\Animals\ExamenType</argument>
         <argument>Symfony\Component\Form\Extension\Core\Type\FormType</argument>
         <argument>Symfony\Component\Form\Extension\Core\Type\ChoiceType</argument>
         <argument>Symfony\Component\Form\Extension\Core\Type\FileType</argument>
@@ -3301,7 +3314,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.HBdvAhp"/>
+      <argument type="service" id=".service_locator.Yj8pLCF"/>
     </service>
     <service id="debug.log_processor" class="Symfony\Bridge\Monolog\Processor\DebugProcessor">
       <tag name="kernel.reset" method="reset"/>
@@ -3793,7 +3806,7 @@
       <argument type="service" id="form.registry"/>
     </service>
     <service id="form.extension" class="Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension">
-      <argument type="service" id=".service_locator.y4dplYt"/>
+      <argument type="service" id=".service_locator.W53dz_H"/>
       <argument type="collection">
         <argument key="Symfony\Component\Form\Extension\Core\Type\FormType" type="iterator">
           <argument type="service" id="form.type_extension.form.transformation_failure_handling"/>
@@ -5049,7 +5062,7 @@
     <service id="doctrine.orm.configuration" class="Doctrine\ORM\Configuration" abstract="true"/>
     <service id="doctrine.orm.entity_manager.abstract" class="Doctrine\ORM\EntityManager" lazy="true" abstract="true"/>
     <service id="doctrine.orm.container_repository_factory" class="Doctrine\Bundle\DoctrineBundle\Repository\ContainerRepositoryFactory">
-      <argument type="service" id=".service_locator.Xbsa8iG"/>
+      <argument type="service" id=".service_locator..WaV0gh"/>
     </service>
     <service id="doctrine.orm.manager_configurator.abstract" class="Doctrine\Bundle\DoctrineBundle\ManagerConfigurator" abstract="true">
       <argument type="collection"/>
@@ -7075,9 +7088,23 @@
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\AboutController" class="App\Controller\AboutController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\AboutController" class="App\Controller\AboutController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\AboutController" class="App\Controller\AboutController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Animals\AnimauxController" class="App\Controller\Animals\AnimauxController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Animals\AnimauxController" class="App\Controller\Animals\AnimauxController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\Animals\AnimauxController" class="App\Controller\Animals\AnimauxController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Animals\ExamensController" class="App\Controller\Animals\ExamensController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Animals\ExamensController" class="App\Controller\Animals\ExamensController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\Animals\ExamensController" class="App\Controller\Animals\ExamensController" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\HomeController" class="App\Controller\HomeController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\HomeController" class="App\Controller\HomeController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\HomeController" class="App\Controller\HomeController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\Animals\AnimauxType" class="App\Form\Animals\AnimauxType" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Form\Animals\AnimauxType" class="App\Form\Animals\AnimauxType" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\Animals\ExamenType" class="App\Form\Animals\ExamenType" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Form\Animals\ExamenType" class="App\Form\Animals\ExamenType" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\Animals\AnimauxRepository" class="App\Repository\Animals\AnimauxRepository" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Repository\Animals\AnimauxRepository" class="App\Repository\Animals\AnimauxRepository" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\Animals\ExamenRepository" class="App\Repository\Animals\ExamenRepository" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Repository\Animals\ExamenRepository" class="App\Repository\Animals\ExamenRepository" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".service_locator.w7.f4fT" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -7501,13 +7528,93 @@
         <argument key="loader" type="service_closure" id=".errored..service_locator.y4_Zrx..Symfony\Component\Config\Loader\LoaderInterface"/>
       </argument>
     </service>
-    <service id=".service_locator.HBdvAhp" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.qf5FuHx" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
+        <argument key="animauxRepository" type="service_closure" id="App\Repository\Animals\AnimauxRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.CsMkqUa" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+      </argument>
+    </service>
+    <service id=".service_locator.9Y9x5wR" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="animaux" type="service_closure" id=".errored..service_locator.9Y9x5wR.App\Entity\Animals\Animaux"/>
+      </argument>
+    </service>
+    <service id=".service_locator..4cEOa9" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="animaux" type="service_closure" id=".errored..service_locator..4cEOa9.App\Entity\Animals\Animaux"/>
+        <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+      </argument>
+    </service>
+    <service id=".service_locator.tl.X0ws" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="examenRepository" type="service_closure" id="App\Repository\Animals\ExamenRepository"/>
+      </argument>
+    </service>
+    <service id=".errored.Erinmqh" class="App\Entity\Aniamls\Examen">
+      <tag name="container.error" message="Cannot determine controller argument for &quot;App\Controller\Animals\ExamensController::show()&quot;: the $examen argument is type-hinted with the non-existent class or interface: &quot;App\Entity\Aniamls\Examen&quot;."/>
+    </service>
+    <service id=".service_locator.Nl1KVNj" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="examen" type="service_closure" id=".errored.Erinmqh"/>
+      </argument>
+    </service>
+    <service id=".errored.V4HklbC" class="App\Entity\Aniamls\Examen">
+      <tag name="container.error" message="Cannot determine controller argument for &quot;App\Controller\Animals\ExamensController::edit()&quot;: the $examen argument is type-hinted with the non-existent class or interface: &quot;App\Entity\Aniamls\Examen&quot;."/>
+    </service>
+    <service id=".service_locator.la7NApM" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="examen" type="service_closure" id=".errored.V4HklbC"/>
+      </argument>
+    </service>
+    <service id=".errored.t4tREwq" class="App\Entity\Aniamls\Examen">
+      <tag name="container.error" message="Cannot determine controller argument for &quot;App\Controller\Animals\ExamensController::delete()&quot;: the $examen argument is type-hinted with the non-existent class or interface: &quot;App\Entity\Aniamls\Examen&quot;."/>
+    </service>
+    <service id=".service_locator.7veCuyK" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="examen" type="service_closure" id=".errored.t4tREwq"/>
+      </argument>
+    </service>
+    <service id=".service_locator.Yj8pLCF" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="App\Controller\Animals\AnimauxController::delete" type="service_closure" id=".service_locator..4cEOa9"/>
+        <argument key="App\Controller\Animals\AnimauxController::edit" type="service_closure" id=".service_locator..4cEOa9"/>
+        <argument key="App\Controller\Animals\AnimauxController::index" type="service_closure" id=".service_locator.qf5FuHx"/>
+        <argument key="App\Controller\Animals\AnimauxController::new" type="service_closure" id=".service_locator.CsMkqUa"/>
+        <argument key="App\Controller\Animals\AnimauxController::show" type="service_closure" id=".service_locator.9Y9x5wR"/>
+        <argument key="App\Controller\Animals\ExamensController::delete" type="service_closure" id=".service_locator.7veCuyK"/>
+        <argument key="App\Controller\Animals\ExamensController::edit" type="service_closure" id=".service_locator.la7NApM"/>
+        <argument key="App\Controller\Animals\ExamensController::index" type="service_closure" id=".service_locator.tl.X0ws"/>
+        <argument key="App\Controller\Animals\ExamensController::new" type="service_closure" id=".service_locator.CsMkqUa"/>
+        <argument key="App\Controller\Animals\ExamensController::show" type="service_closure" id=".service_locator.Nl1KVNj"/>
         <argument key="App\Kernel::loadRoutes" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="App\Kernel::registerContainerConfiguration" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="kernel::loadRoutes" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="kernel::registerContainerConfiguration" type="service_closure" id=".service_locator.y4_Zrx."/>
+        <argument key="App\Controller\Animals\AnimauxController:delete" type="service_closure" id=".service_locator..4cEOa9"/>
+        <argument key="App\Controller\Animals\AnimauxController:edit" type="service_closure" id=".service_locator..4cEOa9"/>
+        <argument key="App\Controller\Animals\AnimauxController:index" type="service_closure" id=".service_locator.qf5FuHx"/>
+        <argument key="App\Controller\Animals\AnimauxController:new" type="service_closure" id=".service_locator.CsMkqUa"/>
+        <argument key="App\Controller\Animals\AnimauxController:show" type="service_closure" id=".service_locator.9Y9x5wR"/>
+        <argument key="App\Controller\Animals\ExamensController:delete" type="service_closure" id=".service_locator.7veCuyK"/>
+        <argument key="App\Controller\Animals\ExamensController:edit" type="service_closure" id=".service_locator.la7NApM"/>
+        <argument key="App\Controller\Animals\ExamensController:index" type="service_closure" id=".service_locator.tl.X0ws"/>
+        <argument key="App\Controller\Animals\ExamensController:new" type="service_closure" id=".service_locator.CsMkqUa"/>
+        <argument key="App\Controller\Animals\ExamensController:show" type="service_closure" id=".service_locator.Nl1KVNj"/>
         <argument key="kernel:loadRoutes" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="kernel:registerContainerConfiguration" type="service_closure" id=".service_locator.y4_Zrx."/>
       </argument>
@@ -7669,9 +7776,11 @@
       <argument type="service" id="argument_resolver.query_parameter_value_resolver"/>
       <argument type="service" id="debug.stopwatch"/>
     </service>
-    <service id=".service_locator.y4dplYt" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.W53dz_H" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
+        <argument key="App\Form\Animals\AnimauxType" type="service_closure" id="App\Form\Animals\AnimauxType"/>
+        <argument key="App\Form\Animals\ExamenType" type="service_closure" id="App\Form\Animals\ExamenType"/>
         <argument key="Symfony\Bridge\Doctrine\Form\Type\EntityType" type="service_closure" id="form.type.entity"/>
         <argument key="Symfony\Component\Form\Extension\Core\Type\ChoiceType" type="service_closure" id="form.type.choice"/>
         <argument key="Symfony\Component\Form\Extension\Core\Type\ColorType" type="service_closure" id="form.type.color"/>
@@ -7797,9 +7906,12 @@
         <argument key="turbo.doctrine.event_listener" type="service_closure" id="turbo.doctrine.event_listener"/>
       </argument>
     </service>
-    <service id=".service_locator.Xbsa8iG" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator..WaV0gh" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
-      <argument type="collection"/>
+      <argument type="collection">
+        <argument key="App\Repository\Animals\AnimauxRepository" type="service_closure" id="App\Repository\Animals\AnimauxRepository"/>
+        <argument key="App\Repository\Animals\ExamenRepository" type="service_closure" id="App\Repository\Animals\ExamenRepository"/>
+      </argument>
     </service>
     <service id=".service_locator.KLVvNIq" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
@@ -8138,6 +8250,18 @@
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.O2p6Lk7" method="withContext"/>
     </service>
+    <service id=".service_locator.O2p6Lk7.App\Controller\Animals\AnimauxController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\Animals\AnimauxController"/>
+      <argument>App\Controller\Animals\AnimauxController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.O2p6Lk7" method="withContext"/>
+    </service>
+    <service id=".service_locator.O2p6Lk7.App\Controller\Animals\ExamensController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\Animals\ExamensController"/>
+      <argument>App\Controller\Animals\ExamensController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.O2p6Lk7" method="withContext"/>
+    </service>
     <service id=".service_locator.O2p6Lk7.App\Controller\HomeController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\HomeController"/>
       <argument>App\Controller\HomeController</argument>
@@ -8216,6 +8340,10 @@
       <argument type="collection">
         <argument key="reverse_container" type="service_closure" id="reverse_container" on-invalid="ignore_uninitialized"/>
       </argument>
+    </service>
+    <service id=".service_locator.Xbsa8iG" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection"/>
     </service>
     <service id=".service_locator.NBUFN6A" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
@@ -8315,6 +8443,8 @@
         <argument type="collection">
           <argument>App\Kernel</argument>
           <argument>App\Controller\AboutController</argument>
+          <argument>App\Controller\Animals\AnimauxController</argument>
+          <argument>App\Controller\Animals\ExamensController</argument>
           <argument>App\Controller\HomeController</argument>
           <argument>Doctrine\Bundle\DoctrineBundle\Controller\ProfilerController</argument>
         </argument>
@@ -8516,6 +8646,12 @@
     <service id="debug.security.event_dispatcher.main.inner" class="Symfony\Component\EventDispatcher\EventDispatcher"/>
     <service id=".errored..service_locator.y4_Zrx..Symfony\Component\Config\Loader\LoaderInterface" class="Symfony\Component\Config\Loader\LoaderInterface">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.y4_Zrx.&quot;: it needs an instance of &quot;Symfony\Component\Config\Loader\LoaderInterface&quot; but this type has been excluded from autowiring."/>
+    </service>
+    <service id=".errored..service_locator.9Y9x5wR.App\Entity\Animals\Animaux" class="App\Entity\Animals\Animaux">
+      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.9Y9x5wR&quot;: it needs an instance of &quot;App\Entity\Animals\Animaux&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
+    </service>
+    <service id=".errored..service_locator..4cEOa9.App\Entity\Animals\Animaux" class="App\Entity\Animals\Animaux">
+      <tag name="container.error" message="Cannot autowire service &quot;.service_locator..4cEOa9&quot;: it needs an instance of &quot;App\Entity\Animals\Animaux&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
     </service>
     <service id=".console.command.about.lazy" class="Symfony\Component\Console\Command\LazyCommand">
       <argument>about</argument>
@@ -9707,7 +9843,7 @@
     <service id="Psr\Log\LoggerInterface" alias="monolog.logger"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.w7.f4fT" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.HBdvAhp"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.Yj8pLCF"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id=".Psr\Log\LoggerInterface $request.logger" alias="monolog.logger.request"/>
@@ -9745,9 +9881,11 @@
     <service id=".service_locator.80edgLI" alias="messenger.receiver_locator"/>
     <service id=".service_locator.h8Jkkd2" alias="messenger.retry_strategy_locator"/>
     <service id=".service_locator.bJ.4HC5" alias=".service_locator.w7.f4fT"/>
-    <service id=".service_locator.L.EDYUC" alias=".service_locator.HBdvAhp"/>
+    <service id=".service_locator.YHeJzvQ" alias=".service_locator.la7NApM"/>
+    <service id=".service_locator.ccwFaAk" alias=".service_locator.7veCuyK"/>
+    <service id=".service_locator.MBa40UY" alias=".service_locator.Yj8pLCF"/>
     <service id=".service_locator.BFrsqsn" alias=".service_locator.F9PKc.7"/>
-    <service id=".service_locator.Za9MpXe" alias=".service_locator.y4dplYt"/>
+    <service id=".service_locator.F1tUQn1" alias=".service_locator.W53dz_H"/>
     <service id=".service_locator.XtmiKbi" alias=".service_locator.MfxSDRP"/>
     <service id=".service_locator.O24_MAy" alias=".service_locator.yY.p4P7"/>
     <service id=".service_locator.jUv.zyj" alias=".service_locator.O2p6Lk7"/>
@@ -9771,6 +9909,13 @@
     <service id="doctrine.orm.default_metadata_driver" alias=".doctrine.orm.default_metadata_driver"/>
     <service id="security.event_dispatcher.main" alias="debug.security.event_dispatcher.main"/>
     <service id=".service_locator.gFlme_s" alias=".service_locator.y4_Zrx."/>
+    <service id=".service_locator.NLwAC4N" alias=".service_locator.qf5FuHx"/>
+    <service id=".service_locator.9e2t_lq" alias=".service_locator.CsMkqUa"/>
+    <service id=".service_locator.WfMZGBY" alias=".service_locator.9Y9x5wR"/>
+    <service id=".service_locator.iySheTy" alias=".service_locator..4cEOa9"/>
+    <service id=".service_locator.eTy.RnK" alias=".service_locator.tl.X0ws"/>
+    <service id=".service_locator.JUDqsfF" alias=".service_locator.la7NApM"/>
+    <service id=".service_locator.9poacNA" alias=".service_locator.7veCuyK"/>
     <service id=".service_locator.Q1z.f9O" alias=".service_locator.O2p6Lk7"/>
     <service id=".service_locator.dGUCsbe" alias=".service_locator.oR77BOj"/>
     <service id=".service_locator._kIAbz1" alias=".service_locator.TpoC7U9"/>
