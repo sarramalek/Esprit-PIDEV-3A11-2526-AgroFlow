@@ -78,15 +78,13 @@ public function login(AuthenticationUtils $authenticationUtils): Response
     }
 
     // ==================== REDIRECTION PAR ROLE ====================
-    private function redirectByRole($user): Response
+   private function redirectByRole($user): Response
 {
-    $role = $user->getRole();
-
-    return match((int)$role) {
-        1 => $this->redirectToRoute('ouvrier_dashboard'),     // Employé/Ouvrier
-        2 => $this->redirectToRoute('agriculteur_dashboard'), // Agriculteur
-        3 => $this->redirectToRoute('admin_dashboard'),       // Admin
-        default => $this->redirectToRoute('app_home'),        // Visiteur
+    return match((int)$user->getRole()) {
+        1       => $this->redirectToRoute('ouvrier_dashboard'),
+        2       => $this->redirectToRoute('agri_home'),
+        3       => $this->redirectToRoute('admin_dashboard'),
+        default => $this->redirectToRoute('app_login'), // ← add this
     };
 }
 }

@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AgroFlow Admin{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        :root {
+            --green-dark:   #1A3A1F;
+            --green-mid:    #2D5A27;
+            --green-accent: #4A8C3F;
+            --green-light:  #C8E6C0;
+            --cream:        #FCF8E6;
+            --cream-dark:   #F0EAD0;
+            --navy:         #1C2B3A;
+            --text-main:    #1C2B3A;
+            --text-muted:   #7A8A95;
+            --white:        #FFFFFF;
+            --sidebar-w:    260px;
+            --topbar-h:     64px;
+            --radius:       10px;
+            --shadow:       0 2px 12px rgba(0,0,0,0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--cream);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ═══════════════════════════════
+           SIDEBAR
+        ═══════════════════════════════ */
+        .sidebar {
+            width: var(--sidebar-w);
+            background: var(--green-dark);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            z-index: 100;
+            overflow-y: auto;
+            overflow-x: hidden;
+            transition: width 0.3s ease;
+        }
+
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+
+        /* Brand */
+        .sidebar-brand {
+            padding: 22px 20px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            flex-shrink: 0;
+        }
+        .sidebar-brand img { height: 38px; filter: brightness(0) invert(1); }
+        .sidebar-brand-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--cream);
+            letter-spacing: -0.02em;
+        }
+        .sidebar-brand-text span { color: var(--green-light); }
+
+        /* Nav */
+        .sidebar-nav {
+            padding: 12px 0;
+            flex: 1;
+        }
+
+        .nav-section-label {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.3);
+            padding: 14px 20px 6px;
+        }
+
+        /* Parent item */
+        .nav-item { position: relative; }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 11px 20px;
+            color: rgba(255,255,255,0.72);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            user-select: none;
+        }
+        .nav-link:hover {
+            background: rgba(255,255,255,0.07);
+            color: var(--cream);
+            border-left-color: var(--green-light);
+        }
+        .nav-link.active {
+            background: rgba(74,140,63,0.25);
+            color: var(--cream);
+            border-left-color: var(--green-accent);
+        }
+        .nav-link .nav-icon {
+            width: 18px;
+            text-align: center;
+            font-size: 14px;
+            flex-shrink: 0;
+            opacity: 0.85;
+        }
+        .nav-link .nav-label { flex: 1; }
+        .nav-link .nav-arrow {
+            font-size: 10px;
+            transition: transform 0.25s ease;
+            opacity: 0.6;
+        }
+        .nav-item.open > .nav-link .nav-arrow {
+            transform: rotate(90deg);
+        }
+
+        /* Sub-menu */
+        .nav-sub {
+            list-style: none;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: rgba(0,0,0,0.18);
+        }
+        .nav-item.open > .nav-sub {
+            max-height: 300px;
+        }
+        .nav-sub a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 20px 9px 46px;
+            color: rgba(255,255,255,0.58);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 400;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .nav-sub a:hover {
+            color: var(--cream);
+            background: rgba(255,255,255,0.05);
+        }
+        .nav-sub a.active {
+            color: var(--green-light);
+            font-weight: 500;
+        }
+        .nav-sub a .sub-dot {
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: currentColor;
+            flex-shrink: 0;
+            opacity: 0.7;
+        }
+
+        /* Sidebar Footer */
+        .sidebar-footer {
+            padding: 14px 20px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            flex-shrink: 0;
+        }
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sidebar-avatar {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            background: var(--green-accent);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 700;
+            color: white; flex-shrink: 0;
+        }
+        .sidebar-user-info { flex: 1; overflow: hidden; }
+        .sidebar-user-name {
+            font-size: 13px; font-weight: 600;
+            color: var(--cream);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .sidebar-user-role {
+            font-size: 11px; color: rgba(255,255,255,0.4);
+        }
+        .sidebar-logout {
+            color: rgba(255,255,255,0.4);
+            font-size: 14px;
+            transition: color 0.2s;
+            text-decoration: none;
+        }
+        .sidebar-logout:hover { color: #ff7b7b; }
+
+        /* ═══════════════════════════════
+           TOPBAR
+        ═══════════════════════════════ */
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-w);
+            right: 0;
+            height: var(--topbar-h);
+            background: var(--white);
+            border-bottom: 1px solid var(--cream-dark);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            z-index: 90;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+        }
+
+        .topbar-left { display: flex; align-items: center; gap: 16px; }
+        .topbar-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--navy);
+        }
+        .topbar-breadcrumb {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-family: 'DM Mono', monospace;
+        }
+        .topbar-breadcrumb span { color: var(--green-accent); }
+
+        .topbar-right { display: flex; align-items: center; gap: 14px; }
+
+        .topbar-btn {
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            background: var(--cream);
+            border: 1px solid var(--cream-dark);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: var(--text-muted);
+            font-size: 14px; transition: all 0.2s;
+            text-decoration: none;
+        }
+        .topbar-btn:hover { background: var(--cream-dark); color: var(--navy); }
+
+        .topbar-badge {
+            position: relative;
+        }
+        .topbar-badge::after {
+            content: '';
+            position: absolute;
+            top: 6px; right: 6px;
+            width: 7px; height: 7px;
+            background: #E53E3E;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        /* ═══════════════════════════════
+           MAIN CONTENT
+        ═══════════════════════════════ */
+        .main-wrapper {
+            margin-left: var(--sidebar-w);
+            margin-top: var(--topbar-h);
+            flex: 1;
+            min-height: calc(100vh - var(--topbar-h));
+            padding: 28px;
+            background: var(--cream);
+        }
+
+        {% block stylesheets %}{% endblock %}
+    </style>
+</head>
+<body>
+
+    <!-- ═══════ SIDEBAR ═══════ -->
+    <aside class="sidebar" id="sidebar">
+
+        <div class="sidebar-brand">
+            <img src="{{ asset('assets/img/Logo.png') }}" alt="AgroFlow">
+            <div class="sidebar-brand-text">Agro<span>Flow</span></div>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <!-- Dashboard -->
+            <a href="{{ path('admin_dashboard') }}" class="nav-link {% if app.request.get('_route') == 'admin_dashboard' %}active{% endif %}">
+                <span class="nav-icon"><i class="fa fa-gauge-high"></i></span>
+                <span class="nav-label">Tableau de bord</span>
+            </a>
+
+            <div class="nav-section-label">Gestion</div>
+
+            <!-- Gestion Utilisateurs -->
+            <div class="nav-item {% if app.request.get('_route') in ['admin_users','admin_offres','admin_abonnements','admin_taches'] %}open{% endif %}">
+                <div class="nav-link {% if app.request.get('_route') in ['admin_users','admin_offres','admin_abonnements','admin_taches'] %}active{% endif %}"
+                     onclick="toggleMenu(this)">
+                    <span class="nav-icon"><i class="fa fa-users"></i></span>
+                    <span class="nav-label">Gestion Utilisateurs</span>
+                    <i class="fa fa-chevron-right nav-arrow"></i>
+                </div>
+                <ul class="nav-sub">
+                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_users' %}active{% endif %}">
+                        <span class="sub-dot"></span> Utilisateurs
+                    </a></li>
+                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_offres' %}active{% endif %}">
+                        <span class="sub-dot"></span> Offres
+                    </a></li>
+                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_abonnements' %}active{% endif %}">
+                        <span class="sub-dot"></span> Abonnements
+                    </a></li>
+                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_taches' %}active{% endif %}">
+                        <span class="sub-dot"></span> Tâches
+                    </a></li>
+                </ul>
+            </div>
+
+            <!-- Gestion Animaux -->
+            <div class="nav-item {% if app.request.get('_route') in ['admin_animaux','admin_examens'] %}open{% endif %}">
+                <div class="nav-link {% if app.request.get('_route') in ['admin_animaux','admin_examens'] %}active{% endif %}"
+                     onclick="toggleMenu(this)">
+                    <span class="nav-icon"><i class="fa fa-paw"></i></span>
+                    <span class="nav-label">Gestion Animaux</span>
+                    <i class="fa fa-chevron-right nav-arrow"></i>
+                </div>
+                <ul class="nav-sub">
+                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_animaux' %}active{% endif %}">
+                        <span class="sub-dot"></span> Animaux
+                    </a></li>
+                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_examens' %}active{% endif %}">
+                        <span class="sub-dot"></span> Examens
+                    </a></li>
+                </ul>
+            </div>
+
+            <!-- Gestion Stocks -->
+            <div class="nav-item {% if app.request.get('_route') in ['admin_categories','admin_produits'] %}open{% endif %}">
+                <div class="nav-link {% if app.request.get('_route') in ['admin_categories','admin_produits'] %}active{% endif %}"
+                     onclick="toggleMenu(this)">
+                    <span class="nav-icon"><i class="fa fa-boxes-stacked"></i></span>
+                    <span class="nav-label">Gestion Stocks</span>
+                    <i class="fa fa-chevron-right nav-arrow"></i>
+                </div>
+                <ul class="nav-sub">
+                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_categories' %}active{% endif %}">
+                        <span class="sub-dot"></span> Catégories
+                    </a></li>
+                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_produits' %}active{% endif %}">
+                        <span class="sub-dot"></span> Produits
+                    </a></li>
+                </ul>
+            </div>
+
+            <!-- Gestion Événements -->
+            <div class="nav-item {% if app.request.get('_route') in ['admin_evenements','admin_participations'] %}open{% endif %}">
+                <div class="nav-link {% if app.request.get('_route') in ['admin_evenements','admin_participations'] %}active{% endif %}"
+                     onclick="toggleMenu(this)">
+                    <span class="nav-icon"><i class="fa fa-calendar-days"></i></span>
+                    <span class="nav-label">Gestion Événements</span>
+                    <i class="fa fa-chevron-right nav-arrow"></i>
+                </div>
+                <ul class="nav-sub">
+                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_evenements' %}active{% endif %}">
+                        <span class="sub-dot"></span> Événements
+                    </a></li>
+                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_participations' %}active{% endif %}">
+                        <span class="sub-dot"></span> Participations
+                    </a></li>
+                </ul>
+            </div>
+
+            <!-- Gestion Terrains -->
+            <div class="nav-item {% if app.request.get('_route') in ['admin_terrains','admin_rotations'] %}open{% endif %}">
+                <div class="nav-link {% if app.request.get('_route') in ['admin_terrains','admin_rotations'] %}active{% endif %}"
+                     onclick="toggleMenu(this)">
+                    <span class="nav-icon"><i class="fa fa-map"></i></span>
+                    <span class="nav-label">Gestion Terrains</span>
+                    <i class="fa fa-chevron-right nav-arrow"></i>
+                </div>
+                <ul class="nav-sub">
+                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_terrains' %}active{% endif %}">
+                        <span class="sub-dot"></span> Terrains
+                    </a></li>
+                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_rotations' %}active{% endif %}">
+                        <span class="sub-dot"></span> Rotations
+                    </a></li>
+                </ul>
+            </div>
+
+            <!-- Gestion Matériels -->
+            <div class="nav-item {% if app.request.get('_route') in ['admin_machines','admin_maintenances'] %}open{% endif %}">
+                <div class="nav-link {% if app.request.get('_route') in ['admin_machines','admin_maintenances'] %}active{% endif %}"
+                     onclick="toggleMenu(this)">
+                    <span class="nav-icon"><i class="fa fa-tractor"></i></span>
+                    <span class="nav-label">Gestion Matériels</span>
+                    <i class="fa fa-chevron-right nav-arrow"></i>
+                </div>
+                <ul class="nav-sub">
+                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_machines' %}active{% endif %}">
+                        <span class="sub-dot"></span> Machines
+                    </a></li>
+                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_maintenances' %}active{% endif %}">
+                        <span class="sub-dot"></span> Maintenances
+                    </a></li>
+                </ul>
+            </div>
+
+        </nav>
+
+        <!-- Footer -->
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="sidebar-avatar">
+                    {{ app.user ? (app.user.prenom|first|upper ~ app.user.nom|first|upper) : 'AD' }}
+                </div>
+                <div class="sidebar-user-info">
+                    <div class="sidebar-user-name">
+                        {{ app.user ? (app.user.prenom ~ ' ' ~ app.user.nom) : 'Administrateur' }}
+                    </div>
+                    <div class="sidebar-user-role">Administrateur</div>
+                </div>
+                <a href="{{ path('app_logout') }}" class="sidebar-logout" title="Déconnexion">
+                    <i class="fa fa-arrow-right-from-bracket"></i>
+                </a>
+            </div>
+        </div>
+
+    </aside>
+
+    <!-- ═══════ TOPBAR ═══════ -->
+    <header class="topbar">
+        <div class="topbar-left">
+            <div class="topbar-title">{% block page_title %}Dashboard{% endblock %}</div>
+            <div class="topbar-breadcrumb">
+                AgroFlow / <span>{% block breadcrumb %}Admin{% endblock %}</span>
+            </div>
+        </div>
+        <div class="topbar-right">
+            <a href="{{ path('app_about') }}" class="topbar-btn" title="Site public">
+                <i class="fa fa-globe"></i>
+            </a>
+            <div class="topbar-btn topbar-badge" title="Notifications">
+                <i class="fa fa-bell"></i>
+            </div>
+            <a href="{{ path('app_logout') }}" class="topbar-btn" title="Déconnexion">
+                <i class="fa fa-power-off"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- ═══════ CONTENT ═══════ -->
+    <main class="main-wrapper">
+        {% block body %}{% endblock %}
+    </main>
+
+    <script>
+        function toggleMenu(el) {
+            const item = el.closest('.nav-item');
+            const isOpen = item.classList.contains('open');
+            // Close all
+            document.querySelectorAll('.nav-item.open').forEach(i => i.classList.remove('open'));
+            // Open clicked if it was closed
+            if (!isOpen) item.classList.add('open');
+        }
+
+        // Auto-open active parent on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const active = document.querySelector('.nav-sub a.active');
+            if (active) {
+                active.closest('.nav-item')?.classList.add('open');
+            }
+        });
+    </script>
+
+    {% block javascripts %}{% endblock %}
+</body>
+</html>
