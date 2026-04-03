@@ -28,6 +28,9 @@ return [
     'app_examens_show' => [['id'], ['_controller' => 'App\\Controller\\Animals\\ExamensController::show'], [], [['variable', '/', '[^/]++', 'id', true], ['text', '/examen']], [], [], []],
     'app_examens_edit' => [['id'], ['_controller' => 'App\\Controller\\Animals\\ExamensController::edit'], [], [['text', '/edit'], ['variable', '/', '[^/]++', 'id', true], ['text', '/examen']], [], [], []],
     'app_examens_delete' => [['id'], ['_controller' => 'App\\Controller\\Animals\\ExamensController::delete'], [], [['variable', '/', '[^/]++', 'id', true], ['text', '/examen']], [], [], []],
+    'app_login' => [[], ['_controller' => 'App\\Controller\\AuthController::login'], [], [['text', '/login']], [], [], []],
+    'app_register' => [[], ['_controller' => 'App\\Controller\\AuthController::register'], [], [['text', '/register']], [], [], []],
+    'app_logout' => [[], ['_controller' => 'App\\Controller\\AuthController::logout'], [], [['text', '/logout']], [], [], []],
     'app_home' => [[], ['_controller' => 'App\\Controller\\HomeController::index'], [], [['text', '/']], [], [], []],
     'App\Controller\AboutController::index' => [[], ['_controller' => 'App\\Controller\\AboutController::index'], [], [['text', '/about']], [], [], []],
     'App\Controller\Animals\AnimauxController::index' => [[], ['_controller' => 'App\\Controller\\Animals\\AnimauxController::index'], [], [['text', '/animaux']], [], [], []],
@@ -40,5 +43,8 @@ return [
     'App\Controller\Animals\ExamensController::show' => [['id'], ['_controller' => 'App\\Controller\\Animals\\ExamensController::show'], [], [['variable', '/', '[^/]++', 'id', true], ['text', '/examen']], [], [], []],
     'App\Controller\Animals\ExamensController::edit' => [['id'], ['_controller' => 'App\\Controller\\Animals\\ExamensController::edit'], [], [['text', '/edit'], ['variable', '/', '[^/]++', 'id', true], ['text', '/examen']], [], [], []],
     'App\Controller\Animals\ExamensController::delete' => [['id'], ['_controller' => 'App\\Controller\\Animals\\ExamensController::delete'], [], [['variable', '/', '[^/]++', 'id', true], ['text', '/examen']], [], [], []],
+    'App\Controller\AuthController::login' => [[], ['_controller' => 'App\\Controller\\AuthController::login'], [], [['text', '/login']], [], [], []],
+    'App\Controller\AuthController::register' => [[], ['_controller' => 'App\\Controller\\AuthController::register'], [], [['text', '/register']], [], [], []],
+    'App\Controller\AuthController::logout' => [[], ['_controller' => 'App\\Controller\\AuthController::logout'], [], [['text', '/logout']], [], [], []],
     'App\Controller\HomeController::index' => [[], ['_controller' => 'App\\Controller\\HomeController::index'], [], [['text', '/']], [], [], []],
 ];
