@@ -1,0 +1,30 @@
+{% extends 'base_admin.html.twig' %}
+
+{% block title %}Nouvel Abonnement — AgroFlow Admin{% endblock %}
+{% block page_title %}Nouvel Abonnement{% endblock %}
+{% block breadcrumb %}
+    <a href="{{ path('admin_abonnements_index') }}" style="color:var(--green-accent);text-decoration:none;">Abonnements</a>
+    / Nouveau
+{% endblock %}
+
+{% block body %}
+<div style="max-width:720px;">
+    <div style="background:var(--white); border:1px solid var(--cream-dark); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden;">
+
+        <div style="padding:16px 22px; border-bottom:1px solid var(--cream-dark); display:flex; align-items:center; gap:10px;">
+            <div style="width:36px;height:36px;border-radius:10px;background:#EAF3E6;display:flex;align-items:center;justify-content:center;">
+                <i class="fa fa-file-circle-plus" style="color:#2D5A27;"></i>
+            </div>
+            <div>
+                <div style="font-size:15px;font-weight:600;color:var(--navy);">Créer un abonnement</div>
+                <div style="font-size:12px;color:var(--text-muted);">Remplissez les informations ci-dessous</div>
+            </div>
+        </div>
+
+        <div style="padding:24px 22px;">
+            {{ include('User/formAbonn.html.twig') }}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

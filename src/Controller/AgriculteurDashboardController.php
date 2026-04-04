@@ -112,9 +112,11 @@ class AgriculteurDashboardController extends AbstractController
 
     // ── Tâches ───────────────────────────────────────────────────────────────
 
-    #[Route('/taches', name: 'taches')]
-    public function taches(): Response
-    {
-        return new Response('Module Tâches — à implémenter');
-    }
+    // ── Tâches ───────────────────────────────────────────────────────────────
+
+#[Route('/taches', name: 'taches')]
+public function taches(): Response
+{
+    return $this->redirectToRoute('app_tache_front');
+}
 }
