@@ -1,0 +1,372 @@
+{% extends 'base_admin.html.twig' %}
+
+{% block title %}Abonnements — AgroFlow Admin{% endblock %}
+{% block page_title %}Gestion des Abonnements{% endblock %}
+{% block breadcrumb %}Abonnements{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .page { display: flex; flex-direction: column; gap: 24px; }
+
+    /* ── Stats ── */
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+    }
+    .stat-card {
+        background: var(--white);
+        border: 1px solid var(--cream-dark);
+        border-radius: var(--radius);
+        padding: 20px 22px;
+        display: flex; align-items: center; gap: 16px;
+        box-shadow: var(--shadow);
+    }
+    .stat-icon {
+        width: 48px; height: 48px; border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 20px; flex-shrink: 0;
+    }
+    .stat-val   { font-size: 26px; font-weight: 700; color: var(--navy); line-height: 1; }
+    .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+    /* ── Toolbar ── */
+    .toolbar {
+        background: var(--white);
+        border: 1px solid var(--cream-dark);
+        border-radius: var(--radius);
+        padding: 16px 20px;
+        display: flex; align-items: center; gap: 12px;
+        box-shadow: var(--shadow);
+    }
+    .search-wrap { position: relative; flex: 1; }
+    .search-wrap i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 13px; }
+    .search-input {
+        width: 100%; padding: 9px 12px 9px 36px;
+        border: 1px solid var(--cream-dark); border-radius: 8px;
+        font-size: 14px; font-family: 'DM Sans', sans-serif;
+        background: var(--cream); transition: border 0.2s;
+    }
+    .search-input:focus { outline: none; border-color: var(--green-accent); background: white; }
+
+    .filter-select {
+        padding: 9px 14px; border: 1px solid var(--cream-dark);
+        border-radius: 8px; font-size: 14px;
+        font-family: 'DM Sans', sans-serif;
+        background: var(--cream); color: var(--navy); cursor: pointer;
+    }
+    .filter-select:focus { outline: none; border-color: var(--green-accent); }
+
+    .btn {
+        display: inline-flex; align-items: center; gap: 7px;
+        padding: 9px 18px; border-radius: 8px;
+        font-size: 13px; font-weight: 600;
+        text-decoration: none; border: none; cursor: pointer;
+        transition: all 0.2s; white-space: nowrap;
+    }
+    .btn-primary   { background: var(--green-mid); color: white; }
+    .btn-primary:hover { background: var(--green-dark); color: white; }
+    .btn-secondary { background: var(--cream); border: 1px solid var(--cream-dark); color: var(--navy); }
+    .btn-secondary:hover { background: var(--cream-dark); }
+    .btn-danger    { background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA; }
+    .btn-danger:hover { background: #DC2626; color: white; }
+    .btn-sm   { padding: 6px 12px; font-size: 12px; }
+    .btn-icon { padding: 7px 10px; }
+
+    /* ── Table card ── */
+    .table-card {
+        background: var(--white);
+        border: 1px solid var(--cream-dark);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+    .table-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--cream-dark);
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .table-title { font-size: 15px; font-weight: 600; color: var(--navy); }
+    .table-count { font-size: 12px; color: var(--text-muted); }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+        background: var(--cream);
+        padding: 11px 16px; text-align: left;
+        font-size: 11px; font-weight: 600;
+        text-transform: uppercase; letter-spacing: 0.07em;
+        color: var(--text-muted);
+        border-bottom: 1px solid var(--cream-dark);
+    }
+
+    /* ── Sort ── */
+    thead th.sortable {
+        cursor: pointer; user-select: none;
+        position: relative; padding-right: 28px;
+        transition: background 0.15s, color 0.15s;
+    }
+    thead th.sortable:hover { background: #edf4e8; color: var(--navy); }
+    thead th.sortable::after {
+        content: '↕'; position: absolute;
+        right: 10px; top: 50%; transform: translateY(-50%);
+        font-size: 11px; color: #c5d0c5;
+    }
+    thead th.sortable.asc::after  { content: '↑'; color: var(--green-accent); }
+    thead th.sortable.desc::after { content: '↓'; color: var(--green-accent); }
+    thead th.sortable.asc,
+    thead th.sortable.desc { background: #edf4e8; color: var(--navy); }
+
+    tbody tr { transition: background 0.15s; }
+    tbody tr:hover { background: #FAFDF8; }
+    tbody td {
+        padding: 13px 16px; font-size: 14px;
+        border-bottom: 1px solid var(--cream-dark);
+        vertical-align: middle;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+
+    /* ── Badges situation ── */
+    .badge {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 4px 10px; border-radius: 20px;
+        font-size: 11px; font-weight: 600;
+    }
+    .badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+    .badge-actif   { background: #D1FAE5; color: #065F46; }
+    .badge-inactif { background: #FEF3C7; color: #B45309; }
+    .badge-expire  { background: #FEE2E2; color: #DC2626; }
+
+    /* ── ID chip ── */
+    .id-chip {
+        display: inline-block;
+        background: var(--cream-dark);
+        color: var(--navy);
+        border-radius: 6px;
+        padding: 2px 8px;
+        font-size: 12px; font-weight: 700;
+        font-family: 'DM Mono', monospace;
+    }
+
+    /* ── Actions ── */
+    .actions { display: flex; align-items: center; gap: 6px; }
+
+    /* ── Empty ── */
+    .empty { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+    .empty i { font-size: 40px; margin-bottom: 14px; opacity: 0.3; display: block; }
+
+    /* ── Flash ── */
+    .flash { padding: 12px 18px; border-radius: 8px; font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+    .flash-success { background: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0; }
+    .flash-danger  { background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="page">
+
+    {# ── Flash messages ── #}
+    {% for msg in app.flashes('success') %}
+        <div class="flash flash-success"><i class="fa fa-check-circle"></i> {{ msg }}</div>
+    {% endfor %}
+    {% for msg in app.flashes('danger') %}
+        <div class="flash flash-danger"><i class="fa fa-triangle-exclamation"></i> {{ msg }}</div>
+    {% endfor %}
+
+    {# ── Stats ── #}
+    {% set total    = abonnements|length %}
+    {% set actifs   = abonnements|filter(a => a.situation == 'actif')|length %}
+    {% set inactifs = abonnements|filter(a => a.situation == 'inactif')|length %}
+    {% set expires  = abonnements|filter(a => a.situation == 'expire')|length %}
+
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-icon" style="background:#EAF3E6;">
+                <i class="fa fa-file-contract" style="color:#2D5A27;"></i>
+            </div>
+            <div>
+                <div class="stat-val">{{ total }}</div>
+                <div class="stat-label">Total abonnements</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background:#D1FAE5;">
+                <i class="fa fa-circle-check" style="color:#065F46;"></i>
+            </div>
+            <div>
+                <div class="stat-val">{{ actifs }}</div>
+                <div class="stat-label">Actifs</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background:#FEF3C7;">
+                <i class="fa fa-circle-pause" style="color:#B45309;"></i>
+            </div>
+            <div>
+                <div class="stat-val">{{ inactifs }}</div>
+                <div class="stat-label">Inactifs</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon" style="background:#FEE2E2;">
+                <i class="fa fa-circle-xmark" style="color:#DC2626;"></i>
+            </div>
+            <div>
+                <div class="stat-val">{{ expires }}</div>
+                <div class="stat-label">Expirés</div>
+            </div>
+        </div>
+    </div>
+
+    {# ── Toolbar ── #}
+    <form method="GET" class="toolbar">
+        <div class="search-wrap">
+            <i class="fa fa-search"></i>
+            <input type="text" name="q" value="{{ search ?? '' }}"
+                   class="search-input" id="searchInput"
+                   placeholder="Rechercher par CIN, offre, situation…">
+        </div>
+        <select name="situation" class="filter-select" onchange="this.form.submit()">
+            <option value="">Toutes situations</option>
+            <option value="actif"   {% if (situation ?? '') == 'actif'   %}selected{% endif %}>Actif</option>
+            <option value="inactif" {% if (situation ?? '') == 'inactif' %}selected{% endif %}>Inactif</option>
+            <option value="expire"  {% if (situation ?? '') == 'expire'  %}selected{% endif %}>Expiré</option>
+        </select>
+        <button type="submit" class="btn btn-secondary"><i class="fa fa-filter"></i> Filtrer</button>
+        {% if (search ?? '') or (situation ?? '') %}
+            <a href="{{ path('admin_abonnements_index') }}" class="btn btn-secondary">
+                <i class="fa fa-xmark"></i> Réinitialiser
+            </a>
+        {% endif %}
+        <a href="{{ path('admin_abonnements_new') }}" class="btn btn-primary">
+            <i class="fa fa-plus"></i> Nouvel abonnement
+        </a>
+    </form>
+
+    {# ── Table ── #}
+    <div class="table-card">
+        <div class="table-header">
+            <div class="table-title">
+                <i class="fa fa-file-contract" style="color:var(--green-accent);margin-right:8px;"></i>
+                Liste des abonnements
+            </div>
+            <div class="table-count">{{ abonnements|length }} résultat(s)</div>
+        </div>
+
+        {% if abonnements|length > 0 %}
+        <table id="abonnTable">
+            <thead>
+                <tr>
+                    <th class="sortable" data-col="0">ID</th>
+                    <th class="sortable" data-col="1">CIN</th>
+                    <th class="sortable" data-col="2">ID Offre</th>
+                    <th class="sortable" data-col="3">Date inscription</th>
+                    <th class="sortable" data-col="4">Date expiration</th>
+                    <th class="sortable" data-col="5">Situation</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for abonnement in abonnements %}
+                <tr>
+                    <td><span class="id-chip">#{{ abonnement.idAbonn }}</span></td>
+                    <td style="font-family:'DM Mono',monospace; font-size:13px;">{{ abonnement.cin }}</td>
+                    <td>{{ abonnement.idOffre }}</td>
+                    <td style="font-size:13px; color:var(--text-muted);">{{ abonnement.dateInscription|date('d/m/Y') }}</td>
+                    <td style="font-size:13px; color:var(--text-muted);">{{ abonnement.dateExpiration|date('d/m/Y') }}</td>
+                    <td>
+                        <span class="badge badge-{{ abonnement.situation }}">
+                            {% if abonnement.situation == 'actif' %}
+                                <i class="fa fa-circle-check"></i>
+                            {% elseif abonnement.situation == 'inactif' %}
+                                <i class="fa fa-circle-pause"></i>
+                            {% else %}
+                                <i class="fa fa-circle-xmark"></i>
+                            {% endif %}
+                            {{ abonnement.situation|capitalize }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="actions">
+                            <a href="{{ path('admin_abonnements_show', {idAbonn: abonnement.idAbonn}) }}"
+                               class="btn btn-sm btn-secondary btn-icon" title="Voir">
+                                <i class="fa fa-eye"></i>
+                            </a>
+                            <a href="{{ path('admin_abonnements_edit', {idAbonn: abonnement.idAbonn}) }}"
+                               class="btn btn-sm btn-secondary btn-icon" title="Modifier">
+                                <i class="fa fa-pen"></i>
+                            </a>
+                            <form method="POST"
+                                  action="{{ path('admin_abonnements_delete', {idAbonn: abonnement.idAbonn}) }}"
+                                  onsubmit="return confirm('Supprimer l\'abonnement #{{ abonnement.idAbonn }} ?')"
+                                  style="margin:0">
+                                <input type="hidden" name="_token"
+                                       value="{{ csrf_token('delete' ~ abonnement.idAbonn) }}">
+                                <button type="submit" class="btn btn-sm btn-danger btn-icon" title="Supprimer">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <div class="empty">
+                <i class="fa fa-file-circle-xmark"></i>
+                <div style="font-size:15px; font-weight:600; color:var(--navy);">Aucun abonnement trouvé</div>
+                <div style="margin-top:6px; font-size:13px;">Modifiez vos filtres ou créez un abonnement</div>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<script>
+// ── Recherche live ──────────────────────────────────────
+document.getElementById('searchInput').addEventListener('input', function () {
+    const q = this.value.toLowerCase();
+    document.querySelectorAll('#abonnTable tbody tr').forEach(r => {
+        r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+});
+
+// ── Tri des colonnes ────────────────────────────────────
+(function () {
+    const table   = document.getElementById('abonnTable');
+    if (!table) return;
+    const headers = table.querySelectorAll('thead th.sortable');
+    let lastCol = -1, ascending = true;
+
+    function parseCell(td) {
+        const txt = td.textContent.trim();
+        const dateMatch = txt.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+        if (dateMatch) return parseInt(dateMatch[3] + dateMatch[2] + dateMatch[1]);
+        const num = parseFloat(txt.replace(/[^0-9.-]/g, ''));
+        return isNaN(num) ? txt.toLowerCase() : num;
+    }
+
+    headers.forEach(th => {
+        th.addEventListener('click', function () {
+            const col = parseInt(this.dataset.col);
+            ascending = (col === lastCol) ? !ascending : true;
+            lastCol   = col;
+
+            headers.forEach(h => h.classList.remove('asc', 'desc'));
+            this.classList.add(ascending ? 'asc' : 'desc');
+
+            const tbody = table.querySelector('tbody');
+            const rows  = Array.from(tbody.querySelectorAll('tr')).filter(r => r.cells.length > 1);
+            rows.sort((a, b) => {
+                const va = parseCell(a.cells[col]);
+                const vb = parseCell(b.cells[col]);
+                if (va < vb) return ascending ? -1 : 1;
+                if (va > vb) return ascending ?  1 : -1;
+                return 0;
+            });
+            rows.forEach(r => tbody.appendChild(r));
+        });
+    });
+})();
+</script>
+{% endblock %}
