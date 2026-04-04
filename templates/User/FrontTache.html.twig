@@ -1,0 +1,272 @@
+{% extends 'base_agriculteur.html.twig' %}
+{% block title %}Tâches - AgroFlow{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .front-wrapper { padding: 35px 40px; font-family: Arial, sans-serif; background: #F4F6F9; min-height: 100vh; }
+    .split-layout { display: grid; grid-template-columns: 320px 1fr; gap: 25px; align-items: start; }
+    .panel { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); overflow: hidden; }
+    .panel-header { padding: 18px 20px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+    .panel-title { font-size: 15px; font-weight: 700; color: #2C3E50; margin: 0; }
+    .panel-count { background: #EAF3DE; color: #3B6D11; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
+    .ouvrier-item { display: flex; align-items: center; gap: 12px; padding: 14px 20px; cursor: pointer; border-bottom: 1px solid #f8f8f8; transition: all 0.2s; border-left: 4px solid transparent; }
+    .ouvrier-item:last-child { border-bottom: none; }
+    .ouvrier-item:hover { background: #FAFDF8; border-left-color: #a8d5a2; }
+    .ouvrier-item.active { background: #EAF3DE; border-left-color: #2D5A27; }
+    .avatar { width: 42px; height: 42px; border-radius: 50%; background: #EAF3DE; color: #3B6D11; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; transition: all 0.2s; }
+    .ouvrier-item.active .avatar { background: #2D5A27; color: white; }
+    .ouvrier-info { flex: 1; min-width: 0; }
+    .ouvrier-name { font-weight: 600; color: #2C3E50; font-size: 14px; margin: 0 0 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ouvrier-email { font-size: 12px; color: #aaa; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ouvrier-badge { background: #f0f0f0; color: #888; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; flex-shrink: 0; transition: all 0.2s; }
+    .ouvrier-item.active .ouvrier-badge { background: #2D5A27; color: white; }
+    .tache-panel { min-height: 500px; }
+    .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; color: #ccc; text-align: center; }
+    .empty-state i { font-size: 50px; margin-bottom: 20px; }
+    .empty-state p { font-size: 15px; margin: 0; color: #bbb; }
+    .tache-card { padding: 18px 20px; border-bottom: 1px solid #f8f8f8; transition: background 0.2s; display: flex; align-items: flex-start; gap: 15px; }
+    .tache-card:last-child { border-bottom: none; }
+    .tache-card:hover { background: #FAFDF8; }
+    .tache-indicator { width: 4px; border-radius: 4px; flex-shrink: 0; align-self: stretch; min-height: 50px; }
+    .tache-content { flex: 1; min-width: 0; }
+    .tache-name { font-weight: 700; color: #2C3E50; font-size: 15px; margin: 0 0 5px; }
+    .tache-desc { font-size: 13px; color: #aaa; margin: 0 0 10px; line-height: 1.5; }
+    .tache-meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+    .badge-green  { background: #EAF3DE; color: #3B6D11; }
+    .badge-blue   { background: #E6F1FB; color: #185FA5; }
+    .badge-amber  { background: #FAEEDA; color: #854F0B; }
+    .badge-red    { background: #FCEBEB; color: #A32D2D; }
+    .badge-gray   { background: #f0f0f0; color: #666; }
+    .echeance-tag { font-size: 12px; color: #888; display: flex; align-items: center; gap: 4px; }
+    .echeance-tag.retard { color: #A32D2D; font-weight: 600; }
+    .loader { display: flex; align-items: center; justify-content: center; padding: 80px 20px; color: #aaa; font-size: 14px; gap: 10px; }
+    .ouvrier-header { padding: 18px 20px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; gap: 12px; background: #FAFDF8; }
+    .ouvrier-header-avatar { width: 44px; height: 44px; border-radius: 50%; background: #2D5A27; color: white; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; }
+    .ouvrier-search { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; }
+    .ouvrier-search input { width: 100%; padding: 9px 14px; border: 1.5px solid #eee; border-radius: 8px; font-size: 13px; outline: none; box-sizing: border-box; transition: border 0.3s; font-family: Arial, sans-serif; }
+    .ouvrier-search input:focus { border-color: #2D5A27; }
+    .tache-actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
+    .btn-action { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 13px; border: none; cursor: pointer; color: white; }
+    .btn-edit   { background: #3498db; }
+    .btn-edit:hover { background: #2176ae; }
+    .btn-delete { background: #e74c3c; }
+    .btn-delete:hover { background: #b03a2e; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div id="jsData"
+     data-new-tache-url="{{ path('app_tache_new') }}"
+     data-edit-tache-url="{{ path('app_tache_edit', {'idTache': 0}) }}"
+     data-delete-tache-url="{{ path('app_tache_delete', {'idTache': 0}) }}">
+</div>
+<div class="front-wrapper">
+
+    {# ── Header ── #}
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+        <div>
+            <p style="margin:0 0 4px; color:#999; font-size:13px;">
+                <i class="fa fa-home"></i> Front Office &rsaquo; <strong style="color:#2C3E50;">Tâches</strong>
+            </p>
+            <h2 style="margin:0; color:#2C3E50; font-size:24px;">Gestion des Tâches par Ouvrier</h2>
+        </div>
+    </div>
+
+    {# ── Layout 2 colonnes ── #}
+    <div class="split-layout">
+
+        {# ── Colonne gauche : liste ouvriers ── #}
+        <div class="panel">
+            <div class="panel-header">
+                <h3 class="panel-title">
+                    <i class="fa fa-users" style="color:#2D5A27; margin-right:6px;"></i> Ouvriers
+                </h3>
+                <span class="panel-count">{{ ouvriers|length }}</span>
+            </div>
+
+            <div class="ouvrier-search">
+                <input type="text" id="ouvrierSearch" placeholder="Rechercher un ouvrier...">
+            </div>
+
+            <div id="ouvrierList">
+                {% for ouvrier in ouvriers %}
+                <div class="ouvrier-item"
+                     data-cin="{{ ouvrier.cin }}"
+                     data-name="{{ ouvrier.nom }} {{ ouvrier.prenom }}"
+                     data-initials="{{ ouvrier.nom|first|upper }}{{ ouvrier.prenom ? ouvrier.prenom|first|upper : '' }}"
+                     data-search="{{ (ouvrier.nom ~ ' ' ~ ouvrier.prenom ~ ' ' ~ ouvrier.email)|lower }}"
+                     onclick="selectOuvrier(this)">
+                    <div class="avatar">
+                        {{ ouvrier.nom|first|upper }}{{ ouvrier.prenom ? ouvrier.prenom|first|upper : '' }}
+                    </div>
+                    <div class="ouvrier-info">
+                        <p class="ouvrier-name">{{ ouvrier.nom }} {{ ouvrier.prenom }}</p>
+                        <p class="ouvrier-email">{{ ouvrier.email }}</p>
+                    </div>
+                    <span class="ouvrier-badge" id="badge-{{ ouvrier.cin }}">—</span>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fa fa-user-times"></i>
+                    <p>Aucun ouvrier trouvé.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        {# ── Colonne droite : taches ── #}
+        <div class="panel tache-panel" id="tachePanel">
+            <div class="empty-state" id="emptyState">
+                <i class="fa fa-hand-o-left"></i>
+                <p>Sélectionnez un ouvrier<br>pour voir ses tâches</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+const newTacheUrl    = document.getElementById('jsData').dataset.newTacheUrl;
+const editTacheUrl   = document.getElementById('jsData').dataset.editTacheUrl;
+const deleteTacheUrl = document.getElementById('jsData').dataset.deleteTacheUrl;
+
+let currentCin = null;
+
+function selectOuvrier(el) {
+    document.querySelectorAll('.ouvrier-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+    currentCin = el.dataset.cin;
+    loadTaches(el.dataset.cin, el.dataset.name, el.dataset.initials);
+}
+
+function loadTaches(cin, name, initials) {
+    const panel = document.getElementById('tachePanel');
+
+    panel.innerHTML = `
+        <div class="loader">
+            <i class="fa fa-spinner fa-spin"></i> Chargement des tâches...
+        </div>`;
+
+    fetch(`/agriculteur/tache/front/agriculteur/${cin}`)
+        .then(res => res.json())
+        .then(taches => {
+            const badge = document.getElementById(`badge-${cin}`);
+            if (badge) badge.textContent = taches.length;
+
+            let html = `
+                <div class="ouvrier-header">
+                    <div class="ouvrier-header-avatar">${initials}</div>
+                    <div style="flex:1;">
+                        <p style="margin:0; font-weight:700; color:#2C3E50; font-size:15px;">${name}</p>
+                        <p style="margin:0; font-size:13px; color:#888;">
+                            ${taches.length} tâche${taches.length > 1 ? 's' : ''} assignée${taches.length > 1 ? 's' : ''}
+                        </p>
+                    </div>
+                    <a href="${newTacheUrl}?assignee=${cin}"
+                       style="width:36px; height:36px; background:#2D5A27; color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:20px; font-weight:700; flex-shrink:0; transition:background 0.2s;"
+                       title="Ajouter une tâche à ${name}"
+                       onmouseover="this.style.background='#1e3d1a'"
+                       onmouseout="this.style.background='#2D5A27'">+</a>
+                </div>`;
+
+            if (taches.length === 0) {
+                html += `
+                    <div class="empty-state">
+                        <i class="fa fa-check-circle" style="color:#EAF3DE;"></i>
+                        <p>Aucune tâche assignée à cet ouvrier.</p>
+                        <a href="${newTacheUrl}?assignee=${cin}"
+                           style="margin-top:16px; background:#2D5A27; color:white; padding:10px 20px; border-radius:8px; text-decoration:none; font-size:14px; font-weight:600; display:inline-flex; align-items:center; gap:8px;">
+                            <i class="fa fa-plus"></i> Ajouter une tâche
+                        </a>
+                    </div>`;
+            } else {
+                taches.forEach(t => {
+                    const etatBadge      = getEtatBadge(t.etat);
+                    const prioriteBadge  = getPrioriteBadge(t.priorite);
+                    const indicatorColor = getIndicatorColor(t.priorite);
+                    const echeanceHtml   = t.echeance
+                        ? `<span class="echeance-tag ${t.enRetard ? 'retard' : ''}">
+                               <i class="fa fa-${t.enRetard ? 'exclamation-triangle' : 'calendar'}"></i>
+                               ${t.echeance}
+                           </span>`
+                        : '';
+
+                    const editUrl   = editTacheUrl.replace('/0/', '/' + t.id + '/') + '?assignee=' + cin;
+                    const deleteUrl = deleteTacheUrl.replace('/0/', '/' + t.id + '/');
+
+                    html += `
+                        <div class="tache-card">
+                            <div class="tache-indicator" style="background:${indicatorColor};"></div>
+                            <div class="tache-content">
+                                <p class="tache-name">${t.nom}</p>
+                                ${t.description
+                                    ? `<p class="tache-desc">${t.description.substring(0,80)}${t.description.length > 80 ? '...' : ''}</p>`
+                                    : ''}
+                                <div class="tache-meta">
+                                    ${etatBadge}
+                                    ${prioriteBadge}
+                                    ${echeanceHtml}
+                                </div>
+                            </div>
+                            <div class="tache-actions">
+                                <a href="${editUrl}" class="btn-action btn-edit" title="Modifier">
+                                    <i class="fa fa-pencil"></i>
+                                </a>
+                                <form method="post" action="${deleteUrl}" onsubmit="return confirm('Supprimer cette tâche ?')" style="margin:0;">
+                                    <input type="hidden" name="_token" value="${t.csrfToken}">
+                                    <button type="submit" class="btn-action btn-delete" title="Supprimer">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>`;
+                });
+            }
+
+            panel.innerHTML = html;
+        })
+        .catch(() => {
+            panel.innerHTML = `
+                <div class="empty-state">
+                    <i class="fa fa-exclamation-triangle" style="color:#FCEBEB;"></i>
+                    <p>Erreur lors du chargement des tâches.</p>
+                </div>`;
+        });
+}
+
+function getEtatBadge(etat) {
+    const map = {
+        'terminée': ['badge-green', 'fa-check',   'Terminée'],
+        'en cours': ['badge-blue',  'fa-spinner', 'En cours'],
+        'annulée':  ['badge-red',   'fa-times',   'Annulée'],
+        'à faire':  ['badge-gray',  'fa-clock-o', 'À faire'],
+    };
+    const [cls, icon, label] = map[etat] || ['badge-gray', 'fa-question', etat ?? '—'];
+    return `<span class="badge ${cls}"><i class="fa ${icon}"></i> ${label}</span>`;
+}
+
+function getPrioriteBadge(priorite) {
+    const map = {
+        'haute':   ['badge-red',   'fa-arrow-up',   'Haute'],
+        'moyenne': ['badge-amber', 'fa-minus',      'Moyenne'],
+        'basse':   ['badge-blue',  'fa-arrow-down', 'Basse'],
+    };
+    const [cls, icon, label] = map[priorite] || ['badge-gray', 'fa-question', priorite ?? '—'];
+    return `<span class="badge ${cls}"><i class="fa ${icon}"></i> ${label}</span>`;
+}
+
+function getIndicatorColor(priorite) {
+    return { 'haute': '#e74c3c', 'moyenne': '#f39c12', 'basse': '#3498db' }[priorite] || '#ddd';
+}
+
+document.getElementById('ouvrierSearch').addEventListener('input', function () {
+    const q = this.value.toLowerCase().trim();
+    document.querySelectorAll('.ouvrier-item').forEach(item => {
+        item.style.display = item.dataset.search.includes(q) ? '' : 'none';
+    });
+});
+</script>
+{% endblock %}

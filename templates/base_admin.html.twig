@@ -311,16 +311,16 @@
                     <i class="fa fa-chevron-right nav-arrow"></i>
                 </div>
                 <ul class="nav-sub">
-                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_users' %}active{% endif %}">
+                    <li><a href="{{ path('admin_users_list') }}" class="{% if app.request.get('_route') == 'admin_users' %}active{% endif %}">
                         <span class="sub-dot"></span> Utilisateurs
                     </a></li>
-                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_offres' %}active{% endif %}">
+                    <li><a href="{{ path('app_offre_list') }}" class="{% if app.request.get('_route') == 'admin_offres' %}active{% endif %}">
                         <span class="sub-dot"></span> Offres
                     </a></li>
-                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_abonnements' %}active{% endif %}">
+                    <li><a href="{{ path('admin_abonnements_index') }}" class="{% if app.request.get('_route') == 'admin_abonnements' %}active{% endif %}">
                         <span class="sub-dot"></span> Abonnements
                     </a></li>
-                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_taches' %}active{% endif %}">
+                    <li><a href="{{ path('app_tache_index') }}" class="{% if app.request.get('_route') == 'admin_taches' %}active{% endif %}">
                         <span class="sub-dot"></span> Tâches
                     </a></li>
                 </ul>
@@ -419,8 +419,9 @@
         </nav>
 
         <!-- Footer -->
+         <!-- ═══════ SIDEBAR FOOTER (remplace l'ancien sidebar-footer) ═══════ -->
         <div class="sidebar-footer">
-            <div class="sidebar-user">
+            <div class="sidebar-user" id="sidebarUserBtn" onclick="toggleUserPanel()" title="Mon compte">
                 <div class="sidebar-avatar">
                     {{ app.user ? (app.user.prenom|first|upper ~ app.user.nom|first|upper) : 'AD' }}
                 </div>
@@ -430,11 +431,204 @@
                     </div>
                     <div class="sidebar-user-role">Administrateur</div>
                 </div>
-                <a href="{{ path('app_logout') }}" class="sidebar-logout" title="Déconnexion">
-                    <i class="fa fa-arrow-right-from-bracket"></i>
-                </a>
+                <i class="fa fa-chevron-up" id="userChevron"
+                   style="font-size:10px; color:rgba(255,255,255,0.35); transition:transform 0.25s;"></i>
+            </div>
+
+            {# ── Dropdown infos compte ── #}
+            <div id="userPanel" style="
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.35s ease;
+                margin-top: 0;
+            ">
+                <div style="
+                    background: rgba(0,0,0,0.25);
+                    border-radius: 10px;
+                    margin-top: 10px;
+                    overflow: hidden;
+                ">
+                    {# Avatar + nom centré #}
+                    <div style="
+                        padding: 18px 16px 14px;
+                        text-align: center;
+                        border-bottom: 1px solid rgba(255,255,255,0.07);
+                    ">
+                        <div style="
+                            width: 52px; height: 52px; border-radius: 14px;
+                            background: linear-gradient(135deg, #4A8C3F, #2D5A27);
+                            display: flex; align-items: center; justify-content: center;
+                            font-size: 18px; font-weight: 700; color: white;
+                            margin: 0 auto 10px;
+                        ">
+                            {{ app.user ? (app.user.prenom|first|upper ~ app.user.nom|first|upper) : 'AD' }}
+                        </div>
+                        <div style="font-size: 14px; font-weight: 700; color: #fff;">
+                            {{ app.user ? (app.user.prenom ~ ' ' ~ app.user.nom) : '—' }}
+                        </div>
+                        <div style="
+                            display: inline-flex; align-items: center; gap: 5px;
+                            background: rgba(74,140,63,0.25); border: 1px solid rgba(74,140,63,0.35);
+                            color: #C8E6C0; font-size: 11px; font-weight: 600;
+                            padding: 3px 10px; border-radius: 20px; margin-top: 6px;
+                        ">
+                            <span style="width:5px;height:5px;border-radius:50%;background:#6FE065;display:inline-block;"></span>
+                            Administrateur
+                        </div>
+                    </div>
+
+                    {# Infos #}
+                    <div style="padding: 10px 0;">
+
+                        {% if app.user and app.user.email %}
+                        <div style="
+                            display: flex; align-items: center; gap: 10px;
+                            padding: 9px 16px;
+                            border-bottom: 1px solid rgba(255,255,255,0.05);
+                        ">
+                            <div style="
+                                width: 28px; height: 28px; border-radius: 8px;
+                                background: rgba(255,255,255,0.07);
+                                display: flex; align-items: center; justify-content: center;
+                                flex-shrink: 0;
+                            ">
+                                <i class="fa fa-envelope" style="font-size:11px; color:rgba(255,255,255,0.5);"></i>
+                            </div>
+                            <div>
+                                <div style="font-size:10px; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.06em;">Email</div>
+                                <div style="font-size:12px; color:rgba(255,255,255,0.75); margin-top:1px; word-break:break-all;">
+                                    {{ app.user.email }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if app.user and app.user.cin %}
+                        <div style="
+                            display: flex; align-items: center; gap: 10px;
+                            padding: 9px 16px;
+                            border-bottom: 1px solid rgba(255,255,255,0.05);
+                        ">
+                            <div style="
+                                width: 28px; height: 28px; border-radius: 8px;
+                                background: rgba(255,255,255,0.07);
+                                display: flex; align-items: center; justify-content: center;
+                                flex-shrink: 0;
+                            ">
+                                <i class="fa fa-id-card" style="font-size:11px; color:rgba(255,255,255,0.5);"></i>
+                            </div>
+                            <div>
+                                <div style="font-size:10px; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.06em;">CIN</div>
+                                <div style="font-size:12px; color:rgba(255,255,255,0.75); margin-top:1px; font-family:'DM Mono',monospace;">
+                                    {{ app.user.cin }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if app.user and app.user.tel %}
+                        <div style="
+                            display: flex; align-items: center; gap: 10px;
+                            padding: 9px 16px;
+                            border-bottom: 1px solid rgba(255,255,255,0.05);
+                        ">
+                            <div style="
+                                width: 28px; height: 28px; border-radius: 8px;
+                                background: rgba(255,255,255,0.07);
+                                display: flex; align-items: center; justify-content: center;
+                                flex-shrink: 0;
+                            ">
+                                <i class="fa fa-phone" style="font-size:11px; color:rgba(255,255,255,0.5);"></i>
+                            </div>
+                            <div>
+                                <div style="font-size:10px; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.06em;">Téléphone</div>
+                                <div style="font-size:12px; color:rgba(255,255,255,0.75); margin-top:1px;">
+                                    {{ app.user.tel }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if app.user and app.user.ville %}
+                        <div style="
+                            display: flex; align-items: center; gap: 10px;
+                            padding: 9px 16px;
+                            border-bottom: 1px solid rgba(255,255,255,0.05);
+                        ">
+                            <div style="
+                                width: 28px; height: 28px; border-radius: 8px;
+                                background: rgba(255,255,255,0.07);
+                                display: flex; align-items: center; justify-content: center;
+                                flex-shrink: 0;
+                            ">
+                                <i class="fa fa-location-dot" style="font-size:11px; color:rgba(255,255,255,0.5);"></i>
+                            </div>
+                            <div>
+                                <div style="font-size:10px; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.06em;">Ville</div>
+                                <div style="font-size:12px; color:rgba(255,255,255,0.75); margin-top:1px;">
+                                    {{ app.user.ville }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if app.user and app.user.dateCreationcpt %}
+                        <div style="
+                            display: flex; align-items: center; gap: 10px;
+                            padding: 9px 16px;
+                        ">
+                            <div style="
+                                width: 28px; height: 28px; border-radius: 8px;
+                                background: rgba(255,255,255,0.07);
+                                display: flex; align-items: center; justify-content: center;
+                                flex-shrink: 0;
+                            ">
+                                <i class="fa fa-calendar" style="font-size:11px; color:rgba(255,255,255,0.5);"></i>
+                            </div>
+                            <div>
+                                <div style="font-size:10px; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.06em;">Membre depuis</div>
+                                <div style="font-size:12px; color:rgba(255,255,255,0.75); margin-top:1px;">
+                                    {{ app.user.dateCreationcpt|date('d/m/Y') }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                    </div>
+
+                    {# Déconnexion #}
+                    <div style="padding: 10px 12px; border-top: 1px solid rgba(255,255,255,0.07);">
+                        <a href="{{ path('app_logout') }}" style="
+                            display: flex; align-items: center; justify-content: center; gap: 8px;
+                            padding: 10px; border-radius: 8px;
+                            background: rgba(220,60,60,0.1); border: 1px solid rgba(220,60,60,0.2);
+                            color: #ff8080; text-decoration: none;
+                            font-size: 13px; font-weight: 600;
+                            transition: all 0.2s;
+                        " onmouseover="this.style.background='rgba(220,60,60,0.22)'"
+                           onmouseout="this.style.background='rgba(220,60,60,0.1)'">
+                            <i class="fa fa-arrow-right-from-bracket"></i>
+                            Déconnexion
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
+
+        {# Script toggle panel #}
+        <script>
+            var _userPanelOpen = false;
+            function toggleUserPanel() {
+                _userPanelOpen = !_userPanelOpen;
+                const panel   = document.getElementById('userPanel');
+                const chevron = document.getElementById('userChevron');
+                const btn     = document.getElementById('sidebarUserBtn');
+                panel.style.maxHeight   = _userPanelOpen ? '500px' : '0';
+                chevron.style.transform = _userPanelOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+                btn.style.background    = _userPanelOpen ? 'rgba(255,255,255,0.06)' : '';
+                btn.style.borderRadius  = _userPanelOpen ? '10px' : '';
+            }
+        </script>
 
     </aside>
 

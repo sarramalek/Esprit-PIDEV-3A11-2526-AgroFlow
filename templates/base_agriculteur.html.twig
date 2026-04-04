@@ -262,12 +262,13 @@
             </div>
 
             {# Tâches #}
-            <div class="nav-item">
-                <a href="{{ path('agri_taches') }}"
-                   class="nav-link {% if app.request.get('_route') == 'agri_taches' %}active{% endif %}">
-                    <i class="fa fa-list-check"></i> Tâches
-                </a>
-            </div>
+            {# Tâches #}
+<div class="nav-item">
+    <a href="{{ path('app_tache_front') }}"
+       class="nav-link {% if app.request.get('_route') in ['app_tache_front', 'agri_taches'] %}active{% endif %}">
+        <i class="fa fa-list-check"></i> Tâches
+    </a>
+</div>
 
         </nav>
 

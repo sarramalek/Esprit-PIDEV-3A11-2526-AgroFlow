@@ -1,0 +1,498 @@
+{% extends 'base_admin.html.twig' %}
+{% block title %}Tâches - AgroFlow{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .page-wrapper { padding: 35px 40px; font-family: Arial, sans-serif; background: #F4F6F9; min-height: 100vh; }
+
+    /* ── Header ── */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+    .btn-new {
+        background: #2D5A27;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: background 0.3s;
+    }
+    .btn-new:hover { background: #1e3d1a; }
+
+    /* ── Stats ── */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0,1fr));
+        gap: 16px;
+        margin-bottom: 35px;
+    }
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        border-left: 5px solid;
+    }
+    .stat-icon {
+        width: 48px; height: 48px;
+        border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+    .stat-label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: .05em; margin: 0 0 4px; }
+    .stat-value { font-size: 26px; font-weight: 700; margin: 0; }
+
+    /* ── Search ── */
+    .search-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 30px;
+    }
+    .search-box {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: white;
+        padding: 14px 24px;
+        border-radius: 50px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        width: 100%;
+        max-width: 600px;
+        border: 2px solid transparent;
+        transition: border 0.3s, box-shadow 0.3s;
+    }
+    .search-box:focus-within {
+        border-color: #2D5A27;
+        box-shadow: 0 4px 20px rgba(45,90,39,0.15);
+    }
+    .search-icon { color: #aaa; font-size: 16px; flex-shrink: 0; }
+    .search-input {
+        flex: 1;
+        border: none;
+        outline: none;
+        font-size: 15px;
+        color: #333;
+        background: transparent;
+        font-family: Arial, sans-serif;
+    }
+    .search-input::placeholder { color: #bbb; }
+    .search-clear {
+        color: #bbb;
+        text-decoration: none;
+        font-size: 13px;
+        white-space: nowrap;
+        transition: color 0.2s;
+        flex-shrink: 0;
+    }
+    .search-clear:hover { color: #e74c3c; }
+
+    /* ── Table card ── */
+    .table-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        overflow: hidden;
+    }
+    .table-card-header {
+        padding: 20px 25px;
+        border-bottom: 1px solid #f0f0f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .table-card-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #2C3E50;
+        margin: 0;
+    }
+    .result-count {
+        font-size: 13px;
+        color: #999;
+        background: #f5f5f5;
+        padding: 4px 12px;
+        border-radius: 20px;
+    }
+
+    /* ── Table ── */
+    .tache-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .tache-table th {
+        padding: 14px 16px;
+        background: #fafafa;
+        color: #999;
+        font-weight: 600;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        border-bottom: 1px solid #f0f0f0;
+        white-space: nowrap;
+    }
+    .tache-table td { padding: 16px; border-bottom: 1px solid #f8f8f8; vertical-align: middle; }
+    .tache-table tr:last-child td { border-bottom: none; }
+    .tache-table tbody tr:hover td { background: #FAFDF8; }
+
+    .th-link {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        text-decoration: none;
+        color: #999;
+        font-weight: 600;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        transition: color 0.2s;
+    }
+    .th-link:hover { color: #2D5A27; }
+    .th-link.active { color: #2D5A27; }
+
+    /* ── Badges ── */
+    .badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; padding: 4px 12px; border-radius: 20px; font-weight: 600; }
+    .badge-green  { background: #EAF3DE; color: #3B6D11; }
+    .badge-blue   { background: #E6F1FB; color: #185FA5; }
+    .badge-amber  { background: #FAEEDA; color: #854F0B; }
+    .badge-red    { background: #FCEBEB; color: #A32D2D; }
+    .badge-gray   { background: #f0f0f0; color: #666; }
+
+    /* ── Avatar ── */
+    .avatar {
+        width: 32px; height: 32px;
+        border-radius: 50%;
+        background: #EAF3DE;
+        color: #3B6D11;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 11px; font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    /* ── Actions ── */
+    .action-btn {
+        width: 32px; height: 32px;
+        border-radius: 8px;
+        display: inline-flex; align-items: center; justify-content: center;
+        text-decoration: none;
+        font-size: 14px;
+        transition: all 0.2s;
+        border: none;
+        cursor: pointer;
+        background: #f5f5f5;
+    }
+    .action-btn:hover { transform: translateY(-1px); }
+    .action-view  { color: #7f8c8d; } .action-view:hover  { background: #ecf0f1; color: #2C3E50; }
+    .action-edit  { color: #3498db; } .action-edit:hover  { background: #E6F1FB; color: #185FA5; }
+    .action-delete{ color: #e74c3c; } .action-delete:hover{ background: #FCEBEB; color: #A32D2D; }
+
+    /* ── Flash ── */
+    .flash-success {
+        background: #EAF3DE;
+        color: #3B6D11;
+        padding: 14px 20px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        border-left: 4px solid #3B6D11;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* ── Empty state ── */
+    .empty-state {
+        padding: 60px 20px;
+        text-align: center;
+        color: #bbb;
+    }
+    .empty-state i { font-size: 48px; margin-bottom: 15px; display: block; }
+    .empty-state p { font-size: 15px; margin: 0; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="page-wrapper">
+
+    {# ── Header ── #}
+    <div class="page-header">
+        <div>
+            <p style="margin:0 0 4px; color:#999; font-size:13px;">
+                <i class="fa fa-home"></i> Gestion &rsaquo; <strong style="color:#2C3E50;">Tâches</strong>
+            </p>
+            <h2 style="margin:0; color:#2C3E50; font-size:24px;">Liste des Tâches</h2>
+        </div>
+        <a href="{{ path('app_tache_new') }}" class="btn-new">
+            <i class="fa fa-plus"></i> Nouvelle tâche
+        </a>
+    </div>
+
+    {# ── Flash ── #}
+    {% for message in app.flashes('success') %}
+        <div class="flash-success">
+            <i class="fa fa-check-circle" style="font-size:18px;"></i>
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    {# ── Stats ── #}
+    <div class="stats-grid">
+        <div class="stat-card" style="border-color:#2C3E50;">
+            <div class="stat-icon" style="background:#ECF0F1;">
+                <i class="fa fa-tasks" style="color:#2C3E50;"></i>
+            </div>
+            <div>
+                <p class="stat-label">Total</p>
+                <p class="stat-value" style="color:#2C3E50;">{{ stats.total }}</p>
+            </div>
+        </div>
+        <div class="stat-card" style="border-color:#185FA5;">
+            <div class="stat-icon" style="background:#E6F1FB;">
+                <i class="fa fa-spinner" style="color:#185FA5;"></i>
+            </div>
+            <div>
+                <p class="stat-label">En cours</p>
+                <p class="stat-value" style="color:#185FA5;">{{ stats.enCours }}</p>
+            </div>
+        </div>
+        <div class="stat-card" style="border-color:#3B6D11;">
+            <div class="stat-icon" style="background:#EAF3DE;">
+                <i class="fa fa-check-circle" style="color:#3B6D11;"></i>
+            </div>
+            <div>
+                <p class="stat-label">Terminées</p>
+                <p class="stat-value" style="color:#3B6D11;">{{ stats.terminee }}</p>
+            </div>
+        </div>
+        <div class="stat-card" style="border-color:#A32D2D;">
+            <div class="stat-icon" style="background:#FCEBEB;">
+                <i class="fa fa-exclamation-circle" style="color:#A32D2D;"></i>
+            </div>
+            <div>
+                <p class="stat-label">En retard</p>
+                <p class="stat-value" style="color:#A32D2D;">{{ stats.enRetard }}</p>
+            </div>
+        </div>
+    </div>
+
+    {# ── Recherche centrée ── #}
+    <div class="search-wrapper">
+        <div class="search-box">
+            <i class="fa fa-search search-icon"></i>
+            <input type="text"
+                   id="searchInput"
+                   class="search-input"
+                   placeholder="Rechercher par nom, état, priorité, assigné..."
+                   value="{{ searchTerm }}">
+            {% if searchTerm %}
+                <a href="{{ path('app_tache_index') }}" class="search-clear">
+                    <i class="fa fa-times-circle"></i> Effacer
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    {# ── Table ── #}
+    <div class="table-card">
+        <div class="table-card-header">
+            <h3 class="table-card-title">
+                <i class="fa fa-list" style="color:#2D5A27; margin-right:8px;"></i>
+                Tâches
+            </h3>
+            <span class="result-count" id="resultCount">{{ taches|length }} tâche(s)</span>
+        </div>
+
+        <div style="overflow-x:auto; padding: 0 10px 10px;">
+        <table class="tache-table" id="tacheTable">
+            <thead>
+                <tr>
+                    {% set nextDir = currentDir == 'ASC' ? 'DESC' : 'ASC' %}
+
+                    <th>
+                        <a href="{{ path('app_tache_index', {q: searchTerm, sort: 'idTache', direction: currentSort == 'idTache' ? nextDir : 'ASC'}) }}"
+                           class="th-link {{ currentSort == 'idTache' ? 'active' : '' }}">
+                            # {% if currentSort == 'idTache' %}<i class="fa fa-sort-{{ currentDir == 'ASC' ? 'up' : 'down' }}"></i>{% else %}<i class="fa fa-sort" style="opacity:.25;"></i>{% endif %}
+                        </a>
+                    </th>
+                    <th>
+                        <a href="{{ path('app_tache_index', {q: searchTerm, sort: 'nomTache', direction: currentSort == 'nomTache' ? nextDir : 'ASC'}) }}"
+                           class="th-link {{ currentSort == 'nomTache' ? 'active' : '' }}">
+                            Nom {% if currentSort == 'nomTache' %}<i class="fa fa-sort-{{ currentDir == 'ASC' ? 'up' : 'down' }}"></i>{% else %}<i class="fa fa-sort" style="opacity:.25;"></i>{% endif %}
+                        </a>
+                    </th>
+                    <th><span class="th-link">Assigné à</span></th>
+                    <th>
+                        <a href="{{ path('app_tache_index', {q: searchTerm, sort: 'etat', direction: currentSort == 'etat' ? nextDir : 'ASC'}) }}"
+                           class="th-link {{ currentSort == 'etat' ? 'active' : '' }}">
+                            État {% if currentSort == 'etat' %}<i class="fa fa-sort-{{ currentDir == 'ASC' ? 'up' : 'down' }}"></i>{% else %}<i class="fa fa-sort" style="opacity:.25;"></i>{% endif %}
+                        </a>
+                    </th>
+                    <th>
+                        <a href="{{ path('app_tache_index', {q: searchTerm, sort: 'priorite', direction: currentSort == 'priorite' ? nextDir : 'ASC'}) }}"
+                           class="th-link {{ currentSort == 'priorite' ? 'active' : '' }}">
+                            Priorité {% if currentSort == 'priorite' %}<i class="fa fa-sort-{{ currentDir == 'ASC' ? 'up' : 'down' }}"></i>{% else %}<i class="fa fa-sort" style="opacity:.25;"></i>{% endif %}
+                        </a>
+                    </th>
+                    <th>
+                        <a href="{{ path('app_tache_index', {q: searchTerm, sort: 'dateEcheancee', direction: currentSort == 'dateEcheancee' ? nextDir : 'ASC'}) }}"
+                           class="th-link {{ currentSort == 'dateEcheancee' ? 'active' : '' }}">
+                            Échéance {% if currentSort == 'dateEcheancee' %}<i class="fa fa-sort-{{ currentDir == 'ASC' ? 'up' : 'down' }}"></i>{% else %}<i class="fa fa-sort" style="opacity:.25;"></i>{% endif %}
+                        </a>
+                    </th>
+                    <th style="text-align:center;">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="tacheBody">
+                {% for tache in taches %}
+                <tr class="tache-row"
+                    data-search="{{ tache.nomTache|lower }} {{ tache.etat|lower }} {{ tache.priorite|lower }} {{ tache.assignee ? (tache.assignee.nom ~ ' ' ~ tache.assignee.prenom)|lower : '' }} {{ tache.description|lower }}">
+
+                    <td style="color:#bbb; font-size:13px;">#{{ tache.idTache }}</td>
+
+                    <td>
+                        <span style="font-weight:600; color:#2C3E50;">{{ tache.nomTache }}</span>
+                        {% if tache.description %}
+                            <p style="margin:4px 0 0; font-size:12px; color:#bbb; line-height:1.4;">
+                                {{ tache.description|slice(0,55) }}{% if tache.description|length > 55 %}...{% endif %}
+                            </p>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if tache.assignee %}
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <div class="avatar">
+                                    {{ tache.assignee.nom|first|upper }}{{ tache.assignee.prenom ? tache.assignee.prenom|first|upper : '' }}
+                                </div>
+                                <div>
+                                    <p style="margin:0; font-size:13px; font-weight:600; color:#2C3E50;">{{ tache.assignee.nom }} {{ tache.assignee.prenom }}</p>
+                                </div>
+                            </div>
+                        {% else %}
+                            <span style="color:#ddd;">—</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if tache.etat == 'terminée' %}
+                            <span class="badge badge-green"><i class="fa fa-check"></i> Terminée</span>
+                        {% elseif tache.etat == 'en cours' %}
+                            <span class="badge badge-blue"><i class="fa fa-spinner"></i> En cours</span>
+                        {% elseif tache.etat == 'annulée' %}
+                            <span class="badge badge-red"><i class="fa fa-times"></i> Annulée</span>
+                        {% else %}
+                            <span class="badge badge-gray"><i class="fa fa-clock-o"></i> À faire</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if tache.priorite == 'haute' %}
+                            <span class="badge badge-red"><i class="fa fa-arrow-up"></i> Haute</span>
+                        {% elseif tache.priorite == 'moyenne' %}
+                            <span class="badge badge-amber"><i class="fa fa-minus"></i> Moyenne</span>
+                        {% else %}
+                            <span class="badge badge-blue"><i class="fa fa-arrow-down"></i> Basse</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if tache.dateEcheancee %}
+                            {% if tache.dateEcheancee < date() and tache.etat != 'terminée' %}
+                                <span style="color:#A32D2D; font-weight:600; font-size:13px;">
+                                    <i class="fa fa-exclamation-triangle"></i>
+                                    {{ tache.dateEcheancee|date('d/m/Y') }}
+                                </span>
+                            {% else %}
+                                <span style="color:#555; font-size:13px;">{{ tache.dateEcheancee|date('d/m/Y') }}</span>
+                            {% endif %}
+                        {% else %}
+                            <span style="color:#ddd;">—</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <div style="display:flex; justify-content:center; gap:6px;">
+                            <a href="{{ path('app_tache_show', {idTache: tache.idTache}) }}"
+                               class="action-btn action-view" title="Voir">
+                                <i class="fa fa-eye"></i>
+                            </a>
+                            <a href="{{ path('app_tache_edit', {idTache: tache.idTache}) }}"
+                               class="action-btn action-edit" title="Modifier">
+                                <i class="fa fa-edit"></i>
+                            </a>
+                            <form method="post" action="{{ path('app_tache_delete', {idTache: tache.idTache}) }}"
+                                  style="display:inline;"
+                                  onsubmit="return confirm('Supprimer cette tâche ?')">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ tache.idTache) }}">
+                                <button type="submit" class="action-btn action-delete" title="Supprimer">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7">
+                        <div class="empty-state">
+                            <i class="fa fa-inbox"></i>
+                            <p>Aucune tâche trouvée.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+const searchInput = document.getElementById('searchInput');
+const tacheBody   = document.getElementById('tacheBody');
+const resultCount = document.getElementById('resultCount');
+
+searchInput.addEventListener('input', function () {
+    const query = this.value.toLowerCase().trim();
+    const rows  = tacheBody.querySelectorAll('tr.tache-row');
+    let visible = 0;
+
+    rows.forEach(row => {
+        const data = row.getAttribute('data-search') || '';
+        const show = query === '' || data.includes(query);
+        row.style.display = show ? '' : 'none';
+        if (show) visible++;
+    });
+
+    resultCount.textContent = visible + ' tâche(s)';
+
+    let noResult = document.getElementById('dynamicEmpty');
+    if (visible === 0) {
+        if (!noResult) {
+            noResult = document.createElement('tr');
+            noResult.id = 'dynamicEmpty';
+            noResult.innerHTML = `
+                <td colspan="7">
+                    <div style="padding:60px 20px; text-align:center; color:#bbb;">
+                        <i class="fa fa-search" style="font-size:40px; margin-bottom:15px; display:block;"></i>
+                        <p style="font-size:15px; margin:0;">Aucun résultat pour "<strong style="color:#555;">${searchInput.value}</strong>"</p>
+                    </div>
+                </td>`;
+            tacheBody.appendChild(noResult);
+        }
+    } else {
+        if (noResult) noResult.remove();
+    }
+});
+</script>
+{% endblock %}
