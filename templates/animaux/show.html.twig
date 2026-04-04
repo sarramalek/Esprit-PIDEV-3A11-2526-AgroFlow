@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Animaux{% endblock %}
+
+{% block body %}
+    <h1>Animaux</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ animaux.id }}</td>
+            </tr>
+            <tr>
+                <th>Nom</th>
+                <td>{{ animaux.nom }}</td>
+            </tr>
+            <tr>
+                <th>Espece</th>
+                <td>{{ animaux.espece }}</td>
+            </tr>
+            
+            <tr>
+                <th>Date_naissance</th>
+                <td>{{ animaux.dateNaissance ? animaux.dateNaissance|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Sexe</th>
+                <td>{{ animaux.sexe }}</td>
+            </tr>
+            <tr>
+                <th>Poids</th>
+                <td>{{ animaux.poids }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_animaux_index') }}">back to list</a>
+
+    <a href="{{ path('app_animaux_edit', {'id': animaux.id}) }}">edit</a>
+
+    {{ include('animaux/_delete_form.html.twig') }}
+{% endblock %}
