@@ -1,0 +1,235 @@
+{% extends 'base_admin.html.twig' %}
+
+{% block title %}Nouveau Produit - AgroFlow{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* ─── Variables de Design Moderne (SaaS Look) ─── */
+        :root {
+            --primary: #2D5A27; /* Vert AgroFlow */
+            --primary-light: #EAF3DE;
+            --text-dark: #1A2A19;
+            --text-gray: #6C757D;
+            --bg-light: #F8F9FA;
+            --white: #FFFFFF;
+            --border: #EEE;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+            --shadow-md: 0 10px 30px rgba(0,0,0,0.08);
+            --transition: all 0.25s ease;
+        }
+
+        /* ─── Structure de la Carte Ultra-Épurée ─── */
+        .agro-form-container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        .agro-form-body {
+            padding: 40px;
+        }
+
+        /* ─── Grille du formulaire ─── */
+        .agro-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        /* ─── Stylisation des Champs (Inputs) SaaS-Style ─── */
+        .form-group {
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-gray);
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Champ de saisie de base épuré */
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 15px;
+            color: var(--text-dark);
+            background-color: var(--white);
+            border: 1px solid #E1E1E1;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+        }
+
+        /* Champ avec icône à gauche */
+        .has-icon .form-control {
+            padding-left: 46px;
+        }
+
+        .field-icon {
+            position: absolute;
+            left: 16px;
+            top: 40px; /* Aligné sous le label */
+            color: #ADB5BD;
+            font-size: 16px;
+            pointer-events: none;
+            transition: var(--transition);
+        }
+
+        /* ─── Interactions au Focus ─── */
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(45, 90, 39, 0.1);
+        }
+
+        .form-control:focus + .field-icon {
+            color: var(--primary);
+        }
+
+        /* ─── Stylisation du Select ─── */
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236C757D' d='M10.293 3.293 6 7.586 1.707 3.293A1 1 0 0 0 .293 4.707l5 5a1 1 0 0 0 1.414 0l5-5a1 1 0 1 0-1.414-1.414Z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 40px;
+        }
+
+        /* ─── Zone d'Actions (Boutons) Modernisée ─── */
+        .form-actions {
+            border-top: 1px solid var(--border);
+            padding: 24px 40px;
+            background-color: var(--bg-light);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--white);
+            box-shadow: 0 4px 12px rgba(45, 90, 39, 0.2);
+        }
+
+        .btn-primary:hover {
+            background-color: #1E3D1A;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: var(--white);
+            color: var(--text-gray);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="dash-wrapper" style="padding: 40px; background-color: var(--bg-light);">
+    
+    {# --- En-tête de page moderne et minimaliste --- #}
+    <div style="margin-bottom: 35px; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+            <h2 style="margin:0; color: var(--text-dark); font-size:26px; font-weight: 800; letter-spacing: -0.5px;">
+                <i class="fa fa-boxes-stacked" style="color: var(--primary); margin-right: 12px;"></i>Nouveau Produit
+            </h2>
+            <p style="margin:5px 0 0; color: var(--text-gray); font-size:15px;">Ajoutez un article à votre inventaire en quelques clics.</p>
+        </div>
+        <a href="{{ path('app_article_index') }}" class="btn btn-secondary">
+            <i class="fa fa-arrow-left"></i> Retour à la liste
+        </a>
+    </div>
+
+    {# --- Conteneur du Formulaire Ultra-Moderne --- #}
+    <div class="agro-form-container">
+        
+        {{ form_start(form) }}
+            <div class="agro-form-body">
+                
+                {# Séparateur visuel épuré #}
+                <div style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #F1F1F1;">
+                    <h4 style="margin: 0 0 8px; color: var(--text-dark); font-weight: 700;">Informations Clés</h4>
+                    <p style="margin: 0; color: var(--text-gray); font-size: 14px;">Identifiez le produit et définissez ses niveaux de stock.</p>
+                </div>
+
+                <div class="agro-grid">
+                    {# Champ Nom : Pleine largeur #}
+                    <div class="form-group full-width">
+                        {{ form_label(form.nom) }}
+                        {{ form_widget(form.nom, {'attr': {'class': 'form-control', 'placeholder': 'ex: Engrais Azoté NPK'}}) }}
+                    </div>
+
+                    {# Champ Catégorie #}
+                    <div class="form-group">
+                        {{ form_label(form.categorie) }}
+                        {{ form_widget(form.categorie, {'attr': {'class': 'form-control'}}) }}
+                    </div>
+
+                    {# Champ Unité #}
+                    <div class="form-group">
+                        {{ form_label(form.unite_mesure) }}
+                        {{ form_widget(form.unite_mesure, {'attr': {'class': 'form-control', 'placeholder': 'ex: Kg, Litre, Sac'}}) }}
+                    </div>
+
+                    {# Champ Quantité (avec icône stylisée) #}
+                    <div class="form-group has-icon">
+                        {{ form_label(form.quantite_en_stock) }}
+                        {{ form_widget(form.quantite_en_stock, {'attr': {'class': 'form-control', 'placeholder': '0.0'}}) }}
+                        <i class="fa fa-layer-group field-icon"></i>
+                    </div>
+
+                    {# Champ Seuil (avec icône stylisée) #}
+                    <div class="form-group has-icon">
+                        {{ form_label(form.seuil_alerte) }}
+                        {{ form_widget(form.seuil_alerte, {'attr': {'class': 'form-control', 'placeholder': '0.0'}}) }}
+                        <i class="fa fa-bell field-icon"></i>
+                    </div>
+                </div>
+            </div>
+
+            {# --- Zone d'Actions Grisée (SaaS Style) --- #}
+            <div class="form-actions">
+                <a href="{{ path('app_article_index') }}" class="btn btn-secondary">Annuler</a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa fa-plus"></i> Créer le produit
+                </button>
+            </div>
+        {{ form_end(form) }}
+        
+    </div>
+</div>
+{% endblock %}

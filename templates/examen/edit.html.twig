@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier l'Examen{% endblock %}
+
+{% block body %}
+    <h1>Modifier l'Examen</h1>
+
+    {# Correction du chemin : 'examen' au lieu de 'examens' #}
+    {{ include('examen/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
+
+    <a href="{{ path('app_examens_index') }}">Retour à la liste</a>
+
+    {# Correction du chemin ici aussi #}
+    {{ include('examen/_delete_form.html.twig') }}
+{% endblock %}
