@@ -257,8 +257,11 @@
                 </a>
                 <div class="dropdown">
                     <a href="{{ path('agri_offres') }}"><i class="fa fa-star"></i> Offres disponibles</a>
-                    <a href="{{ path('agri_abonnements') }}"><i class="fa fa-crown"></i> Mon abonnement</a>
-                </div>
+<a href="{{ path('app_abonnement_front') }}"
+       class="nav-link {% if app.request.get('_route') in ['app_abonnement_front', 'app_abonnement_pdf'] %}active{% endif %}">
+        <i class="fa fa-crown"></i> Abonnement
+    </a>               
+ </div>
             </div>
 
             {# Tâches #}
