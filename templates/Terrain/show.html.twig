@@ -1,0 +1,100 @@
+{% extends 'base_admin.html.twig' %}
+{% block title %}{{ terrain.nomTerrain }} — AgroFlow{% endblock %}
+{% block page_title %}Détail du terrain{% endblock %}
+{% block breadcrumb %}Terrains / {{ terrain.nomTerrain }}{% endblock %}
+
+{% block stylesheets %}
+.actions-top { display:flex; gap:10px; margin-bottom:24px; }
+.btn-back { display:inline-flex; align-items:center; gap:8px; background:var(--cream-dark); color:var(--navy); padding:9px 18px; border-radius:var(--radius); font-size:14px; font-weight:500; text-decoration:none; }
+.btn-edit-top { display:inline-flex; align-items:center; gap:8px; background:var(--green-accent); color:white; padding:9px 18px; border-radius:var(--radius); font-size:14px; font-weight:500; text-decoration:none; }
+.detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.detail-card { background:var(--white); border-radius:var(--radius); box-shadow:var(--shadow); padding:28px; }
+.detail-card h3 { font-size:16px; font-weight:700; color:var(--navy); margin-bottom:20px; padding-bottom:12px; border-bottom:2px solid var(--green-light); display:flex; align-items:center; gap:8px; }
+.detail-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--cream-dark); font-size:14px; }
+.detail-row:last-child { border-bottom:none; }
+.detail-label { color:var(--text-muted); font-weight:500; }
+.detail-value { font-weight:600; color:var(--navy); }
+.badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; }
+.badge-active { background:#D1FAE5; color:#065F46; }
+.badge-inactive { background:#FEE2E2; color:#991B1B; }
+.badge-soil { background:#FEF3C7; color:#92400E; }
+.rotation-table { width:100%; border-collapse:collapse; margin-top:8px; }
+.rotation-table th { background:var(--cream); padding:10px 14px; text-align:left; font-size:12px; font-weight:600; text-transform:uppercase; color:var(--text-muted); }
+.rotation-table td { padding:11px 14px; font-size:13px; border-top:1px solid var(--cream-dark); }
+{% endblock %}
+
+{% block body %}
+<div class="actions-top">
+    <a href="{{ path('admin_terrains') }}" class="btn-back"><i class="fa fa-arrow-left"></i> Retour</a>
+    <a href="{{ path('admin_terrains_edit', {id: terrain.id}) }}" class="btn-edit-top"><i class="fa fa-pen"></i> Modifier</a>
+</div>
+
+<div class="detail-grid">
+    <div class="detail-card">
+        <h3><i class="fa fa-map" style="color:var(--green-accent)"></i> Informations</h3>
+        <div class="detail-row">
+            <span class="detail-label">Nom</span>
+            <span class="detail-value">{{ terrain.nomTerrain }}</span>
+        </div>
+    <div class="detail-row">
+        <span class="detail-label">Propriétaire</span>
+        <span class="detail-value">
+            {% if terrain.cin and cinToName[terrain.cin] is defined %}
+                {{ cinToName[terrain.cin] }}
+                <span class="cin-code" style="font-size:11px; margin-left:6px">{{ terrain.cin }}</span>
+            {% elseif terrain.cin %}
+                <span class="cin-code">{{ terrain.cin }}</span>
+            {% else %}
+                <span style="color:var(--text-muted)">—</span>
+            {% endif %}
+        </span>
+    </div>   
+        <div class="detail-row">
+            <span class="detail-label">Surface</span>
+            <span class="detail-value">{{ terrain.surface }} ha</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Type de sol</span>
+            <span class="detail-value"><span class="badge badge-soil">{{ terrain.typeSol }}</span></span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Localisation</span>
+            <span class="detail-value">{{ terrain.localisation }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">pH</span>
+            <span class="detail-value">{{ terrain.pH ?? '—' }}</span>
+        </div>
+    </div>
+
+    <div class="detail-card" style="grid-column: 1 / -1;">
+        <h3><i class="fa fa-rotate" style="color:var(--green-accent)"></i> Rotations associées</h3>
+        {% if terrain.rotations is empty %}
+            <p style="color:var(--text-muted);text-align:center;padding:24px">Aucune rotation.</p>
+        {% else %}
+        <table class="rotation-table">
+            <thead>
+                <tr>
+                    <th>Plante</th>
+                    <th>Variété</th>
+                    <th>Date début</th>
+                    <th>Date fin</th>
+                    <th>Statut</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for r in terrain.rotations %}
+                <tr>
+                    <td>{{ r.plante.nomP }}</td>
+                    <td>{{ r.plante.variete ?? '—' }}</td>
+                    <td>{{ r.dateDebut|date('d/m/Y') }}</td>
+                    <td>{{ r.dateFin|date('d/m/Y') }}</td>
+                    <td><span class="badge {{ r.status ? 'badge-active' : 'badge-inactive' }}">{{ r.status ? 'Actif' : 'Inactif' }}</span></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
