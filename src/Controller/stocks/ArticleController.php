@@ -12,14 +12,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 // Cette route parente définit le début de l'URL pour toutes les méthodes
-#[Route('/admin/produits')]
+#[Route('/agriculteur/stocks/produits')]
 class ArticleController extends AbstractController
 {
-    // L'URL finale sera : /admin/produits/
-    #[Route('/', name: 'app_article_index', methods: ['GET'])]
+    // L'URL sera maintenant bien : /agriculteur/stocks/produits/
+    #[Route('/', name: 'agri_produits', methods: ['GET'])]
     public function index(ArticleRepository $articleRepository): Response
     {
-        return $this->render('stocks/article/index.html.twig', [
+        return $this->render('/stocks/article/index.html.twig', [
             'articles' => $articleRepository->findAll(),
         ]);
     }
