@@ -1,7 +1,5 @@
 {% extends 'base_agriculteur.html.twig' %}
 
-
-
 {% block title %}Nouveau Produit - AgroFlow{% endblock %}
 
 {% block stylesheets %}
@@ -65,7 +63,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* Champ de saisie de base épuré */
         .form-control {
             width: 100%;
             padding: 14px 16px;
@@ -77,7 +74,6 @@
             transition: var(--transition);
         }
 
-        /* Champ avec icône à gauche */
         .has-icon .form-control {
             padding-left: 46px;
         }
@@ -85,14 +81,13 @@
         .field-icon {
             position: absolute;
             left: 16px;
-            top: 40px; /* Aligné sous le label */
+            top: 40px; 
             color: #ADB5BD;
             font-size: 16px;
             pointer-events: none;
             transition: var(--transition);
         }
 
-        /* ─── Interactions au Focus ─── */
         .form-control:focus {
             outline: none;
             border-color: var(--primary);
@@ -103,7 +98,6 @@
             color: var(--primary);
         }
 
-        /* ─── Stylisation du Select ─── */
         select.form-control {
             appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236C757D' d='M10.293 3.293 6 7.586 1.707 3.293A1 1 0 0 0 .293 4.707l5 5a1 1 0 0 0 1.414 0l5-5a1 1 0 1 0-1.414-1.414Z'/%3E%3C/svg%3E");
@@ -112,7 +106,6 @@
             padding-right: 40px;
         }
 
-        /* ─── Zone d'Actions (Boutons) Modernisée ─── */
         .form-actions {
             border-top: 1px solid var(--border);
             padding: 24px 40px;
@@ -163,7 +156,6 @@
 {% block body %}
 <div class="dash-wrapper" style="padding: 40px; background-color: var(--bg-light);">
     
-    {# --- En-tête de page moderne et minimaliste --- #}
     <div style="margin-bottom: 35px; display: flex; align-items: center; justify-content: space-between;">
         <div>
             <h2 style="margin:0; color: var(--text-dark); font-size:26px; font-weight: 800; letter-spacing: -0.5px;">
@@ -171,21 +163,19 @@
             </h2>
             <p style="margin:5px 0 0; color: var(--text-gray); font-size:15px;">Ajoutez un article à votre inventaire en quelques clics.</p>
         </div>
-        <a href="{{ path('app_article_index') }}" class="btn btn-secondary">
+        <a href="{{ path('agri_produits') }}" class="btn btn-secondary">
             <i class="fa fa-arrow-left"></i> Retour à la liste
         </a>
     </div>
 
-    {# --- Conteneur du Formulaire Ultra-Moderne --- #}
     <div class="agro-form-container">
         
         {{ form_start(form) }}
             <div class="agro-form-body">
                 
-                {# Séparateur visuel épuré #}
                 <div style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #F1F1F1;">
                     <h4 style="margin: 0 0 8px; color: var(--text-dark); font-weight: 700;">Informations Clés</h4>
-                    <p style="margin: 0; color: var(--text-gray); font-size: 14px;">Identifiez le produit et définissez ses niveaux de stock.</p>
+                    <p style="margin: 0; color: var(--text-gray); font-size: 14px;">Identifiez le produit et définissez ses niveaux de stock et de prix.</p>
                 </div>
 
                 <div class="agro-grid">
@@ -201,20 +191,27 @@
                         {{ form_widget(form.categorie, {'attr': {'class': 'form-control'}}) }}
                     </div>
 
+                    {# AJOUT : Champ Prix Unitaire #}
+                    <div class="form-group has-icon">
+                        {{ form_label(form.prix_unitaire) }}
+                        {{ form_widget(form.prix_unitaire, {'attr': {'class': 'form-control', 'placeholder': '0.000'}}) }}
+                        <i class="fa fa-money-bill-wave field-icon"></i>
+                    </div>
+
                     {# Champ Unité #}
                     <div class="form-group">
                         {{ form_label(form.unite_mesure) }}
                         {{ form_widget(form.unite_mesure, {'attr': {'class': 'form-control', 'placeholder': 'ex: Kg, Litre, Sac'}}) }}
                     </div>
 
-                    {# Champ Quantité (avec icône stylisée) #}
+                    {# Champ Quantité #}
                     <div class="form-group has-icon">
                         {{ form_label(form.quantite_en_stock) }}
                         {{ form_widget(form.quantite_en_stock, {'attr': {'class': 'form-control', 'placeholder': '0.0'}}) }}
                         <i class="fa fa-layer-group field-icon"></i>
                     </div>
 
-                    {# Champ Seuil (avec icône stylisée) #}
+                    {# Champ Seuil #}
                     <div class="form-group has-icon">
                         {{ form_label(form.seuil_alerte) }}
                         {{ form_widget(form.seuil_alerte, {'attr': {'class': 'form-control', 'placeholder': '0.0'}}) }}
@@ -223,9 +220,8 @@
                 </div>
             </div>
 
-            {# --- Zone d'Actions Grisée (SaaS Style) --- #}
             <div class="form-actions">
-                <a href="{{ path('app_article_index') }}" class="btn btn-secondary">Annuler</a>
+                <a href="{{ path('agri_produits') }}" class="btn btn-secondary">Annuler</a>
                 <button type="submit" class="btn btn-primary">
                     <i class="fa fa-plus"></i> Créer le produit
                 </button>

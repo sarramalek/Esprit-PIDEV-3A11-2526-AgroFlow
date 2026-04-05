@@ -1,0 +1,200 @@
+{% extends 'base_agriculteur.html.twig' %}
+
+{% block title %}Modifier Produit - AgroFlow{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        :root {
+            --primary: #2D5A27;
+            --primary-light: #EAF3DE;
+            --text-dark: #1A2A19;
+            --text-gray: #6C757D;
+            --bg-light: #F8F9FA;
+            --white: #FFFFFF;
+            --border: #EEE;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+            --shadow-md: 0 10px 30px rgba(0,0,0,0.08);
+            --transition: all 0.25s ease;
+        }
+
+        .agro-form-container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        .agro-form-body { padding: 40px; }
+
+        .agro-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .full-width { grid-column: span 2; }
+
+        .form-group { position: relative; }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: var(--text-gray);
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 15px;
+            border: 1px solid #E1E1E1;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+            box-sizing: border-box;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(45, 90, 39, 0.1);
+        }
+
+        .has-icon .form-control { padding-left: 46px; }
+
+        .field-icon {
+            position: absolute;
+            left: 16px;
+            bottom: 14px; 
+            color: #ADB5BD;
+            font-size: 16px;
+        }
+
+        .form-actions {
+            border-top: 1px solid var(--border);
+            padding: 24px 40px;
+            background-color: var(--bg-light);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: var(--transition);
+            border: none;
+        }
+
+        .btn-primary { background-color: var(--primary); color: var(--white); }
+        .btn-primary:hover { background-color: #21431d; transform: translateY(-1px); }
+        
+        .btn-secondary { background-color: var(--white); color: var(--text-gray); border: 1px solid var(--border); }
+        .btn-secondary:hover { background-color: #f1f1f1; }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="dash-wrapper" style="padding: 40px; background-color: var(--bg-light);">
+    
+    {# --- En-tête --- #}
+    <div style="margin-bottom: 35px; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+            <h2 style="margin:0; color: var(--text-dark); font-size:26px; font-weight: 800;">
+                <i class="fa fa-pen-to-square" style="color: var(--primary); margin-right: 12px;"></i>Modifier : {{ article.nom }}
+            </h2>
+            <p style="margin:5px 0 0; color: var(--text-gray); font-size:15px;">Mise à jour des informations du stock.</p>
+        </div>
+        <a href="{{ path('agri_produits') }}" class="btn btn-secondary">
+            <i class="fa fa-arrow-left"></i> Retour à la liste
+        </a>
+    </div>
+
+    <div class="agro-form-container">
+        {{ form_start(form) }}
+            <div class="agro-form-body">
+                
+                <div style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #F1F1F1;">
+                    <h4 style="margin: 0; color: var(--text-dark); font-weight: 700;">Détails de l'article</h4>
+                </div>
+
+                <div class="agro-grid">
+                    {# Nom de l'article #}
+                    <div class="form-group full-width">
+                        {{ form_label(form.nom, 'Désignation du produit') }}
+                        {{ form_widget(form.nom, {'attr': {'class': 'form-control'}}) }}
+                    </div>
+
+                    {# Catégorie #}
+                    <div class="form-group">
+                        {{ form_label(form.categorie, 'Catégorie') }}
+                        {{ form_widget(form.categorie, {'attr': {'class': 'form-control'}}) }}
+                    </div>
+
+                    {# AJOUT : Prix Unitaire #}
+                    <div class="form-group has-icon">
+                        {{ form_label(form.prix_unitaire, 'Prix Unitaire (DT)') }}
+                        <div style="position: relative;">
+                            {{ form_widget(form.prix_unitaire, {'attr': {'class': 'form-control', 'placeholder': '0.000'}}) }}
+                            <i class="fa fa-money-bill-wave field-icon"></i>
+                        </div>
+                    </div>
+
+                    {# Unité #}
+                    <div class="form-group">
+                        {{ form_label(form.unite_mesure, 'Unité de mesure') }}
+                        {{ form_widget(form.unite_mesure, {'attr': {'class': 'form-control'}}) }}
+                    </div>
+
+                    {# Quantité #}
+                    <div class="form-group has-icon">
+                        {{ form_label(form.quantite_en_stock, 'Stock actuel') }}
+                        <div style="position: relative;">
+                            {{ form_widget(form.quantite_en_stock, {'attr': {'class': 'form-control'}}) }}
+                            <i class="fa fa-layer-group field-icon"></i>
+                        </div>
+                    </div>
+
+                    {# Seuil d'alerte #}
+                    <div class="form-group has-icon">
+                        {{ form_label(form.seuil_alerte, 'Seuil d\'alerte') }}
+                        <div style="position: relative;">
+                            {{ form_widget(form.seuil_alerte, {'attr': {'class': 'form-control'}}) }}
+                            <i class="fa fa-bell field-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="{{ path('agri_produits') }}" class="btn btn-secondary">Annuler</a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa fa-save"></i> Mettre à jour le produit
+                </button>
+            </div>
+        {{ form_end(form) }}
+    </div>
+
+    {# Suppression - Zone de danger #}
+    <div style="margin-top: 40px; padding-top: 20px; border-top: 1px dashed #ccc; text-align: center;">
+        <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Ce produit n'est plus utilisé ?</p>
+        <div style="display: inline-block; background: white; padding: 10px 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+            {{ include('stocks/article/_delete_form.html.twig') }}
+            <span style="color: #D32F2F; font-weight: 600; font-size: 14px; margin-left: 8px;">Supprimer définitivement</span>
+        </div>
+    </div>
+</div>
+{% endblock %}
