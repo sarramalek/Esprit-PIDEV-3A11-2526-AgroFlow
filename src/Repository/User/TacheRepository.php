@@ -162,4 +162,32 @@ public function searchAndSort(string $search, string $sort, string $direction): 
 
     return $qb->getQuery()->getResult();
 }
+// Tâches sans assignee ou à l'état "à faire"
+public function findTachesAAssigner(): array
+{
+    return $this->createQueryBuilder('t')
+        ->where('t.assignee IS NULL')
+        ->orWhere('t.etat = :etat')
+        ->setParameter('etat', 'à faire')
+        ->andWhere('t.etat != :terminee')
+        ->setParameter('terminee', 'terminée')
+        ->getQuery()
+        ->getResult();
+}
+
+// Tâches en conflit pour un ouvrier sur une période
+public function findTachesConflict($ouvrier, \DateTime $debut, \DateTime $fin): array
+{
+    return $this->createQueryBuilder('t')
+        ->where('t.assignee = :ouvrier')
+        ->andWhere('t.etat NOT IN (:etats)')
+        ->andWhere('t.dateEcheancee >= :debut')
+        ->andWhere('t.dateEcheancee <= :fin')
+        ->setParameter('ouvrier', $ouvrier)
+        ->setParameter('etats', ['terminée', 'annulée'])
+        ->setParameter('debut', $debut)
+        ->setParameter('fin', $fin)
+        ->getQuery()
+        ->getResult();
+}
 }
