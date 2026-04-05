@@ -2,6 +2,9 @@
 
 namespace App\Controller;
 
+use App\Repository\User\AbonnementRepository;
+use App\Repository\User\OffreRepository;
+use App\Repository\User\TacheRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -11,18 +14,42 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_AGRICULTEUR')]
 class AgriculteurDashboardController extends AbstractController
 {
-    // ── Dashboard ────────────────────────────────────────────────────────────
-
     #[Route('/', name: 'home')]
-    public function index(): Response
-    {
+    public function index(
+        AbonnementRepository $abonnRepo,
+        OffreRepository      $offreRepo,
+        TacheRepository      $tacheRepo
+    ): Response {
+        /** @var \App\Entity\User\User $user */
+        $user = $this->getUser();
+        $cin  = $user->getCin();
+
+        $tousAbonnements = $abonnRepo->findByCin($cin);
+        
+        $taches          = $tacheRepo->findByAssignee($user);
+
+        $abonnementsActifs = [];
+        foreach ($tousAbonnements as $a) {
+            if (
+                strtolower($a->getSituation()) === 'actif'
+                && $a->getDateExpiration() >= new \DateTime('today')
+            ) {
+                $offre               = $offreRepo->find($a->getIdOffre());
+                $abonnementsActifs[] = [
+                    'nomOffre' => $offre?->getNomOffre() ?? '—',
+                    'duree'    => $offre?->getDureeOffre() ?? 0,
+                ];
+            }
+        }
+
         return $this->render('agriculteur_dashboard.html.twig', [
-            'animaux'        => 0,
-            'terrains'       => 0,
-            'machines'       => 0,
-            'taches'         => 0,
-            'abonnement'     => null,
-            'participations' => [],
+            'animaux'           => 0,
+            'terrains'          => 0,
+            'machines'          => 0,
+            'taches'            => count($taches),
+            'abonnement'        => null,
+            'abonnementsActifs' => $abonnementsActifs,
+            'participations'    => [],
         ]);
     }
 
@@ -101,22 +128,20 @@ class AgriculteurDashboardController extends AbstractController
     #[Route('/abonnements/offres', name: 'offres')]
     public function offres(): Response
     {
-        return new Response('Module Offres — à implémenter');
+        return $this->redirectToRoute('app_offre_front');
     }
 
     #[Route('/abonnements', name: 'abonnements')]
     public function abonnements(): Response
     {
-        return new Response('Module Abonnements — à implémenter');
+        return $this->redirectToRoute('app_abonnement_front');
     }
 
     // ── Tâches ───────────────────────────────────────────────────────────────
 
-    // ── Tâches ───────────────────────────────────────────────────────────────
-
-#[Route('/taches', name: 'taches')]
-public function taches(): Response
-{
-    return $this->redirectToRoute('app_tache_front');
-}
+    #[Route('/taches', name: 'taches')]
+    public function taches(): Response
+    {
+        return $this->redirectToRoute('app_tache_front');
+    }
 }

@@ -1,0 +1,143 @@
+{% extends 'base_agriculteur.html.twig' %}
+{% block title %}Offres - AgroFlow{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .front-wrapper { padding: 35px 40px; font-family: Arial, sans-serif; background: #F4F6F9; min-height: 100vh; }
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+    .page-header h2 { margin: 0; color: #2C3E50; font-size: 24px; }
+    .page-header p { margin: 4px 0 0; color: #999; font-size: 13px; }
+    .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .offre-card { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; }
+    .offre-card:hover { transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,0,0,0.10); }
+    .offre-card.souscrite { border: 2px solid #2D5A27; }
+    .card-top { padding: 20px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; gap: 14px; }
+    .card-icon { width: 48px; height: 48px; border-radius: 12px; background: #EAF3DE; color: #2D5A27; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .card-title { font-weight: 700; color: #2C3E50; font-size: 15px; margin: 0 0 3px; }
+    .card-sub { font-size: 12px; color: #aaa; margin: 0; }
+    .card-body { padding: 16px 20px; flex: 1; }
+    .info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 13px; }
+    .info-row:last-child { margin-bottom: 0; }
+    .info-label { color: #aaa; }
+    .info-value { font-weight: 600; color: #2C3E50; }
+    .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+    .badge-green { background: #EAF3DE; color: #3B6D11; }
+    .badge-gray  { background: #f0f0f0; color: #666; }
+    .card-footer { padding: 14px 20px; border-top: 1px solid #f0f0f0; }
+    .btn-souscrire { width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; background: #2D5A27; color: white; padding: 11px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: background 0.2s; text-decoration: none; }
+    .btn-souscrire:hover { background: #1e3d1a; }
+    .btn-souscrite { width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; background: #EAF3DE; color: #3B6D11; padding: 11px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; border: none; cursor: default; }
+    .stats-bar { display: flex; gap: 16px; margin-bottom: 28px; }
+    .stat-chip { background: white; border-radius: 10px; padding: 12px 20px; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); font-size: 13px; }
+    .stat-chip i { color: #2D5A27; font-size: 16px; }
+    .stat-chip strong { color: #2C3E50; font-size: 16px; }
+    .stat-chip span { color: #aaa; }
+    .prix-highlight { font-size: 22px; font-weight: 800; color: #2D5A27; }
+    .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; color: #ccc; text-align: center; background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+    .empty-state i { font-size: 50px; margin-bottom: 20px; }
+    @media (max-width: 900px) { .cards-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .cards-grid { grid-template-columns: 1fr; } .front-wrapper { padding: 20px; } }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="front-wrapper">
+
+    {# ── Header ── #}
+    <div class="page-header">
+        <div>
+            <p style="margin:0 0 4px; color:#999; font-size:13px;">
+                <i class="fa fa-home"></i> Front Office &rsaquo; <strong style="color:#2C3E50;">Offres</strong>
+            </p>
+            <h2>Offres Disponibles</h2>
+        </div>
+    </div>
+
+    {# ── Stats ── #}
+    <div class="stats-bar">
+        <div class="stat-chip">
+            <i class="fa fa-star"></i>
+            <div><strong>{{ offres|length }}</strong><br><span>Offres disponibles</span></div>
+        </div>
+        <div class="stat-chip">
+            <i class="fa fa-crown" style="color:#2D5A27;"></i>
+            <div><strong>{{ offresSouscrites|length }}</strong><br><span>Souscrites</span></div>
+        </div>
+    </div>
+
+    {# ── Cards ── #}
+    {% if offres is empty %}
+        <div class="empty-state">
+            <i class="fa fa-star"></i>
+            <p>Aucune offre disponible pour le moment.</p>
+        </div>
+    {% else %}
+        <div class="cards-grid">
+            {% for offre in offres %}
+                {% set souscrite = offre.idOffres in offresSouscrites %}
+                <div class="offre-card {{ souscrite ? 'souscrite' : '' }}">
+
+                    <div class="card-top">
+                        <div class="card-icon">
+                            <i class="fa fa-{{ souscrite ? 'check-circle' : 'star' }}"></i>
+                        </div>
+                        <div>
+                            <p class="card-title">{{ offre.nomOffre }}</p>
+                            <p class="card-sub">Offre #{{ offre.idOffres }}</p>
+                        </div>
+                        {% if souscrite %}
+                            <span class="badge badge-green" style="margin-left:auto;">
+                                <i class="fa fa-check"></i> Souscrite
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <div class="card-body">
+                        <div class="info-row">
+                            <span class="info-label"><i class="fa fa-money-bill"></i> Prix</span>
+                            <span class="prix-highlight">{{ offre.prix|number_format(2) }} TND</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label"><i class="fa fa-clock"></i> Durée</span>
+                            <span class="info-value">{{ offre.dureeOffre }} jours</span>
+                        </div>
+                        {% if offre.description %}
+                        <div class="info-row" style="align-items:flex-start; margin-top:8px;">
+                            <span class="info-label"><i class="fa fa-info-circle"></i> Description</span>
+                            <span class="info-value" style="text-align:right; max-width:65%; font-size:12px; color:#888;">
+                                {{ offre.description|length > 80 ? offre.description|slice(0,80) ~ '...' : offre.description }}
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="card-footer">
+                        {% if souscrite %}
+                            <div class="btn-souscrite">
+                                <i class="fa fa-check-circle"></i> Déjà souscrite
+                            </div>
+                        {% else %}
+                            <form method="post" action="{{ path('app_offre_souscrire', {id: offre.idOffres}) }}"
+                                  onsubmit="return confirm('Confirmer l\'inscription à l\'offre {{ offre.nomOffre }} ?')">
+                                <button type="submit" class="btn-souscrire">
+                                    <i class="fa fa-crown"></i> S'inscrire
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+</div>
+
+{% if app.flashes('success') %}
+<div style="position:fixed; bottom:24px; right:24px; background:#2D5A27; color:white; padding:14px 22px; border-radius:10px; box-shadow:0 4px 20px rgba(0,0,0,0.2); font-size:14px; font-weight:600; z-index:9999; display:flex; align-items:center; gap:10px;">
+    <i class="fa fa-check-circle"></i>
+    {% for msg in app.flashes('success') %}{{ msg }}{% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}
