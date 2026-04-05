@@ -1,0 +1,115 @@
+{% extends 'base_agriculteur.html.twig' %}
+
+{% block title %}Journal des Flux - AgroFlow{% endblock %}
+
+{% block body %}
+<div class="dash-wrapper" style="padding: 30px; background-color: #f8f9fa; font-family: 'DM Sans', sans-serif;">
+
+    {# --- EN-TÊTE --- #}
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+        <div>
+            <h2 style="margin:0; color:#1a2a19; font-size:28px; font-weight: 800;">
+                <i class="fa fa-history" style="color: #1976d2; margin-right: 10px;"></i>Journal des Flux
+            </h2>
+            <p style="margin:5px 0 0; color:#6c757d;">Historique détaillé des entrées et sorties de stock</p>
+        </div>
+        <a href="{{ path('agri_produits') }}" class="btn" style="background-color: #6c757d; color: white; padding: 10px 20px; border-radius: 10px; text-decoration: none; font-weight: 600;">
+            <i class="fa fa-arrow-left"></i> Retour au stock
+        </a>
+    </div>
+
+    {# --- FORMULAIRE DE FILTRE --- #}
+    <div style="background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 25px;">
+        <form method="GET" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) auto; gap: 15px; align-items: end;">
+            
+            <div class="filter-group">
+                <label style="display:block; margin-bottom:5px; font-size:13px; font-weight:600; color:#444;">Produit</label>
+                <select name="article" class="filter-input">
+                    <option value="">Tous les produits</option>
+                    {% for art in articles %}
+                        <option value="{{ art.id }}" {{ currentArticle == art.id ? 'selected' : '' }}>{{ art.nom }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label style="display:block; margin-bottom:5px; font-size:13px; font-weight:600; color:#444;">Du (date)</label>
+                <input type="date" name="date_debut" value="{{ currentDebut }}" class="filter-input">
+            </div>
+
+            <div class="filter-group">
+                <label style="display:block; margin-bottom:5px; font-size:13px; font-weight:600; color:#444;">Au (date)</label>
+                <input type="date" name="date_fin" value="{{ currentFin }}" class="filter-input">
+            </div>
+
+            <div style="display: flex; gap: 10px;">
+                <button type="submit" class="btn-filter" style="background: #1976d2; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                    <i class="fa fa-filter"></i> Filtrer
+                </button>
+                {% if currentArticle or currentDebut or currentFin %}
+                    <a href="{{ path('app_mouvement_index') }}" class="btn-reset" title="Réinitialiser" style="background: #eef2f7; color: #666; padding: 10px 15px; border-radius: 8px; text-decoration: none;">
+                        <i class="fa fa-undo"></i>
+                    </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    {# --- TABLEAU DES MOUVEMENTS --- #}
+    <div class="card" style="background: white; border: none; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); overflow: hidden;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead style="background-color: #fcfdfc; border-bottom: 1px solid #eee;">
+                <tr>
+                    <th class="th-style">Date & Heure</th>
+                    <th class="th-style">Article</th>
+                    <th class="th-style">Type</th>
+                    <th class="th-style">Quantité</th>
+                    <th class="th-style">Motif</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for mouvement in mouvements %}
+                <tr style="border-bottom: 1px solid #f8f9fa;">
+                    <td style="padding: 15px 25px; color: #666; font-size: 14px;">
+                        {{ mouvement.dateMouvement|date('d/m/Y H:i') }}
+                    </td>
+                    <td style="padding: 15px 25px; font-weight: 600; color: #2c3e50;">
+                        {{ mouvement.article.nom }}
+                    </td>
+                    <td style="padding: 15px 25px;">
+                        {% if mouvement.type == 'ENTREE' %}
+                            <span style="background: #eafbe7; color: #2ecc71; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700;">
+                                <i class="fa fa-arrow-up"></i> ENTRÉE
+                            </span>
+                        {% else %}
+                            <span style="background: #fdf2f2; color: #e74c3c; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700;">
+                                <i class="fa fa-arrow-down"></i> SORTIE
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 15px 25px; font-weight: 700;">
+                        {{ mouvement.quantite }} {{ mouvement.article.uniteMesure }}
+                    </td>
+                    <td style="padding: 15px 25px; color: #7f8c8d; font-style: italic; font-size: 13px;">
+                        {{ mouvement.motif|default('---') }}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5" style="text-align:center; padding:50px; color: #999;">
+                        <i class="fa fa-info-circle fa-2x" style="margin-bottom: 10px; display: block;"></i>
+                        Aucun mouvement enregistré pour cette sélection.
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .th-style { padding: 15px 25px; color: #888; font-size: 11px; text-transform: uppercase; text-align: left; font-weight: 700; }
+    .filter-input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-family: inherit; }
+    .filter-input:focus { border-color: #1976d2; outline: none; box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1); }
+</style>
+{% endblock %}
