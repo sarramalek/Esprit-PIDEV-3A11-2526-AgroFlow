@@ -240,6 +240,9 @@
         <a href="{{ path('admin_abonnements_new') }}" class="btn btn-primary">
             <i class="fa fa-plus"></i> Nouvel abonnement
         </a>
+        <a href="{{ path('admin_abonnements_export_pdf') }}" class="btn btn-secondary">
+    <i class="fa fa-file-pdf" style="color:#DC2626;"></i> Exporter PDF
+</a>
     </form>
 
     {# ── Table ── #}
@@ -305,6 +308,10 @@
                                     <i class="fa fa-trash"></i>
                                 </button>
                             </form>
+                            <a href="{{ path('admin_abonnements_pdf', {idAbonn: abonnement.idAbonn}) }}"
+   class="btn btn-sm btn-secondary btn-icon" title="Télécharger PDF">
+    <i class="fa fa-file-pdf" style="color:#DC2626;"></i>
+</a>
                         </div>
                     </td>
                 </tr>
