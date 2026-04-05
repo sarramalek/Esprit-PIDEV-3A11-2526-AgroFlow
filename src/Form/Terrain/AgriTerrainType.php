@@ -28,9 +28,9 @@ class AgriTerrainType extends AbstractType
                 'label' => 'Surface (ha)',
                 'attr'  => ['placeholder' => '2.5'],
                 'constraints' => [
-                    new NotBlank(),
-                    new Positive(message: 'La surface doit être positive.'),
-                    new LessThan(value: 10000),
+                    new NotBlank(message: 'La surface est obligatoire.'),
+                    new Positive(message: 'La surface doit être un nombre positif.'),
+                    new LessThan(value: 10000, message: 'La surface ne peut pas dépasser 10 000 ha.'),
                 ],
             ])
             ->add('typeSol', ChoiceType::class, [
@@ -43,13 +43,15 @@ class AgriTerrainType extends AbstractType
                     'Calcaire' => 'Calcaire',
                     'Humifère' => 'Humifère',
                 ],
-                'constraints' => [new NotBlank()],
+                'constraints' => [
+                    new NotBlank(message: 'Le type de sol est obligatoire.'),
+                ],
             ])
             ->add('localisation', TextType::class, [
                 'label' => 'Localisation',
                 'attr'  => ['placeholder' => 'Ex: Nabeul, Béja...'],
                 'constraints' => [
-                    new NotBlank(),
+                    new NotBlank(message: 'La localisation est obligatoire.'),
                     new Length(min: 2, max: 150),
                 ],
             ])
@@ -58,8 +60,10 @@ class AgriTerrainType extends AbstractType
                 'scale'    => 2,
                 'attr'     => ['placeholder' => '0 – 14'],
                 'constraints' => [
-                    new NotBlank(),
-                    new Range(min: 0, max: 14,
+                    new NotBlank(message: 'Le pH est obligatoire.'),
+                    new Range(
+                        min: 0,
+                        max: 14,
                         notInRangeMessage: 'Le pH doit être entre {{ min }} et {{ max }}.'
                     ),
                 ],
