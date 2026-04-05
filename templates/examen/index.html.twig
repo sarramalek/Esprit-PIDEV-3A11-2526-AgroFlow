@@ -1,0 +1,135 @@
+{% extends 'base_agriculteur.html.twig' %}
+
+{% block title %}AgroFlow - Examens Vétérinaires{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .search-container {
+            background: white;
+            padding: 20px 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #f1f3f5;
+            border-radius: 10px;
+            outline: none;
+            transition: all 0.3s;
+            background: #fafbfc;
+        }
+        .search-input:focus { border-color: #2D5A27; background: white; }
+        .btn-stats {
+            background: #3498db;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div style="padding: 10px;">
+        <!-- Header : Breadcrumb -->
+        <div style="margin-bottom: 25px; color: #666; font-size: 14px;">
+            <span>Gestion</span> <i class="fa fa-chevron-right" style="font-size: 10px; margin: 0 5px;"></i> 
+            <strong style="color: #2C3E50;">Examens Vétérinaires</strong>
+        </div>
+
+        <!-- Barre de Recherche et Filtres -->
+        <div class="search-container">
+            <form action="{{ path('app_examens_index') }}" method="get" style="display: flex; gap: 15px; flex: 1;">
+                <input type="text" name="q" value="{{ searchTerm }}" class="search-input" placeholder="Diagnostic, traitement, animal...">
+                <select name="type" onchange="this.form.submit()" style="padding: 10px 15px; border-radius: 10px; border: 2px solid #f1f3f5; outline: none; background: #fafbfc; cursor: pointer; min-width: 180px;">
+                    <option value="">Tous les types</option>
+                    <option value="Vaccin" {{ currentType == 'Vaccin' ? 'selected' : '' }}>Vaccin</option>
+                    <option value="Radio" {{ currentType == 'Radio' ? 'selected' : '' }}>Radio</option>
+                    <option value="Scanner" {{ currentType == 'Scanner' ? 'selected' : '' }}>Scanner</option>
+                    <option value="Consultation" {{ currentType == 'Consultation' ? 'selected' : '' }}>Consultation</option>
+                </select>
+                <button type="submit" style="background: #2D5A27; color: white; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-weight: 700;">Filtrer</button>
+            </form>
+            <a href="{{ path('app_examens_stats') }}" class="btn-stats">
+                <i class="fa fa-chart-pie"></i> Statistiques
+            </a>
+        </div>
+
+        <!-- Tableau CRUD -->
+        <div style="background: white; border-radius: 15px; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h2 style="margin: 0; color: #2C3E50; font-size: 20px;">Rapports de santé</h2>
+                <a href="{{ path('app_examens_new') }}" style="background: #2D5A27; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px;">
+                    <i class="fa fa-plus"></i> Nouveau Rapport
+                </a>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #EEE;">
+                            {% set nextDirection = (currentDirection == 'ASC') ? 'DESC' : 'ASC' %}
+                            <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">
+                                <a href="{{ path('app_examens_index', { q: searchTerm, type: currentType, sort: 'date_examen', direction: (currentSort == 'date_examen' ? nextDirection : 'DESC') }) }}" style="text-decoration:none; color:inherit;">Date</a>
+                            </th>
+                            <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">Animal</th>
+                            <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">Type</th>
+                            <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">Diagnostic</th>
+                            <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">Traitement</th>
+                            <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600; text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for e in examens %}
+                        <tr style="border-bottom: 1px solid #EEE; transition: background 0.2s;" onmouseover="this.style.backgroundColor='#fcfcf0'" onmouseout="this.style.backgroundColor='transparent'">
+                            <td style="padding: 15px 10px; color: #2C3E50;">{{ e.dateExamen ? e.dateExamen|date('d/m/Y') : '' }}</td>
+                            <td style="padding: 15px 10px; font-weight: 600; color: #2D5A27;">{{ e.animal ? e.animal.nom : '-' }}</td>
+                            <td style="padding: 15px 10px;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    {% if e.typeExamen == 'Vaccin' %}
+                                        <i class="fa fa-syringe" style="color: #2ecc71; font-size: 14px;"></i>
+                                    {% elseif e.typeExamen == 'Radio' %}
+                                        <i class="fa fa-radiation" style="color: #3498db; font-size: 14px;"></i>
+                                    {% elseif e.typeExamen == 'Scanner' %}
+                                        <i class="fa fa-magnifying-glass" style="color: #9b59b6; font-size: 14px;"></i>
+                                    {% else %}
+                                        <i class="fa fa-stethoscope" style="color: #e74c3c; font-size: 14px;"></i>
+                                    {% endif %}
+                                    <span style="font-weight: 600; color: #2C3E50; font-size: 14px;">{{ e.typeExamen }}</span>
+                                </div>
+                            </td>
+                            <td style="padding: 15px 10px;">
+                                <span style="background: {{ e.diagnostic == 'En bonne santé' ? '#E8F5E2' : '#FFF0F0' }}; color: {{ e.diagnostic == 'En bonne santé' ? '#2D5A27' : '#E74C3C' }}; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; border: 1px solid {{ e.diagnostic == 'En bonne santé' ? '#D5EBC9' : '#FFDada' }};">
+                                    {{ e.diagnostic }}
+                                </span>
+                            </td>
+                            <td style="padding: 15px 10px; color: #555; font-size: 14px;">
+                                <i class="fa fa-capsules" style="color: #999; font-size: 12px; margin-right: 5px;"></i> {{ e.traitement }}
+                            </td>
+                            <td style="padding: 15px 10px; text-align: center;">
+                                <a href="{{ path('app_examens_show', {'id': e.id}) }}" style="color: #7f8c8d; margin: 0 8px;"><i class="fa fa-eye"></i></a>
+                                <a href="{{ path('app_examens_edit', {'id': e.id}) }}" style="color: #3498db; margin: 0 8px;"><i class="fa fa-edit"></i></a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" style="padding: 30px; text-align: center; color: #999;">Aucun rapport médical trouvé.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

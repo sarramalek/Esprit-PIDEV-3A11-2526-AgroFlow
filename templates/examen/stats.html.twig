@@ -1,0 +1,98 @@
+{% extends 'base_agriculteur.html.twig' %}
+
+{% block title %}AgroFlow - Statistiques Santé{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('typeExamenChart').getContext('2d');
+            
+            const stats = {{ stats|json_encode|raw }};
+            const labels = stats.map(s => s.type);
+            const data = stats.map(s => s.total);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Nombre d\'interventions',
+                        data: data,
+                        backgroundColor: '#e74c3c',
+                        borderRadius: 10,
+                        barThickness: 40
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            grid: { display: false },
+                            ticks: { precision: 0 }
+                        },
+                        x: { 
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}
+
+{% block body %}
+<div style="padding: 10px;">
+    <!-- Header : Breadcrumb -->
+    <div style="margin-bottom: 25px; color: #666; font-size: 14px;">
+        <span>Gestion</span> <i class="fa fa-chevron-right" style="font-size: 10px; margin: 0 5px;"></i> 
+        <span>Examens</span> <i class="fa fa-chevron-right" style="font-size: 10px; margin: 0 5px;"></i> 
+        <strong style="color: #2C3E50;">Statistiques Santé</strong>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 350px; gap: 30px;">
+        
+        <!-- Graphique -->
+        <div style="background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 40px;">
+            <h3 style="margin: 0 0 40px 0; color: #2C3E50; font-size: 22px; font-weight: 800; border-left: 5px solid #e74c3c; padding-left: 15px;">Volume des Examens par Type</h3>
+            <div style="height: 400px; position: relative;">
+                <canvas id="typeExamenChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Totaux et Liens -->
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            <div style="background: #e74c3c; padding: 30px; border-radius: 20px; color: white; box-shadow: 0 10px 20px rgba(231, 76, 60, 0.2);">
+                <i class="fa fa-stethoscope" style="font-size: 30px; opacity: 0.8; margin-bottom: 15px;"></i>
+                <h4 style="margin: 0; font-size: 14px; text-transform: uppercase;">Interventions Totales</h4>
+                {% set totalExamens = 0 %}
+                {% for s in stats %}{% set totalExamens = totalExamens + s.total %}{% endfor %}
+                <h2 style="margin: 5px 0 0 0; font-size: 40px; font-weight: 800;">{{ totalExamens }}</h2>
+            </div>
+
+            <div style="background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 30px; flex: 1;">
+                <h4 style="color: #2C3E50; border-bottom: 1px solid #F1F3F5; padding-bottom: 15px; margin: 0 0 20px 0;">Activités médicales</h4>
+                {% for s in stats %}
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0;">
+                        <span style="font-weight: 600; color: #555;">{{ s.type }}</span>
+                        <span style="background: rgba(231, 76, 60, 0.1); color: #e74c3c; padding: 3px 12px; border-radius: 6px; font-weight: 800;">{{ s.total }}</span>
+                    </div>
+                {% endfor %}
+                
+                <div style="margin-top: 30px; border-top: 1px solid #F1F3F5; padding-top: 20px; text-align: center;">
+                    <a href="{{ path('app_examens_index') }}" style="color: #7f8c8d; text-decoration: none; font-weight: 700; font-size: 14px;">
+                        <i class="fa fa-arrow-left"></i> Retour aux rapports
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
