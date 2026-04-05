@@ -532,7 +532,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.KYVqCuv"/>
+      <argument type="service" id=".service_locator.MZs5ciU"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -3428,7 +3428,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.KYVqCuv"/>
+      <argument type="service" id=".service_locator.MZs5ciU"/>
     </service>
     <service id="debug.log_processor" class="Symfony\Bridge\Monolog\Processor\DebugProcessor">
       <tag name="kernel.reset" method="reset"/>
@@ -8108,14 +8108,23 @@
         <argument key="tache" type="service_closure" id=".errored..service_locator.Mzhqy3N.App\Entity\User\Tache"/>
       </argument>
     </service>
-    <service id=".service_locator.l3rYz8h" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.xxq2prQ" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
+        <argument key="csrfTokenManager" type="service_closure" id="security.csrf.token_manager"/>
         <argument key="tacheRepo" type="service_closure" id="App\Repository\User\TacheRepository"/>
         <argument key="userRepo" type="service_closure" id="App\Repository\User\UserRepository"/>
       </argument>
     </service>
-    <service id=".service_locator.KYVqCuv" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.1CkTyg5" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="tacheRepo" type="service_closure" id="App\Repository\User\TacheRepository"/>
+        <argument key="userRepo" type="service_closure" id="App\Repository\User\UserRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.MZs5ciU" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Controller\AdminDashboardController::index" type="service_closure" id=".service_locator.qni5W9T"/>
@@ -8161,8 +8170,9 @@
         <argument key="App\Controller\User\TacheController::new" type="service_closure" id=".service_locator.PhEk7tx"/>
         <argument key="App\Controller\User\TacheController::pdf" type="service_closure" id=".service_locator.3Vzszbx"/>
         <argument key="App\Controller\User\TacheController::show" type="service_closure" id=".service_locator.WVGOjkY"/>
+        <argument key="App\Controller\User\TacheFrontController::autoAssigner" type="service_closure" id=".service_locator.1CkTyg5"/>
         <argument key="App\Controller\User\TacheFrontController::front" type="service_closure" id=".service_locator.qni5W9T"/>
-        <argument key="App\Controller\User\TacheFrontController::tachesByOuvrier" type="service_closure" id=".service_locator.l3rYz8h"/>
+        <argument key="App\Controller\User\TacheFrontController::tachesByOuvrier" type="service_closure" id=".service_locator.xxq2prQ"/>
         <argument key="App\Kernel::loadRoutes" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="App\Kernel::registerContainerConfiguration" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="kernel::loadRoutes" type="service_closure" id=".service_locator.y4_Zrx."/>
@@ -8210,8 +8220,9 @@
         <argument key="App\Controller\User\TacheController:new" type="service_closure" id=".service_locator.PhEk7tx"/>
         <argument key="App\Controller\User\TacheController:pdf" type="service_closure" id=".service_locator.3Vzszbx"/>
         <argument key="App\Controller\User\TacheController:show" type="service_closure" id=".service_locator.WVGOjkY"/>
+        <argument key="App\Controller\User\TacheFrontController:autoAssigner" type="service_closure" id=".service_locator.1CkTyg5"/>
         <argument key="App\Controller\User\TacheFrontController:front" type="service_closure" id=".service_locator.qni5W9T"/>
-        <argument key="App\Controller\User\TacheFrontController:tachesByOuvrier" type="service_closure" id=".service_locator.l3rYz8h"/>
+        <argument key="App\Controller\User\TacheFrontController:tachesByOuvrier" type="service_closure" id=".service_locator.xxq2prQ"/>
         <argument key="kernel:loadRoutes" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="kernel:registerContainerConfiguration" type="service_closure" id=".service_locator.y4_Zrx."/>
       </argument>
@@ -10560,7 +10571,7 @@
     <service id="Psr\Log\LoggerInterface" alias="monolog.logger"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.w7.f4fT" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.KYVqCuv"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.MZs5ciU"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id=".Psr\Log\LoggerInterface $request.logger" alias="monolog.logger.request"/>
@@ -10607,8 +10618,9 @@
     <service id=".service_locator.oaRQYyJ" alias=".service_locator.10ih3yF"/>
     <service id=".service_locator.Jc2xsDH" alias=".service_locator.z7LPJKP"/>
     <service id=".service_locator.nSvg3uO" alias=".service_locator.Mzhqy3N"/>
-    <service id=".service_locator.AGFiz_N" alias=".service_locator.l3rYz8h"/>
-    <service id=".service_locator.DvIdrBx" alias=".service_locator.KYVqCuv"/>
+    <service id=".service_locator.5pebkNV" alias=".service_locator.xxq2prQ"/>
+    <service id=".service_locator.4ZCMkQz" alias=".service_locator.1CkTyg5"/>
+    <service id=".service_locator.8HutPAU" alias=".service_locator.MZs5ciU"/>
     <service id=".service_locator.BFrsqsn" alias=".service_locator.F9PKc.7"/>
     <service id=".service_locator.SEIKAM_" alias=".service_locator.tTIt3Io"/>
     <service id=".service_locator.XtmiKbi" alias=".service_locator.MfxSDRP"/>
@@ -10662,7 +10674,8 @@
     <service id=".service_locator.vO.9397" alias=".service_locator.WVGOjkY"/>
     <service id=".service_locator.U0KjzJw" alias=".service_locator.z7LPJKP"/>
     <service id=".service_locator.lzFT4E_" alias=".service_locator.Mzhqy3N"/>
-    <service id=".service_locator.R7ukWjK" alias=".service_locator.l3rYz8h"/>
+    <service id=".service_locator.O9U8oFw" alias=".service_locator.xxq2prQ"/>
+    <service id=".service_locator.9dmTLtj" alias=".service_locator.1CkTyg5"/>
     <service id=".service_locator.Q1z.f9O" alias=".service_locator.O2p6Lk7"/>
     <service id=".service_locator.dGUCsbe" alias=".service_locator.oR77BOj"/>
     <service id=".service_locator._kIAbz1" alias=".service_locator.TpoC7U9"/>

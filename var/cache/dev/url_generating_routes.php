@@ -81,6 +81,7 @@ return [
     'app_tache_delete' => [['idTache'], ['_controller' => 'App\\Controller\\User\\TacheController::delete'], [], [['text', '/delete'], ['variable', '/', '[^/]++', 'idTache', true], ['text', '/tache']], [], [], []],
     'app_tache_front' => [[], ['_controller' => 'App\\Controller\\User\\TacheFrontController::front'], [], [['text', '/agriculteur/tache/front']], [], [], []],
     'app_tache_by_ouvrier' => [['cin'], ['_controller' => 'App\\Controller\\User\\TacheFrontController::tachesByOuvrier'], [], [['variable', '/', '[^/]++', 'cin', true], ['text', '/agriculteur/tache/front/agriculteur']], [], [], []],
+    'app_tache_auto_assigner' => [[], ['_controller' => 'App\\Controller\\User\\TacheFrontController::autoAssigner'], [], [['text', '/agriculteur/tache/auto-assigner']], [], [], []],
     'App\Controller\AboutController::index' => [[], ['_controller' => 'App\\Controller\\AboutController::index'], [], [['text', '/about']], [], [], []],
     'App\Controller\AdminDashboardController::index' => [[], ['_controller' => 'App\\Controller\\AdminDashboardController::index'], [], [['text', '/DashboardAdmin']], [], [], []],
     'App\Controller\AgriculteurDashboardController::index' => [[], ['_controller' => 'App\\Controller\\AgriculteurDashboardController::index'], [], [['text', '/agriculteur/']], [], [], []],
@@ -145,4 +146,5 @@ return [
     'App\Controller\User\TacheController::delete' => [['idTache'], ['_controller' => 'App\\Controller\\User\\TacheController::delete'], [], [['text', '/delete'], ['variable', '/', '[^/]++', 'idTache', true], ['text', '/tache']], [], [], []],
     'App\Controller\User\TacheFrontController::front' => [[], ['_controller' => 'App\\Controller\\User\\TacheFrontController::front'], [], [['text', '/agriculteur/tache/front']], [], [], []],
     'App\Controller\User\TacheFrontController::tachesByOuvrier' => [['cin'], ['_controller' => 'App\\Controller\\User\\TacheFrontController::tachesByOuvrier'], [], [['variable', '/', '[^/]++', 'cin', true], ['text', '/agriculteur/tache/front/agriculteur']], [], [], []],
+    'App\Controller\User\TacheFrontController::autoAssigner' => [[], ['_controller' => 'App\\Controller\\User\\TacheFrontController::autoAssigner'], [], [['text', '/agriculteur/tache/auto-assigner']], [], [], []],
 ];
