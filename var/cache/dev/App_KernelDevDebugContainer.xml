@@ -402,6 +402,13 @@
         <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\HomeController"/>
       </call>
     </service>
+    <service id="App\Controller\Terrain\AgriPlanteController" class="App\Controller\Terrain\AgriPlanteController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\Terrain\AgriPlanteController"/>
+      </call>
+    </service>
     <service id="App\Controller\Terrain\AgriTerrainController" class="App\Controller\Terrain\AgriTerrainController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
@@ -512,7 +519,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.nds8QVn"/>
+      <argument type="service" id=".service_locator.3ujDbiE"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -3409,7 +3416,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.nds8QVn"/>
+      <argument type="service" id=".service_locator.3ujDbiE"/>
     </service>
     <service id="debug.log_processor" class="Symfony\Bridge\Monolog\Processor\DebugProcessor">
       <tag name="kernel.reset" method="reset"/>
@@ -7377,6 +7384,9 @@
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\HomeController" class="App\Controller\HomeController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\HomeController" class="App\Controller\HomeController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\HomeController" class="App\Controller\HomeController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Terrain\AgriPlanteController" class="App\Controller\Terrain\AgriPlanteController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Terrain\AgriPlanteController" class="App\Controller\Terrain\AgriPlanteController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\Terrain\AgriPlanteController" class="App\Controller\Terrain\AgriPlanteController" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Terrain\AgriTerrainController" class="App\Controller\Terrain\AgriTerrainController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Terrain\AgriTerrainController" class="App\Controller\Terrain\AgriTerrainController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\Terrain\AgriTerrainController" class="App\Controller\Terrain\AgriTerrainController" autowire="true" autoconfigure="true" abstract="true"/>
@@ -7917,35 +7927,16 @@
         <argument key="passwordHasher" type="service_closure" id="security.user_password_hasher"/>
       </argument>
     </service>
-    <service id=".service_locator.PbrJcXN" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.ZUN3WII" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
-        <argument key="repo" type="service_closure" id="App\Repository\Terrain\TerrainRepository"/>
+        <argument key="repo" type="service_closure" id="App\Repository\Terrain\PlanteRepository"/>
       </argument>
     </service>
     <service id=".service_locator.9kKwU2t" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
-      </argument>
-    </service>
-    <service id=".service_locator.4mmheGO" class="Symfony\Component\DependencyInjection\ServiceLocator">
-      <tag name="container.service_locator"/>
-      <argument type="collection">
-        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
-        <argument key="terrain" type="service_closure" id=".errored..service_locator.4mmheGO.App\Entity\Terrain\Terrain"/>
-      </argument>
-    </service>
-    <service id=".service_locator.fs7gKM2" class="Symfony\Component\DependencyInjection\ServiceLocator">
-      <tag name="container.service_locator"/>
-      <argument type="collection">
-        <argument key="terrain" type="service_closure" id=".errored..service_locator.fs7gKM2.App\Entity\Terrain\Terrain"/>
-      </argument>
-    </service>
-    <service id=".service_locator.ZUN3WII" class="Symfony\Component\DependencyInjection\ServiceLocator">
-      <tag name="container.service_locator"/>
-      <argument type="collection">
-        <argument key="repo" type="service_closure" id="App\Repository\Terrain\PlanteRepository"/>
       </argument>
     </service>
     <service id=".service_locator.yjHtSb5" class="Symfony\Component\DependencyInjection\ServiceLocator">
@@ -7959,6 +7950,25 @@
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="plante" type="service_closure" id=".errored..service_locator.nKRs_ZO.App\Entity\Terrain\Plante"/>
+      </argument>
+    </service>
+    <service id=".service_locator.PbrJcXN" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="repo" type="service_closure" id="App\Repository\Terrain\TerrainRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.4mmheGO" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="terrain" type="service_closure" id=".errored..service_locator.4mmheGO.App\Entity\Terrain\Terrain"/>
+      </argument>
+    </service>
+    <service id=".service_locator.fs7gKM2" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="terrain" type="service_closure" id=".errored..service_locator.fs7gKM2.App\Entity\Terrain\Terrain"/>
       </argument>
     </service>
     <service id=".service_locator.1MSyv7A" class="Symfony\Component\DependencyInjection\ServiceLocator">
@@ -7994,7 +8004,7 @@
         <argument key="userRepo" type="service_closure" id="App\Repository\User\UserRepository"/>
       </argument>
     </service>
-    <service id=".service_locator.nds8QVn" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.3ujDbiE" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Controller\AdminDashboardController::index" type="service_closure" id=".service_locator.qni5W9T"/>
@@ -8010,6 +8020,11 @@
         <argument key="App\Controller\Animals\ExamensController::show" type="service_closure" id=".service_locator.Nl1KVNj"/>
         <argument key="App\Controller\AuthController::login" type="service_closure" id=".service_locator.rSTd.nA"/>
         <argument key="App\Controller\AuthController::register" type="service_closure" id=".service_locator.t8346QO"/>
+        <argument key="App\Controller\Terrain\AgriPlanteController::delete" type="service_closure" id=".service_locator.yjHtSb5"/>
+        <argument key="App\Controller\Terrain\AgriPlanteController::edit" type="service_closure" id=".service_locator.yjHtSb5"/>
+        <argument key="App\Controller\Terrain\AgriPlanteController::index" type="service_closure" id=".service_locator.ZUN3WII"/>
+        <argument key="App\Controller\Terrain\AgriPlanteController::new" type="service_closure" id=".service_locator.9kKwU2t"/>
+        <argument key="App\Controller\Terrain\AgriPlanteController::show" type="service_closure" id=".service_locator.nKRs_ZO"/>
         <argument key="App\Controller\Terrain\AgriTerrainController::delete" type="service_closure" id=".service_locator.4mmheGO"/>
         <argument key="App\Controller\Terrain\AgriTerrainController::edit" type="service_closure" id=".service_locator.4mmheGO"/>
         <argument key="App\Controller\Terrain\AgriTerrainController::index" type="service_closure" id=".service_locator.PbrJcXN"/>
@@ -8047,6 +8062,11 @@
         <argument key="App\Controller\Animals\ExamensController:show" type="service_closure" id=".service_locator.Nl1KVNj"/>
         <argument key="App\Controller\AuthController:login" type="service_closure" id=".service_locator.rSTd.nA"/>
         <argument key="App\Controller\AuthController:register" type="service_closure" id=".service_locator.t8346QO"/>
+        <argument key="App\Controller\Terrain\AgriPlanteController:delete" type="service_closure" id=".service_locator.yjHtSb5"/>
+        <argument key="App\Controller\Terrain\AgriPlanteController:edit" type="service_closure" id=".service_locator.yjHtSb5"/>
+        <argument key="App\Controller\Terrain\AgriPlanteController:index" type="service_closure" id=".service_locator.ZUN3WII"/>
+        <argument key="App\Controller\Terrain\AgriPlanteController:new" type="service_closure" id=".service_locator.9kKwU2t"/>
+        <argument key="App\Controller\Terrain\AgriPlanteController:show" type="service_closure" id=".service_locator.nKRs_ZO"/>
         <argument key="App\Controller\Terrain\AgriTerrainController:delete" type="service_closure" id=".service_locator.4mmheGO"/>
         <argument key="App\Controller\Terrain\AgriTerrainController:edit" type="service_closure" id=".service_locator.4mmheGO"/>
         <argument key="App\Controller\Terrain\AgriTerrainController:index" type="service_closure" id=".service_locator.PbrJcXN"/>
@@ -8766,6 +8786,12 @@
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.O2p6Lk7" method="withContext"/>
     </service>
+    <service id=".service_locator.O2p6Lk7.App\Controller\Terrain\AgriPlanteController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\Terrain\AgriPlanteController"/>
+      <argument>App\Controller\Terrain\AgriPlanteController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.O2p6Lk7" method="withContext"/>
+    </service>
     <service id=".service_locator.O2p6Lk7.App\Controller\Terrain\AgriTerrainController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\Terrain\AgriTerrainController"/>
       <argument>App\Controller\Terrain\AgriTerrainController</argument>
@@ -8971,6 +8997,7 @@
           <argument>App\Controller\Animals\ExamensController</argument>
           <argument>App\Controller\AuthController</argument>
           <argument>App\Controller\HomeController</argument>
+          <argument>App\Controller\Terrain\AgriPlanteController</argument>
           <argument>App\Controller\Terrain\AgriTerrainController</argument>
           <argument>App\Controller\Terrain\PlanteController</argument>
           <argument>App\Controller\Terrain\RotationController</argument>
@@ -9183,17 +9210,17 @@
     <service id=".errored..service_locator..4cEOa9.App\Entity\Animals\Animaux" class="App\Entity\Animals\Animaux">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator..4cEOa9&quot;: it needs an instance of &quot;App\Entity\Animals\Animaux&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
     </service>
-    <service id=".errored..service_locator.4mmheGO.App\Entity\Terrain\Terrain" class="App\Entity\Terrain\Terrain">
-      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.4mmheGO&quot;: it needs an instance of &quot;App\Entity\Terrain\Terrain&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
-    </service>
-    <service id=".errored..service_locator.fs7gKM2.App\Entity\Terrain\Terrain" class="App\Entity\Terrain\Terrain">
-      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.fs7gKM2&quot;: it needs an instance of &quot;App\Entity\Terrain\Terrain&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
-    </service>
     <service id=".errored..service_locator.yjHtSb5.App\Entity\Terrain\Plante" class="App\Entity\Terrain\Plante">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.yjHtSb5&quot;: it needs an instance of &quot;App\Entity\Terrain\Plante&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
     </service>
     <service id=".errored..service_locator.nKRs_ZO.App\Entity\Terrain\Plante" class="App\Entity\Terrain\Plante">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.nKRs_ZO&quot;: it needs an instance of &quot;App\Entity\Terrain\Plante&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
+    </service>
+    <service id=".errored..service_locator.4mmheGO.App\Entity\Terrain\Terrain" class="App\Entity\Terrain\Terrain">
+      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.4mmheGO&quot;: it needs an instance of &quot;App\Entity\Terrain\Terrain&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
+    </service>
+    <service id=".errored..service_locator.fs7gKM2.App\Entity\Terrain\Terrain" class="App\Entity\Terrain\Terrain">
+      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.fs7gKM2&quot;: it needs an instance of &quot;App\Entity\Terrain\Terrain&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
     </service>
     <service id=".errored..service_locator.QoKtgh5.App\Entity\Terrain\Rotation" class="App\Entity\Terrain\Rotation">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.QoKtgh5&quot;: it needs an instance of &quot;App\Entity\Terrain\Rotation&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
@@ -10394,7 +10421,7 @@
     <service id="Psr\Log\LoggerInterface" alias="monolog.logger"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.w7.f4fT" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.nds8QVn"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.3ujDbiE"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id=".Psr\Log\LoggerInterface $request.logger" alias="monolog.logger.request"/>
@@ -10435,10 +10462,10 @@
     <service id=".service_locator.YHeJzvQ" alias=".service_locator.la7NApM"/>
     <service id=".service_locator.ccwFaAk" alias=".service_locator.7veCuyK"/>
     <service id=".service_locator.81LTOQ7" alias=".service_locator.t8346QO"/>
-    <service id=".service_locator.EN_uOgD" alias=".service_locator.4mmheGO"/>
     <service id=".service_locator.9_5m.zA" alias=".service_locator.yjHtSb5"/>
+    <service id=".service_locator.EN_uOgD" alias=".service_locator.4mmheGO"/>
     <service id=".service_locator.TSrp4XK" alias=".service_locator.QoKtgh5"/>
-    <service id=".service_locator.9MIIBin" alias=".service_locator.nds8QVn"/>
+    <service id=".service_locator.CsDj5.9" alias=".service_locator.3ujDbiE"/>
     <service id=".service_locator.BFrsqsn" alias=".service_locator.F9PKc.7"/>
     <service id=".service_locator.Qv5xrwH" alias=".service_locator.zTUZ04q"/>
     <service id=".service_locator.XtmiKbi" alias=".service_locator.MfxSDRP"/>
@@ -10474,13 +10501,13 @@
     <service id=".service_locator.9poacNA" alias=".service_locator.7veCuyK"/>
     <service id=".service_locator.7NIAq8D" alias=".service_locator.rSTd.nA"/>
     <service id=".service_locator.PgYGRUQ" alias=".service_locator.t8346QO"/>
-    <service id=".service_locator.22U4beL" alias=".service_locator.PbrJcXN"/>
-    <service id=".service_locator.gaTSUXr" alias=".service_locator.9kKwU2t"/>
-    <service id=".service_locator.iAk21e6" alias=".service_locator.4mmheGO"/>
-    <service id=".service_locator.Ry.QS4P" alias=".service_locator.fs7gKM2"/>
     <service id=".service_locator.biu0rfU" alias=".service_locator.ZUN3WII"/>
+    <service id=".service_locator.gaTSUXr" alias=".service_locator.9kKwU2t"/>
     <service id=".service_locator..wevcEs" alias=".service_locator.yjHtSb5"/>
     <service id=".service_locator.zzr2p.g" alias=".service_locator.nKRs_ZO"/>
+    <service id=".service_locator.22U4beL" alias=".service_locator.PbrJcXN"/>
+    <service id=".service_locator.iAk21e6" alias=".service_locator.4mmheGO"/>
+    <service id=".service_locator.Ry.QS4P" alias=".service_locator.fs7gKM2"/>
     <service id=".service_locator.uedKmBM" alias=".service_locator.1MSyv7A"/>
     <service id=".service_locator.gNVSsmw" alias=".service_locator.QoKtgh5"/>
     <service id=".service_locator._snA8_4" alias=".service_locator.Rqi5rrk"/>
