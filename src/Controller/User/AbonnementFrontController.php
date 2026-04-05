@@ -4,47 +4,53 @@ namespace App\Controller\User;
 
 use App\Repository\User\AbonnementRepository;
 use App\Repository\User\OffreRepository;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Dompdf\Dompdf;
-use Dompdf\Options;
 
 #[Route('/agriculteur/abonnement')]
 class AbonnementFrontController extends AbstractController
 {
     #[Route('/front', name: 'app_abonnement_front', methods: ['GET'])]
-public function front(AbonnementRepository $abonnRepo, OffreRepository $offreRepo): Response
-{
-    /** @var \App\Entity\User\User $user */
-    $user = $this->getUser();
-    $cin  = $user->getCin();
+    public function front(AbonnementRepository $abonnRepo, OffreRepository $offreRepo): Response
+    {
+        /** @var \App\Entity\User\User $user */
+        $user = $this->getUser();
+        $cin  = $user->getCin();
 
-    $abonnements = $abonnRepo->findByCin($cin);
+        $abonnements = $abonnRepo->findByCin($cin);
 
-    $data = array_map(function($a) use ($offreRepo) {
-        $offre = $offreRepo->find($a->getIdOffre());
-        return [
-            'id'              => $a->getIdAbonn(),
-            'cin'             => $a->getCin(),
-            'dateInscription' => $a->getDateInscription()->format('d/m/Y'),
-            'dateExpiration'  => $a->getDateExpiration()->format('d/m/Y'),
-            'situation'       => $a->getSituation(),
-            'expireBientot'   => $a->getDateExpiration() < new \DateTime('+7 days') && $a->getDateExpiration() > new \DateTime(),
-            'estExpire'       => $a->getDateExpiration() < new \DateTime(),
-            'nomOffre'        => $offre?->getNomOffre() ?? '—',
-            'description'     => $offre?->getDescription() ?? '—',
-            'prix'            => $offre?->getPrix() ?? 0,
-            'duree'           => $offre?->getDureeOffre() ?? 0,
-        ];
-    }, $abonnements);
+        $data = array_map(function($a) use ($offreRepo) {
+            $offre = $offreRepo->find($a->getIdOffre());
+            $now   = new \DateTime('today');
+            $exp   = $a->getDateExpiration();
+            $diff  = $now->diff($exp);
+            $joursRestants = $exp > $now ? $diff->days : 0;
 
-    return $this->render('User/FrontAbonnement.html.twig', [
-        'abonnements' => $data,
-    ]);
-}
+            return [
+                'id'              => $a->getIdAbonn(),
+                'cin'             => $a->getCin(),
+                'dateInscription' => $a->getDateInscription()->format('d/m/Y'),
+                'dateExpiration'  => $a->getDateExpiration()->format('d/m/Y'),
+                'situation'       => $a->getSituation(),
+                'expireBientot'   => $a->getDateExpiration() > new \DateTime('today')
+                                     && $a->getDateExpiration() <= new \DateTime('+7 days'),
+                'estExpire'       => $a->getDateExpiration() <= new \DateTime('today'),
+                'joursRestants'   => $joursRestants,
+                'nomOffre'        => $offre?->getNomOffre() ?? '—',
+                'description'     => $offre?->getDescription() ?? '—',
+                'prix'            => $offre?->getPrix() ?? 0,
+                'duree'           => $offre?->getDureeOffre() ?? 0,
+            ];
+        }, $abonnements);
 
-    // ==================== PDF ====================
+        return $this->render('User/FrontAbonnement.html.twig', [
+            'abonnements' => $data,
+        ]);
+    }
+
     #[Route('/front/pdf/{id}', name: 'app_abonnement_pdf', methods: ['GET'])]
     public function pdf(int $id, AbonnementRepository $abonnRepo, OffreRepository $offreRepo): Response
     {
@@ -54,7 +60,7 @@ public function front(AbonnementRepository $abonnRepo, OffreRepository $offreRep
             throw $this->createNotFoundException('Abonnement non trouvé');
         }
 
-        // Sécurité : l'agriculteur ne peut télécharger que ses propres abonnements
+        /** @var \App\Entity\User\User $user */
         $user = $this->getUser();
         if ($abonnement->getCin() !== $user->getCin()) {
             throw $this->createAccessDeniedException();
@@ -67,7 +73,7 @@ public function front(AbonnementRepository $abonnRepo, OffreRepository $offreRep
         $dompdf = new Dompdf($options);
 
         $situation  = $abonnement->getSituation();
-        $situColor  = match($situation) {
+        $situColor  = match(strtolower($situation)) {
             'actif'    => '#2D5A27',
             'expiré'   => '#A32D2D',
             'suspendu' => '#854F0B',
