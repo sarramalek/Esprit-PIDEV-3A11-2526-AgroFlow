@@ -1,0 +1,307 @@
+{% extends 'base_admin.html.twig' %}
+{% block title %}Terrains — AgroFlow{% endblock %}
+{% block page_title %}Gestion des Terrains{% endblock %}
+{% block breadcrumb %}Terrains{% endblock %}
+
+{% block stylesheets %}
+/* ── Stats Cards ── */
+.stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
+.stat-card { background:var(--white); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px 24px; display:flex; align-items:center; gap:16px; }
+.stat-icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+.stat-icon.green  { background:#D1FAE5; color:#065F46; }
+.stat-icon.blue   { background:#DBEAFE; color:#1D4ED8; }
+.stat-icon.yellow { background:#FEF3C7; color:#92400E; }
+.stat-icon.purple { background:#EDE9FE; color:#5B21B6; }
+.stat-value { font-size:24px; font-weight:700; color:var(--navy); line-height:1; }
+.stat-label { font-size:12px; color:var(--text-muted); margin-top:4px; }
+
+/* ── Sol Repartition ── */
+.sol-bars { display:flex; flex-direction:column; gap:8px; margin-top:12px; }
+.sol-bar-row { display:flex; align-items:center; gap:10px; font-size:13px; }
+.sol-bar-label { width:80px; color:var(--text-muted); font-weight:500; }
+.sol-bar-track { flex:1; height:8px; background:var(--cream-dark); border-radius:4px; overflow:hidden; }
+.sol-bar-fill { height:100%; background:var(--green-accent); border-radius:4px; transition:width 0.6s ease; }
+.sol-bar-count { width:24px; text-align:right; font-weight:600; color:var(--navy); }
+
+/* ── Toolbar ── */
+.toolbar { display:flex; align-items:center; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
+.search-box { position:relative; flex:1; min-width:220px; }
+.search-box input { width:100%; padding:10px 14px 10px 38px; border:1.5px solid var(--cream-dark); border-radius:8px; font-size:14px; font-family:'DM Sans',sans-serif; background:var(--white); color:var(--navy); transition:border-color 0.2s; }
+.search-box input:focus { outline:none; border-color:var(--green-accent); }
+.search-box i { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:13px; }
+.filter-select { padding:10px 14px; border:1.5px solid var(--cream-dark); border-radius:8px; font-size:14px; font-family:'DM Sans',sans-serif; background:var(--white); color:var(--navy); cursor:pointer; }
+.filter-select:focus { outline:none; border-color:var(--green-accent); }
+.btn-primary { display:inline-flex; align-items:center; gap:8px; background:var(--green-accent); color:white; padding:10px 20px; border-radius:var(--radius); font-size:14px; font-weight:600; text-decoration:none; border:none; cursor:pointer; white-space:nowrap; }
+.btn-primary:hover { background:var(--green-mid); }
+.result-count { font-size:13px; color:var(--text-muted); margin-left:4px; }
+
+/* ── Table ── */
+.card { background:var(--white); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
+.flash-success { background:#D1FAE5; color:#065F46; padding:12px 18px; border-radius:var(--radius); margin-bottom:20px; font-size:14px; font-weight:500; display:flex; align-items:center; gap:8px; }
+.data-table { width:100%; border-collapse:collapse; }
+.data-table thead th { background:var(--cream); padding:13px 18px; text-align:left; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); border-bottom:1px solid var(--cream-dark); white-space:nowrap; }
+.data-table thead th.sortable { cursor:pointer; user-select:none; transition:color 0.2s; }
+.data-table thead th.sortable:hover { color:var(--green-accent); }
+.data-table thead th .sort-icon { margin-left:5px; opacity:0.4; font-size:10px; }
+.data-table thead th.sort-asc .sort-icon,
+.data-table thead th.sort-desc .sort-icon { opacity:1; color:var(--green-accent); }
+.data-table tbody td { padding:14px 18px; font-size:14px; border-bottom:1px solid var(--cream-dark); vertical-align:middle; }
+.data-table tbody tr:last-child td { border-bottom:none; }
+.data-table tbody tr:hover { background:#FAFDF8; }
+.data-table tbody tr.hidden-row { display:none; }
+.badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; }
+.badge-soil { background:#FEF3C7; color:#92400E; }
+.terrain-name { font-weight:600; color:var(--navy); }
+.cin-code { font-family:'DM Mono',monospace; font-size:13px; background:var(--cream); padding:3px 8px; border-radius:6px; }
+.actions { display:flex; gap:8px; align-items:center; }
+.btn-danger { background:#FEE2E2; color:#DC2626; border:none; padding:6px 12px; border-radius:7px; font-size:13px; cursor:pointer; }
+.btn-danger:hover { background:#FECACA; }
+.btn-edit { display:inline-flex; align-items:center; gap:5px; background:var(--cream-dark); color:var(--navy); border:1px solid #ddd; padding:6px 12px; border-radius:7px; font-size:13px; text-decoration:none; }
+.btn-edit:hover { background:#e5e0cc; }
+.btn-show { display:inline-flex; align-items:center; gap:5px; background:#EFF6FF; color:#2563EB; border:1px solid #BFDBFE; padding:6px 12px; border-radius:7px; font-size:13px; text-decoration:none; }
+.btn-show:hover { background:#DBEAFE; }
+.empty-state { text-align:center; padding:60px 20px; color:var(--text-muted); }
+.empty-state i { font-size:48px; margin-bottom:16px; opacity:0.3; display:block; }
+.no-results { text-align:center; padding:40px; color:var(--text-muted); display:none; }
+{% endblock %}
+
+{% block body %}
+
+{% for msg in app.flashes('success') %}
+<div class="flash-success"><i class="fa fa-check-circle"></i> {{ msg }}</div>
+{% endfor %}
+
+{# ══ STATISTIQUES ══ #}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon green"><i class="fa fa-map"></i></div>
+        <div>
+            <div class="stat-value">{{ totalTerrains }}</div>
+            <div class="stat-label">Total terrains</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon blue"><i class="fa fa-ruler-combined"></i></div>
+        <div>
+            <div class="stat-value">{{ surfaceTotale|number_format(1) }}</div>
+            <div class="stat-label">Surface totale (ha)</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon yellow"><i class="fa fa-flask"></i></div>
+        <div>
+            <div class="stat-value">{{ pHMoyen ?? '—' }}</div>
+            <div class="stat-label">pH moyen</div>
+        </div>
+    </div>
+    <div class="stat-card" style="flex-direction:column; align-items:flex-start; gap:8px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+            <div class="stat-icon purple"><i class="fa fa-layer-group"></i></div>
+            <div>
+                <div class="stat-value">{{ typeSolStats|length }}</div>
+                <div class="stat-label">Types de sol</div>
+            </div>
+        </div>
+        <div class="sol-bars" style="width:100%">
+            {% for type, count in typeSolStats %}
+            <div class="sol-bar-row">
+                <span class="sol-bar-label">{{ type }}</span>
+                <div class="sol-bar-track">
+                    <div class="sol-bar-fill"
+                         style="width:{{ totalTerrains > 0 ? (count/totalTerrains*100)|round : 0 }}%">
+                    </div>
+                </div>
+                <span class="sol-bar-count">{{ count }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{# ══ TOOLBAR ══ #}
+<div class="toolbar">
+    <div class="search-box">
+        <i class="fa fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" placeholder="Rechercher par nom, localisation, CIN…">
+    </div>
+    <select class="filter-select" id="filterSol">
+        <option value="">Tous les sols</option>
+        <option value="Argileux">Argileux</option>
+        <option value="Sableux">Sableux</option>
+        <option value="Limoneux">Limoneux</option>
+        <option value="Calcaire">Calcaire</option>
+        <option value="Humifère">Humifère</option>
+    </select>
+    <span class="result-count" id="resultCount"></span>
+    <a href="{{ path('admin_terrains_new') }}" class="btn-primary">
+        <i class="fa fa-plus"></i> Nouveau terrain
+    </a>
+</div>
+
+{# ══ TABLE ══ #}
+<div class="card">
+    {% if terrains is empty %}
+    <div class="empty-state">
+        <i class="fa fa-map"></i>
+        <p>Aucun terrain enregistré.</p>
+    </div>
+    {% else %}
+    <table class="data-table" id="terrainTable">
+        <thead>
+            <tr>
+                <th class="sortable" data-col="0">#<i class="fa fa-sort sort-icon"></i></th>
+                <th class="sortable" data-col="1">Nom<i class="fa fa-sort sort-icon"></i></th>
+                <th class="sortable" data-col="2">Propriétaire<i class="fa fa-sort sort-icon"></i></th>
+                <th class="sortable" data-col="3">Surface<i class="fa fa-sort sort-icon"></i></th>
+                <th class="sortable" data-col="4">Type sol<i class="fa fa-sort sort-icon"></i></th>
+                <th class="sortable" data-col="5">Localisation<i class="fa fa-sort sort-icon"></i></th>
+                <th class="sortable" data-col="6">pH<i class="fa fa-sort sort-icon"></i></th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="terrainBody">
+        {% for terrain in terrains %}
+            <tr data-nom="{{ terrain.nomTerrain|lower }}"
+                data-localisation="{{ terrain.localisation|lower }}"
+                data-cin="{{ terrain.cin|lower }}"
+                data-proprietaire="{{ terrain.cin and cinToName[terrain.cin] is defined ? cinToName[terrain.cin]|lower : '' }}"
+                data-sol="{{ terrain.typeSol }}">
+                <td style="color:var(--text-muted);font-family:'DM Mono',monospace;font-size:13px">
+                    #{{ terrain.id }}
+                </td>
+                <td><span class="terrain-name">{{ terrain.nomTerrain }}</span></td>
+                <td>
+                    {% if terrain.cin and cinToName[terrain.cin] is defined %}
+                        <span style="font-weight:600; color:var(--navy)">{{ cinToName[terrain.cin] }}</span>
+                        <br><span class="cin-code" style="font-size:11px">{{ terrain.cin }}</span>
+                    {% elseif terrain.cin %}
+                        <span class="cin-code">{{ terrain.cin }}</span>
+                    {% else %}
+                        <span style="color:var(--text-muted)">—</span>
+                    {% endif %}
+                </td>
+                <td>{{ terrain.surface }} ha</td>
+                <td><span class="badge badge-soil">{{ terrain.typeSol }}</span></td>
+                <td>{{ terrain.localisation }}</td>
+                <td>{{ terrain.pH ?? '—' }}</td>
+                <td>
+                    <div class="actions">
+                        <a href="{{ path('admin_terrains_show', {id: terrain.id}) }}" class="btn-show">
+                            <i class="fa fa-eye"></i>
+                        </a>
+                        <a href="{{ path('admin_terrains_edit', {id: terrain.id}) }}" class="btn-edit">
+                            <i class="fa fa-pen"></i>
+                        </a>
+                        <form method="post"
+                              action="{{ path('admin_terrains_delete', {id: terrain.id}) }}"
+                              onsubmit="return confirm('Supprimer ce terrain ?')">
+                            <input type="hidden" name="_token"
+                                   value="{{ csrf_token('delete'~terrain.id) }}">
+                            <button class="btn-danger"><i class="fa fa-trash"></i></button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="no-results" id="noResults">
+        <i class="fa fa-magnifying-glass" style="font-size:32px;opacity:0.3;display:block;margin-bottom:12px"></i>
+        Aucun résultat trouvé.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+const searchInput  = document.getElementById('searchInput');
+const filterSol    = document.getElementById('filterSol');
+const resultCount  = document.getElementById('resultCount');
+const noResults    = document.getElementById('noResults');
+const tbody        = document.getElementById('terrainBody');
+
+// ── Recherche + Filtre ──────────────────────────────────
+function filterTable() {
+    const q   = searchInput.value.toLowerCase().trim();
+    const sol = filterSol.value;
+    const rows = tbody ? tbody.querySelectorAll('tr') : [];
+    let visible = 0;
+
+    rows.forEach(row => {
+        const nom  = row.dataset.nom || '';
+        const loc  = row.dataset.localisation || '';
+        const cin  = row.dataset.cin || '';
+        const type = row.dataset.sol || '';
+
+        const proprietaire = row.dataset.proprietaire || '';
+        const matchSearch = !q || nom.includes(q) || loc.includes(q) || cin.includes(q) || proprietaire.includes(q);
+        const matchSol    = !sol || type === sol;
+
+        if (matchSearch && matchSol) {
+            row.classList.remove('hidden-row');
+            visible++;
+        } else {
+            row.classList.add('hidden-row');
+        }
+    });
+
+    resultCount.textContent = visible + ' résultat' + (visible > 1 ? 's' : '');
+    if (noResults) noResults.style.display = visible === 0 ? 'block' : 'none';
+}
+
+if (searchInput) searchInput.addEventListener('input', filterTable);
+if (filterSol)   filterSol.addEventListener('change', filterTable);
+
+// Lancer au chargement pour afficher le count initial
+window.addEventListener('DOMContentLoaded', filterTable);
+
+// ── Tri par colonne ─────────────────────────────────────
+let sortCol = -1;
+let sortAsc = true;
+
+document.querySelectorAll('th.sortable').forEach(th => {
+    th.addEventListener('click', () => {
+        const col = parseInt(th.dataset.col);
+
+        // Reset toutes les colonnes
+        document.querySelectorAll('th.sortable').forEach(t => {
+            t.classList.remove('sort-asc', 'sort-desc');
+            t.querySelector('.sort-icon').className = 'fa fa-sort sort-icon';
+        });
+
+        if (sortCol === col) {
+            sortAsc = !sortAsc;
+        } else {
+            sortCol = col;
+            sortAsc = true;
+        }
+
+        th.classList.add(sortAsc ? 'sort-asc' : 'sort-desc');
+        th.querySelector('.sort-icon').className =
+            'fa fa-sort-' + (sortAsc ? 'up' : 'down') + ' sort-icon';
+
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+
+        rows.sort((a, b) => {
+            const aVal = a.cells[col]?.textContent.trim() || '';
+            const bVal = b.cells[col]?.textContent.trim() || '';
+
+            // Numérique si possible
+            const aNum = parseFloat(aVal.replace(/[^\d.]/g, ''));
+            const bNum = parseFloat(bVal.replace(/[^\d.]/g, ''));
+
+            if (!isNaN(aNum) && !isNaN(bNum)) {
+                return sortAsc ? aNum - bNum : bNum - aNum;
+            }
+            return sortAsc
+                ? aVal.localeCompare(bVal, 'fr')
+                : bVal.localeCompare(aVal, 'fr');
+        });
+
+        rows.forEach(r => tbody.appendChild(r));
+        filterTable(); // Réappliquer le filtre après le tri
+    });
+});
+</script>
+{% endblock %}
