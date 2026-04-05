@@ -286,3 +286,11 @@ a720ee,127.0.0.1,GET,http://127.0.0.1:8000/tache/export/pdf,1775388387,,500,requ
 c2145a,127.0.0.1,GET,http://127.0.0.1:8000/tache/export/pdf,1775388526,,200,request
 3a94aa,127.0.0.1,GET,http://127.0.0.1:8000/tache/export/pdf,1775388532,,200,request
 3f6536,127.0.0.1,GET,http://127.0.0.1:8000/tache/11/pdf,1775388543,,200,request
+645f7f,127.0.0.1,GET,http://127.0.0.1:8000/tache/?direction=ASC&q=&sort=priorite,1775389586,,200,request
+8cfd3d,127.0.0.1,GET,http://127.0.0.1:8000/admin/abonnements,1775389590,,200,request
+c3e9e3,127.0.0.1,GET,http://127.0.0.1:8000/admin/abonnements/export/pdf,1775389596,7ab7a3,500,request
+7ab7a3,127.0.0.1,GET,http://127.0.0.1:8000/admin/abonnements/export/pdf,1775389596,,500,request
+5f1601,127.0.0.1,GET,http://127.0.0.1:8000/admin/abonnements/export/pdf,1775389643,,200,request
+69241d,127.0.0.1,GET,http://127.0.0.1:8000/admin/abonnements/export/pdf,1775389647,,200,request
+f0b50a,127.0.0.1,GET,http://127.0.0.1:8000/admin/abonnements/2/pdf,1775389651,,200,request
+01a11a,127.0.0.1,GET,http://127.0.0.1:8000/offre/,1775389705,,200,request
