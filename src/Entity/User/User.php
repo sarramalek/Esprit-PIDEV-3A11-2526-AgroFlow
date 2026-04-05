@@ -70,12 +70,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        return match((int)$this->role) {
+        $roles = match ((int)$this->role) {
             1 => ['ROLE_OUVRIER'],
             2 => ['ROLE_AGRICULTEUR'],
             3 => ['ROLE_ADMIN'],
-            default => ['ROLE_USER'],
+            default => [],
         };
+
+        // On ajoute toujours ROLE_USER par défaut en plus du reste
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
     }
 
     public function getPassword(): string
@@ -90,51 +95,163 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     // ==================== GETTERS & SETTERS ====================
 
-    public function getCin(): ?int { return $this->cin; }
-    public function setCin(int $cin): self { $this->cin = $cin; return $this; }
+    public function getCin(): ?int
+    {
+        return $this->cin;
+    }
+    public function setCin(int $cin): self
+    {
+        $this->cin = $cin;
+        return $this;
+    }
 
-    public function getNom(): ?string { return $this->nom; }
-    public function setNom(?string $nom): self { $this->nom = $nom; return $this; }
+    public function getNom(): ?string
+    {
+        return $this->nom;
+    }
+    public function setNom(?string $nom): self
+    {
+        $this->nom = $nom;
+        return $this;
+    }
 
-    public function getPrenom(): ?string { return $this->prenom; }
-    public function setPrenom(?string $prenom): self { $this->prenom = $prenom; return $this; }
+    public function getPrenom(): ?string
+    {
+        return $this->prenom;
+    }
+    public function setPrenom(?string $prenom): self
+    {
+        $this->prenom = $prenom;
+        return $this;
+    }
 
-    public function getTel(): ?string { return $this->tel; }
-    public function setTel(?string $tel): self { $this->tel = $tel; return $this; }
+    public function getTel(): ?string
+    {
+        return $this->tel;
+    }
+    public function setTel(?string $tel): self
+    {
+        $this->tel = $tel;
+        return $this;
+    }
 
-    public function getDateNaiss(): ?\DateTimeInterface { return $this->dateNaiss; }
-    public function setDateNaiss(?\DateTimeInterface $dateNaiss): self { $this->dateNaiss = $dateNaiss; return $this; }
+    public function getDateNaiss(): ?\DateTimeInterface
+    {
+        return $this->dateNaiss;
+    }
+    public function setDateNaiss(?\DateTimeInterface $dateNaiss): self
+    {
+        $this->dateNaiss = $dateNaiss;
+        return $this;
+    }
 
-    public function getEmail(): ?string { return $this->email; }
-    public function setEmail(?string $email): self { $this->email = $email; return $this; }
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+    public function setEmail(?string $email): self
+    {
+        $this->email = $email;
+        return $this;
+    }
 
-    public function getMdp(): ?string { return $this->mdp; }
-    public function setMdp(?string $mdp): self { $this->mdp = $mdp; return $this; }
+    public function getMdp(): ?string
+    {
+        return $this->mdp;
+    }
+    public function setMdp(?string $mdp): self
+    {
+        $this->mdp = $mdp;
+        return $this;
+    }
 
-    public function getAdresse(): ?string { return $this->adresse; }
-    public function setAdresse(?string $adresse): self { $this->adresse = $adresse; return $this; }
+    public function getAdresse(): ?string
+    {
+        return $this->adresse;
+    }
+    public function setAdresse(?string $adresse): self
+    {
+        $this->adresse = $adresse;
+        return $this;
+    }
 
-    public function getVille(): ?string { return $this->ville; }
-    public function setVille(?string $ville): self { $this->ville = $ville; return $this; }
+    public function getVille(): ?string
+    {
+        return $this->ville;
+    }
+    public function setVille(?string $ville): self
+    {
+        $this->ville = $ville;
+        return $this;
+    }
 
-    public function getRole(): ?int { return $this->role; }
-    public function setRole(?int $role): self { $this->role = $role; return $this; }
+    public function getRole(): ?int
+    {
+        return $this->role;
+    }
+    public function setRole(?int $role): self
+    {
+        $this->role = $role;
+        return $this;
+    }
 
-    public function getDateCreationcpt(): ?\DateTimeInterface { return $this->dateCreationcpt; }
-    public function setDateCreationcpt(?\DateTimeInterface $dateCreationcpt): self { $this->dateCreationcpt = $dateCreationcpt; return $this; }
+    public function getDateCreationcpt(): ?\DateTimeInterface
+    {
+        return $this->dateCreationcpt;
+    }
+    public function setDateCreationcpt(?\DateTimeInterface $dateCreationcpt): self
+    {
+        $this->dateCreationcpt = $dateCreationcpt;
+        return $this;
+    }
 
-    public function getDateDernierchg(): ?\DateTimeInterface { return $this->dateDernierchg; }
-    public function setDateDernierchg(?\DateTimeInterface $dateDernierchg): self { $this->dateDernierchg = $dateDernierchg; return $this; }
+    public function getDateDernierchg(): ?\DateTimeInterface
+    {
+        return $this->dateDernierchg;
+    }
+    public function setDateDernierchg(?\DateTimeInterface $dateDernierchg): self
+    {
+        $this->dateDernierchg = $dateDernierchg;
+        return $this;
+    }
 
-    public function isTwoFactorEnabled(): bool { return $this->twoFactorEnabled; }
-    public function setTwoFactorEnabled(bool $twoFactorEnabled): self { $this->twoFactorEnabled = $twoFactorEnabled; return $this; }
+    public function isTwoFactorEnabled(): bool
+    {
+        return $this->twoFactorEnabled;
+    }
+    public function setTwoFactorEnabled(bool $twoFactorEnabled): self
+    {
+        $this->twoFactorEnabled = $twoFactorEnabled;
+        return $this;
+    }
 
-    public function getTwoFactorSecret(): ?string { return $this->twoFactorSecret; }
-    public function setTwoFactorSecret(?string $twoFactorSecret): self { $this->twoFactorSecret = $twoFactorSecret; return $this; }
+    public function getTwoFactorSecret(): ?string
+    {
+        return $this->twoFactorSecret;
+    }
+    public function setTwoFactorSecret(?string $twoFactorSecret): self
+    {
+        $this->twoFactorSecret = $twoFactorSecret;
+        return $this;
+    }
 
-    public function getTwoFactorBackupCodes(): ?string { return $this->twoFactorBackupCodes; }
-    public function setTwoFactorBackupCodes(?string $twoFactorBackupCodes): self { $this->twoFactorBackupCodes = $twoFactorBackupCodes; return $this; }
+    public function getTwoFactorBackupCodes(): ?string
+    {
+        return $this->twoFactorBackupCodes;
+    }
+    public function setTwoFactorBackupCodes(?string $twoFactorBackupCodes): self
+    {
+        $this->twoFactorBackupCodes = $twoFactorBackupCodes;
+        return $this;
+    }
 
-    public function getImg(): ?string { return $this->img; }
-    public function setImg(?string $img): self { $this->img = $img; return $this; }
+    public function getImg(): ?string
+    {
+        return $this->img;
+    }
+    public function setImg(?string $img): self
+    {
+        $this->img = $img;
+        return $this;
+    }
 }
