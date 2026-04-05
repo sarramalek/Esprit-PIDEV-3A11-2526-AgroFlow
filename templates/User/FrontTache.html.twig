@@ -64,14 +64,36 @@
 <div class="front-wrapper">
 
     {# ── Header ── #}
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-        <div>
-            <p style="margin:0 0 4px; color:#999; font-size:13px;">
-                <i class="fa fa-home"></i> Front Office &rsaquo; <strong style="color:#2C3E50;">Tâches</strong>
-            </p>
-            <h2 style="margin:0; color:#2C3E50; font-size:24px;">Gestion des Tâches par Ouvrier</h2>
-        </div>
+   {# ── Header ── #}
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+    <div>
+        <p style="margin:0 0 4px; color:#999; font-size:13px;">
+            <i class="fa fa-home"></i> Front Office &rsaquo; <strong style="color:#2C3E50;">Tâches</strong>
+        </p>
+        <h2 style="margin:0; color:#2C3E50; font-size:24px;">Gestion des Tâches par Ouvrier</h2>
     </div>
+    <button onclick="autoAssigner()"
+            style="background:#2D5A27; color:white; padding:12px 22px; border:none; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:8px; transition:background 0.2s;"
+            onmouseover="this.style.background='#1e3d1a'"
+            onmouseout="this.style.background='#2D5A27'">
+        <i class="fa fa-magic"></i> Auto-assigner les tâches
+    </button>
+</div>
+
+{# ── Modal résultat ── #}
+<div id="autoModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:9999; align-items:center; justify-content:center;">
+    <div style="background:white; border-radius:16px; padding:30px; max-width:500px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h3 style="margin:0; color:#2C3E50; font-size:18px;"><i class="fa fa-magic" style="color:#2D5A27;"></i> Résultat auto-assignation</h3>
+            <button onclick="closeModal()" style="background:none; border:none; font-size:20px; cursor:pointer; color:#aaa;">×</button>
+        </div>
+        <div id="autoModalContent"></div>
+        <button onclick="closeModal()"
+                style="width:100%; margin-top:20px; background:#2D5A27; color:white; padding:12px; border:none; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer;">
+            Fermer
+        </button>
+    </div>
+</div>
 
     {# ── Layout 2 colonnes ── #}
     <div class="split-layout">
@@ -268,5 +290,76 @@ document.getElementById('ouvrierSearch').addEventListener('input', function () {
         item.style.display = item.dataset.search.includes(q) ? '' : 'none';
     });
 });
+function autoAssigner() {
+    const btn = document.querySelector('button[onclick="autoAssigner()"]');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Assignation en cours...';
+
+    fetch('{{ path("app_tache_auto_assigner") }}', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+    })
+    .then(res => res.json())
+    .then(data => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa fa-magic"></i> Auto-assigner les tâches';
+
+        const modal   = document.getElementById('autoModal');
+        const content = document.getElementById('autoModalContent');
+
+        if (!data.success) {
+            content.innerHTML = `
+                <div style="text-align:center; padding:20px; color:#888;">
+                    <i class="fa fa-info-circle" style="font-size:40px; margin-bottom:12px; display:block; color:#aaa;"></i>
+                    <p>${data.message}</p>
+                </div>`;
+        } else {
+            let html = `<p style="font-size:13px; color:#888; margin-bottom:16px;">${data.total} tâche(s) traitée(s)</p>`;
+            html += '<div style="display:flex; flex-direction:column; gap:10px; max-height:300px; overflow-y:auto;">';
+
+            data.assignations.forEach(a => {
+                if (a.ouvrier) {
+                    html += `
+                    <div style="display:flex; align-items:center; gap:12px; padding:12px; background:#EAF3DE; border-radius:10px;">
+                        <i class="fa fa-check-circle" style="color:#2D5A27; font-size:18px; flex-shrink:0;"></i>
+                        <div>
+                            <div style="font-weight:700; color:#2C3E50; font-size:13px;">${a.tache}</div>
+                            <div style="font-size:12px; color:#666;">Assignée à <strong>${a.ouvrier}</strong></div>
+                        </div>
+                    </div>`;
+                } else {
+                    html += `
+                    <div style="display:flex; align-items:center; gap:12px; padding:12px; background:#FCEBEB; border-radius:10px;">
+                        <i class="fa fa-exclamation-triangle" style="color:#A32D2D; font-size:18px; flex-shrink:0;"></i>
+                        <div>
+                            <div style="font-weight:700; color:#2C3E50; font-size:13px;">${a.tache}</div>
+                            <div style="font-size:12px; color:#A32D2D;">${a.message}</div>
+                        </div>
+                    </div>`;
+                }
+            });
+
+            html += '</div>';
+            content.innerHTML = html;
+        }
+
+        modal.style.display = 'flex';
+
+        // Recharger l'ouvrier actif si sélectionné
+        if (currentCin) {
+            const activeItem = document.querySelector('.ouvrier-item.active');
+            if (activeItem) loadTaches(currentCin, activeItem.dataset.name, activeItem.dataset.initials);
+        }
+    })
+    .catch(() => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa fa-magic"></i> Auto-assigner les tâches';
+        alert('Erreur lors de l\'auto-assignation.');
+    });
+}
+
+function closeModal() {
+    document.getElementById('autoModal').style.display = 'none';
+}
 </script>
 {% endblock %}
