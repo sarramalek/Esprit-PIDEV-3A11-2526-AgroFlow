@@ -229,9 +229,14 @@
             </p>
             <h2 style="margin:0; color:#2C3E50; font-size:24px;">Liste des Tâches</h2>
         </div>
-        <a href="{{ path('app_tache_new') }}" class="btn-new">
-            <i class="fa fa-plus"></i> Nouvelle tâche
-        </a>
+       <div style="display:flex; gap:10px;">
+    <a href="{{ path('app_tache_export_pdf') }}" class="btn-new" style="background:#A32D2D;">
+        <i class="fa fa-file-pdf"></i> Exporter PDF
+    </a>
+    <a href="{{ path('app_tache_new') }}" class="btn-new">
+        <i class="fa fa-plus"></i> Nouvelle tâche
+    </a>
+</div>
     </div>
 
     {# ── Flash ── #}
@@ -435,6 +440,10 @@
                                     <i class="fa fa-trash"></i>
                                 </button>
                             </form>
+                            <a href="{{ path('app_tache_pdf', {idTache: tache.idTache}) }}"
+   class="action-btn" style="color:#A32D2D;" title="Télécharger PDF">
+    <i class="fa fa-file-pdf"></i>
+</a>
                         </div>
                     </td>
                 </tr>
