@@ -1,0 +1,31 @@
+<style>
+    .agro-form input, .agro-form select {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-sizing: border-box;
+    }
+    .agro-form label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+        color: #2C3E50;
+    }
+</style>
+
+<div class="agro-form">
+    {{ form_start(form) }}
+        {{ form_row(form.nom) }}
+        <div style="display: flex; gap: 20px;">
+            <div style="flex: 1;">{{ form_row(form.prix) }}</div>
+            <div style="flex: 1;">{{ form_row(form.quantite) }}</div>
+        </div>
+        {{ form_row(form.idCategorie) }}
+        
+        <button class="btn-agroflow" style="width: 100%; padding: 15px; margin-top: 10px; border: none;">
+            {{ button_label|default('Enregistrer le produit') }}
+        </button>
+    {{ form_end(form) }}
+</div>
