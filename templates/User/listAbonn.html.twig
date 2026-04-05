@@ -244,7 +244,26 @@
     <i class="fa fa-file-pdf" style="color:#DC2626;"></i> Exporter PDF
 </a>
     </form>
+{# ── Actions automatiques ── #}
+<div style="display:flex; gap:12px; flex-wrap:wrap;">
 
+    <form method="POST" action="{{ path('admin_abonnements_update_etats') }}"
+          onsubmit="return confirm('Mettre à jour tous les abonnements dont la date est dépassée ?')">
+        <input type="hidden" name="_token" value="{{ csrf_token('update_etats') }}">
+        <button type="submit" class="btn btn-secondary">
+            <i class="fa fa-rotate"></i> Mettre à jour les états expirés
+        </button>
+    </form>
+
+    <form method="POST" action="{{ path('admin_abonnements_purge_expires') }}"
+          onsubmit="return confirm('Supprimer définitivement tous les abonnements expirés depuis plus d\'un mois ?')">
+        <input type="hidden" name="_token" value="{{ csrf_token('purge_expires') }}">
+        <button type="submit" class="btn btn-danger">
+            <i class="fa fa-trash-can"></i> Purger les expirés (&gt;1 mois)
+        </button>
+    </form>
+
+</div>
     {# ── Table ── #}
     <div class="table-card">
         <div class="table-header">

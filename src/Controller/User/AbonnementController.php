@@ -261,4 +261,58 @@ class AbonnementController extends AbstractController
 
         return $this->redirectToRoute('admin_abonnements_index');
     }
+     #[Route('/update-etats', name: '_update_etats', methods: ['POST'])]
+    public function updateEtats(Request $request, AbonnementRepository $repo, EntityManagerInterface $em): Response
+    {
+        if (!$this->isCsrfTokenValid('update_etats', $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Token CSRF invalide.');
+            return $this->redirectToRoute('admin_abonnements_index');
+        }
+ 
+        $today = new \DateTime('today');
+        $abonnements = $repo->createQueryBuilder('a')
+            ->where('a.dateExpiration < :today')
+            ->andWhere('a.situation != :situation')
+            ->setParameter('today', $today)
+            ->setParameter('situation', 'expire')
+            ->getQuery()
+            ->getResult();
+ 
+        $count = count($abonnements);
+        foreach ($abonnements as $abonnement) {
+            $abonnement->setSituation('expire');
+        }
+        $em->flush();
+ 
+        $this->addFlash('success', "$count abonnement(s) mis à jour en « Expiré ».");
+        return $this->redirectToRoute('admin_abonnements_index');
+    }
+ 
+    // ── PURGE DES EXPIRÉS DEPUIS +1 MOIS ─────────────────────────────────────
+    #[Route('/purge-expires', name: '_purge_expires', methods: ['POST'])]
+    public function purgeExpires(Request $request, AbonnementRepository $repo, EntityManagerInterface $em): Response
+    {
+        if (!$this->isCsrfTokenValid('purge_expires', $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Token CSRF invalide.');
+            return $this->redirectToRoute('admin_abonnements_index');
+        }
+ 
+        $limite = new \DateTime('-1 month');
+        $abonnements = $repo->createQueryBuilder('a')
+            ->where('a.situation = :situation')
+            ->andWhere('a.dateExpiration < :limite')
+            ->setParameter('situation', 'expire')
+            ->setParameter('limite', $limite)
+            ->getQuery()
+            ->getResult();
+ 
+        $count = count($abonnements);
+        foreach ($abonnements as $abonnement) {
+            $em->remove($abonnement);
+        }
+        $em->flush();
+ 
+        $this->addFlash('success', "$count abonnement(s) expiré(s) depuis plus d'un mois supprimé(s).");
+        return $this->redirectToRoute('admin_abonnements_index');
+    }
 }
