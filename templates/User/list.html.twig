@@ -8,7 +8,6 @@
 <style>
     .page { display: flex; flex-direction: column; gap: 24px; }
 
-    /* ── Stats ── */
     .stats-row {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
@@ -33,7 +32,6 @@
     .stat-val { font-size: 26px; font-weight: 700; color: var(--navy); line-height: 1; }
     .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
 
-    /* ── Toolbar ── */
     .toolbar {
         background: var(--white);
         border: 1px solid var(--cream-dark);
@@ -43,10 +41,9 @@
         align-items: center;
         gap: 12px;
         box-shadow: var(--shadow);
+        flex-wrap: wrap;
     }
-    .search-wrap {
-        position: relative; flex: 1;
-    }
+    .search-wrap { position: relative; flex: 1; min-width: 200px; }
     .search-wrap i {
         position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
         color: var(--text-muted); font-size: 13px;
@@ -87,7 +84,6 @@
     .btn-sm { padding: 6px 12px; font-size: 12px; }
     .btn-icon { padding: 7px 10px; }
 
-    /* ── Table ── */
     .table-card {
         background: var(--white);
         border: 1px solid var(--cream-dark);
@@ -112,7 +108,11 @@
         text-transform: uppercase; letter-spacing: 0.07em;
         color: var(--text-muted);
         border-bottom: 1px solid var(--cream-dark);
+        user-select: none;
     }
+    thead th.sortable:hover { background: var(--cream-dark); color: var(--green-dark); }
+    thead th.sorted { color: var(--green-accent); }
+
     tbody tr { transition: background 0.15s; }
     tbody tr:hover { background: #FAFDF8; }
     tbody td {
@@ -122,8 +122,8 @@
         vertical-align: middle;
     }
     tbody tr:last-child td { border-bottom: none; }
+    tbody tr.hidden { display: none; }
 
-    /* User cell */
     .user-cell { display: flex; align-items: center; gap: 11px; }
     .user-av {
         width: 38px; height: 38px; border-radius: 10px;
@@ -134,7 +134,6 @@
     .user-name { font-weight: 600; color: var(--navy); }
     .user-email { font-size: 12px; color: var(--text-muted); }
 
-    /* Role badge */
     .badge {
         display: inline-flex; align-items: center; gap: 5px;
         padding: 4px 10px; border-radius: 20px;
@@ -146,19 +145,20 @@
     .badge-ouv    { background: #DBEAFE; color: #1D4ED8; }
     .badge-other  { background: var(--cream-dark); color: var(--text-muted); }
 
-    /* Actions */
     .actions { display: flex; align-items: center; gap: 6px; }
 
-    /* Empty state */
-    .empty {
-        text-align: center; padding: 60px 20px; color: var(--text-muted);
-    }
+    .empty { text-align: center; padding: 60px 20px; color: var(--text-muted); }
     .empty i { font-size: 40px; margin-bottom: 14px; opacity: 0.3; display: block; }
 
-    /* Flash */
     .flash { padding: 12px 18px; border-radius: 8px; font-size: 14px; font-weight: 500; margin-bottom: 4px; }
     .flash-success { background: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0; }
     .flash-danger  { background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA; }
+
+    .no-results {
+        text-align: center; padding: 40px 20px; color: var(--text-muted);
+        display: none;
+    }
+    .no-results i { font-size: 30px; margin-bottom: 10px; display: block; opacity: 0.3; }
 </style>
 {% endblock %}
 
@@ -214,51 +214,70 @@
     </div>
 
     {# Toolbar #}
-    <form method="GET" class="toolbar">
+    <div class="toolbar">
         <div class="search-wrap">
             <i class="fa fa-search"></i>
-            <input type="text" name="q" value="{{ search }}"
+            <input type="text" id="searchInput"
                    class="search-input" placeholder="Rechercher par nom, prénom ou email…">
         </div>
-        <select name="role" class="filter-select" onchange="this.form.submit()">
+        <select id="roleFilter" class="filter-select">
             <option value="">Tous les rôles</option>
-            <option value="3" {% if role == '3' %}selected{% endif %}>Administrateurs</option>
-            <option value="2" {% if role == '2' %}selected{% endif %}>Agriculteurs</option>
-            <option value="1" {% if role == '1' %}selected{% endif %}>Ouvriers</option>
+            <option value="3">Administrateurs</option>
+            <option value="2">Agriculteurs</option>
+            <option value="1">Ouvriers</option>
         </select>
-        <button type="submit" class="btn btn-secondary"><i class="fa fa-filter"></i> Filtrer</button>
-        {% if search or role %}
-            <a href="{{ path('admin_users_list') }}" class="btn btn-secondary"><i class="fa fa-xmark"></i> Réinitialiser</a>
-        {% endif %}
+        <button onclick="resetFilters()" class="btn btn-secondary">
+            <i class="fa fa-xmark"></i> Réinitialiser
+        </button>
         <a href="{{ path('admin_users_new') }}" class="btn btn-primary">
             <i class="fa fa-plus"></i> Nouvel utilisateur
         </a>
-    </form>
+        <a href="{{ path('admin_users_excel') }}" class="btn btn-secondary">
+            <i class="fa fa-file-csv" style="color:#1D6F42;"></i> Exporter CSV
+        </a>
+    </div>
 
     {# Table #}
     <div class="table-card">
         <div class="table-header">
-            <div class="table-title"><i class="fa fa-users" style="color:var(--green-accent);margin-right:8px;"></i>Liste des utilisateurs</div>
-            <div class="table-count">{{ users|length }} résultat(s)</div>
+            <div class="table-title">
+                <i class="fa fa-users" style="color:var(--green-accent);margin-right:8px;"></i>
+                Liste des utilisateurs
+            </div>
+            <div class="table-count" id="resultCount">{{ users|length }} résultat(s)</div>
         </div>
 
         {% if users|length > 0 %}
-        <table>
+        <table id="usersTable">
             <thead>
                 <tr>
-                    <th>Utilisateur</th>
-                    <th>CIN</th>
-                    <th>Téléphone</th>
-                    <th>Ville</th>
-                    <th>Rôle</th>
-                    <th>Inscription</th>
+                    <th class="sortable" onclick="sortTable(0)">
+                        Utilisateur <i class="fa fa-sort" id="sort-0" style="opacity:0.4;font-size:10px;margin-left:4px;"></i>
+                    </th>
+                    <th class="sortable" onclick="sortTable(1)">
+                        CIN <i class="fa fa-sort" id="sort-1" style="opacity:0.4;font-size:10px;margin-left:4px;"></i>
+                    </th>
+                    <th class="sortable" onclick="sortTable(2)">
+                        Téléphone <i class="fa fa-sort" id="sort-2" style="opacity:0.4;font-size:10px;margin-left:4px;"></i>
+                    </th>
+                    <th class="sortable" onclick="sortTable(3)">
+                        Ville <i class="fa fa-sort" id="sort-3" style="opacity:0.4;font-size:10px;margin-left:4px;"></i>
+                    </th>
+                    <th class="sortable" onclick="sortTable(4)">
+                        Rôle <i class="fa fa-sort" id="sort-4" style="opacity:0.4;font-size:10px;margin-left:4px;"></i>
+                    </th>
+                    <th class="sortable" onclick="sortTable(5)">
+                        Inscription <i class="fa fa-sort" id="sort-5" style="opacity:0.4;font-size:10px;margin-left:4px;"></i>
+                    </th>
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="usersBody">
             {% for user in users %}
-                <tr>
-                    <td>
+                <tr class="user-row"
+                    data-search="{{ (user.nom ~ ' ' ~ user.prenom ~ ' ' ~ user.email)|lower }}"
+                    data-role="{{ user.role }}">
+                    <td data-val="{{ user.nom|lower }} {{ user.prenom|lower }}">
                         <div class="user-cell">
                             <div class="user-av">
                                 {{ user.prenom|first|upper }}{{ user.nom|first|upper }}
@@ -269,10 +288,12 @@
                             </div>
                         </div>
                     </td>
-                    <td style="font-family:'DM Mono',monospace; font-size:13px;">{{ user.cin }}</td>
-                    <td>{{ user.tel ?? '—' }}</td>
-                    <td>{{ user.ville ?? '—' }}</td>
-                    <td>
+                    <td data-val="{{ user.cin }}" style="font-family:'DM Mono',monospace; font-size:13px;">
+                        {{ user.cin }}
+                    </td>
+                    <td data-val="{{ user.tel ?? '' }}">{{ user.tel ?? '—' }}</td>
+                    <td data-val="{{ user.ville ?? '' }}">{{ user.ville ?? '—' }}</td>
+                    <td data-val="{{ user.role }}">
                         {% if user.role == 3 %}
                             <span class="badge badge-admin"><i class="fa fa-shield-halved"></i> Admin</span>
                         {% elseif user.role == 2 %}
@@ -283,7 +304,8 @@
                             <span class="badge badge-other">Inconnu</span>
                         {% endif %}
                     </td>
-                    <td style="font-size:13px; color:var(--text-muted);">
+                    <td data-val="{{ user.dateCreationcpt ? user.dateCreationcpt|date('Ymd') : '0' }}"
+                        style="font-size:13px; color:var(--text-muted);">
                         {{ user.dateCreationcpt ? user.dateCreationcpt|date('d/m/Y') : '—' }}
                     </td>
                     <td>
@@ -296,9 +318,14 @@
                                class="btn btn-sm btn-secondary btn-icon" title="Modifier">
                                 <i class="fa fa-pen"></i>
                             </a>
+                            <a href="{{ path('admin_users_pdf', {cin: user.cin}) }}"
+                               class="btn btn-sm btn-secondary btn-icon" title="Télécharger PDF">
+                                <i class="fa fa-file-pdf" style="color:#DC2626;"></i>
+                            </a>
                             <form method="POST"
                                   action="{{ path('admin_users_delete', {cin: user.cin}) }}"
-                                  onsubmit="return confirm('Supprimer {{ user.prenom }} {{ user.nom }} ?')">
+                                  onsubmit="return confirm('Supprimer {{ user.prenom }} {{ user.nom }} ?')"
+                                  style="margin:0;">
                                 <input type="hidden" name="_token"
                                        value="{{ csrf_token('delete_user_' ~ user.cin) }}">
                                 <button type="submit" class="btn btn-sm btn-danger btn-icon" title="Supprimer">
@@ -311,6 +338,13 @@
             {% endfor %}
             </tbody>
         </table>
+
+        <div class="no-results" id="noResults">
+            <i class="fa fa-search"></i>
+            <div style="font-size:15px; font-weight:600; color:var(--navy);">Aucun résultat trouvé</div>
+            <div style="margin-top:6px; font-size:13px;">Modifiez votre recherche ou réinitialisez les filtres</div>
+        </div>
+
         {% else %}
             <div class="empty">
                 <i class="fa fa-users-slash"></i>
@@ -321,4 +355,76 @@
     </div>
 
 </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+let sortDir = {};
+const total = {{ users|length }};
+
+function filterTable() {
+    const q    = document.getElementById('searchInput').value.toLowerCase().trim();
+    const role = document.getElementById('roleFilter').value;
+    const rows = document.querySelectorAll('.user-row');
+    let count  = 0;
+
+    rows.forEach(row => {
+        const matchSearch = !q    || row.dataset.search.includes(q);
+        const matchRole   = !role || row.dataset.role === role;
+        const show        = matchSearch && matchRole;
+        row.classList.toggle('hidden', !show);
+        if (show) count++;
+    });
+
+    document.getElementById('resultCount').textContent = count + ' résultat(s)';
+    document.getElementById('noResults').style.display = count === 0 ? 'block' : 'none';
+}
+
+function sortTable(colIndex) {
+    const tbody = document.getElementById('usersBody');
+    const rows  = Array.from(document.querySelectorAll('.user-row'));
+    const asc   = !sortDir[colIndex];
+    sortDir     = {};
+    sortDir[colIndex] = asc;
+
+    // Reset all icons
+    document.querySelectorAll('[id^="sort-"]').forEach(i => {
+        i.className    = 'fa fa-sort';
+        i.style.opacity = '0.4';
+        i.style.color  = '';
+    });
+    document.querySelectorAll('thead th').forEach(th => th.classList.remove('sorted'));
+
+    // Active icon
+    const icon = document.getElementById('sort-' + colIndex);
+    if (icon) {
+        icon.className    = 'fa fa-sort-' + (asc ? 'up' : 'down');
+        icon.style.opacity = '1';
+        icon.style.color  = 'var(--green-accent)';
+    }
+    document.querySelectorAll('thead th')[colIndex]?.classList.add('sorted');
+
+    rows.sort((a, b) => {
+        const aCells = a.querySelectorAll('td');
+        const bCells = b.querySelectorAll('td');
+        const aVal   = (aCells[colIndex]?.dataset?.val ?? aCells[colIndex]?.textContent ?? '').trim().toLowerCase();
+        const bVal   = (bCells[colIndex]?.dataset?.val ?? bCells[colIndex]?.textContent ?? '').trim().toLowerCase();
+        const cmp    = isNaN(aVal) || isNaN(bVal) || aVal === '' || bVal === ''
+            ? aVal.localeCompare(bVal, 'fr')
+            : Number(aVal) - Number(bVal);
+        return asc ? cmp : -cmp;
+    });
+
+    rows.forEach(row => tbody.appendChild(row));
+}
+
+function resetFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('roleFilter').value  = '';
+    filterTable();
+}
+
+document.getElementById('searchInput').addEventListener('input', filterTable);
+document.getElementById('roleFilter').addEventListener('change', filterTable);
+</script>
 {% endblock %}
