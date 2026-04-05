@@ -1,0 +1,26 @@
+{% extends 'base_agriculteur.html.twig' %}
+
+{% block title %}AgroFlow - Nouveau Rapport Médical{% endblock %}
+
+{% block body %}
+    <div style="padding: 10px;">
+        <!-- Header : Breadcrumb -->
+        <div style="margin-bottom: 25px; color: #666; font-size: 14px;">
+            <span>Gestion</span> <i class="fa fa-chevron-right" style="font-size: 10px; margin: 0 5px;"></i> 
+            <span>Examens</span> <i class="fa fa-chevron-right" style="font-size: 10px; margin: 0 5px;"></i> 
+            <strong style="color: #2C3E50;">Nouveau Rapport</strong>
+        </div>
+
+        <div style="background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); max-width: 800px; margin: 0 auto;">
+            <h2 style="color: #2C3E50; margin-bottom: 30px; font-size: 24px; border-bottom: 3px solid #e74c3c; display: inline-block; padding-bottom: 8px;">Nouveau Rapport Médical</h2>
+            
+            {{ include('examen/_form.html.twig', {'button_label': 'Enregistrer l\'examen'}) }}
+            
+            <div style="margin-top: 25px; border-top: 1px solid #EEE; padding-top: 20px;">
+                <a href="{{ path('app_examens_index') }}" style="color: #7f8c8d; text-decoration: none; font-size: 14px; font-weight: 600;">
+                    <i class="fa fa-arrow-left"></i> Retour à la liste
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
