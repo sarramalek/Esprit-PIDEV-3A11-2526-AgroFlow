@@ -36,6 +36,8 @@ class PlanteType extends AbstractType
                 'attr'     => ['class' => 'form-input', 'placeholder' => 'ex: cerise'],
                 'constraints' => [
                     new Length(max: 100, maxMessage: 'Maximum 100 caractères.'),
+                    new NotBlank(message: 'variete est obligatoire.'),
+                
                 ],
             ])
             ->add('besoinEau', NumberType::class, [
