@@ -47,9 +47,14 @@
             </p>
             <h2 style="margin:0; color:#2C3E50; font-size:24px;">Liste des Offres</h2>
         </div>
-        <a href="{{ path('app_offre_new') }}" class="btn-new">
-            <i class="fa fa-plus"></i> Nouvelle offre
-        </a>
+       <div style="display:flex; gap:10px;">
+    <a href="{{ path('app_offre_export_pdf') }}" class="btn-new" style="background:#A32D2D;">
+        <i class="fa fa-file-pdf"></i> Exporter PDF
+    </a>
+    <a href="{{ path('app_offre_new') }}" class="btn-new">
+        <i class="fa fa-plus"></i> Nouvelle offre
+    </a>
+</div>
     </div>
 
     {# ── Flash ── #}
@@ -198,6 +203,7 @@
                                 </button>
                             </form>
                         </div>
+                        
                     </td>
                 </tr>
                 {% else %}

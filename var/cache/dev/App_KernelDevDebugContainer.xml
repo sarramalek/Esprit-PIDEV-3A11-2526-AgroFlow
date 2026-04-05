@@ -532,7 +532,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.vFhrvI1"/>
+      <argument type="service" id=".service_locator.KYVqCuv"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -3428,7 +3428,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.vFhrvI1"/>
+      <argument type="service" id=".service_locator.KYVqCuv"/>
     </service>
     <service id="debug.log_processor" class="Symfony\Bridge\Monolog\Processor\DebugProcessor">
       <tag name="kernel.reset" method="reset"/>
@@ -8115,7 +8115,7 @@
         <argument key="userRepo" type="service_closure" id="App\Repository\User\UserRepository"/>
       </argument>
     </service>
-    <service id=".service_locator.vFhrvI1" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.KYVqCuv" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Controller\AdminDashboardController::index" type="service_closure" id=".service_locator.qni5W9T"/>
@@ -8147,8 +8147,10 @@
         <argument key="App\Controller\User\AdminUserController::show" type="service_closure" id=".service_locator.S18McA7"/>
         <argument key="App\Controller\User\OffreController::delete" type="service_closure" id=".service_locator.jDXJRjC"/>
         <argument key="App\Controller\User\OffreController::edit" type="service_closure" id=".service_locator.jDXJRjC"/>
+        <argument key="App\Controller\User\OffreController::exportPdf" type="service_closure" id=".service_locator.SLbcwc9"/>
         <argument key="App\Controller\User\OffreController::list" type="service_closure" id=".service_locator.SLbcwc9"/>
         <argument key="App\Controller\User\OffreController::new" type="service_closure" id=".service_locator.9kKwU2t"/>
+        <argument key="App\Controller\User\OffreController::pdf" type="service_closure" id=".service_locator.9hPlMik"/>
         <argument key="App\Controller\User\OffreController::show" type="service_closure" id=".service_locator.9hPlMik"/>
         <argument key="App\Controller\User\OffreFrontController::front" type="service_closure" id=".service_locator.CLxInnv"/>
         <argument key="App\Controller\User\OffreFrontController::souscrire" type="service_closure" id=".service_locator.10ih3yF"/>
@@ -8194,8 +8196,10 @@
         <argument key="App\Controller\User\AdminUserController:show" type="service_closure" id=".service_locator.S18McA7"/>
         <argument key="App\Controller\User\OffreController:delete" type="service_closure" id=".service_locator.jDXJRjC"/>
         <argument key="App\Controller\User\OffreController:edit" type="service_closure" id=".service_locator.jDXJRjC"/>
+        <argument key="App\Controller\User\OffreController:exportPdf" type="service_closure" id=".service_locator.SLbcwc9"/>
         <argument key="App\Controller\User\OffreController:list" type="service_closure" id=".service_locator.SLbcwc9"/>
         <argument key="App\Controller\User\OffreController:new" type="service_closure" id=".service_locator.9kKwU2t"/>
+        <argument key="App\Controller\User\OffreController:pdf" type="service_closure" id=".service_locator.9hPlMik"/>
         <argument key="App\Controller\User\OffreController:show" type="service_closure" id=".service_locator.9hPlMik"/>
         <argument key="App\Controller\User\OffreFrontController:front" type="service_closure" id=".service_locator.CLxInnv"/>
         <argument key="App\Controller\User\OffreFrontController:souscrire" type="service_closure" id=".service_locator.10ih3yF"/>
@@ -10556,7 +10560,7 @@
     <service id="Psr\Log\LoggerInterface" alias="monolog.logger"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.w7.f4fT" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.vFhrvI1"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.KYVqCuv"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id=".Psr\Log\LoggerInterface $request.logger" alias="monolog.logger.request"/>
@@ -10604,7 +10608,7 @@
     <service id=".service_locator.Jc2xsDH" alias=".service_locator.z7LPJKP"/>
     <service id=".service_locator.nSvg3uO" alias=".service_locator.Mzhqy3N"/>
     <service id=".service_locator.AGFiz_N" alias=".service_locator.l3rYz8h"/>
-    <service id=".service_locator.q964IBk" alias=".service_locator.vFhrvI1"/>
+    <service id=".service_locator.DvIdrBx" alias=".service_locator.KYVqCuv"/>
     <service id=".service_locator.BFrsqsn" alias=".service_locator.F9PKc.7"/>
     <service id=".service_locator.SEIKAM_" alias=".service_locator.tTIt3Io"/>
     <service id=".service_locator.XtmiKbi" alias=".service_locator.MfxSDRP"/>
