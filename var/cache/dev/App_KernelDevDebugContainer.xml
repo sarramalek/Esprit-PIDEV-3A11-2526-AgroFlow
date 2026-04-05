@@ -433,6 +433,13 @@
         <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\User\OffreController"/>
       </call>
     </service>
+    <service id="App\Controller\User\OffreFrontController" class="App\Controller\User\OffreFrontController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\User\OffreFrontController"/>
+      </call>
+    </service>
     <service id="App\Controller\User\TacheController" class="App\Controller\User\TacheController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
@@ -525,7 +532,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.RMdfbtC"/>
+      <argument type="service" id=".service_locator.oBgJxNJ"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -3421,7 +3428,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.RMdfbtC"/>
+      <argument type="service" id=".service_locator.oBgJxNJ"/>
     </service>
     <service id="debug.log_processor" class="Symfony\Bridge\Monolog\Processor\DebugProcessor">
       <tag name="kernel.reset" method="reset"/>
@@ -7448,6 +7455,9 @@
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\User\OffreController" class="App\Controller\User\OffreController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\User\OffreController" class="App\Controller\User\OffreController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\User\OffreController" class="App\Controller\User\OffreController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\User\OffreFrontController" class="App\Controller\User\OffreFrontController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\User\OffreFrontController" class="App\Controller\User\OffreFrontController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\User\OffreFrontController" class="App\Controller\User\OffreFrontController" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\User\TacheController" class="App\Controller\User\TacheController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\User\TacheController" class="App\Controller\User\TacheController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\User\TacheController" class="App\Controller\User\TacheController" autowire="true" autoconfigure="true" abstract="true"/>
@@ -7905,6 +7915,14 @@
         <argument key="userRepo" type="service_closure" id="App\Repository\User\UserRepository"/>
       </argument>
     </service>
+    <service id=".service_locator.79ed2Qj" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="abonnRepo" type="service_closure" id="App\Repository\User\AbonnementRepository"/>
+        <argument key="offreRepo" type="service_closure" id="App\Repository\User\OffreRepository"/>
+        <argument key="tacheRepo" type="service_closure" id="App\Repository\User\TacheRepository"/>
+      </argument>
+    </service>
     <service id=".service_locator.qf5FuHx" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -8003,13 +8021,6 @@
         <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
       </argument>
     </service>
-    <service id=".service_locator.ahE6ilb" class="Symfony\Component\DependencyInjection\ServiceLocator">
-      <tag name="container.service_locator"/>
-      <argument type="collection">
-        <argument key="abonnRepo" type="service_closure" id="App\Repository\User\AbonnementRepository"/>
-        <argument key="offreRepo" type="service_closure" id="App\Repository\User\OffreRepository"/>
-      </argument>
-    </service>
     <service id=".service_locator.S18McA7" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -8033,6 +8044,20 @@
       <argument type="collection">
         <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
         <argument key="offre" type="service_closure" id=".errored..service_locator.jDXJRjC.App\Entity\User\Offre"/>
+      </argument>
+    </service>
+    <service id=".service_locator.CLxInnv" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="abonnRepo" type="service_closure" id="App\Repository\User\AbonnementRepository"/>
+        <argument key="offreRepo" type="service_closure" id="App\Repository\User\OffreRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.10ih3yF" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="offreRepo" type="service_closure" id="App\Repository\User\OffreRepository"/>
       </argument>
     </service>
     <service id=".service_locator.3Vzszbx" class="Symfony\Component\DependencyInjection\ServiceLocator">
@@ -8070,10 +8095,11 @@
         <argument key="userRepo" type="service_closure" id="App\Repository\User\UserRepository"/>
       </argument>
     </service>
-    <service id=".service_locator.RMdfbtC" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.oBgJxNJ" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Controller\AdminDashboardController::index" type="service_closure" id=".service_locator.qni5W9T"/>
+        <argument key="App\Controller\AgriculteurDashboardController::index" type="service_closure" id=".service_locator.79ed2Qj"/>
         <argument key="App\Controller\Animals\AnimauxController::delete" type="service_closure" id=".service_locator..4cEOa9"/>
         <argument key="App\Controller\Animals\AnimauxController::edit" type="service_closure" id=".service_locator..4cEOa9"/>
         <argument key="App\Controller\Animals\AnimauxController::index" type="service_closure" id=".service_locator.qf5FuHx"/>
@@ -8091,8 +8117,8 @@
         <argument key="App\Controller\User\AbonnementController::index" type="service_closure" id=".service_locator.3oEYk47"/>
         <argument key="App\Controller\User\AbonnementController::new" type="service_closure" id=".service_locator.9kKwU2t"/>
         <argument key="App\Controller\User\AbonnementController::show" type="service_closure" id=".service_locator.wzz8Y5M"/>
-        <argument key="App\Controller\User\AbonnementFrontController::front" type="service_closure" id=".service_locator.ahE6ilb"/>
-        <argument key="App\Controller\User\AbonnementFrontController::pdf" type="service_closure" id=".service_locator.ahE6ilb"/>
+        <argument key="App\Controller\User\AbonnementFrontController::front" type="service_closure" id=".service_locator.CLxInnv"/>
+        <argument key="App\Controller\User\AbonnementFrontController::pdf" type="service_closure" id=".service_locator.CLxInnv"/>
         <argument key="App\Controller\User\AdminUserController::delete" type="service_closure" id=".service_locator.S18McA7"/>
         <argument key="App\Controller\User\AdminUserController::edit" type="service_closure" id=".service_locator.S18McA7"/>
         <argument key="App\Controller\User\AdminUserController::show" type="service_closure" id=".service_locator.S18McA7"/>
@@ -8101,6 +8127,8 @@
         <argument key="App\Controller\User\OffreController::list" type="service_closure" id=".service_locator.SLbcwc9"/>
         <argument key="App\Controller\User\OffreController::new" type="service_closure" id=".service_locator.9kKwU2t"/>
         <argument key="App\Controller\User\OffreController::show" type="service_closure" id=".service_locator.9hPlMik"/>
+        <argument key="App\Controller\User\OffreFrontController::front" type="service_closure" id=".service_locator.CLxInnv"/>
+        <argument key="App\Controller\User\OffreFrontController::souscrire" type="service_closure" id=".service_locator.10ih3yF"/>
         <argument key="App\Controller\User\TacheController::delete" type="service_closure" id=".service_locator.Mzhqy3N"/>
         <argument key="App\Controller\User\TacheController::edit" type="service_closure" id=".service_locator.z7LPJKP"/>
         <argument key="App\Controller\User\TacheController::index" type="service_closure" id=".service_locator.3Vzszbx"/>
@@ -8112,6 +8140,7 @@
         <argument key="kernel::loadRoutes" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="kernel::registerContainerConfiguration" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="App\Controller\AdminDashboardController:index" type="service_closure" id=".service_locator.qni5W9T"/>
+        <argument key="App\Controller\AgriculteurDashboardController:index" type="service_closure" id=".service_locator.79ed2Qj"/>
         <argument key="App\Controller\Animals\AnimauxController:delete" type="service_closure" id=".service_locator..4cEOa9"/>
         <argument key="App\Controller\Animals\AnimauxController:edit" type="service_closure" id=".service_locator..4cEOa9"/>
         <argument key="App\Controller\Animals\AnimauxController:index" type="service_closure" id=".service_locator.qf5FuHx"/>
@@ -8129,8 +8158,8 @@
         <argument key="App\Controller\User\AbonnementController:index" type="service_closure" id=".service_locator.3oEYk47"/>
         <argument key="App\Controller\User\AbonnementController:new" type="service_closure" id=".service_locator.9kKwU2t"/>
         <argument key="App\Controller\User\AbonnementController:show" type="service_closure" id=".service_locator.wzz8Y5M"/>
-        <argument key="App\Controller\User\AbonnementFrontController:front" type="service_closure" id=".service_locator.ahE6ilb"/>
-        <argument key="App\Controller\User\AbonnementFrontController:pdf" type="service_closure" id=".service_locator.ahE6ilb"/>
+        <argument key="App\Controller\User\AbonnementFrontController:front" type="service_closure" id=".service_locator.CLxInnv"/>
+        <argument key="App\Controller\User\AbonnementFrontController:pdf" type="service_closure" id=".service_locator.CLxInnv"/>
         <argument key="App\Controller\User\AdminUserController:delete" type="service_closure" id=".service_locator.S18McA7"/>
         <argument key="App\Controller\User\AdminUserController:edit" type="service_closure" id=".service_locator.S18McA7"/>
         <argument key="App\Controller\User\AdminUserController:show" type="service_closure" id=".service_locator.S18McA7"/>
@@ -8139,6 +8168,8 @@
         <argument key="App\Controller\User\OffreController:list" type="service_closure" id=".service_locator.SLbcwc9"/>
         <argument key="App\Controller\User\OffreController:new" type="service_closure" id=".service_locator.9kKwU2t"/>
         <argument key="App\Controller\User\OffreController:show" type="service_closure" id=".service_locator.9hPlMik"/>
+        <argument key="App\Controller\User\OffreFrontController:front" type="service_closure" id=".service_locator.CLxInnv"/>
+        <argument key="App\Controller\User\OffreFrontController:souscrire" type="service_closure" id=".service_locator.10ih3yF"/>
         <argument key="App\Controller\User\TacheController:delete" type="service_closure" id=".service_locator.Mzhqy3N"/>
         <argument key="App\Controller\User\TacheController:edit" type="service_closure" id=".service_locator.z7LPJKP"/>
         <argument key="App\Controller\User\TacheController:index" type="service_closure" id=".service_locator.3Vzszbx"/>
@@ -8863,6 +8894,12 @@
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.O2p6Lk7" method="withContext"/>
     </service>
+    <service id=".service_locator.O2p6Lk7.App\Controller\User\OffreFrontController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\User\OffreFrontController"/>
+      <argument>App\Controller\User\OffreFrontController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.O2p6Lk7" method="withContext"/>
+    </service>
     <service id=".service_locator.O2p6Lk7.App\Controller\User\TacheController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\User\TacheController"/>
       <argument>App\Controller\User\TacheController</argument>
@@ -9060,6 +9097,7 @@
           <argument>App\Controller\User\AbonnementFrontController</argument>
           <argument>App\Controller\User\AdminUserController</argument>
           <argument>App\Controller\User\OffreController</argument>
+          <argument>App\Controller\User\OffreFrontController</argument>
           <argument>App\Controller\User\TacheController</argument>
           <argument>App\Controller\User\TacheFrontController</argument>
           <argument>Doctrine\Bundle\DoctrineBundle\Controller\ProfilerController</argument>
@@ -10480,7 +10518,7 @@
     <service id="Psr\Log\LoggerInterface" alias="monolog.logger"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.w7.f4fT" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.RMdfbtC"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.oBgJxNJ"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id=".Psr\Log\LoggerInterface $request.logger" alias="monolog.logger.request"/>
@@ -10522,10 +10560,12 @@
     <service id=".service_locator.ccwFaAk" alias=".service_locator.7veCuyK"/>
     <service id=".service_locator.81LTOQ7" alias=".service_locator.t8346QO"/>
     <service id=".service_locator.d0U0rWZ" alias=".service_locator.jDXJRjC"/>
+    <service id=".service_locator.ahE6ilb" alias=".service_locator.CLxInnv"/>
+    <service id=".service_locator.oaRQYyJ" alias=".service_locator.10ih3yF"/>
     <service id=".service_locator.Jc2xsDH" alias=".service_locator.z7LPJKP"/>
     <service id=".service_locator.nSvg3uO" alias=".service_locator.Mzhqy3N"/>
     <service id=".service_locator.AGFiz_N" alias=".service_locator.l3rYz8h"/>
-    <service id=".service_locator.GpxQngL" alias=".service_locator.RMdfbtC"/>
+    <service id=".service_locator.kIr_Mb_" alias=".service_locator.oBgJxNJ"/>
     <service id=".service_locator.BFrsqsn" alias=".service_locator.F9PKc.7"/>
     <service id=".service_locator.SEIKAM_" alias=".service_locator.tTIt3Io"/>
     <service id=".service_locator.XtmiKbi" alias=".service_locator.MfxSDRP"/>
@@ -10552,6 +10592,7 @@
     <service id="security.event_dispatcher.main" alias="debug.security.event_dispatcher.main"/>
     <service id=".service_locator.gFlme_s" alias=".service_locator.y4_Zrx."/>
     <service id=".service_locator.Q5C_DE9" alias=".service_locator.qni5W9T"/>
+    <service id=".service_locator.JaeoPJi" alias=".service_locator.79ed2Qj"/>
     <service id=".service_locator.NLwAC4N" alias=".service_locator.qf5FuHx"/>
     <service id=".service_locator.9e2t_lq" alias=".service_locator.CsMkqUa"/>
     <service id=".service_locator.WfMZGBY" alias=".service_locator.9Y9x5wR"/>
@@ -10565,11 +10606,12 @@
     <service id=".service_locator.gaTSUXr" alias=".service_locator.9kKwU2t"/>
     <service id=".service_locator.WYubhsw" alias=".service_locator.wzz8Y5M"/>
     <service id=".service_locator.hjxQ7tU" alias=".service_locator.629YYc0"/>
-    <service id=".service_locator.nA7ETfe" alias=".service_locator.ahE6ilb"/>
     <service id=".service_locator.CGdbDXd" alias=".service_locator.S18McA7"/>
     <service id=".service_locator.xoZBJdw" alias=".service_locator.SLbcwc9"/>
     <service id=".service_locator.0d5GrSc" alias=".service_locator.9hPlMik"/>
     <service id=".service_locator.VwLHYWS" alias=".service_locator.jDXJRjC"/>
+    <service id=".service_locator.nA7ETfe" alias=".service_locator.CLxInnv"/>
+    <service id=".service_locator.f8hoWXX" alias=".service_locator.10ih3yF"/>
     <service id=".service_locator.bVGge6n" alias=".service_locator.3Vzszbx"/>
     <service id=".service_locator.bGJjvaT" alias=".service_locator.PhEk7tx"/>
     <service id=".service_locator.U0KjzJw" alias=".service_locator.z7LPJKP"/>
