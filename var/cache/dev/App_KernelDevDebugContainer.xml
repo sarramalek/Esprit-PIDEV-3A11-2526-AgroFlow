@@ -367,6 +367,13 @@
         <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\AdminDashboardController"/>
       </call>
     </service>
+    <service id="App\Controller\AdminMateriels\MachineAdminController" class="App\Controller\AdminMateriels\MachineAdminController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\AdminMateriels\MachineAdminController"/>
+      </call>
+    </service>
     <service id="App\Controller\AgriculteurDashboardController" class="App\Controller\AgriculteurDashboardController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
@@ -481,7 +488,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator..YC9LVl"/>
+      <argument type="service" id=".service_locator.0MPCpad"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -3376,7 +3383,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator..YC9LVl"/>
+      <argument type="service" id=".service_locator.0MPCpad"/>
     </service>
     <service id="debug.log_processor" class="Symfony\Bridge\Monolog\Processor\DebugProcessor">
       <tag name="kernel.reset" method="reset"/>
@@ -7329,6 +7336,9 @@
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\AdminDashboardController" class="App\Controller\AdminDashboardController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\AdminDashboardController" class="App\Controller\AdminDashboardController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\AdminDashboardController" class="App\Controller\AdminDashboardController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\AdminMateriels\MachineAdminController" class="App\Controller\AdminMateriels\MachineAdminController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\AdminMateriels\MachineAdminController" class="App\Controller\AdminMateriels\MachineAdminController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\AdminMateriels\MachineAdminController" class="App\Controller\AdminMateriels\MachineAdminController" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\AgriculteurDashboardController" class="App\Controller\AgriculteurDashboardController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\AgriculteurDashboardController" class="App\Controller\AgriculteurDashboardController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\AgriculteurDashboardController" class="App\Controller\AgriculteurDashboardController" autowire="true" autoconfigure="true" abstract="true"/>
@@ -7920,10 +7930,15 @@
         <argument key="maintenance" type="service_closure" id=".errored..service_locator.kLp2YUI.App\Entity\Materiels\Maintenance"/>
       </argument>
     </service>
-    <service id=".service_locator..YC9LVl" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.0MPCpad" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Controller\AdminDashboardController::index" type="service_closure" id=".service_locator.qni5W9T"/>
+        <argument key="App\Controller\AdminMateriels\MachineAdminController::delete" type="service_closure" id=".service_locator.pt54IVS"/>
+        <argument key="App\Controller\AdminMateriels\MachineAdminController::edit" type="service_closure" id=".service_locator.pt54IVS"/>
+        <argument key="App\Controller\AdminMateriels\MachineAdminController::index" type="service_closure" id=".service_locator.2E5fScC"/>
+        <argument key="App\Controller\AdminMateriels\MachineAdminController::new" type="service_closure" id=".service_locator.9kKwU2t"/>
+        <argument key="App\Controller\AdminMateriels\MachineAdminController::show" type="service_closure" id=".service_locator.6xRxq88"/>
         <argument key="App\Controller\AgriculteurDashboardController::machineDelete" type="service_closure" id=".service_locator.pt54IVS"/>
         <argument key="App\Controller\AgriculteurDashboardController::machineEdit" type="service_closure" id=".service_locator.pt54IVS"/>
         <argument key="App\Controller\AgriculteurDashboardController::machineIndex" type="service_closure" id=".service_locator.2E5fScC"/>
@@ -7961,6 +7976,11 @@
         <argument key="kernel::loadRoutes" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="kernel::registerContainerConfiguration" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="App\Controller\AdminDashboardController:index" type="service_closure" id=".service_locator.qni5W9T"/>
+        <argument key="App\Controller\AdminMateriels\MachineAdminController:delete" type="service_closure" id=".service_locator.pt54IVS"/>
+        <argument key="App\Controller\AdminMateriels\MachineAdminController:edit" type="service_closure" id=".service_locator.pt54IVS"/>
+        <argument key="App\Controller\AdminMateriels\MachineAdminController:index" type="service_closure" id=".service_locator.2E5fScC"/>
+        <argument key="App\Controller\AdminMateriels\MachineAdminController:new" type="service_closure" id=".service_locator.9kKwU2t"/>
+        <argument key="App\Controller\AdminMateriels\MachineAdminController:show" type="service_closure" id=".service_locator.6xRxq88"/>
         <argument key="App\Controller\AgriculteurDashboardController:machineDelete" type="service_closure" id=".service_locator.pt54IVS"/>
         <argument key="App\Controller\AgriculteurDashboardController:machineEdit" type="service_closure" id=".service_locator.pt54IVS"/>
         <argument key="App\Controller\AgriculteurDashboardController:machineIndex" type="service_closure" id=".service_locator.2E5fScC"/>
@@ -8655,6 +8675,12 @@
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.O2p6Lk7" method="withContext"/>
     </service>
+    <service id=".service_locator.O2p6Lk7.App\Controller\AdminMateriels\MachineAdminController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\AdminMateriels\MachineAdminController"/>
+      <argument>App\Controller\AdminMateriels\MachineAdminController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.O2p6Lk7" method="withContext"/>
+    </service>
     <service id=".service_locator.O2p6Lk7.App\Controller\AgriculteurDashboardController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\AgriculteurDashboardController"/>
       <argument>App\Controller\AgriculteurDashboardController</argument>
@@ -8873,6 +8899,7 @@
           <argument>App\Kernel</argument>
           <argument>App\Controller\AboutController</argument>
           <argument>App\Controller\AdminDashboardController</argument>
+          <argument>App\Controller\AdminMateriels\MachineAdminController</argument>
           <argument>App\Controller\AgriculteurDashboardController</argument>
           <argument>App\Controller\Animals\AnimauxController</argument>
           <argument>App\Controller\Animals\ExamensController</argument>
@@ -10289,7 +10316,7 @@
     <service id="Psr\Log\LoggerInterface" alias="monolog.logger"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.w7.f4fT" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator..YC9LVl"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.0MPCpad"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id=".Psr\Log\LoggerInterface $request.logger" alias="monolog.logger.request"/>
@@ -10332,7 +10359,7 @@
     <service id=".service_locator.ccwFaAk" alias=".service_locator.7veCuyK"/>
     <service id=".service_locator.81LTOQ7" alias=".service_locator.t8346QO"/>
     <service id=".service_locator.XvTo7NF" alias=".service_locator.kLp2YUI"/>
-    <service id=".service_locator.si.1EuD" alias=".service_locator..YC9LVl"/>
+    <service id=".service_locator.H.G_zEs" alias=".service_locator.0MPCpad"/>
     <service id=".service_locator.BFrsqsn" alias=".service_locator.F9PKc.7"/>
     <service id=".service_locator.G9HJ8Ma" alias=".service_locator.dGEBibA"/>
     <service id=".service_locator.XtmiKbi" alias=".service_locator.MfxSDRP"/>
