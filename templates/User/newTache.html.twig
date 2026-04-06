@@ -1,4 +1,3 @@
-{% set layout = 'base.html.twig' %}
 {% if is_granted('ROLE_ADMIN') %}
     {% set layout = 'base_admin.html.twig' %}
     {% set cancel_route = 'app_tache_index' %}
@@ -13,7 +12,7 @@
 {% block body %}
 <div style="padding:30px; font-family:Arial,sans-serif; max-width:700px; margin:0 auto;">
     <div style="margin-bottom:25px;">
-        <a href="{{ path('app_tache_index') }}" style="color:#888; text-decoration:none; font-size:14px;">
+        <a href="{{ path(cancel_route) }}" style="color:#888; text-decoration:none; font-size:14px;">
             <i class="fa fa-arrow-left"></i> Retour
         </a>
         <h2 style="margin:10px 0 0; color:#2C3E50;">Nouvelle tâche</h2>
