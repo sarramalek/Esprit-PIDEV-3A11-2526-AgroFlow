@@ -1,0 +1,162 @@
+{# templates/maintenances/form.html.twig #}
+
+<style>
+    /* Conteneur principal du formulaire */
+    .af-form-card {
+        background: #ffffff;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.04);
+        border: 1px solid #eef2ee;
+    }
+
+    /* Style des labels */
+    .form-label {
+        font-weight: 600;
+        color: #4a5d4a;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    /* Wrapper pour l'icône dans l'input */
+    .af-input-group {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .af-icon {
+        position: absolute;
+        left: 12px;
+        color: #a0aec0;
+        font-size: 1.1rem;
+        z-index: 5;
+    }
+
+    /* Style des inputs */
+    .af-control {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.6rem; /* Padding gauche pour l'icône */
+        border: 1.5px solid #e2e8f0;
+        border-radius: 8px;
+        background-color: #fcfdfc;
+        transition: all 0.2s ease;
+        font-size: 0.95rem;
+    }
+
+    .af-control:focus {
+        outline: none;
+        border-color: #4ade80;
+        background-color: #fff;
+        box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.1);
+    }
+
+    /* Feedback de validation (bordure verte quand valide) */
+    .af-control:not(:placeholder-shown):valid {
+        border-color: #22c55e;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2322c55e'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M5 13l4 4L19 7'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 18px;
+    }
+
+    /* Cas spécifique du Textarea (Description) */
+    textarea.af-control {
+        padding-left: 1rem; /* Pas d'icône pour la description pour gagner de l'espace */
+    }
+
+    /* Boutons */
+    .btn-save {
+        background-color: #2d6a2d;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: transform 0.1s, background 0.2s;
+    }
+    .btn-save:hover { background-color: #235223; color: white; }
+    .btn-save:active { transform: scale(0.98); }
+
+    .btn-cancel-custom {
+        border: 1.5px solid #e2e8f0;
+        border-radius: 8px;
+        color: #64748b;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .text-danger-custom { color: #dc3545; font-size: 0.8rem; margin-top: 4px; }
+</style>
+
+<div class="af-form-card">
+    {{ form_start(form, {'attr': {'class': 'needs-validation'}}) }}
+    
+    <div class="row g-4">
+        {# Type de Panne #}
+        <div class="col-md-6">
+            <label class="form-label">Type de Panne <span class="text-danger">*</span></label>
+            <div class="af-input-group">
+                <span class="af-icon">🔧</span>
+                {{ form_widget(form.typePanne, {'attr': {'class': 'af-control'}}) }}
+            </div>
+            {{ form_errors(form.typePanne, {'attr': {'class': 'text-danger-custom'}}) }}
+        </div>
+
+        {# Coût #}
+        <div class="col-md-6">
+            <label class="form-label">Coût (DT) <span class="text-danger">*</span></label>
+            <div class="af-input-group">
+                <span class="af-icon">💰</span>
+                {{ form_widget(form.cout, {'attr': {'class': 'af-control', 'placeholder': '0.00'}}) }}
+            </div>
+            {{ form_errors(form.cout, {'attr': {'class': 'text-danger-custom'}}) }}
+        </div>
+
+        {# Date de Maintenance #}
+        <div class="col-md-6">
+            <label class="form-label">Date de Maintenance <span class="text-danger">*</span></label>
+            <div class="af-input-group">
+                <span class="af-icon">📅</span>
+                {{ form_widget(form.dateMain, {'attr': {'class': 'af-control'}}) }}
+            </div>
+            {{ form_errors(form.dateMain, {'attr': {'class': 'text-danger-custom'}}) }}
+        </div>
+
+        {# ID Matériel #}
+        <div class="col-md-6">
+            <label class="form-label">ID Matériel <span class="text-danger">*</span></label>
+            <div class="af-input-group">
+                <span class="af-icon">🆔</span>
+                {{ form_widget(form.idM, {'attr': {'class': 'af-control', 'readonly': 'readonly'}}) }}
+            </div>
+            {{ form_errors(form.idM, {'attr': {'class': 'text-danger-custom'}}) }}
+        </div>
+
+        {# Description #}
+        <div class="col-12">
+            <label class="form-label">Description <span class="text-danger">*</span></label>
+            {{ form_widget(form.description, {'attr': {'class': 'af-control', 'rows': '4', 'placeholder': 'Décrivez l\'intervention...'}}) }}
+            {{ form_errors(form.description, {'attr': {'class': 'text-danger-custom'}}) }}
+        </div>
+    </div>
+
+    <div class="mt-5 d-flex gap-3">
+        <button type="submit" class="btn btn-save px-4 py-2">
+            {{ btn_label|default('💾 Enregistrer les modifications') }}
+        </button>
+
+        {% if cancel_url is defined %}
+            <a href="{{ cancel_url }}" class="btn btn-cancel-custom px-4 py-2">
+                <span class="me-1">✖</span> Annuler
+            </a>
+        {% endif %}
+    </div>
+
+    {{ form_end(form) }}
+</div>

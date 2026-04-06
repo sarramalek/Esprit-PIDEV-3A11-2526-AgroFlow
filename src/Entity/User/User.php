@@ -57,8 +57,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $twoFactorBackupCodes = null;
 
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private ?string $img = null;
+   /* #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $img = null;*/
+
+     #[ORM\Column(type: 'string', length: 255, nullable: false, options: ['default' => 'default.png'])]
+    private ?string $img = 'default.png';
 
     // ==================== UserInterface ====================
 

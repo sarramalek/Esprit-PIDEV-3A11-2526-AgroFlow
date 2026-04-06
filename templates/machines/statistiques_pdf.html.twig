@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DejaVu Sans', sans-serif;
+            font-size: 11px;
+            color: #1a2e1a;
+            background: #fff;
+            padding: 25px 30px;
+        }
+
+        /* ── En-tête ── */
+        .pdf-header {
+            display: table;
+            width: 100%;
+            border-bottom: 2px solid #2d6a2d;
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+        .pdf-header-left  { display: table-cell; vertical-align: middle; }
+        .pdf-header-right { display: table-cell; vertical-align: middle; text-align: right; }
+        .pdf-title   { font-size: 18px; font-weight: bold; color: #1a2e1a; }
+        .pdf-subtitle{ font-size: 10px; color: #6b8c6b; margin-top: 3px; }
+        .pdf-date    { font-size: 10px; color: #8fa68f; }
+
+        /* ── Section titre ── */
+        .section-title {
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: #2d6a2d;
+            border-left: 3px solid #2d6a2d;
+            padding-left: 8px;
+            margin: 20px 0 10px;
+        }
+
+        /* ── Grid stats 4 colonnes ── */
+        .grid {
+            display: table;
+            width: 100%;
+            border-spacing: 8px;
+            margin-bottom: 4px;
+        }
+        .grid-row  { display: table-row; }
+        .grid-cell {
+            display: table-cell;
+            width: 25%;
+            vertical-align: top;
+            background: #f8fbf5;
+            border: 1px solid #dce8d5;
+            border-radius: 6px;
+            padding: 12px;
+        }
+        .card-title {
+            font-size: 8px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: #6b8c6b;
+            margin-bottom: 10px;
+        }
+
+        /* ── Total ── */
+        .total-value { font-size: 42px; font-weight: bold; color: #2d6a2d; line-height: 1; }
+        .total-label { font-size: 10px; color: #8fa68f; margin-top: 4px; }
+
+        /* ── Tableaux état / marque ── */
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table td {
+            padding: 4px 3px;
+            font-size: 10px;
+            border-bottom: 1px solid #eaf2e4;
+            vertical-align: middle;
+        }
+        .data-table td:last-child {
+            text-align: right;
+            font-weight: bold;
+            color: #2d6a2d;
+            width: 24px;
+        }
+
+        /* ── Badges état ── */
+        .badge {
+            display: inline-block;
+            padding: 2px 7px;
+            border-radius: 10px;
+            font-size: 9px;
+            font-weight: bold;
+        }
+        .b-neuf     { background: #d4edda; color: #155724; }
+        .b-bon      { background: #cce5ff; color: #004085; }
+        .b-occasion { background: #fff3cd; color: #856404; }
+        .b-panne    { background: #f8d7da; color: #721c24; }
+
+        /* ── Barres années ── */
+        .bar-row        { display: table; width: 100%; margin-bottom: 6px; }
+        .bar-year       { display: table-cell; width: 34px; font-size: 9px; color: #5a7a5a; font-weight: bold; vertical-align: middle; }
+        .bar-track-wrap { display: table-cell; vertical-align: middle; padding: 0 5px; }
+        .bar-track      { background: #e8f2e0; border-radius: 8px; height: 8px; width: 100%; }
+        .bar-fill       { background: #2d6a2d; border-radius: 8px; height: 8px; }
+        .bar-nb         { display: table-cell; width: 18px; font-size: 9px; color: #2d6a2d; font-weight: bold; vertical-align: middle; text-align: right; }
+
+        /* ── Table liste machines ── */
+        .machines-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 4px;
+        }
+        .machines-table thead tr {
+            background: #2d6a2d;
+            color: #fff;
+        }
+        .machines-table thead th {
+            padding: 7px 8px;
+            font-size: 9px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            text-align: left;
+        }
+        .machines-table tbody tr:nth-child(even) {
+            background: #f8fbf5;
+        }
+        .machines-table tbody tr:nth-child(odd) {
+            background: #ffffff;
+        }
+        .machines-table tbody td {
+            padding: 6px 8px;
+            font-size: 10px;
+            border-bottom: 1px solid #eaf2e4;
+            vertical-align: middle;
+        }
+        .machines-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .td-muted  { color: #8fa68f; font-size: 9px; }
+        .td-bold   { font-weight: bold; }
+        .td-center { text-align: center; }
+
+        /* ── Pied de page ── */
+        .pdf-footer {
+            margin-top: 24px;
+            border-top: 1px solid #dce8d5;
+            padding-top: 8px;
+            font-size: 8px;
+            color: #aac8aa;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+{# ── En-tête ── #}
+<div class="pdf-header">
+    <div class="pdf-header-left">
+        <div class="pdf-title">Statistiques des Machines</div>
+        <div class="pdf-subtitle">AgroFlow — Vue d'ensemble du parc machine</div>
+    </div>
+    <div class="pdf-header-right">
+        <div class="pdf-date">Généré le {{ date|date('d/m/Y à H:i') }}</div>
+    </div>
+</div>
+
+{# ── Calcul max années ── #}
+{% set maxAnnee = 1 %}
+{% for nb in stats.achatsParAnnee %}
+    {% if nb > maxAnnee %}{% set maxAnnee = nb %}{% endif %}
+{% endfor %}
+
+{% set badgeClass = {
+    'Neuf':     'b-neuf',
+    'Bon':      'b-bon',
+    'Occasion': 'b-occasion',
+    'En panne': 'b-panne'
+} %}
+
+{# ══════════════════════════════════════════
+   SECTION 1 — STATISTIQUES
+══════════════════════════════════════════ #}
+<div class="section-title">Vue d'ensemble</div>
+
+<div class="grid">
+    <div class="grid-row">
+
+        {# Total #}
+        <div class="grid-cell">
+            <div class="card-title">Total des machines</div>
+            <div class="total-value">{{ stats.total }}</div>
+            <div class="total-label">machines enregistrées</div>
+        </div>
+
+        {# Par état #}
+        <div class="grid-cell">
+            <div class="card-title">Répartition par état</div>
+            <table class="data-table">
+                {% for etat, nb in stats.parEtat %}
+                <tr>
+                    <td><span class="badge {{ badgeClass[etat] ?? 'b-bon' }}">{{ etat }}</span></td>
+                    <td>{{ nb }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        {# Par marque #}
+        <div class="grid-cell">
+            <div class="card-title">Répartition par marque</div>
+            <table class="data-table">
+                {% for marque, nb in stats.parMarque %}
+                <tr>
+                    <td>{{ marque }}</td>
+                    <td>{{ nb }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        {# Achats par année #}
+        <div class="grid-cell">
+            <div class="card-title">Achats par année</div>
+            {% for annee, nb in stats.achatsParAnnee %}
+            <div class="bar-row">
+                <div class="bar-year">{{ annee }}</div>
+                <div class="bar-track-wrap">
+                    <div class="bar-track">
+                        <div class="bar-fill" style="width:{{ (nb / maxAnnee * 100)|round }}%"></div>
+                    </div>
+                </div>
+                <div class="bar-nb">{{ nb }}</div>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
+
+{# ══════════════════════════════════════════
+   SECTION 2 — LISTE DES MACHINES
+══════════════════════════════════════════ #}
+<div class="section-title">Liste des machines ({{ machines|length }})</div>
+
+<table class="machines-table">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Nom</th>
+            <th>Marque</th>
+            <th>Modèle</th>
+            <th>N° Série</th>
+            <th>État</th>
+            <th>Date d'achat</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for machine in machines %}
+        <tr>
+            <td class="td-muted td-center">{{ machine.id }}</td>
+            <td class="td-bold">{{ machine.nom }}</td>
+            <td>{{ machine.marque }}</td>
+            <td>{{ machine.modele }}</td>
+            <td class="td-muted">{{ machine.numeroSerie ?? '—' }}</td>
+            <td>
+                <span class="badge {{ badgeClass[machine.etatM] ?? 'b-bon' }}">
+                    {{ machine.etatM }}
+                </span>
+            </td>
+            <td class="td-muted">
+                {{ machine.dateAchat ? machine.dateAchat|date('d/m/Y') : '—' }}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{# ── Pied de page ── #}
+<div class="pdf-footer">
+    AgroFlow &bull; Rapport généré automatiquement &bull; {{ date|date('d/m/Y') }} &bull; {{ machines|length }} machine{{ machines|length != 1 ? 's' : '' }} enregistrée{{ machines|length != 1 ? 's' : '' }}
+</div>
+
+</body>
+</html>

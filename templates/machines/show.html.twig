@@ -1,0 +1,204 @@
+{% extends 'agriculteur_dashboard.html.twig' %}
+{% block title %}Machine — {{ machine.nom }} — AgroFlow{% endblock %}
+
+{% block body %}
+<style>
+    .machine-show {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 1.5rem;
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .header-left h1 {
+        margin: 0 0 0.3rem 0;
+        font-size: 1.85rem;
+        font-weight: 700;
+        color: #1f2a1f;
+    }
+
+    .header-left p {
+        margin: 0;
+        color: #5f7a5f;
+        font-size: 1.05rem;
+    }
+
+    .card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.8rem 2.5rem;
+        padding: 2.2rem 2.5rem;
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+
+    .info-label {
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6b8c6b;
+    }
+
+    .info-value {
+        font-size: 1.1rem;
+        color: #1f2a1f;
+        font-weight: 500;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 0.45rem 1.2rem;
+        border-radius: 50px;
+        font-size: 0.92rem;
+        font-weight: 600;
+        background: #d1f0d1;
+        color: #1e5c1e;
+    }
+
+    .actions {
+        padding: 1.4rem 2.5rem;
+        background: #f8fbf5;
+        border-top: 1px solid #e0ecd9;
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 0.65rem 1.4rem;
+        border-radius: 10px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        text-decoration: none;
+        transition: all 0.2s;
+        font-size: 0.95rem;
+    }
+
+    .btn-edit {
+        background: #2d6a2d;
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background: #245524;
+    }
+
+    .btn-delete {
+        background: transparent;
+        color: #c53030;
+        border: 1.5px solid #f5c6cb;
+    }
+
+    .btn-delete:hover {
+        background: #fdf0f0;
+    }
+
+    .btn-back {
+        background: transparent;
+        color: #5f7a5f;
+        border: 1.5px solid #dce8d5;
+        padding: 0.6rem 1.1rem;
+    }
+</style>
+
+<div class="machine-show">
+
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <h1>⚙️ {{ machine.nom }}</h1>
+            <p>{{ machine.marque }} • {{ machine.modele }}</p>
+        </div>
+        <a href="{{ path('agri_machine_index') }}" class="btn btn-back">← Retour à la liste</a>
+    </div>
+
+    <!-- Card principale -->
+    <div class="card">
+
+        <!-- Informations -->
+        <div class="info-grid">
+
+            <div class="info-item">
+                <span class="info-label">ID MACHINE</span>
+                <span class="info-value">#{{ machine.id }}</span>
+            </div>
+
+            <div class="info-item">
+                <span class="info-label">NOM DE LA MACHINE</span>
+                <span class="info-value">{{ machine.nom }}</span>
+            </div>
+
+            <div class="info-item">
+                <span class="info-label">MARQUE</span>
+                <span class="info-value">{{ machine.marque }}</span>
+            </div>
+
+            <div class="info-item">
+                <span class="info-label">MODÈLE</span>
+                <span class="info-value">{{ machine.modele }}</span>
+            </div>
+
+            <div class="info-item">
+                <span class="info-label">NUMÉRO DE SÉRIE</span>
+                <span class="info-value">{{ machine.numeroSerie }}</span>
+            </div>
+
+            <div class="info-item">
+                <span class="info-label">ÉTAT ACTUEL</span>
+                <span class="badge">
+                    {{ machine.etatM }}
+                </span>
+            </div>
+
+            <div class="info-item">
+                <span class="info-label">DATE D'ACHAT</span>
+                <span class="info-value">
+                    {{ machine.dateAchat ? machine.dateAchat|date('d/m/Y') : '—' }}
+                </span>
+            </div>
+
+        </div>
+
+        <!-- Actions -->
+        <div class="actions">
+            <a href="{{ path('agri_machine_edit', {id: machine.id}) }}" class="btn btn-edit">
+                ✏️ Modifier la machine
+            </a>
+            
+            <form method="post" action="{{ path('agri_machine_delete', {id: machine.id}) }}" 
+                  onsubmit="return confirm('⚠️ Voulez-vous vraiment supprimer cette machine ?')">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ machine.id) }}">
+                <button type="submit" class="btn btn-delete">
+                    🗑 Supprimer
+                </button>
+            </form>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

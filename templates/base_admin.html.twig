@@ -397,24 +397,29 @@
                     </a></li>
                 </ul>
             </div>
-
-            <!-- Gestion Matériels -->
-            <div class="nav-item {% if app.request.get('_route') in ['admin_machines','admin_maintenances'] %}open{% endif %}">
-                <div class="nav-link {% if app.request.get('_route') in ['admin_machines','admin_maintenances'] %}active{% endif %}"
-                     onclick="toggleMenu(this)">
-                    <span class="nav-icon"><i class="fa fa-tractor"></i></span>
-                    <span class="nav-label">Gestion Matériels</span>
-                    <i class="fa fa-chevron-right nav-arrow"></i>
+                <!-- Gestion Matériels -->
+                <div class="nav-item {% if app.request.get('_route') starts with 'machine_' or app.request.get('_route') starts with 'maintenance_' %}open{% endif %}">
+                    <div class="nav-link {% if app.request.get('_route') starts with 'machine_' or app.request.get('_route') starts with 'maintenance_' %}active{% endif %}"
+                        onclick="toggleMenu(this)">
+                        <span class="nav-icon"><i class="fa fa-tractor"></i></span>
+                        <span class="nav-label">Gestion Matériels</span>
+                        <i class="fa fa-chevron-right nav-arrow"></i>
+                    </div>
+                    <ul class="nav-sub">
+                    <li>
+                        <a href="{{ path('agri_machines') }}" 
+                        class="{% if app.request.get('_route') starts with 'agri_machine' or app.request.get('_route') == 'agri_machines' %}active{% endif %}">
+                            <span class="sub-dot"></span> Machines
+                        </a>
+                       </li>
+                        <li>
+                            <a href="#"
+                            class="{% if app.request.get('_route') starts with 'maintenance_' %}active{% endif %}">
+                                <span class="sub-dot"></span> Maintenances
+                            </a>
+                        </li>
+                    </ul>
                 </div>
-                <ul class="nav-sub">
-                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_machines' %}active{% endif %}">
-                        <span class="sub-dot"></span> Machines
-                    </a></li>
-                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_maintenances' %}active{% endif %}">
-                        <span class="sub-dot"></span> Maintenances
-                    </a></li>
-                </ul>
-            </div>
 
         </nav>
 
