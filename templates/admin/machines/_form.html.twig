@@ -1,70 +1,336 @@
-<div style="margin-bottom: 20px;">
-    <label style="display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px;">
-        Nom de la machine *
-    </label>
-    <input type="text" 
-           name="nom" 
-           value="{{ machine.nom|default('') }}" 
-           required
-           minlength="2"
-           maxlength="100"
-           style="width: 100%; padding: 12px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
-</div>
+<style>
+/* ── Champs ── */
+.field-group      { display: flex; flex-direction: column; gap: 5px; margin-bottom: 18px; }
+.field-group label {
+    font-size: 12px; font-weight: 700; color: #444;
+    text-transform: uppercase; letter-spacing: .4px;
+}
+.field-group label .required { color: #A32D2D; margin-left: 2px; }
 
-<div style="margin-bottom: 20px;">
-    <label style="display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px;">
-        Marque *
-    </label>
-    <input type="text" 
-           name="marque" 
-           value="{{ machine.marque|default('') }}" 
-           required
-           minlength="2"
-           style="width: 100%; padding: 12px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
-</div>
+.field-input {
+    padding: 10px 14px; border: 1.5px solid #ddd; border-radius: 8px;
+    font-size: 14px; color: #2C3E50; background: #fafafa;
+    transition: border-color .2s, box-shadow .2s, background .2s;
+    width: 100%; box-sizing: border-box;
+}
+.field-input:focus {
+    outline: none; border-color: #2D5A27; background: #fff;
+    box-shadow: 0 0 0 3px rgba(45,90,39,.1);
+}
+.field-input.is-invalid {
+    border-color: #A32D2D;
+    box-shadow: 0 0 0 3px rgba(163,45,45,.1);
+    background: #fff8f8;
+}
+.field-input.is-valid {
+    border-color: #3B6D11;
+    box-shadow: 0 0 0 3px rgba(59,109,17,.08);
+    background: #f9fcf6;
+}
 
-<div style="margin-bottom: 20px;">
-    <label style="display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px;">
-        Modèle *
-    </label>
-    <input type="text" 
-           name="modele" 
-           value="{{ machine.modele|default('') }}" 
-           required
-           style="width: 100%; padding: 12px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
-</div>
+.field-error {
+    font-size: 12px; color: #A32D2D;
+    display: none; align-items: center; gap: 5px;
+    margin-top: 2px;
+}
+.field-error.visible { display: flex; }
+.field-error::before { content: '⚠'; font-size: 11px; }
 
-<div style="margin-bottom: 20px;">
-    <label style="display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px;">
-        Numéro de série *
-    </label>
-    <input type="text" 
-           name="numeroSerie" 
-           value="{{ machine.numeroSerie|default('') }}" 
-           required
-           pattern="[A-Za-z0-9\-]+"
-           title="Le numéro de série peut contenir des lettres, chiffres et tirets"
-           style="width: 100%; padding: 12px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
-</div>
+.field-hint {
+    font-size: 11px; color: #999; margin-top: 2px;
+}
 
-<div style="margin-bottom: 20px;">
-    <label style="display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px;">
-        État *
-    </label>
-    <select name="etatM" required style="width: 100%; padding: 12px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
-        <option value="">-- Sélectionnez l'état --</option>
-        {% for etat in ['Neuf', 'Bon', 'Actif', 'Occasion', 'En panne', 'En maintenance', 'Hors service'] %}
-            <option value="{{ etat }}" {{ machine.etatM == etat ? 'selected' : '' }}>{{ etat }}</option>
-        {% endfor %}
-    </select>
-</div>
+/* ── 2 colonnes ── */
+.form-grid-2 {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px;
+}
+@media (max-width: 560px) { .form-grid-2 { grid-template-columns: 1fr; } }
 
-<div style="margin-bottom: 20px;">
-    <label style="display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px;">
-        Date d'achat
-    </label>
-    <input type="date" 
-           name="dateAchat" 
-           value="{{ machine.dateAchat ? machine.dateAchat|date('Y-m-d') : '' }}"
-           style="width: 100%; padding: 12px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
-</div>
+/* ── Séparateur de section ── */
+.form-section {
+    font-size: 11px; font-weight: 700; color: #2D5A27;
+    text-transform: uppercase; letter-spacing: .8px;
+    border-bottom: 2px solid #EAF3DE; padding-bottom: 6px;
+    margin: 24px 0 18px;
+}
+.form-section:first-child { margin-top: 0; }
+
+/* ── Compteur caractères ── */
+.char-counter {
+    font-size: 11px; color: #aaa; text-align: right; margin-top: 2px;
+}
+.char-counter.warn  { color: #854F0B; }
+.char-counter.error { color: #A32D2D; }
+
+/* ── Select custom ── */
+select.field-input { cursor: pointer; }
+</style>
+
+{# ══════════════════════════════════════════
+   SECTION 1 — Identification
+══════════════════════════════════════════ #}
+<div class="form-section"><i class="fa fa-tag"></i> Identification</div>
+
+<div class="form-grid-2">
+
+    {# Nom #}
+    <div class="field-group">
+        <label for="nom">Nom de la machine <span class="required">*</span></label>
+        <input type="text" id="nom" name="nom"
+               class="field-input"
+               value="{{ machine.nom|default('') }}"
+               placeholder="ex : Tracteur Grande Puissance"
+               maxlength="100"
+               autocomplete="off">
+        <div class="field-error" id="err-nom">Champ obligatoire (3 à 100 caractères)</div>
+        <div class="char-counter" id="cc-nom">0 / 100</div>
+    </div>
+
+    {# Marque #}
+    <div class="field-group">
+        <label for="marque">Marque <span class="required">*</span></label>
+        <input type="text" id="marque" name="marque"
+               class="field-input"
+               value="{{ machine.marque|default('') }}"
+               placeholder="ex : John Deere"
+               maxlength="80"
+               autocomplete="off">
+        <div class="field-error" id="err-marque">Champ obligatoire (2 à 80 caractères)</div>
+        <div class="char-counter" id="cc-marque">0 / 80</div>
+    </div>
+
+</div>{# /grid #}
+
+<div class="form-grid-2">
+
+    {# Modèle #}
+    <div class="field-group">
+        <label for="modele">Modèle <span class="required">*</span></label>
+        <input type="text" id="modele" name="modele"
+               class="field-input"
+               value="{{ machine.modele|default('') }}"
+               placeholder="ex : 5075E"
+               maxlength="80"
+               autocomplete="off">
+        <div class="field-error" id="err-modele">Champ obligatoire (1 à 80 caractères)</div>
+        <div class="char-counter" id="cc-modele">0 / 80</div>
+    </div>
+
+    {# Numéro de série #}
+    <div class="field-group">
+        <label for="numeroSerie">N° de série <span class="required">*</span></label>
+        <input type="text" id="numeroSerie" name="numeroSerie"
+               class="field-input"
+               value="{{ machine.numeroSerie|default('') }}"
+               placeholder="ex : JD5075E-2020-01"
+               maxlength="60"
+               autocomplete="off"
+               style="font-family: monospace; letter-spacing: .5px;">
+        <div class="field-error" id="err-numeroSerie">Obligatoire · lettres, chiffres et tirets uniquement</div>
+        <div class="char-counter" id="cc-numeroSerie">0 / 60</div>
+    </div>
+
+</div>{# /grid #}
+
+{# ══════════════════════════════════════════
+   SECTION 2 — État & Date
+══════════════════════════════════════════ #}
+<div class="form-section"><i class="fa fa-info-circle"></i> État & Acquisition</div>
+
+<div class="form-grid-2">
+
+    {# État #}
+    <div class="field-group">
+        <label for="etatM">État <span class="required">*</span></label>
+        <select id="etatM" name="etatM" class="field-input">
+            <option value="" disabled {{ machine.etatM is empty ? 'selected' : '' }}>
+                — Choisir un état —
+            </option>
+            {% set etats = ['Neuf', 'Bon', 'Actif', 'Occasion', 'En panne', 'Hors service'] %}
+            {% for etat in etats %}
+                <option value="{{ etat }}"
+                    {{ machine.etatM|default('') == etat ? 'selected' : '' }}>
+                    {{ etat }}
+                </option>
+            {% endfor %}
+        </select>
+        <div class="field-error" id="err-etatM">Veuillez sélectionner un état</div>
+    </div>
+
+    {# Date d'achat #}
+    <div class="field-group">
+        <label for="dateAchat">Date d'achat</label>
+        <input type="date" id="dateAchat" name="dateAchat"
+               class="field-input"
+               value="{{ machine.dateAchat ? machine.dateAchat|date('Y-m-d') : '' }}"
+               max="{{ 'today'|date('Y-m-d') }}">
+        <div class="field-error" id="err-dateAchat">La date ne peut pas être dans le futur</div>
+        <div class="field-hint">Optionnel · date ≤ aujourd'hui</div>
+    </div>
+
+</div>{# /grid #}
+
+{# ══════════════════════════════════════════
+   JS — Validation
+══════════════════════════════════════════ #}
+<script>
+(function () {
+
+    /* ── Règles de validation ── */
+    const RULES = {
+        nom:          { min: 3,  max: 100, pattern: null,              msg: 'Champ obligatoire (3 à 100 caractères)' },
+        marque:       { min: 2,  max: 80,  pattern: null,              msg: 'Champ obligatoire (2 à 80 caractères)' },
+        modele:       { min: 1,  max: 80,  pattern: null,              msg: 'Champ obligatoire (1 à 80 caractères)' },
+        numeroSerie:  { min: 3,  max: 60,  pattern: /^[A-Za-z0-9\-_]+$/, msg: 'Obligatoire · lettres, chiffres et tirets uniquement' },
+        etatM:        { min: 1,  max: null,pattern: null,              msg: 'Veuillez sélectionner un état' },
+        dateAchat:    { min: 0,  max: null,pattern: null,              msg: 'La date ne peut pas être dans le futur', optional: true },
+    };
+
+    /* ── Compteurs de caractères ── */
+    const CC_FIELDS = ['nom','marque','modele','numeroSerie'];
+    CC_FIELDS.forEach(id => {
+        const input = document.getElementById(id);
+        const cc    = document.getElementById('cc-' + id);
+        if (!input || !cc) return;
+
+        function updateCounter() {
+            const len = input.value.length;
+            const max = parseInt(input.getAttribute('maxlength'));
+            cc.textContent = `${len} / ${max}`;
+            cc.className   = 'char-counter';
+            if (len >= max)           cc.classList.add('error');
+            else if (len >= max * .8) cc.classList.add('warn');
+        }
+        input.addEventListener('input', updateCounter);
+        updateCounter(); /* init */
+    });
+
+    /* ── Valide un champ unique ── */
+    function validateField(id) {
+        const rule  = RULES[id];
+        if (!rule) return true;
+
+        const input = document.getElementById(id);
+        const err   = document.getElementById('err-' + id);
+        if (!input) return true;
+
+        const val = input.value.trim();
+
+        /* champ optionnel vide → toujours valide */
+        if (rule.optional && val === '') {
+            input.classList.remove('is-invalid','is-valid');
+            if (err) err.classList.remove('visible');
+            return true;
+        }
+
+        /* vide ou trop court */
+        if (val.length < rule.min) {
+            setInvalid(input, err);
+            return false;
+        }
+
+        /* trop long */
+        if (rule.max && val.length > rule.max) {
+            setInvalid(input, err);
+            return false;
+        }
+
+        /* pattern */
+        if (rule.pattern && !rule.pattern.test(val)) {
+            setInvalid(input, err);
+            return false;
+        }
+
+        /* date dans le futur */
+        if (id === 'dateAchat' && val !== '') {
+            const chosen = new Date(val);
+            const today  = new Date(); today.setHours(0,0,0,0);
+            if (chosen > today) {
+                setInvalid(input, err);
+                return false;
+            }
+        }
+
+        setValid(input, err);
+        return true;
+    }
+
+    function setInvalid(input, err) {
+        input.classList.add('is-invalid');
+        input.classList.remove('is-valid');
+        if (err) err.classList.add('visible');
+    }
+
+    function setValid(input, err) {
+        input.classList.remove('is-invalid');
+        input.classList.add('is-valid');
+        if (err) err.classList.remove('visible');
+    }
+
+    /* ── Attacher validation blur + input ── */
+    Object.keys(RULES).forEach(id => {
+        const input = document.getElementById(id);
+        if (!input) return;
+        input.addEventListener('blur',  () => validateField(id));
+        input.addEventListener('input', () => {
+            /* ne montrer le vert que si déjà touché */
+            if (input.classList.contains('is-invalid') ||
+                input.classList.contains('is-valid')) {
+                validateField(id);
+            }
+        });
+    });
+
+    /* ── Validation globale à la soumission ── */
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function (e) {
+            const fields  = ['nom','marque','modele','numeroSerie','etatM','dateAchat'];
+            let   allOk   = true;
+            let   firstBad = null;
+
+            fields.forEach(id => {
+                const ok = validateField(id);
+                if (!ok) {
+                    allOk = false;
+                    if (!firstBad) firstBad = document.getElementById(id);
+                }
+            });
+
+            if (!allOk) {
+                e.preventDefault();
+                if (firstBad) {
+                    firstBad.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstBad.focus();
+                }
+                /* bannière d'erreur globale */
+                showBanner('Veuillez corriger les erreurs avant d\'enregistrer.', 'error');
+            }
+        });
+    }
+
+    /* ── Bannière flash JS ── */
+    function showBanner(msg, type) {
+        const existing = document.getElementById('js-banner');
+        if (existing) existing.remove();
+
+        const div = document.createElement('div');
+        div.id = 'js-banner';
+        div.style.cssText = `
+            padding: 12px 18px; border-radius: 8px; margin-bottom: 18px;
+            font-size: 13.5px; font-weight: 500; display: flex; align-items: center; gap: 10px;
+            ${type === 'error'
+                ? 'background:#FCEBEB; color:#A32D2D; border:1px solid #f7c1c1;'
+                : 'background:#EAF3DE; color:#3B6D11; border:1px solid #c0dd97;'}
+        `;
+        div.innerHTML = `<i class="fa fa-${type === 'error' ? 'exclamation-circle' : 'check-circle'}"></i> ${msg}`;
+
+        const formEl = document.querySelector('form');
+        formEl.insertBefore(div, formEl.firstChild);
+        div.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        setTimeout(() => div.remove(), 5000);
+    }
+
+})();
+</script>
