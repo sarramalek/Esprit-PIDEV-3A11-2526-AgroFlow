@@ -80,12 +80,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        return match((int)$this->role) {
+        $roles = match((int)$this->role) {
             1 => ['ROLE_OUVRIER'],
             2 => ['ROLE_AGRICULTEUR'],
             3 => ['ROLE_ADMIN'],
-            default => ['ROLE_USER'],
+            default => [],
         };
+        // On garantit que tout utilisateur a au moins ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
     }
 
     public function getPassword(): string

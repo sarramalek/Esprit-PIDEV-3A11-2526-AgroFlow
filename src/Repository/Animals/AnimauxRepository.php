@@ -80,4 +80,23 @@ class AnimauxRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    /**
+     * Calcule le poids moyen par espèce pour l'ensemble des animaux.
+     */
+    public function getAverageWeightsBySpecies(): array
+    {
+        $results = $this->createQueryBuilder('a')
+            ->select('a.espece as espece, AVG(a.poids) as moyenne')
+            ->where('a.poids IS NOT NULL')
+            ->groupBy('a.espece')
+            ->getQuery()
+            ->getResult();
+
+        $averages = [];
+        foreach ($results as $row) {
+            $averages[strtolower($row['espece'])] = (float) $row['moyenne'];
+        }
+
+        return $averages;
+    }
 }
