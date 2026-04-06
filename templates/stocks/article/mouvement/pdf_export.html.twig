@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        /* --- Configuration de la page --- */
+        @page { margin: 0; } /* On gère les marges nous-mêmes pour le header plein écran */
+        
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-size: 10px;
+            color: #444;
+            margin: 0;
+            padding: 0;
+            background-color: #fcfcfc;
+        }
+
+        /* --- Barre Latérale de Couleur (Design Accent) --- */
+        .sidebar-accent {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 5px;
+            background-color: #28a745;
+        }
+
+        /* --- Header Premium --- */
+        .header-container {
+            background-color: #1a1a1a; /* Fond sombre moderne */
+            color: white;
+            padding: 30px 40px;
+            margin-bottom: 20px;
+        }
+        
+        .brand-name {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            color: #28a745;
+            margin: 0;
+        }
+
+        .report-type {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        /* --- Stats Cards (Le petit plus qui change tout) --- */
+        .stats-row {
+            padding: 0 40px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            float: left;
+            width: 30%;
+            background: white;
+            border: 1px solid #eee;
+            padding: 15px;
+            border-radius: 8px;
+            margin-right: 3%;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .stat-label { font-size: 9px; color: #888; text-transform: uppercase; margin-bottom: 5px; }
+        .stat-value { font-size: 16px; font-weight: bold; color: #333; }
+
+        /* --- Section Contenu --- */
+        .content { padding: 0 40px; }
+
+        .filter-summary {
+            background: #f0f7f1;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border-left: 3px solid #28a745;
+            margin-bottom: 20px;
+            color: #444;
+        }
+
+        /* --- Tableau de Luxe --- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            text-align: left;
+            padding: 15px 12px;
+            font-weight: 700;
+            border-bottom: 2px solid #28a745;
+            text-transform: uppercase;
+            font-size: 9px;
+        }
+
+        td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+        .row-even { background-color: #fafafa; }
+
+        /* --- Styles Spécifiques --- */
+        .date-box { color: #888; font-size: 9px; }
+        .article-name { font-size: 11px; font-weight: 700; color: #1a1a1a; }
+        
+        .badge {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .badge-in { background-color: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+        .badge-out { background-color: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+
+        .qty { font-family: 'Courier New', Courier, monospace; font-size: 13px; font-weight: bold; }
+        .text-green { color: #2e7d32; }
+        .text-red { color: #c62828; }
+
+        /* --- Footer --- */
+        .footer {
+            position: fixed;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            font-size: 9px;
+            color: #bbb;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar-accent"></div>
+
+    <div class="header-container">
+        <table style="width: 100%; background: none; border: none;">
+            <tr>
+                <td style="border: none; padding: 0;">
+                    <h1 class="brand-name">AgroFlow</h1>
+                    <div class="report-type">Logistique & Stocks</div>
+                </td>
+                <td style="border: none; padding: 0; text-align: right; vertical-align: top; color: #888;">
+                    Rapport Officiel de Flux<br>
+                    ID: {{ "now"|date("Ymd-Hi") }}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-label">Total Mouvements</div>
+            <div class="stat-value">{{ mouvements|length }} opérations</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Date d'Export</div>
+            <div class="stat-value">{{ "now"|date("d/m/Y") }}</div>
+        </div>
+        <div class="stat-card" style="margin-right: 0;">
+            <div class="stat-label">Statut</div>
+            <div class="stat-value" style="color: #28a745;">Certifié</div>
+        </div>
+        <div style="clear: both;"></div>
+    </div>
+
+    <div class="content">
+
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Horodatage</th>
+                    <th>Désignation Article</th>
+                    <th style="text-align: center;">Flux</th>
+                    <th style="text-align: right;">Quantité</th>
+                    <th>Motif détaillé</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mouvement in mouvements %}
+                    <tr class="{{ loop.index is even ? 'row-even' : '' }}">
+                        <td class="date-box">
+                            <strong>{{ mouvement.dateMouvement|date('d/m/Y') }}</strong><br>
+                            {{ mouvement.dateMouvement|date('H:i') }}
+                        </td>
+                        <td class="article-name">{{ mouvement.article.nom }}</td>
+                        <td style="text-align: center;">
+                            <span class="badge {{ mouvement.type == 'ENTREE' ? 'badge-in' : 'badge-out' }}">
+                                {{ mouvement.type }}
+                            </span>
+                        </td>
+                        <td class="qty {{ mouvement.type == 'ENTREE' ? 'text-green' : 'text-red' }}" style="text-align: right;">
+                            {{ mouvement.type == 'ENTREE' ? '+' : '-' }} {{ mouvement.quantite|number_format(2, ',', ' ') }}
+                        </td>
+                        <td style="color: #666;">{{ mouvement.motif|default('Aucune note') }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="footer">
+        Ce document est généré par le système AgroFlow. Toute modification manuelle annule sa validité.
+    </div>
+</body>
+</html>
