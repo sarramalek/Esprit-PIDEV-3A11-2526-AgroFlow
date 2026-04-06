@@ -1,5 +1,4 @@
 {% extends 'agriculteur_dashboard.html.twig' %}
-
 {% block title %}Nouvelle maintenance — AgroFlow{% endblock %}
 
 {% block body %}
@@ -18,10 +17,10 @@
         color: #5f7a5f;
         margin-bottom: 1.5rem;
     }
-    .mn-breadcrumb a { 
-        color: #2d6a2d; 
-        text-decoration: none; 
-        font-weight: 500; 
+    .mn-breadcrumb a {
+        color: #2d6a2d;
+        text-decoration: none;
+        font-weight: 500;
     }
     .mn-breadcrumb a:hover { text-decoration: underline; }
     .mn-breadcrumb__sep { color: #aac2aa; }
@@ -41,18 +40,17 @@
         font-size: 0.875rem;
         color: #6b8c6b;
     }
-    .mn-header p .req { 
-        color: #a32d2d; 
+    .mn-header p .req {
+        color: #a32d2d;
         font-weight: 600;
     }
 
-    /* Style pour les messages d'erreur (comme dans ton image) */
     .alert-error {
         background-color: #fef2f2;
         border: 1px solid #f5c6cb;
         color: #c53030;
         padding: 12px 16px;
-        border-radius: 6px;
+        border-radius: 8px;
         margin-bottom: 1.5rem;
         display: flex;
         align-items: center;
@@ -73,19 +71,16 @@
         <p>Les champs marqués d'un <span class="req">*</span> sont obligatoires</p>
     </div>
 
-    {# ==================== MESSAGE GLOBAL D'ERREUR ==================== #}
     {% if form.vars.submitted and not form.vars.valid %}
         <div class="alert-error">
-            <i class="bi bi-exclamation-triangle-fill"></i>
-            Le formulaire contient des erreurs. Veuillez les corriger avant de continuer.
+            ⚠️ Le formulaire contient des erreurs. Veuillez les corriger avant de continuer.
         </div>
     {% endif %}
 
-    {# Inclusion du formulaire sans le bouton submit #}
-   {% include 'maintenances/form.html.twig' with {
-    'form': form,
-    'btn_label': '💾 Enregistrer',
-    'cancel_url': path('agri_maintenances_index')
-} only %}   {# 'only' pour éviter de passer des variables inutiles #}
+    {% include 'maintenances/form.html.twig' with {
+        'form': form,
+        'btn_label': '💾 Enregistrer',
+        'cancel_url': path('agri_maintenances_index')
+    } only %}
 </div>
 {% endblock %}
