@@ -1,0 +1,16 @@
+{# templates/machines/delete_form.html.twig
+   Réutilisable dans show.html.twig et edit.html.twig #}
+<form method="post"
+      action="{{ path('app_machine_delete', {'id': machine.id}) }}"
+      onsubmit="return confirm('Supprimer définitivement « {{ machine.nom }} » ?\nCette action est irréversible.');">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ machine.id) }}">
+    <button type="submit" class="af-btn af-btn--danger">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6l-1 14H6L5 6"/>
+            <path d="M10 11v6M14 11v6"/>
+            <path d="M9 6V4h6v2"/>
+        </svg>
+        Supprimer
+    </button>
+</form>

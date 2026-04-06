@@ -58,6 +58,11 @@ public function login(AuthenticationUtils $authenticationUtils): Response
             $user->setDateCreationcpt(new \DateTime());
             $user->setDateDernierchg(new \DateTime());
 
+                if (!$user->getImg()) {
+                $user->setImg('default.png');
+            }
+
+
             $em->persist($user);
             $em->flush();
 
