@@ -13,21 +13,31 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotNull;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\GreaterThan;
+use Doctrine\ORM\EntityRepository;
 
 class RotationType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $userCin = $options['user_cin'];
+
         $builder
             ->add('terrain', EntityType::class, [
-                'class'        => Terrain::class,
-                'choice_label' => 'nomTerrain',
-                'label'        => 'Terrain',
-                'placeholder'  => '— Choisir un terrain —',
-                'attr'         => ['class' => 'form-input'],
-                'constraints'  => [
+                'class'         => Terrain::class,
+                'choice_label'  => 'nomTerrain',
+                'label'         => 'Terrain',
+                'placeholder'   => '— Choisir un terrain —',
+                'attr'          => ['class' => 'form-input'],
+                'query_builder' => function(EntityRepository $repo) use ($userCin) {
+                    $qb = $repo->createQueryBuilder('t')
+                        ->orderBy('t.nomTerrain', 'ASC');
+                    if ($userCin !== null) {
+                        $qb->where('t.cin = :cin')
+           ->setParameter('cin', $userCin);  // ← Symfony gère le type
+                    }
+                    return $qb;
+                },
+                'constraints' => [
                     new NotNull(message: 'Veuillez sélectionner un terrain.'),
                 ],
             ])
@@ -85,6 +95,9 @@ class RotationType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults(['data_class' => Rotation::class]);
+        $resolver->setDefaults([
+            'data_class' => Rotation::class,
+            'user_cin'   => null,
+        ]);
     }
 }
