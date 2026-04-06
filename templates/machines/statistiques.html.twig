@@ -1,0 +1,147 @@
+{% extends 'agriculteur_dashboard.html.twig' %}
+
+{% block title %}Statistiques des Machines — AgroFlow{% endblock %}
+
+{% block body %}
+
+<style>
+.stats-header{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;margin-bottom:1.75rem}
+.stats-header h1{margin:0 0 .25rem;font-size:1.55rem;font-weight:700;color:#1a2e1a}
+.stats-header p{margin:0;font-size:.88rem;color:#6b8c6b}
+.stats-header-actions{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
+
+.btn{display:inline-flex;align-items:center;gap:.35rem;padding:.48rem 1rem;border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer;border:1.5px solid transparent;text-decoration:none;transition:all .15s}
+.btn-ghost{background:transparent;color:#5a7a5a;border-color:#dce8d5}.btn-ghost:hover{background:#f0f7f0}
+.btn-export{background:#1a2e1a;color:#fff;border-color:#1a2e1a}.btn-export:hover{background:#0f1f0f}
+
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:1.25rem;margin-bottom:1.5rem}
+.stat-card{background:#fff;border:1px solid #dce8d5;border-radius:14px;padding:1.5rem;display:flex;flex-direction:column;align-items:center}
+.stat-card .card-title{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#6b8c6b;margin:0 0 1rem;align-self:flex-start}
+
+.total-value{font-size:4rem;font-weight:800;color:#2d6a2d;line-height:1;margin-bottom:.35rem}
+.total-label{font-size:.9rem;color:#8fa68f}
+
+.chart-wrap{position:relative;width:100%;max-width:230px}
+
+.bar-list{display:flex;flex-direction:column;gap:.6rem;width:100%}
+.bar-row{display:flex;align-items:center;gap:.65rem;font-size:.85rem}
+.bar-label{width:38px;text-align:right;color:#5a7a5a;font-weight:600;flex-shrink:0}
+.bar-track{flex:1;background:#f0f5ec;border-radius:20px;height:11px;overflow:hidden}
+.bar-fill{height:100%;border-radius:20px;background:#2d6a2d;transition:width .7s cubic-bezier(.4,0,.2,1)}
+.bar-count{width:22px;text-align:left;color:#2d6a2d;font-weight:700;flex-shrink:0}
+</style>
+
+{# ── Calcul du max pour les barres années ── #}
+{% set maxAnnee = 1 %}
+{% for nb in stats.achatsParAnnee %}
+    {% if nb > maxAnnee %}{% set maxAnnee = nb %}{% endif %}
+{% endfor %}
+
+{# ── En-tête ── #}
+<div class="stats-header">
+    <div>
+        <h1>📊 Statistiques des Machines</h1>
+        <p>Vue d'ensemble du parc machine</p>
+    </div>
+    <div class="stats-header-actions">
+        {# ✅ Bouton retour vers la liste #}
+        <a href="{{ path('agri_machines') }}" class="btn btn-ghost">← Retour à la liste</a>
+        {# ✅ Bouton export PDF vers la bonne route #}
+        <a href="{{ path('agri_machine_statistiques_pdf') }}" class="btn btn-export">⬇ Exporter en PDF</a>
+    </div>
+</div>
+
+<div class="stats-grid">
+
+    {# ── Card 1 : Total ── #}
+    <div class="stat-card">
+        <p class="card-title">🚜 Total des machines</p>
+        <div class="total-value">{{ stats.total }}</div>
+        <div class="total-label">machines enregistrées</div>
+    </div>
+
+    {# ── Card 2 : Pie état ── #}
+    <div class="stat-card">
+        <p class="card-title">⚙️ Répartition par état</p>
+        <div class="chart-wrap">
+            <canvas id="chartEtat"></canvas>
+        </div>
+    </div>
+
+    {# ── Card 3 : Pie marque ── #}
+    <div class="stat-card">
+        <p class="card-title">🏷️ Répartition par marque</p>
+        <div class="chart-wrap">
+            <canvas id="chartMarque"></canvas>
+        </div>
+    </div>
+
+    {# ── Card 4 : Achats par année ── #}
+    <div class="stat-card">
+        <p class="card-title">📅 Achats par année</p>
+        <div class="bar-list">
+            {% for annee, nb in stats.achatsParAnnee %}
+            <div class="bar-row">
+                <span class="bar-label">{{ annee }}</span>
+                <div class="bar-track">
+                    <div class="bar-fill" style="width:{{ (nb / maxAnnee * 100)|round }}%"></div>
+                </div>
+                <span class="bar-count">{{ nb }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+
+{# ── Chart.js ── #}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const palette = [
+    '#3b82f6','#f59e0b','#ef4444','#8b5cf6','#06b6d4',
+    '#f97316','#10b981','#ec4899','#6366f1','#14b8a6',
+    '#f43f5e','#a855f7'
+];
+
+new Chart(document.getElementById('chartEtat'), {
+    type: 'pie',
+    data: {
+        labels: {{ etatLabels|json_encode|raw }},
+        datasets: [{
+            data: {{ etatValues|json_encode|raw }},
+            backgroundColor: palette.slice(0, {{ etatLabels|length }}),
+            borderColor: '#fff',
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { position: 'bottom', labels: { font: { size: 12 }, padding: 10, color: '#1a2e1a' } },
+            tooltip: { callbacks: { label: ctx => ` ${ctx.label} : ${ctx.parsed} machine${ctx.parsed > 1 ? 's' : ''}` } }
+        }
+    }
+});
+
+new Chart(document.getElementById('chartMarque'), {
+    type: 'pie',
+    data: {
+        labels: {{ marqueLabels|json_encode|raw }},
+        datasets: [{
+            data: {{ marqueValues|json_encode|raw }},
+            backgroundColor: palette.slice(0, {{ marqueLabels|length }}),
+            borderColor: '#fff',
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { position: 'bottom', labels: { font: { size: 11 }, padding: 8, color: '#1a2e1a' } },
+            tooltip: { callbacks: { label: ctx => ` ${ctx.label} : ${ctx.parsed} machine${ctx.parsed > 1 ? 's' : ''}` } }
+        }
+    }
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,178 @@
+{% extends 'agriculteur_dashboard.html.twig' %}
+
+{% block title %}Machines — AgroFlow{% endblock %}
+
+{% block body %}
+
+{% import _self as macros %}
+
+<style>
+.af-header{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1.75rem}
+.af-header h1{margin:0 0 .2rem;font-size:1.55rem;font-weight:700;color:#1a2e1a}
+.af-header p{margin:0;font-size:.88rem;color:#6b8c6b}
+.af-card{background:#fff;border:1px solid #dce8d5;border-radius:12px;overflow:hidden;margin-bottom:1.5rem}
+.btn{display:inline-flex;align-items:center;gap:.35rem;padding:.48rem 1rem;border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer;border:1.5px solid transparent;text-decoration:none;transition:all .15s}
+.btn-primary{background:#2d6a2d;color:#fff;border-color:#2d6a2d}.btn-primary:hover{background:#245524}
+.btn-ghost{background:transparent;color:#5a7a5a;border-color:#dce8d5;padding:.32rem .65rem;font-size:.8rem}.btn-ghost:hover{background:#f0f7f0}
+.btn-danger-ghost{background:transparent;color:#b94040;border-color:#f0d0d0;padding:.32rem .65rem;font-size:.8rem}.btn-danger-ghost:hover{background:#fdf0f0}
+.search-bar{background:#fff;border:1px solid #dce8d5;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.25rem;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center}
+.search-bar input,.search-bar select{padding:.42rem .75rem;border:1.5px solid #dce8d5;border-radius:8px;font-size:.88rem;outline:none;color:#1a2e1a;background:#fafcf8}
+.search-bar input:focus,.search-bar select:focus{border-color:#2d6a2d}
+.search-bar input[type=text]{flex:1;min-width:180px}
+.af-table{width:100%;border-collapse:collapse}
+.af-table thead tr{border-bottom:1.5px solid #dce8d5}
+.af-table thead th{padding:.7rem 1rem;font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#5a7a5a;white-space:nowrap;text-align:left}
+.af-table thead th a{color:#5a7a5a;text-decoration:none}.af-table thead th a:hover{color:#2d6a2d}
+.af-table tbody tr{border-bottom:1px solid #f0f5ec;transition:background .1s}
+.af-table tbody tr:last-child{border-bottom:none}
+.af-table tbody tr:hover{background:#f8fbf5}
+.af-table td{padding:.72rem 1rem;font-size:.92rem;color:#1a2e1a;vertical-align:middle}
+.td-muted{color:#8fa68f;font-size:.85rem}
+.td-bold{font-weight:600}
+.td-actions{display:flex;gap:.35rem}
+.badge{display:inline-block;padding:.22rem .7rem;border-radius:20px;font-size:.76rem;font-weight:700;white-space:nowrap}
+.b-neuf{background:#d4edda;color:#155724}
+.b-bon{background:#cce5ff;color:#004085}
+.b-occasion{background:#fff3cd;color:#856404}
+.b-panne{background:#f8d7da;color:#721c24}
+.alert{padding:.75rem 1rem;border-radius:8px;margin-bottom:1rem;font-size:.9rem}
+.alert-success{background:#d4edda;color:#155724;border:1px solid #c3e6cb}
+.alert-danger{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb}
+.empty-state{text-align:center;padding:4rem 2rem;color:#7a9a7a}
+.empty-state .icon{font-size:3rem;margin-bottom:.75rem}
+.empty-state h3{font-size:1.15rem;color:#3a5a3a;margin:0 0 .4rem}
+</style>
+
+{# ── Macro tri ── #}
+{% macro sort_link(label, field, filters) %}
+    {% set f = filters|default({}) %}
+    {% set dir = (f.sortBy is defined and f.sortBy == field and f.sortDir == 'ASC') ? 'DESC' : 'ASC' %}
+    <a href="{{ path('agri_machine_search', f|merge({sortBy: field, sortDir: dir})) }}">
+        {{ label }}
+        {% if f.sortBy is defined and f.sortBy == field %}
+            {{ f.sortDir == 'ASC' ? '▲' : '▼' }}
+        {% endif %}
+    </a>
+{% endmacro %}
+
+{# ── Flash messages ── #}
+{% for label, messages in app.flashes %}
+    {% for message in messages %}
+        <div class="alert alert-{{ label }}">{{ message }}</div>
+    {% endfor %}
+{% endfor %}
+
+{# ── En-tête ── #}
+<div class="af-header">
+    <div>
+        <h1>⚙️ Gestion des Machines</h1>
+        <p>{{ machines|length }} machine{{ machines|length != 1 ? 's' : '' }} enregistrée{{ machines|length != 1 ? 's' : '' }}</p>
+    </div>
+    <div style="display:flex;gap:.6rem">
+        <a href="{{ path('agri_machine_statistiques') }}" class="btn btn-ghost">📊 Statistiques</a>
+        <a href="{{ path('agri_machine_new') }}" class="btn btn-primary">+ Nouvelle machine</a>
+    </div>
+</div>
+
+{# ── Barre de recherche/filtres (sans champ date) ── #}
+{% set f = filters|default({}) %}
+<form method="GET" action="{{ path('agri_machine_search') }}" class="search-bar">
+
+    <input type="text" name="search"
+           placeholder="Nom, marque, modèle, N° série..."
+           value="{{ f.search ?? '' }}">
+
+    <select name="etat">
+        <option value="">— Tous les états —</option>
+        {% for etat in ['Neuf', 'Bon état', 'Occasion', 'En panne'] %}
+            <option value="{{ etat }}" {{ (f.etat ?? '') == etat ? 'selected' : '' }}>
+                {{ etat }}
+            </option>
+        {% endfor %}
+    </select>
+
+    <select name="sortDir" onchange="this.form.submit()">
+        <option value="ASC"  {{ (f.sortDir ?? 'ASC') == 'ASC'  ? 'selected' : '' }}>📅 Date ↑ Croissant</option>
+        <option value="DESC" {{ (f.sortDir ?? '') == 'DESC' ? 'selected' : '' }}>📅 Date ↓ Décroissant</option>
+    </select>
+
+    <input type="hidden" name="sortBy" value="dateAchat">
+
+    <button type="submit" class="btn btn-primary">🔍 Rechercher</button>
+
+    {% if f|filter(v => v is not empty) is not empty %}
+        <a href="{{ path('agri_machines') }}" class="btn btn-ghost">✖ Réinitialiser</a>
+    {% endif %}
+
+</form>
+
+{# ── Tableau ── #}
+{% if machines is empty %}
+    <div class="af-card">
+        <div class="empty-state">
+            <div class="icon">🚜</div>
+            <h3>Aucune machine trouvée</h3>
+            <p>Modifiez vos filtres ou ajoutez une nouvelle machine.</p>
+            <a href="{{ path('agri_machine_new') }}" class="btn btn-primary">Ajouter une machine</a>
+        </div>
+    </div>
+{% else %}
+    <div class="af-card">
+        <table class="af-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>{{ macros.sort_link('Nom',          'nom',       f) }}</th>
+                    <th>{{ macros.sort_link('Marque',       'marque',    f) }}</th>
+                    <th>{{ macros.sort_link('Modèle',       'modele',    f) }}</th>
+                    <th>N° Série</th>
+                    <th>{{ macros.sort_link('État',         'etatM',     f) }}</th>
+                    <th>{{ macros.sort_link("Date d'achat", 'dateAchat', f) }}</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for machine in machines %}
+                <tr>
+                    <td class="td-muted">{{ machine.id }}</td>
+                    <td class="td-bold">{{ machine.nom }}</td>
+                    <td>{{ machine.marque }}</td>
+                    <td>{{ machine.modele }}</td>
+                    <td class="td-muted">{{ machine.numeroSerie }}</td>
+                    <td>
+                        {% set badgeClass = {
+                            'Neuf':     'b-neuf',
+                            'Bon':      'b-bon',
+                            'Occasion': 'b-occasion',
+                            'panne':    'b-panne'
+                        } %}
+                        <span class="badge {{ badgeClass[machine.etatM] ?? 'b-bon' }}">
+                            {{ machine.etatM }}
+                        </span>
+                    </td>
+                    <td class="td-muted">
+                        {{ machine.dateAchat ? machine.dateAchat|date('d/m/Y') : '—' }}
+                    </td>
+                    <td>
+                        <div class="td-actions">
+                            <a href="{{ path('agri_machine_show', {id: machine.id}) }}"
+                               class="btn btn-ghost">👁 Voir</a>
+                            <a href="{{ path('agri_machine_edit', {id: machine.id}) }}"
+                               class="btn btn-ghost">✏️ Modifier</a>
+                            <form method="post"
+                                  action="{{ path('agri_machine_delete', {id: machine.id}) }}"
+                                  onsubmit="return confirm('Supprimer « {{ machine.nom }} » ?')">
+                                <input type="hidden" name="_token"
+                                       value="{{ csrf_token('delete_machine_' ~ machine.id) }}">
+                                <button type="submit" class="btn btn-danger-ghost">🗑 Supprimer</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}
+
+{% endblock %}

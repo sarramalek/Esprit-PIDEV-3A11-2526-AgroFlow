@@ -1,0 +1,420 @@
+{% extends 'agriculteur_dashboard.html.twig' %}
+{% block title %}Maintenances — AgroFlow{% endblock %}
+{% block body %}
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+
+.mp {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1.75rem;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+/* ── Breadcrumb ── */
+.bc { display:flex; align-items:center; gap:.4rem; font-size:.82rem; color:#5f7a5f; margin-bottom:1.5rem; }
+.bc a { color:#2d6a2d; text-decoration:none; font-weight:500; }
+.bc a:hover { text-decoration:underline; }
+.bc__sep { color:#aac2aa; }
+
+/* ── Header ── */
+.mh { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem; }
+.mh h1 { margin:0 0 .2rem; font-size:1.75rem; font-weight:700; color:#1a2e1a; letter-spacing:-.02em; }
+.mh p  { margin:0; font-size:.875rem; color:#6b8c6b; }
+.mh__right { display:flex; gap:.6rem; flex-wrap:wrap; align-items:center; }
+
+/* ── Buttons ── */
+.btn {
+    display:inline-flex; align-items:center; gap:.4rem;
+    border-radius:10px; padding:.6rem 1.2rem;
+    font-size:.875rem; font-weight:600; text-decoration:none;
+    cursor:pointer; border:none; transition:all .15s;
+}
+.btn--green        { background:#2d6a2d; color:#fff; }
+.btn--green:hover  { background:#235223; }
+.btn--outline      { background:#fff; color:#2d6a2d; border:1.5px solid #b3d4b3; }
+.btn--outline:hover{ background:#eaf3de; }
+.btn--red-outline  { background:#fff; color:#a32d2d; border:1.5px solid #f7c1c1; font-size:.82rem; padding:.5rem .9rem; }
+.btn--red-outline:hover { background:#fcebeb; }
+
+/* ── Alerts ── */
+.alert { padding:.8rem 1.1rem; border-radius:10px; font-size:.9rem; font-weight:500; margin-bottom:1rem; border-left:4px solid; }
+.alert--success { background:#eaf3de; color:#27500a; border-color:#3b6d11; }
+.alert--danger  { background:#fcebeb; color:#501313; border-color:#a32d2d; }
+
+/* ── Stats ── */
+.stats-row {
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));
+    gap:1rem;
+    margin-bottom:1.5rem;
+}
+.stat-card { background:#fff; border-radius:14px; padding:1.1rem 1.4rem; box-shadow:0 2px 14px rgba(0,0,0,.06); }
+.stat-card__label { font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:#7a9a7a; }
+.stat-card__value { font-size:1.6rem; font-weight:800; color:#1a2e1a; margin-top:.15rem; }
+
+/* ── Charts ── */
+.charts-row {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:1.25rem;
+    margin-bottom:1.5rem;
+}
+@media(max-width:700px){ .charts-row { grid-template-columns:1fr; } }
+.chart-card { background:#fff; border-radius:16px; box-shadow:0 2px 14px rgba(0,0,0,.06); padding:1.25rem 1.5rem; }
+.chart-card h3 { margin:0 0 1rem; font-size:.95rem; font-weight:700; color:#1a2e1a; }
+
+/* ── Toolbar ── */
+.toolbar { display:flex; gap:.8rem; flex-wrap:wrap; margin-bottom:1.25rem; align-items:center; }
+.toolbar input,
+.toolbar select {
+    padding:.55rem .9rem;
+    border:1.5px solid #d4e8d4;
+    border-radius:9px;
+    font-size:.875rem;
+    color:#1a2e1a;
+    background:#fff;
+    outline:none;
+    transition: border-color .15s;
+}
+.toolbar input:focus,
+.toolbar select:focus { border-color:#2d6a2d; }
+.toolbar input { flex:1; min-width:200px; max-width:320px; }
+
+/* ── Table ── */
+.maint-card { background:#fff; border-radius:16px; box-shadow:0 2px 18px rgba(0,0,0,.07); overflow:hidden; }
+.maint-table { width:100%; border-collapse:collapse; font-size:.9rem; }
+.maint-table thead tr { background:#f7faf4; border-bottom:1.5px solid #e4edde; }
+.maint-table th {
+    padding:.8rem 1rem;
+    text-align:left;
+    font-size:.71rem;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.7px;
+    color:#7a9a7a;
+    white-space:nowrap;
+}
+.maint-table tbody tr { border-bottom:1px solid #f1f5ee; transition:background .12s; }
+.maint-table tbody tr:hover { background:#f9fcf7; }
+.maint-table td { padding:.9rem 1rem; color:#1f2e1f; vertical-align:middle; }
+
+.td-cost { font-variant-numeric:tabular-nums; font-weight:600; white-space:nowrap; }
+.td-date { color:#5f7a5f; font-size:.87rem; white-space:nowrap; }
+.td-mat  { color:#2d6a2d; font-weight:700; }
+.td-desc {
+    color:#4a6a4a;
+    font-size:.87rem;
+    max-width:260px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+/* ── Badges ── */
+.badge { display:inline-block; padding:.28rem .85rem; border-radius:50px; font-size:.78rem; font-weight:600; white-space:nowrap; }
+.badge--mecanique    { background:#e1f5ee; color:#085041; }
+.badge--electrique   { background:#faeeda; color:#633806; }
+.badge--hydraulique  { background:#eaf3de; color:#27500a; }
+.badge--logicielle   { background:#e6f1fb; color:#0c447c; }
+.badge--transmission { background:#ede8fa; color:#4a1d8c; }
+.badge--moteur       { background:#fde8e8; color:#a32d2d; }
+.badge--vidange      { background:#fff8e1; color:#7b5200; }
+.badge--revision     { background:#e8f4fd; color:#1a5276; }
+.badge--pneumatique  { background:#ddeeff; color:#0a3d6b; }
+.badge--autre,
+.badge--default      { background:#f1efe8; color:#2c2c2a; }
+
+/* ── Action buttons ── */
+.actions { display:flex; align-items:center; gap:.45rem; }
+.act-btn {
+    display:inline-flex; align-items:center; gap:.3rem;
+    padding:.35rem .8rem; border-radius:8px;
+    font-size:.82rem; font-weight:600;
+    text-decoration:none; cursor:pointer;
+    border:1.5px solid; background:#fff;
+    transition:all .13s; white-space:nowrap;
+}
+.act-btn--view       { border-color:#b3d4b3; color:#2d6a2d; }
+.act-btn--view:hover { background:#eaf3de; }
+.act-btn--edit       { border-color:#f5c4b3; color:#993c1d; }
+.act-btn--edit:hover { background:#faece7; }
+.act-btn--del        { border-color:#f7c1c1; color:#a32d2d; }
+.act-btn--del:hover  { background:#fcebeb; }
+
+/* ── Empty state ── */
+.empty {
+    text-align:center; padding:4rem 2rem;
+    background:#fff; border-radius:16px;
+    border:1.5px dashed #c8dac8;
+}
+</style>
+
+<div class="mp">
+
+  {# ── Breadcrumb ── #}
+  <nav class="bc">
+    <a href="#">Matériels</a>
+    <span class="bc__sep">›</span>
+    <span>Maintenances</span>
+  </nav>
+
+  {# ── Header ── #}
+  <div class="mh">
+    <div>
+      <h1>🔧 Maintenances</h1>
+      <p>
+        {{ maintenances|length }} maintenance(s) enregistrée(s)
+        &nbsp;·&nbsp;
+        Total : <strong>{{ totalCout|number_format(2, ',', ' ') }} DT</strong>
+      </p>
+    </div>
+    <div class="mh__right">
+      <a href="{{ path('agri_maintenances_export_excel') }}" class="btn btn--outline">⬇ Excel</a>
+      <a href="{{ path('agri_maintenances_export_pdf') }}" target="_blank" class="btn btn--outline">📄 PDF</a>
+      <a href="{{ path('agri_maintenances_new') }}" class="btn btn--green">+ Nouvelle maintenance</a>
+    </div>
+  </div>
+
+  {# ── Flash messages ── #}
+  {% for type, messages in app.flashes %}
+    {% for msg in messages %}
+      <div class="alert alert--{{ type }}">{{ msg }}</div>
+    {% endfor %}
+  {% endfor %}
+
+  {# ── Stats cards ── #}
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-card__label">Total maintenances</div>
+      <div class="stat-card__value">{{ maintenances|length }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card__label">Coût total</div>
+      <div class="stat-card__value">{{ totalCout|number_format(0, ',', ' ') }} DT</div>
+    </div>
+    {% for row in countByType|slice(0, 1) %}
+      <div class="stat-card">
+        <div class="stat-card__label">Type dominant</div>
+        <div class="stat-card__value" style="font-size:1.1rem;">{{ row.type|capitalize }}</div>
+      </div>
+    {% endfor %}
+    <div class="stat-card">
+      <div class="stat-card__label">Coût moyen</div>
+      <div class="stat-card__value">
+        {% if maintenances|length > 0 %}
+          {{ (totalCout / maintenances|length)|number_format(0, ',', ' ') }} DT
+        {% else %}
+          0 DT
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {# ── Charts ── #}
+  <div class="charts-row">
+    <div class="chart-card">
+      <h3>📊 Répartition par type de panne</h3>
+      <canvas id="barChart" height="200"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>📈 Coût mensuel (DT)</h3>
+      <canvas id="lineChart" height="200"></canvas>
+    </div>
+  </div>
+
+  {# ── Toolbar : recherche + filtre + tri ── #}
+  <form method="get" action="{{ path('agri_maintenances_index') }}" id="filterForm">
+    <div class="toolbar">
+
+      <input type="text"
+             name="search"
+             value="{{ search }}"
+             placeholder="🔍 Rechercher (type, description…)"
+             oninput="document.getElementById('filterForm').submit()">
+
+      <select name="type" onchange="document.getElementById('filterForm').submit()">
+        <option value="">Tous les types</option>
+        {% for row in countByType %}
+          <option value="{{ row.type }}" {% if type == row.type %}selected{% endif %}>
+            {{ row.type|capitalize }} ({{ row.total }})
+          </option>
+        {% endfor %}
+      </select>
+
+      <select name="sort" onchange="document.getElementById('filterForm').submit()">
+        <option value="dateMain"  {% if sort == 'dateMain'  %}selected{% endif %}>Trier par date</option>
+        <option value="cout"      {% if sort == 'cout'      %}selected{% endif %}>Trier par coût</option>
+        <option value="typePanne" {% if sort == 'typePanne' %}selected{% endif %}>Trier par type</option>
+        <option value="idM"       {% if sort == 'idM'       %}selected{% endif %}>Trier par matériel</option>
+      </select>
+
+      <select name="dir" onchange="document.getElementById('filterForm').submit()">
+        <option value="DESC" {% if dir == 'DESC' %}selected{% endif %}>↓ Décroissant</option>
+        <option value="ASC"  {% if dir == 'ASC'  %}selected{% endif %}>↑ Croissant</option>
+      </select>
+
+      {% if search or type %}
+        <a href="{{ path('agri_maintenances_index') }}" class="btn btn--red-outline">✕ Réinitialiser</a>
+      {% endif %}
+
+    </div>
+  </form>
+
+  {# ── Table ── #}
+  {% if maintenances is empty %}
+    <div class="empty">
+      <p style="font-size:2.5rem; margin:0 0 .5rem;">🔧</p>
+      <p style="color:#6b8c6b; margin:0 0 1.5rem;">Aucune maintenance trouvée.</p>
+      <a href="{{ path('agri_maintenances_new') }}" class="btn btn--green">Ajouter une maintenance</a>
+    </div>
+  {% else %}
+    <div class="maint-card">
+      <table class="maint-table">
+        <thead>
+          <tr>
+            <th>Type de panne</th>
+            <th>Coût (DT)</th>
+            <th>Date</th>
+            <th>Description</th>
+            <th>ID Matériel</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for m in maintenances %}
+
+            {# Calcul de la classe badge selon le type #}
+            {% set tl = m.typePanne|default('autre')|lower
+                |replace({'é':'e','è':'e','ê':'e','à':'a','&':'',' ':''}) %}
+            {% set validBadges = [
+                'mecanique','electrique','hydraulique','logicielle',
+                'transmission','moteur','vidange','revision','pneumatique','autre'
+            ] %}
+            {% set bc = tl in validBadges ? tl : 'default' %}
+
+            <tr>
+              {# Type de panne — badge coloré #}
+              <td>
+                <span class="badge badge--{{ bc }}">
+                  {{ m.typePanne|default('—')|capitalize }}
+                </span>
+              </td>
+
+              {# Coût #}
+              <td class="td-cost">
+                {{ m.cout|number_format(2, ',', ' ') }} DT
+              </td>
+
+              {# Date #}
+              <td class="td-date">
+                {{ m.dateMain ? m.dateMain|date('d/m/Y') : '—' }}
+              </td>
+
+              {# Description avec tooltip sur survol #}
+              <td class="td-desc" title="{{ m.description|default('') }}">
+                {{ m.description|default('—') }}
+              </td>
+
+              {# ID Matériel #}
+              <td class="td-mat">
+                {{ m.idM ? '#' ~ m.idM : '—' }}
+              </td>
+
+              {# Actions #}
+              <td>
+                <div class="actions">
+
+                  <a href="{{ path('agri_maintenances_show', {id: m.idMain}) }}"
+                     class="act-btn act-btn--view"
+                     title="Voir le détail">
+                    👁 Voir
+                  </a>
+
+                  <a href="{{ path('agri_maintenances_edit', {id: m.idMain}) }}"
+                     class="act-btn act-btn--edit"
+                     title="Modifier">
+                    ✏️ Modifier
+                  </a>
+
+                  <form method="post"
+                        action="{{ path('agri_maintenances_delete', {id: m.idMain}) }}"
+                        onsubmit="return confirm('⚠️ Supprimer cette maintenance ?')"
+                        style="display:inline; margin:0;">
+                    <input type="hidden"
+                           name="_token"
+                           value="{{ csrf_token('delete_maintenance_' ~ m.idMain) }}">
+                    <button type="submit"
+                            class="act-btn act-btn--del"
+                            title="Supprimer">
+                      🗑 Supprimer
+                    </button>
+                  </form>
+
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+
+</div>{# /.mp #}
+
+{# ── Chart.js ── #}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+// Bar chart — répartition par type
+new Chart(document.getElementById('barChart'), {
+  type: 'bar',
+  data: {
+    labels: {{ countByType|map(r => r.type)|json_encode|raw }},
+    datasets: [{
+      label: 'Nb maintenances',
+      data: {{ countByType|map(r => r.total)|json_encode|raw }},
+      backgroundColor: [
+        '#2d6a2d','#4a9e4a','#7ac47a','#aadaaa',
+        '#d0edd0','#eaf3de','#b3d4b3','#85c285'
+      ],
+      borderRadius: 8,
+      borderSkipped: false,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { beginAtZero: true, ticks: { stepSize: 1 } }
+    }
+  }
+});
+
+// Line chart — coût mensuel
+new Chart(document.getElementById('lineChart'), {
+  type: 'line',
+  data: {
+    labels: {{ coutByMonth|map(r => r.mois)|json_encode|raw }},
+    datasets: [{
+      label: 'Coût (DT)',
+      data: {{ coutByMonth|map(r => r.total)|json_encode|raw }},
+      borderColor: '#2d6a2d',
+      backgroundColor: 'rgba(45,106,45,.12)',
+      borderWidth: 2.5,
+      tension: 0.4,
+      fill: true,
+      pointBackgroundColor: '#2d6a2d',
+      pointRadius: 5,
+      pointHoverRadius: 7,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { beginAtZero: true }
+    }
+  }
+});
+</script>
+{% endblock %}

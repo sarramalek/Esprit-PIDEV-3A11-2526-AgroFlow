@@ -1,0 +1,91 @@
+{% extends 'agriculteur_dashboard.html.twig' %}
+
+{% block title %}Nouvelle maintenance — AgroFlow{% endblock %}
+
+{% block body %}
+<style>
+    .mn-page {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem 1.75rem;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+    .mn-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.82rem;
+        color: #5f7a5f;
+        margin-bottom: 1.5rem;
+    }
+    .mn-breadcrumb a { 
+        color: #2d6a2d; 
+        text-decoration: none; 
+        font-weight: 500; 
+    }
+    .mn-breadcrumb a:hover { text-decoration: underline; }
+    .mn-breadcrumb__sep { color: #aac2aa; }
+
+    .mn-header {
+        margin-bottom: 1.75rem;
+    }
+    .mn-header h1 {
+        margin: 0 0 0.3rem;
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #1a2e1a;
+        letter-spacing: -0.02em;
+    }
+    .mn-header p {
+        margin: 0;
+        font-size: 0.875rem;
+        color: #6b8c6b;
+    }
+    .mn-header p .req { 
+        color: #a32d2d; 
+        font-weight: 600;
+    }
+
+    /* Style pour les messages d'erreur (comme dans ton image) */
+    .alert-error {
+        background-color: #fef2f2;
+        border: 1px solid #f5c6cb;
+        color: #c53030;
+        padding: 12px 16px;
+        border-radius: 6px;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.95rem;
+    }
+</style>
+
+<div class="mn-page">
+    <nav class="mn-breadcrumb">
+        <a href="{{ path('agri_maintenances_index') }}">Maintenances</a>
+        <span class="mn-breadcrumb__sep">›</span>
+        <span>Nouvelle</span>
+    </nav>
+
+    <div class="mn-header">
+        <h1>➕ Nouvelle maintenance</h1>
+        <p>Les champs marqués d'un <span class="req">*</span> sont obligatoires</p>
+    </div>
+
+    {# ==================== MESSAGE GLOBAL D'ERREUR ==================== #}
+    {% if form.vars.submitted and not form.vars.valid %}
+        <div class="alert-error">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            Le formulaire contient des erreurs. Veuillez les corriger avant de continuer.
+        </div>
+    {% endif %}
+
+    {# Inclusion du formulaire sans le bouton submit #}
+   {% include 'maintenances/form.html.twig' with {
+    'form': form,
+    'btn_label': '💾 Enregistrer',
+    'cancel_url': path('agri_maintenances_index')
+} only %}   {# 'only' pour éviter de passer des variables inutiles #}
+</div>
+{% endblock %}
