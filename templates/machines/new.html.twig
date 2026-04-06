@@ -1,10 +1,8 @@
 {% extends 'agriculteur_dashboard.html.twig' %}
-
 {% block title %}Nouvelle machine — AgroFlow{% endblock %}
 
 {% block body %}
 <div class="af-page">
-
     <div class="af-breadcrumb">
         <a href="{{ path('agri_machines') }}">Machines</a>
         <span class="af-breadcrumb__sep">›</span>
@@ -28,20 +26,29 @@
         {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
 
         <div class="af-grid">
-
+            
+            <!-- Champ Nom de la machine (corrigé) -->
             <div class="form-group {{ form.nom.vars.errors|length > 0 ? 'is-invalid' : (form.nom.vars.value is not empty ? 'is-valid' : '') }}">
-                {{ form_label(form.nom) }}<span class="req"> *</span>
+                {{ form_label(form.nom, 'Nom de la machine') }}<span class="req"> *</span>
                 <div class="input-wrap">
-                    {{ form_widget(form.nom) }}
+                    {{ form_widget(form.nom, {'attr': {'placeholder': 'Ex : John Deere 5075E'}}) }}
                     <span class="input-icon-left">🚜</span>
-                    {% if form.nom.vars.errors|length > 0 %}<span class="status-icon error">✖</span>
-                    {% elseif form.nom.vars.value is not empty %}<span class="status-icon success">✔</span>{% endif %}
+                    {% if form.nom.vars.errors|length > 0 %}
+                        <span class="status-icon error">✖</span>
+                    {% elseif form.nom.vars.value is not empty %}
+                        <span class="status-icon success">✔</span>
+                    {% endif %}
                 </div>
                 {% if form.nom.vars.errors|length > 0 %}
-                    <ul class="error-list">{% for e in form.nom.vars.errors %}<li>⚠ {{ e.message }}</li>{% endfor %}</ul>
-                {% else %}<small class="hint">Ex : John Deere 5075E</small>{% endif %}
+                    <ul class="error-list">
+                        {% for e in form.nom.vars.errors %}<li>⚠ {{ e.message }}</li>{% endfor %}
+                    </ul>
+                {% else %}
+                    <small class="hint">Ex : John Deere 5075E, Massey Ferguson 5713, Fendt 724 Vario</small>
+                {% endif %}
             </div>
 
+            <!-- Les autres champs restent inchangés -->
             <div class="form-group {{ form.marque.vars.errors|length > 0 ? 'is-invalid' : (form.marque.vars.value is not empty ? 'is-valid' : '') }}">
                 {{ form_label(form.marque) }}<span class="req"> *</span>
                 <div class="input-wrap">
