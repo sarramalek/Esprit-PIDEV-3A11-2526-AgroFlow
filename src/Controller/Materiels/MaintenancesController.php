@@ -44,33 +44,51 @@ class MaintenancesController extends AbstractController
     }
 
     // EXPORT EXCEL
-    #[Route('/export/excel', name: 'agri_maintenances_export_excel', methods: ['GET'])]
-    public function exportExcel(MaintenanceRepository $repo): StreamedResponse
-    {
-        $maintenances = $repo->findAllOrderedByDate();
+   #[Route('/export/excel', name: 'agri_maintenances_export_excel', methods: ['GET'])]
+public function exportExcel(MaintenanceRepository $repo): StreamedResponse
+{
+    $maintenances = $repo->findAllOrderedByDate();
 
-        $response = new StreamedResponse(function () use ($maintenances) {
-            $handle = fopen('php://output', 'w+');
-            // BOM UTF-8
-            fwrite($handle, "\xEF\xBB\xBF");
-            fputcsv($handle, ['ID', 'Type de panne', 'Coût (DT)', 'Date', 'ID Matériel'], ';');
-            foreach ($maintenances as $m) {
-                fputcsv($handle, [
-                    $m->getIdMain(),
-                    $m->getTypePanne(),
-                    number_format($m->getCout(), 2, ',', ' '),
-                    $m->getDateMain()?->format('d/m/Y') ?? '',
-                    $m->getIdM() ?? '',
-                ], ';');
-            }
-            fclose($handle);
-        });
+    $response = new StreamedResponse(function () use ($maintenances) {
+        $handle = fopen('php://output', 'w+');
+        // BOM UTF-8
+        fwrite($handle, "\xEF\xBB\xBF");
 
-        $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
-        $response->headers->set('Content-Disposition', 'attachment; filename="maintenances.csv"');
-        return $response;
-    }
+        // Title row
+        fputcsv($handle, ['AGROFLOW — Rapport Maintenances'], ';');
+        fputcsv($handle, ['Exporté le : ' . (new \DateTime())->format('d/m/Y H:i')], ';');
+        fputcsv($handle, ['Nombre d\'enregistrements : ' . count($maintenances)], ';');
+        fputcsv($handle, [], ';'); // blank line
 
+        // Header
+        fputcsv($handle, ['#', 'Type de panne', 'Coût (DT)', 'Date', 'Description', 'ID Matériel'], ';');
+
+        $index = 1;
+        $totalCout = 0.0;
+        foreach ($maintenances as $m) {
+            fputcsv($handle, [
+                $index++,
+                $m->getTypePanne(),
+                number_format($m->getCout(), 2, ',', ' '),
+                $m->getDateMain()?->format('d/m/Y') ?? '',
+                $m->getDescription() ?? '',
+                $m->getIdM() ? '#' . $m->getIdM() : '',
+            ], ';');
+            $totalCout += $m->getCout();
+        }
+
+        // Total row
+        fputcsv($handle, [], ';');
+        fputcsv($handle, ['', 'TOTAL', number_format($totalCout, 2, ',', ' ') . ' DT', '', '', ''], ';');
+
+        fclose($handle);
+    });
+
+    $filename = 'maintenances_' . (new \DateTime())->format('Ymd_Hi') . '.csv';
+    $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
+    $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
+    return $response;
+}
     // EXPORT PDF (via simple HTML print)
     #[Route('/export/pdf', name: 'agri_maintenances_export_pdf', methods: ['GET'])]
     public function exportPdf(MaintenanceRepository $repo): Response
