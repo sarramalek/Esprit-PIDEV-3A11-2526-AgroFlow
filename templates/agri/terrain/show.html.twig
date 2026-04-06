@@ -67,6 +67,12 @@
     <a href="{{ path('agri_terrains_edit', {id: terrain.id}) }}" class="btn-edit-top">
         <i class="fa fa-pen"></i> Modifier
     </a>
+    <!-- Bouton PDF avec le même style que "Modifier" -->
+    <a href="{{ path('agri_terrains_certificat_propriete', {id: terrain.id}) }}" 
+       class="btn-pdf" 
+       target="_blank">
+        <i class="fa fa-file-pdf"></i> Certificat PDF
+    </a>
 </div>
 
 <div class="show-grid">
@@ -123,9 +129,10 @@
                         <div>
                             <strong>{{ rot.plante.nomP ?? 'Plante' }}</strong>
                             <div style="font-size:11px;color:#7A8A95">
-                                {{ rot.dateDebutT|date('d/m/Y') }}
-                                → {{ rot.dateFinT|date('d/m/Y') }}
-                            </div>
+    {{ rot.dateDebutT is defined ? rot.dateDebutT|date('d/m/Y') : (rot.getDateDebutT() ?? '—') }}
+    → 
+    {{ rot.dateFinT is defined ? rot.dateFinT|date('d/m/Y') : (rot.getDateFinT() ?? '—') }}
+</div>
                         </div>
                         <span style="margin-left:auto">
                             <span style="background:{% if rot.status == 1 %}#f0fff4;color:#276749{% else %}#fffbeb;color:#92400e{% endif %};
