@@ -240,6 +240,12 @@
                     <a href="{{ path('agri_terrains_edit', {id: terrain.id}) }}" class="btn-sm btn-edit">
                         <i class="fa fa-pen"></i> Modifier
                     </a>
+                    <a href="{{ path('agri_terrains_certificat_propriete', {id: terrain.id}) }}" 
+       class="btn-sm btn-view" 
+       target="_blank"
+       style="background:#2D5A27; color:#fff; border:1px solid #1e3f1f;">
+        <i class="fa fa-file-pdf"></i> PDF
+    </a>
                     <form method="post" action="{{ path('agri_terrains_delete', {id: terrain.id}) }}"
                           onsubmit="return confirm('Supprimer ce terrain ?')">
                         <input type="hidden" name="_token"

@@ -10,6 +10,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Dompdf\Dompdf;
+use Dompdf\Options;
+
 
 #[Route('/agri/terrains', name: 'agri_terrains')]
 #[IsGranted('ROLE_AGRICULTEUR')]   // ← corrigé ici
@@ -110,4 +113,44 @@ class AgriTerrainController extends AbstractController
             'terrain' => $terrain,
         ]);
     }
-}
+    
+/**
+     * Génère le Certificat de Propriété en PDF
+     */
+    #[Route('/{id}/certificat-propriete', name: '_certificat_propriete', methods: ['GET'])]
+public function certificatPropriete(Terrain $terrain): Response
+{
+    // On désactive temporairement la vérification de propriétaire
+    // (on la remettra une fois que tu auras ajouté la relation dans l'entité)
+
+    $options = new Options();
+    $options->setChroot($this->getParameter('kernel.project_dir') . '/public');
+    $options->setDefaultFont('DejaVu Sans');
+    $options->setIsRemoteEnabled(true);
+    $options->setIsHtml5ParserEnabled(true);
+
+    $dompdf = new Dompdf($options);
+
+    $html = $this->renderView('agri/terrain/certificat_propriete.html.twig', [
+        'terrain'      => $terrain,
+        'dateEmission' => new \DateTime('now'),
+        'user'         => $this->getUser(),           // utilisateur connecté
+    ]);
+
+    $dompdf->loadHtml($html);
+    $dompdf->setPaper('A4', 'portrait');
+    $dompdf->render();
+
+    $filename = 'Certificat_Propriete_' 
+                . preg_replace('/[^A-Za-z0-9_-]/', '_', $terrain->getNomTerrain()) 
+                . '_' . date('Ymd_His') . '.pdf';
+
+    return new Response(
+        $dompdf->output(),
+        200,
+        [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]
+    );
+}}
