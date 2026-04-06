@@ -17,7 +17,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class AnimauxController extends AbstractController
 {
     #[Route(name: 'app_animaux_index', methods: ['GET'])]
-    #[IsGranted('ROLE_AGRICULTEUR')]
+    #[IsGranted('ROLE_USER')]
     public function index(Request $request, AnimauxRepository $animauxRepository): Response
     {
         $user = $this->getUser();
@@ -29,16 +29,21 @@ final class AnimauxController extends AbstractController
         $filterUser = $this->isGranted('ROLE_ADMIN') ? null : $user;
         
         $animaux = $animauxRepository->searchDashboard($searchTerm, $sortBy, $direction, $filterUser);
+        
+        // Moyennes globales par espèce pour le calcul de l'IQ (Index Qualité)
+        $averages = $animauxRepository->getAverageWeightsBySpecies();
 
         return $this->render('animaux/index.html.twig', [
             'animaux' => $animaux,
             'searchTerm' => $searchTerm,
             'currentSort' => $sortBy,
             'currentDirection' => $direction,
+            'averages' => $averages
         ]);
     }
 
     #[Route('/stats', name: 'app_animaux_stats', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function stats(AnimauxRepository $animauxRepository): Response
     {
         $user = $this->getUser();
@@ -51,6 +56,7 @@ final class AnimauxController extends AbstractController
     }
 
     #[Route('/new', name: 'app_animaux_new', methods: ['GET', 'POST'])]
+    #[IsGranted('ROLE_USER')]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $animaux = new Animaux();

@@ -16,7 +16,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class ExamensController extends AbstractController
 {
     #[Route(name: 'app_examens_index', methods: ['GET'])]
-    #[IsGranted('ROLE_AGRICULTEUR')]
+    #[IsGranted('ROLE_USER')]
     public function index(Request $request, ExamenRepository $examenRepository): Response
     {
         $user = $this->getUser();
@@ -29,13 +29,17 @@ final class ExamensController extends AbstractController
         $filterUser = $this->isGranted('ROLE_ADMIN') ? null : $user;
 
         $examens = $examenRepository->searchExamen($searchTerm, $sortBy, $direction, $typeFilter, $filterUser);
+        
+        // Données de fragilité par espèce (pour les dashboard cards)
+        $fragilityStats = $user instanceof \App\Entity\User\User ? $examenRepository->getFragilityData($user) : [];
 
         return $this->render('examen/index.html.twig', [
             'examens' => $examens,
             'searchTerm' => $searchTerm,
             'currentSort' => $sortBy,
             'currentDirection' => $direction,
-            'currentType' => $typeFilter
+            'currentType' => $typeFilter,
+            'fragilityStats' => $fragilityStats
         ]);
     }
 

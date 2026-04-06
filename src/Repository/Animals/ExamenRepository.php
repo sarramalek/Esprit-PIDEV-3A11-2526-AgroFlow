@@ -69,4 +69,48 @@ class ExamenRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
+    /**
+     * Analyse la fragilité par espèce pour un utilisateur (pourcentage d'animaux malades).
+     */
+    public function getFragilityData(User $user): array
+    {
+        // 1. Récupérer tous les animaux de l'utilisateur groupés par espèce
+        $allAnimals = $this->getEntityManager()->getRepository(\App\Entity\Animals\Animaux::class)
+            ->findBy(['user' => $user]);
+
+        $speciesStats = [];
+        foreach ($allAnimals as $animal) {
+            $esp = $animal->getEspece() ?: 'Autre';
+            if (!isset($speciesStats[$esp])) {
+                $speciesStats[$esp] = ['total' => 0, 'problematic' => 0];
+            }
+            $speciesStats[$esp]['total']++;
+
+            // Vérifier s'il a des examens "non sains"
+            $hasIssues = false;
+            foreach ($animal->getExamen() as $ex) {
+                if ($ex->getDiagnostic() !== 'En bonne santé') {
+                    $hasIssues = true;
+                    break;
+                }
+            }
+            if ($hasIssues) {
+                $speciesStats[$esp]['problematic']++;
+            }
+        }
+
+        // 2. Formater le résultat final
+        $result = [];
+        foreach ($speciesStats as $espece => $data) {
+            $percent = $data['total'] > 0 ? round(($data['problematic'] / $data['total']) * 100) : 0;
+            $result[] = [
+                'espece' => $espece,
+                'total' => $data['total'],
+                'malades' => $data['problematic'],
+                'percent' => $percent
+            ];
+        }
+
+        return $result;
+    }
 }

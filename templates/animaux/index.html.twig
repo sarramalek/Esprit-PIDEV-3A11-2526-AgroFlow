@@ -58,13 +58,54 @@
             background-color: white;
             margin: 8% auto;
             padding: 0;
-            border-radius: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
             width: 90%;
-            max-width: 550px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
-            position: relative;
-            overflow: hidden;
+            max-width: 600px;
+            animation: modalPop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
+
+        /* IQ Badge & Tooltip Styles */
+        .iq-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: help;
+            transition: 0.3s;
+            position: relative;
+        }
+        .iq-badge:hover { transform: scale(1.05); }
+        
+        .iq-tooltip {
+            position: relative;
+        }
+        .iq-tooltip::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2C3E50;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 100;
+        }
+        .iq-tooltip:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
     </style>
 {% endblock %}
 
@@ -186,9 +227,7 @@
                     <thead>
                         <tr style="border-bottom: 2px solid #F1F3F5;">
                             {% set nextDirection = (currentDirection == 'ASC') ? 'DESC' : 'ASC' %}
-                            <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">
-                                <a href="{{ path('app_animaux_index', { q: searchTerm, sort: 'id', direction: (currentSort == 'id' ? nextDirection : 'DESC') }) }}" style="text-decoration:none; color:inherit;">ID</a>
-                            </th>
+
                             <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">
                                 <a href="{{ path('app_animaux_index', { q: searchTerm, sort: 'nom', direction: (currentSort == 'nom' ? nextDirection : 'ASC') }) }}" style="text-decoration:none; color:inherit;">Nom</a>
                             </th>
@@ -203,7 +242,7 @@
                     <tbody>
                         {% for a in animaux %}
                         <tr style="border-bottom: 1px solid #EEE; transition: background 0.2s;" onmouseover="this.style.backgroundColor='#fcfcf0'" onmouseout="this.style.backgroundColor='transparent'">
-                            <td style="padding: 15px 10px; font-weight: bold;">#{{ a.id }}</td>
+
                             <td style="padding: 15px 10px; font-weight: 600; color: #2D5A27;">{{ a.nom }}</td>
                             <td style="padding: 15px 10px;">{{ a.espece }}</td>
                             <td style="padding: 15px 10px;">
@@ -212,7 +251,41 @@
                                     {{ a.sexe }}
                                 </span>
                             </td>
-                            <td style="padding: 15px 10px;">{{ a.poids }} kg</td>
+                            <td style="padding: 15px 10px;">
+                                <div style="display: flex; flex-direction: column; gap: 4px;">
+                                    <span style="font-weight: 700; color: #2C3E50;">{{ a.poids }} kg</span>
+                                    
+                                    {% set species_key = a.espece|lower %}
+                                    {% if averages[species_key] is defined and a.poids > 0 %}
+                                        {% set avg = averages[species_key] %}
+                                        {% set diff = ((a.poids - avg) / avg) * 100 %}
+                                        
+                                        {# Scoring Logic #}
+                                        {% if diff > 15 %}
+                                            {% set badge_color = "#3498db" %}{# Blue #}
+                                            {% set badge_bg = "#EBF5FB" %}
+                                            {% set label = "Élite" %}
+                                            {% set icon = "star" %}
+                                        {% elseif diff >= -5 %}
+                                            {% set badge_color = "#27ae60" %}{# Green #}
+                                            {% set badge_bg = "#E8F5E9" %}
+                                            {% set label = "Conforme" %}
+                                            {% set icon = "check-circle" %}
+                                        {% else %}
+                                            {% set badge_color = "#f39c12" %}{# Orange #}
+                                            {% set badge_bg = "#FEF5E7" %}
+                                            {% set label = "À surveiller" %}
+                                            {% set icon = "exclamation-triangle" %}
+                                        {% endif %}
+                                        
+                                        <div class="iq-tooltip" data-tip="{{ diff > 0 ? '+' : '' }}{{ diff|round(1) }}% par rapport à la moyenne {{ a.espece }}">
+                                            <span class="iq-badge" style="background: {{ badge_bg }}; color: {{ badge_color }}; border: 1px solid {{ badge_color }}40;">
+                                                <i class="fa fa-{{ icon }}" style="margin-right: 5px;"></i> {{ label }}
+                                            </span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </td>
                             <td style="padding: 15px 10px;">{{ a.dateNaissance ? a.dateNaissance|date('d/m/Y') : '-' }}</td>
                             {% if is_granted('ROLE_ADMIN') %}
                                 <td style="padding: 15px 10px; font-size: 13px;">{{ a.user ? a.user.prenom ~ ' ' ~ a.user.nom : 'Inconnu' }}</td>

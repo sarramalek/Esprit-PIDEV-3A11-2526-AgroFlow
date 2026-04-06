@@ -112,4 +112,63 @@ class Examen
         $this->animal = $animal;
         return $this;
     }
+
+    /**
+     * Calcule le score de santé de l'animal basé sur l'examen (0-100)
+     */
+    public function getHealthScore(): int
+    {
+        $score = 50; // Base de départ
+
+        // Bonus
+        if ($this->type_examen === 'Vaccin') {
+            $score += 20;
+        }
+        if ($this->diagnostic === 'En bonne santé') {
+            $score += 10;
+        }
+
+        // Malus
+        if ($this->diagnostic === 'Infection' || $this->diagnostic === 'Urgence') {
+            $score -= 40;
+        }
+        if ($this->traitement === 'Chirurgie' || $this->traitement === 'Antibiotiques') {
+            $score -= 30;
+        }
+
+        // Clamp le score entre 0 et 100
+        return max(0, min(100, $score));
+    }
+
+    /**
+     * Retourne l'emoji correspondant au score de santé
+     */
+    public function getHealthEmoji(): string
+    {
+        $score = $this->getHealthScore();
+
+        if ($score >= 80) return '🌟';
+        if ($score >= 50) return '🙂';
+        return '⚠️';
+    }
+
+    /**
+     * Calcule le prix estimé de l'acte vétérinaire (DT)
+     */
+    public function getEstimatedPrice(): int
+    {
+        $price = 0;
+        switch ($this->type_examen) {
+            case 'Vaccin': $price = 50; break;
+            case 'Consultation': $price = 80; break;
+            case 'Radio':
+            case 'Scanner': $price = 150; break;
+        }
+
+        if ($this->traitement === 'Chirurgie') {
+            $price += 200;
+        }
+
+        return $price;
+    }
 }
