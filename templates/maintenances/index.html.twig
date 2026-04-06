@@ -11,107 +11,195 @@
     font-family: 'Segoe UI', system-ui, sans-serif;
 }
 
-/* ── Breadcrumb ── */
 .bc { display:flex; align-items:center; gap:.4rem; font-size:.82rem; color:#5f7a5f; margin-bottom:1.5rem; }
 .bc a { color:#2d6a2d; text-decoration:none; font-weight:500; }
 .bc a:hover { text-decoration:underline; }
 .bc__sep { color:#aac2aa; }
 
-/* ── Header ── */
 .mh { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem; }
 .mh h1 { margin:0 0 .2rem; font-size:1.75rem; font-weight:700; color:#1a2e1a; letter-spacing:-.02em; }
 .mh p  { margin:0; font-size:.875rem; color:#6b8c6b; }
 .mh__right { display:flex; gap:.6rem; flex-wrap:wrap; align-items:center; }
 
-/* ── Buttons ── */
 .btn {
     display:inline-flex; align-items:center; gap:.4rem;
     border-radius:10px; padding:.6rem 1.2rem;
     font-size:.875rem; font-weight:600; text-decoration:none;
     cursor:pointer; border:none; transition:all .15s;
 }
-.btn--green        { background:#2d6a2d; color:#fff; }
-.btn--green:hover  { background:#235223; }
+.btn--green       { background:#2d6a2d; color:#fff; }
+.btn--green:hover { background:#235223; }
 .btn--outline      { background:#fff; color:#2d6a2d; border:1.5px solid #b3d4b3; }
 .btn--outline:hover{ background:#eaf3de; }
-.btn--red-outline  { background:#fff; color:#a32d2d; border:1.5px solid #f7c1c1; font-size:.82rem; padding:.5rem .9rem; }
+.btn--stats        { background:#EEEDFE; color:#3C3489; border:1.5px solid #AFA9EC; }
+.btn--stats:hover  { background:#CECBF6; border-color:#7F77DD; }
+.btn--stats.active { background:#CECBF6; border-color:#7F77DD; }
+.btn--red-outline  { background:#fff; color:#a32d2d; border:1.5px solid #f7c1c1; font-size:.82rem; padding:.55rem 1rem; border-radius:10px; }
 .btn--red-outline:hover { background:#fcebeb; }
 
-/* ── Alerts ── */
-.alert { padding:.8rem 1.1rem; border-radius:10px; font-size:.9rem; font-weight:500; margin-bottom:1rem; border-left:4px solid; }
+.alert {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:.8rem 1.1rem; border-radius:10px;
+    font-size:.9rem; font-weight:500;
+    margin-bottom:1rem; border-left:4px solid;
+}
 .alert--success { background:#eaf3de; color:#27500a; border-color:#3b6d11; }
 .alert--danger  { background:#fcebeb; color:#501313; border-color:#a32d2d; }
-
-/* ── Stats ── */
-.stats-row {
-    display:grid;
-    grid-template-columns:repeat(auto-fit, minmax(160px, 1fr));
-    gap:1rem;
-    margin-bottom:1.5rem;
+.alert__close {
+    background:none; border:none; cursor:pointer;
+    font-size:1.1rem; line-height:1; padding:0 4px;
+    opacity:.6; transition:opacity .12s;
 }
-.stat-card { background:#fff; border-radius:14px; padding:1.1rem 1.4rem; box-shadow:0 2px 14px rgba(0,0,0,.06); }
-.stat-card__label { font-size:.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:#7a9a7a; }
-.stat-card__value { font-size:1.6rem; font-weight:800; color:#1a2e1a; margin-top:.15rem; }
+.alert--success .alert__close { color:#27500a; }
+.alert--danger  .alert__close { color:#501313; }
+.alert__close:hover { opacity:1; }
 
-/* ── Charts ── */
-.charts-row {
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:1.25rem;
-    margin-bottom:1.5rem;
+.charts-panel {
+    display: none;
+    background: #fff;
+    border-radius: 16px;
+    border: 1.5px solid #CECBF6;
+    border-left: 4px solid #534AB7;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 14px rgba(83,74,183,.08);
 }
+.charts-panel.is-open { display: block; }
+.charts-panel__header {
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:1.25rem; padding-bottom:.9rem;
+    border-bottom:1px solid #EEEDFE;
+}
+.charts-panel__title { margin:0; font-size:.95rem; font-weight:700; color:#3C3489; }
+.charts-panel__close {
+    background:none; border:none; cursor:pointer;
+    color:#7a9a7a; font-size:1.2rem; padding:0 4px; line-height:1;
+    transition:color .12s;
+}
+.charts-panel__close:hover { color:#3C3489; }
+
+.panel-stats {
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(140px,1fr));
+    gap:12px; margin-bottom:1.5rem;
+}
+.pstat { border-radius:12px; padding:.9rem 1.1rem; }
+.pstat--purple { background:#EEEDFE; }
+.pstat--green  { background:#EAF3DE; }
+.pstat--teal   { background:#E1F5EE; }
+.pstat--amber  { background:#FAEEDA; }
+.pstat__label  { font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.6px; margin-bottom:.25rem; }
+.pstat--purple .pstat__label { color:#534AB7; }
+.pstat--green  .pstat__label { color:#3B6D11; }
+.pstat--teal   .pstat__label { color:#0F6E56; }
+.pstat--amber  .pstat__label { color:#854F0B; }
+.pstat__value  { font-size:1.5rem; font-weight:800; }
+.pstat--purple .pstat__value { color:#26215C; }
+.pstat--green  .pstat__value { color:#173404; }
+.pstat--teal   .pstat__value { color:#04342C; font-size:1.1rem; margin-top:.2rem; }
+.pstat--amber  .pstat__value { color:#412402; }
+
+.charts-row { display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; }
 @media(max-width:700px){ .charts-row { grid-template-columns:1fr; } }
-.chart-card { background:#fff; border-radius:16px; box-shadow:0 2px 14px rgba(0,0,0,.06); padding:1.25rem 1.5rem; }
-.chart-card h3 { margin:0 0 1rem; font-size:.95rem; font-weight:700; color:#1a2e1a; }
+.chart-card { background:#f9f7ff; border-radius:12px; padding:1.1rem 1.25rem; border:1px solid #EEEDFE; }
+.chart-card h3 { margin:0 0 1rem; font-size:.875rem; font-weight:700; color:#3C3489; }
 
-/* ── Toolbar ── */
-.toolbar { display:flex; gap:.8rem; flex-wrap:wrap; margin-bottom:1.25rem; align-items:center; }
-.toolbar input,
-.toolbar select {
-    padding:.55rem .9rem;
+.toolbar {
+    display:flex; gap:.75rem; flex-wrap:wrap;
+    margin-bottom:1.25rem; align-items:center;
+    background:#fff; border-radius:14px;
+    padding:.85rem 1.1rem;
+    box-shadow:0 2px 12px rgba(0,0,0,.06);
+    border:1.5px solid #eaf3de;
+}
+.toolbar__search {
+    position:relative; flex:1; min-width:220px;
+}
+.toolbar__search-icon {
+    position:absolute; left:.8rem; top:50%;
+    transform:translateY(-50%);
+    pointer-events:none; color:#7a9a7a;
+    display:flex; align-items:center;
+}
+.toolbar__search input {
+    width:100%;
+    padding:.55rem .9rem .55rem 2.4rem;
     border:1.5px solid #d4e8d4;
     border-radius:9px;
-    font-size:.875rem;
-    color:#1a2e1a;
-    background:#fff;
-    outline:none;
-    transition: border-color .15s;
+    font-size:.875rem; color:#1a2e1a;
+    background:#f9fcf7; outline:none; height:40px;
+    transition:border-color .15s, background .15s, box-shadow .15s;
 }
-.toolbar input:focus,
-.toolbar select:focus { border-color:#2d6a2d; }
-.toolbar input { flex:1; min-width:200px; max-width:320px; }
+.toolbar__search input:focus {
+    border-color:#2d6a2d;
+    background:#fff;
+    box-shadow: 0 0 0 3px rgba(45,106,45,.08);
+}
+.toolbar__search input::placeholder { color:#aac2aa; }
+.toolbar__search-clear {
+    position:absolute; right:.7rem; top:50%;
+    transform:translateY(-50%);
+    background:none; border:none; cursor:pointer;
+    color:#aac2aa; font-size:1rem; line-height:1;
+    padding:2px 4px; border-radius:4px;
+    display:none; transition:color .12s;
+}
+.toolbar__search-clear:hover { color:#a32d2d; }
+.toolbar__search-clear.visible { display:block; }
 
-/* ── Table ── */
+.toolbar__select-wrap {
+    position:relative; display:flex; align-items:center;
+}
+.toolbar__select-icon {
+    position:absolute; left:.7rem; top:50%;
+    transform:translateY(-50%);
+    pointer-events:none; color:#7a9a7a;
+    display:flex; align-items:center; z-index:1;
+}
+.toolbar select {
+    padding:.55rem .9rem .55rem 2.2rem;
+    border:1.5px solid #d4e8d4;
+    border-radius:9px; font-size:.875rem; color:#1a2e1a;
+    background:#f9fcf7; outline:none; height:40px;
+    cursor:pointer;
+    transition:border-color .15s, background .15s;
+    appearance:none; -webkit-appearance:none;
+    padding-right:2rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a9a7a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:right .6rem center;
+}
+.toolbar select:focus { border-color:#2d6a2d; background-color:#fff; }
+.toolbar__sep { width:1px; height:26px; background:#d4e8d4; flex-shrink:0; }
+
 .maint-card { background:#fff; border-radius:16px; box-shadow:0 2px 18px rgba(0,0,0,.07); overflow:hidden; }
 .maint-table { width:100%; border-collapse:collapse; font-size:.9rem; }
 .maint-table thead tr { background:#f7faf4; border-bottom:1.5px solid #e4edde; }
 .maint-table th {
-    padding:.8rem 1rem;
-    text-align:left;
-    font-size:.71rem;
-    font-weight:700;
-    text-transform:uppercase;
-    letter-spacing:.7px;
-    color:#7a9a7a;
-    white-space:nowrap;
+    padding:.8rem 1rem; text-align:left;
+    font-size:.71rem; font-weight:700;
+    text-transform:uppercase; letter-spacing:.7px;
+    color:#7a9a7a; white-space:nowrap;
 }
 .maint-table tbody tr { border-bottom:1px solid #f1f5ee; transition:background .12s; }
 .maint-table tbody tr:hover { background:#f9fcf7; }
 .maint-table td { padding:.9rem 1rem; color:#1f2e1f; vertical-align:middle; }
-
 .td-cost { font-variant-numeric:tabular-nums; font-weight:600; white-space:nowrap; }
 .td-date { color:#5f7a5f; font-size:.87rem; white-space:nowrap; }
-.td-mat  { color:#2d6a2d; font-weight:700; }
-.td-desc {
-    color:#4a6a4a;
-    font-size:.87rem;
-    max-width:260px;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
+.td-idm  {
+    font-weight:700; white-space:nowrap;
+    color:#fff;
 }
+.td-idm span {
+    display:inline-flex; align-items:center; justify-content:center;
+    background:#2d6a2d;
+    border-radius:20px;
+    padding:.18rem .75rem;
+    font-size:.78rem;
+    letter-spacing:.3px;
+}
+.td-desc { color:#4a6a4a; font-size:.87rem; max-width:240px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
-/* ── Badges ── */
 .badge { display:inline-block; padding:.28rem .85rem; border-radius:50px; font-size:.78rem; font-weight:600; white-space:nowrap; }
 .badge--mecanique    { background:#e1f5ee; color:#085041; }
 .badge--electrique   { background:#faeeda; color:#633806; }
@@ -125,7 +213,6 @@
 .badge--autre,
 .badge--default      { background:#f1efe8; color:#2c2c2a; }
 
-/* ── Action buttons ── */
 .actions { display:flex; align-items:center; gap:.45rem; }
 .act-btn {
     display:inline-flex; align-items:center; gap:.3rem;
@@ -142,11 +229,14 @@
 .act-btn--del        { border-color:#f7c1c1; color:#a32d2d; }
 .act-btn--del:hover  { background:#fcebeb; }
 
-/* ── Empty state ── */
 .empty {
     text-align:center; padding:4rem 2rem;
     background:#fff; border-radius:16px;
     border:1.5px dashed #c8dac8;
+}
+.no-results {
+    text-align:center; padding:3rem 2rem;
+    display:none;
 }
 </style>
 
@@ -170,6 +260,9 @@
       </p>
     </div>
     <div class="mh__right">
+      <button type="button" class="btn btn--stats" id="statsToggle" onclick="toggleStats()">
+        📊 Statistiques
+      </button>
       <a href="{{ path('agri_maintenances_export_excel') }}" class="btn btn--outline">⬇ Excel</a>
       <a href="{{ path('agri_maintenances_export_pdf') }}" target="_blank" class="btn btn--outline">📄 PDF</a>
       <a href="{{ path('agri_maintenances_new') }}" class="btn btn--green">+ Nouvelle maintenance</a>
@@ -177,244 +270,375 @@
   </div>
 
   {# ── Flash messages ── #}
+  {% set flashShown = false %}
   {% for type, messages in app.flashes %}
-    {% for msg in messages %}
-      <div class="alert alert--{{ type }}">{{ msg }}</div>
-    {% endfor %}
+    {% if not flashShown %}
+      {% for msg in messages %}
+        {% if not flashShown %}
+          <div class="alert alert--{{ type }}" id="flashAlert">
+            <span>{{ msg }}</span>
+            <button class="alert__close" onclick="document.getElementById('flashAlert').remove()">✕</button>
+          </div>
+          {% set flashShown = true %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
   {% endfor %}
 
-  {# ── Stats cards ── #}
-  <div class="stats-row">
-    <div class="stat-card">
-      <div class="stat-card__label">Total maintenances</div>
-      <div class="stat-card__value">{{ maintenances|length }}</div>
+  {# ── Panel Statistiques ── #}
+  <div class="charts-panel" id="chartsPanel">
+    <div class="charts-panel__header">
+      <p class="charts-panel__title">📊 Statistiques des maintenances</p>
+      <button class="charts-panel__close" onclick="toggleStats()">✕</button>
     </div>
-    <div class="stat-card">
-      <div class="stat-card__label">Coût total</div>
-      <div class="stat-card__value">{{ totalCout|number_format(0, ',', ' ') }} DT</div>
-    </div>
-    {% for row in countByType|slice(0, 1) %}
-      <div class="stat-card">
-        <div class="stat-card__label">Type dominant</div>
-        <div class="stat-card__value" style="font-size:1.1rem;">{{ row.type|capitalize }}</div>
+    <div class="panel-stats">
+      <div class="pstat pstat--purple">
+        <div class="pstat__label">Total</div>
+        <div class="pstat__value">{{ maintenances|length }}</div>
       </div>
-    {% endfor %}
-    <div class="stat-card">
-      <div class="stat-card__label">Coût moyen</div>
-      <div class="stat-card__value">
-        {% if maintenances|length > 0 %}
-          {{ (totalCout / maintenances|length)|number_format(0, ',', ' ') }} DT
-        {% else %}
-          0 DT
-        {% endif %}
+      <div class="pstat pstat--green">
+        <div class="pstat__label">Coût total</div>
+        <div class="pstat__value">{{ totalCout|number_format(0, ',', ' ') }} DT</div>
+      </div>
+      {% for row in countByType|slice(0,1) %}
+      <div class="pstat pstat--teal">
+        <div class="pstat__label">Type dominant</div>
+        <div class="pstat__value">{{ row.type|capitalize }}</div>
+      </div>
+      {% endfor %}
+      <div class="pstat pstat--amber">
+        <div class="pstat__label">Coût moyen</div>
+        <div class="pstat__value">
+          {% if maintenances|length > 0 %}
+            {{ (totalCout / maintenances|length)|number_format(0, ',', ' ') }} DT
+          {% else %}0 DT{% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="charts-row">
+      <div class="chart-card">
+        <h3>📊 Répartition par type de panne</h3>
+        <canvas id="barChart" height="200"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>📈 Coût mensuel (DT)</h3>
+        <canvas id="lineChart" height="200"></canvas>
       </div>
     </div>
   </div>
 
-  {# ── Charts ── #}
-  <div class="charts-row">
-    <div class="chart-card">
-      <h3>📊 Répartition par type de panne</h3>
-      <canvas id="barChart" height="200"></canvas>
+  {# ── Toolbar ── #}
+  <div class="toolbar">
+    <div class="toolbar__search">
+      <span class="toolbar__search-icon">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+      </span>
+      <input type="text" id="searchInput"
+             placeholder="Rechercher (type, description…)"
+             oninput="onSearchInput(this)">
+      <button class="toolbar__search-clear" id="clearSearch"
+              onclick="clearSearch()" title="Effacer">✕</button>
     </div>
-    <div class="chart-card">
-      <h3>📈 Coût mensuel (DT)</h3>
-      <canvas id="lineChart" height="200"></canvas>
-    </div>
-  </div>
 
-  {# ── Toolbar : recherche + filtre + tri ── #}
-  <form method="get" action="{{ path('agri_maintenances_index') }}" id="filterForm">
-    <div class="toolbar">
+    <div class="toolbar__sep"></div>
 
-      <input type="text"
-             name="search"
-             value="{{ search }}"
-             placeholder="🔍 Rechercher (type, description…)"
-             oninput="document.getElementById('filterForm').submit()">
-
-      <select name="type" onchange="document.getElementById('filterForm').submit()">
+    <div class="toolbar__select-wrap">
+      <span class="toolbar__select-icon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+        </svg>
+      </span>
+      <select id="typeFilter" onchange="filterTable()">
         <option value="">Tous les types</option>
         {% for row in countByType %}
-          <option value="{{ row.type }}" {% if type == row.type %}selected{% endif %}>
-            {{ row.type|capitalize }} ({{ row.total }})
+          <option value="{{ row.type|lower }}">
+            {{ row.type }} ({{ row.total }})
           </option>
         {% endfor %}
       </select>
-
-      <select name="sort" onchange="document.getElementById('filterForm').submit()">
-        <option value="dateMain"  {% if sort == 'dateMain'  %}selected{% endif %}>Trier par date</option>
-        <option value="cout"      {% if sort == 'cout'      %}selected{% endif %}>Trier par coût</option>
-        <option value="typePanne" {% if sort == 'typePanne' %}selected{% endif %}>Trier par type</option>
-        <option value="idM"       {% if sort == 'idM'       %}selected{% endif %}>Trier par matériel</option>
-      </select>
-
-      <select name="dir" onchange="document.getElementById('filterForm').submit()">
-        <option value="DESC" {% if dir == 'DESC' %}selected{% endif %}>↓ Décroissant</option>
-        <option value="ASC"  {% if dir == 'ASC'  %}selected{% endif %}>↑ Croissant</option>
-      </select>
-
-      {% if search or type %}
-        <a href="{{ path('agri_maintenances_index') }}" class="btn btn--red-outline">✕ Réinitialiser</a>
-      {% endif %}
-
     </div>
-  </form>
+
+    <div class="toolbar__select-wrap">
+      <span class="toolbar__select-icon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round">
+          <line x1="8" y1="6" x2="21" y2="6"/>
+          <line x1="8" y1="12" x2="21" y2="12"/>
+          <line x1="8" y1="18" x2="21" y2="18"/>
+          <line x1="3" y1="6" x2="3.01" y2="6"/>
+          <line x1="3" y1="12" x2="3.01" y2="12"/>
+          <line x1="3" y1="18" x2="3.01" y2="18"/>
+        </svg>
+      </span>
+      <select id="sortFilter" onchange="filterTable()">
+        <option value="date">Trier par date</option>
+        <option value="cout">Trier par coût</option>
+        <option value="type">Trier par type</option>
+        <option value="idm">Trier par ID matériel</option>
+      </select>
+    </div>
+
+    <div class="toolbar__select-wrap">
+      <span class="toolbar__select-icon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <polyline points="19 12 12 19 5 12"/>
+        </svg>
+      </span>
+      <select id="dirFilter" onchange="filterTable()">
+        <option value="desc">Décroissant</option>
+        <option value="asc">Croissant</option>
+      </select>
+    </div>
+
+    <button type="button" class="btn btn--red-outline" id="resetBtn"
+            onclick="resetFilters()" style="display:none;">
+      ✕ Réinitialiser
+    </button>
+  </div>
 
   {# ── Table ── #}
   {% if maintenances is empty %}
     <div class="empty">
       <p style="font-size:2.5rem; margin:0 0 .5rem;">🔧</p>
-      <p style="color:#6b8c6b; margin:0 0 1.5rem;">Aucune maintenance trouvée.</p>
-      <a href="{{ path('agri_maintenances_new') }}" class="btn btn--green">Ajouter une maintenance</a>
+      <p style="color:#6b8c6b; margin:0 0 1.5rem;">Aucune maintenance enregistrée.</p>
+      <a href="{{ path('agri_maintenances_new') }}" class="btn btn--green">
+        Ajouter une maintenance
+      </a>
     </div>
   {% else %}
     <div class="maint-card">
-      <table class="maint-table">
+      <table class="maint-table" id="maintTable">
         <thead>
           <tr>
             <th>Type de panne</th>
             <th>Coût (DT)</th>
             <th>Date</th>
-            <th>Description</th>
             <th>ID Matériel</th>
+            <th>Description</th>
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="maintBody">
           {% for m in maintenances %}
 
-            {# Calcul de la classe badge selon le type #}
-            {% set tl = m.typePanne|default('autre')|lower
-                |replace({'é':'e','è':'e','ê':'e','à':'a','&':'',' ':''}) %}
-            {% set validBadges = [
-                'mecanique','electrique','hydraulique','logicielle',
-                'transmission','moteur','vidange','revision','pneumatique','autre'
-            ] %}
-            {% set bc = tl in validBadges ? tl : 'default' %}
+            {% set typeMap = {
+                'Mécanique':         'mecanique',
+                'Électricité':       'electrique',
+                'Hydraulique':       'hydraulique',
+                'Logicielle':        'logicielle',
+                'Transmission':      'transmission',
+                'Moteur':            'moteur',
+                'Vidange & filtres': 'vidange',
+                'Révision générale': 'revision',
+                'Pneumatique':       'pneumatique',
+                'Autre':             'autre'
+            } %}
+            {% set bc = typeMap[m.typePanne]|default('default') %}
 
-            <tr>
-              {# Type de panne — badge coloré #}
+            <tr
+              data-type="{{ m.typePanne|default('')|lower }}"
+              data-desc="{{ m.description|default('')|lower }}"
+              data-cout="{{ m.cout }}"
+              data-date="{{ m.dateMain ? m.dateMain|date('Y-m-d') : '0000-00-00' }}"
+              data-idm="{{ m.idM|default(0) }}"
+            >
               <td>
                 <span class="badge badge--{{ bc }}">
-                  {{ m.typePanne|default('—')|capitalize }}
+                  {{ m.typePanne|default('—') }}
                 </span>
               </td>
-
-              {# Coût #}
-              <td class="td-cost">
-                {{ m.cout|number_format(2, ',', ' ') }} DT
-              </td>
-
-              {# Date #}
+              <td class="td-cost">{{ m.cout|number_format(2, ',', ' ') }} DT</td>
               <td class="td-date">
                 {{ m.dateMain ? m.dateMain|date('d/m/Y') : '—' }}
               </td>
-
-              {# Description avec tooltip sur survol #}
+              <td class="td-idm">
+                <span>#{{ m.idM|default('—') }}</span>
+              </td>
               <td class="td-desc" title="{{ m.description|default('') }}">
                 {{ m.description|default('—') }}
               </td>
-
-              {# ID Matériel #}
-              <td class="td-mat">
-                {{ m.idM ? '#' ~ m.idM : '—' }}
-              </td>
-
-              {# Actions #}
               <td>
                 <div class="actions">
-
                   <a href="{{ path('agri_maintenances_show', {id: m.idMain}) }}"
-                     class="act-btn act-btn--view"
-                     title="Voir le détail">
-                    👁 Voir
-                  </a>
-
+                     class="act-btn act-btn--view">👁 Voir</a>
                   <a href="{{ path('agri_maintenances_edit', {id: m.idMain}) }}"
-                     class="act-btn act-btn--edit"
-                     title="Modifier">
-                    ✏️ Modifier
-                  </a>
-
+                     class="act-btn act-btn--edit">✏️ Modifier</a>
                   <form method="post"
                         action="{{ path('agri_maintenances_delete', {id: m.idMain}) }}"
                         onsubmit="return confirm('⚠️ Supprimer cette maintenance ?')"
                         style="display:inline; margin:0;">
-                    <input type="hidden"
-                           name="_token"
+                    <input type="hidden" name="_token"
                            value="{{ csrf_token('delete_maintenance_' ~ m.idMain) }}">
-                    <button type="submit"
-                            class="act-btn act-btn--del"
-                            title="Supprimer">
+                    <button type="submit" class="act-btn act-btn--del">
                       🗑 Supprimer
                     </button>
                   </form>
-
                 </div>
               </td>
             </tr>
           {% endfor %}
         </tbody>
       </table>
+      <div class="no-results" id="noResults">
+        <p style="font-size:2rem; margin:0 0 .5rem;">🔍</p>
+        <p style="color:#6b8c6b; margin:0;">Aucun résultat pour votre recherche.</p>
+      </div>
     </div>
   {% endif %}
 
-</div>{# /.mp #}
+</div>
 
-{# ── Chart.js ── #}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-// Bar chart — répartition par type
-new Chart(document.getElementById('barChart'), {
-  type: 'bar',
-  data: {
-    labels: {{ countByType|map(r => r.type)|json_encode|raw }},
-    datasets: [{
-      label: 'Nb maintenances',
-      data: {{ countByType|map(r => r.total)|json_encode|raw }},
-      backgroundColor: [
-        '#2d6a2d','#4a9e4a','#7ac47a','#aadaaa',
-        '#d0edd0','#eaf3de','#b3d4b3','#85c285'
-      ],
-      borderRadius: 8,
-      borderSkipped: false,
-    }]
-  },
-  options: {
-    responsive: true,
-    plugins: { legend: { display: false } },
-    scales: {
-      y: { beginAtZero: true, ticks: { stepSize: 1 } }
-    }
-  }
+
+/* ── Flash auto-close ── */
+window.addEventListener('DOMContentLoaded', () => {
+  const flash = document.getElementById('flashAlert');
+  if (flash) setTimeout(() => flash.remove(), 4000);
+  filterTable();
 });
 
-// Line chart — coût mensuel
-new Chart(document.getElementById('lineChart'), {
-  type: 'line',
-  data: {
-    labels: {{ coutByMonth|map(r => r.mois)|json_encode|raw }},
-    datasets: [{
-      label: 'Coût (DT)',
-      data: {{ coutByMonth|map(r => r.total)|json_encode|raw }},
-      borderColor: '#2d6a2d',
-      backgroundColor: 'rgba(45,106,45,.12)',
-      borderWidth: 2.5,
-      tension: 0.4,
-      fill: true,
-      pointBackgroundColor: '#2d6a2d',
-      pointRadius: 5,
-      pointHoverRadius: 7,
-    }]
-  },
-  options: {
-    responsive: true,
-    plugins: { legend: { display: false } },
-    scales: {
-      y: { beginAtZero: true }
-    }
+/* ── Statistiques ── */
+let chartsInitialized = false;
+
+function toggleStats() {
+  const panel = document.getElementById('chartsPanel');
+  const btn   = document.getElementById('statsToggle');
+  const open  = panel.classList.toggle('is-open');
+  if (open) {
+    btn.textContent = '✕ Masquer';
+    btn.classList.add('active');
+    if (!chartsInitialized) { chartsInitialized = true; initCharts(); }
+  } else {
+    btn.textContent = '📊 Statistiques';
+    btn.classList.remove('active');
   }
-});
+}
+
+function initCharts() {
+  new Chart(document.getElementById('barChart'), {
+    type: 'bar',
+    data: {
+      labels: {{ countByType|map(r => r.type)|json_encode|raw }},
+      datasets: [{
+        data: {{ countByType|map(r => r.total)|json_encode|raw }},
+        backgroundColor: [
+          '#534AB7','#7F77DD','#97C459','#EF9F27',
+          '#1D9E75','#D85A30','#378ADD','#AFA9EC',
+          '#5DCAA5','#F09595'
+        ],
+        borderRadius: 8, borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+    }
+  });
+
+  new Chart(document.getElementById('lineChart'), {
+    type: 'line',
+    data: {
+      labels: {{ coutByMonth|map(r => r.mois)|json_encode|raw }},
+      datasets: [{
+        label: 'Coût (DT)',
+        data: {{ coutByMonth|map(r => r.total)|json_encode|raw }},
+        borderColor: '#534AB7',
+        backgroundColor: 'rgba(83,74,183,.10)',
+        borderWidth: 2.5, tension: 0.4, fill: true,
+        pointBackgroundColor: '#534AB7',
+        pointRadius: 5, pointHoverRadius: 7,
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+}
+
+/* ── Recherche ── */
+function onSearchInput(input) {
+  const clearBtn = document.getElementById('clearSearch');
+  clearBtn.classList.toggle('visible', input.value.length > 0);
+  filterTable();
+}
+
+function clearSearch() {
+  const input = document.getElementById('searchInput');
+  input.value = '';
+  document.getElementById('clearSearch').classList.remove('visible');
+  filterTable();
+  input.focus();
+}
+
+/* ── Filtre + tri ── */
+function filterTable() {
+  const search  = document.getElementById('searchInput').value.toLowerCase().trim();
+  const typeVal = document.getElementById('typeFilter').value.toLowerCase().trim();
+  const sortVal = document.getElementById('sortFilter').value;
+  const dirVal  = document.getElementById('dirFilter').value;
+  const rows    = Array.from(document.querySelectorAll('#maintBody tr'));
+  const resetBtn = document.getElementById('resetBtn');
+
+  resetBtn.style.display = (search || typeVal) ? 'inline-flex' : 'none';
+
+  let visible = [];
+  rows.forEach(row => {
+    const rowType = row.dataset.type || '';
+    const rowDesc = row.dataset.desc || '';
+    const matchSearch = !search || rowType.includes(search) || rowDesc.includes(search);
+    const matchType   = !typeVal || rowType === typeVal;
+    if (matchSearch && matchType) {
+      row.style.display = '';
+      visible.push(row);
+    } else {
+      row.style.display = 'none';
+    }
+  });
+
+  visible.sort((a, b) => {
+    let valA, valB;
+    if      (sortVal === 'cout') { valA = parseFloat(a.dataset.cout) || 0; valB = parseFloat(b.dataset.cout) || 0; }
+    else if (sortVal === 'date') { valA = a.dataset.date || ''; valB = b.dataset.date || ''; }
+    else if (sortVal === 'type') { valA = a.dataset.type || ''; valB = b.dataset.type || ''; }
+    else if (sortVal === 'idm')  { valA = parseInt(a.dataset.idm)  || 0; valB = parseInt(b.dataset.idm)  || 0; }
+    if (valA < valB) return dirVal === 'asc' ? -1 :  1;
+    if (valA > valB) return dirVal === 'asc' ?  1 : -1;
+    return 0;
+  });
+
+  const tbody = document.getElementById('maintBody');
+  visible.forEach(row => tbody.appendChild(row));
+
+  const noResults  = document.getElementById('noResults');
+  const maintTable = document.getElementById('maintTable');
+  if (noResults && maintTable) {
+    noResults.style.display  = visible.length === 0 ? 'block' : 'none';
+    maintTable.style.display = visible.length === 0 ? 'none'  : '';
+  }
+}
+
+function resetFilters() {
+  const input = document.getElementById('searchInput');
+  input.value = '';
+  document.getElementById('clearSearch').classList.remove('visible');
+  document.getElementById('typeFilter').value = '';
+  document.getElementById('sortFilter').value = 'date';
+  document.getElementById('dirFilter').value  = 'desc';
+  filterTable();
+}
 </script>
 {% endblock %}
