@@ -1,0 +1,77 @@
+{% extends 'base_admin.html.twig' %}
+
+{% block title %}Détail Machine - {{ machine.nom }}{% endblock %}
+{% block page_title %}Détail de la Machine{% endblock %}
+{% block breadcrumb %}Matériels / Machines / {{ machine.nom }}{% endblock %}
+
+{% block body %}
+<div style="max-width: 700px; margin: 0 auto;">
+
+    <!-- Bouton Retour -->
+    <a href="{{ path('admin_machines_index') }}" 
+       style="color:#2D5A27; text-decoration:none; font-size:14px; display:inline-flex; align-items:center; gap:6px; margin-bottom:25px;">
+        <i class="fa fa-arrow-left"></i> Retour à la liste
+    </a>
+
+    <!-- Carte centrée -->
+    <div style="background:white; border-radius:12px; padding:35px; box-shadow:0 4px 15px rgba(0,0,0,0.07);">
+
+        <h2 style="margin:0 0 30px 0; color:#2C3E50; text-align:center;">
+            {{ machine.nom }}
+        </h2>
+
+        <div style="display: grid; grid-template-columns: 180px 1fr; gap: 18px 25px; font-size: 15px;">
+
+            <div style="color:#666; font-weight:500;">Marque</div>
+            <div style="color:#2C3E50; font-weight:600;">{{ machine.marque }}</div>
+
+            <div style="color:#666; font-weight:500;">Modèle</div>
+            <div style="color:#2C3E50;">{{ machine.modele }}</div>
+
+            <div style="color:#666; font-weight:500;">Numéro de série</div>
+            <div style="color:#2C3E50; font-family:monospace; font-size:14.5px;">{{ machine.numeroSerie }}</div>
+
+            <div style="color:#666; font-weight:500;">État</div>
+            <div>
+                {% if machine.etatM in ['Neuf', 'Bon', 'Actif'] %}
+                    <span style="background:#EAF3DE; color:#3B6D11; padding:6px 14px; border-radius:20px; font-size:13px; font-weight:500;">
+                        {{ machine.etatM }}
+                    </span>
+                {% elseif machine.etatM in ['En panne', 'Hors service'] %}
+                    <span style="background:#FCEBEB; color:#A32D2D; padding:6px 14px; border-radius:20px; font-size:13px; font-weight:500;">
+                        {{ machine.etatM }}
+                    </span>
+                {% else %}
+                    <span style="background:#FAEEDA; color:#854F0B; padding:6px 14px; border-radius:20px; font-size:13px; font-weight:500;">
+                        {{ machine.etatM }}
+                    </span>
+                {% endif %}
+            </div>
+
+            <div style="color:#666; font-weight:500;">Date d'achat</div>
+            <div style="color:#2C3E50;">
+                {{ machine.dateAchat ? machine.dateAchat|date('d/m/Y') : 'Non renseignée' }}
+            </div>
+
+        </div>
+
+        <!-- Boutons d'actions -->
+        <div style="margin-top: 40px; display: flex; gap: 12px; justify-content: center;">
+            <a href="{{ path('admin_machines_edit', {id: machine.id}) }}" 
+               style="background:#FAEEDA; color:#854F0B; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:500; display:flex; align-items:center; gap:8px;">
+                <i class="fa fa-pen"></i> Modifier
+            </a>
+
+            <form method="post" action="{{ path('admin_machines_delete', {id: machine.id}) }}" 
+                  onsubmit="return confirm('Voulez-vous vraiment supprimer cette machine ?')">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ machine.id) }}">
+                <button type="submit" 
+                        style="background:#FCEBEB; color:#A32D2D; padding:12px 24px; border:none; border-radius:8px; cursor:pointer; font-weight:500; display:flex; align-items:center; gap:8px;">
+                    <i class="fa fa-trash"></i> Supprimer
+                </button>
+            </form>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

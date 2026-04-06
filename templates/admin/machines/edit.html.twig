@@ -1,0 +1,27 @@
+{% extends 'base_admin.html.twig' %}
+
+{% block title %}Modifier Machine{% endblock %}
+{% block page_title %}Modifier Machine{% endblock %}
+{% block breadcrumb %}Matériels / Machines / Modifier{% endblock %}
+
+{% block body %}
+<div style="max-width:600px; margin:0 auto;">
+    <a href="{{ path('admin_machines_index') }}" 
+       style="color:#2D5A27; text-decoration:none; font-size:14px; display:inline-flex; align-items:center; gap:6px; margin-bottom:20px;">
+        <i class="fa fa-arrow-left"></i> Retour à la liste
+    </a>
+
+    <div style="background:white; border-radius:12px; padding:28px; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+        <h3 style="margin:0 0 24px; color:#2C3E50;">Modifier — {{ machine.nom }}</h3>
+        
+        <form method="post">
+            {{ include('admin/machines/_form.html.twig') }}
+            
+            <button type="submit" 
+                    style="background:#2D5A27; color:white; padding:12px 24px; border:none; border-radius:8px; font-size:15px; cursor:pointer; width:100%; margin-top:20px;">
+                <i class="fa fa-save"></i> Sauvegarder les modifications
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

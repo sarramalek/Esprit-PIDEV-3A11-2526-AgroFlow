@@ -1,0 +1,70 @@
+<div style="margin-bottom: 20px;">
+    <label style="display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px;">
+        Nom de la machine *
+    </label>
+    <input type="text" 
+           name="nom" 
+           value="{{ machine.nom|default('') }}" 
+           required
+           minlength="2"
+           maxlength="100"
+           style="width: 100%; padding: 12px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
+</div>
+
+<div style="margin-bottom: 20px;">
+    <label style="display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px;">
+        Marque *
+    </label>
+    <input type="text" 
+           name="marque" 
+           value="{{ machine.marque|default('') }}" 
+           required
+           minlength="2"
+           style="width: 100%; padding: 12px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
+</div>
+
+<div style="margin-bottom: 20px;">
+    <label style="display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px;">
+        Modèle *
+    </label>
+    <input type="text" 
+           name="modele" 
+           value="{{ machine.modele|default('') }}" 
+           required
+           style="width: 100%; padding: 12px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
+</div>
+
+<div style="margin-bottom: 20px;">
+    <label style="display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px;">
+        Numéro de série *
+    </label>
+    <input type="text" 
+           name="numeroSerie" 
+           value="{{ machine.numeroSerie|default('') }}" 
+           required
+           pattern="[A-Za-z0-9\-]+"
+           title="Le numéro de série peut contenir des lettres, chiffres et tirets"
+           style="width: 100%; padding: 12px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
+</div>
+
+<div style="margin-bottom: 20px;">
+    <label style="display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px;">
+        État *
+    </label>
+    <select name="etatM" required style="width: 100%; padding: 12px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
+        <option value="">-- Sélectionnez l'état --</option>
+        {% for etat in ['Neuf', 'Bon', 'Actif', 'Occasion', 'En panne', 'En maintenance', 'Hors service'] %}
+            <option value="{{ etat }}" {{ machine.etatM == etat ? 'selected' : '' }}>{{ etat }}</option>
+        {% endfor %}
+    </select>
+</div>
+
+<div style="margin-bottom: 20px;">
+    <label style="display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px;">
+        Date d'achat
+    </label>
+    <input type="date" 
+           name="dateAchat" 
+           value="{{ machine.dateAchat ? machine.dateAchat|date('Y-m-d') : '' }}"
+           style="width: 100%; padding: 12px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
+</div>
