@@ -7,6 +7,7 @@ use App\Repository\stocks\ArticleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ArticleRepository::class)]
 #[ORM\Table(name: "article")]
@@ -18,27 +19,33 @@ class Article
     private ?int $id = null;
 
     #[ORM\Column(length: 150)]
+    #[Assert\NotBlank(message: "Le nom du produit ne peut pas être vide.")]
+    #[Assert\Length(min: 3, minMessage: "Le nom doit contenir au moins {{ limit }} caractères.")]
     private ?string $nom = null;
 
     #[ORM\Column]
+    #[Assert\NotNull(message: "La quantité est obligatoire.")]
+    #[Assert\PositiveOrZero(message: "La quantité ne peut pas être négative.")]
     private ?float $quantite_en_stock = null;
 
     #[ORM\Column]
+    #[Assert\NotNull(message: "Le seuil d'alerte est obligatoire.")]
+    #[Assert\PositiveOrZero(message: "Le seuil doit être un nombre positif.")]
     private ?float $seuil_alerte = null;
 
     #[ORM\Column(length: 20)]
+    #[Assert\NotBlank(message: "Veuillez préciser l'unité (Kg, Litre, etc.).")]
     private ?string $unite_mesure = null;
 
     #[ORM\Column(type: "float", nullable: true)]
+    #[Assert\NotNull(message: "Le prix unitaire est requis.")]
+    #[Assert\Positive(message: "Le prix doit être supérieur à zéro.")]
     private ?float $prix_unitaire = null;
 
     #[ORM\ManyToOne(targetEntity: Categorie::class, inversedBy: "articles")]
     #[ORM\JoinColumn(name: "id_categorie", referencedColumnName: "id_categorie", nullable: true)]
     private ?Categorie $categorie = null;
 
-    /**
-     * @var Collection<int, MouvementStock>
-     */
     #[ORM\OneToMany(targetEntity: MouvementStock::class, mappedBy: 'article', orphanRemoval: true)]
     private Collection $mouvementStocks;
 
@@ -134,5 +141,15 @@ class Article
             }
         }
         return $this;
+    }
+
+    public function getValeurTotaleStock(): float
+    {
+        return ($this->quantite_en_stock ?? 0) * ($this->prix_unitaire ?? 0);
+    }
+
+    public function isStockCritique(): bool
+    {
+        return $this->quantite_en_stock <= $this->seuil_alerte;
     }
 }

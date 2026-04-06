@@ -5,38 +5,41 @@
 {% block stylesheets %}
     {{ parent() }}
     <style>
-        /* ─── Variables de Design Moderne (SaaS Look) ─── */
+        /* ─── Variables de Design ─── */
         :root {
-            --primary: #2D5A27; /* Vert AgroFlow */
+            --primary: #2D5A27;
             --primary-light: #EAF3DE;
             --text-dark: #1A2A19;
             --text-gray: #6C757D;
-            --bg-light: #F8F9FA;
             --white: #FFFFFF;
             --border: #EEE;
-            --radius-md: 12px;
-            --radius-sm: 8px;
-            --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
-            --shadow-md: 0 10px 30px rgba(0,0,0,0.08);
+            --radius-md: 16px;
+            --radius-sm: 12px;
+            --shadow-md: 0 10px 40px rgba(0,0,0,0.04); /* Ombre plus douce */
             --transition: all 0.25s ease;
+            --danger: #dc3545;
+            --warning: #fd7e14;
         }
 
-        /* ─── Structure de la Carte Ultra-Épurée ─── */
+        /* Suppression du background gris global */
+        .dash-wrapper {
+            padding: 40px;
+            background-color: transparent !important; /* Force la transparence */
+            font-family: 'DM Sans', sans-serif;
+        }
+
         .agro-form-container {
             max-width: 850px;
             margin: 0 auto;
             background: var(--white);
-            border-radius: 16px;
+            border-radius: var(--radius-md);
             box-shadow: var(--shadow-md);
             overflow: hidden;
-            border: 1px solid rgba(0,0,0,0.03);
+            border: 1px solid rgba(0,0,0,0.05);
         }
 
-        .agro-form-body {
-            padding: 40px;
-        }
+        .agro-form-body { padding: 40px; }
 
-        /* ─── Grille du formulaire ─── */
         .agro-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -44,23 +47,21 @@
             margin-bottom: 32px;
         }
 
-        .full-width {
-            grid-column: span 2;
-        }
-
-        /* ─── Stylisation des Champs (Inputs) SaaS-Style ─── */
-        .form-group {
-            position: relative;
-        }
+        .full-width { grid-column: span 2; }
 
         .form-group label {
             display: block;
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-gray);
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: 8px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+        }
+
+        .validation-msg {
+            font-size: 11px;
+            font-weight: 700;
         }
 
         .form-control {
@@ -68,48 +69,23 @@
             padding: 14px 16px;
             font-size: 15px;
             color: var(--text-dark);
-            background-color: var(--white);
-            border: 1px solid #E1E1E1;
+            border: 1px solid #F0F0F0;
             border-radius: var(--radius-sm);
             transition: var(--transition);
-        }
-
-        .has-icon .form-control {
-            padding-left: 46px;
-        }
-
-        .field-icon {
-            position: absolute;
-            left: 16px;
-            top: 40px; 
-            color: #ADB5BD;
-            font-size: 16px;
-            pointer-events: none;
-            transition: var(--transition);
+            background-color: #FCFCFC; /* Très léger gris pour les champs */
         }
 
         .form-control:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(45, 90, 39, 0.1);
-        }
-
-        .form-control:focus + .field-icon {
-            color: var(--primary);
-        }
-
-        select.form-control {
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236C757D' d='M10.293 3.293 6 7.586 1.707 3.293A1 1 0 0 0 .293 4.707l5 5a1 1 0 0 0 1.414 0l5-5a1 1 0 1 0-1.414-1.414Z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 16px center;
-            padding-right: 40px;
+            background-color: var(--white);
+            box-shadow: 0 0 0 4px rgba(45, 90, 39, 0.05);
         }
 
         .form-actions {
             border-top: 1px solid var(--border);
             padding: 24px 40px;
-            background-color: var(--bg-light);
+            background-color: #FAFAFA;
             display: flex;
             justify-content: flex-end;
             gap: 12px;
@@ -117,105 +93,111 @@
 
         .btn {
             padding: 12px 24px;
-            font-size: 15px;
-            font-weight: 600;
-            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 700;
+            border-radius: 10px;
             cursor: pointer;
-            transition: var(--transition);
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            border: none;
             text-decoration: none;
+            border: none;
+            transition: var(--transition);
         }
 
-        .btn-primary {
-            background-color: var(--primary);
-            color: var(--white);
-            box-shadow: 0 4px 12px rgba(45, 90, 39, 0.2);
-        }
+        .btn-primary { background-color: #1a1a1a; color: var(--white); }
+        .btn-primary:hover { background-color: var(--primary); transform: translateY(-2px); }
+        
+        .btn-secondary { background-color: var(--white); color: var(--text-gray); border: 1px solid var(--border); }
+        .btn-secondary:hover { border-color: #1a1a1a; color: #1a1a1a; }
 
-        .btn-primary:hover {
-            background-color: #1E3D1A;
-            transform: translateY(-1px);
+        .field-icon {
+            position: absolute;
+            left: 16px;
+            top: 42px; 
+            color: #ADB5BD;
+            font-size: 14px;
+            pointer-events: none;
         }
-
-        .btn-secondary {
-            background-color: var(--white);
-            color: var(--text-gray);
-            border: 1px solid var(--border);
-        }
-
-        .btn-secondary:hover {
-            background-color: var(--bg-light);
-            color: var(--text-dark);
-        }
+        
+        .has-icon { position: relative; }
+        .has-icon .form-control { padding-left: 44px; }
     </style>
 {% endblock %}
 
 {% block body %}
-<div class="dash-wrapper" style="padding: 40px; background-color: var(--bg-light);">
+<div class="dash-wrapper">
     
-    <div style="margin-bottom: 35px; display: flex; align-items: center; justify-content: space-between;">
+    {# EN-TÊTE #}
+    <div style="margin-bottom: 40px; display: flex; align-items: flex-end; justify-content: space-between; max-width: 850px; margin-left: auto; margin-right: auto;">
         <div>
-            <h2 style="margin:0; color: var(--text-dark); font-size:26px; font-weight: 800; letter-spacing: -0.5px;">
-                <i class="fa fa-boxes-stacked" style="color: var(--primary); margin-right: 12px;"></i>Nouveau Produit
-            </h2>
-            <p style="margin:5px 0 0; color: var(--text-gray); font-size:15px;">Ajoutez un article à votre inventaire en quelques clics.</p>
+            <span style="color: var(--primary); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 2px;">Inventaire</span>
+            <h2 style="margin:5px 0 0; color: var(--text-dark); font-size:32px; font-weight: 800; letter-spacing: -1px;">Nouveau Produit</h2>
         </div>
         <a href="{{ path('agri_produits') }}" class="btn btn-secondary">
-            <i class="fa fa-arrow-left"></i> Retour à la liste
+            <i class="fa fa-arrow-left"></i> Retour
         </a>
     </div>
 
     <div class="agro-form-container">
-        
-        {{ form_start(form) }}
+        {{ form_start(form, {'attr': {'id': 'product-form'}}) }}
             <div class="agro-form-body">
                 
                 <div style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #F1F1F1;">
-                    <h4 style="margin: 0 0 8px; color: var(--text-dark); font-weight: 700;">Informations Clés</h4>
-                    <p style="margin: 0; color: var(--text-gray); font-size: 14px;">Identifiez le produit et définissez ses niveaux de stock et de prix.</p>
+                    <h4 style="margin: 0 0 8px; color: var(--text-dark); font-weight: 700;">Détails de l'article</h4>
+                    <p style="margin:0; color: var(--text-gray); font-size: 14px;">Remplissez les informations pour ajouter un produit au stock.</p>
                 </div>
 
                 <div class="agro-grid">
-                    {# Champ Nom : Pleine largeur #}
+                    {# NOM #}
                     <div class="form-group full-width">
-                        {{ form_label(form.nom) }}
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            {{ form_label(form.nom) }}
+                            <span id="msg-nom" class="validation-msg"></span>
+                        </div>
                         {{ form_widget(form.nom, {'attr': {'class': 'form-control', 'placeholder': 'ex: Engrais Azoté NPK'}}) }}
                     </div>
 
-                    {# Champ Catégorie #}
+                    {# CATEGORIE #}
                     <div class="form-group">
                         {{ form_label(form.categorie) }}
                         {{ form_widget(form.categorie, {'attr': {'class': 'form-control'}}) }}
                     </div>
 
-                    {# AJOUT : Champ Prix Unitaire #}
+                    {# PRIX #}
                     <div class="form-group has-icon">
-                        {{ form_label(form.prix_unitaire) }}
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            {{ form_label(form.prix_unitaire) }}
+                            <span id="msg-prix" class="validation-msg"></span>
+                        </div>
                         {{ form_widget(form.prix_unitaire, {'attr': {'class': 'form-control', 'placeholder': '0.000'}}) }}
-                        <i class="fa fa-money-bill-wave field-icon"></i>
+                        <i class="fa fa-tag field-icon"></i>
                     </div>
 
-                    {# Champ Unité #}
+                    {# UNITE #}
                     <div class="form-group">
                         {{ form_label(form.unite_mesure) }}
-                        {{ form_widget(form.unite_mesure, {'attr': {'class': 'form-control', 'placeholder': 'ex: Kg, Litre, Sac'}}) }}
+                        {{ form_widget(form.unite_mesure, {'attr': {'class': 'form-control'}}) }}
                     </div>
 
-                    {# Champ Quantité #}
+                    {# STOCK #}
                     <div class="form-group has-icon">
-                        {{ form_label(form.quantite_en_stock) }}
-                        {{ form_widget(form.quantite_en_stock, {'attr': {'class': 'form-control', 'placeholder': '0.0'}}) }}
-                        <i class="fa fa-layer-group field-icon"></i>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            {{ form_label(form.quantite_en_stock) }}
+                            <span id="msg-stock" class="validation-msg"></span>
+                        </div>
+                        {{ form_widget(form.quantite_en_stock, {'attr': {'class': 'form-control'}}) }}
+                        <i class="fa fa-box field-icon"></i>
                     </div>
 
-                    {# Champ Seuil #}
+                    {# SEUIL #}
                     <div class="form-group has-icon">
-                        {{ form_label(form.seuil_alerte) }}
-                        {{ form_widget(form.seuil_alerte, {'attr': {'class': 'form-control', 'placeholder': '0.0'}}) }}
-                        <i class="fa fa-bell field-icon"></i>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            {{ form_label(form.seuil_alerte) }}
+                            <span id="msg-seuil" class="validation-msg"></span>
+                        </div>
+                        {{ form_widget(form.seuil_alerte, {'attr': {'class': 'form-control'}}) }}
+                        <i class="fa fa-exclamation-circle field-icon"></i>
                     </div>
                 </div>
             </div>
@@ -223,11 +205,67 @@
             <div class="form-actions">
                 <a href="{{ path('agri_produits') }}" class="btn btn-secondary">Annuler</a>
                 <button type="submit" class="btn btn-primary">
-                    <i class="fa fa-plus"></i> Créer le produit
+                    <i class="fa fa-check"></i> Enregistrer le produit
                 </button>
             </div>
         {{ form_end(form) }}
-        
     </div>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const validations = [
+        {
+            input: document.querySelector('[name*="[nom]"]'),
+            msg: document.getElementById('msg-nom'),
+            check: (val) => {
+                if (val.length === 0) return { text: "Requis", color: "#dc3545" };
+                if (val.length < 3) return { text: "Trop court", color: "#fd7e14" };
+                return { text: "Valide ✓", color: "#2D5A27" };
+            }
+        },
+        {
+            input: document.querySelector('[name*="[prix_unitaire]"]'),
+            msg: document.getElementById('msg-prix'),
+            check: (val) => {
+                if (val === "" || parseFloat(val) <= 0) return { text: "Prix > 0 requis", color: "#dc3545" };
+                return { text: "Valide ✓", color: "#2D5A27" };
+            }
+        },
+        {
+            input: document.querySelector('[name*="[quantite_en_stock]"]'),
+            msg: document.getElementById('msg-stock'),
+            check: (val) => {
+                if (val === "" || parseFloat(val) < 0) return { text: "Min 0", color: "#dc3545" };
+                return { text: "Valide ✓", color: "#2D5A27" };
+            }
+        },
+        {
+            input: document.querySelector('[name*="[seuil_alerte]"]'),
+            msg: document.getElementById('msg-seuil'),
+            check: (val) => {
+                if (val === "" || parseFloat(val) < 0) return { text: "Min 0", color: "#dc3545" };
+                return { text: "Valide ✓", color: "#2D5A27" };
+            }
+        }
+    ];
+
+    function validateField(v) {
+        if (!v.input) return;
+        const result = v.check(v.input.value.trim());
+        v.msg.textContent = result.text;
+        v.msg.style.color = result.color;
+        v.input.style.borderColor = result.color;
+    }
+
+    validations.forEach(v => {
+        if (v.input) {
+            v.input.addEventListener('input', () => validateField(v));
+            validateField(v);
+        }
+    });
+});
+</script>
 {% endblock %}

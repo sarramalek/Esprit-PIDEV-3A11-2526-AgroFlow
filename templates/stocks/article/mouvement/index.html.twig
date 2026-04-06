@@ -16,6 +16,9 @@
         <a href="{{ path('agri_produits') }}" class="btn" style="background-color: #6c757d; color: white; padding: 10px 20px; border-radius: 10px; text-decoration: none; font-weight: 600;">
             <i class="fa fa-arrow-left"></i> Retour au stock
         </a>
+        <a href="{{ path('app_mouvement_export_pdf', app.request.query.all) }}" class="btn btn-danger">
+    <i class="fas fa-file-pdf"></i> Exporter en PDF
+</a>
     </div>
 
     {# --- FORMULAIRE DE FILTRE --- #}
