@@ -1,0 +1,113 @@
+{% extends 'base_admin.html.twig' %}
+{% block title %}Rotation #{{ rotation.id }} — AgroFlow{% endblock %}
+{% block page_title %}Détail de la rotation{% endblock %}
+{% block breadcrumb %}Rotations / #{{ rotation.id }}{% endblock %}
+
+{% block stylesheets %}
+.actions-top { display:flex; gap:10px; margin-bottom:24px; }
+.btn-back { display:inline-flex; align-items:center; gap:8px; background:var(--cream-dark); color:var(--navy); padding:9px 18px; border-radius:var(--radius); font-size:14px; font-weight:500; text-decoration:none; }
+.btn-edit-top { display:inline-flex; align-items:center; gap:8px; background:var(--green-accent); color:white; padding:9px 18px; border-radius:var(--radius); font-size:14px; font-weight:500; text-decoration:none; }
+.detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.detail-card { background:var(--white); border-radius:var(--radius); box-shadow:var(--shadow); padding:28px; }
+.detail-card h3 { font-size:16px; font-weight:700; color:var(--navy); margin-bottom:20px; padding-bottom:12px; border-bottom:2px solid var(--green-light); display:flex; align-items:center; gap:8px; }
+.detail-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--cream-dark); font-size:14px; }
+.detail-row:last-child { border-bottom:none; }
+.detail-label { color:var(--text-muted); font-weight:500; }
+.detail-value { font-weight:600; color:var(--navy); }
+.badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; }
+.badge-active { background:#D1FAE5; color:#065F46; }
+.badge-inactive { background:#FEE2E2; color:#991B1B; }
+.duree-badge { background:#EDE9FE; color:#5B21B6; padding:4px 12px; border-radius:20px; font-size:13px; font-weight:600; }
+{% endblock %}
+
+{% block body %}
+<div class="actions-top">
+    <a href="{{ path('admin_rotations') }}" class="btn-back">
+        <i class="fa fa-arrow-left"></i> Retour
+    </a>
+    <a href="{{ path('admin_rotations_edit', {id: rotation.id}) }}" class="btn-edit-top">
+        <i class="fa fa-pen"></i> Modifier
+    </a>
+</div>
+
+<div class="detail-grid">
+
+    {# ── Infos rotation ── #}
+    <div class="detail-card">
+        <h3><i class="fa fa-rotate" style="color:var(--green-accent)"></i> Informations</h3>
+
+        <div class="detail-row">
+            <span class="detail-label">ID</span>
+            <span class="detail-value" style="font-family:'DM Mono',monospace">#{{ rotation.id }}</span>
+        </div>
+
+        <div class="detail-row">
+            <span class="detail-label">Terrain</span>
+            <span class="detail-value">{{ rotation.terrain.nomTerrain }}</span>
+        </div>
+
+        <div class="detail-row">
+            <span class="detail-label">Plante</span>
+            <span class="detail-value">{{ rotation.plante.nomP }}</span>
+        </div>
+
+        <div class="detail-row">
+            <span class="detail-label">Variété</span>
+            <span class="detail-value">{{ rotation.plante.variete ?? '—' }}</span>
+        </div>
+
+        <div class="detail-row">
+            <span class="detail-label">Statut</span>
+            <span class="detail-value">
+                <span class="badge {{ rotation.status ? 'badge-active' : 'badge-inactive' }}">
+                    {{ rotation.status ? 'Actif' : 'Inactif' }}
+                </span>
+            </span>
+        </div>
+    </div>
+
+    {# ── Dates ── #}
+    <div class="detail-card">
+        <h3><i class="fa fa-calendar" style="color:var(--green-accent)"></i> Période</h3>
+
+        <div class="detail-row">
+            <span class="detail-label">Date de début</span>
+            <span class="detail-value">{{ rotation.dateDebut|date('d/m/Y') }}</span>
+        </div>
+
+        <div class="detail-row">
+            <span class="detail-label">Date de fin</span>
+            <span class="detail-value">{{ rotation.dateFin|date('d/m/Y') }}</span>
+        </div>
+
+        <div class="detail-row">
+            <span class="detail-label">Durée</span>
+            <span class="detail-value">
+                {% if rotation.dateDebut and rotation.dateFin %}
+                    {% if rotation.dateDebut and rotation.dateFin %}
+    {% set diff = rotation.dateFin.diff(rotation.dateDebut) %}
+    <span class="duree-badge">
+        {{ diff.days }} jour{{ diff.days > 1 ? 's' : '' }}
+    </span>
+{% else %}
+    —
+{% endif %}
+                {% else %}
+                    —
+                {% endif %}
+            </span>
+        </div>
+
+        <div class="detail-row">
+            <span class="detail-label">Localisation terrain</span>
+            <span class="detail-value">{{ rotation.terrain.localisation ?? '—' }}</span>
+        </div>
+
+        <div class="detail-row">
+            <span class="detail-label">Type de sol</span>
+            <span class="detail-value">{{ rotation.terrain.typeSol ?? '—' }}</span>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

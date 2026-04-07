@@ -134,4 +134,15 @@ public function countByMonth(\DateTime $date): int
         ->getQuery()
         ->getSingleScalarResult();
 }
+// src/Repository/UserRepository.php (ou le nom de votre repo User)
+
+public function findAllForSelect(): array
+{
+    return $this->createQueryBuilder('u')
+        ->select('u.cin, u.nom, u.prenom')
+        ->where('u.cin IS NOT NULL')
+        ->orderBy('u.nom', 'ASC')
+        ->getQuery()
+        ->getResult();
+}
 }
