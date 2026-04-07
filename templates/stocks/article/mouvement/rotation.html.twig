@@ -1,87 +1,190 @@
-{# templates/stocks/article/mouvement/rotation.html.twig #}
-{% extends 'base.html.twig' %}
+{% extends 'base_agriculteur.html.twig' %}
+
+{% block title %}Rotation des Flux - AgroFlow{% endblock %}
 
 {% block body %}
-<div class="container mt-4">
-    <h2 class="mb-4">📊 Analyse Dynamique des Flux</h2>
+<div class="container-fluid" style="background-color: #fcfcf9; min-height: 100vh; padding: 40px; font-family: 'DM Sans', sans-serif;">
+    
+    {# --- EN-TÊTE --- #}
+    <div class="d-flex justify-content-between align-items-center mb-5">
+        <div>
+            <h6 class="text-uppercase text-success font-weight-bold" style="letter-spacing: 1px; font-size: 13px;">Analytique des Stocks</h6>
+            <h1 class="font-weight-bold" style="color: #1a1a1a; font-size: 40px; margin-top: 5px;">Rotation des Flux</h1>
+        </div>
+        
+        <form method="get" class="d-flex align-items-center bg-white p-2 rounded-pill shadow-sm border">
+            <div class="px-3 border-right">
+                <small class="text-muted d-block" style="font-size: 10px; font-weight: 800;">DÉBUT</small>
+                <input type="date" name="debut" value="{{ dateDebut }}" class="border-0 bg-transparent p-0" style="font-size: 14px; outline: none;">
+            </div>
+            <div class="px-3">
+                <small class="text-muted d-block" style="font-size: 10px; font-weight: 800;">FIN</small>
+                <input type="date" name="fin" value="{{ dateFin }}" class="border-0 bg-transparent p-0" style="font-size: 14px; outline: none;">
+            </div>
+            <button type="submit" class="btn btn-dark rounded-circle ml-2" style="width: 45px; height: 45px; display: flex; align-items: center; justify-content: center;">
+                <i class="fa fa-sync-alt"></i>
+            </button>
+        </form>
+    </div>
 
-    <!-- 1. GRAPHIQUE DES SORTIES PAR CATÉGORIE -->
-    <div class="row mb-5">
-        <div class="col-md-8">
-            <div class="card shadow-sm p-3">
-                <h5>Volume de consommation par catégorie</h5>
-                <canvas id="rotationChart" height="100"></canvas>
+    <div class="row">
+        {# --- GRAPHIQUE --- #}
+        <div class="col-lg-8 mb-4">
+            <div class="card border-0 shadow-sm" style="border-radius: 25px;">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0 font-weight-bold" style="color: #2c3e50;">Performance par Catégorie</h5>
+                        <div style="font-size: 12px; color: #888;">
+                            <span class="mr-3"><i class="fa fa-circle" style="color: #A8D5BA;"></i> Entrées</span>
+                            <span><i class="fa fa-circle" style="color: #2D5A27;"></i> Sorties</span>
+                        </div>
+                    </div>
+                    <div style="height: 350px;">
+                        <canvas id="rotationChart"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card shadow-sm p-3 bg-light">
-                <h5>💡 Aide à la décision</h5>
-                <p id="agro-advice" class="small text-muted">Sélectionnez une période pour obtenir des conseils.</p>
+
+        {# --- AIDE À LA DÉCISION (DESIGN ÉPURÉ) --- #}
+        <div class="col-lg-4 mb-4">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 25px; background: white; border-left: 6px solid #2D5A27 !important;">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-4">
+                        <div style="background: #f0f7f0; width: 45px; height: 45px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 15px;">
+                            <i class="fa fa-lightbulb text-success" style="font-size: 20px;"></i>
+                        </div>
+                        <h5 class="font-weight-bold mb-0" style="color: #1a1a1a;">Aide à la décision</h5>
+                    </div>
+                    
+                    <div style="min-height: 120px;">
+                        <p id="agro-advice" style="font-size: 16px; line-height: 1.6; color: #555;">
+                            Analyse de vos données en cours...
+                        </p>
+                    </div>
+                    
+                    <div class="mt-4" style="background: #f8f9fa; padding: 15px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 11px; color: #888; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px;">Statut global du stock</span>
+                        <span id="global-status-badge" class="badge badge-success px-3 py-2" style="background-color: #2D5A27; border-radius: 8px; font-weight: 600;">Optimal</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- 2. TABLEAU STYLE "DASHBOARD" -->
-    <div class="card shadow-sm overflow-hidden">
-        <table class="table table-hover align-middle mb-0">
-            <thead class="table-dark">
-                <tr>
-                    <th>Catégorie</th>
-                    <th>Flux de sortie</th>
-                    <th>Niveau de Rotation</th>
-                    <th>État</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for s in stats %}
-                <tr>
-                    <td class="fw-bold">{{ s.categorie.nom }}</td>
-                    <td>
-                        <span class="badge bg-info text-dark">{{ s.sorties }} unités</span>
-                    </td>
-                    <td style="width: 30%;">
-                        <div class="progress" style="height: 10px;">
-                            {# On capte l'indice pour la barre de progression (max 100%) #}
-                            {% set percent = (s.indice * 100) > 100 ? 100 : (s.indice * 100) %}
-                            <div class="progress-bar {{ s.indice > 0.7 ? 'bg-danger' : (s.indice < 0.2 ? 'bg-warning' : 'bg-success') }}" 
-                                 role="progressbar" style="width: {{ percent }}%"></div>
-                        </div>
-                        <small class="text-muted">Indice : {{ s.indice }}</small>
-                    </td>
-                    <td>
-                        {% if s.indice > 0.7 %}
-                            <span class="text-danger"><i class="fas fa-fire"></i> Flux Tendu</span>
-                        {% elseif s.indice < 0.2 %}
-                            <span class="text-muted"><i class="fas fa-snowflake"></i> Stock Dormant</span>
-                        {% else %}
-                            <span class="text-success"><i class="fas fa-check-circle"></i> Optimal</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    {# --- TABLEAU DES FLUX --- #}
+    <div class="card border-0 shadow-sm mt-3" style="border-radius: 25px; overflow: hidden;">
+        <div class="card-header bg-white border-0 p-4">
+            <h5 class="mb-0 font-weight-bold">Détails des mouvements par catégorie</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead style="background-color: #fafafa;">
+                    <tr>
+                        <th class="p-4 text-muted border-0" style="font-size: 12px; letter-spacing: 1px;">CATÉGORIE</th>
+                        <th class="p-4 text-muted border-0" style="font-size: 12px; letter-spacing: 1px;">ENTRÉES (+)</th>
+                        <th class="p-4 text-muted border-0" style="font-size: 12px; letter-spacing: 1px;">SORTIES (-)</th>
+                        <th class="p-4 text-muted border-0" style="font-size: 12px; letter-spacing: 1px;">INDICE DE ROTATION</th>
+                        <th class="p-4 text-muted border-0" style="font-size: 12px; letter-spacing: 1px;">ÉTAT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in stats %}
+                    <tr style="border-top: 1px solid #f2f2f2;">
+                        <td class="p-4 align-middle font-weight-bold" style="font-size: 15px; color: #2c3e50;">
+                            {{ s.categorie.nom }}
+                        </td>
+                        <td class="p-4 align-middle">
+                            <div class="d-flex align-items-center">
+                                <i class="fa fa-arrow-alt-circle-up text-info mr-2 opacity-50"></i>
+                                <span class="font-weight-bold" style="color: #0c5460;">{{ s.entrees }} unités</span>
+                            </div>
+                        </td>
+                        <td class="p-4 align-middle">
+                            <div class="d-flex align-items-center">
+                                <i class="fa fa-arrow-alt-circle-down text-danger mr-2 opacity-50"></i>
+                                <span class="font-weight-bold" style="color: #721c24;">{{ s.sorties }} unités</span>
+                            </div>
+                        </td>
+                        <td class="p-4 align-middle" style="min-width: 200px;">
+                            {% set progress = (s.indice * 100) > 100 ? 100 : (s.indice * 100) %}
+                            <div class="progress" style="height: 6px; border-radius: 10px; background-color: #eee; margin-bottom: 5px;">
+                                <div class="progress-bar" style="width: {{ progress }}%; background-color: {{ s.indice > 0.7 ? '#e74c3c' : '#2D5A27' }}; border-radius: 10px;"></div>
+                            </div>
+                            <small class="text-muted font-weight-bold">{{ s.indice }}</small>
+                        </td>
+                        <td class="p-4 align-middle">
+                            {% if s.indice > 0.7 %}
+                                <span class="badge" style="background: #fff5f5; color: #e74c3c; border: 1px solid #fed7d7; padding: 6px 12px; border-radius: 8px;">Critique</span>
+                            {% elseif s.indice < 0.1 %}
+                                <span class="badge" style="background: #f8f9fa; color: #a0aec0; border: 1px solid #edf2f7; padding: 6px 12px; border-radius: 8px;">Dormant</span>
+                            {% else %}
+                                <span class="badge" style="background: #f0fdf4; color: #2D5A27; border: 1px solid #dcfce7; padding: 6px 12px; border-radius: 8px;">Sain</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
-<!-- Scripts pour le graphique -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const ctx = document.getElementById('rotationChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: [{% for s in stats %}'{{ s.categorie.nom }}',{% endfor %}],
-            datasets: [{
-                label: 'Unités sorties',
-                data: [{% for s in stats %}{{ s.sorties }},{% endfor %}],
-                backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: { y: { beginAtZero: true } }
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('rotationChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [{% for s in stats %}'{{ s.categorie.nom|e('js') }}',{% endfor %}],
+                datasets: [
+                {
+                    label: 'Entrées',
+                    data: [{% for s in stats %}{{ s.entrees }},{% endfor %}],
+                    backgroundColor: '#A8D5BA',
+                    borderRadius: 8,
+                    barThickness: 25
+                },
+                {
+                    label: 'Sorties',
+                    data: [{% for s in stats %}{{ s.sorties }},{% endfor %}],
+                    backgroundColor: '#2D5A27',
+                    borderRadius: 8,
+                    barThickness: 25
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { display: false } 
+                },
+                scales: { 
+                    y: { 
+                        grid: { color: '#f0f0f0', drawBorder: false },
+                        beginAtZero: true 
+                    },
+                    x: { 
+                        grid: { display: false },
+                        ticks: { font: { size: 11, weight: 'bold' } }
+                    }
+                }
+            }
+        });
+
+        // Logique de conseil dynamique
+        const adviceBox = document.getElementById('agro-advice');
+        const badge = document.getElementById('global-status-badge');
+        
+        const criticalCats = [{% for s in stats %}{% if s.indice > 0.7 %}'{{ s.categorie.nom|e('js') }}',{% endif %}{% endfor %}];
+        
+        if(criticalCats.length > 0) {
+            adviceBox.innerHTML = "Attention : La rotation de la catégorie <strong>" + criticalCats[0] + "</strong> est très élevée. Vos sorties dépassent largement votre stock de sécurité. Prévoyez un réapprovisionnement rapide.";
+            badge.innerHTML = "Alerte Rupture";
+            badge.style.backgroundColor = "#e74c3c";
+        } else {
+            adviceBox.innerHTML = "Vos flux sont actuellement <strong>équilibrés</strong>. Le rythme des sorties correspond à vos capacités de stockage. Aucune action immédiate n'est requise.";
         }
     });
 </script>
