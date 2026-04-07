@@ -3,12 +3,10 @@
 namespace App\Controller\Materiels;
 
 use App\Entity\Materiels\Machine;
+use App\Entity\User\User;
 use App\Form\Materiels\MachineType;
 use App\Repository\Materiels\MachineRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Dompdf\Dompdf;
-use Dompdf\Options;
-use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,182 +15,129 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/agriculteur/materiels/machines', name: 'agri_')]
 final class MachineController extends AbstractController
 {
-    // ──────────────────────────────────────────
-    // LIST
-    // ──────────────────────────────────────────
     #[Route('', name: 'machines', methods: ['GET'])]
-    public function index(MachineRepository $machineRepository): Response
+    public function machineIndex(Request $request, MachineRepository $repo): Response
     {
-        $machines = $machineRepository->findAll();
+        $cin = $request->getSession()->get('agriculteur_cin');
+
+        if (!$cin) {
+            $this->addFlash('error', 'Session expirée. Veuillez vous reconnecter.');
+            return $this->redirectToRoute('app_login');
+        }
+
+        // Récupération explicite des paramètres GET
+        $search = $request->query->get('search', '');
+        $etat = $request->query->get('etat', '');
+        $sortBy = $request->query->get('sortBy', 'dateAchat');
+        $sortDir = $request->query->get('sortDir', 'DESC');
+
+        // Construction des filtres
+        $filters = [
+            'cin'     => (int) $cin,
+            'search'  => trim($search),
+            'etat'    => trim($etat),
+            'sortBy'  => $sortBy,
+            'sortDir' => $sortDir,
+        ];
+
+        // Récupération des machines avec les filtres
+        $machines = $repo->search($filters);
 
         return $this->render('machines/index.html.twig', [
             'machines' => $machines,
-            'total'    => count($machines),
+            'search'   => $search,      // Passage au template
+            'etat'     => $etat,        // Passage au template
+            'sortBy'   => $sortBy,      // Passage au template
+            'sortDir'  => $sortDir,     // Passage au template
         ]);
     }
 
-    // ──────────────────────────────────────────
-    // CREATE
-    // ──────────────────────────────────────────
     #[Route('/new', name: 'machine_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $em): Response
+    public function machineNew(Request $request, EntityManagerInterface $em): Response
     {
         $machine = new Machine();
         $form    = $this->createForm(MachineType::class, $machine);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $cin = $request->getSession()->get('agriculteur_cin');
+            if ($cin) {
+                $user = $em->getRepository(User::class)->find($cin);
+                if ($user) {
+                    $machine->setAgriculteur($user);
+                    $machine->setCin($cin);
+                }
+            }
+            
             $em->persist($machine);
             $em->flush();
-            $this->addFlash('success', '✅ La machine a été ajoutée avec succès !');
-            return $this->redirectToRoute('agri_machines', [], Response::HTTP_SEE_OTHER);
+            $this->addFlash('success', '✅ Machine « ' . $machine->getNom() . ' » ajoutée.');
+            return $this->redirectToRoute('agri_machines');
         }
 
         return $this->render('machines/new.html.twig', [
-            'form'    => $form->createView(),
+            'form'    => $form,
             'machine' => $machine,
         ]);
     }
 
-    // ──────────────────────────────────────────
-    // SEARCH
-    // ──────────────────────────────────────────
-    #[Route('/search', name: 'machine_search', methods: ['GET'])]
-    public function search(Request $request, MachineRepository $machineRepository): Response
+    #[Route('/{id}', name: 'machine_show', methods: ['GET'], requirements: ['id' => '\d+'])]
+    public function machineShow(Machine $machine): Response
     {
-        $filters = [
-            'search'  => $request->query->get('search'),
-            'etat'    => $request->query->get('etat'),
-            'sortBy'  => $request->query->get('sortBy', 'nom'),
-            'sortDir' => $request->query->get('sortDir', 'ASC'),
-        ];
-
-        $machines = $machineRepository->search($filters);
-
-        return $this->render('machines/index.html.twig', [
-            'machines' => $machines,
-            'total'    => count($machines),
-            'filters'  => $filters,
-        ]);
-    }
-
-    // ──────────────────────────────────────────
-    // STATISTIQUES — Page HTML (affichage)
-    // ──────────────────────────────────────────
-    #[Route('/statistiques', name: 'machine_statistiques', methods: ['GET'])]
-    public function statistiques(MachineRepository $machineRepository): Response
-    {
-        $stats = $machineRepository->getStatistiques();
-
-        // Préparer les données pour Chart.js
-        $etatLabels  = array_keys($stats['parEtat']);
-        $etatValues  = array_values($stats['parEtat']);
-        $marqueLabels = array_keys($stats['parMarque']);
-        $marqueValues = array_values($stats['parMarque']);
-
-        return $this->render('machines/statistiques.html.twig', [
-            'stats'        => $stats,
-            'etatLabels'   => $etatLabels,
-            'etatValues'   => $etatValues,
-            'marqueLabels' => $marqueLabels,
-            'marqueValues' => $marqueValues,
-        ]);
-    }
-
-    // ──────────────────────────────────────────
-    // STATISTIQUES PDF — Export
-    // ──────────────────────────────────────────
-    #[Route('/statistiques/pdf', name: 'machine_statistiques_pdf', methods: ['GET'])]
-    public function statistiquesPdf(MachineRepository $machineRepository): Response
-    {
-        $stats    = $machineRepository->getStatistiques();
-        $machines = $machineRepository->findAll();
-
-        $html = $this->renderView('machines/statistiques_pdf.html.twig', [
-            'stats'    => $stats,
-            'machines' => $machines,
-            'date'     => new \DateTime(),
-        ]);
-
-        $options = new Options();
-        $options->set('defaultFont', 'DejaVu Sans');
-        $options->set('isHtml5ParserEnabled', true);
-        $options->set('isRemoteEnabled', false);
-
-        $dompdf = new Dompdf($options);
-        $dompdf->loadHtml($html);
-        $dompdf->setPaper('A4', 'landscape');
-        $dompdf->render();
-
-        $filename = 'statistiques-machines-' . date('Y-m-d') . '.pdf';
-
-        return new Response(
-            $dompdf->output(),
-            Response::HTTP_OK,
-            [
-                'Content-Type'        => 'application/pdf',
-                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-            ]
-        );
-    }
-
-    // ──────────────────────────────────────────
-    // SHOW
-    // ──────────────────────────────────────────
-    #[Route('/{id}', name: 'machine_show', methods: ['GET'])]
-    public function show(
-        #[MapEntity(mapping: ['id' => 'id'])] Machine $machine
-    ): Response {
         return $this->render('machines/show.html.twig', [
             'machine' => $machine,
+            'nomAgriculteur' => $machine->getNomAgriculteur(),
         ]);
     }
 
-    // ──────────────────────────────────────────
-    // EDIT
-    // ──────────────────────────────────────────
-    #[Route('/{id}/edit', name: 'machine_edit', methods: ['GET', 'POST'])]
-    public function edit(
-        Request $request,
-        #[MapEntity(mapping: ['id' => 'id'])] Machine $machine,
-        EntityManagerInterface $em
-    ): Response {
+    #[Route('/{id}/edit', name: 'machine_edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
+    public function machineEdit(Request $request, Machine $machine, EntityManagerInterface $em): Response
+    {
         $form = $this->createForm(MachineType::class, $machine);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $em->flush();
-            $this->addFlash('success', '✅ La machine a été modifiée avec succès !');
-            return $this->redirectToRoute('agri_machine_show', [
-                'id' => $machine->getId(),
-            ], Response::HTTP_SEE_OTHER);
+            $this->addFlash('success', '✅ Machine « ' . $machine->getNom() . ' » mise à jour.');
+            return $this->redirectToRoute('agri_machines');
         }
 
         return $this->render('machines/edit.html.twig', [
+            'form'    => $form,
             'machine' => $machine,
-            'form'    => $form->createView(),
         ]);
     }
 
-    // ──────────────────────────────────────────
-    // DELETE
-    // ──────────────────────────────────────────
-    #[Route('/{id}/delete', name: 'machine_delete', methods: ['POST'])]
-    public function delete(
-        Request $request,
-        #[MapEntity(mapping: ['id' => 'id'])] Machine $machine,
-        EntityManagerInterface $em
-    ): Response {
-        $token = $request->request->get('_token');
-
-        if ($this->isCsrfTokenValid('delete_machine_' . $machine->getId(), $token)) {
+    #[Route('/{id}/delete', name: 'machine_delete', methods: ['POST'], requirements: ['id' => '\d+'])]
+    public function machineDelete(Request $request, Machine $machine, EntityManagerInterface $em): Response
+    {
+        if ($this->isCsrfTokenValid('delete_machine_' . $machine->getId(), $request->getPayload()->getString('_token'))) {
             $em->remove($machine);
             $em->flush();
-            $this->addFlash('success', '🗑️ Machine supprimée avec succès.');
+            $this->addFlash('success', '🗑️ Machine supprimée.');
         } else {
-            $this->addFlash('error', '❌ Token CSRF invalide. Suppression annulée.');
+            $this->addFlash('error', '❌ Token CSRF invalide.');
         }
 
-        return $this->redirectToRoute('agri_machines', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('agri_machines');
+    }
+
+    #[Route('/statistiques', name: 'machine_statistiques', methods: ['GET'])]
+    public function machineStatistiques(MachineRepository $repo): Response
+    {
+        $stats = $repo->getStatistiques();
+        
+        $etatLabels = array_keys($stats['parEtat']);
+        $etatValues = array_values($stats['parEtat']);
+        $marqueLabels = array_keys($stats['parMarque']);
+        $marqueValues = array_values($stats['parMarque']);
+        
+        return $this->render('machines/statistiques.html.twig', [
+            'stats' => $stats,
+            'etatLabels' => $etatLabels,
+            'etatValues' => $etatValues,
+            'marqueLabels' => $marqueLabels,
+            'marqueValues' => $marqueValues,
+        ]);
     }
 }

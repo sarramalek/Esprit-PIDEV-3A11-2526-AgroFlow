@@ -1,178 +1,298 @@
 {% extends 'agriculteur_dashboard.html.twig' %}
-
-{% block title %}Machines — AgroFlow{% endblock %}
+{% block title %}Mes Machines — AgroFlow{% endblock %}
 
 {% block body %}
-
-{% import _self as macros %}
-
 <style>
-.af-header{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1.75rem}
-.af-header h1{margin:0 0 .2rem;font-size:1.55rem;font-weight:700;color:#1a2e1a}
-.af-header p{margin:0;font-size:.88rem;color:#6b8c6b}
-.af-card{background:#fff;border:1px solid #dce8d5;border-radius:12px;overflow:hidden;margin-bottom:1.5rem}
-.btn{display:inline-flex;align-items:center;gap:.35rem;padding:.48rem 1rem;border-radius:8px;font-size:.88rem;font-weight:600;cursor:pointer;border:1.5px solid transparent;text-decoration:none;transition:all .15s}
-.btn-primary{background:#2d6a2d;color:#fff;border-color:#2d6a2d}.btn-primary:hover{background:#245524}
-.btn-ghost{background:transparent;color:#5a7a5a;border-color:#dce8d5;padding:.32rem .65rem;font-size:.8rem}.btn-ghost:hover{background:#f0f7f0}
-.btn-danger-ghost{background:transparent;color:#b94040;border-color:#f0d0d0;padding:.32rem .65rem;font-size:.8rem}.btn-danger-ghost:hover{background:#fdf0f0}
-.search-bar{background:#fff;border:1px solid #dce8d5;border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.25rem;display:flex;gap:.75rem;flex-wrap:wrap;align-items:center}
-.search-bar input,.search-bar select{padding:.42rem .75rem;border:1.5px solid #dce8d5;border-radius:8px;font-size:.88rem;outline:none;color:#1a2e1a;background:#fafcf8}
-.search-bar input:focus,.search-bar select:focus{border-color:#2d6a2d}
-.search-bar input[type=text]{flex:1;min-width:180px}
-.af-table{width:100%;border-collapse:collapse}
-.af-table thead tr{border-bottom:1.5px solid #dce8d5}
-.af-table thead th{padding:.7rem 1rem;font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#5a7a5a;white-space:nowrap;text-align:left}
-.af-table thead th a{color:#5a7a5a;text-decoration:none}.af-table thead th a:hover{color:#2d6a2d}
-.af-table tbody tr{border-bottom:1px solid #f0f5ec;transition:background .1s}
-.af-table tbody tr:last-child{border-bottom:none}
-.af-table tbody tr:hover{background:#f8fbf5}
-.af-table td{padding:.72rem 1rem;font-size:.92rem;color:#1a2e1a;vertical-align:middle}
-.td-muted{color:#8fa68f;font-size:.85rem}
-.td-bold{font-weight:600}
-.td-actions{display:flex;gap:.35rem}
-.badge{display:inline-block;padding:.22rem .7rem;border-radius:20px;font-size:.76rem;font-weight:700;white-space:nowrap}
-.b-neuf{background:#d4edda;color:#155724}
-.b-bon{background:#cce5ff;color:#004085}
-.b-occasion{background:#fff3cd;color:#856404}
-.b-panne{background:#f8d7da;color:#721c24}
-.alert{padding:.75rem 1rem;border-radius:8px;margin-bottom:1rem;font-size:.9rem}
-.alert-success{background:#d4edda;color:#155724;border:1px solid #c3e6cb}
-.alert-danger{background:#f8d7da;color:#721c24;border:1px solid #f5c6cb}
-.empty-state{text-align:center;padding:4rem 2rem;color:#7a9a7a}
-.empty-state .icon{font-size:3rem;margin-bottom:.75rem}
-.empty-state h3{font-size:1.15rem;color:#3a5a3a;margin:0 0 .4rem}
+    .machines-page { max-width: 1480px; margin: 0 auto; padding: 1.5rem; }
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+    .page-header h1 { margin: 0; font-size: 1.9rem; font-weight: 700; color: #1f2a1f; }
+
+    .btn {
+        padding: 0.65rem 1.4rem;
+        border-radius: 10px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        transition: all 0.2s;
+        border: none;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+    .btn-primary { background: #2d6a2d; color: white; }
+    .btn-primary:hover { background: #245524; }
+    .btn-secondary { background: #f0f7f0; color: #2d6a2d; border: 1px solid #dce8d5; }
+    .btn-secondary:hover { background: #e0ecd9; }
+
+    .search-filters {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .filter-group label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #6b8c6b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .filter-group input, 
+    .filter-group select {
+        padding: 0.75rem;
+        border: 1px solid #dce8d5;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        background: white;
+    }
+    .filter-actions {
+        display: flex;
+        gap: 0.8rem;
+        justify-content: flex-end;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+    thead tr { background: #f8fbf5; border-bottom: 2px solid #e0ecd9; }
+    thead th {
+        padding: 1.2rem 1rem;
+        text-align: left;
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: #6b8c6b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    tbody tr { border-bottom: 1px solid #f0f5ee; transition: background 0.2s; }
+    tbody tr:hover { background: #f8fbf5; }
+    tbody td { padding: 1rem; vertical-align: middle; }
+
+    .machine-name { font-weight: 600; color: #1f2a1f; }
+
+    .badge {
+        padding: 0.4rem 1rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+    .badge-neuf { background: #d4edda; color: #155724; }
+    .badge-bon { background: #cce5ff; color: #004085; }
+    .badge-occasion { background: #fff3cd; color: #856404; }
+    .badge-panne { background: #f8d7da; color: #721c24; }
+
+    .action-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+        cursor: pointer;
+    }
+    .btn-view { background: #f0f7f0; color: #2d6a2d; border-color: #dce8d5; }
+    .btn-view:hover { background: #e0ecd9; }
+    .btn-edit { background: #fff3cd; color: #856404; border-color: #ffeaa8; }
+    .btn-edit:hover { background: #ffeaa8; }
+    .btn-delete { background: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+    .btn-delete:hover { background: #f5c6cb; }
+
+    .flash-message {
+        padding: 0.8rem 1.2rem;
+        border-radius: 10px;
+        margin-bottom: 1.2rem;
+        font-weight: 500;
+    }
+    .flash-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .flash-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem;
+        color: #8a9e8a;
+        font-size: 1.1rem;
+    }
+
+    @media (max-width: 1200px) {
+        .machines-page { padding: 1rem; overflow-x: auto; }
+        table { min-width: 1000px; }
+    }
 </style>
 
-{# ── Macro tri ── #}
-{% macro sort_link(label, field, filters) %}
-    {% set f = filters|default({}) %}
-    {% set dir = (f.sortBy is defined and f.sortBy == field and f.sortDir == 'ASC') ? 'DESC' : 'ASC' %}
-    <a href="{{ path('agri_machine_search', f|merge({sortBy: field, sortDir: dir})) }}">
-        {{ label }}
-        {% if f.sortBy is defined and f.sortBy == field %}
-            {{ f.sortDir == 'ASC' ? '▲' : '▼' }}
-        {% endif %}
-    </a>
-{% endmacro %}
+<div class="machines-page">
 
-{# ── Flash messages ── #}
-{% for label, messages in app.flashes %}
-    {% for message in messages %}
-        <div class="alert alert-{{ label }}">{{ message }}</div>
-    {% endfor %}
-{% endfor %}
-
-{# ── En-tête ── #}
-<div class="af-header">
-    <div>
-        <h1>⚙️ Gestion des Machines</h1>
-        <p>{{ machines|length }} machine{{ machines|length != 1 ? 's' : '' }} enregistrée{{ machines|length != 1 ? 's' : '' }}</p>
-    </div>
-    <div style="display:flex;gap:.6rem">
-        <a href="{{ path('agri_machine_statistiques') }}" class="btn btn-ghost">📊 Statistiques</a>
-        <a href="{{ path('agri_machine_new') }}" class="btn btn-primary">+ Nouvelle machine</a>
-    </div>
-</div>
-
-{# ── Barre de recherche/filtres (sans champ date) ── #}
-{% set f = filters|default({}) %}
-<form method="GET" action="{{ path('agri_machine_search') }}" class="search-bar">
-
-    <input type="text" name="search"
-           placeholder="Nom, marque, modèle, N° série..."
-           value="{{ f.search ?? '' }}">
-
-    <select name="etat">
-        <option value="">— Tous les états —</option>
-        {% for etat in ['Neuf', 'Bon état', 'Occasion', 'En panne'] %}
-            <option value="{{ etat }}" {{ (f.etat ?? '') == etat ? 'selected' : '' }}>
-                {{ etat }}
-            </option>
+    {# Flash messages #}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="flash-message flash-{{ label == 'success' ? 'success' : 'error' }}">
+                {{ message }}
+            </div>
         {% endfor %}
-    </select>
+    {% endfor %}
 
-    <select name="sortDir" onchange="this.form.submit()">
-        <option value="ASC"  {{ (f.sortDir ?? 'ASC') == 'ASC'  ? 'selected' : '' }}>📅 Date ↑ Croissant</option>
-        <option value="DESC" {{ (f.sortDir ?? '') == 'DESC' ? 'selected' : '' }}>📅 Date ↓ Décroissant</option>
-    </select>
-
-    <input type="hidden" name="sortBy" value="dateAchat">
-
-    <button type="submit" class="btn btn-primary">🔍 Rechercher</button>
-
-    {% if f|filter(v => v is not empty) is not empty %}
-        <a href="{{ path('agri_machines') }}" class="btn btn-ghost">✖ Réinitialiser</a>
-    {% endif %}
-
-</form>
-
-{# ── Tableau ── #}
-{% if machines is empty %}
-    <div class="af-card">
-        <div class="empty-state">
-            <div class="icon">🚜</div>
-            <h3>Aucune machine trouvée</h3>
-            <p>Modifiez vos filtres ou ajoutez une nouvelle machine.</p>
-            <a href="{{ path('agri_machine_new') }}" class="btn btn-primary">Ajouter une machine</a>
+    <div class="page-header">
+        <h1>⚙️ Mes Machines</h1>
+        <div style="display: flex; gap: 0.8rem;">
+            <a href="{{ path('agri_machine_new') }}" class="btn btn-primary">
+                ➕ Ajouter une machine
+            </a>
+            <a href="{{ path('agri_machine_statistiques') }}" class="btn btn-secondary">
+                📊 Statistiques
+            </a>
         </div>
     </div>
-{% else %}
-    <div class="af-card">
-        <table class="af-table">
+
+    <!-- Formulaire de recherche et filtres - Version sans variable filters -->
+    <div class="search-filters">
+        <form method="GET" action="{{ path('agri_machines') }}">
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label>🔍 Recherche</label>
+                    <input type="text" 
+                           name="search" 
+                           value="{{ app.request.query.get('search') }}"
+                           placeholder="Nom, marque, modèle ou n° série...">
+                </div>
+
+                <div class="filter-group">
+                    <label>📊 État</label>
+                    <select name="etat">
+                        <option value="">Tous les états</option>
+                        <option value="Neuf" {{ app.request.query.get('etat') == 'Neuf' ? 'selected' : '' }}>🚜 Neuf</option>
+                        <option value="Bon" {{ app.request.query.get('etat') == 'Bon' ? 'selected' : '' }}>👍 Bon</option>
+                        <option value="Occasion" {{ app.request.query.get('etat') == 'Occasion' ? 'selected' : '' }}>🔄 Occasion</option>
+                        <option value="En panne" {{ app.request.query.get('etat') == 'En panne' ? 'selected' : '' }}>⚠️ En panne</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>📋 Trier par</label>
+                    <select name="sortBy">
+                        <option value="dateAchat" {{ app.request.query.get('sortBy') == 'dateAchat' ? 'selected' : '' }}>📅 Date d'achat</option>
+                        <option value="nom" {{ app.request.query.get('sortBy') == 'nom' ? 'selected' : '' }}>🔤 Nom</option>
+                        <option value="marque" {{ app.request.query.get('sortBy') == 'marque' ? 'selected' : '' }}>🏭 Marque</option>
+                        <option value="modele" {{ app.request.query.get('sortBy') == 'modele' ? 'selected' : '' }}>📟 Modèle</option>
+                        <option value="etatM" {{ app.request.query.get('sortBy') == 'etatM' ? 'selected' : '' }}>⚡ État</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>⬆️⬇️ Ordre</label>
+                    <select name="sortDir">
+                        <option value="DESC" {{ app.request.query.get('sortDir') == 'DESC' ? 'selected' : '' }}>↓ Décroissant</option>
+                        <option value="ASC" {{ app.request.query.get('sortDir') == 'ASC' ? 'selected' : '' }}>↑ Croissant</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="filter-actions">
+                <button type="submit" class="btn btn-primary">🔎 Rechercher</button>
+                <a href="{{ path('agri_machines') }}" class="btn btn-secondary">⟳ Réinitialiser</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tableau des résultats -->
+    <div style="overflow-x: auto;">
+        <table>
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>{{ macros.sort_link('Nom',          'nom',       f) }}</th>
-                    <th>{{ macros.sort_link('Marque',       'marque',    f) }}</th>
-                    <th>{{ macros.sort_link('Modèle',       'modele',    f) }}</th>
-                    <th>N° Série</th>
-                    <th>{{ macros.sort_link('État',         'etatM',     f) }}</th>
-                    <th>{{ macros.sort_link("Date d'achat", 'dateAchat', f) }}</th>
-                    <th>Actions</th>
+                    <th>NOM AGRICULTEUR</th>
+                    <th>NOM MACHINE</th>
+                    <th>MARQUE</th>
+                    <th>MODÈLE</th>
+                    <th>N° SÉRIE</th>
+                    <th>ÉTAT</th>
+                    <th>DATE D'ACHAT</th>
+                    <th>ACTIONS</th>
                 </tr>
             </thead>
             <tbody>
                 {% for machine in machines %}
-                <tr>
-                    <td class="td-muted">{{ machine.id }}</td>
-                    <td class="td-bold">{{ machine.nom }}</td>
-                    <td>{{ machine.marque }}</td>
-                    <td>{{ machine.modele }}</td>
-                    <td class="td-muted">{{ machine.numeroSerie }}</td>
-                    <td>
-                        {% set badgeClass = {
-                            'Neuf':     'b-neuf',
-                            'Bon':      'b-bon',
-                            'Occasion': 'b-occasion',
-                            'panne':    'b-panne'
-                        } %}
-                        <span class="badge {{ badgeClass[machine.etatM] ?? 'b-bon' }}">
-                            {{ machine.etatM }}
-                        </span>
-                    </td>
-                    <td class="td-muted">
-                        {{ machine.dateAchat ? machine.dateAchat|date('d/m/Y') : '—' }}
-                    </td>
-                    <td>
-                        <div class="td-actions">
-                            <a href="{{ path('agri_machine_show', {id: machine.id}) }}"
-                               class="btn btn-ghost">👁 Voir</a>
-                            <a href="{{ path('agri_machine_edit', {id: machine.id}) }}"
-                               class="btn btn-ghost">✏️ Modifier</a>
-                            <form method="post"
-                                  action="{{ path('agri_machine_delete', {id: machine.id}) }}"
-                                  onsubmit="return confirm('Supprimer « {{ machine.nom }} » ?')">
-                                <input type="hidden" name="_token"
-                                       value="{{ csrf_token('delete_machine_' ~ machine.id) }}">
-                                <button type="submit" class="btn btn-danger-ghost">🗑 Supprimer</button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
+                    {% set nomAgriculteur = machine.nomAgriculteur %}
+                    {% set badgeClass = '' %}
+                    {% if machine.etatM == 'Neuf' %}
+                        {% set badgeClass = 'badge-neuf' %}
+                    {% elseif machine.etatM == 'Bon' %}
+                        {% set badgeClass = 'badge-bon' %}
+                    {% elseif machine.etatM == 'Occasion' %}
+                        {% set badgeClass = 'badge-occasion' %}
+                    {% elseif machine.etatM == 'En panne' %}
+                        {% set badgeClass = 'badge-panne' %}
+                    {% else %}
+                        {% set badgeClass = 'badge-bon' %}
+                    {% endif %}
+
+                    <tr>
+                        <td style="color: #8a9e8a; font-weight: 500;">#{{ machine.id }}</td>
+                        <td style="font-weight: 500;">{{ nomAgriculteur }}</td>
+                        <td class="machine-name">{{ machine.nom }}</td>
+                        <td>{{ machine.marque }}</td>
+                        <td>{{ machine.modele }}</td>
+                        <td style="color: #8a9e8a; font-family: monospace;">{{ machine.numeroSerie ?? '—' }}</td>
+                        <td><span class="badge {{ badgeClass }}">{{ machine.etatM }}</span></td>
+                        <td>{{ machine.dateAchat ? machine.dateAchat|date('d/m/Y') : '—' }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{{ path('agri_machine_show', {id: machine.id}) }}" class="action-btn btn-view">
+                                    👁 Voir
+                                </a>
+                                <a href="{{ path('agri_machine_edit', {id: machine.id}) }}" class="action-btn btn-edit">
+                                    ✏️ Modifier
+                                </a>
+                                <form method="post" 
+                                      action="{{ path('agri_machine_delete', {id: machine.id}) }}" 
+                                      onsubmit="return confirm('⚠️ Supprimer définitivement « {{ machine.nom }} » ?\nCette action est irréversible.');" 
+                                      style="display:inline;">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete_machine_' ~ machine.id) }}">
+                                    <button type="submit" class="action-btn btn-delete">
+                                        🗑 Supprimer
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="9" class="empty-state">
+                            🤷 Aucune machine trouvée.<br>
+                            <a href="{{ path('agri_machine_new') }}" style="color: #2d6a2d; margin-top: 1rem; display: inline-block;">➕ Ajouter votre première machine</a>
+                        </td>
+                    </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-{% endif %}
-
+    
+    {% if machines|length > 0 %}
+    <div style="margin-top: 1rem; text-align: right; color: #8a9e8a; font-size: 0.85rem;">
+        📊 {{ machines|length }} machine(s) trouvée(s)
+    </div>
+    {% endif %}
+</div>
 {% endblock %}

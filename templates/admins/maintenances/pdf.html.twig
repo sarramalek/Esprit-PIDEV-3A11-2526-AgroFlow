@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Rapport Maintenances</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: Arial, sans-serif; font-size:12px; color:#222; background:#fff; }
+
+    .header {
+      background: #1a472a;
+      color: white;
+      padding: 20px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header h1 { font-size:22px; }
+    .header .meta { font-size:11px; opacity:.8; }
+
+    .kpi-row {
+      display: flex;
+      gap: 15px;
+      padding: 15px 30px;
+      background: #f8f9fa;
+      border-bottom: 2px solid #dee2e6;
+    }
+    .kpi {
+      flex:1; background:#fff; border:1px solid #dee2e6;
+      border-radius:6px; padding:10px 15px; text-align:center;
+    }
+    .kpi .val { font-size:20px; font-weight:bold; color:#1a472a; }
+    .kpi .lbl { font-size:10px; color:#666; margin-top:2px; }
+
+    .section { padding: 15px 30px; }
+    .section-title {
+      font-size:13px; font-weight:bold;
+      border-left:4px solid #1a472a;
+      padding-left:10px; margin-bottom:10px;
+      color:#1a472a;
+    }
+
+    table { width:100%; border-collapse:collapse; font-size:11px; }
+    thead tr { background:#1a472a; color:white; }
+    thead th { padding:7px 10px; text-align:left; }
+    tbody tr:nth-child(even) { background:#f4f7f4; }
+    tbody td { padding:6px 10px; border-bottom:1px solid #e9ecef; }
+    tfoot td { background:#e8f5e9; font-weight:bold; padding:7px 10px; }
+
+    .badge {
+      display:inline-block; padding:2px 8px;
+      border-radius:10px; font-size:10px; font-weight:bold; color:#fff;
+    }
+    .badge-warning { background:#ffc107; color:#000; }
+    .badge-info    { background:#0dcaf0; color:#000; }
+    .badge-primary { background:#0d6efd; }
+    .badge-secondary { background:#6c757d; }
+    .badge-success { background:#198754; }
+    .badge-danger  { background:#dc3545; }
+    .badge-dark    { background:#212529; }
+
+    .by-type { display:flex; flex-wrap:wrap; gap:10px; }
+    .by-type-item {
+      flex:1; min-width:120px; background:#f8f9fa;
+      border:1px solid #dee2e6; border-radius:6px;
+      padding:8px 12px; text-align:center;
+    }
+    .by-type-item .num { font-size:18px; font-weight:bold; color:#1a472a; }
+
+    .footer {
+      text-align:center; color:#999; font-size:10px;
+      padding:10px 30px; border-top:1px solid #dee2e6; margin-top:10px;
+    }
+
+    @media print {
+      .no-print { display:none !important; }
+      body { font-size:11px; }
+    }
+  </style>
+</head>
+<body>
+
+  {# Bouton impression #}
+  <div class="no-print" style="background:#333; padding:10px 30px; display:flex; gap:10px; align-items:center;">
+    <button onclick="window.print()"
+            style="background:#198754; color:#fff; border:none; padding:8px 20px; border-radius:5px; cursor:pointer; font-size:13px;">
+      🖨️ Imprimer / Sauvegarder en PDF
+    </button>
+    <button onclick="window.close()"
+            style="background:#6c757d; color:#fff; border:none; padding:8px 20px; border-radius:5px; cursor:pointer; font-size:13px;">
+      ✖ Fermer
+    </button>
+    <span style="color:#aaa; font-size:12px;">
+      Astuce : dans la boîte de dialogue d'impression, choisissez "Enregistrer en PDF"
+    </span>
+  </div>
+
+  {# En-tête rapport #}
+  <div class="header">
+    <div>
+      <h1>🔧 Rapport des Maintenances</h1>
+      <div class="meta">Généré le {{ date|date('d/m/Y à H:i') }}</div>
+    </div>
+    <div style="text-align:right;">
+      <div style="font-size:13px; font-weight:bold;">AgroFlow</div>
+      <div class="meta">Gestion du Matériel Agricole</div>
+    </div>
+  </div>
+
+  {# KPI #}
+  <div class="kpi-row">
+    <div class="kpi">
+      <div class="val">{{ maintenances|length }}</div>
+      <div class="lbl">Total interventions</div>
+    </div>
+    <div class="kpi">
+      <div class="val">{{ totalCout|number_format(2, ',', ' ') }} DT</div>
+      <div class="lbl">Coût total</div>
+    </div>
+    <div class="kpi">
+      <div class="val">{{ byType|length }}</div>
+      <div class="lbl">Types de pannes</div>
+    </div>
+    <div class="kpi">
+      <div class="val">
+        {% if maintenances|length > 0 %}
+          {{ (totalCout / maintenances|length)|number_format(2, ',', ' ') }} DT
+        {% else %}—{% endif %}
+      </div>
+      <div class="lbl">Coût moyen</div>
+    </div>
+  </div>
+
+  {# Répartition par type #}
+  <div class="section">
+    <div class="section-title">Répartition par type de panne</div>
+    <div class="by-type">
+      {% for r in byType %}
+      <div class="by-type-item">
+        <div class="num">{{ r.total }}</div>
+        <div style="font-size:10px; color:#555;">{{ r.type }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  {# Tableau #}
+  <div class="section">
+    <div class="section-title">Liste détaillée des maintenances</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Type de panne</th>
+          <th>Coût (DT)</th>
+          <th>Date</th>
+          <th>Description</th>
+          <th>ID Matériel</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in maintenances %}
+        <tr>
+          <td>
+            <span class="badge
+              {% if m.typePanne in ['Électrique','Electricité'] %}badge-warning
+              {% elseif m.typePanne == 'Mécanique' %}badge-info
+              {% elseif m.typePanne == 'Hydraulique' %}badge-primary
+              {% elseif m.typePanne == 'Pneumatique' %}badge-secondary
+              {% elseif m.typePanne == 'logicielle' %}badge-dark
+              {% elseif m.typePanne == 'Moteur' %}badge-success
+              {% elseif m.typePanne == 'Transmission' %}badge-danger
+              {% else %}badge-secondary{% endif %}">
+              {{ m.typePanne }}
+            </span>
+          </td>
+          <td style="font-weight:bold; color:#1a472a;">
+            {{ m.cout|number_format(2, ',', ' ') }} DT
+          </td>
+          <td>{{ m.dateMain ? m.dateMain|date('d/m/Y') : '—' }}</td>
+          <td style="max-width:250px;">{{ m.description ?? '—' }}</td>
+          <td>{{ m.idM ? 'M-' ~ m.idM : '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td><strong>TOTAL</strong></td>
+          <td><strong>{{ totalCout|number_format(2, ',', ' ') }} DT</strong></td>
+          <td colspan="3"></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <div class="footer">
+    AgroFlow — Rapport généré automatiquement le {{ date|date('d/m/Y à H:i') }}
+    — {{ maintenances|length }} intervention(s) — Total : {{ totalCout|number_format(2, ',', ' ') }} DT
+  </div>
+
+</body>
+</html>

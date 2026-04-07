@@ -1,6 +1,6 @@
 <!-- Gestion Matériels -->
-<div class="nav-item {% if app.request.get('_route') starts with 'machine_' or app.request.get('_route') starts with 'maintenance_' %}open{% endif %}">
-    <div class="nav-link {% if app.request.get('_route') starts with 'machine_' or app.request.get('_route') starts with 'maintenance_' %}active{% endif %}"
+<div class="nav-item {% if app.request.get('_route') starts with 'agri_machine_' %}open{% endif %}">
+    <div class="nav-link {% if app.request.get('_route') starts with 'agri_machine_' %}active{% endif %}"
          onclick="toggleMenu(this)">
         <span class="nav-icon"><i class="fa fa-tractor"></i></span>
         <span class="nav-label">Gestion Matériels</span>
@@ -8,8 +8,8 @@
     </div>
     <ul class="nav-sub">
         <li>
-            <a href="{{ path('machine_index') }}"
-               class="{% if app.request.get('_route') starts with 'machine_' %}active{% endif %}">
+            <a href="{{ path('agri_machines') }}"
+               class="{% if app.request.get('_route') == 'agri_machines' or app.request.get('_route') starts with 'agri_machine_' %}active{% endif %}">
                 <span class="sub-dot"></span> Machines
             </a>
         </li>

@@ -1,0 +1,217 @@
+{% extends 'base.html.twig' %}
+{% block title %}Statistiques — Maintenances{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid py-4">
+
+  {# Header #}
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold">
+      <i class="bi bi-bar-chart-fill text-primary"></i> Statistiques — Maintenances
+    </h2>
+    <a href="{{ path('admin_maintenances_index') }}" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> Retour
+    </a>
+  </div>
+
+  {# KPI Cards #}
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm bg-success text-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="small opacity-75">Coût total</div>
+              <div class="fs-3 fw-bold">{{ totalCout|number_format(2, ',', ' ') }} DT</div>
+            </div>
+            <i class="bi bi-cash-coin fs-1 opacity-50"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm bg-primary text-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="small opacity-75">Total interventions</div>
+              <div class="fs-3 fw-bold">{{ total }}</div>
+            </div>
+            <i class="bi bi-tools fs-1 opacity-50"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm bg-info text-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="small opacity-75">Types distincts</div>
+              <div class="fs-3 fw-bold">{{ byType|length }}</div>
+            </div>
+            <i class="bi bi-tags fs-1 opacity-50"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# Bar Chart + Tableau côte à côte #}
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-header fw-semibold bg-white">
+          <i class="bi bi-bar-chart-fill text-primary me-2"></i>
+          Nombre d'interventions par type
+        </div>
+        <div class="card-body">
+          <canvas id="barTypeChart" height="280"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-header fw-semibold bg-white">
+          <i class="bi bi-table text-secondary me-2"></i>
+          Récapitulatif par type
+        </div>
+        <div class="card-body p-0">
+          <table class="table table-hover mb-0 align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Type</th>
+                <th class="text-center">Interventions</th>
+                <th class="text-end">% du total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% set grandTotal = 0 %}
+              {% for r in byType %}
+                {% set grandTotal = grandTotal + r.total %}
+              {% endfor %}
+              {% for r in byType %}
+              <tr>
+                <td>
+                  <span class="badge
+                    {% if r.type in ['Électrique','Electricité'] %}bg-warning text-dark
+                    {% elseif r.type == 'Mécanique' %}bg-info text-dark
+                    {% elseif r.type == 'Hydraulique' %}bg-primary
+                    {% elseif r.type == 'Pneumatique' %}bg-secondary
+                    {% elseif r.type == 'logicielle' %}bg-dark
+                    {% elseif r.type == 'Moteur' %}bg-success
+                    {% elseif r.type == 'Transmission' %}bg-danger
+                    {% else %}bg-secondary{% endif %}">
+                    {{ r.type }}
+                  </span>
+                </td>
+                <td class="text-center fw-semibold">{{ r.total }}</td>
+                <td>
+                  {% if grandTotal > 0 %}
+                    {% set pct = (r.total / grandTotal * 100)|round(1) %}
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="progress flex-grow-1" style="height:18px;">
+                        <div class="progress-bar bg-info" style="width:{{ pct }}%">
+                          {{ pct }}%
+                        </div>
+                      </div>
+                    </div>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+            <tfoot class="fw-bold table-light">
+              <tr>
+                <td>Total</td>
+                <td class="text-center">{{ grandTotal }}</td>
+                <td class="text-end text-success">
+                  {{ totalCout|number_format(2, ',', ' ') }} DT
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script type="application/json" id="data-byType">
+  {{ byType|json_encode(constant('JSON_UNESCAPED_UNICODE'))|raw }}
+</script>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  function readJson(id) {
+    try {
+      const el  = document.getElementById(id);
+      const val = JSON.parse(el ? el.textContent : '[]');
+      return Array.isArray(val) ? val : Object.values(val);
+    } catch (e) {
+      console.error('Impossible de lire ' + id, e);
+      return [];
+    }
+  }
+
+  const byType = readJson('data-byType');
+
+  const palette = [
+    '#4e79a7','#f28e2b','#e15759','#76b7b2',
+    '#59a14f','#edc948','#b07aa1','#ff9da7','#9c755f','#bab0ac'
+  ];
+
+  const ctxType = document.getElementById('barTypeChart');
+  if (ctxType && byType.length > 0) {
+    new Chart(ctxType, {
+      type: 'bar',
+      data: {
+        labels: byType.map(r => r.type),
+        datasets: [{
+          label: 'Interventions',
+          data: byType.map(r => Number(r.total)),
+          backgroundColor: palette.slice(0, byType.length),
+          borderRadius: 6,
+          borderSkipped: false,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: { label: ctx => ' ' + ctx.raw + ' intervention(s)' }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: { stepSize: 1 },
+            grid: { color: '#f0f0f0' }
+          },
+          x: { grid: { display: false } }
+        }
+      }
+    });
+  } else if (ctxType) {
+    ctxType.parentElement.innerHTML =
+      '<p class="text-muted text-center py-4">Aucune donnée disponible.</p>';
+  }
+
+})();
+</script>
+{% endblock %}
