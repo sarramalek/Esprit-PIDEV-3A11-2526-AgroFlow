@@ -3,6 +3,7 @@
 namespace App\Controller\stocks;
 
 use App\Entity\stocks\Categorie;
+use App\Entity\stocks\MouvementStock;
 use App\Form\stocks\CategorieType;
 use App\Repository\stocks\CategorieRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -15,16 +16,19 @@ use Symfony\Component\Routing\Annotation\Route;
 class CategorieController extends AbstractController
 {
     #[Route('/', name: 'agri_categories', methods: ['GET'])]
-    public function index(Request $request, CategorieRepository $repository): Response
+    public function index(Request $request, CategorieRepository $repository, EntityManagerInterface $em): Response
     {
         $search = $request->query->get('q');
         $sort = $request->query->get('sort', 'date_creation');
         $direction = $request->query->get('direction', 'DESC');
 
+        // Préparation de la période pour la rotation (3 derniers mois)
+        $dateRotationDebut = new \DateTime('-3 months');
+        $dateRotationFin = new \DateTime('now');
+
         $queryBuilder = $repository->createQueryBuilder('c')
             ->leftJoin('c.articles', 'a')
             ->addSelect('COUNT(a.id) as HIDDEN articleCount')
-            // CORRECTION ICI : On utilise le nom de la propriété PHP 'quantite_en_stock'
             ->addSelect('SUM(a.quantite_en_stock) as totalQuantite')
             ->groupBy('c.id');
 
@@ -43,21 +47,53 @@ class CategorieController extends AbstractController
         }
 
         $results = $queryBuilder->getQuery()->getResult();
-
         $aujourdhui = new \DateTime();
         $categoriesData = [];
 
         foreach ($results as $result) {
             $categorie = $result[0];
             $totalStock = $result['totalQuantite'] ?? 0;
+            $articles = $categorie->getArticles();
+            $nbProduits = count($articles);
 
+            // --- 1. LOGIQUE DE ROTATION (NOUVEAU) ---
+            $totalSorties = $em->getRepository(MouvementStock::class)->createQueryBuilder('m')
+                ->select('SUM(m.quantite)')
+                ->join('m.article', 'art')
+                ->where('art.categorie = :cat')
+                ->andWhere('m.type = :type')
+                ->andWhere('m.dateMouvement BETWEEN :debut AND :fin')
+                ->setParameter('cat', $categorie)
+                ->setParameter('type', 'SORTIE')
+                ->setParameter('debut', $dateRotationDebut)
+                ->setParameter('fin', $dateRotationFin)
+                ->getQuery()
+                ->getSingleScalarResult() ?: 0;
+
+            // Indice de rotation : Sorties / Stock Actuel
+            $indiceRotation = ($totalStock > 0) ? ($totalSorties / $totalStock) : ($totalSorties > 0 ? 1 : 0);
+
+            // --- 2. LOGIQUE DES 60 JOURS (EXISTANTE) ---
             $diff = $aujourdhui->diff($categorie->getDateCreation());
+            $joursPasses = $diff->days;
+            $joursRestants = 60 - $joursPasses;
 
-            $categoriesData[] = [
-                'info' => $categorie,
-                'isNouveau' => ($diff->days <= 30),
-                'totalStock' => $totalStock
-            ];
+            $afficherAlerte = ($nbProduits === 0 && $joursPasses > 30 && $joursPasses <= 60);
+            $estExpiree = ($nbProduits === 0 && $joursPasses > 60);
+
+            if (!$estExpiree) {
+                $categoriesData[] = [
+                    'info' => $categorie,
+                    'isNouveau' => ($joursPasses <= 30),
+                    'totalStock' => $totalStock,
+                    'nbProduits' => $nbProduits,
+                    'afficherAlerte' => $afficherAlerte,
+                    'joursRestants' => $joursRestants,
+                    // Nouvelles données de rotation
+                    'totalSorties' => $totalSorties,
+                    'indiceRotation' => round($indiceRotation, 2),
+                ];
+            }
         }
 
         return $this->render('stocks/categorie/index.html.twig', [

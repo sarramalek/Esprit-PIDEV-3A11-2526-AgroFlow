@@ -2,9 +2,12 @@
 
 namespace App\Form\stocks;
 
+use App\Entity\stocks\Article;
 use App\Entity\stocks\MouvementStock;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -15,32 +18,49 @@ class MouvementStockType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            // Le type de mouvement : Entrée ou Sortie
+            // 1. Sélection de l'article concerné
+            ->add('article', EntityType::class, [
+                'class' => Article::class,
+                'choice_label' => 'nom',
+                'label' => 'Article concerné',
+                'placeholder' => 'Choisir un article...',
+                'attr' => ['class' => 'form-select']
+            ])
+
+            // 2. Type de mouvement (Entrée ou Sortie)
             ->add('type', ChoiceType::class, [
                 'label' => 'Type de mouvement',
                 'choices'  => [
                     '📈 Entrée de stock' => 'ENTREE',
                     '📉 Sortie de stock' => 'SORTIE',
                 ],
-                'attr' => ['class' => 'form-control']
+                'attr' => ['class' => 'form-select']
             ])
 
-            // La quantité (doit être un nombre)
+            // 3. Quantité
             ->add('quantite', NumberType::class, [
-                'label' => 'Quantité',
+                'label' => 'Quantité mouvementée',
                 'attr' => [
                     'class' => 'form-control',
-                    'placeholder' => 'Ex: 10.5'
+                    'placeholder' => 'Ex: 100'
                 ]
             ])
 
-            // Le motif (optionnel)
+            // 4. Date du mouvement (Crucial pour tes rapports par mois)
+            ->add('date_mouvement', DateTimeType::class, [
+                'label' => 'Date de l\'opération',
+                'widget' => 'single_text',
+                'data' => new \DateTime(), // Date actuelle par défaut
+                'attr' => ['class' => 'form-control']
+            ])
+
+            // 5. Motif / Commentaire
             ->add('motif', TextType::class, [
-                'label' => 'Motif (Raison)',
+                'label' => 'Motif ou Référence',
                 'required' => false,
                 'attr' => [
                     'class' => 'form-control',
-                    'placeholder' => 'Ex: Livraison fournisseur, Perte, Vente...'
+                    'placeholder' => 'Ex: Livraison fournisseur, Vente directe, Perte...'
                 ]
             ])
         ;
@@ -49,7 +69,6 @@ class MouvementStockType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            // On lie officiellement le formulaire à l'entité
             'data_class' => MouvementStock::class,
         ]);
     }
