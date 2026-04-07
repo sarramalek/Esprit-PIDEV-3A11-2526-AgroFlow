@@ -17,25 +17,25 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 class AuthController extends AbstractController
 {
     // ==================== LOGIN ====================
-   #[Route('/login', name: 'app_login')]
-public function login(AuthenticationUtils $authenticationUtils): Response
-{
-    if ($this->getUser()) {
-        return $this->redirectByRole($this->getUser());
+    #[Route('/login', name: 'app_login')]
+    public function login(AuthenticationUtils $authenticationUtils): Response
+    {
+        if ($this->getUser()) {
+            return $this->redirectByRole($this->getUser());
+        }
+
+        $error        = $authenticationUtils->getLastAuthenticationError();
+        $lastUsername = $authenticationUtils->getLastUsername();
+
+        $loginForm = $this->createForm(LoginFormType::class, [
+            '_username' => $lastUsername,
+        ]);
+
+        return $this->render('auth/login.html.twig', [
+            'loginForm' => $loginForm->createView(),
+            'error'     => $error,
+        ]);
     }
-
-    $error        = $authenticationUtils->getLastAuthenticationError();
-    $lastUsername = $authenticationUtils->getLastUsername();
-
-    $loginForm = $this->createForm(LoginFormType::class, [
-        '_username' => $lastUsername,
-    ]);
-
-   return $this->render('auth/login.html.twig', [
-    'loginForm' => $loginForm->createView(),
-    'error'     => $error,   // ← obligatoire
-]);
-}
 
     // ==================== REGISTER ====================
     #[Route('/register', name: 'app_register')]
@@ -58,10 +58,14 @@ public function login(AuthenticationUtils $authenticationUtils): Response
             $user->setDateCreationcpt(new \DateTime());
             $user->setDateDernierchg(new \DateTime());
 
+            // Forcer le rôle ouvrier si non défini
+            if (!$user->getRole()) {
+                $user->setRole(1);
+            }
+
             $em->persist($user);
             $em->flush();
 
-            // Redirection selon le rôle après inscription
             return $this->redirectByRole($user);
         }
 
@@ -78,13 +82,13 @@ public function login(AuthenticationUtils $authenticationUtils): Response
     }
 
     // ==================== REDIRECTION PAR ROLE ====================
-   private function redirectByRole($user): Response
-{
-    return match((int)$user->getRole()) {
-        1       => $this->redirectToRoute('ouvrier_dashboard'),
-        2       => $this->redirectToRoute('agri_home'),
-        3       => $this->redirectToRoute('admin_dashboard'),
-        default => $this->redirectToRoute('app_login'), // ← add this
-    };
-}
+    private function redirectByRole($user): Response
+    {
+        return match((int)$user->getRole()) {
+            1       => $this->redirectToRoute('ouvrier_home'),   // ← corrigé
+            2       => $this->redirectToRoute('agri_home'),
+            3       => $this->redirectToRoute('admin_dashboard'),
+            default => $this->redirectToRoute('ouvrier_home'),   // ← corrigé
+        };
+    }
 }
