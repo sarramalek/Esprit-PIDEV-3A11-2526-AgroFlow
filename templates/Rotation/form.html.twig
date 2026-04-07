@@ -1,0 +1,71 @@
+{% extends 'base_admin.html.twig' %}
+{% block title %}{{ title }} — AgroFlow{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block breadcrumb %}Rotations / {{ edit ? 'Modifier' : 'Nouvelle' }}{% endblock %}
+
+{% block stylesheets %}
+.form-card { background:var(--white); border-radius:var(--radius); box-shadow:var(--shadow); padding:32px; max-width:680px; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.form-group { display:flex; flex-direction:column; gap:6px; }
+.form-group.full { grid-column:1 / -1; }
+.form-label { font-size:13px; font-weight:600; color:var(--navy); }
+.form-input { padding:10px 14px; border:1.5px solid var(--cream-dark); border-radius:8px; font-size:14px; font-family:'DM Sans',sans-serif; color:var(--navy); background:var(--cream); width:100%; }
+.form-input:focus { outline:none; border-color:var(--green-accent); background:white; }
+.form-actions { display:flex; gap:12px; margin-top:28px; padding-top:24px; border-top:1px solid var(--cream-dark); }
+.btn-primary { display:inline-flex; align-items:center; gap:8px; background:var(--green-accent); color:white; padding:11px 24px; border-radius:var(--radius); font-size:14px; font-weight:600; border:none; cursor:pointer; }
+.btn-secondary { display:inline-flex; align-items:center; gap:8px; background:var(--cream-dark); color:var(--text-main); padding:11px 24px; border-radius:var(--radius); font-size:14px; font-weight:600; text-decoration:none; }
+/* Erreurs */
+ul.form-errors, .form-errors { list-style:none; margin:4px 0 0; padding:0; }
+ul.form-errors li, .form-errors { color:#DC2626; font-size:12px; display:flex; align-items:center; gap:4px; }
+ul.form-errors li::before { content:'⚠ '; }
+{% endblock %}
+
+{% block body %}
+<div class="form-card">
+    {# ← PAS de novalidate pour que Symfony valide #}
+    {{ form_start(form, {attr: {novalidate: 'novalidate'}}) }}
+    <div class="form-grid">
+
+        <div class="form-group full">
+            {{ form_label(form.terrain, null, {label_attr: {class: 'form-label'}}) }}
+            {{ form_widget(form.terrain, {attr: {class: 'form-input'}}) }}
+            {{ form_errors(form.terrain) }}
+        </div>
+
+        <div class="form-group full">
+            {{ form_label(form.plante, null, {label_attr: {class: 'form-label'}}) }}
+            {{ form_widget(form.plante, {attr: {class: 'form-input'}}) }}
+            {{ form_errors(form.plante) }}
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.dateDebut, null, {label_attr: {class: 'form-label'}}) }}
+            {{ form_widget(form.dateDebut, {attr: {class: 'form-input'}}) }}
+            {{ form_errors(form.dateDebut) }}
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.dateFin, null, {label_attr: {class: 'form-label'}}) }}
+            {{ form_widget(form.dateFin, {attr: {class: 'form-input'}}) }}
+            {{ form_errors(form.dateFin) }}
+        </div>
+
+        <div class="form-group">
+            {{ form_label(form.status, null, {label_attr: {class: 'form-label'}}) }}
+            {{ form_widget(form.status, {attr: {class: 'form-input'}}) }}
+            {{ form_errors(form.status) }}
+        </div>
+
+    </div>
+    <div class="form-actions">
+        <button type="submit" class="btn-primary">
+            <i class="fa fa-{{ edit ? 'floppy-disk' : 'plus' }}"></i>
+            {{ edit ? 'Enregistrer' : 'Créer la rotation' }}
+        </button>
+        <a href="{{ path('admin_rotations') }}" class="btn-secondary">
+            <i class="fa fa-arrow-left"></i> Annuler
+        </a>
+    </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}
