@@ -2,6 +2,7 @@
 
 namespace App\Entity\Materiels;
 
+use App\Entity\User\User;
 use App\Repository\Materiels\MachineRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -13,6 +14,14 @@ class Machine
     #[ORM\GeneratedValue]
     #[ORM\Column(name: 'idM', type: 'integer')]
     private ?int $id = null;
+
+    #[ORM\Column(name: 'cin', type: 'integer', nullable: true)]
+    private ?int $cin = null;
+
+    // Relation avec l'Agriculteur
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'cin', referencedColumnName: 'cin', nullable: true, onDelete: 'SET NULL')]
+    private ?User $agriculteur = null;
 
     #[ORM\Column(name: 'nom', length: 255)]
     private ?string $nom = null;
@@ -32,74 +41,78 @@ class Machine
     #[ORM\Column(name: 'dateAchat', type: 'date', nullable: true)]
     private ?\DateTimeInterface $dateAchat = null;
 
+    // ==================== Getters & Setters ====================
+
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getNom(): ?string
+    public function getCin(): ?int
     {
-        return $this->nom;
+        return $this->cin;
     }
 
-    public function setNom(?string $nom): static
+    public function setCin(?int $cin): static
     {
-        $this->nom = $nom;
+        $this->cin = $cin;
         return $this;
     }
 
-    public function getMarque(): ?string
+    // ==================== Relation Agriculteur ====================
+
+    public function getAgriculteur(): ?User
     {
-        return $this->marque;
+        return $this->agriculteur;
     }
 
-    public function setMarque(?string $marque): static
+    public function setAgriculteur(?User $agriculteur): static
     {
-        $this->marque = $marque;
+        $this->agriculteur = $agriculteur;
+        $this->cin = $agriculteur?->getCin();
         return $this;
     }
 
-    public function getModele(): ?string
+    /**
+     * Retourne le nom complet de l'agriculteur (Nom + Prénom)
+     */
+    public function getNomAgriculteur(): string
     {
-        return $this->modele;
+        if (!$this->agriculteur) {
+            return '—';
+        }
+
+        $nom = $this->agriculteur->getNom() ?? '';
+        $prenom = $this->agriculteur->getPrenom() ?? '';
+        $nomComplet = trim($nom . ' ' . $prenom);
+
+        return $nomComplet ?: '—';
     }
 
-    public function setModele(?string $modele): static
+    /**
+     * Retourne le CIN de l'agriculteur
+     */
+    public function getCinAgriculteur(): ?int
     {
-        $this->modele = $modele;
-        return $this;
+        return $this->agriculteur?->getCin() ?? $this->cin;
     }
 
-    public function getNumeroSerie(): ?string
-    {
-        return $this->numeroSerie;
-    }
+    // Autres getters/setters
+    public function getNom(): ?string { return $this->nom; }
+    public function setNom(?string $nom): static { $this->nom = $nom; return $this; }
 
-    public function setNumeroSerie(?string $numeroSerie): static
-    {
-        $this->numeroSerie = $numeroSerie;
-        return $this;
-    }
+    public function getMarque(): ?string { return $this->marque; }
+    public function setMarque(?string $marque): static { $this->marque = $marque; return $this; }
 
-    public function getEtatM(): ?string
-    {
-        return $this->etatM;
-    }
+    public function getModele(): ?string { return $this->modele; }
+    public function setModele(?string $modele): static { $this->modele = $modele; return $this; }
 
-    public function setEtatM(?string $etatM): static
-    {
-        $this->etatM = $etatM;
-        return $this;
-    }
+    public function getNumeroSerie(): ?string { return $this->numeroSerie; }
+    public function setNumeroSerie(?string $numeroSerie): static { $this->numeroSerie = $numeroSerie; return $this; }
 
-    public function getDateAchat(): ?\DateTimeInterface
-    {
-        return $this->dateAchat;
-    }
+    public function getEtatM(): ?string { return $this->etatM; }
+    public function setEtatM(?string $etatM): static { $this->etatM = $etatM; return $this; }
 
-    public function setDateAchat(?\DateTimeInterface $dateAchat): static
-    {
-        $this->dateAchat = $dateAchat;
-        return $this;
-    }
+    public function getDateAchat(): ?\DateTimeInterface { return $this->dateAchat; }
+    public function setDateAchat(?\DateTimeInterface $dateAchat): static { $this->dateAchat = $dateAchat; return $this; }
 }
