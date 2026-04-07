@@ -5,7 +5,7 @@
 {% block body %}
 <div style="padding: 30px; min-height: 100vh;">
     
-    <!-- Header avec Titre et Recherche -->
+    <!-- Header -->
     <div style="margin-bottom: 40px; display: flex; align-items: flex-end; justify-content: space-between; gap: 25px;">
         <div style="flex-shrink: 0;">
             <span style="color: #2D5A27; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 2px;">Inventaire</span>
@@ -27,23 +27,15 @@
         </div>
     </div>
 
-    <!-- Carte de contenu (Box Blanche) -->
+    <!-- Tableau -->
     <div style="background: white; border-radius: 24px; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 10px 40px rgba(0,0,0,0.04); overflow: hidden;">
         <table style="width: 100%; border-collapse: collapse;">
             <thead>
                 <tr style="border-bottom: 2px solid #f8f8f8; background-color: #fcfcfc;">
-                    <th class="th-modern">
-                        <a href="{{ path('agri_categories', {q: searchTerm, sort: 'nom', direction: (currentSort == 'nom' and currentDirection == 'ASC') ? 'DESC' : 'ASC'}) }}" style="text-decoration:none; color: {{ currentSort == 'nom' ? '#2D5A27' : '#999' }};">
-                            NOM <i class="fa fa-sort" style="font-size: 10px; margin-left: 5px;"></i>
-                        </a>
-                    </th>
+                    <th class="th-modern">NOM</th>
                     <th class="th-modern">DESCRIPTION</th>
-                    <th class="th-modern">
-                        <a href="{{ path('agri_categories', {q: searchTerm, sort: 'articles', direction: (currentSort == 'articles' and currentDirection == 'ASC') ? 'DESC' : 'ASC'}) }}" style="text-decoration:none; color: {{ currentSort == 'articles' ? '#2D5A27' : '#999' }};">
-                            STOCK DISPONIBLE <i class="fa fa-sort" style="font-size: 10px; margin-left: 5px;"></i>
-                        </a>
-                    </th>
-                    <th class="th-modern">ÉTAT</th>
+                    <th class="th-modern">STOCK DISPONIBLE</th>
+                    <th class="th-modern">ÉTAT & PERFORMANCE</th>
                     <th class="th-modern" style="text-align: right;">ACTIONS</th>
                 </tr>
             </thead>
@@ -51,42 +43,54 @@
                 {% for data in categoriesData %}
                     {% set categorie = data.info %}
                     <tr class="tr-modern">
-                        <td style="padding: 24px 20px; font-weight: 700; color: #1a1a1a;">{{ categorie.nom }}</td>
-                        <td style="padding: 24px 20px; color: #666; font-size: 14px; max-width: 300px;">{{ categorie.description ?: 'Aucune description' }}</td>
-                        <td style="padding: 24px 20px;">
-                            <div style="font-weight: 700; color: #2D5A27; font-size: 14px;">
-                                {{ data.totalStock }} unités
-                            </div>
-                            <div style="font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 3px;">
-                                répartis sur {{ categorie.articles|length }} produits
-                            </div>
-                        </td>
-                        <td style="padding: 24px 20px;">
-                            {% if data.isNouveau %}
-                                <span class="badge-modern nouveau">✨ NOUVEAU</span>
-                            {% else %}
-                                <span class="badge-modern established">Actif</span>
+                        <td style="padding: 24px 20px; font-weight: 700; color: #1a1a1a;">
+                            {{ categorie.nom }}
+                            
+                            {% if data.afficherAlerte %}
+                                <i class="fa fa-exclamation-triangle" 
+                                   style="color: #e67e22; cursor: pointer; margin-left: 10px;" 
+                                   onclick="showSursisInfo('{{ categorie.nom }}', {{ data.joursRestants }})">
+                                </i>
                             {% endif %}
                         </td>
-                        <td style="padding: 24px 20px; text-align: right;">
-                            <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                                <a href="{{ path('agri_categories_edit', {'id': categorie.id}) }}" class="action-btn-modern edit" title="Modifier">
-                                    <i class="fa fa-pencil-alt"></i>
-                                </a>
-                                <form method="post" action="{{ path('agri_categories_delete', {'id': categorie.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer cette catégorie ?');" style="display:inline;">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ categorie.id) }}">
-                                    <button class="action-btn-modern delete" title="Supprimer">
-                                        <i class="fa fa-trash-alt"></i>
-                                    </button>
-                                </form>
+                        <td style="padding: 24px 20px; color: #666; font-size: 14px;">{{ categorie.description ?: 'Aucune description' }}</td>
+                        
+                        <td style="padding: 24px 20px;">
+                            <div style="font-weight: 700; color: #2D5A27; font-size: 14px;">{{ data.totalStock }} unités</div>
+                            <div style="font-size: 11px; color: #999;">sur {{ data.nbProduits }} produits</div>
+                        </td>
+
+                        <td style="padding: 24px 20px;">
+                            <div style="display: flex; flex-direction: column; gap: 8px; max-width: 180px;">
+                                <div style="display: flex; align-items: center; justify-content: space-between;">
+                                    {% if data.isNouveau %}
+                                        <span class="badge-modern nouveau">✨ NOUVEAU</span>
+                                    {% elseif data.indiceRotation > 0.7 %}
+                                        <span class="badge-modern danger">⚡ FLUX TENDU</span>
+                                    {% elseif data.indiceRotation > 0.1 %}
+                                        <span class="badge-modern established">ACTIF</span>
+                                    {% else %}
+                                        <span class="badge-modern dormant">❄️ DORMANT</span>
+                                    {% endif %}
+                                    <span style="font-size: 10px; color: #999; font-weight: 700;">{{ data.totalSorties }} sorties</span>
+                                </div>
+                                
+                                {# Barre de rotation visuelle #}
+                                <div style="height: 4px; width: 100%; background: #eee; border-radius: 2px; overflow: hidden;">
+                                    {% set progress = (data.indiceRotation * 100) > 100 ? 100 : (data.indiceRotation * 100) %}
+                                    <div style="height: 100%; width: {{ progress }}%; background: {{ data.indiceRotation > 0.7 ? '#e74c3c' : '#2D5A27' }};"></div>
+                                </div>
                             </div>
                         </td>
-                    </tr>
-                {% else %}
-                    <tr>
-                        <td colspan="5" style="padding: 60px; text-align: center; color: #999;">
-                            <i class="fa fa-folder-open" style="font-size: 40px; display: block; margin-bottom: 15px; opacity: 0.3;"></i>
-                            Aucune catégorie trouvée.
+
+                        <td style="padding: 24px 20px; text-align: right;">
+                             <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                                <a href="{{ path('agri_categories_edit', {'id': categorie.id}) }}" class="action-btn-modern edit"><i class="fa fa-pencil-alt"></i></a>
+                                <form method="post" action="{{ path('agri_categories_delete', {'id': categorie.id}) }}" onsubmit="return confirm('Supprimer ?');" style="display:inline;">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ categorie.id) }}">
+                                    <button class="action-btn-modern delete"><i class="fa fa-trash-alt"></i></button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                 {% endfor %}
@@ -95,20 +99,35 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function showSursisInfo(nom, jours) {
+    Swal.fire({
+        title: 'Nettoyage imminent',
+        html: `La catégorie <b>${nom}</b> est vide depuis plus de 30 jours.<br><br>` +
+              `Il vous reste <b>${jours} jours</b> pour ajouter des articles avant sa suppression automatique (Limite totale : 60 jours).`,
+        icon: 'warning',
+        confirmButtonColor: '#2D5A27',
+        confirmButtonText: 'D\'accord'
+    });
+}
+</script>
+
 <style>
     .btn-modern { background-color: #1a1a1a; color: white; padding: 14px 26px; border-radius: 14px; text-decoration: none; font-weight: 600; font-size: 14px; transition: 0.3s; display: flex; align-items: center; gap: 10px; border: none; }
-    .btn-modern:hover { background-color: #2D5A27; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(45, 90, 39, 0.2); }
-    
-    .th-modern { padding: 20px; font-size: 11px; font-weight: 800; letter-spacing: 1.2px; color: #aaa; text-transform: uppercase; text-align: left; }
+    .btn-modern:hover { background-color: #2D5A27; transform: translateY(-2px); }
+    .th-modern { padding: 20px; font-size: 11px; font-weight: 800; color: #aaa; text-transform: uppercase; text-align: left; }
     .tr-modern { border-bottom: 1px solid #f1f1f1; transition: 0.2s; }
-    .tr-modern:hover { background-color: #fcfdfc; }
+    .tr-modern:hover { background-color: #fcfcfc; }
     
-    .badge-modern { padding: 6px 14px; border-radius: 10px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+    .badge-modern { padding: 4px 10px; border-radius: 8px; font-size: 9px; font-weight: 800; letter-spacing: 0.5px; }
     .badge-modern.nouveau { background: #E8F5E9; color: #2D5A27; }
-    .badge-modern.established { background: #f5f5f5; color: #777; }
-    
-    .action-btn-modern { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 12px; border: 1px solid #edf0f2; background: white; color: #7f8c8d; cursor: pointer; transition: 0.2s; text-decoration: none; }
-    .action-btn-modern:hover { background: #1a1a1a; color: white; border-color: #1a1a1a; transform: scale(1.05); }
-    .action-btn-modern.delete:hover { background: #e74c3c; color: white; border-color: #e74c3c; }
+    .badge-modern.established { background: #f0f0f0; color: #666; }
+    .badge-modern.danger { background: #FDEDEC; color: #E74C3C; }
+    .badge-modern.dormant { background: #F8F9F9; color: #95A5A6; }
+
+    .action-btn-modern { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid #edf0f2; cursor: pointer; background: white; transition: 0.2s; color: #666; text-decoration: none; }
+    .action-btn-modern.edit:hover { border-color: #2D5A27; color: #2D5A27; background: #F1F9F1; }
+    .action-btn-modern.delete:hover { border-color: #E74C3C; color: #E74C3C; background: #FDEDEC; }
 </style>
 {% endblock %}

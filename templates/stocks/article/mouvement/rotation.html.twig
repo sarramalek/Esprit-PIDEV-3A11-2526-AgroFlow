@@ -1,0 +1,88 @@
+{# templates/stocks/article/mouvement/rotation.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container mt-4">
+    <h2 class="mb-4">📊 Analyse Dynamique des Flux</h2>
+
+    <!-- 1. GRAPHIQUE DES SORTIES PAR CATÉGORIE -->
+    <div class="row mb-5">
+        <div class="col-md-8">
+            <div class="card shadow-sm p-3">
+                <h5>Volume de consommation par catégorie</h5>
+                <canvas id="rotationChart" height="100"></canvas>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm p-3 bg-light">
+                <h5>💡 Aide à la décision</h5>
+                <p id="agro-advice" class="small text-muted">Sélectionnez une période pour obtenir des conseils.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. TABLEAU STYLE "DASHBOARD" -->
+    <div class="card shadow-sm overflow-hidden">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Catégorie</th>
+                    <th>Flux de sortie</th>
+                    <th>Niveau de Rotation</th>
+                    <th>État</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in stats %}
+                <tr>
+                    <td class="fw-bold">{{ s.categorie.nom }}</td>
+                    <td>
+                        <span class="badge bg-info text-dark">{{ s.sorties }} unités</span>
+                    </td>
+                    <td style="width: 30%;">
+                        <div class="progress" style="height: 10px;">
+                            {# On capte l'indice pour la barre de progression (max 100%) #}
+                            {% set percent = (s.indice * 100) > 100 ? 100 : (s.indice * 100) %}
+                            <div class="progress-bar {{ s.indice > 0.7 ? 'bg-danger' : (s.indice < 0.2 ? 'bg-warning' : 'bg-success') }}" 
+                                 role="progressbar" style="width: {{ percent }}%"></div>
+                        </div>
+                        <small class="text-muted">Indice : {{ s.indice }}</small>
+                    </td>
+                    <td>
+                        {% if s.indice > 0.7 %}
+                            <span class="text-danger"><i class="fas fa-fire"></i> Flux Tendu</span>
+                        {% elseif s.indice < 0.2 %}
+                            <span class="text-muted"><i class="fas fa-snowflake"></i> Stock Dormant</span>
+                        {% else %}
+                            <span class="text-success"><i class="fas fa-check-circle"></i> Optimal</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Scripts pour le graphique -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('rotationChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [{% for s in stats %}'{{ s.categorie.nom }}',{% endfor %}],
+            datasets: [{
+                label: 'Unités sorties',
+                data: [{% for s in stats %}{{ s.sorties }},{% endfor %}],
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: { y: { beginAtZero: true } }
+        }
+    });
+</script>
+{% endblock %}
