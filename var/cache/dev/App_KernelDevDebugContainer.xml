@@ -9,8 +9,8 @@
     <parameter key="kernel.runtime_mode.cli">%env(not:default:kernel.runtime_mode.web:)%</parameter>
     <parameter key="kernel.runtime_mode.worker">%env(bool:default::key:worker:default:kernel.runtime_mode:)%</parameter>
     <parameter key="kernel.debug">true</parameter>
-    <parameter key="kernel.build_dir">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev</parameter>
-    <parameter key="kernel.cache_dir">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev</parameter>
+    <parameter key="kernel.build_dir">C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev</parameter>
+    <parameter key="kernel.cache_dir">C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev</parameter>
     <parameter key="kernel.logs_dir">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\log</parameter>
     <parameter key="kernel.bundles" type="collection">
       <parameter key="FrameworkBundle">Symfony\Bundle\FrameworkBundle\FrameworkBundle</parameter>
@@ -115,15 +115,15 @@
     <parameter key="translator.logging">false</parameter>
     <parameter key="translator.default_path">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/translations</parameter>
     <parameter key="debug.error_handler.throw_at">-1</parameter>
-    <parameter key="debug.container.dump">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/App_KernelDevDebugContainer.xml</parameter>
+    <parameter key="debug.container.dump">C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/App_KernelDevDebugContainer.xml</parameter>
     <parameter key="router.request_context.host">localhost</parameter>
     <parameter key="router.request_context.scheme">http</parameter>
     <parameter key="router.request_context.base_url"></parameter>
     <parameter key="router.resource">kernel::loadRoutes</parameter>
-    <parameter key="router.cache_dir">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev</parameter>
+    <parameter key="router.cache_dir">C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev</parameter>
     <parameter key="request_listener.http_port">80</parameter>
     <parameter key="request_listener.https_port">443</parameter>
-    <parameter key="serializer.mapping.cache.file">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/serialization.php</parameter>
+    <parameter key="serializer.mapping.cache.file">C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/serialization.php</parameter>
     <parameter key="cache.prefix.seed">_C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow.App_KernelDevDebugContainer</parameter>
     <parameter key="session.metadata.storage_key">_sf2_meta</parameter>
     <parameter key="session.storage.options" type="collection">
@@ -138,11 +138,11 @@
     <parameter key="session.metadata.update_threshold">0</parameter>
     <parameter key="form.type_extension.csrf.enabled">true</parameter>
     <parameter key="form.type_extension.csrf.field_name">_token</parameter>
-    <parameter key="validator.mapping.cache.file">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/validation.php</parameter>
+    <parameter key="validator.mapping.cache.file">C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/validation.php</parameter>
     <parameter key="validator.translation_domain">validators</parameter>
     <parameter key="profiler_listener.only_exceptions">false</parameter>
     <parameter key="profiler_listener.only_main_requests">false</parameter>
-    <parameter key="profiler.storage.dsn">file:C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/profiler</parameter>
+    <parameter key="profiler.storage.dsn">file:C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/profiler</parameter>
     <parameter key="doctrine.dbal.configuration.class">Doctrine\DBAL\Configuration</parameter>
     <parameter key="doctrine.data_collector.class">Doctrine\Bundle\DoctrineBundle\DataCollector\DoctrineDataCollector</parameter>
     <parameter key="doctrine.dbal.connection.event_manager.class">Symfony\Bridge\Doctrine\ContainerAwareEventManager</parameter>
@@ -209,7 +209,7 @@
     <parameter key="doctrine.orm.auto_generate_proxy_classes">true</parameter>
     <parameter key="doctrine.orm.enable_lazy_ghost_objects">true</parameter>
     <parameter key="doctrine.orm.enable_native_lazy_objects">false</parameter>
-    <parameter key="doctrine.orm.proxy_dir">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/doctrine/orm/Proxies</parameter>
+    <parameter key="doctrine.orm.proxy_dir">C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/doctrine/orm/Proxies</parameter>
     <parameter key="doctrine.orm.proxy_namespace">Proxies</parameter>
     <parameter key="doctrine.migrations.preferred_em">null</parameter>
     <parameter key="doctrine.migrations.preferred_connection">null</parameter>
@@ -440,6 +440,13 @@
         <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\User\OffreFrontController"/>
       </call>
     </service>
+    <service id="App\Controller\User\OuvrierController" class="App\Controller\User\OuvrierController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\User\OuvrierController"/>
+      </call>
+    </service>
     <service id="App\Controller\User\TacheController" class="App\Controller\User\TacheController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
@@ -532,7 +539,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.2T8vvHu"/>
+      <argument type="service" id=".service_locator.__uTjwm"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -615,7 +622,7 @@
       </argument>
     </service>
     <service id="http_cache.store" class="Symfony\Component\HttpKernel\HttpCache\Store">
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/http_cache</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/http_cache</argument>
     </service>
     <service id="url_helper" class="Symfony\Component\HttpFoundation\UrlHelper">
       <argument type="service" id="request_stack"/>
@@ -625,7 +632,7 @@
       <tag name="container.no_preload"/>
       <argument type="tagged_iterator" tag="kernel.cache_warmer"/>
       <argument>true</argument>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/App_KernelDevDebugContainerDeprecations.log</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/App_KernelDevDebugContainerDeprecations.log</argument>
     </service>
     <service id="cache_clearer" class="Symfony\Component\HttpKernel\CacheClearer\ChainCacheClearer">
       <argument type="tagged_iterator" tag="kernel.cache_clearer"/>
@@ -1622,7 +1629,7 @@
       <argument></argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -1641,7 +1648,7 @@
       <tag name="monolog.logger" channel="cache"/>
       <argument></argument>
       <argument>0</argument>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/app</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/app</argument>
       <argument type="service" id="cache.default_marshaller" on-invalid="ignore"/>
       <call method="setLogger">
         <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
@@ -1810,7 +1817,7 @@
     <service id="asset_mapper.cached_mapped_asset_factory" class="Symfony\Component\AssetMapper\Factory\CachedMappedAssetFactory">
       <tag name="container.decorator" id="asset_mapper.mapped_asset_factory" inner="asset_mapper.cached_mapped_asset_factory.inner"/>
       <argument type="service" id="asset_mapper.cached_mapped_asset_factory.inner"/>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/asset_mapper</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/asset_mapper</argument>
       <argument>true</argument>
     </service>
     <service id="asset_mapper.repository" class="Symfony\Component\AssetMapper\AssetMapperRepository">
@@ -2174,7 +2181,7 @@
         </argument>
       </argument>
       <argument type="collection">
-        <argument key="cache_dir">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/translations</argument>
+        <argument key="cache_dir">C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/translations</argument>
         <argument key="debug">true</argument>
         <argument key="resource_files" type="collection">
           <argument key="af" type="collection">
@@ -3428,7 +3435,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.2T8vvHu"/>
+      <argument type="service" id=".service_locator.__uTjwm"/>
     </service>
     <service id="debug.log_processor" class="Symfony\Bridge\Monolog\Processor\DebugProcessor">
       <tag name="kernel.reset" method="reset"/>
@@ -3531,7 +3538,7 @@
       <argument type="service" id=".service_locator.bN.V_Nq.router.default"/>
       <argument>kernel::loadRoutes</argument>
       <argument type="collection">
-        <argument key="cache_dir">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev</argument>
+        <argument key="cache_dir">C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev</argument>
         <argument key="debug">true</argument>
         <argument key="generator_class">Symfony\Component\Routing\Generator\CompiledUrlGenerator</argument>
         <argument key="generator_dumper_class">Symfony\Component\Routing\Generator\Dumper\CompiledUrlGeneratorDumper</argument>
@@ -3710,10 +3717,10 @@
           </service>
         </argument>
       </argument>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/serialization.php</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/serialization.php</argument>
     </service>
     <service id="serializer.mapping.cache.symfony" class="Psr\Cache\CacheItemPoolInterface">
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/serialization.php</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/serialization.php</argument>
       <argument type="service" id="cache.serializer"/>
       <factory class="Symfony\Component\Cache\Adapter\PhpArrayAdapter" method="create"/>
     </service>
@@ -3851,7 +3858,7 @@
       <argument>true</argument>
     </service>
     <service id="session.storage.factory.mock_file" class="Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorageFactory">
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/sessions</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/sessions</argument>
       <argument>MOCKSESSID</argument>
       <argument type="service">
         <service class="Symfony\Component\HttpFoundation\Session\Storage\MetadataBag">
@@ -4057,10 +4064,10 @@
     <service id="validator.mapping.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\ValidatorCacheWarmer">
       <tag name="kernel.cache_warmer"/>
       <argument type="service" id="validator.builder"/>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/validation.php</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/validation.php</argument>
     </service>
     <service id="validator.mapping.cache.adapter" class="Symfony\Component\Cache\Adapter\PhpArrayAdapter" constructor="create">
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/validation.php</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/validation.php</argument>
       <argument type="service" id="cache.validator"/>
     </service>
     <service id="validator.validator_factory" class="Symfony\Component\Validator\ContainerConstraintValidatorFactory">
@@ -4722,7 +4729,7 @@
       </call>
     </service>
     <service id="profiler.storage" class="Symfony\Component\HttpKernel\Profiler\FileProfilerStorage">
-      <argument>file:C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/profiler</argument>
+      <argument>file:C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/profiler</argument>
     </service>
     <service id="profiler_listener" class="Symfony\Component\HttpKernel\EventListener\ProfilerListener">
       <tag name="kernel.event_subscriber"/>
@@ -4787,7 +4794,7 @@
       <tag name="monolog.logger" channel="profiler"/>
       <tag name="data_collector" template="@WebProfiler/Collector/logger.html.twig" id="logger" priority="300"/>
       <argument type="service" id="monolog.logger.profiler" on-invalid="ignore"/>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/App_KernelDevDebugContainer</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/App_KernelDevDebugContainer</argument>
       <argument type="service" id=".virtual_request_stack" on-invalid="ignore"/>
     </service>
     <service id="data_collector.time" class="Symfony\Component\HttpKernel\DataCollector\TimeDataCollector">
@@ -5374,7 +5381,7 @@
         <argument type="service" id=".doctrine.orm.default_metadata_driver"/>
       </call>
       <call method="setProxyDir">
-        <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/doctrine/orm/Proxies</argument>
+        <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/doctrine/orm/Proxies</argument>
       </call>
       <call method="setProxyNamespace">
         <argument>Proxies</argument>
@@ -5794,7 +5801,7 @@
       <argument type="service" id="twig.loader.native_filesystem"/>
       <argument type="collection">
         <argument key="autoescape">name</argument>
-        <argument key="cache">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/twig</argument>
+        <argument key="cache">C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/twig</argument>
         <argument key="charset">UTF-8</argument>
         <argument key="debug">true</argument>
         <argument key="strict_variables">true</argument>
@@ -7458,6 +7465,9 @@
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\User\OffreFrontController" class="App\Controller\User\OffreFrontController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\User\OffreFrontController" class="App\Controller\User\OffreFrontController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\User\OffreFrontController" class="App\Controller\User\OffreFrontController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\User\OuvrierController" class="App\Controller\User\OuvrierController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\User\OuvrierController" class="App\Controller\User\OuvrierController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\User\OuvrierController" class="App\Controller\User\OuvrierController" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\User\TacheController" class="App\Controller\User\TacheController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\User\TacheController" class="App\Controller\User\TacheController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\User\TacheController" class="App\Controller\User\TacheController" autowire="true" autoconfigure="true" abstract="true"/>
@@ -8087,6 +8097,13 @@
         <argument key="tacheRepo" type="service_closure" id="App\Repository\User\TacheRepository"/>
       </argument>
     </service>
+    <service id=".service_locator.pl5XVUK" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="tacheRepo" type="service_closure" id="App\Repository\User\TacheRepository"/>
+      </argument>
+    </service>
     <service id=".service_locator.PhEk7tx" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -8131,7 +8148,7 @@
         <argument key="userRepo" type="service_closure" id="App\Repository\User\UserRepository"/>
       </argument>
     </service>
-    <service id=".service_locator.2T8vvHu" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.__uTjwm" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Controller\AdminDashboardController::index" type="service_closure" id=".service_locator.qni5W9T"/>
@@ -8172,6 +8189,9 @@
         <argument key="App\Controller\User\OffreController::show" type="service_closure" id=".service_locator.9hPlMik"/>
         <argument key="App\Controller\User\OffreFrontController::front" type="service_closure" id=".service_locator.CLxInnv"/>
         <argument key="App\Controller\User\OffreFrontController::souscrire" type="service_closure" id=".service_locator.10ih3yF"/>
+        <argument key="App\Controller\User\OuvrierController::changerStatut" type="service_closure" id=".service_locator.pl5XVUK"/>
+        <argument key="App\Controller\User\OuvrierController::home" type="service_closure" id=".service_locator.3Vzszbx"/>
+        <argument key="App\Controller\User\OuvrierController::taches" type="service_closure" id=".service_locator.3Vzszbx"/>
         <argument key="App\Controller\User\TacheController::delete" type="service_closure" id=".service_locator.Mzhqy3N"/>
         <argument key="App\Controller\User\TacheController::edit" type="service_closure" id=".service_locator.z7LPJKP"/>
         <argument key="App\Controller\User\TacheController::exportPdf" type="service_closure" id=".service_locator.3Vzszbx"/>
@@ -8224,6 +8244,9 @@
         <argument key="App\Controller\User\OffreController:show" type="service_closure" id=".service_locator.9hPlMik"/>
         <argument key="App\Controller\User\OffreFrontController:front" type="service_closure" id=".service_locator.CLxInnv"/>
         <argument key="App\Controller\User\OffreFrontController:souscrire" type="service_closure" id=".service_locator.10ih3yF"/>
+        <argument key="App\Controller\User\OuvrierController:changerStatut" type="service_closure" id=".service_locator.pl5XVUK"/>
+        <argument key="App\Controller\User\OuvrierController:home" type="service_closure" id=".service_locator.3Vzszbx"/>
+        <argument key="App\Controller\User\OuvrierController:taches" type="service_closure" id=".service_locator.3Vzszbx"/>
         <argument key="App\Controller\User\TacheController:delete" type="service_closure" id=".service_locator.Mzhqy3N"/>
         <argument key="App\Controller\User\TacheController:edit" type="service_closure" id=".service_locator.z7LPJKP"/>
         <argument key="App\Controller\User\TacheController:exportPdf" type="service_closure" id=".service_locator.3Vzszbx"/>
@@ -8958,6 +8981,12 @@
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.O2p6Lk7" method="withContext"/>
     </service>
+    <service id=".service_locator.O2p6Lk7.App\Controller\User\OuvrierController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\User\OuvrierController"/>
+      <argument>App\Controller\User\OuvrierController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.O2p6Lk7" method="withContext"/>
+    </service>
     <service id=".service_locator.O2p6Lk7.App\Controller\User\TacheController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\User\TacheController"/>
       <argument>App\Controller\User\TacheController</argument>
@@ -9156,6 +9185,7 @@
           <argument>App\Controller\User\AdminUserController</argument>
           <argument>App\Controller\User\OffreController</argument>
           <argument>App\Controller\User\OffreFrontController</argument>
+          <argument>App\Controller\User\OuvrierController</argument>
           <argument>App\Controller\User\TacheController</argument>
           <argument>App\Controller\User\TacheFrontController</argument>
           <argument>Doctrine\Bundle\DoctrineBundle\Controller\ProfilerController</argument>
@@ -10312,7 +10342,7 @@
     <service id="cache.app.recorder_inner" class="Symfony\Component\Cache\Adapter\FilesystemAdapter">
       <argument>V3r2+IAK+b</argument>
       <argument>0</argument>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/app</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/app</argument>
       <argument type="service" id="cache.default_marshaller" on-invalid="ignore"/>
       <call method="setLogger">
         <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
@@ -10322,7 +10352,7 @@
       <argument>VDMa2z-Ns2</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -10330,7 +10360,7 @@
       <argument>4SKo0Ud+iV</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -10338,7 +10368,7 @@
       <argument>elH9ffFWAh</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -10346,7 +10376,7 @@
       <argument>tvUCEMx2lP</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -10354,7 +10384,7 @@
       <argument>mKK9yXSYB9</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -10362,14 +10392,14 @@
       <argument>eBIOPthAm5</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
     <service id="cache.messenger.restart_workers_signal.recorder_inner" class="Symfony\Component\Cache\Adapter\FilesystemAdapter">
       <argument>vkC3p+AY5E</argument>
       <argument>0</argument>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/app</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/app</argument>
       <argument type="service" id="cache.default_marshaller" on-invalid="ignore"/>
       <call method="setLogger">
         <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
@@ -10379,7 +10409,7 @@
       <argument>QFs9HgwAGB</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -10389,7 +10419,7 @@
       <argument>GcFxJ9F4EC</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -10397,7 +10427,7 @@
       <argument>W+caoUdv9h</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -10582,7 +10612,7 @@
     <service id="Psr\Log\LoggerInterface" alias="monolog.logger"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.w7.f4fT" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.2T8vvHu"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.__uTjwm"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id=".Psr\Log\LoggerInterface $request.logger" alias="monolog.logger.request"/>
@@ -10628,11 +10658,12 @@
     <service id=".service_locator.d0U0rWZ" alias=".service_locator.jDXJRjC"/>
     <service id=".service_locator.ahE6ilb" alias=".service_locator.CLxInnv"/>
     <service id=".service_locator.oaRQYyJ" alias=".service_locator.10ih3yF"/>
+    <service id=".service_locator.pwqUmIQ" alias=".service_locator.pl5XVUK"/>
     <service id=".service_locator.Jc2xsDH" alias=".service_locator.z7LPJKP"/>
     <service id=".service_locator.nSvg3uO" alias=".service_locator.Mzhqy3N"/>
     <service id=".service_locator.5pebkNV" alias=".service_locator.xxq2prQ"/>
     <service id=".service_locator.4ZCMkQz" alias=".service_locator.1CkTyg5"/>
-    <service id=".service_locator.CemHSE6" alias=".service_locator.2T8vvHu"/>
+    <service id=".service_locator.mJVvCTP" alias=".service_locator.__uTjwm"/>
     <service id=".service_locator.BFrsqsn" alias=".service_locator.F9PKc.7"/>
     <service id=".service_locator.SEIKAM_" alias=".service_locator.tTIt3Io"/>
     <service id=".service_locator.XtmiKbi" alias=".service_locator.MfxSDRP"/>
@@ -10683,6 +10714,7 @@
     <service id=".service_locator.nA7ETfe" alias=".service_locator.CLxInnv"/>
     <service id=".service_locator.f8hoWXX" alias=".service_locator.10ih3yF"/>
     <service id=".service_locator.bVGge6n" alias=".service_locator.3Vzszbx"/>
+    <service id=".service_locator.vv0pyJg" alias=".service_locator.pl5XVUK"/>
     <service id=".service_locator.bGJjvaT" alias=".service_locator.PhEk7tx"/>
     <service id=".service_locator.vO.9397" alias=".service_locator.WVGOjkY"/>
     <service id=".service_locator.U0KjzJw" alias=".service_locator.z7LPJKP"/>
