@@ -3,7 +3,7 @@
 {% block title %}Journal des Flux - AgroFlow{% endblock %}
 
 {% block body %}
-<div class="dash-wrapper" style="padding: 30px; background-color: #f8f9fa; font-family: 'DM Sans', sans-serif;">
+<div class="dash-wrapper" style="padding: 30px; background-color: #fcfcf9; font-family: 'DM Sans', sans-serif;">
 
     {# --- EN-TÊTE --- #}
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
@@ -13,17 +13,19 @@
             </h2>
             <p style="margin:5px 0 0; color:#6c757d;">Historique détaillé des entrées et sorties de stock</p>
         </div>
-        <a href="{{ path('agri_produits') }}" class="btn" style="background-color: #6c757d; color: white; padding: 10px 20px; border-radius: 10px; text-decoration: none; font-weight: 600;">
-            <i class="fa fa-arrow-left"></i> Retour au stock
-        </a>
-        <a href="{{ path('app_mouvement_export_pdf', app.request.query.all) }}" class="btn btn-danger">
-    <i class="fas fa-file-pdf"></i> Exporter en PDF
-</a>
+        <div style="display: flex; gap: 10px;">
+             <a href="{{ path('app_mouvement_export_pdf', app.request.query.all) }}" class="btn btn-danger" style="border-radius: 10px; font-weight: 600; padding: 10px 20px;">
+                <i class="fas fa-file-pdf"></i> Exporter PDF
+            </a>
+            <a href="{{ path('agri_produits') }}" class="btn" style="background-color: #6c757d; color: white; padding: 10px 20px; border-radius: 10px; text-decoration: none; font-weight: 600;">
+                <i class="fa fa-arrow-left"></i> Retour
+            </a>
+        </div>
     </div>
 
     {# --- FORMULAIRE DE FILTRE --- #}
     <div style="background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 25px;">
-        <form method="GET" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) auto; gap: 15px; align-items: end;">
+        <form method="GET" action="{{ path('app_mouvement_index') }}" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) auto; gap: 15px; align-items: end;">
             
             <div class="filter-group">
                 <label style="display:block; margin-bottom:5px; font-size:13px; font-weight:600; color:#444;">Produit</label>
@@ -50,7 +52,7 @@
                     <i class="fa fa-filter"></i> Filtrer
                 </button>
                 {% if currentArticle or currentDebut or currentFin %}
-                    <a href="{{ path('app_mouvement_index') }}" class="btn-reset" title="Réinitialiser" style="background: #eef2f7; color: #666; padding: 10px 15px; border-radius: 8px; text-decoration: none;">
+                    <a href="{{ path('app_mouvement_index') }}" class="btn-reset" title="Réinitialiser" style="background: #eef2f7; color: #666; padding: 10px 15px; border-radius: 8px; text-decoration: none; display: flex; align-items: center;">
                         <i class="fa fa-undo"></i>
                     </a>
                 {% endif %}
@@ -58,10 +60,10 @@
         </form>
     </div>
 
-    {# --- TABLEAU DES MOUVEMENTS --- #}
+    {# --- TABLEAU --- #}
     <div class="card" style="background: white; border: none; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); overflow: hidden;">
         <table style="width: 100%; border-collapse: collapse;">
-            <thead style="background-color: #fcfdfc; border-bottom: 1px solid #eee;">
+            <thead style="background-color: #f8f9fa; border-bottom: 1px solid #eee;">
                 <tr>
                     <th class="th-style">Date & Heure</th>
                     <th class="th-style">Article</th>
@@ -101,7 +103,7 @@
                 <tr>
                     <td colspan="5" style="text-align:center; padding:50px; color: #999;">
                         <i class="fa fa-info-circle fa-2x" style="margin-bottom: 10px; display: block;"></i>
-                        Aucun mouvement enregistré pour cette sélection.
+                        Aucun mouvement trouvé.
                     </td>
                 </tr>
             {% endfor %}
@@ -113,6 +115,6 @@
 <style>
     .th-style { padding: 15px 25px; color: #888; font-size: 11px; text-transform: uppercase; text-align: left; font-weight: 700; }
     .filter-input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-family: inherit; }
-    .filter-input:focus { border-color: #1976d2; outline: none; box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1); }
+    .filter-input:focus { border-color: #1976d2; outline: none; }
 </style>
 {% endblock %}
