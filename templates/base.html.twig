@@ -11,15 +11,16 @@
                 body {
                     margin: 0;
                     padding: 0;
-                    background-color: #FCF8E6;
+                    background-color: #FCF8E6; /* Jaune Pâle */
                     display: flex;
                     flex-direction: column;
                     min-height: 100vh;
                     font-family: Arial, sans-serif;
                 }
                 
+                /* Navbar Haut */
                 .navbar-tech {
-                    background-color: #2C3E50;
+                    background-color: #2C3E50; /* Bleu Tech */
                     color: white;
                     padding: 15px 30px;
                     display: flex;
@@ -27,12 +28,20 @@
                     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
                     z-index: 10;
                 }
+                .navbar-tech .brand {
+                    font-size: 1.5rem;
+                    font-weight: bold;
+                    color: white;
+                    text-decoration: none;
+                }
 
+                /* Container Principal */
                 .main-container {
                     display: flex;
                     flex: 1;
                 }
 
+                /* Sidebar Gauche */
                 .sidebar-nature {
                     background-color: #2D5A27; /* Vert Nature */
                     width: 250px;
@@ -40,15 +49,16 @@
                     color: white;
                     box-shadow: 2px 0 5px rgba(0,0,0,0.1);
                 }
-                
                 .sidebar-nature ul {
                     list-style: none;
                     margin: 0;
                     padding: 0;
                 }
-
+                .sidebar-nature li {
+                    margin: 0;
+                }
                 .sidebar-nature a {
-                    color: #FCF8E6;
+                    color: #FCF8E6; /* Jaune Pâle pour le texte pour un bon contraste */
                     display: block;
                     padding: 15px 25px;
                     text-decoration: none;
@@ -56,18 +66,18 @@
                     border-left: 4px solid transparent;
                     transition: all 0.3s ease;
                 }
-
                 .sidebar-nature a:hover {
                     background-color: rgba(255, 255, 255, 0.1);
                     border-left: 4px solid #FCF8E6;
                 }
 
+                /* Contenu Central */
                 .content-area {
                     flex: 1;
                     padding: 30px;
-                    background-color: #FCF8E6;
+                    background-color: #FCF8E6; /* Jaune Pâle */
                 }
-
+                /* Style ajouté pour le hover du menu */
                 .navmenu a:hover {
                     color: #2D5A27 !important;
                 }
@@ -87,37 +97,35 @@
             </div>
             
             <nav id="navmenu" class="navmenu" style="display: flex; gap: 30px; align-items: center;">
-                <a href="/" style="color: #2C3E50; text-decoration: none; font-weight: 600; font-size: 15px;">Accueil</a>
-                <a href="/#services" style="color: #2C3E50; text-decoration: none; font-weight: 600; font-size: 15px;">Services</a>
-                <a href="{{ path('app_about') }}" style="color: #2C3E50; text-decoration: none; font-weight: 600; font-size: 15px;">Notre Équipe</a>
+                <a href="/" style="color: #2C3E50; text-decoration: none; font-weight: 600; font-size: 15px; transition: color 0.3s;">Accueil</a>
+                <a href="/#services" style="color: #2C3E50; text-decoration: none; font-weight: 600; font-size: 15px; transition: color 0.3s;">Services</a>
+                <a href="/#posts" style="color: #2C3E50; text-decoration: none; font-weight: 600; font-size: 15px; transition: color 0.3s;">Publications</a>
+                <a href="/#testimonials" style="color: #2C3E50; text-decoration: none; font-weight: 600; font-size: 15px; transition: color 0.3s;">Avis</a>
+                <a href="/#ads" style="color: #2C3E50; text-decoration: none; font-weight: 600; font-size: 15px; transition: color 0.3s;">Tutos & Partenaires</a>
+                <a href="{{ path('app_about') }}" style="color: #2C3E50; text-decoration: none; font-weight: 600; font-size: 15px; transition: color 0.3s;">Notre Équipe</a>
             </nav>
             
             <div style="display: flex; gap: 15px; align-items: center;">
                 <a href="{{ path('app_login') }}" style="color: #2C3E50; text-decoration: none; font-weight: 600; font-size: 15px;">Connexion</a>
-                <a href="{{ path('app_register') }}" style="background-color: #2D5A27; color: white; padding: 10px 25px; border-radius: 5px; text-decoration: none; font-weight: 600; font-size: 15px;">S'inscrire</a>
+                <a href="{{ path('app_register') }}" style="background-color: #2D5A27; color: white; padding: 10px 25px; border-radius: 5px; text-decoration: none; font-weight: 600; font-size: 15px; transition: background 0.3s;">S'inscrire</a>
             </div>
         </header>
 
         <div class="main-container">
             <!-- Sidebar -->
-            <aside class="sidebar-nature">
+            <aside class="sidebar-nature" style="display: none;">
                 <nav>
                     <ul>
-                        <li style="padding: 10px 25px; color: #FCF8E6; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; opacity: 0.7;">Gestion Élevage</li>
                         <li><a href="{{ path('app_animaux_index') }}">Nos Animaux</a></li>
                         <li><a href="{{ path('app_examens_index') }}">Examens</a></li>
-                        
-                        <li style="padding: 10px 25px; color: #FCF8E6; font-weight: bold; font-size: 0.8rem; text-transform: uppercase; opacity: 0.7; margin-top: 15px;">Gestion Stocks</li>
-<li><a href="#">📦 Produits</a></li>
-<li><a href="#">📂 Catégories</a></li>
                     </ul>
                 </nav>
             </aside>
 
             <!-- Contenu central -->
-            <main class="content-area">
+            <main class="content-area" style="flex: 1; padding: 0;">
                 {% block body %}
-                    <!-- Le contenu des autres pages s'affichera ici -->
+                    <!-- Le contenu spécifique à la page va s'afficher ici -->
                 {% endblock %}
             </main>
         </div>
