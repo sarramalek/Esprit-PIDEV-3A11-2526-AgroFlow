@@ -17,18 +17,18 @@ class MachineType extends AbstractType
     {
         $builder
             ->add('nom', TextType::class, [
-                'label' => 'Nom du Machine',
+                'label' => 'Nom de la machine',
                 'constraints' => [
-                    new Assert\NotBlank(['message' => 'Nom du Machine est obligatoire']),
+                    new Assert\NotBlank(['message' => 'Le nom de la machine est obligatoire']),
                     new Assert\Length([
                         'min'        => 3,
                         'max'        => 100,
-                        'minMessage' => 'Nom du Machine doit contenir au moins {{ limit }} caractères',
-                        'maxMessage' => 'Nom du Machine ne peut pas dépasser {{ limit }} caractères',
+                        'minMessage' => 'Le nom doit contenir au moins {{ limit }} caractères',
+                        'maxMessage' => 'Le nom ne peut pas dépasser {{ limit }} caractères',
                     ]),
                     new Assert\Regex([
                         'pattern' => '/^[a-zA-ZÀ-ÿ0-9\s\-]+$/',
-                        'message' => 'Le type de tracteur ne peut contenir que des lettres, chiffres, espaces et tirets',
+                        'message' => 'Le nom ne peut contenir que des lettres, chiffres, espaces et tirets',
                     ]),
                 ],
                 'attr' => [

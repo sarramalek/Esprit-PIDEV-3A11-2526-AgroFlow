@@ -13,59 +13,66 @@ class MachineRepository extends ServiceEntityRepository
         parent::__construct($registry, Machine::class);
     }
 
-    /**
-     * @return Machine[]
-     */
     public function search(array $filters = []): array
     {
-        $qb = $this->createQueryBuilder('m');
+        $qb = $this->createQueryBuilder('m')
+            ->leftJoin('m.agriculteur', 'u')
+            ->addSelect('u');
 
-        // ── Recherche full-text ──
+        // Filtre par CIN (obligatoire)
+        if (!empty($filters['cin'])) {
+            $qb->andWhere('m.cin = :cin')
+               ->setParameter('cin', (int) $filters['cin']);
+        }
+
+        // Recherche textuelle (nom, marque, modèle, numéro série)
         if (!empty($filters['search'])) {
             $search = '%' . $filters['search'] . '%';
             $qb->andWhere(
                 $qb->expr()->orX(
-                    $qb->expr()->like('m.nom',         ':search'),
-                    $qb->expr()->like('m.marque',      ':search'),
-                    $qb->expr()->like('m.modele',      ':search'),
-                    $qb->expr()->like('m.numeroSerie', ':search'),
+                    $qb->expr()->like('m.nom', ':search'),
+                    $qb->expr()->like('m.marque', ':search'),
+                    $qb->expr()->like('m.modele', ':search'),
+                    $qb->expr()->like('m.numeroSerie', ':search')
                 )
             )->setParameter('search', $search);
         }
 
-        // ── Filtre par état ──
-        if (!empty($filters['etat'])) {
+        // Filtre par état
+        if (!empty($filters['etat']) && $filters['etat'] !== '') {
             $qb->andWhere('m.etatM = :etat')
                ->setParameter('etat', $filters['etat']);
         }
 
-        // ── Tri sécurisé ──
-        $allowedSortFields = ['nom', 'marque', 'modele', 'etatM', 'dateAchat'];
-        $sortBy  = in_array($filters['sortBy'] ?? '', $allowedSortFields, true)
-                    ? $filters['sortBy'] : 'dateAchat';
-        $sortDir = strtoupper($filters['sortDir'] ?? 'ASC') === 'DESC' ? 'DESC' : 'ASC';
-
-        $qb->orderBy('m.' . $sortBy, $sortDir);
+        // Tri
+        $allowedSortFields = ['nom', 'marque', 'modele', 'etatM', 'dateAchat', 'id'];
+        $sortBy = in_array($filters['sortBy'] ?? 'dateAchat', $allowedSortFields, true) 
+                  ? $filters['sortBy'] 
+                  : 'dateAchat';
+        
+        $sortDir = strtoupper($filters['sortDir'] ?? 'DESC') === 'DESC' ? 'DESC' : 'ASC';
+        
+        if ($sortBy === 'dateAchat') {
+            $qb->addOrderBy('m.dateAchat', $sortDir);
+            $qb->addOrderBy('m.id', $sortDir);
+        } else {
+            $qb->orderBy('m.' . $sortBy, $sortDir);
+        }
 
         return $qb->getQuery()->getResult();
     }
 
-    /**
-     * @return array{total: int, parEtat: array, parMarque: array, achatsParAnnee: array}
-     */
     public function getStatistiques(): array
     {
-        // ── Total ──
         $total = (int) $this->createQueryBuilder('m')
             ->select('COUNT(m.id)')
             ->getQuery()
             ->getSingleScalarResult();
 
-        // ── Répartition par état ──
         $rawEtat = $this->createQueryBuilder('m')
             ->select('m.etatM AS etat, COUNT(m.id) AS nb')
             ->groupBy('m.etatM')
-            ->orderBy('COUNT(m.id)', 'DESC') // ✅ expression DQL, pas l'alias
+            ->orderBy('nb', 'DESC')
             ->getQuery()
             ->getArrayResult();
 
@@ -74,11 +81,10 @@ class MachineRepository extends ServiceEntityRepository
             $parEtat[$row['etat']] = (int) $row['nb'];
         }
 
-        // ── Répartition par marque ──
         $rawMarque = $this->createQueryBuilder('m')
             ->select('m.marque AS marque, COUNT(m.id) AS nb')
             ->groupBy('m.marque')
-            ->orderBy('COUNT(m.id)', 'DESC') // ✅ correction alias invalide
+            ->orderBy('nb', 'DESC')
             ->getQuery()
             ->getArrayResult();
 
@@ -87,26 +93,16 @@ class MachineRepository extends ServiceEntityRepository
             $parMarque[$row['marque']] = (int) $row['nb'];
         }
 
-        // ── Achats par année ──
-        // On récupère les dates en PHP pour éviter YEAR() non portable en Doctrine
-        $rows = $this->createQueryBuilder('m')
-            ->select('m.dateAchat')
-            ->where('m.dateAchat IS NOT NULL')
+        return compact('total', 'parEtat', 'parMarque');
+    }
+
+    public function findByCin(int $cin): array
+    {
+        return $this->createQueryBuilder('m')
+            ->andWhere('m.cin = :cin')
+            ->setParameter('cin', $cin)
+            ->orderBy('m.dateAchat', 'DESC')
             ->getQuery()
-            ->getArrayResult();
-
-        $achatsParAnnee = [];
-        foreach ($rows as $row) {
-            // dateAchat peut être un \DateTimeInterface ou une string selon le mapping
-            $date  = $row['dateAchat'];
-            $annee = $date instanceof \DateTimeInterface
-                ? $date->format('Y')
-                : (new \DateTime($date))->format('Y');
-
-            $achatsParAnnee[$annee] = ($achatsParAnnee[$annee] ?? 0) + 1;
-        }
-        ksort($achatsParAnnee); // tri chronologique
-
-        return compact('total', 'parEtat', 'parMarque', 'achatsParAnnee');
+            ->getResult();
     }
 }
