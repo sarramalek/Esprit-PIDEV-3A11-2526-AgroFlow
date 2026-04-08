@@ -60,6 +60,8 @@
     background: #f9fcf7;
     transition: all 0.15s;
     font-family: inherit;
+    box-shadow: none;
+    outline: none;
 }
 .af-control:focus {
     outline: none;
@@ -77,11 +79,21 @@
 select.af-control {
     appearance: none;
     -webkit-appearance: none;
+    -moz-appearance: none;
     cursor: pointer;
+    border: 1.5px solid #d4e8d4 !important;
+    box-shadow: none !important;
+    outline: none !important;
+    background-color: #f9fcf7;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237a9a7a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 0.85rem center;
     padding-right: 2.2rem;
+}
+select.af-control:focus {
+    border-color: #2d6a2d !important;
+    box-shadow: 0 0 0 3px rgba(45,106,45,.08) !important;
+    outline: none !important;
 }
 textarea.af-control {
     resize: vertical;
@@ -169,144 +181,119 @@ textarea.af-control {
 </style>
 
 <div class="af-form">
-    {{ form_start(form, {'attr': {'class': 'af-form-grid', 'novalidate': 'novalidate'}}) }}
+    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
 
-    {# ── Type de panne ── #}
-    <div class="af-form-group">
-        <label class="af-form-label">
-            Type de panne <span class="required">*</span>
-        </label>
-        <div class="af-input-group">
-            <span class="af-icon">🔧</span>
-            {{ form_widget(form.typePanne, {
-                'attr': {
-                    'class': 'af-control' ~ (form.typePanne.vars.errors|length > 0 ? ' is-invalid' : ''),
-                    'onchange': 'afValidate(this)'
-                }
-            }) }}
-        </div>
-        {% if form.typePanne.vars.errors|length > 0 %}
-            <div class="af-error-msg visible">
-                {% for error in form.typePanne.vars.errors %}{{ error.message }}{% endfor %}
+    <div class="af-form-grid">
+
+        {# ── Type de panne ── #}
+        <div class="af-form-group">
+            <label class="af-form-label">
+                Type de panne <span class="required">*</span>
+            </label>
+            <div class="af-input-group">
+                <span class="af-icon">🔧</span>
+                {{ form_widget(form.typePanne, {
+                    'attr': {
+                        'class': 'af-control' ~ (form.typePanne.vars.errors|length > 0 ? ' is-invalid' : ''),
+                        'onchange': 'afValidate(this)'
+                    }
+                }) }}
             </div>
-        {% else %}
-            <div class="af-error-msg" data-msg="Veuillez sélectionner un type de panne."></div>
-        {% endif %}
-    </div>
-
-    {# ── Coût ── #}
-    <div class="af-form-group">
-        <label class="af-form-label">
-            Coût (DT) <span class="required">*</span>
-        </label>
-        <div class="af-input-group">
-            <span class="af-icon">💰</span>
-            {{ form_widget(form.cout, {
-                'attr': {
-                    'class': 'af-control' ~ (form.cout.vars.errors|length > 0 ? ' is-invalid' : ''),
-                    'placeholder': 'Ex: 150.00',
-                    'step': '0.01',
-                    'oninput': 'afValidate(this)'
-                }
-            }) }}
-            <button type="button" class="af-clear" onclick="afClear(this)" title="Effacer">✕</button>
+            {% if form.typePanne.vars.errors|length > 0 %}
+                <div class="af-error-msg visible">
+                    {% for error in form.typePanne.vars.errors %}{{ error.message }}{% endfor %}
+                </div>
+            {% endif %}
         </div>
-        {% if form.cout.vars.errors|length > 0 %}
-            <div class="af-error-msg visible">
-                {% for error in form.cout.vars.errors %}{{ error.message }}{% endfor %}
-            </div>
-        {% else %}
-            <div class="af-error-msg" data-msg="Le coût doit être un nombre positif."></div>
-        {% endif %}
-    </div>
 
-    {# ── Date ── #}
-    <div class="af-form-group">
-        <label class="af-form-label">
-            Date de maintenance <span class="required">*</span>
-        </label>
-        <div class="af-input-group">
-            <span class="af-icon">📅</span>
-            {{ form_widget(form.dateMain, {
-                'attr': {
-                    'class': 'af-control' ~ (form.dateMain.vars.errors|length > 0 ? ' is-invalid' : ''),
-                    'onchange': 'afValidate(this)'
-                }
-            }) }}
+        {# ── Coût ── #}
+        <div class="af-form-group">
+            <label class="af-form-label">
+                Coût (DT) <span class="required">*</span>
+            </label>
+            <div class="af-input-group">
+                <span class="af-icon">💰</span>
+                {{ form_widget(form.cout, {
+                    'attr': {
+                        'class': 'af-control' ~ (form.cout.vars.errors|length > 0 ? ' is-invalid' : ''),
+                        'placeholder': 'Ex: 150.00',
+                        'step': '0.01',
+                        'oninput': 'afValidate(this)'
+                    }
+                }) }}
+                <button type="button" class="af-clear" onclick="afClear(this)" title="Effacer">✕</button>
+            </div>
+            {% if form.cout.vars.errors|length > 0 %}
+                <div class="af-error-msg visible">
+                    {% for error in form.cout.vars.errors %}{{ error.message }}{% endfor %}
+                </div>
+            {% endif %}
         </div>
-        {% if form.dateMain.vars.errors|length > 0 %}
-            <div class="af-error-msg visible">
-                {% for error in form.dateMain.vars.errors %}{{ error.message }}{% endfor %}
-            </div>
-        {% else %}
-            <div class="af-error-msg" data-msg="La date ne peut pas être dans le futur."></div>
-        {% endif %}
-    </div>
 
-    {# ── ID Machine ── #}
-    <div class="af-form-group">
-        <label class="af-form-label">
-            ID Machine
-        </label>
-        <div class="af-input-group">
-            <span class="af-icon">🚜</span>
-            {{ form_widget(form.idM, {
-                'attr': {
-                    'class': 'af-control' ~ (form.idM.vars.errors|length > 0 ? ' is-invalid' : ''),
-                    'placeholder': 'Ex : 3',
-                    'oninput': 'afValidate(this)'
-                }
-            }) }}
-            <button type="button" class="af-clear" onclick="afClear(this)" title="Effacer">✕</button>
+        {# ── Date ── #}
+        <div class="af-form-group">
+            <label class="af-form-label">
+                Date de maintenance <span class="required">*</span>
+            </label>
+            <div class="af-input-group">
+                <span class="af-icon">📅</span>
+                {{ form_widget(form.dateMain, {
+                    'attr': {
+                        'class': 'af-control' ~ (form.dateMain.vars.errors|length > 0 ? ' is-invalid' : ''),
+                        'onchange': 'afValidate(this)'
+                    }
+                }) }}
+            </div>
+            {% if form.dateMain.vars.errors|length > 0 %}
+                <div class="af-error-msg visible">
+                    {% for error in form.dateMain.vars.errors %}{{ error.message }}{% endfor %}
+                </div>
+            {% endif %}
         </div>
-        {% if form.idM.vars.errors|length > 0 %}
-            <div class="af-error-msg visible">
-                {% for error in form.idM.vars.errors %}{{ error.message }}{% endfor %}
-            </div>
-        {% else %}
-            <div class="af-error-msg" data-msg="L'ID machine doit être un entier positif."></div>
-        {% endif %}
-        <div class="af-hint">Entrez l'ID de la machine concernée (optionnel)</div>
-    </div>
 
-    {# ── Description (pleine largeur) ── #}
-    <div class="af-form-group full-width">
-        <label class="af-form-label">
-            Description
-        </label>
-        <div class="af-input-group">
-            <span class="af-icon">📝</span>
-            {{ form_widget(form.description, {
-                'attr': {
-                    'class': 'af-control' ~ (form.description.vars.errors|length > 0 ? ' is-invalid' : ''),
-                    'placeholder': 'Décrivez l\'intervention effectuée...',
-                    'rows': 4,
-                    'oninput': 'afValidate(this)'
-                }
-            }) }}
-            <button type="button" class="af-clear" onclick="afClear(this)" title="Effacer">✕</button>
+        {# ── Description (pleine largeur) ── #}
+        <div class="af-form-group full-width">
+            <label class="af-form-label">
+                Description
+            </label>
+            <div class="af-input-group">
+                <span class="af-icon">📝</span>
+                {{ form_widget(form.description, {
+                    'attr': {
+                        'class': 'af-control' ~ (form.description.vars.errors|length > 0 ? ' is-invalid' : ''),
+                        'placeholder': 'Décrivez l\'intervention effectuée...',
+                        'rows': 4,
+                        'oninput': 'afValidate(this)'
+                    }
+                }) }}
+                <button type="button" class="af-clear" onclick="afClear(this)" title="Effacer">✕</button>
+            </div>
+            <div class="af-hint">Minimum 5 caractères, maximum 1000 caractères.</div>
+            {% if form.description.vars.errors|length > 0 %}
+                <div class="af-error-msg visible">
+                    {% for error in form.description.vars.errors %}{{ error.message }}{% endfor %}
+                </div>
+            {% endif %}
         </div>
-        <div class="af-hint">Minimum 5 caractères, maximum 1000 caractères.</div>
-        {% if form.description.vars.errors|length > 0 %}
-            <div class="af-error-msg visible">
-                {% for error in form.description.vars.errors %}{{ error.message }}{% endfor %}
-            </div>
-        {% else %}
-            <div class="af-error-msg" data-msg="La description doit contenir au moins 5 caractères."></div>
-        {% endif %}
-    </div>
 
-    {# ── Actions ── #}
-    <div class="af-form-actions" style="grid-column: 1 / -1;">
-        <button type="submit" class="btn-save">
-            {{ btn_label|default('💾 Enregistrer') }}
-        </button>
-        <a href="{{ cancel_url|default(path('agri_maintenances_index')) }}" class="btn-cancel">
-            ✕ Annuler
-        </a>
-    </div>
+        {# ── Actions ── #}
+        <div class="af-form-actions" style="grid-column: 1 / -1;">
+            <button type="submit" class="btn-save">
+                {{ btn_label|default('💾 Enregistrer') }}
+            </button>
+            <a href="{{ cancel_url|default(path('agri_maintenances_index')) }}" class="btn-cancel">
+                ✕ Annuler
+            </a>
+        </div>
 
-    {{ form_end(form) }}
+    </div>{# fin af-form-grid #}
+
+    {# ✅ CORRECTION DÉFINITIVE : empêche Symfony d'afficher idM et autres champs cachés #}
+    {{ form_end(form, {'render_rest': false}) }}
+
+    {# ✅ On garde uniquement le token CSRF (obligatoire, invisible) #}
+    {{ form_widget(form._token) }}
+
 </div>
 
 <script>
@@ -314,15 +301,13 @@ function afValidate(input) {
     const group = input.closest('.af-form-group');
     const errorDiv = group.querySelector('.af-error-msg');
     const clearBtn = group.querySelector('.af-clear');
-    
-    // Afficher/masquer le bouton clear
+
     if (clearBtn && input.value && input.value.length > 0) {
         clearBtn.classList.add('visible');
     } else if (clearBtn) {
         clearBtn.classList.remove('visible');
     }
-    
-    // Validation simple côté client
+
     if (input.name === 'maintenance[cout]') {
         const val = parseFloat(input.value);
         if (input.value && (isNaN(val) || val <= 0)) {
@@ -334,19 +319,7 @@ function afValidate(input) {
             if (errorDiv) errorDiv.classList.remove('visible');
         }
     }
-    
-    if (input.name === 'maintenance[idM]' && input.value) {
-        const val = parseInt(input.value);
-        if (isNaN(val) || val <= 0) {
-            input.classList.add('is-invalid');
-            if (errorDiv) errorDiv.classList.add('visible');
-            return false;
-        } else {
-            input.classList.remove('is-invalid');
-            if (errorDiv) errorDiv.classList.remove('visible');
-        }
-    }
-    
+
     if (input.name === 'maintenance[description]' && input.value) {
         if (input.value.length < 5) {
             input.classList.add('is-invalid');
@@ -357,7 +330,7 @@ function afValidate(input) {
             if (errorDiv) errorDiv.classList.remove('visible');
         }
     }
-    
+
     return true;
 }
 
@@ -371,16 +344,11 @@ function afClear(btn) {
         if (errorDiv) errorDiv.classList.remove('visible');
         btn.classList.remove('visible');
         input.focus();
-        
-        // Déclencher l'événement change pour mettre à jour
-        if (input.dispatchEvent) {
-            input.dispatchEvent(new Event('change', { bubbles: true }));
-            input.dispatchEvent(new Event('input', { bubbles: true }));
-        }
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+        input.dispatchEvent(new Event('input', { bubbles: true }));
     }
 }
 
-// Initialiser les clear buttons
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.af-control').forEach(input => {
         const group = input.closest('.af-form-group');
