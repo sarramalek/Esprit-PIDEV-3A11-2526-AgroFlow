@@ -336,7 +336,7 @@
         </svg>
       </span>
       <input type="text" id="searchInput"
-             placeholder="Rechercher (type, description…)"
+             placeholder="Rechercher (type, description, machine…)"
              oninput="onSearchInput(this)">
       <button class="toolbar__search-clear" id="clearSearch"
               onclick="clearSearch()" title="Effacer">✕</button>
@@ -380,6 +380,7 @@
         <option value="cout">Trier par coût</option>
         <option value="type">Trier par type</option>
         <option value="idm">Trier par ID machine</option>
+        <option value="nom">Trier par nom machine</option>
       </select>
     </div>
 
@@ -421,8 +422,7 @@
             <th>Type de panne</th>
             <th>Coût (DT)</th>
             <th>Date</th>
-            <th>ID Machine</th>
-            <th>Nom Machine</th>
+            <th>Machine</th>
             <th>Description</th>
             <th>Actions</th>
           </tr>
@@ -450,6 +450,7 @@
               data-cout="{{ m.cout }}"
               data-date="{{ m.dateMain ? m.dateMain|date('Y-m-d') : '0000-00-00' }}"
               data-idm="{{ m.idM|default(0) }}"
+              data-nom="{{ m.nom|default('')|lower }}"
             >
               <td class="td-type">
                 <span class="badge badge--{{ bc }}">
@@ -461,15 +462,15 @@
                 {{ m.dateMain ? m.dateMain|date('d/m/Y') : '—' }}
               </td>
               <td class="td-machine">
-                {% if m.idM %}
-                  <span class="machine-badge">🚜 #{{ m.idM }}</span>
-                {% else %}
-                  <span class="machine-badge machine-badge--none">Non assigné</span>
-                {% endif %}
-              </td>
-              <td class="td-machine">
-                {% if m.nom %}
-                  <span class="machine-name">{{ m.nom }}</span>
+                {% if m.idM and m.nom %}
+                  <div class="machine-badge">🚜 #{{ m.idM }}</div>
+                  <div class="machine-name" style="margin-top: 4px;">{{ m.nom }}</div>
+                {% elseif m.idM %}
+                  <div class="machine-badge">🚜 #{{ m.idM }}</div>
+                  <div class="machine-name machine-badge--none" style="margin-top: 4px;">Nom non disponible</div>
+                {% elseif m.nom %}
+                  <div class="machine-badge machine-badge--none">ID non assigné</div>
+                  <div class="machine-name" style="margin-top: 4px;">{{ m.nom }}</div>
                 {% else %}
                   <span class="machine-badge machine-badge--none">—</span>
                 {% endif %}
@@ -604,7 +605,8 @@ function filterTable() {
   rows.forEach(row => {
     const rowType = row.dataset.type || '';
     const rowDesc = row.dataset.desc || '';
-    const matchSearch = !search || rowType.includes(search) || rowDesc.includes(search);
+    const rowNom  = row.dataset.nom || '';
+    const matchSearch = !search || rowType.includes(search) || rowDesc.includes(search) || rowNom.includes(search);
     const matchType   = !typeVal || rowType === typeVal;
     if (matchSearch && matchType) {
       row.style.display = '';
@@ -620,6 +622,7 @@ function filterTable() {
     else if (sortVal === 'date') { valA = a.dataset.date || ''; valB = b.dataset.date || ''; }
     else if (sortVal === 'type') { valA = a.dataset.type || ''; valB = b.dataset.type || ''; }
     else if (sortVal === 'idm')  { valA = parseInt(a.dataset.idm) || 0; valB = parseInt(b.dataset.idm) || 0; }
+    else if (sortVal === 'nom')  { valA = a.dataset.nom || ''; valB = b.dataset.nom || ''; }
     else { valA = a.dataset.date || ''; valB = b.dataset.date || ''; }
     
     if (valA < valB) return dirVal === 'asc' ? -1 : 1;

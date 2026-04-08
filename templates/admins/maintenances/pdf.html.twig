@@ -2,206 +2,165 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Rapport Maintenances</title>
+  <title>Rapport Maintenances — AgroFlow</title>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family: Arial, sans-serif; font-size:12px; color:#222; background:#fff; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; font-size:12px; color:#1a1a18; background:#fff; }
 
-    .header {
-      background: #1a472a;
-      color: white;
-      padding: 20px 30px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .header h1 { font-size:22px; }
-    .header .meta { font-size:11px; opacity:.8; }
+    /* TOOLBAR */
+    .toolbar { background: #1d3d17; padding: 12px 32px; display: flex; gap: 12px; align-items: center; }
+    .toolbar button { padding: 8px 18px; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+    .btn-print { background: #3f7526; color: #fff; }
+    .btn-close  { background: rgba(255,255,255,.12); color: #fff; border: 1px solid rgba(255,255,255,.2) !important; }
+    .toolbar-tip { color: rgba(255,255,255,.45); font-size: 11px; margin-left: auto; }
 
-    .kpi-row {
-      display: flex;
-      gap: 15px;
-      padding: 15px 30px;
-      background: #f8f9fa;
-      border-bottom: 2px solid #dee2e6;
-    }
-    .kpi {
-      flex:1; background:#fff; border:1px solid #dee2e6;
-      border-radius:6px; padding:10px 15px; text-align:center;
-    }
-    .kpi .val { font-size:20px; font-weight:bold; color:#1a472a; }
-    .kpi .lbl { font-size:10px; color:#666; margin-top:2px; }
+    /* DOC */
+    .doc { padding: 32px 40px 48px; max-width: 900px; margin: 0 auto; }
 
-    .section { padding: 15px 30px; }
-    .section-title {
-      font-size:13px; font-weight:bold;
-      border-left:4px solid #1a472a;
-      padding-left:10px; margin-bottom:10px;
-      color:#1a472a;
-    }
+    /* HEADER */
+    .doc-header { background: #1d3d17; border-radius: 10px; padding: 22px 28px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
+    .doc-header h1 { font-size: 18px; font-weight: 600; color: #fff; }
+    .doc-header-meta { font-size: 11px; color: rgba(200,230,176,.65); margin-top: 4px; }
+    .brand { font-size: 15px; font-weight: 600; color: #c8e6b0; text-align: right; }
+    .brand-sub { font-size: 10px; color: rgba(200,230,176,.55); margin-top: 2px; }
 
-    table { width:100%; border-collapse:collapse; font-size:11px; }
-    thead tr { background:#1a472a; color:white; }
-    thead th { padding:7px 10px; text-align:left; }
-    tbody tr:nth-child(even) { background:#f4f7f4; }
-    tbody td { padding:6px 10px; border-bottom:1px solid #e9ecef; }
-    tfoot td { background:#e8f5e9; font-weight:bold; padding:7px 10px; }
+    /* KPI */
+    .kpi-strip { display: flex; gap: 10px; margin-bottom: 22px; }
+    .kpi-item { flex: 1; background: #f5f2ec; border: 1px solid #ece7dd; border-radius: 8px; padding: 12px 16px; text-align: center; }
+    .kpi-val { font-size: 18px; font-weight: 600; color: #2d5a1b; }
+    .kpi-lbl { font-size: 10px; color: #9e9d95; margin-top: 3px; text-transform: uppercase; letter-spacing: .5px; }
 
-    .badge {
-      display:inline-block; padding:2px 8px;
-      border-radius:10px; font-size:10px; font-weight:bold; color:#fff;
-    }
-    .badge-warning { background:#ffc107; color:#000; }
-    .badge-info    { background:#0dcaf0; color:#000; }
-    .badge-primary { background:#0d6efd; }
-    .badge-secondary { background:#6c757d; }
-    .badge-success { background:#198754; }
-    .badge-danger  { background:#dc3545; }
-    .badge-dark    { background:#212529; }
+    /* SECTION TITLE */
+    .section-title { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #2d5a1b; border-left: 3px solid #2d5a1b; padding-left: 10px; margin-bottom: 12px; }
 
-    .by-type { display:flex; flex-wrap:wrap; gap:10px; }
-    .by-type-item {
-      flex:1; min-width:120px; background:#f8f9fa;
-      border:1px solid #dee2e6; border-radius:6px;
-      padding:8px 12px; text-align:center;
-    }
-    .by-type-item .num { font-size:18px; font-weight:bold; color:#1a472a; }
+    /* BY-TYPE */
+    .by-type-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+    .btype-item { background: #f5f2ec; border: 1px solid #ece7dd; border-radius: 8px; padding: 10px 16px; min-width: 100px; text-align: center; }
+    .btype-num { font-size: 20px; font-weight: 600; color: #1d3d17; }
+    .btype-lbl { font-size: 10px; color: #6b6b64; margin-top: 2px; }
 
-    .footer {
-      text-align:center; color:#999; font-size:10px;
-      padding:10px 30px; border-top:1px solid #dee2e6; margin-top:10px;
-    }
+    /* TABLE */
+    table { width: 100%; border-collapse: collapse; font-size: 11px; }
+    thead tr { background: #1d3d17; }
+    thead th { padding: 9px 12px; color: #c8e6b0; font-weight: 600; font-size: 10px; text-align: left; letter-spacing: .5px; text-transform: uppercase; }
+    tbody tr:nth-child(even) { background: #f9f8f4; }
+    tbody tr:nth-child(odd)  { background: #fff; }
+    tbody td { padding: 9px 12px; border-bottom: 1px solid #ece7dd; vertical-align: middle; color: #3d3d38; }
+    tfoot td { background: #f0ede6; font-weight: 600; padding: 10px 12px; border-top: 2px solid #d8d1c1; color: #1d3d17; }
+
+    /* BADGES */
+    .badge { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 10px; font-weight: 600; }
+    .bm  { background: #e8f5e9; color: #1b5e20; }
+    .bh  { background: #e3f2fd; color: #0d47a1; }
+    .be  { background: #fff8e1; color: #e65100; }
+    .bme { background: #fce4ec; color: #880e4f; }
+    .bp  { background: #f3e5f5; color: #4a148c; }
+    .bt  { background: #fff3e0; color: #bf360c; }
+    .bv  { background: #e0f7fa; color: #004d40; }
+    .bl  { background: #eceff1; color: #263238; }
+    .ba  { background: #f5f5f5; color: #424242; }
+
+    /* FOOTER */
+    .doc-footer { margin-top: 28px; padding-top: 14px; border-top: 1px solid #ece7dd; display: flex; justify-content: space-between; font-size: 10px; color: #9e9d95; }
 
     @media print {
-      .no-print { display:none !important; }
-      body { font-size:11px; }
+      .toolbar { display: none !important; }
+      body { font-size: 11px; }
+      .doc { padding: 0; max-width: 100%; }
+      .doc-header { border-radius: 0; }
     }
   </style>
 </head>
 <body>
 
-  {# Bouton impression #}
-  <div class="no-print" style="background:#333; padding:10px 30px; display:flex; gap:10px; align-items:center;">
-    <button onclick="window.print()"
-            style="background:#198754; color:#fff; border:none; padding:8px 20px; border-radius:5px; cursor:pointer; font-size:13px;">
-      🖨️ Imprimer / Sauvegarder en PDF
-    </button>
-    <button onclick="window.close()"
-            style="background:#6c757d; color:#fff; border:none; padding:8px 20px; border-radius:5px; cursor:pointer; font-size:13px;">
-      ✖ Fermer
-    </button>
-    <span style="color:#aaa; font-size:12px;">
-      Astuce : dans la boîte de dialogue d'impression, choisissez "Enregistrer en PDF"
-    </span>
+  <div class="toolbar">
+    <button class="btn-print" onclick="window.print()">🖨️ Imprimer / Enregistrer en PDF</button>
+    <button class="btn-close" onclick="window.close()">✕ Fermer</button>
+    <span class="toolbar-tip">Astuce : choisissez "Enregistrer en PDF" dans la boîte d'impression</span>
   </div>
 
-  {# En-tête rapport #}
-  <div class="header">
-    <div>
-      <h1>🔧 Rapport des Maintenances</h1>
-      <div class="meta">Généré le {{ date|date('d/m/Y à H:i') }}</div>
-    </div>
-    <div style="text-align:right;">
-      <div style="font-size:13px; font-weight:bold;">AgroFlow</div>
-      <div class="meta">Gestion du Matériel Agricole</div>
-    </div>
-  </div>
+  <div class="doc">
 
-  {# KPI #}
-  <div class="kpi-row">
-    <div class="kpi">
-      <div class="val">{{ maintenances|length }}</div>
-      <div class="lbl">Total interventions</div>
-    </div>
-    <div class="kpi">
-      <div class="val">{{ totalCout|number_format(2, ',', ' ') }} DT</div>
-      <div class="lbl">Coût total</div>
-    </div>
-    <div class="kpi">
-      <div class="val">{{ byType|length }}</div>
-      <div class="lbl">Types de pannes</div>
-    </div>
-    <div class="kpi">
-      <div class="val">
-        {% if maintenances|length > 0 %}
-          {{ (totalCout / maintenances|length)|number_format(2, ',', ' ') }} DT
-        {% else %}—{% endif %}
+    <div class="doc-header">
+      <div>
+        <h1>Rapport des Maintenances</h1>
+        <div class="doc-header-meta">Généré le {{ date|date('d/m/Y à H:i') }}</div>
       </div>
-      <div class="lbl">Coût moyen</div>
+      <div>
+        <div class="brand">AgroFlow</div>
+        <div class="brand-sub">Gestion du Matériel Agricole</div>
+      </div>
     </div>
-  </div>
 
-  {# Répartition par type #}
-  <div class="section">
-    <div class="section-title">Répartition par type de panne</div>
-    <div class="by-type">
+    <div class="kpi-strip">
+      <div class="kpi-item">
+        <div class="kpi-val">{{ maintenances|length }}</div>
+        <div class="kpi-lbl">Interventions</div>
+      </div>
+      <div class="kpi-item">
+        <div class="kpi-val">{{ totalCout|number_format(2, ',', ' ') }} DT</div>
+        <div class="kpi-lbl">Coût total</div>
+      </div>
+      <div class="kpi-item">
+        <div class="kpi-val">{{ byType|length }}</div>
+        <div class="kpi-lbl">Types de pannes</div>
+      </div>
+      <div class="kpi-item">
+        <div class="kpi-val">{% if maintenances|length > 0 %}{{ (totalCout / maintenances|length)|number_format(2, ',', ' ') }} DT{% else %}—{% endif %}</div>
+        <div class="kpi-lbl">Coût moyen</div>
+      </div>
+    </div>
+
+    {% if byType|length > 0 %}
+    <div class="section-title" style="margin-bottom:12px;">Répartition par type</div>
+    <div class="by-type-grid" style="margin-bottom:24px;">
       {% for r in byType %}
-      <div class="by-type-item">
-        <div class="num">{{ r.total }}</div>
-        <div style="font-size:10px; color:#555;">{{ r.type }}</div>
+      <div class="btype-item">
+        <div class="btype-num">{{ r.total }}</div>
+        <div class="btype-lbl">{{ r.type }}</div>
       </div>
       {% endfor %}
     </div>
-  </div>
+    {% endif %}
 
-  {# Tableau #}
-  <div class="section">
-    <div class="section-title">Liste détaillée des maintenances</div>
+    <div class="section-title" style="margin-bottom:12px;">Liste détaillée</div>
     <table>
       <thead>
         <tr>
-          <th>Type de panne</th>
-          <th>Matériel</th>
-          <th>Coût (DT)</th>
-          <th>Date</th>
-          <th>Description</th>
+          <th>Type de panne</th><th>Matériel</th><th>Coût (DT)</th><th>Date</th><th>Description</th>
         </tr>
       </thead>
       <tbody>
         {% for m in maintenances %}
         <tr>
           <td>
-            <span class="badge
-              {% if m.typePanne in ['Électrique','Electricité'] %}badge-warning
-              {% elseif m.typePanne == 'Mécanique' %}badge-info
-              {% elseif m.typePanne == 'Hydraulique' %}badge-primary
-              {% elseif m.typePanne == 'Pneumatique' %}badge-secondary
-              {% elseif m.typePanne == 'Logicielle' %}badge-dark
-              {% elseif m.typePanne == 'Moteur' %}badge-success
-              {% elseif m.typePanne == 'Transmission' %}badge-danger
-              {% else %}badge-secondary{% endif %}">
-              {{ m.typePanne }}
-            </span>
+            <span class="badge {% if m.typePanne == 'Moteur' %}bm{% elseif m.typePanne == 'Hydraulique' %}bh{% elseif m.typePanne in ['Électrique','Electricité'] %}be{% elseif m.typePanne == 'Mécanique' %}bme{% elseif m.typePanne == 'Pneumatique' %}bp{% elseif m.typePanne == 'Transmission' %}bt{% elseif m.typePanne == 'Vidange & Filtres' %}bv{% elseif m.typePanne == 'Logicielle' %}bl{% else %}ba{% endif %}">{{ m.typePanne }}</span>
           </td>
           <td>
-            {% if m.nom %}
-              <strong>{{ m.nom }}</strong><br>
-              <small>ID: {{ m.idM }}</small>
-            {% else %}
-              <span style="color:#999;">— Non lié —</span>
-            {% endif %}
+            {% if m.nom %}<strong>{{ m.nom }}</strong><div style="font-size:10px;color:#9e9d95;">#{{ m.idM }}</div>{% else %}<span style="color:#9e9d95;font-style:italic;">— Non lié —</span>{% endif %}
           </td>
-          <td style="font-weight:bold; color:#1a472a;">
-            {{ m.cout|number_format(2, ',', ' ') }} DT
-          </td>
-          <td>{{ m.dateMain ? m.dateMain|date('d/m/Y') : '—' }}</td>
-          <td style="max-width:250px;">{{ m.description ?? '—' }}</td>
+          <td style="font-weight:600;color:#2d5a1b;font-variant-numeric:tabular-nums;">{{ m.cout|number_format(2, ',', ' ') }}</td>
+          <td style="white-space:nowrap;">{{ m.dateMain ? m.dateMain|date('d/m/Y') : '—' }}</td>
+          <td style="max-width:230px;color:#6b6b64;">{{ m.description ? m.description|slice(0,85)~(m.description|length > 85 ? '…' : '') : '—' }}</td>
         </tr>
+        {% else %}
+        <tr><td colspan="5" style="text-align:center;padding:24px;color:#9e9d95;">Aucune maintenance</td></tr>
         {% endfor %}
       </tbody>
       <tfoot>
         <tr>
-          <td colspan="2"><strong>TOTAL</strong></td>
-          <td><strong>{{ totalCout|number_format(2, ',', ' ') }} DT</strong></td>
-          <td colspan="2"></td>
+          <td colspan="2">TOTAL</td>
+          <td style="font-variant-numeric:tabular-nums;">{{ totalCout|number_format(2, ',', ' ') }} DT</td>
+          <td colspan="2">{{ maintenances|length }} intervention{{ maintenances|length != 1 ? 's' : '' }}</td>
         </tr>
       </tfoot>
     </table>
-  </div>
 
-  <div class="footer">
-    AgroFlow — Rapport généré automatiquement le {{ date|date('d/m/Y à H:i') }}
-    — {{ maintenances|length }} intervention(s) — Total : {{ totalCout|number_format(2, ',', ' ') }} DT
+    <div class="doc-footer">
+      <span>AgroFlow — Rapport généré automatiquement</span>
+      <span>{{ date|date('d/m/Y à H:i') }} — {{ maintenances|length }} intervention(s) — {{ totalCout|number_format(2, ',', ' ') }} DT</span>
+    </div>
+
   </div>
 
 </body>
