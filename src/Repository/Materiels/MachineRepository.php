@@ -19,44 +19,49 @@ class MachineRepository extends ServiceEntityRepository
             ->leftJoin('m.agriculteur', 'u')
             ->addSelect('u');
 
-        // Filtre par CIN (obligatoire)
-        if (!empty($filters['cin'])) {
-            $qb->andWhere('m.cin = :cin')
-               ->setParameter('cin', (int) $filters['cin']);
+        // ── Filtre par CIN ──────────────────────────────────────────────────
+        // ✅ CORRIGÉ : on vérifie que cin est un entier valide > 0
+        // Si cin est null/0/vide → on ne retourne RIEN (sécurité : jamais afficher
+        // toutes les machines de tous les agriculteurs)
+        $cin = isset($filters['cin']) ? (int) $filters['cin'] : 0;
+
+        if ($cin > 0) {
+            $qb->andWhere('u.cin = :cin')
+               ->setParameter('cin', $cin);
+        } else {
+            // ✅ Sécurité : si pas de CIN valide, retourner tableau vide
+            return [];
         }
 
-        // Recherche textuelle (nom, marque, modèle, numéro série)
+        // ── Recherche textuelle (insensible à la casse) ─────────────────────
         if (!empty($filters['search'])) {
-            $search = '%' . $filters['search'] . '%';
+            $search = '%' . mb_strtolower(trim($filters['search'])) . '%';
             $qb->andWhere(
                 $qb->expr()->orX(
-                    $qb->expr()->like('m.nom', ':search'),
-                    $qb->expr()->like('m.marque', ':search'),
-                    $qb->expr()->like('m.modele', ':search'),
-                    $qb->expr()->like('m.numeroSerie', ':search')
+                    $qb->expr()->like('LOWER(m.nom)',         ':search'),
+                    $qb->expr()->like('LOWER(m.marque)',      ':search'),
+                    $qb->expr()->like('LOWER(m.modele)',      ':search'),
+                    $qb->expr()->like('LOWER(m.numeroSerie)', ':search')
                 )
             )->setParameter('search', $search);
         }
 
-        // Filtre par état
-        if (!empty($filters['etat']) && $filters['etat'] !== '') {
+        // ── Filtre par état ─────────────────────────────────────────────────
+        if (!empty($filters['etat'])) {
             $qb->andWhere('m.etatM = :etat')
                ->setParameter('etat', $filters['etat']);
         }
 
-        // Tri
+        // ── Tri ─────────────────────────────────────────────────────────────
         $allowedSortFields = ['nom', 'marque', 'modele', 'etatM', 'dateAchat', 'id'];
-        $sortBy = in_array($filters['sortBy'] ?? 'dateAchat', $allowedSortFields, true) 
-                  ? $filters['sortBy'] 
-                  : 'dateAchat';
-        
-        $sortDir = strtoupper($filters['sortDir'] ?? 'DESC') === 'DESC' ? 'DESC' : 'ASC';
-        
-        if ($sortBy === 'dateAchat') {
-            $qb->addOrderBy('m.dateAchat', $sortDir);
-            $qb->addOrderBy('m.id', $sortDir);
-        } else {
-            $qb->orderBy('m.' . $sortBy, $sortDir);
+        $sortBy  = in_array($filters['sortBy'] ?? 'dateAchat', $allowedSortFields, true)
+                   ? ($filters['sortBy'] ?? 'dateAchat')
+                   : 'dateAchat';
+        $sortDir = strtoupper($filters['sortDir'] ?? 'DESC') === 'ASC' ? 'ASC' : 'DESC';
+
+        $qb->orderBy('m.' . $sortBy, $sortDir);
+        if ($sortBy !== 'id') {
+            $qb->addOrderBy('m.id', 'DESC');
         }
 
         return $qb->getQuery()->getResult();
@@ -99,7 +104,8 @@ class MachineRepository extends ServiceEntityRepository
     public function findByCin(int $cin): array
     {
         return $this->createQueryBuilder('m')
-            ->andWhere('m.cin = :cin')
+            ->leftJoin('m.agriculteur', 'u')
+            ->andWhere('u.cin = :cin')
             ->setParameter('cin', $cin)
             ->orderBy('m.dateAchat', 'DESC')
             ->getQuery()

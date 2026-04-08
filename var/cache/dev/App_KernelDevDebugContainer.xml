@@ -495,7 +495,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.9EHBkr4"/>
+      <argument type="service" id=".service_locator.P7_PY8i"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -3390,7 +3390,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.9EHBkr4"/>
+      <argument type="service" id=".service_locator.P7_PY8i"/>
     </service>
     <service id="debug.log_processor" class="Symfony\Bridge\Monolog\Processor\DebugProcessor">
       <tag name="kernel.reset" method="reset"/>
@@ -7928,6 +7928,20 @@
         <argument key="passwordHasher" type="service_closure" id="security.user_password_hasher"/>
       </argument>
     </service>
+    <service id=".service_locator._.8m7iI" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="repo" type="service_closure" id="App\Repository\Materiels\MachineRepository"/>
+        <argument key="userRepo" type="service_closure" id="App\Repository\User\UserRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.IOi49kI" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="userRepo" type="service_closure" id="App\Repository\User\UserRepository"/>
+      </argument>
+    </service>
     <service id=".service_locator.BG5SaRJ" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -7941,7 +7955,7 @@
         <argument key="maintenance" type="service_closure" id=".errored..service_locator.kLp2YUI.App\Entity\Materiels\Maintenance"/>
       </argument>
     </service>
-    <service id=".service_locator.9EHBkr4" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.P7_PY8i" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Controller\AdminDashboardController::index" type="service_closure" id=".service_locator.qni5W9T"/>
@@ -7976,8 +7990,8 @@
         <argument key="App\Controller\AuthController::register" type="service_closure" id=".service_locator.t8346QO"/>
         <argument key="App\Controller\Materiels\MachineController::machineDelete" type="service_closure" id=".service_locator.pt54IVS"/>
         <argument key="App\Controller\Materiels\MachineController::machineEdit" type="service_closure" id=".service_locator.pt54IVS"/>
-        <argument key="App\Controller\Materiels\MachineController::machineIndex" type="service_closure" id=".service_locator.2E5fScC"/>
-        <argument key="App\Controller\Materiels\MachineController::machineNew" type="service_closure" id=".service_locator.9kKwU2t"/>
+        <argument key="App\Controller\Materiels\MachineController::machineIndex" type="service_closure" id=".service_locator._.8m7iI"/>
+        <argument key="App\Controller\Materiels\MachineController::machineNew" type="service_closure" id=".service_locator.IOi49kI"/>
         <argument key="App\Controller\Materiels\MachineController::machineShow" type="service_closure" id=".service_locator.6xRxq88"/>
         <argument key="App\Controller\Materiels\MachineController::machineStatistiques" type="service_closure" id=".service_locator.2E5fScC"/>
         <argument key="App\Controller\Materiels\MaintenancesController::delete" type="service_closure" id=".service_locator.kLp2YUI"/>
@@ -8023,8 +8037,8 @@
         <argument key="App\Controller\AuthController:register" type="service_closure" id=".service_locator.t8346QO"/>
         <argument key="App\Controller\Materiels\MachineController:machineDelete" type="service_closure" id=".service_locator.pt54IVS"/>
         <argument key="App\Controller\Materiels\MachineController:machineEdit" type="service_closure" id=".service_locator.pt54IVS"/>
-        <argument key="App\Controller\Materiels\MachineController:machineIndex" type="service_closure" id=".service_locator.2E5fScC"/>
-        <argument key="App\Controller\Materiels\MachineController:machineNew" type="service_closure" id=".service_locator.9kKwU2t"/>
+        <argument key="App\Controller\Materiels\MachineController:machineIndex" type="service_closure" id=".service_locator._.8m7iI"/>
+        <argument key="App\Controller\Materiels\MachineController:machineNew" type="service_closure" id=".service_locator.IOi49kI"/>
         <argument key="App\Controller\Materiels\MachineController:machineShow" type="service_closure" id=".service_locator.6xRxq88"/>
         <argument key="App\Controller\Materiels\MachineController:machineStatistiques" type="service_closure" id=".service_locator.2E5fScC"/>
         <argument key="App\Controller\Materiels\MaintenancesController:delete" type="service_closure" id=".service_locator.kLp2YUI"/>
@@ -10344,7 +10358,7 @@
     <service id="Psr\Log\LoggerInterface" alias="monolog.logger"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.w7.f4fT" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.9EHBkr4"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.P7_PY8i"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id=".Psr\Log\LoggerInterface $request.logger" alias="monolog.logger.request"/>
@@ -10388,7 +10402,7 @@
     <service id=".service_locator.ccwFaAk" alias=".service_locator.7veCuyK"/>
     <service id=".service_locator.81LTOQ7" alias=".service_locator.t8346QO"/>
     <service id=".service_locator.XvTo7NF" alias=".service_locator.kLp2YUI"/>
-    <service id=".service_locator.4akasMa" alias=".service_locator.9EHBkr4"/>
+    <service id=".service_locator.DQw5.2H" alias=".service_locator.P7_PY8i"/>
     <service id=".service_locator.BFrsqsn" alias=".service_locator.F9PKc.7"/>
     <service id=".service_locator.G9HJ8Ma" alias=".service_locator.dGEBibA"/>
     <service id=".service_locator.XtmiKbi" alias=".service_locator.MfxSDRP"/>
@@ -10430,6 +10444,8 @@
     <service id=".service_locator.9poacNA" alias=".service_locator.7veCuyK"/>
     <service id=".service_locator.7NIAq8D" alias=".service_locator.rSTd.nA"/>
     <service id=".service_locator.PgYGRUQ" alias=".service_locator.t8346QO"/>
+    <service id=".service_locator.b3SM2he" alias=".service_locator._.8m7iI"/>
+    <service id=".service_locator.VIwhQZf" alias=".service_locator.IOi49kI"/>
     <service id=".service_locator.vMvOOU9" alias=".service_locator.BG5SaRJ"/>
     <service id=".service_locator.JG4uyKr" alias=".service_locator.kLp2YUI"/>
     <service id=".service_locator.Q1z.f9O" alias=".service_locator.O2p6Lk7"/>

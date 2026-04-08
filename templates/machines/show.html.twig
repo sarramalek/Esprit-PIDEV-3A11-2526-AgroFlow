@@ -4,46 +4,106 @@
 {% block body %}
 <style>
     .machine-show { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
-    .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+
+    /* ── En-tête ── */
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
     .header-left h1 { margin: 0 0 0.3rem 0; font-size: 1.85rem; font-weight: 700; color: #1f2a1f; }
-    .header-left p { margin: 0; color: #5f7a5f; font-size: 1.05rem; }
+    .header-left p  { margin: 0; color: #5f7a5f; font-size: 1.05rem; }
     .user-info { font-size: 1rem; color: #6b8c6b; margin-top: 0.4rem; }
-    .card { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); overflow: hidden; margin-bottom: 2rem; }
-    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.8rem 2.5rem; padding: 2.2rem 2.5rem; }
+
+    /* ── Carte ── */
+    .card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.8rem 2.5rem;
+        padding: 2.2rem 2.5rem;
+    }
     .info-item { display: flex; flex-direction: column; gap: 0.4rem; }
-    .info-label { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #6b8c6b; }
+    .info-label {
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6b8c6b;
+    }
     .info-value { font-size: 1.1rem; color: #1f2a1f; font-weight: 500; }
-    .badge { display: inline-block; padding: 0.45rem 1.2rem; border-radius: 50px; font-size: 0.92rem; font-weight: 600; }
-    .badge-neuf { background: #d4edda; color: #155724; }
-    .badge-bon { background: #cce5ff; color: #004085; }
+
+    /* ── Badges état ── */
+    .badge {
+        display: inline-block;
+        padding: 0.45rem 1.2rem;
+        border-radius: 50px;
+        font-size: 0.92rem;
+        font-weight: 600;
+    }
+    .badge-neuf     { background: #d4edda; color: #155724; }
+    .badge-bon      { background: #cce5ff; color: #004085; }
     .badge-occasion { background: #fff3cd; color: #856404; }
-    .badge-panne { background: #f8d7da; color: #721c24; }
-    .actions { padding: 1.4rem 2.5rem; background: #f8fbf5; border-top: 1px solid #e0ecd9; display: flex; gap: 1rem; flex-wrap: wrap; }
-    .btn { 
-        padding: 0.65rem 1.4rem; 
-        border-radius: 10px; 
-        font-weight: 600; 
-        display: inline-flex; 
-        align-items: center; 
-        gap: 0.45rem; 
-        text-decoration: none; 
+    .badge-panne    { background: #f8d7da; color: #721c24; }
+
+    /* ── Zone actions ── */
+    .actions {
+        padding: 1.4rem 2.5rem;
+        background: #f8fbf5;
+        border-top: 1px solid #e0ecd9;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    /* ── Boutons génériques ── */
+    .btn {
+        padding: 0.65rem 1.4rem;
+        border-radius: 10px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        text-decoration: none;
         transition: all 0.2s;
         cursor: pointer;
-        border: none;
         font-size: 0.9rem;
+        border: none;
+        font-family: inherit;
+        line-height: 1.4;
     }
+    .btn-back {
+        background: transparent;
+        color: #5f7a5f;
+        border: 1.5px solid #dce8d5;
+        padding: 0.6rem 1.1rem;
+    }
+    .btn-back:hover { background: #f0f7f0; }
+
     .btn-edit { background: #2d6a2d; color: white; }
     .btn-edit:hover { background: #245524; }
-    .btn-delete { 
-        background: transparent; 
-        color: #c53030; 
+
+    .btn-delete {
+        background: #fdf0f0;
+        color: #c53030;
         border: 1.5px solid #f5c6cb;
-        cursor: pointer;
     }
-    .btn-delete:hover { background: #fdf0f0; }
-    .btn-back { background: transparent; color: #5f7a5f; border: 1.5px solid #dce8d5; padding: 0.6rem 1.1rem; }
-    .btn-back:hover { background: #f0f7f0; }
-    
+    .btn-delete:hover { background: #fde0e0; border-color: #e8a0a8; }
+
+    /* Le <form> de suppression ne doit pas créer de bloc */
+    .form-inline { display: contents; }
+
+    /* ── Flash messages ── */
     .flash-message {
         padding: 0.75rem 1rem;
         border-radius: 8px;
@@ -51,25 +111,28 @@
         font-size: 0.95rem;
     }
     .flash-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-    .flash-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-    
+    .flash-error   { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+    /* ── Responsive ── */
     @media (max-width: 768px) {
         .machine-show { padding: 1rem; }
-        .info-grid { grid-template-columns: 1fr; gap: 1rem; padding: 1.5rem; }
-        .actions { padding: 1rem 1.5rem; }
+        .info-grid    { grid-template-columns: 1fr; gap: 1rem; padding: 1.5rem; }
+        .actions      { padding: 1rem 1.5rem; }
     }
 </style>
 
 <div class="machine-show">
-    {# Flash messages #}
+
+    {# ── Flash messages ── #}
     {% for label, messages in app.flashes %}
         {% for message in messages %}
             <div class="flash-message flash-{{ label == 'success' ? 'success' : 'error' }}">
-                {{ message|raw }}
+                {{ message }}
             </div>
         {% endfor %}
     {% endfor %}
 
+    {# ── En-tête ── #}
     <div class="header">
         <div class="header-left">
             <h1>⚙️ {{ machine.nom }}</h1>
@@ -84,31 +147,38 @@
         <a href="{{ path('agri_machines') }}" class="btn btn-back">← Retour à la liste</a>
     </div>
 
+    {# ── Carte détails ── #}
     <div class="card">
         <div class="info-grid">
+
             <div class="info-item">
-                <span class="info-label">ID MACHINE</span>
+                <span class="info-label">ID Machine</span>
                 <span class="info-value">#{{ machine.id }}</span>
             </div>
+
             <div class="info-item">
-                <span class="info-label">NOM MACHINE</span>
+                <span class="info-label">Nom Machine</span>
                 <span class="info-value">{{ machine.nom }}</span>
             </div>
+
             <div class="info-item">
-                <span class="info-label">MARQUE</span>
+                <span class="info-label">Marque</span>
                 <span class="info-value">{{ machine.marque }}</span>
             </div>
+
             <div class="info-item">
-                <span class="info-label">MODÈLE</span>
+                <span class="info-label">Modèle</span>
                 <span class="info-value">{{ machine.modele }}</span>
             </div>
+
             <div class="info-item">
-                <span class="info-label">NUMÉRO DE SÉRIE</span>
+                <span class="info-label">Numéro de Série</span>
                 <span class="info-value">{{ machine.numeroSerie ?? '—' }}</span>
             </div>
+
             <div class="info-item">
-                <span class="info-label">ÉTAT ACTUEL</span>
-                {# Correction du badge #}
+                <span class="info-label">État Actuel</span>
+                {# ✅ CORRIGÉ : 'Occasion' (était 'En occasion') #}
                 {% if machine.etatM == 'Neuf' %}
                     {% set badgeClass = 'badge-neuf' %}
                 {% elseif machine.etatM == 'Bon' %}
@@ -122,26 +192,34 @@
                 {% endif %}
                 <span class="badge {{ badgeClass }}">{{ machine.etatM }}</span>
             </div>
+
             <div class="info-item">
-                <span class="info-label">DATE D'ACHAT</span>
-                <span class="info-value">{{ machine.dateAchat ? machine.dateAchat|date('d/m/Y') : '—' }}</span>
+                <span class="info-label">Date d'Achat</span>
+                <span class="info-value">
+                    {{ machine.dateAchat ? machine.dateAchat|date('d/m/Y') : '—' }}
+                </span>
             </div>
+
         </div>
 
+        {# ── Boutons d'action ── #}
         <div class="actions">
             <a href="{{ path('agri_machine_edit', {id: machine.id}) }}" class="btn btn-edit">
                 ✏️ Modifier la machine
             </a>
-            <form method="post" 
-                  action="{{ path('agri_machine_delete', {id: machine.id}) }}" 
-                  onsubmit="return confirm('⚠️ Voulez-vous vraiment supprimer « {{ machine.nom }} » ?\nCette action est irréversible.');"
-                  style="display: inline;">
-                <input type="hidden" name="_token" value="{{ csrf_token('delete_machine_' ~ machine.id) }}">
+
+            <form method="post"
+                  action="{{ path('agri_machine_delete', {id: machine.id}) }}"
+                  class="form-inline"
+                  onsubmit="return confirm('⚠️ Voulez-vous vraiment supprimer « {{ machine.nom }} » ?\nCette action est irréversible.');">
+                <input type="hidden" name="_token"
+                       value="{{ csrf_token('delete_machine_' ~ machine.id) }}">
                 <button type="submit" class="btn btn-delete">
                     🗑 Supprimer
                 </button>
             </form>
         </div>
     </div>
+
 </div>
 {% endblock %}
