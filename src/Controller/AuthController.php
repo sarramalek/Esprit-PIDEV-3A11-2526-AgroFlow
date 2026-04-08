@@ -58,11 +58,6 @@ class AuthController extends AbstractController
             $user->setDateCreationcpt(new \DateTime());
             $user->setDateDernierchg(new \DateTime());
 
-            // Forcer le rôle ouvrier si non défini
-            if (!$user->getRole()) {
-                $user->setRole(1);
-            }
-
             $em->persist($user);
             $em->flush();
 
