@@ -15,12 +15,16 @@ class Machine
     #[ORM\Column(name: 'idM', type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(name: 'cin', type: 'integer', nullable: true)]
+    // ── CORRECTION CLÉ ───────────────────────────────────────────────────────
+    // On NE mappe PLUS $cin comme champ scalaire Doctrine.
+    // La colonne `cin` est entièrement gérée par la relation ManyToOne ci-dessous.
+    // On garde uniquement une propriété PHP non-mappée pour la compatibilité
+    // avec le code existant (getCin / setCin).
     private ?int $cin = null;
 
-    // Relation avec l'Agriculteur
+    // La relation ManyToOne gère la colonne `cin` en base
     #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(name: 'cin', referencedColumnName: 'cin', nullable: true, onDelete: 'SET NULL')]
+    #[ORM\JoinColumn(name: 'cin', referencedColumnName: 'cin', nullable: false, onDelete: 'CASCADE')]
     private ?User $agriculteur = null;
 
     #[ORM\Column(name: 'nom', length: 255)]
@@ -32,7 +36,7 @@ class Machine
     #[ORM\Column(name: 'modele', length: 255)]
     private ?string $modele = null;
 
-    #[ORM\Column(name: 'numeroSerie', length: 255)]
+    #[ORM\Column(name: 'numeroSerie', length: 255, nullable: true)]
     private ?string $numeroSerie = null;
 
     #[ORM\Column(name: 'etatM', length: 255)]
@@ -48,9 +52,12 @@ class Machine
         return $this->id;
     }
 
+    // getCin / setCin lisent/écrivent la propriété PHP non-mappée
+    // La vraie valeur en base est gérée par la relation agriculteur
     public function getCin(): ?int
     {
-        return $this->cin;
+        // Priorité à la relation pour avoir la valeur réelle
+        return $this->agriculteur?->getCin() ?? $this->cin;
     }
 
     public function setCin(?int $cin): static
@@ -69,6 +76,7 @@ class Machine
     public function setAgriculteur(?User $agriculteur): static
     {
         $this->agriculteur = $agriculteur;
+        // Synchroniser la propriété PHP locale
         $this->cin = $agriculteur?->getCin();
         return $this;
     }
@@ -82,7 +90,7 @@ class Machine
             return '—';
         }
 
-        $nom = $this->agriculteur->getNom() ?? '';
+        $nom    = $this->agriculteur->getNom()    ?? '';
         $prenom = $this->agriculteur->getPrenom() ?? '';
         $nomComplet = trim($nom . ' ' . $prenom);
 
@@ -97,7 +105,8 @@ class Machine
         return $this->agriculteur?->getCin() ?? $this->cin;
     }
 
-    // Autres getters/setters
+    // ==================== Autres getters/setters ====================
+
     public function getNom(): ?string { return $this->nom; }
     public function setNom(?string $nom): static { $this->nom = $nom; return $this; }
 
