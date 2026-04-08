@@ -1,0 +1,86 @@
+{% extends 'agriculteur_dashboard.html.twig' %}
+
+{% block title %}Nouvelle maintenance — AgroFlow{% endblock %}
+
+{% block body %}
+<style>
+    .mn-page {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem 1.75rem;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    .mn-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.82rem;
+        color: #5f7a5f;
+        margin-bottom: 1.5rem;
+    }
+
+    .mn-breadcrumb a {
+        color: #2d6a2d;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .mn-breadcrumb a:hover {
+        text-decoration: underline;
+    }
+
+    .mn-header {
+        margin-bottom: 1.75rem;
+    }
+
+    .mn-header h1 {
+        margin: 0;
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #1a2e1a;
+    }
+
+    .mn-header p {
+        margin: 0;
+        font-size: 0.875rem;
+        color: #6b8c6b;
+    }
+
+    .alert-error {
+        background-color: #fef2f2;
+        border: 1px solid #f5c6cb;
+        color: #c53030;
+        padding: 12px 16px;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+    }
+</style>
+
+<div class="mn-page">
+
+    <nav class="mn-breadcrumb">
+        <a href="{{ path('agri_maintenances_index') }}">Maintenances</a>
+        <span>›</span>
+        <span>Nouvelle</span>
+    </nav>
+
+    <div class="mn-header">
+        <h1>➕ Nouvelle maintenance</h1>
+        <p>Les champs marqués d'un <span style="color:red">*</span> sont obligatoires</p>
+    </div>
+
+    {% if form.vars.submitted and not form.vars.valid %}
+        <div class="alert-error">
+            ⚠️ Le formulaire contient des erreurs.
+        </div>
+    {% endif %}
+
+    {% include 'maintenances/form.html.twig' with {
+        form: form,
+        btn_label: '💾 Enregistrer',
+        cancel_url: path('agri_maintenances_index')
+    } only %}
+
+</div>
+{% endblock %}
