@@ -24,3 +24,12 @@ dfc5d3,127.0.0.1,GET,https://127.0.0.1:8000/admin/machines,1775679394,,200,reque
 52a3db,127.0.0.1,GET,https://127.0.0.1:8000/admin/machines,1775679405,,200,request
 7104f6,127.0.0.1,GET,https://127.0.0.1:8000/admin/machines/14/edit,1775679407,,200,request
 3a0817,127.0.0.1,GET,https://127.0.0.1:8000/admin/machines,1775679423,,200,request
+347354,127.0.0.1,GET,https://127.0.0.1:8000/logout,1775679576,,302,request
+cf1141,127.0.0.1,GET,https://127.0.0.1:8000/login,1775679578,,200,request
+2748f9,127.0.0.1,POST,https://127.0.0.1:8000/login,1775679584,,302,request
+7b1cc1,127.0.0.1,GET,https://127.0.0.1:8000/,1775679585,,200,request
+8d404f,127.0.0.1,GET,https://127.0.0.1:8000/login,1775679588,,302,request
+df7bad,127.0.0.1,GET,https://127.0.0.1:8000/agriculteur/,1775679589,,200,request
+4b2104,127.0.0.1,GET,https://127.0.0.1:8000/agriculteur/materiels/machines,1775679596,,200,request
+c6ecb3,127.0.0.1,GET,https://127.0.0.1:8000/agriculteur/materiels/machines/new,1775679601,,200,request
+a3a6dd,127.0.0.1,POST,https://127.0.0.1:8000/agriculteur/materiels/machines/new,1775679605,,422,request
