@@ -107,15 +107,15 @@ class MachineType extends AbstractType
             ->add('etatM', ChoiceType::class, [
                 'label' => 'État',
                 'choices' => [
-                    'Neuf'        => 'Neuf',
-                    'Bon'         => 'Bon',
-                    'En occasion' => 'En occasion',
-                    'En panne'    => 'En panne',
+                    'Neuf'     => 'Neuf',
+                    'Bon'      => 'Bon',
+                    'Occasion' => 'Occasion',   // ✅ corrigé : était 'En occasion'
+                    'En panne' => 'En panne',
                 ],
                 'constraints' => [
                     new Assert\NotBlank(['message' => 'Veuillez sélectionner l\'état de la machine']),
                     new Assert\Choice([
-                        'choices' => ['Neuf', 'Bon', 'En occasion', 'En panne'],
+                        'choices' => ['Neuf', 'Bon', 'Occasion', 'En panne'],  // ✅ corrigé
                         'message' => 'Veuillez choisir un état valide',
                     ]),
                 ],

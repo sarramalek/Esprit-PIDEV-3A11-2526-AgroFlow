@@ -4,7 +4,15 @@
 {% block body %}
 <style>
     .machines-page { max-width: 1480px; margin: 0 auto; padding: 1.5rem; }
-    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
     .page-header h1 { margin: 0; font-size: 1.9rem; font-weight: 700; color: #1f2a1f; }
 
     .btn {
@@ -19,9 +27,10 @@
         border: none;
         cursor: pointer;
         font-size: 0.9rem;
+        font-family: inherit;
     }
-    .btn-primary { background: #2d6a2d; color: white; }
-    .btn-primary:hover { background: #245524; }
+    .btn-primary  { background: #2d6a2d; color: white; }
+    .btn-primary:hover  { background: #245524; }
     .btn-secondary { background: #f0f7f0; color: #2d6a2d; border: 1px solid #dce8d5; }
     .btn-secondary:hover { background: #e0ecd9; }
 
@@ -36,13 +45,9 @@
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 1rem;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
     }
-    .filter-group {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
+    .filter-group { display: flex; flex-direction: column; gap: 0.5rem; }
     .filter-group label {
         font-size: 0.75rem;
         font-weight: 600;
@@ -50,76 +55,98 @@
         text-transform: uppercase;
         letter-spacing: 0.5px;
     }
-    .filter-group input, 
+    .filter-group input,
     .filter-group select {
         padding: 0.75rem;
         border: 1px solid #dce8d5;
         border-radius: 10px;
         font-size: 0.9rem;
         background: white;
+        outline: none;
+        transition: border-color 0.2s;
+        font-family: inherit;
     }
+    .filter-group input:focus,
+    .filter-group select:focus { border-color: #2d6a2d; }
+
     .filter-actions {
         display: flex;
         gap: 0.8rem;
         justify-content: flex-end;
+        margin-top: 0.5rem;
     }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
+    .table-wrapper {
         background: white;
         border-radius: 16px;
-        overflow: hidden;
         box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        overflow: hidden;
     }
+    table { width: 100%; border-collapse: collapse; }
     thead tr { background: #f8fbf5; border-bottom: 2px solid #e0ecd9; }
     thead th {
-        padding: 1.2rem 1rem;
+        padding: 1.1rem 1rem;
         text-align: left;
         font-size: 0.78rem;
         font-weight: 700;
         color: #6b8c6b;
         text-transform: uppercase;
         letter-spacing: 0.5px;
+        white-space: nowrap;
     }
-    tbody tr { border-bottom: 1px solid #f0f5ee; transition: background 0.2s; }
+    tbody tr { border-bottom: 1px solid #f0f5ee; transition: background 0.15s; }
     tbody tr:hover { background: #f8fbf5; }
-    tbody td { padding: 1rem; vertical-align: middle; }
+    tbody tr.hidden-row { display: none; }
+    tbody td { padding: 0.9rem 1rem; vertical-align: middle; font-size: 0.92rem; color: #2c3e2c; }
 
     .machine-name { font-weight: 600; color: #1f2a1f; }
+    .td-muted { color: #8a9e8a; font-family: monospace; font-size: 0.85rem; }
 
     .badge {
-        padding: 0.4rem 1rem;
+        padding: 0.35rem 0.95rem;
         border-radius: 50px;
-        font-size: 0.85rem;
+        font-size: 0.82rem;
         font-weight: 600;
         display: inline-block;
+        white-space: nowrap;
     }
-    .badge-neuf { background: #d4edda; color: #155724; }
-    .badge-bon { background: #cce5ff; color: #004085; }
+    .badge-neuf     { background: #d4edda; color: #155724; }
+    .badge-bon      { background: #cce5ff; color: #004085; }
     .badge-occasion { background: #fff3cd; color: #856404; }
-    .badge-panne { background: #f8d7da; color: #721c24; }
+    .badge-panne    { background: #f8d7da; color: #721c24; }
 
-    .action-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+    .action-buttons {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: 6px;
+    }
     .action-btn {
         display: inline-flex;
         align-items: center;
-        gap: 5px;
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
-        font-size: 0.85rem;
+        gap: 4px;
+        padding: 0.42rem 0.85rem;
+        border-radius: 20px;
+        font-size: 0.82rem;
         font-weight: 600;
         text-decoration: none;
-        transition: all 0.2s;
-        border: 1px solid transparent;
+        transition: all 0.18s;
+        border: 1.5px solid transparent;
         cursor: pointer;
+        white-space: nowrap;
+        background: none;
+        font-family: inherit;
+        line-height: 1.4;
     }
-    .btn-view { background: #f0f7f0; color: #2d6a2d; border-color: #dce8d5; }
-    .btn-view:hover { background: #e0ecd9; }
-    .btn-edit { background: #fff3cd; color: #856404; border-color: #ffeaa8; }
-    .btn-edit:hover { background: #ffeaa8; }
-    .btn-delete { background: #f8d7da; color: #721c24; border-color: #f5c6cb; }
-    .btn-delete:hover { background: #f5c6cb; }
+    .btn-view   { background: #f0f7f0; color: #2d6a2d; border-color: #c3dfc3; }
+    .btn-view:hover   { background: #dff0df; border-color: #a8d0a8; }
+    .btn-edit   { background: #fff8ee; color: #b96b00; border-color: #ffd9a0; }
+    .btn-edit:hover   { background: #ffecd1; border-color: #f0bb70; }
+    .btn-delete { background: #fdf0f0; color: #c53030; border-color: #f5c6cb; }
+    .btn-delete:hover { background: #fde0e0; border-color: #e8a0a8; }
+
+    .form-inline { display: contents; }
 
     .flash-message {
         padding: 0.8rem 1.2rem;
@@ -128,24 +155,33 @@
         font-weight: 500;
     }
     .flash-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-    .flash-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .flash-error   { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 
     .empty-state {
         text-align: center;
         padding: 4rem;
         color: #8a9e8a;
-        font-size: 1.1rem;
+        font-size: 1.05rem;
+        line-height: 2;
+    }
+    #no-results-row { display: none; }
+
+    .result-count {
+        margin-top: 1rem;
+        text-align: right;
+        color: #8a9e8a;
+        font-size: 0.85rem;
     }
 
     @media (max-width: 1200px) {
-        .machines-page { padding: 1rem; overflow-x: auto; }
-        table { min-width: 1000px; }
+        .machines-page { padding: 1rem; }
+        .table-wrapper { overflow-x: auto; }
+        table { min-width: 900px; }
     }
 </style>
 
 <div class="machines-page">
 
-    {# Flash messages #}
     {% for label, messages in app.flashes %}
         {% for message in messages %}
             <div class="flash-message flash-{{ label == 'success' ? 'success' : 'error' }}">
@@ -156,86 +192,80 @@
 
     <div class="page-header">
         <h1>⚙️ Mes Machines</h1>
-        <div style="display: flex; gap: 0.8rem;">
-            <a href="{{ path('agri_machine_new') }}" class="btn btn-primary">
-                ➕ Ajouter une machine
-            </a>
-            <a href="{{ path('agri_machine_statistiques') }}" class="btn btn-secondary">
-                📊 Statistiques
-            </a>
+        <div style="display:flex; gap:0.8rem;">
+            <a href="{{ path('agri_machine_new') }}" class="btn btn-primary">➕ Ajouter une machine</a>
+            <a href="{{ path('agri_machine_statistiques') }}" class="btn btn-secondary">📊 Statistiques</a>
         </div>
     </div>
 
-    <!-- Formulaire de recherche et filtres - Version sans variable filters -->
     <div class="search-filters">
-        <form method="GET" action="{{ path('agri_machines') }}">
-            <div class="filter-grid">
-                <div class="filter-group">
-                    <label>🔍 Recherche</label>
-                    <input type="text" 
-                           name="search" 
-                           value="{{ app.request.query.get('search') }}"
-                           placeholder="Nom, marque, modèle ou n° série...">
-                </div>
+        <div class="filter-grid">
 
-                <div class="filter-group">
-                    <label>📊 État</label>
-                    <select name="etat">
-                        <option value="">Tous les états</option>
-                        <option value="Neuf" {{ app.request.query.get('etat') == 'Neuf' ? 'selected' : '' }}>🚜 Neuf</option>
-                        <option value="Bon" {{ app.request.query.get('etat') == 'Bon' ? 'selected' : '' }}>👍 Bon</option>
-                        <option value="Occasion" {{ app.request.query.get('etat') == 'Occasion' ? 'selected' : '' }}>🔄 Occasion</option>
-                        <option value="En panne" {{ app.request.query.get('etat') == 'En panne' ? 'selected' : '' }}>⚠️ En panne</option>
-                    </select>
-                </div>
+            {% set _search  = app.request.query.get('search',  '') %}
+            {% set _etat    = app.request.query.get('etat',    '') %}
+            {% set _sortBy  = app.request.query.get('sortBy',  'dateAchat') %}
+            {% set _sortDir = app.request.query.get('sortDir', 'DESC') %}
 
-                <div class="filter-group">
-                    <label>📋 Trier par</label>
-                    <select name="sortBy">
-                        <option value="dateAchat" {{ app.request.query.get('sortBy') == 'dateAchat' ? 'selected' : '' }}>📅 Date d'achat</option>
-                        <option value="nom" {{ app.request.query.get('sortBy') == 'nom' ? 'selected' : '' }}>🔤 Nom</option>
-                        <option value="marque" {{ app.request.query.get('sortBy') == 'marque' ? 'selected' : '' }}>🏭 Marque</option>
-                        <option value="modele" {{ app.request.query.get('sortBy') == 'modele' ? 'selected' : '' }}>📟 Modèle</option>
-                        <option value="etatM" {{ app.request.query.get('sortBy') == 'etatM' ? 'selected' : '' }}>⚡ État</option>
-                    </select>
-                </div>
-
-                <div class="filter-group">
-                    <label>⬆️⬇️ Ordre</label>
-                    <select name="sortDir">
-                        <option value="DESC" {{ app.request.query.get('sortDir') == 'DESC' ? 'selected' : '' }}>↓ Décroissant</option>
-                        <option value="ASC" {{ app.request.query.get('sortDir') == 'ASC' ? 'selected' : '' }}>↑ Croissant</option>
-                    </select>
-                </div>
+            <div class="filter-group">
+                <label>🔍 Recherche</label>
+                <input type="text"
+                       id="filter-search"
+                       placeholder="Nom, marque, modèle ou n° série..."
+                       value="{{ _search }}">
             </div>
 
-            <div class="filter-actions">
-                <button type="submit" class="btn btn-primary">🔎 Rechercher</button>
-                <a href="{{ path('agri_machines') }}" class="btn btn-secondary">⟳ Réinitialiser</a>
+            <div class="filter-group">
+                <label>📊 État</label>
+                <select id="filter-etat">
+                    <option value="">Tous les états</option>
+                    <option value="Neuf"      {{ _etat == 'Neuf'      ? 'selected' : '' }}>🚜 Neuf</option>
+                    <option value="Bon"       {{ _etat == 'Bon'       ? 'selected' : '' }}>👍 Bon</option>
+                    <option value="Occasion"  {{ _etat == 'Occasion'  ? 'selected' : '' }}>🔄 Occasion</option>
+                    <option value="En panne"  {{ _etat == 'En panne'  ? 'selected' : '' }}>⚠️ En panne</option>
+                </select>
             </div>
-        </form>
+
+            <div class="filter-group">
+                <label>📋 Trier par</label>
+                <select id="filter-sortBy">
+                    <option value="dateAchat" {{ _sortBy == 'dateAchat' ? 'selected' : '' }}>📅 Date d'achat</option>
+                    <option value="marque"    {{ _sortBy == 'marque'    ? 'selected' : '' }}>🏭 Marque</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>⬆️⬇️ Ordre</label>
+                <select id="filter-sortDir">
+                    <option value="DESC" {{ _sortDir == 'DESC' ? 'selected' : '' }}>↓ Décroissant</option>
+                    <option value="ASC"  {{ _sortDir == 'ASC'  ? 'selected' : '' }}>↑ Croissant</option>
+                </select>
+            </div>
+
+        </div>
+
+        <div class="filter-actions">
+            <button type="button" class="btn btn-primary" onclick="applyFilters()">🔎 Rechercher</button>
+            <button type="button" class="btn btn-secondary" onclick="resetFilters()">⟳ Réinitialiser</button>
+        </div>
     </div>
 
-    <!-- Tableau des résultats -->
-    <div style="overflow-x: auto;">
-        <table>
+    <div class="table-wrapper">
+        <table id="machines-table">
             <thead>
                 <tr>
-                    <th>#</th>
-                    <th>NOM AGRICULTEUR</th>
-                    <th>NOM MACHINE</th>
-                    <th>MARQUE</th>
-                    <th>MODÈLE</th>
-                    <th>N° SÉRIE</th>
-                    <th>ÉTAT</th>
-                    <th>DATE D'ACHAT</th>
-                    <th>ACTIONS</th>
+                    {# ✅ Colonne ID supprimée #}
+                    <th>Nom Agriculteur</th>
+                    <th>Nom Machine</th>
+                    <th>Marque</th>
+                    <th>Modèle</th>
+                    <th>N° Série</th>
+                    <th>État</th>
+                    <th>Date d'Achat</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="machines-tbody">
                 {% for machine in machines %}
-                    {% set nomAgriculteur = machine.nomAgriculteur %}
-                    {% set badgeClass = '' %}
                     {% if machine.etatM == 'Neuf' %}
                         {% set badgeClass = 'badge-neuf' %}
                     {% elseif machine.etatM == 'Bon' %}
@@ -248,13 +278,20 @@
                         {% set badgeClass = 'badge-bon' %}
                     {% endif %}
 
-                    <tr>
-                        <td style="color: #8a9e8a; font-weight: 500;">#{{ machine.id }}</td>
-                        <td style="font-weight: 500;">{{ nomAgriculteur }}</td>
+                    <tr class="machine-row"
+                        data-nom="{{ machine.nom|lower }}"
+                        data-marque="{{ machine.marque|lower }}"
+                        data-modele="{{ machine.modele|lower }}"
+                        data-serie="{{ machine.numeroSerie ? machine.numeroSerie|lower : '' }}"
+                        data-etat="{{ machine.etatM }}"
+                        data-date="{{ machine.dateAchat ? machine.dateAchat|date('Y-m-d') : '' }}">
+
+                        {# ✅ Cellule ID supprimée #}
+                        <td style="font-weight:500;">{{ machine.nomAgriculteur }}</td>
                         <td class="machine-name">{{ machine.nom }}</td>
                         <td>{{ machine.marque }}</td>
                         <td>{{ machine.modele }}</td>
-                        <td style="color: #8a9e8a; font-family: monospace;">{{ machine.numeroSerie ?? '—' }}</td>
+                        <td class="td-muted">{{ machine.numeroSerie ?? '—' }}</td>
                         <td><span class="badge {{ badgeClass }}">{{ machine.etatM }}</span></td>
                         <td>{{ machine.dateAchat ? machine.dateAchat|date('d/m/Y') : '—' }}</td>
                         <td>
@@ -265,10 +302,10 @@
                                 <a href="{{ path('agri_machine_edit', {id: machine.id}) }}" class="action-btn btn-edit">
                                     ✏️ Modifier
                                 </a>
-                                <form method="post" 
-                                      action="{{ path('agri_machine_delete', {id: machine.id}) }}" 
-                                      onsubmit="return confirm('⚠️ Supprimer définitivement « {{ machine.nom }} » ?\nCette action est irréversible.');" 
-                                      style="display:inline;">
+                                <form method="post"
+                                      action="{{ path('agri_machine_delete', {id: machine.id}) }}"
+                                      class="form-inline"
+                                      onsubmit="return confirm('⚠️ Supprimer définitivement « {{ machine.nom }} » ?\nCette action est irréversible.');">
                                     <input type="hidden" name="_token" value="{{ csrf_token('delete_machine_' ~ machine.id) }}">
                                     <button type="submit" class="action-btn btn-delete">
                                         🗑 Supprimer
@@ -279,20 +316,100 @@
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="9" class="empty-state">
+                        <td colspan="8" class="empty-state">
                             🤷 Aucune machine trouvée.<br>
-                            <a href="{{ path('agri_machine_new') }}" style="color: #2d6a2d; margin-top: 1rem; display: inline-block;">➕ Ajouter votre première machine</a>
+                            <a href="{{ path('agri_machine_new') }}" style="color:#2d6a2d; display:inline-block; margin-top:0.5rem;">
+                                ➕ Ajouter votre première machine
+                            </a>
                         </td>
                     </tr>
                 {% endfor %}
+
+                <tr id="no-results-row">
+                    <td colspan="8" class="empty-state">🔍 Aucun résultat pour ces critères.</td>
+                </tr>
             </tbody>
         </table>
     </div>
-    
-    {% if machines|length > 0 %}
-    <div style="margin-top: 1rem; text-align: right; color: #8a9e8a; font-size: 0.85rem;">
-        📊 {{ machines|length }} machine(s) trouvée(s)
+
+    <div class="result-count" id="result-count">
+        {% if machines|length > 0 %}
+            📊 <span id="count-visible">{{ machines|length }}</span> / {{ machines|length }} machine(s)
+        {% endif %}
     </div>
-    {% endif %}
+
 </div>
+
+<script>
+(function () {
+    const totalRows = document.querySelectorAll('.machine-row').length;
+
+    function applyFilters() {
+        const search  = document.getElementById('filter-search').value.trim().toLowerCase();
+        const etat    = document.getElementById('filter-etat').value;
+        const sortBy  = document.getElementById('filter-sortBy').value;
+        const sortDir = document.getElementById('filter-sortDir').value;
+
+        const tbody = document.getElementById('machines-tbody');
+        const rows  = Array.from(tbody.querySelectorAll('.machine-row'));
+
+        let visibleCount = 0;
+        rows.forEach(row => {
+            const matchSearch = !search || (
+                row.dataset.nom.includes(search)    ||
+                row.dataset.marque.includes(search) ||
+                row.dataset.modele.includes(search) ||
+                row.dataset.serie.includes(search)
+            );
+            const matchEtat = !etat || row.dataset.etat === etat;
+
+            if (matchSearch && matchEtat) {
+                row.classList.remove('hidden-row');
+                visibleCount++;
+            } else {
+                row.classList.add('hidden-row');
+            }
+        });
+
+        const visibleRows = rows.filter(r => !r.classList.contains('hidden-row'));
+
+        visibleRows.sort((a, b) => {
+            let valA = '', valB = '';
+            if (sortBy === 'marque')          { valA = a.dataset.marque; valB = b.dataset.marque; }
+            else if (sortBy === 'dateAchat')  { valA = a.dataset.date;   valB = b.dataset.date; }
+
+            if (valA < valB) return sortDir === 'ASC' ? -1 :  1;
+            if (valA > valB) return sortDir === 'ASC' ?  1 : -1;
+            return 0;
+        });
+
+        const noResultsRow = document.getElementById('no-results-row');
+        visibleRows.forEach(row => tbody.insertBefore(row, noResultsRow));
+
+        noResultsRow.style.display = visibleCount === 0 && totalRows > 0 ? 'table-row' : 'none';
+
+        const countEl = document.getElementById('count-visible');
+        if (countEl) countEl.textContent = visibleCount;
+    }
+
+    function resetFilters() {
+        document.getElementById('filter-search').value  = '';
+        document.getElementById('filter-etat').value    = '';
+        document.getElementById('filter-sortBy').value  = 'dateAchat';
+        document.getElementById('filter-sortDir').value = 'DESC';
+        applyFilters();
+    }
+
+    document.getElementById('filter-search').addEventListener('input', applyFilters);
+    document.getElementById('filter-etat').addEventListener('change', applyFilters);
+    document.getElementById('filter-sortBy').addEventListener('change', applyFilters);
+    document.getElementById('filter-sortDir').addEventListener('change', applyFilters);
+
+    window.applyFilters  = applyFilters;
+    window.resetFilters  = resetFilters;
+
+    applyFilters();
+})();
+</script>
+
 {% endblock %}
