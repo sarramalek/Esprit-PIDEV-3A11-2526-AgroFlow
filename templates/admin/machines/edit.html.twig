@@ -7,14 +7,12 @@
 {% block body %}
 <div style="max-width: 680px; margin: 0 auto;">
 
-    {# ── Retour ── #}
     <a href="{{ path('admin_machines_index') }}"
        style="color:#2D5A27; text-decoration:none; font-size:13px;
               display:inline-flex; align-items:center; gap:6px; margin-bottom:20px;">
         <i class="fa fa-arrow-left"></i> Retour à la liste
     </a>
 
-    {# ── Flash messages serveur ── #}
     {% for msg in app.flashes('success') %}
         <div style="padding:12px 18px; border-radius:8px; margin-bottom:16px;
                     background:#EAF3DE; color:#3B6D11; border:1px solid #c0dd97;
@@ -30,7 +28,6 @@
         </div>
     {% endfor %}
 
-    {# ── Info machine en lecture seule ── #}
     <div style="background:#f9fbf8; border:1px solid #d6e8cc; border-radius:10px;
                 padding:14px 18px; margin-bottom:18px;
                 display:flex; align-items:center; gap:12px;">
@@ -56,11 +53,9 @@
         </div>
     </div>
 
-    {# ── Carte formulaire ── #}
     <div style="background:white; border-radius:14px;
                 box-shadow:0 2px 12px rgba(0,0,0,.07); overflow:hidden;">
 
-        {# En-tête colorée #}
         <div style="background:linear-gradient(135deg,#854F0B,#BA7517);
                     padding:24px 28px; display:flex; align-items:center; gap:14px;">
             <div style="width:44px; height:44px; border-radius:10px;
@@ -79,13 +74,10 @@
             </div>
         </div>
 
-        {# Corps du formulaire #}
         <div style="padding:28px 32px;">
             <form method="post" novalidate id="machineForm">
-
-                {{ include('admin/machines/_form.html.twig') }}
-
-                {# Boutons #}
+                {{ include('admin/machines/_form.html.twig', {agriculteurs: agriculteurs}) }}
+                
                 <div style="display:flex; gap:12px; margin-top:28px; padding-top:20px;
                             border-top:1px solid #f0f0f0;">
                     <button type="submit"
@@ -104,10 +96,8 @@
                         <i class="fa fa-xmark"></i> Annuler
                     </a>
                 </div>
-
             </form>
         </div>
     </div>
-
 </div>
 {% endblock %}

@@ -3,6 +3,7 @@
 namespace App\Repository\Materiels;
 
 use App\Entity\Materiels\Maintenance;
+use App\Entity\Materiels\Machine;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -13,61 +14,160 @@ class MaintenanceRepository extends ServiceEntityRepository
         parent::__construct($registry, Maintenance::class);
     }
 
-    // ── Recherche + filtre + tri — index ────────────────────────────────────
-    public function search(
-        string $search     = '',
-        string $type       = '',
-        string $sort       = 'dateMain',
-        string $dir        = 'DESC',
-        string $coutFilter = ''   // ← géré directement ici
+    // Récupérer toutes les machines avec la bonne propriété
+    public function getAllMachines(): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = "SELECT idM as id, nom FROM machine ORDER BY nom ASC";
+        $stmt = $conn->executeQuery($sql);
+        return $stmt->fetchAllAssociative();
+    }
+
+    // Recherche avec filtre et tri
+    public function searchWithMaterielName(
+        string $search = '',
+        string $type   = '',
+        string $sort   = 'dateMain',
+        string $dir    = 'DESC',
+        string $idM    = ''
     ): array {
-        $allowedSorts = ['typePanne', 'cout', 'dateMain', 'description'];
+        $conn = $this->getEntityManager()->getConnection();
+        
+        $allowedSorts = ['typePanne', 'cout', 'dateMain'];
         $allowedDirs  = ['ASC', 'DESC'];
-
-        // Le filtre coût prend la priorité sur sort/dir
-        if ($coutFilter === 'asc') {
-            $sort = 'cout';
-            $dir  = 'ASC';
-        } elseif ($coutFilter === 'desc') {
-            $sort = 'cout';
-            $dir  = 'DESC';
-        }
-
+        
         $sort = in_array($sort, $allowedSorts, true) ? $sort : 'dateMain';
         $dir  = in_array(strtoupper($dir), $allowedDirs, true) ? strtoupper($dir) : 'DESC';
-
-        $qb = $this->createQueryBuilder('m');
-
+        
+        $sql = "
+            SELECT 
+                m.idMain,
+                m.typePanne,
+                m.cout,
+                m.dateMain,
+                m.description,
+                m.idM,
+                mac.nom
+            FROM maintenance m
+            LEFT JOIN machine mac ON mac.idM = m.idM
+            WHERE 1=1
+        ";
+        
+        $params = [];
+        
         if ($search !== '') {
-            $qb->andWhere(
-                $qb->expr()->orX(
-                    $qb->expr()->like('m.typePanne',   ':s'),
-                    $qb->expr()->like('m.description', ':s')
-                )
-            )->setParameter('s', '%' . $search . '%');
+            $sql .= " AND (LOWER(m.typePanne) LIKE :search OR LOWER(m.description) LIKE :search OR LOWER(mac.nom) LIKE :search)";
+            $params['search'] = '%' . strtolower($search) . '%';
         }
-
+        
         if ($type !== '') {
-            $qb->andWhere('m.typePanne = :type')
-               ->setParameter('type', $type);
+            $sql .= " AND LOWER(m.typePanne) = :type";
+            $params['type'] = strtolower($type);
         }
-
-        return $qb->orderBy('m.' . $sort, $dir)
-                  ->getQuery()
-                  ->getResult();
+        
+        if ($idM !== '') {
+            $sql .= " AND m.idM = :idM";
+            $params['idM'] = (int) $idM;
+        }
+        
+        $sql .= " ORDER BY m.$sort $dir";
+        
+        $stmt = $conn->executeQuery($sql, $params);
+        $results = $stmt->fetchAllAssociative();
+        
+        $maintenances = [];
+        foreach ($results as $row) {
+            $m = new Maintenance();
+            $m->setIdMain($row['idMain']);
+            $m->setTypePanne($row['typePanne']);
+            $m->setCout((float) $row['cout']);
+            $m->setDateMain($row['dateMain'] ? new \DateTime($row['dateMain']) : null);
+            $m->setDescription($row['description']);
+            $m->setIdM($row['idM']);
+            $m->setNom($row['nom']);
+            $maintenances[] = $m;
+        }
+        
+        return $maintenances;
     }
 
-    // ── Toutes les maintenances triées par date DESC ─────────────────────────
+    // Toutes les maintenances
     public function findAllOrderedByDate(): array
     {
-        return $this->createQueryBuilder('m')
-            ->orderBy('m.dateMain', 'DESC')
-            ->getQuery()
-            ->getResult();
+        $conn = $this->getEntityManager()->getConnection();
+        
+        $sql = "
+            SELECT 
+                m.idMain,
+                m.typePanne,
+                m.cout,
+                m.dateMain,
+                m.description,
+                m.idM,
+                mac.nom
+            FROM maintenance m
+            LEFT JOIN machine mac ON mac.idM = m.idM
+            ORDER BY m.dateMain DESC
+        ";
+        
+        $stmt = $conn->executeQuery($sql);
+        $results = $stmt->fetchAllAssociative();
+        
+        $maintenances = [];
+        foreach ($results as $row) {
+            $m = new Maintenance();
+            $m->setIdMain($row['idMain']);
+            $m->setTypePanne($row['typePanne']);
+            $m->setCout((float) $row['cout']);
+            $m->setDateMain($row['dateMain'] ? new \DateTime($row['dateMain']) : null);
+            $m->setDescription($row['description']);
+            $m->setIdM($row['idM']);
+            $m->setNom($row['nom']);
+            $maintenances[] = $m;
+        }
+        
+        return $maintenances;
     }
 
-    // ── Coût total global ───────────────────────────────────────────────────
-    // CORRIGÉ : ?? appliqué AVANT le cast (float) pour éviter (float)null = 0
+    // Trouver par ID
+    public function findOneWithMaterielName(int $id): ?Maintenance
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        
+        $sql = "
+            SELECT 
+                m.idMain,
+                m.typePanne,
+                m.cout,
+                m.dateMain,
+                m.description,
+                m.idM,
+                mac.nom
+            FROM maintenance m
+            LEFT JOIN machine mac ON mac.idM = m.idM
+            WHERE m.idMain = :id
+        ";
+        
+        $stmt = $conn->executeQuery($sql, ['id' => $id]);
+        $row = $stmt->fetchAssociative();
+        
+        if (!$row) {
+            return null;
+        }
+        
+        $m = new Maintenance();
+        $m->setIdMain($row['idMain']);
+        $m->setTypePanne($row['typePanne']);
+        $m->setCout((float) $row['cout']);
+        $m->setDateMain($row['dateMain'] ? new \DateTime($row['dateMain']) : null);
+        $m->setDescription($row['description']);
+        $m->setIdM($row['idM']);
+        $m->setNom($row['nom']);
+        
+        return $m;
+    }
+
+    // Coût total
     public function getTotalCout(): float
     {
         $result = $this->createQueryBuilder('m')
@@ -78,8 +178,7 @@ class MaintenanceRepository extends ServiceEntityRepository
         return (float) ($result ?? 0.0);
     }
 
-    // ── Nombre de maintenances par type — retourne [['type'=>..,'total'=>..]]
-    // CORRIGÉ : orderBy sur l'expression COUNT et non sur l'alias
+    // Nombre par type
     public function countByTypePanne(): array
     {
         $rows = $this->createQueryBuilder('m')
@@ -89,15 +188,13 @@ class MaintenanceRepository extends ServiceEntityRepository
             ->getQuery()
             ->getScalarResult();
 
-        // Forcer total en int pour que JSON encode correctement
         return array_map(fn($row) => [
             'type'  => $row['type'],
             'total' => (int) $row['total'],
         ], $rows);
     }
 
-    // ── Coût total par mois — SQL natif ────────────────────────────────────
-    // CORRIGÉ : noms de colonnes/table entre backticks via sprintf()
+    // Coût par mois
     public function getCoutByMonth(): array
     {
         $conn      = $this->getEntityManager()->getConnection();
@@ -138,65 +235,5 @@ class MaintenanceRepository extends ServiceEntityRepository
         }
 
         return $result;
-    }
-
-    // ── Coût total pour un matériel donné ───────────────────────────────────
-    // CORRIGÉ : ?? appliqué AVANT le cast (float)
-    public function getTotalCoutByMateriel(int $idM): float
-    {
-        $result = $this->createQueryBuilder('m')
-            ->select('SUM(m.cout)')
-            ->andWhere('m.idM = :idM')
-            ->setParameter('idM', $idM)
-            ->getQuery()
-            ->getSingleScalarResult();
-
-        return (float) ($result ?? 0.0);
-    }
-
-    // ── Maintenances par matériel ────────────────────────────────────────────
-    public function findByIdMateriel(int $idM): array
-    {
-        return $this->createQueryBuilder('m')
-            ->andWhere('m.idM = :idM')
-            ->setParameter('idM', $idM)
-            ->orderBy('m.dateMain', 'DESC')
-            ->getQuery()
-            ->getResult();
-    }
-
-    // ── Dernière maintenance d'un matériel ──────────────────────────────────
-    public function findLastByMateriel(int $idM): ?Maintenance
-    {
-        return $this->createQueryBuilder('m')
-            ->andWhere('m.idM = :idM')
-            ->setParameter('idM', $idM)
-            ->orderBy('m.dateMain', 'DESC')
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getOneOrNullResult();
-    }
-
-    // ── Maintenances entre deux dates ───────────────────────────────────────
-    public function findBetweenDates(\DateTime $start, \DateTime $end): array
-    {
-        return $this->createQueryBuilder('m')
-            ->andWhere('m.dateMain BETWEEN :start AND :end')
-            ->setParameter('start', $start)
-            ->setParameter('end', $end)
-            ->orderBy('m.dateMain', 'ASC')
-            ->getQuery()
-            ->getResult();
-    }
-
-    // ── Recherche par type de panne ─────────────────────────────────────────
-    public function findByTypePanne(string $typePanne): array
-    {
-        return $this->createQueryBuilder('m')
-            ->andWhere('m.typePanne = :type')
-            ->setParameter('type', $typePanne)
-            ->orderBy('m.dateMain', 'DESC')
-            ->getQuery()
-            ->getResult();
     }
 }

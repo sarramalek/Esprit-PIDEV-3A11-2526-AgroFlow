@@ -5,147 +5,221 @@
 {{ parent() }}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<style>
+    .stat-card {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        cursor: default;
+    }
+    .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    .chart-container {
+        position: relative;
+        min-height: 350px;
+    }
+    .progress-bar {
+        transition: width 0.5s ease;
+    }
+</style>
 {% endblock %}
 
 {% block body %}
 <div class="container-fluid py-4">
 
-  {# Header #}
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold">
-      <i class="bi bi-bar-chart-fill text-primary"></i> Statistiques — Maintenances
-    </h2>
-    <a href="{{ path('admin_maintenances_index') }}" class="btn btn-outline-secondary">
-      <i class="bi bi-arrow-left"></i> Retour
-    </a>
-  </div>
+    {# Header #}
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div>
+            <h2 class="fw-bold mb-1">
+                <i class="bi bi-bar-chart-fill text-primary"></i> Statistiques — Maintenances
+            </h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-0" style="font-size:13px;">
+                    <li class="breadcrumb-item">
+                        <a href="{{ path('admin_dashboard') }}" class="text-decoration-none text-success">AgroFlow</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{{ path('admin_maintenances_index') }}" class="text-decoration-none text-success">Maintenances</a>
+                    </li>
+                    <li class="breadcrumb-item active">Statistiques</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ path('admin_maintenances_export_pdf') }}" target="_blank" class="btn btn-outline-danger btn-sm">
+                <i class="bi bi-file-earmark-pdf-fill"></i> Export PDF
+            </a>
+            <a href="{{ path('admin_maintenances_index') }}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left"></i> Retour
+            </a>
+        </div>
+    </div>
 
-  {# KPI Cards #}
-  <div class="row g-3 mb-4">
-    <div class="col-md-4">
-      <div class="card border-0 shadow-sm bg-success text-white">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <div class="small opacity-75">Coût total</div>
-              <div class="fs-3 fw-bold">{{ totalCout|number_format(2, ',', ' ') }} DT</div>
-            </div>
-            <i class="bi bi-cash-coin fs-1 opacity-50"></i>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card border-0 shadow-sm bg-primary text-white">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <div class="small opacity-75">Total interventions</div>
-              <div class="fs-3 fw-bold">{{ total }}</div>
-            </div>
-            <i class="bi bi-tools fs-1 opacity-50"></i>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card border-0 shadow-sm bg-info text-white">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <div>
-              <div class="small opacity-75">Types distincts</div>
-              <div class="fs-3 fw-bold">{{ byType|length }}</div>
-            </div>
-            <i class="bi bi-tags fs-1 opacity-50"></i>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  {# Bar Chart + Tableau côte à côte #}
-  <div class="row g-4">
-    <div class="col-lg-6">
-      <div class="card shadow-sm h-100">
-        <div class="card-header fw-semibold bg-white">
-          <i class="bi bi-bar-chart-fill text-primary me-2"></i>
-          Nombre d'interventions par type
-        </div>
-        <div class="card-body">
-          <canvas id="barTypeChart" height="280"></canvas>
-        </div>
-      </div>
-    </div>
-    <div class="col-lg-6">
-      <div class="card shadow-sm h-100">
-        <div class="card-header fw-semibold bg-white">
-          <i class="bi bi-table text-secondary me-2"></i>
-          Récapitulatif par type
-        </div>
-        <div class="card-body p-0">
-          <table class="table table-hover mb-0 align-middle">
-            <thead class="table-light">
-              <tr>
-                <th>Type</th>
-                <th class="text-center">Interventions</th>
-                <th class="text-end">% du total</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% set grandTotal = 0 %}
-              {% for r in byType %}
-                {% set grandTotal = grandTotal + r.total %}
-              {% endfor %}
-              {% for r in byType %}
-              <tr>
-                <td>
-                  <span class="badge
-                    {% if r.type in ['Électrique','Electricité'] %}bg-warning text-dark
-                    {% elseif r.type == 'Mécanique' %}bg-info text-dark
-                    {% elseif r.type == 'Hydraulique' %}bg-primary
-                    {% elseif r.type == 'Pneumatique' %}bg-secondary
-                    {% elseif r.type == 'logicielle' %}bg-dark
-                    {% elseif r.type == 'Moteur' %}bg-success
-                    {% elseif r.type == 'Transmission' %}bg-danger
-                    {% else %}bg-secondary{% endif %}">
-                    {{ r.type }}
-                  </span>
-                </td>
-                <td class="text-center fw-semibold">{{ r.total }}</td>
-                <td>
-                  {% if grandTotal > 0 %}
-                    {% set pct = (r.total / grandTotal * 100)|round(1) %}
-                    <div class="d-flex align-items-center gap-2">
-                      <div class="progress flex-grow-1" style="height:18px;">
-                        <div class="progress-bar bg-info" style="width:{{ pct }}%">
-                          {{ pct }}%
+    {# KPI Cards #}
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card stat-card border-0 shadow-sm bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="small opacity-75 text-uppercase">Coût total</div>
+                            <div class="fs-3 fw-bold">{{ totalCout|default(0)|number_format(2, ',', ' ') }} DT</div>
+                            <div class="small opacity-75 mt-1">Toutes interventions confondues</div>
                         </div>
-                      </div>
+                        <i class="bi bi-cash-stack fs-1 opacity-50"></i>
                     </div>
-                  {% endif %}
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-            <tfoot class="fw-bold table-light">
-              <tr>
-                <td>Total</td>
-                <td class="text-center">{{ grandTotal }}</td>
-                <td class="text-end text-success">
-                  {{ totalCout|number_format(2, ',', ' ') }} DT
-                </td>
-              </tr>
-            </tfoot>
-          </table>
+                </div>
+            </div>
         </div>
-      </div>
+        <div class="col-md-4">
+            <div class="card stat-card border-0 shadow-sm bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="small opacity-75 text-uppercase">Total interventions</div>
+                            <div class="fs-3 fw-bold">{{ total|default(0) }}</div>
+                            <div class="small opacity-75 mt-1">Maintenances enregistrées</div>
+                        </div>
+                        <i class="bi bi-tools fs-1 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card border-0 shadow-sm bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <div class="small opacity-75 text-uppercase">Types distincts</div>
+                            <div class="fs-3 fw-bold">{{ byType|default([])|length }}</div>
+                            <div class="small opacity-75 mt-1">Catégories de pannes</div>
+                        </div>
+                        <i class="bi bi-tags fs-1 opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
+
+    {# Graphique à barres #}
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body chart-container">
+                    <canvas id="barTypeChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Tableau récapitulatif #}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header fw-semibold bg-white">
+                    <i class="bi bi-table text-secondary me-2"></i>
+                    Détail par type de panne
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0 align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Type de panne</th>
+                                    <th class="text-center">Interventions</th>
+                                    <th class="text-end">Pourcentage</th>
+                                    <th class="text-end">Coût total</th>
+                                    <th class="text-end">Coût moyen</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set grandTotal = 0 %}
+                                {% for r in byType %}
+                                    {% set grandTotal = grandTotal + r.total %}
+                                {% endfor %}
+                                
+                                {% set totalCoutGlobal = totalCout|default(0) %}
+                                
+                                {% for r in byType %}
+                                <tr>
+                                    <td>
+                                        <span class="badge
+                                            {% if r.type in ['Électrique','Electricité'] %}bg-warning text-dark
+                                            {% elseif r.type == 'Mécanique' %}bg-info text-dark
+                                            {% elseif r.type == 'Hydraulique' %}bg-primary text-white
+                                            {% elseif r.type == 'Pneumatique' %}bg-secondary text-white
+                                            {% elseif r.type == 'Logicielle' %}bg-dark text-white
+                                            {% elseif r.type == 'Moteur' %}bg-success text-white
+                                            {% elseif r.type == 'Transmission' %}bg-danger text-white
+                                            {% elseif r.type == 'Vidange & Filtres' %}bg-success text-white
+                                            {% else %}bg-secondary text-white{% endif %}">
+                                            {{ r.type }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center fw-semibold">
+                                        {{ r.total }}
+                                    </td>
+                                    <td class="text-end">
+                                        {% if grandTotal > 0 %}
+                                            {% set pct = (r.total / grandTotal * 100)|round(1) %}
+                                            <div class="d-flex align-items-center justify-content-end gap-2">
+                                                <span class="fw-semibold">{{ pct }}%</span>
+                                                <div class="progress" style="width: 100px; height: 8px;">
+                                                    <div class="progress-bar bg-info" style="width: {{ pct }}%"></div>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            0%
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end text-success fw-semibold">
+                                        {{ (r.coutTotal|default(0))|number_format(2, ',', ' ') }} DT
+                                    </td>
+                                    <td class="text-end text-muted">
+                                        {% if r.total > 0 %}
+                                            {{ ((r.coutTotal|default(0)) / r.total)|number_format(2, ',', ' ') }} DT
+                                        {% else %}
+                                            0,00 DT
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-5 text-muted">
+                                        <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                        Aucune donnée disponible.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            {% if byType|length > 0 %}
+                            <tfoot class="fw-bold table-light">
+                                <tr>
+                                    <td>Total</th>
+                                    <td class="text-center">{{ grandTotal }}</td>
+                                    <td class="text-end">100%</td>
+                                    <td class="text-end text-success">{{ totalCoutGlobal|number_format(2, ',', ' ') }} DT</td>
+                                    <td class="text-end">
+                                        {% if grandTotal > 0 %}
+                                            {{ (totalCoutGlobal / grandTotal)|number_format(2, ',', ' ') }} DT
+                                        {% else %}
+                                            0,00 DT
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </tfoot>
+                            {% endif %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>
 
 <script type="application/json" id="data-byType">
-  {{ byType|json_encode(constant('JSON_UNESCAPED_UNICODE'))|raw }}
+    {{ byType|json_encode(constant('JSON_UNESCAPED_UNICODE'))|raw }}
 </script>
 {% endblock %}
 
@@ -155,62 +229,87 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
 <script>
 (function () {
-  'use strict';
+    'use strict';
 
-  function readJson(id) {
-    try {
-      const el  = document.getElementById(id);
-      const val = JSON.parse(el ? el.textContent : '[]');
-      return Array.isArray(val) ? val : Object.values(val);
-    } catch (e) {
-      console.error('Impossible de lire ' + id, e);
-      return [];
-    }
-  }
-
-  const byType = readJson('data-byType');
-
-  const palette = [
-    '#4e79a7','#f28e2b','#e15759','#76b7b2',
-    '#59a14f','#edc948','#b07aa1','#ff9da7','#9c755f','#bab0ac'
-  ];
-
-  const ctxType = document.getElementById('barTypeChart');
-  if (ctxType && byType.length > 0) {
-    new Chart(ctxType, {
-      type: 'bar',
-      data: {
-        labels: byType.map(r => r.type),
-        datasets: [{
-          label: 'Interventions',
-          data: byType.map(r => Number(r.total)),
-          backgroundColor: palette.slice(0, byType.length),
-          borderRadius: 6,
-          borderSkipped: false,
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            callbacks: { label: ctx => ' ' + ctx.raw + ' intervention(s)' }
-          }
-        },
-        scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { stepSize: 1 },
-            grid: { color: '#f0f0f0' }
-          },
-          x: { grid: { display: false } }
+    function readJson(id) {
+        try {
+            const el = document.getElementById(id);
+            const val = JSON.parse(el ? el.textContent : '[]');
+            return Array.isArray(val) ? val : Object.values(val);
+        } catch (e) {
+            console.error('Impossible de lire ' + id, e);
+            return [];
         }
-      }
-    });
-  } else if (ctxType) {
-    ctxType.parentElement.innerHTML =
-      '<p class="text-muted text-center py-4">Aucune donnée disponible.</p>';
-  }
+    }
+
+    const byType = readJson('data-byType');
+    
+    const palette = [
+        '#4e79a7', '#f28e2b', '#e15759', '#76b7b2',
+        '#59a14f', '#edc948', '#b07aa1', '#ff9da7', 
+        '#9c755f', '#bab0ac', '#1f77b4', '#ff7f0e'
+    ];
+
+    const ctxType = document.getElementById('barTypeChart');
+    if (ctxType && byType.length > 0) {
+        new Chart(ctxType, {
+            type: 'bar',
+            data: {
+                labels: byType.map(r => r.type),
+                datasets: [{
+                    label: "Nombre d'interventions",
+                    data: byType.map(r => Number(r.total)),
+                    backgroundColor: palette.slice(0, byType.length),
+                    borderRadius: 8,
+                    borderSkipped: false,
+                    barPercentage: 0.7,
+                    categoryPercentage: 0.8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return ' ' + context.raw + ' intervention(s)';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1,
+                            precision: 0
+                        },
+                        title: {
+                            display: true,
+                            text: "Nombre d'interventions",
+                            font: { size: 12, weight: 'bold' }
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Type de panne',
+                            font: { size: 12, weight: 'bold' }
+                        }
+                    }
+                }
+            }
+        });
+    } else if (ctxType) {
+        ctxType.parentElement.innerHTML = 
+            '<div class="alert alert-info text-center py-5 m-3">' +
+            '<i class="bi bi-info-circle fs-2 d-block mb-2"></i>' +
+            'Aucune donnée disponible pour le moment.</div>';
+    }
 
 })();
 </script>

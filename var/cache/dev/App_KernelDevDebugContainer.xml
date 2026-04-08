@@ -495,7 +495,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.P7_PY8i"/>
+      <argument type="service" id=".service_locator.gWKCXrJ"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -3390,7 +3390,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.P7_PY8i"/>
+      <argument type="service" id=".service_locator.gWKCXrJ"/>
     </service>
     <service id="debug.log_processor" class="Symfony\Bridge\Monolog\Processor\DebugProcessor">
       <tag name="kernel.reset" method="reset"/>
@@ -7842,9 +7842,31 @@
         <argument key="machine" type="service_closure" id=".errored..service_locator.pt54IVS.App\Entity\Materiels\Machine"/>
       </argument>
     </service>
+    <service id=".service_locator.pgExxvC" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="machineRepo" type="service_closure" id="App\Repository\Materiels\MachineRepository"/>
+        <argument key="repo" type="service_closure" id="App\Repository\Materiels\MaintenanceRepository"/>
+      </argument>
+    </service>
     <service id=".service_locator.b5YG.FV" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
+        <argument key="repo" type="service_closure" id="App\Repository\Materiels\MaintenanceRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator..2t9Uf5" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="machineRepo" type="service_closure" id="App\Repository\Materiels\MachineRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator..zXqV8G" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="machineRepo" type="service_closure" id="App\Repository\Materiels\MachineRepository"/>
         <argument key="repo" type="service_closure" id="App\Repository\Materiels\MaintenanceRepository"/>
       </argument>
     </service>
@@ -7942,12 +7964,6 @@
         <argument key="userRepo" type="service_closure" id="App\Repository\User\UserRepository"/>
       </argument>
     </service>
-    <service id=".service_locator.BG5SaRJ" class="Symfony\Component\DependencyInjection\ServiceLocator">
-      <tag name="container.service_locator"/>
-      <argument type="collection">
-        <argument key="maintenance" type="service_closure" id=".errored..service_locator.BG5SaRJ.App\Entity\Materiels\Maintenance"/>
-      </argument>
-    </service>
     <service id=".service_locator.kLp2YUI" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -7955,20 +7971,21 @@
         <argument key="maintenance" type="service_closure" id=".errored..service_locator.kLp2YUI.App\Entity\Materiels\Maintenance"/>
       </argument>
     </service>
-    <service id=".service_locator.P7_PY8i" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.gWKCXrJ" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Controller\AdminDashboardController::index" type="service_closure" id=".service_locator.qni5W9T"/>
         <argument key="App\Controller\AdminMateriels\MachineAdminController::delete" type="service_closure" id=".service_locator.pt54IVS"/>
+        <argument key="App\Controller\AdminMateriels\MachineAdminController::deleteConfirm" type="service_closure" id=".service_locator.6xRxq88"/>
         <argument key="App\Controller\AdminMateriels\MachineAdminController::edit" type="service_closure" id=".service_locator.pt54IVS"/>
         <argument key="App\Controller\AdminMateriels\MachineAdminController::index" type="service_closure" id=".service_locator.2E5fScC"/>
         <argument key="App\Controller\AdminMateriels\MachineAdminController::new" type="service_closure" id=".service_locator.9kKwU2t"/>
         <argument key="App\Controller\AdminMateriels\MachineAdminController::show" type="service_closure" id=".service_locator.6xRxq88"/>
         <argument key="App\Controller\AdminMateriels\MaintenanceAdminController::delete" type="service_closure" id=".service_locator.cZxzGoz"/>
-        <argument key="App\Controller\AdminMateriels\MaintenanceAdminController::edit" type="service_closure" id=".service_locator.cZxzGoz"/>
+        <argument key="App\Controller\AdminMateriels\MaintenanceAdminController::edit" type="service_closure" id=".service_locator..zXqV8G"/>
         <argument key="App\Controller\AdminMateriels\MaintenanceAdminController::exportPdf" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\AdminMateriels\MaintenanceAdminController::index" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\AdminMateriels\MaintenanceAdminController::new" type="service_closure" id=".service_locator.9kKwU2t"/>
+        <argument key="App\Controller\AdminMateriels\MaintenanceAdminController::index" type="service_closure" id=".service_locator.pgExxvC"/>
+        <argument key="App\Controller\AdminMateriels\MaintenanceAdminController::new" type="service_closure" id=".service_locator..2t9Uf5"/>
         <argument key="App\Controller\AdminMateriels\MaintenanceAdminController::show" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\AdminMateriels\MaintenanceAdminController::statsBar" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\AgriculteurDashboardController::machineDelete" type="service_closure" id=".service_locator.pt54IVS"/>
@@ -8000,22 +8017,23 @@
         <argument key="App\Controller\Materiels\MaintenancesController::exportPdf" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\Materiels\MaintenancesController::index" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\Materiels\MaintenancesController::new" type="service_closure" id=".service_locator.9kKwU2t"/>
-        <argument key="App\Controller\Materiels\MaintenancesController::show" type="service_closure" id=".service_locator.BG5SaRJ"/>
+        <argument key="App\Controller\Materiels\MaintenancesController::show" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Kernel::loadRoutes" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="App\Kernel::registerContainerConfiguration" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="kernel::loadRoutes" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="kernel::registerContainerConfiguration" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="App\Controller\AdminDashboardController:index" type="service_closure" id=".service_locator.qni5W9T"/>
         <argument key="App\Controller\AdminMateriels\MachineAdminController:delete" type="service_closure" id=".service_locator.pt54IVS"/>
+        <argument key="App\Controller\AdminMateriels\MachineAdminController:deleteConfirm" type="service_closure" id=".service_locator.6xRxq88"/>
         <argument key="App\Controller\AdminMateriels\MachineAdminController:edit" type="service_closure" id=".service_locator.pt54IVS"/>
         <argument key="App\Controller\AdminMateriels\MachineAdminController:index" type="service_closure" id=".service_locator.2E5fScC"/>
         <argument key="App\Controller\AdminMateriels\MachineAdminController:new" type="service_closure" id=".service_locator.9kKwU2t"/>
         <argument key="App\Controller\AdminMateriels\MachineAdminController:show" type="service_closure" id=".service_locator.6xRxq88"/>
         <argument key="App\Controller\AdminMateriels\MaintenanceAdminController:delete" type="service_closure" id=".service_locator.cZxzGoz"/>
-        <argument key="App\Controller\AdminMateriels\MaintenanceAdminController:edit" type="service_closure" id=".service_locator.cZxzGoz"/>
+        <argument key="App\Controller\AdminMateriels\MaintenanceAdminController:edit" type="service_closure" id=".service_locator..zXqV8G"/>
         <argument key="App\Controller\AdminMateriels\MaintenanceAdminController:exportPdf" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\AdminMateriels\MaintenanceAdminController:index" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\AdminMateriels\MaintenanceAdminController:new" type="service_closure" id=".service_locator.9kKwU2t"/>
+        <argument key="App\Controller\AdminMateriels\MaintenanceAdminController:index" type="service_closure" id=".service_locator.pgExxvC"/>
+        <argument key="App\Controller\AdminMateriels\MaintenanceAdminController:new" type="service_closure" id=".service_locator..2t9Uf5"/>
         <argument key="App\Controller\AdminMateriels\MaintenanceAdminController:show" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\AdminMateriels\MaintenanceAdminController:statsBar" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\AgriculteurDashboardController:machineDelete" type="service_closure" id=".service_locator.pt54IVS"/>
@@ -8047,7 +8065,7 @@
         <argument key="App\Controller\Materiels\MaintenancesController:exportPdf" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\Materiels\MaintenancesController:index" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\Materiels\MaintenancesController:new" type="service_closure" id=".service_locator.9kKwU2t"/>
-        <argument key="App\Controller\Materiels\MaintenancesController:show" type="service_closure" id=".service_locator.BG5SaRJ"/>
+        <argument key="App\Controller\Materiels\MaintenancesController:show" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="kernel:loadRoutes" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="kernel:registerContainerConfiguration" type="service_closure" id=".service_locator.y4_Zrx."/>
       </argument>
@@ -9161,9 +9179,6 @@
     </service>
     <service id=".errored..service_locator..4cEOa9.App\Entity\Animals\Animaux" class="App\Entity\Animals\Animaux">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator..4cEOa9&quot;: it needs an instance of &quot;App\Entity\Animals\Animaux&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
-    </service>
-    <service id=".errored..service_locator.BG5SaRJ.App\Entity\Materiels\Maintenance" class="App\Entity\Materiels\Maintenance">
-      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.BG5SaRJ&quot;: it needs an instance of &quot;App\Entity\Materiels\Maintenance&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
     </service>
     <service id=".errored..service_locator.kLp2YUI.App\Entity\Materiels\Maintenance" class="App\Entity\Materiels\Maintenance">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.kLp2YUI&quot;: it needs an instance of &quot;App\Entity\Materiels\Maintenance&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
@@ -10358,7 +10373,7 @@
     <service id="Psr\Log\LoggerInterface" alias="monolog.logger"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.w7.f4fT" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.P7_PY8i"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.gWKCXrJ"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id=".Psr\Log\LoggerInterface $request.logger" alias="monolog.logger.request"/>
@@ -10397,12 +10412,14 @@
     <service id=".service_locator.h8Jkkd2" alias="messenger.retry_strategy_locator"/>
     <service id=".service_locator.bJ.4HC5" alias=".service_locator.w7.f4fT"/>
     <service id=".service_locator._vhpmx6" alias=".service_locator.pt54IVS"/>
+    <service id=".service_locator.gobRZbS" alias=".service_locator.pgExxvC"/>
+    <service id=".service_locator.GVciNJE" alias=".service_locator..zXqV8G"/>
     <service id=".service_locator.Ye5OOWs" alias=".service_locator.cZxzGoz"/>
     <service id=".service_locator.YHeJzvQ" alias=".service_locator.la7NApM"/>
     <service id=".service_locator.ccwFaAk" alias=".service_locator.7veCuyK"/>
     <service id=".service_locator.81LTOQ7" alias=".service_locator.t8346QO"/>
     <service id=".service_locator.XvTo7NF" alias=".service_locator.kLp2YUI"/>
-    <service id=".service_locator.DQw5.2H" alias=".service_locator.P7_PY8i"/>
+    <service id=".service_locator.g97qfZ7" alias=".service_locator.gWKCXrJ"/>
     <service id=".service_locator.BFrsqsn" alias=".service_locator.F9PKc.7"/>
     <service id=".service_locator.G9HJ8Ma" alias=".service_locator.dGEBibA"/>
     <service id=".service_locator.XtmiKbi" alias=".service_locator.MfxSDRP"/>
@@ -10433,7 +10450,10 @@
     <service id=".service_locator.gaTSUXr" alias=".service_locator.9kKwU2t"/>
     <service id=".service_locator.pthUssq" alias=".service_locator.6xRxq88"/>
     <service id=".service_locator.A7sVNVS" alias=".service_locator.pt54IVS"/>
+    <service id=".service_locator.S4fmlmi" alias=".service_locator.pgExxvC"/>
     <service id=".service_locator.lfmVyU9" alias=".service_locator.b5YG.FV"/>
+    <service id=".service_locator.fkH.F9G" alias=".service_locator..2t9Uf5"/>
+    <service id=".service_locator.9vMarpz" alias=".service_locator..zXqV8G"/>
     <service id=".service_locator.ufBeM6b" alias=".service_locator.cZxzGoz"/>
     <service id=".service_locator.NLwAC4N" alias=".service_locator.qf5FuHx"/>
     <service id=".service_locator.9e2t_lq" alias=".service_locator.CsMkqUa"/>
@@ -10446,7 +10466,6 @@
     <service id=".service_locator.PgYGRUQ" alias=".service_locator.t8346QO"/>
     <service id=".service_locator.b3SM2he" alias=".service_locator._.8m7iI"/>
     <service id=".service_locator.VIwhQZf" alias=".service_locator.IOi49kI"/>
-    <service id=".service_locator.vMvOOU9" alias=".service_locator.BG5SaRJ"/>
     <service id=".service_locator.JG4uyKr" alias=".service_locator.kLp2YUI"/>
     <service id=".service_locator.Q1z.f9O" alias=".service_locator.O2p6Lk7"/>
     <service id=".service_locator.dGUCsbe" alias=".service_locator.oR77BOj"/>

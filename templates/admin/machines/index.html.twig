@@ -79,7 +79,7 @@
         transition: max-height .5s ease, opacity .4s ease;
         margin-bottom: 0;
     }
-    #statsPanel.open { max-height: 560px; opacity: 1; margin-bottom: 20px; }
+    #statsPanel.open { max-height: 800px; opacity: 1; margin-bottom: 20px; }
 
     .stats-top-grid {
         display: grid; grid-template-columns: repeat(4,1fr); gap: 14px;
@@ -122,6 +122,10 @@
     .legend-pct   { font-size: 11px; color: #aaa; min-width: 36px; text-align: right; }
 
     /* ── Table ── */
+    #machinesTable {
+        width: 100%;
+        border-collapse: collapse;
+    }
     #machinesTable thead th {
         font-size: 13px; color: #555; font-weight: 600;
         padding: 14px 12px; cursor: pointer; user-select: none;
@@ -157,6 +161,18 @@
         text-align: center; color: #aaa;
         padding: 80px 20px; font-size: 15px;
     }
+    
+    /* ── Flash messages ── */
+    .flash-success {
+        background: #EAF3DE; color: #3B6D11; border: 1px solid #c0dd97;
+        padding: 12px 18px; border-radius: 8px; margin-bottom: 16px;
+        display: flex; align-items: center; gap: 10px;
+    }
+    .flash-error {
+        background: #FCEBEB; color: #A32D2D; border: 1px solid #f7c1c1;
+        padding: 12px 18px; border-radius: 8px; margin-bottom: 16px;
+        display: flex; align-items: center; gap: 10px;
+    }
 </style>
 {% endblock %}
 
@@ -175,17 +191,17 @@
 
 {# ── Flash messages ── #}
 {% for msg in app.flashes('success') %}
-    <div class="flash flash-success" style="margin-bottom:14px;">
+    <div class="flash-success">
         <i class="fa fa-check-circle"></i> {{ msg }}
     </div>
 {% endfor %}
 {% for msg in app.flashes('error') %}
-    <div class="flash flash-error" style="margin-bottom:14px;">
+    <div class="flash-error">
         <i class="fa fa-exclamation-circle"></i> {{ msg }}
     </div>
 {% endfor %}
 
-{# ── Stats panel (dynamique JS) ── #}
+{# ── Stats panel ── #}
 <div id="statsPanel">
     <div class="stats-top-grid" id="statsGrid"></div>
     <div class="stats-bottom">
@@ -208,16 +224,13 @@
 <div style="background:white; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.06);
             padding:16px 18px; margin-bottom:14px;">
     <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-
-        {# Recherche texte — dynamique (oninput) #}
         <div class="search-wrap">
             <i class="fa fa-magnifying-glass"></i>
             <input type="text" id="searchInput"
-                   placeholder="Nom, marque, modèle, n° série..."
+                   placeholder="Nom, marque, modèle, n° série, propriétaire..."
                    oninput="applyFilters()">
         </div>
 
-        {# Filtre état #}
         <div class="select-wrap">
             <i class="fa fa-filter"></i>
             <select id="etatFilter" onchange="applyFilters()">
@@ -231,13 +244,12 @@
             </select>
         </div>
 
-        {# Tri date ── #}
         <button type="button" class="tb-btn" id="sortDateAsc"
-                onclick="sortByDate('asc', this)" title="Date ancienne → récente">
+                onclick="sortByDate('asc')" title="Date ancienne → récente">
             <i class="fa fa-calendar"></i><i class="fa fa-arrow-up"></i> Date ↑
         </button>
         <button type="button" class="tb-btn" id="sortDateDesc"
-                onclick="sortByDate('desc', this)" title="Date récente → ancienne">
+                onclick="sortByDate('desc')" title="Date récente → ancienne">
             <i class="fa fa-calendar"></i><i class="fa fa-arrow-down"></i> Date ↓
         </button>
 
@@ -261,9 +273,9 @@
 </div>
 
 {# ── Tableau ── #}
-<div style="background:white; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.06); overflow:hidden;">
+<div style="background:white; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.06); overflow-x:auto;">
     <div id="resultCount"></div>
-    <table id="machinesTable" style="width:100%; border-collapse:collapse;">
+    <table id="machinesTable">
         <thead>
             <tr style="background:#fafafa; border-bottom:1px solid #eee;">
                 <th onclick="sortTable(0)">Nom</th>
@@ -272,30 +284,28 @@
                 <th>N° Série</th>
                 <th onclick="sortTable(4)">État</th>
                 <th onclick="sortTable(5)">Date Achat</th>
+                <th onclick="sortTable(6)">Propriétaire</th>
                 <th style="text-align:center; width:120px;">Actions</th>
-            </tr>
+              </tr>
         </thead>
         <tbody id="tableBody"></tbody>
-    </table>
+      </table>
 </div>
 
-{# ── Données JSON injectées depuis Twig ── #}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
     const MACHINES_DATA = {{ machinesJson|raw }};
 </script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
-{% endblock %}
-
-{% block javascripts %}
 <script>
 /* ═══════════════════════════════════════════════════
    État global
 ═══════════════════════════════════════════════════ */
 let activeLetter = '';
 let currentSort  = { col: -1, dir: 'asc' };
-let dateSort     = null;     // 'asc' | 'desc' | null
+let dateSort     = 'desc';
 let statsOpen    = false;
+let pieChartInstance = null;
 
 /* ═══════════════════════════════════════════════════
    Utilitaires
@@ -318,6 +328,15 @@ function parseDate(d) {
     return d ? new Date(d).getTime() : 0;
 }
 
+function escHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;');
+}
+
 /* ═══════════════════════════════════════════════════
    Filtrage
 ═══════════════════════════════════════════════════ */
@@ -326,13 +345,10 @@ function getFiltered() {
     const e = document.getElementById('etatFilter').value;
 
     return MACHINES_DATA.filter(r => {
-        /* filtre alphabétique */
         if (activeLetter && !r.nom.toUpperCase().startsWith(activeLetter)) return false;
-        /* filtre état */
         if (e && r.etat !== e) return false;
-        /* filtre texte multi-champs */
         if (s) {
-            const hay = [r.nom, r.marque, r.modele, r.serie].join(' ').toLowerCase();
+            const hay = [r.nom, r.marque, r.modele, r.serie, r.nomAgriculteur].join(' ').toLowerCase();
             if (!hay.includes(s)) return false;
         }
         return true;
@@ -344,7 +360,12 @@ function getFiltered() {
 ═══════════════════════════════════════════════════ */
 function sortData(rows) {
     rows = [...rows];
-
+    
+    if (!dateSort && currentSort.col === -1) {
+        rows.sort((a,b) => parseDate(b.date) - parseDate(a.date));
+        return rows;
+    }
+    
     if (dateSort) {
         rows.sort((a,b) =>
             dateSort === 'asc'
@@ -353,16 +374,17 @@ function sortData(rows) {
         );
         return rows;
     }
-
+    
     if (currentSort.col >= 0) {
-        const keys = ['nom','marque','modele','serie','etat','date'];
+        const keys = ['nom','marque','modele','serie','etat','date','nomAgriculteur'];
         const k    = keys[currentSort.col];
         rows.sort((a,b) => {
             if (k === 'date') {
                 const va = parseDate(a[k]), vb = parseDate(b[k]);
                 return currentSort.dir === 'asc' ? va - vb : vb - va;
             }
-            const va = (a[k] || ''), vb = (b[k] || '');
+            let va = (k === 'nomAgriculteur') ? (a.nomAgriculteur || '') : (a[k] || '');
+            let vb = (k === 'nomAgriculteur') ? (b.nomAgriculteur || '') : (b[k] || '');
             return currentSort.dir === 'asc'
                 ? va.localeCompare(vb, 'fr')
                 : vb.localeCompare(va, 'fr');
@@ -378,15 +400,14 @@ function render() {
     const filtered = sortData(getFiltered());
     const tbody    = document.getElementById('tableBody');
 
-    /* compteur */
     document.getElementById('resultCount').textContent =
         `${filtered.length} machine${filtered.length !== 1 ? 's' : ''} trouvée${filtered.length !== 1 ? 's' : ''}`;
 
     if (!filtered.length) {
-        tbody.innerHTML = `<tr class="empty-row"><td colspan="7">
+        tbody.innerHTML = `<tr class="empty-row"><td colspan="8">
             <i class="fa fa-inbox" style="font-size:28px;display:block;margin-bottom:10px;"></i>
             Aucune machine trouvée
-        </td></tr>`;
+          </tr>`;
         renderStats([]);
         return;
     }
@@ -399,6 +420,13 @@ function render() {
             <td style="font-family:monospace; font-size:13px; color:#555;">${escHtml(r.serie)}</td>
             <td>${getBadge(r.etat)}</td>
             <td>${fmtDate(r.date)}</td>
+            <td style="font-size:13px;">
+                ${r.cinAgriculteur && r.cinAgriculteur !== '—' && r.nomAgriculteur && r.nomAgriculteur !== '—'
+                    ? `<span style="color:#2C3E50; font-weight:500;">${escHtml(r.nomAgriculteur)}</span>
+                       <span style="color:#888; font-size:11px; display:block; font-family:monospace;">CIN: ${r.cinAgriculteur}</span>`
+                    : `<span style="color:#999; font-style:italic;">Non assigné</span>`
+                }
+            </td>
             <td>
                 <div style="display:flex; gap:6px; justify-content:center;">
                     <a href="/admin/machines/${r.id}"
@@ -409,29 +437,115 @@ function render() {
                        class="action-btn action-btn-edit" title="Modifier">
                         <i class="fa fa-pen"></i>
                     </a>
-                    <form method="post" action="/admin/machines/${r.id}/delete"
-                          onsubmit="return confirm('Supprimer cette machine ?');"
-                          style="margin:0;">
-                        <input type="hidden" name="_token" value="${escHtml(r.csrf)}">
-                        <button type="submit"
-                                class="action-btn action-btn-delete" title="Supprimer">
-                            <i class="fa fa-trash"></i>
-                        </button>
-                    </form>
+                    <a href="/admin/machines/${r.id}/delete-confirm"
+                       class="action-btn action-btn-delete" title="Supprimer">
+                        <i class="fa fa-trash"></i>
+                    </a>
                 </div>
             </td>
-        </tr>`
-    ).join('');
+        </tr>
+    `).join('');
 
     renderStats(filtered);
 }
 
 /* ═══════════════════════════════════════════════════
-   Statistiques dynamiques + Pie Chart
+   Statistiques avancées
 ═══════════════════════════════════════════════════ */
-let pieChartInstance = null;
+function calculateAdvancedStats(filtered) {
+    const total = filtered.length;
+    
+    if (total === 0) {
+        return {
+            total: 0,
+            avgAge: 0,
+            newest: null,
+            oldest: null,
+            mostCommonBrand: null,
+            brandCount: {},
+            etatCount: {}
+        };
+    }
+    
+    const brandCount = {};
+    filtered.forEach(r => {
+        brandCount[r.marque] = (brandCount[r.marque] || 0) + 1;
+    });
+    
+    let mostCommonBrand = null;
+    let maxCount = 0;
+    for (const [brand, count] of Object.entries(brandCount)) {
+        if (count > maxCount) {
+            maxCount = count;
+            mostCommonBrand = brand;
+        }
+    }
+    
+    let totalAge = 0;
+    let ageCount = 0;
+    let newestDate = null;
+    let oldestDate = null;
+    const today = new Date();
+    
+    filtered.forEach(r => {
+        if (r.date) {
+            const purchaseDate = new Date(r.date);
+            if (!isNaN(purchaseDate.getTime())) {
+                const age = today.getFullYear() - purchaseDate.getFullYear();
+                totalAge += age;
+                ageCount++;
+                
+                if (!newestDate || purchaseDate > newestDate) newestDate = purchaseDate;
+                if (!oldestDate || purchaseDate < oldestDate) oldestDate = purchaseDate;
+            }
+        }
+    });
+    
+    const avgAge = ageCount > 0 ? (totalAge / ageCount).toFixed(1) : 0;
+    
+    const etatCount = {};
+    filtered.forEach(r => {
+        etatCount[r.etat] = (etatCount[r.etat] || 0) + 1;
+    });
+    
+    return { total, avgAge, newest: newestDate, oldest: oldestDate, mostCommonBrand, brandCount, etatCount };
+}
 
-/* Palette couleur par état */
+function updateAdvancedStats(stats) {
+    const statsGrid = document.getElementById('statsGrid');
+    if (!statsGrid) return;
+    
+    const total = stats.total;
+    const avgAge = stats.avgAge;
+    const mostCommonBrand = stats.mostCommonBrand || '—';
+    const brandCount = stats.brandCount;
+    const topBrand = mostCommonBrand !== '—' ? `${mostCommonBrand} (${brandCount[mostCommonBrand]})` : '—';
+    const available = (stats.etatCount['Bon'] || 0) + (stats.etatCount['Neuf'] || 0) + (stats.etatCount['Actif'] || 0);
+    const occupancyRate = total > 0 ? Math.round(available / total * 100) : 0;
+    
+    statsGrid.innerHTML = `
+        <div class="stat-card" style="border-top:4px solid #2D5A27;">
+            <div class="stat-label"><i class="fa fa-server"></i> Total machines</div>
+            <div class="stat-number" style="color:#2C3E50;">${total}</div>
+        </div>
+        <div class="stat-card" style="border-top:4px solid #185FA5;">
+            <div class="stat-label"><i class="fa fa-calendar"></i> Âge moyen</div>
+            <div class="stat-number" style="color:#185FA5;">${avgAge} ans</div>
+        </div>
+        <div class="stat-card" style="border-top:4px solid #854F0B;">
+            <div class="stat-label"><i class="fa fa-chart-simple"></i> Marque dominante</div>
+            <div class="stat-number" style="font-size:24px; color:#854F0B;">${escHtml(topBrand)}</div>
+        </div>
+        <div class="stat-card" style="border-top:4px solid #3B6D11;">
+            <div class="stat-label"><i class="fa fa-chart-line"></i> Taux disponibilité</div>
+            <div class="stat-number" style="font-size:24px; color:#3B6D11;">${occupancyRate}%</div>
+        </div>
+    `;
+}
+
+/* ═══════════════════════════════════════════════════
+   Graphique et légende
+═══════════════════════════════════════════════════ */
 const ETAT_COLORS = {
     'Neuf':        { bg: '#2D5A27', light: '#EAF3DE', text: '#3B6D11' },
     'Bon':         { bg: '#3B6D11', light: '#EAF3DE', text: '#3B6D11' },
@@ -447,47 +561,20 @@ function getColor(etat) {
 }
 
 function renderStats(filtered) {
-    const total  = filtered.length;
-    const dispo  = filtered.filter(r => ['Neuf','Bon','Actif'].includes(r.etat)).length;
-    const panne  = filtered.filter(r => ['En panne','Hors service'].includes(r.etat)).length;
-    const autres = total - dispo - panne;
-
-    /* ── 4 cartes chiffres ── */
-    document.getElementById('statsGrid').innerHTML = `
-        <div class="stat-card" style="border-top:4px solid #2D5A27;">
-            <div class="stat-label"><i class="fa fa-server"></i> Total</div>
-            <div class="stat-number" style="color:#2C3E50;">${total}</div>
-        </div>
-        <div class="stat-card" style="border-top:4px solid #3B6D11;">
-            <div class="stat-label"><i class="fa fa-check-circle"></i> Disponibles</div>
-            <div class="stat-number" style="color:#3B6D11;">${dispo}</div>
-        </div>
-        <div class="stat-card" style="border-top:4px solid #A32D2D;">
-            <div class="stat-label"><i class="fa fa-wrench"></i> En panne</div>
-            <div class="stat-number" style="color:#A32D2D;">${panne}</div>
-        </div>
-        <div class="stat-card" style="border-top:4px solid #854F0B;">
-            <div class="stat-label"><i class="fa fa-triangle-exclamation"></i> Autres</div>
-            <div class="stat-number" style="color:#854F0B;">${autres}</div>
-        </div>`;
-
-    /* ── Comptage par état ── */
-    const counts = {};
-    filtered.forEach(r => {
-        counts[r.etat] = (counts[r.etat] || 0) + 1;
-    });
-
-    const labels  = Object.keys(counts);
-    const values  = Object.values(counts);
-    const colors  = labels.map(l => getColor(l).bg);
-
-    /* ── Pie Chart ── */
+    const stats = calculateAdvancedStats(filtered);
+    updateAdvancedStats(stats);
+    
+    const total = stats.total;
+    const counts = stats.etatCount;
+    const labels = Object.keys(counts);
+    const values = Object.values(counts);
+    const colors = labels.map(l => getColor(l).bg);
+    
     const ctx = document.getElementById('pieChart');
     if (ctx) {
         if (pieChartInstance) pieChartInstance.destroy();
-
+        
         if (total === 0) {
-            /* état vide */
             ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
             pieChartInstance = null;
         } else {
@@ -512,9 +599,7 @@ function renderStats(filtered) {
                         tooltip: {
                             callbacks: {
                                 label: function(ctx) {
-                                    const pct = total > 0
-                                        ? Math.round(ctx.parsed / total * 100)
-                                        : 0;
+                                    const pct = total > 0 ? Math.round(ctx.parsed / total * 100) : 0;
                                     return ` ${ctx.label} : ${ctx.parsed} (${pct}%)`;
                                 }
                             }
@@ -525,17 +610,17 @@ function renderStats(filtered) {
             });
         }
     }
-
-    /* ── Légende détaillée ── */
+    
     const legendEl = document.getElementById('chartLegend');
     if (legendEl) {
         if (total === 0) {
             legendEl.innerHTML = `<div style="color:#aaa; font-size:13px; text-align:center; padding:20px 0;">
-                Aucune donnée
+                <i class="fa fa-chart-pie" style="font-size:32px; margin-bottom:10px; display:block;"></i>
+                Aucune donnée à afficher
             </div>`;
         } else {
             legendEl.innerHTML = labels.map((lbl, i) => {
-                const c   = getColor(lbl);
+                const c = getColor(lbl);
                 const pct = Math.round(values[i] / total * 100);
                 return `
                 <div class="legend-item">
@@ -553,18 +638,14 @@ function renderStats(filtered) {
    Barre alphabétique
 ═══════════════════════════════════════════════════ */
 function buildAlphaBar() {
-    const letters     = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     const usedLetters = new Set(MACHINES_DATA.map(r => r.nom[0].toUpperCase()));
-    const wrap        = document.getElementById('alphaButtons');
-
+    const wrap = document.getElementById('alphaButtons');
+    if (!wrap) return;
+    
     wrap.innerHTML = letters.map(l => {
         const has = usedLetters.has(l);
-        return `<button
-            class="alpha-btn${has ? '' : ' alpha-disabled'}"
-            id="alpha-${l}"
-            onclick="${has ? `setAlpha('${l}')` : 'void(0)'}">
-            ${l}
-        </button>`;
+        return `<button class="alpha-btn${has ? '' : ' alpha-disabled'}" id="alpha-${l}" onclick="${has ? `setAlpha('${l}')` : 'void(0)'}">${l}</button>`;
     }).join('');
 }
 
@@ -572,7 +653,8 @@ function setAlpha(l) {
     if (activeLetter === l) { clearAlpha(); return; }
     activeLetter = l;
     document.querySelectorAll('.alpha-btn').forEach(b => b.classList.remove('alpha-active'));
-    document.getElementById(`alpha-${l}`).classList.add('alpha-active');
+    const btn = document.getElementById(`alpha-${l}`);
+    if (btn) btn.classList.add('alpha-active');
     document.getElementById('alphaClear').style.display = 'inline';
     render();
 }
@@ -585,94 +667,67 @@ function clearAlpha() {
 }
 
 /* ═══════════════════════════════════════════════════
-   Tri colonnes (clic header)
+   Tri
 ═══════════════════════════════════════════════════ */
 function sortTable(colIdx) {
-    /* annuler le tri date si on trie une colonne */
     dateSort = null;
     document.getElementById('sortDateAsc').classList.remove('sort-active');
     document.getElementById('sortDateDesc').classList.remove('sort-active');
-
+    
     if (currentSort.col === colIdx) {
         currentSort.dir = currentSort.dir === 'asc' ? 'desc' : 'asc';
     } else {
         currentSort = { col: colIdx, dir: 'asc' };
     }
-
+    
     document.querySelectorAll('#machinesTable thead th').forEach((th, i) => {
-        th.classList.remove('sorted-asc','sorted-desc');
-        if (i === colIdx)
-            th.classList.add(currentSort.dir === 'asc' ? 'sorted-asc' : 'sorted-desc');
+        th.classList.remove('sorted-asc', 'sorted-desc');
+        if (i === colIdx) th.classList.add(currentSort.dir === 'asc' ? 'sorted-asc' : 'sorted-desc');
     });
     render();
 }
 
-/* ═══════════════════════════════════════════════════
-   Tri date (boutons toolbar)
-═══════════════════════════════════════════════════ */
-function sortByDate(dir, btn) {
-    /* toggle : reclique = désactive */
+function sortByDate(dir) {
     dateSort = (dateSort === dir) ? null : dir;
     currentSort = { col: -1, dir: 'asc' };
-
-    document.querySelectorAll('#machinesTable thead th')
-        .forEach(t => t.classList.remove('sorted-asc','sorted-desc'));
-
-    document.getElementById('sortDateAsc').classList.toggle('sort-active',  dateSort === 'asc');
+    
+    document.querySelectorAll('#machinesTable thead th').forEach(t => t.classList.remove('sorted-asc', 'sorted-desc'));
+    document.getElementById('sortDateAsc').classList.toggle('sort-active', dateSort === 'asc');
     document.getElementById('sortDateDesc').classList.toggle('sort-active', dateSort === 'desc');
     render();
 }
 
-/* ═══════════════════════════════════════════════════
-   Filtre texte + état
-═══════════════════════════════════════════════════ */
 function applyFilters() { render(); }
 
-/* ═══════════════════════════════════════════════════
-   Réinitialiser tout
-═══════════════════════════════════════════════════ */
 function resetAll() {
     document.getElementById('searchInput').value = '';
-    document.getElementById('etatFilter').value  = '';
-    activeLetter  = '';
-    dateSort      = null;
-    currentSort   = { col: -1, dir: 'asc' };
-
+    document.getElementById('etatFilter').value = '';
+    activeLetter = '';
+    dateSort = 'desc';
+    currentSort = { col: -1, dir: 'asc' };
+    
     document.querySelectorAll('.alpha-btn').forEach(b => b.classList.remove('alpha-active'));
     document.getElementById('alphaClear').style.display = 'none';
     document.getElementById('sortDateAsc').classList.remove('sort-active');
-    document.getElementById('sortDateDesc').classList.remove('sort-active');
-    document.querySelectorAll('#machinesTable thead th')
-        .forEach(t => t.classList.remove('sorted-asc','sorted-desc'));
-
+    document.getElementById('sortDateDesc').classList.add('sort-active');
+    document.querySelectorAll('#machinesTable thead th').forEach(t => t.classList.remove('sorted-asc', 'sorted-desc'));
+    
     if (statsOpen) toggleStats();
     render();
 }
 
-/* ═══════════════════════════════════════════════════
-   Panel statistiques
-═══════════════════════════════════════════════════ */
 function toggleStats() {
     statsOpen = !statsOpen;
     document.getElementById('statsPanel').classList.toggle('open', statsOpen);
 }
 
 /* ═══════════════════════════════════════════════════
-   XSS protection
+   Initialisation
 ═══════════════════════════════════════════════════ */
-function escHtml(str) {
-    if (!str) return '';
-    return String(str)
-        .replace(/&/g,'&amp;')
-        .replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;')
-        .replace(/"/g,'&quot;');
-}
-
-/* ═══════════════════════════════════════════════════
-   Init
-═══════════════════════════════════════════════════ */
-buildAlphaBar();
-render();
+document.addEventListener('DOMContentLoaded', function() {
+    buildAlphaBar();
+    document.getElementById('sortDateDesc').classList.add('sort-active');
+    render();
+});
 </script>
 {% endblock %}

@@ -172,8 +172,8 @@
 .toolbar select:focus { border-color:#2d6a2d; background-color:#fff; }
 .toolbar__sep { width:1px; height:26px; background:#d4e8d4; flex-shrink:0; }
 
-.maint-card { background:#fff; border-radius:16px; box-shadow:0 2px 18px rgba(0,0,0,.07); overflow:hidden; }
-.maint-table { width:100%; border-collapse:collapse; font-size:.9rem; }
+.maint-card { background:#fff; border-radius:16px; box-shadow:0 2px 18px rgba(0,0,0,.07); overflow-x:auto; }
+.maint-table { width:100%; border-collapse:collapse; font-size:.9rem; min-width:800px; }
 .maint-table thead tr { background:#f7faf4; border-bottom:1.5px solid #e4edde; }
 .maint-table th {
     padding:.8rem 1rem; text-align:left;
@@ -186,18 +186,21 @@
 .maint-table td { padding:.9rem 1rem; color:#1f2e1f; vertical-align:middle; }
 .td-cost { font-variant-numeric:tabular-nums; font-weight:600; white-space:nowrap; }
 .td-date { color:#5f7a5f; font-size:.87rem; white-space:nowrap; }
-.td-idm  {
-    font-weight:700; white-space:nowrap;
-    color:#fff;
+
+.td-machine { white-space:nowrap; }
+.machine-badge {
+    display:inline-flex; align-items:center; gap:5px;
+    background:#2d6a2d; color:#fff;
+    border-radius:20px; padding:.18rem .75rem;
+    font-size:.78rem; font-weight:600; letter-spacing:.3px;
+    width:fit-content;
 }
-.td-idm span {
-    display:inline-flex; align-items:center; justify-content:center;
-    background:#2d6a2d;
-    border-radius:20px;
-    padding:.18rem .75rem;
-    font-size:.78rem;
-    letter-spacing:.3px;
+.machine-badge--none { background:#e4edde; color:#7a9a7a; }
+.machine-name {
+    font-size:.85rem; color:#1a2e1a; font-weight:500;
+    white-space:nowrap;
 }
+
 .td-desc { color:#4a6a4a; font-size:.87rem; max-width:240px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
 .badge { display:inline-block; padding:.28rem .85rem; border-radius:50px; font-size:.78rem; font-weight:600; white-space:nowrap; }
@@ -234,22 +237,17 @@
     background:#fff; border-radius:16px;
     border:1.5px dashed #c8dac8;
 }
-.no-results {
-    text-align:center; padding:3rem 2rem;
-    display:none;
-}
+.no-results { text-align:center; padding:3rem 2rem; display:none; }
 </style>
 
 <div class="mp">
 
-  {# ── Breadcrumb ── #}
   <nav class="bc">
     <a href="#">Matériels</a>
     <span class="bc__sep">›</span>
     <span>Maintenances</span>
   </nav>
 
-  {# ── Header ── #}
   <div class="mh">
     <div>
       <h1>🔧 Maintenances</h1>
@@ -381,7 +379,7 @@
         <option value="date">Trier par date</option>
         <option value="cout">Trier par coût</option>
         <option value="type">Trier par type</option>
-        <option value="idm">Trier par ID matériel</option>
+        <option value="idm">Trier par ID machine</option>
       </select>
     </div>
 
@@ -423,14 +421,14 @@
             <th>Type de panne</th>
             <th>Coût (DT)</th>
             <th>Date</th>
-            <th>ID Matériel</th>
+            <th>ID Machine</th>
+            <th>Nom Machine</th>
             <th>Description</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody id="maintBody">
           {% for m in maintenances %}
-
             {% set typeMap = {
                 'Mécanique':         'mecanique',
                 'Électricité':       'electrique',
@@ -443,6 +441,7 @@
                 'Pneumatique':       'pneumatique',
                 'Autre':             'autre'
             } %}
+
             {% set bc = typeMap[m.typePanne]|default('default') %}
 
             <tr
@@ -452,7 +451,7 @@
               data-date="{{ m.dateMain ? m.dateMain|date('Y-m-d') : '0000-00-00' }}"
               data-idm="{{ m.idM|default(0) }}"
             >
-              <td>
+              <td class="td-type">
                 <span class="badge badge--{{ bc }}">
                   {{ m.typePanne|default('—') }}
                 </span>
@@ -461,13 +460,24 @@
               <td class="td-date">
                 {{ m.dateMain ? m.dateMain|date('d/m/Y') : '—' }}
               </td>
-              <td class="td-idm">
-                <span>#{{ m.idM|default('—') }}</span>
+              <td class="td-machine">
+                {% if m.idM %}
+                  <span class="machine-badge">🚜 #{{ m.idM }}</span>
+                {% else %}
+                  <span class="machine-badge machine-badge--none">Non assigné</span>
+                {% endif %}
+              </td>
+              <td class="td-machine">
+                {% if m.nom %}
+                  <span class="machine-name">{{ m.nom }}</span>
+                {% else %}
+                  <span class="machine-badge machine-badge--none">—</span>
+                {% endif %}
               </td>
               <td class="td-desc" title="{{ m.description|default('') }}">
-                {{ m.description|default('—') }}
+                {{ m.description|default('—')|slice(0, 50) }}{{ m.description|length > 50 ? '…' : '' }}
               </td>
-              <td>
+              <td class="td-actions">
                 <div class="actions">
                   <a href="{{ path('agri_maintenances_show', {id: m.idMain}) }}"
                      class="act-btn act-btn--view">👁 Voir</a>
@@ -501,14 +511,12 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 
-/* ── Flash auto-close ── */
 window.addEventListener('DOMContentLoaded', () => {
   const flash = document.getElementById('flashAlert');
   if (flash) setTimeout(() => flash.remove(), 4000);
   filterTable();
 });
 
-/* ── Statistiques ── */
 let chartsInitialized = false;
 
 function toggleStats() {
@@ -569,10 +577,8 @@ function initCharts() {
   });
 }
 
-/* ── Recherche ── */
 function onSearchInput(input) {
-  const clearBtn = document.getElementById('clearSearch');
-  clearBtn.classList.toggle('visible', input.value.length > 0);
+  document.getElementById('clearSearch').classList.toggle('visible', input.value.length > 0);
   filterTable();
 }
 
@@ -584,13 +590,12 @@ function clearSearch() {
   input.focus();
 }
 
-/* ── Filtre + tri ── */
 function filterTable() {
-  const search  = document.getElementById('searchInput').value.toLowerCase().trim();
-  const typeVal = document.getElementById('typeFilter').value.toLowerCase().trim();
-  const sortVal = document.getElementById('sortFilter').value;
-  const dirVal  = document.getElementById('dirFilter').value;
-  const rows    = Array.from(document.querySelectorAll('#maintBody tr'));
+  const search   = document.getElementById('searchInput').value.toLowerCase().trim();
+  const typeVal  = document.getElementById('typeFilter').value.toLowerCase().trim();
+  const sortVal  = document.getElementById('sortFilter').value;
+  const dirVal   = document.getElementById('dirFilter').value;
+  const rows     = Array.from(document.querySelectorAll('#maintBody tr'));
   const resetBtn = document.getElementById('resetBtn');
 
   resetBtn.style.display = (search || typeVal) ? 'inline-flex' : 'none';
@@ -614,9 +619,11 @@ function filterTable() {
     if      (sortVal === 'cout') { valA = parseFloat(a.dataset.cout) || 0; valB = parseFloat(b.dataset.cout) || 0; }
     else if (sortVal === 'date') { valA = a.dataset.date || ''; valB = b.dataset.date || ''; }
     else if (sortVal === 'type') { valA = a.dataset.type || ''; valB = b.dataset.type || ''; }
-    else if (sortVal === 'idm')  { valA = parseInt(a.dataset.idm)  || 0; valB = parseInt(b.dataset.idm)  || 0; }
-    if (valA < valB) return dirVal === 'asc' ? -1 :  1;
-    if (valA > valB) return dirVal === 'asc' ?  1 : -1;
+    else if (sortVal === 'idm')  { valA = parseInt(a.dataset.idm) || 0; valB = parseInt(b.dataset.idm) || 0; }
+    else { valA = a.dataset.date || ''; valB = b.dataset.date || ''; }
+    
+    if (valA < valB) return dirVal === 'asc' ? -1 : 1;
+    if (valA > valB) return dirVal === 'asc' ? 1 : -1;
     return 0;
   });
 
@@ -627,7 +634,7 @@ function filterTable() {
   const maintTable = document.getElementById('maintTable');
   if (noResults && maintTable) {
     noResults.style.display  = visible.length === 0 ? 'block' : 'none';
-    maintTable.style.display = visible.length === 0 ? 'none'  : '';
+    maintTable.style.display = visible.length === 0 ? 'none' : '';
   }
 }
 

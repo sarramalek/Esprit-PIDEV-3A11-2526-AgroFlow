@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Controller\Materiels;
-
+use App\Entity\Materiels\Machine;
 use App\Entity\Materiels\Maintenance;
 use App\Form\Materiels\MaintenanceType;
 use App\Repository\Materiels\MaintenanceRepository;
@@ -15,21 +15,19 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/agriculteur/maintenances')]
 class MaintenancesController extends AbstractController
 {
-    // LIST + SEARCH + FILTER + SORT
     #[Route('', name: 'agri_maintenances_index', methods: ['GET'])]
     public function index(Request $request, MaintenanceRepository $repo): Response
     {
-        $search  = $request->query->get('search', '');
-        $type    = $request->query->get('type', '');
-        $sort    = $request->query->get('sort', 'dateMain');
-        $dir     = $request->query->get('dir', 'DESC');
+        $search = $request->query->get('search', '');
+        $type   = $request->query->get('type', '');
+        $sort   = $request->query->get('sort', 'dateMain');
+        $dir    = $request->query->get('dir', 'DESC');
 
-        $maintenances = $repo->search($search, $type, $sort, $dir);
+        $maintenances = $repo->searchWithMaterielName($search, $type, $sort, $dir);
 
-        // Stats
-        $countByType  = $repo->countByTypePanne();
-        $coutByMonth  = $repo->getCoutByMonth();
-        $totalCout    = $repo->getTotalCout();
+        $countByType = $repo->countByTypePanne();
+        $coutByMonth = $repo->getCoutByMonth();
+        $totalCout   = $repo->getTotalCout();
 
         return $this->render('maintenances/index.html.twig', [
             'maintenances' => $maintenances,
@@ -42,54 +40,52 @@ class MaintenancesController extends AbstractController
             'totalCout'    => $totalCout,
         ]);
     }
-
+    
     // EXPORT EXCEL
-   #[Route('/export/excel', name: 'agri_maintenances_export_excel', methods: ['GET'])]
-public function exportExcel(MaintenanceRepository $repo): StreamedResponse
-{
-    $maintenances = $repo->findAllOrderedByDate();
+    #[Route('/export/excel', name: 'agri_maintenances_export_excel', methods: ['GET'])]
+    public function exportExcel(MaintenanceRepository $repo): StreamedResponse
+    {
+        $maintenances = $repo->findAllOrderedByDate();
 
-    $response = new StreamedResponse(function () use ($maintenances) {
-        $handle = fopen('php://output', 'w+');
-        // BOM UTF-8
-        fwrite($handle, "\xEF\xBB\xBF");
+        $response = new StreamedResponse(function () use ($maintenances) {
+            $handle = fopen('php://output', 'w+');
+            fwrite($handle, "\xEF\xBB\xBF");
 
-        // Title row
-        fputcsv($handle, ['AGROFLOW — Rapport Maintenances'], ';');
-        fputcsv($handle, ['Exporté le : ' . (new \DateTime())->format('d/m/Y H:i')], ';');
-        fputcsv($handle, ['Nombre d\'enregistrements : ' . count($maintenances)], ';');
-        fputcsv($handle, [], ';'); // blank line
+            fputcsv($handle, ['AGROFLOW — Rapport Maintenances'], ';');
+            fputcsv($handle, ['Exporté le : ' . (new \DateTime())->format('d/m/Y H:i')], ';');
+            fputcsv($handle, ['Nombre d\'enregistrements : ' . count($maintenances)], ';');
+            fputcsv($handle, [], ';');
 
-        // Header
-        fputcsv($handle, ['#', 'Type de panne', 'Coût (DT)', 'Date', 'Description', 'ID Matériel'], ';');
+            fputcsv($handle, ['#', 'Type de panne', 'Coût (DT)', 'Date', 'Description', 'ID Matériel', 'Nom Matériel'], ';');
 
-        $index = 1;
-        $totalCout = 0.0;
-        foreach ($maintenances as $m) {
-            fputcsv($handle, [
-                $index++,
-                $m->getTypePanne(),
-                number_format($m->getCout(), 2, ',', ' '),
-                $m->getDateMain()?->format('d/m/Y') ?? '',
-                $m->getDescription() ?? '',
-                $m->getIdM() ? '#' . $m->getIdM() : '',
-            ], ';');
-            $totalCout += $m->getCout();
-        }
+            $index = 1;
+            $totalCout = 0.0;
+            foreach ($maintenances as $m) {
+                fputcsv($handle, [
+                    $index++,
+                    $m->getTypePanne(),
+                    number_format($m->getCout(), 2, ',', ' '),
+                    $m->getDateMain()?->format('d/m/Y') ?? '',
+                    $m->getDescription() ?? '',
+                    $m->getIdM() ? '#' . $m->getIdM() : '',
+                    $m->getNomMateriel() ?? '',
+                ], ';');
+                $totalCout += $m->getCout();
+            }
 
-        // Total row
-        fputcsv($handle, [], ';');
-        fputcsv($handle, ['', 'TOTAL', number_format($totalCout, 2, ',', ' ') . ' DT', '', '', ''], ';');
+            fputcsv($handle, [], ';');
+            fputcsv($handle, ['', 'TOTAL', number_format($totalCout, 2, ',', ' ') . ' DT', '', '', '', ''], ';');
 
-        fclose($handle);
-    });
+            fclose($handle);
+        });
 
-    $filename = 'maintenances_' . (new \DateTime())->format('Ymd_Hi') . '.csv';
-    $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
-    $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
-    return $response;
-}
-    // EXPORT PDF (via simple HTML print)
+        $filename = 'maintenances_' . (new \DateTime())->format('Ymd_Hi') . '.csv';
+        $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
+        $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
+        return $response;
+    }
+    
+    // EXPORT PDF
     #[Route('/export/pdf', name: 'agri_maintenances_export_pdf', methods: ['GET'])]
     public function exportPdf(MaintenanceRepository $repo): Response
     {
@@ -121,8 +117,14 @@ public function exportExcel(MaintenanceRepository $repo): StreamedResponse
 
     // SHOW
     #[Route('/{id}', name: 'agri_maintenances_show', methods: ['GET'])]
-    public function show(Maintenance $maintenance): Response
+    public function show(int $id, MaintenanceRepository $repo): Response
     {
+        $maintenance = $repo->findOneWithMaterielName($id);
+        
+        if (!$maintenance) {
+            throw $this->createNotFoundException('Maintenance non trouvée.');
+        }
+        
         return $this->render('maintenances/show.html.twig', [
             'maintenance' => $maintenance,
         ]);

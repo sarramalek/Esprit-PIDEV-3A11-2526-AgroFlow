@@ -1,361 +1,393 @@
-{# templates/maintenances/form.html.twig #}
+{# Formulaire maintenance - à inclure dans new.html.twig et edit.html.twig #}
 
 <style>
-    .af-form-card {
-        background: #ffffff;
-        border-radius: 16px;
-        padding: 2rem;
-        box-shadow: 0 2px 15px rgba(0,0,0,0.06);
-        border: 1px solid #eef2ee;
+.af-form {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 18px rgba(0,0,0,.07);
+}
+.af-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+}
+@media (max-width: 700px) {
+    .af-form-grid {
+        grid-template-columns: 1fr;
     }
-    .af-form-label {
-        font-weight: 600;
-        color: #4a5d4a;
-        font-size: 0.875rem;
-        margin-bottom: 0.45rem;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-    }
-    .af-form-label .req { color: #a32d2d; }
-
-    .af-input-group {
-        position: relative;
-        display: flex;
-        align-items: center;
-    }
-    .af-icon {
-        position: absolute;
-        left: 11px;
-        font-size: 15px;
-        pointer-events: none;
-        z-index: 5;
-        line-height: 1;
-    }
-    .af-clear {
-        position: absolute;
-        right: 10px;
-        background: none;
-        border: none;
-        cursor: pointer;
-        color: #e24b4a;
-        font-size: 13px;
-        line-height: 1;
-        padding: 2px 4px;
-        z-index: 5;
-        display: none;
-        border-radius: 4px;
-    }
-    .af-clear:hover { background: #fcebeb; }
-
-    .af-control {
-        width: 100%;
-        padding: 0.65rem 2.2rem 0.65rem 2.5rem;
-        border: 1.5px solid #e2e8f0;
-        border-radius: 8px;
-        background-color: #fcfdfc;
-        font-size: 0.9rem;
-        color: #1a2e1a;
-        transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
-        outline: none;
-        font-family: inherit;
-    }
-    .af-control:focus {
-        border-color: #4ade80;
-        background-color: #fff;
-        box-shadow: 0 0 0 3px rgba(74,222,128,0.12);
-    }
-    .af-control.is-valid {
-        border-color: #22c55e;
-        background-color: #f9fcf7;
-    }
-    .af-control.is-invalid {
-        border-color: #e24b4a;
-        background-color: #fef2f2;
-    }
-    .af-control::placeholder { color: #aac2aa; }
-
-    select.af-control {
-        appearance: none;
-        -webkit-appearance: none;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a9a7a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-        background-repeat: no-repeat;
-        background-position: right 2.2rem center;
-        cursor: pointer;
-    }
-    textarea.af-control {
-        padding-left: 1rem;
-        resize: vertical;
-        min-height: 100px;
-    }
-
-    .af-error-msg {
-        display: none;
-        align-items: center;
-        gap: 5px;
-        color: #a32d2d;
-        font-size: 0.78rem;
-        margin-top: 5px;
-        font-weight: 500;
-    }
-    .af-error-msg.visible { display: flex; }
-    .af-error-msg::before {
-        content: '⚠';
-        font-size: 12px;
-        flex-shrink: 0;
-    }
-
-    .af-id-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        background: #f7faf4;
-        border: 1.5px solid #d4e8d4;
-        border-radius: 8px;
-        padding: 0.6rem 1rem;
-        font-size: 0.9rem;
-        color: #5f7a5f;
-        font-style: italic;
-    }
-
-    .af-btn-row {
-        display: flex;
-        gap: 0.75rem;
-        margin-top: 1.75rem;
-        flex-wrap: wrap;
-    }
-    .btn-save {
-        background-color: #2d6a2d;
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        padding: 0.65rem 1.75rem;
-        font-size: 0.9rem;
-        cursor: pointer;
-        transition: background 0.15s, transform 0.1s;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-    .btn-save:hover  { background-color: #235223; }
-    .btn-save:active { transform: scale(0.98); }
-
-    .btn-cancel-custom {
-        border: 1.5px solid #d4e8d4;
-        border-radius: 8px;
-        color: #64748b;
-        font-weight: 600;
-        font-size: 0.9rem;
-        padding: 0.65rem 1.75rem;
-        text-decoration: none;
-        background: #fff;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        transition: background 0.15s, border-color 0.15s;
-        cursor: pointer;
-    }
-    .btn-cancel-custom:hover { background: #f0f4f0; border-color: #b3d4b3; }
+}
+.af-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.af-form-group.full-width {
+    grid-column: 1 / -1;
+}
+.af-form-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #5f7a5f;
+}
+.af-form-label .required {
+    color: #a32d2d;
+    margin-left: 0.2rem;
+}
+.af-input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.af-icon {
+    position: absolute;
+    left: 0.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    pointer-events: none;
+    z-index: 1;
+}
+.af-control {
+    width: 100%;
+    padding: 0.7rem 2rem 0.7rem 2.5rem;
+    border: 1.5px solid #d4e8d4;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    color: #1a2e1a;
+    background: #f9fcf7;
+    transition: all 0.15s;
+    font-family: inherit;
+}
+.af-control:focus {
+    outline: none;
+    border-color: #2d6a2d;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(45,106,45,.08);
+}
+.af-control.is-invalid {
+    border-color: #a32d2d;
+    background: #fff8f8;
+}
+.af-control.is-invalid:focus {
+    box-shadow: 0 0 0 3px rgba(163,45,45,.08);
+}
+select.af-control {
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237a9a7a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.85rem center;
+    padding-right: 2.2rem;
+}
+textarea.af-control {
+    resize: vertical;
+    min-height: 90px;
+}
+.af-clear {
+    position: absolute;
+    right: 0.7rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #aac2aa;
+    font-size: 1rem;
+    padding: 4px;
+    border-radius: 4px;
+    transition: color 0.12s;
+    display: none;
+}
+.af-clear.visible {
+    display: block;
+}
+.af-clear:hover {
+    color: #a32d2d;
+}
+.af-error-msg {
+    font-size: 0.75rem;
+    color: #a32d2d;
+    margin-top: 0.25rem;
+    display: none;
+}
+.af-error-msg.visible {
+    display: block;
+}
+.af-hint {
+    font-size: 0.7rem;
+    color: #aac2aa;
+    margin-top: 0.25rem;
+}
+.af-form-actions {
+    margin-top: 1.75rem;
+    padding-top: 1rem;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    border-top: 1px solid #eaf3de;
+}
+.btn-save {
+    background: #2d6a2d;
+    color: #fff;
+    border: none;
+    padding: 0.7rem 1.6rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.14s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.btn-save:hover {
+    background: #235223;
+}
+.btn-cancel {
+    background: transparent;
+    color: #7a9a7a;
+    border: 1.5px solid #d4e8d4;
+    padding: 0.7rem 1.6rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.14s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.btn-cancel:hover {
+    background: #f2f8ee;
+    border-color: #b3d4b3;
+    color: #2d6a2d;
+}
 </style>
 
-<div class="af-form-card">
-    {{ form_start(form, {
-        'attr': {
-            'id': 'af-maintenance-form',
-            'novalidate': 'novalidate'
-        }
-    }) }}
+<div class="af-form">
+    {{ form_start(form, {'attr': {'class': 'af-form-grid', 'novalidate': 'novalidate'}}) }}
 
-    <div class="row g-4">
-
-        {# ── ID auto-increment (affiché, non éditable) ── #}
-        <div class="col-12">
-            <div class="af-form-label">ID de maintenance</div>
-            <div class="af-id-badge">🔒 Généré automatiquement</div>
+    {# ── Type de panne ── #}
+    <div class="af-form-group">
+        <label class="af-form-label">
+            Type de panne <span class="required">*</span>
+        </label>
+        <div class="af-input-group">
+            <span class="af-icon">🔧</span>
+            {{ form_widget(form.typePanne, {
+                'attr': {
+                    'class': 'af-control' ~ (form.typePanne.vars.errors|length > 0 ? ' is-invalid' : ''),
+                    'onchange': 'afValidate(this)'
+                }
+            }) }}
         </div>
-
-        {# ── Type de panne ── #}
-        <div class="col-md-6">
-            <label class="af-form-label" for="{{ form.typePanne.vars.id }}">
-                Type de panne <span class="req">*</span>
-            </label>
-            <div class="af-input-group">
-                <span class="af-icon">🔧</span>
-                {{ form_widget(form.typePanne, {
-                    'attr': {
-                        'class': 'af-control' ~ (form.typePanne.vars.errors|length > 0 ? ' is-invalid' : ''),
-                        'onchange': 'afValidate(this)'
-                    }
-                }) }}
-                <button type="button" class="af-clear" onclick="afClear(this)" title="Effacer">✕</button>
+        {% if form.typePanne.vars.errors|length > 0 %}
+            <div class="af-error-msg visible">
+                {% for error in form.typePanne.vars.errors %}{{ error.message }}{% endfor %}
             </div>
-            {% if form.typePanne.vars.errors|length > 0 %}
-                <div class="af-error-msg visible">
-                    {% for error in form.typePanne.vars.errors %}{{ error.message }}{% endfor %}
-                </div>
-            {% else %}
-                <div class="af-error-msg" data-msg="Veuillez sélectionner un type de panne."></div>
-            {% endif %}
-        </div>
-
-        {# ── Coût ── #}
-        <div class="col-md-6">
-            <label class="af-form-label" for="{{ form.cout.vars.id }}">
-                Coût (DT) <span class="req">*</span>
-            </label>
-            <div class="af-input-group">
-                <span class="af-icon">💰</span>
-                {{ form_widget(form.cout, {
-                    'attr': {
-                        'class': 'af-control' ~ (form.cout.vars.errors|length > 0 ? ' is-invalid' : ''),
-                        'placeholder': 'Ex : 250.00',
-                        'oninput': 'afValidate(this)'
-                    }
-                }) }}
-                <button type="button" class="af-clear" onclick="afClear(this)" title="Effacer">✕</button>
-            </div>
-            {% if form.cout.vars.errors|length > 0 %}
-                <div class="af-error-msg visible">
-                    {% for error in form.cout.vars.errors %}{{ error.message }}{% endfor %}
-                </div>
-            {% else %}
-                <div class="af-error-msg" data-msg="Le coût doit être un nombre positif (0.01 – 999 999,99 DT)."></div>
-            {% endif %}
-        </div>
-
-        {# ── Date de maintenance ── #}
-        <div class="col-md-6">
-            <label class="af-form-label" for="{{ form.dateMain.vars.id }}">
-                Date de maintenance <span class="req">*</span>
-            </label>
-            <div class="af-input-group">
-                <span class="af-icon">📅</span>
-                {{ form_widget(form.dateMain, {
-                    'attr': {
-                        'class': 'af-control' ~ (form.dateMain.vars.errors|length > 0 ? ' is-invalid' : ''),
-                        'oninput': 'afValidate(this)'
-                    }
-                }) }}
-                <button type="button" class="af-clear" onclick="afClear(this)" title="Effacer">✕</button>
-            </div>
-            {% if form.dateMain.vars.errors|length > 0 %}
-                <div class="af-error-msg visible">
-                    {% for error in form.dateMain.vars.errors %}{{ error.message }}{% endfor %}
-                </div>
-            {% else %}
-                <div class="af-error-msg" data-msg="La date est obligatoire et ne peut pas être dans le futur."></div>
-            {% endif %}
-        </div>
-
-        {# ── Description ── #}
-        <div class="col-12">
-            <label class="af-form-label" for="{{ form.description.vars.id }}">
-                Description
-            </label>
-            <div class="af-input-group">
-                {{ form_widget(form.description, {
-                    'attr': {
-                        'class': 'af-control' ~ (form.description.vars.errors|length > 0 ? ' is-invalid' : ''),
-                        'rows': '4',
-                        'placeholder': "Décrivez l'intervention effectuée…",
-                        'oninput': 'afValidate(this)'
-                    }
-                }) }}
-            </div>
-            {% if form.description.vars.errors|length > 0 %}
-                <div class="af-error-msg visible">
-                    {% for error in form.description.vars.errors %}{{ error.message }}{% endfor %}
-                </div>
-            {% else %}
-                <div class="af-error-msg" data-msg="La description doit contenir entre 5 et 1000 caractères, sans < > { }."></div>
-            {% endif %}
-        </div>
-
+        {% else %}
+            <div class="af-error-msg" data-msg="Veuillez sélectionner un type de panne."></div>
+        {% endif %}
     </div>
 
-    <div class="af-btn-row">
+    {# ── Coût ── #}
+    <div class="af-form-group">
+        <label class="af-form-label">
+            Coût (DT) <span class="required">*</span>
+        </label>
+        <div class="af-input-group">
+            <span class="af-icon">💰</span>
+            {{ form_widget(form.cout, {
+                'attr': {
+                    'class': 'af-control' ~ (form.cout.vars.errors|length > 0 ? ' is-invalid' : ''),
+                    'placeholder': 'Ex: 150.00',
+                    'step': '0.01',
+                    'oninput': 'afValidate(this)'
+                }
+            }) }}
+            <button type="button" class="af-clear" onclick="afClear(this)" title="Effacer">✕</button>
+        </div>
+        {% if form.cout.vars.errors|length > 0 %}
+            <div class="af-error-msg visible">
+                {% for error in form.cout.vars.errors %}{{ error.message }}{% endfor %}
+            </div>
+        {% else %}
+            <div class="af-error-msg" data-msg="Le coût doit être un nombre positif."></div>
+        {% endif %}
+    </div>
+
+    {# ── Date ── #}
+    <div class="af-form-group">
+        <label class="af-form-label">
+            Date de maintenance <span class="required">*</span>
+        </label>
+        <div class="af-input-group">
+            <span class="af-icon">📅</span>
+            {{ form_widget(form.dateMain, {
+                'attr': {
+                    'class': 'af-control' ~ (form.dateMain.vars.errors|length > 0 ? ' is-invalid' : ''),
+                    'onchange': 'afValidate(this)'
+                }
+            }) }}
+        </div>
+        {% if form.dateMain.vars.errors|length > 0 %}
+            <div class="af-error-msg visible">
+                {% for error in form.dateMain.vars.errors %}{{ error.message }}{% endfor %}
+            </div>
+        {% else %}
+            <div class="af-error-msg" data-msg="La date ne peut pas être dans le futur."></div>
+        {% endif %}
+    </div>
+
+    {# ── ID Machine ── #}
+    <div class="af-form-group">
+        <label class="af-form-label">
+            ID Machine
+        </label>
+        <div class="af-input-group">
+            <span class="af-icon">🚜</span>
+            {{ form_widget(form.idM, {
+                'attr': {
+                    'class': 'af-control' ~ (form.idM.vars.errors|length > 0 ? ' is-invalid' : ''),
+                    'placeholder': 'Ex : 3',
+                    'oninput': 'afValidate(this)'
+                }
+            }) }}
+            <button type="button" class="af-clear" onclick="afClear(this)" title="Effacer">✕</button>
+        </div>
+        {% if form.idM.vars.errors|length > 0 %}
+            <div class="af-error-msg visible">
+                {% for error in form.idM.vars.errors %}{{ error.message }}{% endfor %}
+            </div>
+        {% else %}
+            <div class="af-error-msg" data-msg="L'ID machine doit être un entier positif."></div>
+        {% endif %}
+        <div class="af-hint">Entrez l'ID de la machine concernée (optionnel)</div>
+    </div>
+
+    {# ── Description (pleine largeur) ── #}
+    <div class="af-form-group full-width">
+        <label class="af-form-label">
+            Description
+        </label>
+        <div class="af-input-group">
+            <span class="af-icon">📝</span>
+            {{ form_widget(form.description, {
+                'attr': {
+                    'class': 'af-control' ~ (form.description.vars.errors|length > 0 ? ' is-invalid' : ''),
+                    'placeholder': 'Décrivez l\'intervention effectuée...',
+                    'rows': 4,
+                    'oninput': 'afValidate(this)'
+                }
+            }) }}
+            <button type="button" class="af-clear" onclick="afClear(this)" title="Effacer">✕</button>
+        </div>
+        <div class="af-hint">Minimum 5 caractères, maximum 1000 caractères.</div>
+        {% if form.description.vars.errors|length > 0 %}
+            <div class="af-error-msg visible">
+                {% for error in form.description.vars.errors %}{{ error.message }}{% endfor %}
+            </div>
+        {% else %}
+            <div class="af-error-msg" data-msg="La description doit contenir au moins 5 caractères."></div>
+        {% endif %}
+    </div>
+
+    {# ── Actions ── #}
+    <div class="af-form-actions" style="grid-column: 1 / -1;">
         <button type="submit" class="btn-save">
             {{ btn_label|default('💾 Enregistrer') }}
         </button>
-        {% if cancel_url is defined %}
-            <a href="{{ cancel_url }}" class="btn-cancel-custom">✖ Annuler</a>
-        {% endif %}
+        <a href="{{ cancel_url|default(path('agri_maintenances_index')) }}" class="btn-cancel">
+            ✕ Annuler
+        </a>
     </div>
 
     {{ form_end(form) }}
 </div>
 
 <script>
-(function () {
-    const today = new Date().toISOString().split('T')[0];
-
-    const validators = {
-        typepanne:   el => el.value !== '',
-        cout:        el => { const v = parseFloat(el.value); return !isNaN(v) && v > 0 && v <= 999999.99; },
-        datemain:    el => el.value && el.value >= '1990-01-01' && el.value <= today,
-        description: el => {
-            const v = el.value.trim();
-            if (!v) return true;
-            return v.length >= 5 && v.length <= 1000 && !/[<>{}]/.test(v);
-        }
-    };
-
-    function getKey(el) {
-        const id = (el.id || '').toLowerCase();
-        for (const key of Object.keys(validators)) {
-            if (id.includes(key)) return key;
-        }
-        return null;
+function afValidate(input) {
+    const group = input.closest('.af-form-group');
+    const errorDiv = group.querySelector('.af-error-msg');
+    const clearBtn = group.querySelector('.af-clear');
+    
+    // Afficher/masquer le bouton clear
+    if (clearBtn && input.value && input.value.length > 0) {
+        clearBtn.classList.add('visible');
+    } else if (clearBtn) {
+        clearBtn.classList.remove('visible');
     }
-
-    window.afValidate = function (el) {
-        const key  = getKey(el);
-        const wrap = el.closest('.af-input-group');
-        const err  = wrap ? wrap.nextElementSibling : null;
-        const btn  = wrap ? wrap.querySelector('.af-clear') : null;
-
-        if (btn) btn.style.display = el.value ? 'block' : 'none';
-        if (!key) return;
-
-        const ok = validators[key](el);
-        el.classList.toggle('is-invalid', !ok);
-        el.classList.toggle('is-valid',   ok && el.value !== '');
-
-        if (err && err.classList.contains('af-error-msg')) {
-            err.classList.toggle('visible', !ok);
-            if (!ok && err.dataset.msg) err.textContent = err.dataset.msg;
+    
+    // Validation simple côté client
+    if (input.name === 'maintenance[cout]') {
+        const val = parseFloat(input.value);
+        if (input.value && (isNaN(val) || val <= 0)) {
+            input.classList.add('is-invalid');
+            if (errorDiv) errorDiv.classList.add('visible');
+            return false;
+        } else {
+            input.classList.remove('is-invalid');
+            if (errorDiv) errorDiv.classList.remove('visible');
         }
-    };
+    }
+    
+    if (input.name === 'maintenance[idM]' && input.value) {
+        const val = parseInt(input.value);
+        if (isNaN(val) || val <= 0) {
+            input.classList.add('is-invalid');
+            if (errorDiv) errorDiv.classList.add('visible');
+            return false;
+        } else {
+            input.classList.remove('is-invalid');
+            if (errorDiv) errorDiv.classList.remove('visible');
+        }
+    }
+    
+    if (input.name === 'maintenance[description]' && input.value) {
+        if (input.value.length < 5) {
+            input.classList.add('is-invalid');
+            if (errorDiv) errorDiv.classList.add('visible');
+            return false;
+        } else {
+            input.classList.remove('is-invalid');
+            if (errorDiv) errorDiv.classList.remove('visible');
+        }
+    }
+    
+    return true;
+}
 
-    window.afClear = function (btn) {
-        const wrap = btn.closest('.af-input-group');
-        if (!wrap) return;
-        const el = wrap.querySelector('input, select, textarea');
-        if (!el) return;
-        el.value = '';
-        el.classList.remove('is-invalid', 'is-valid');
-        btn.style.display = 'none';
-        const err = wrap.nextElementSibling;
-        if (err && err.classList.contains('af-error-msg')) err.classList.remove('visible');
-        el.focus();
-    };
+function afClear(btn) {
+    const group = btn.closest('.af-form-group');
+    const input = group.querySelector('input, textarea, select');
+    if (input) {
+        input.value = '';
+        input.classList.remove('is-invalid');
+        const errorDiv = group.querySelector('.af-error-msg');
+        if (errorDiv) errorDiv.classList.remove('visible');
+        btn.classList.remove('visible');
+        input.focus();
+        
+        // Déclencher l'événement change pour mettre à jour
+        if (input.dispatchEvent) {
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    }
+}
 
-    /* Clear button visible si valeur pré-remplie (mode édition) */
-    document.querySelectorAll('.af-input-group').forEach(wrap => {
-        const el  = wrap.querySelector('input, select, textarea');
-        const btn = wrap.querySelector('.af-clear');
-        if (el && btn && el.value) btn.style.display = 'block';
+// Initialiser les clear buttons
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.af-control').forEach(input => {
+        const group = input.closest('.af-form-group');
+        const clearBtn = group?.querySelector('.af-clear');
+        if (clearBtn && input.value && input.value.length > 0) {
+            clearBtn.classList.add('visible');
+        }
     });
-
-    /* Validation complète à la soumission */
-    const form = document.getElementById('af-maintenance-form');
-    if (form) {
-        form.addEventListener('submit', () => {
-            form.querySelectorAll('.af-control').forEach(el => {
-                if (getKey(el)) afValidate(el);
-            });
-        });
-    }
-})();
+});
 </script>
