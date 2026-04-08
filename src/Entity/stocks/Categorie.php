@@ -2,16 +2,16 @@
 
 namespace App\Entity\stocks;
 
+use App\Entity\User\User;
+use App\Entity\stocks\Article;
 use App\Repository\stocks\CategorieRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: CategorieRepository::class)]
 #[ORM\Table(name: "categorie")]
-#[UniqueEntity(fields: ['nom'], message: 'Ce nom de catégorie existe déjà.')]
 class Categorie
 {
     #[ORM\Id]
@@ -21,25 +21,27 @@ class Categorie
 
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank(message: "Le nom de la catégorie est obligatoire.")]
-    #[Assert\Length(min: 3, minMessage: "Le nom doit faire au moins 3 caractères.")]
     private ?string $nom = null;
 
     #[ORM\Column(type: "text", nullable: true)]
     private ?string $description = null;
 
-    #[ORM\Column(type: "datetime_immutable")]
-    private ?\DateTimeImmutable $date_creation = null;
+    // Utilisation de CamelCase pour PHP, snake_case pour la base de données
+    #[ORM\Column(name: "date_creation", type: "datetime_immutable")]
+    private ?\DateTimeImmutable $dateCreation = null;
 
-    #[ORM\OneToMany(targetEntity: Article::class, mappedBy: "categorie")]
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: "id_user", referencedColumnName: "cin", nullable: false)]
+    private ?User $agriculteur = null;
+
+    #[ORM\OneToMany(mappedBy: 'categorie', targetEntity: Article::class)]
     private Collection $articles;
 
     public function __construct()
     {
         $this->articles = new ArrayCollection();
-        $this->date_creation = new \DateTimeImmutable(); // Date auto à la création
+        $this->dateCreation = new \DateTimeImmutable();
     }
-
-    // --- GETTERS & SETTERS ---
 
     public function getId(): ?int
     {
@@ -68,7 +70,22 @@ class Categorie
 
     public function getDateCreation(): ?\DateTimeImmutable
     {
-        return $this->date_creation;
+        return $this->dateCreation;
+    }
+    public function setDateCreation(\DateTimeImmutable $dateCreation): self
+    {
+        $this->dateCreation = $dateCreation;
+        return $this;
+    }
+
+    public function getAgriculteur(): ?User
+    {
+        return $this->agriculteur;
+    }
+    public function setAgriculteur(?User $agriculteur): self
+    {
+        $this->agriculteur = $agriculteur;
+        return $this;
     }
 
     /** @return Collection<int, Article> */

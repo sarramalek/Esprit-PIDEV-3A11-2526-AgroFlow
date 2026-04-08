@@ -18,8 +18,11 @@ class CategorieController extends AbstractController
     #[Route('/', name: 'agri_categories', methods: ['GET'])]
     public function index(Request $request, CategorieRepository $repository, EntityManagerInterface $em): Response
     {
+        $user = $this->getUser();
         $search = $request->query->get('q');
-        $sort = $request->query->get('sort', 'date_creation');
+
+        // Correction : Utilisation de la propriété PHP dateCreation
+        $sort = $request->query->get('sort', 'dateCreation');
         $direction = $request->query->get('direction', 'DESC');
 
         // Préparation de la période pour la rotation (3 derniers mois)
@@ -30,6 +33,8 @@ class CategorieController extends AbstractController
             ->leftJoin('c.articles', 'a')
             ->addSelect('COUNT(a.id) as HIDDEN articleCount')
             ->addSelect('SUM(a.quantite_en_stock) as totalQuantite')
+            ->where('c.agriculteur = :user')
+            ->setParameter('user', $user)
             ->groupBy('c.id');
 
         if ($search) {
@@ -37,13 +42,14 @@ class CategorieController extends AbstractController
                 ->setParameter('search', '%' . $search . '%');
         }
 
-        // Gestion du tri
+        // Gestion du tri corrigée
         if ($sort === 'nom') {
             $queryBuilder->orderBy('c.nom', $direction);
         } elseif ($sort === 'articles') {
             $queryBuilder->orderBy('articleCount', $direction);
         } else {
-            $queryBuilder->orderBy('c.date_creation', $direction);
+            // Correction ici : date_creation devient dateCreation
+            $queryBuilder->orderBy('c.dateCreation', $direction);
         }
 
         $results = $queryBuilder->getQuery()->getResult();
@@ -56,7 +62,7 @@ class CategorieController extends AbstractController
             $articles = $categorie->getArticles();
             $nbProduits = count($articles);
 
-            // --- 1. LOGIQUE DE ROTATION (NOUVEAU) ---
+            // --- 1. LOGIQUE DE ROTATION ---
             $totalSorties = $em->getRepository(MouvementStock::class)->createQueryBuilder('m')
                 ->select('SUM(m.quantite)')
                 ->join('m.article', 'art')
@@ -73,7 +79,7 @@ class CategorieController extends AbstractController
             // Indice de rotation : Sorties / Stock Actuel
             $indiceRotation = ($totalStock > 0) ? ($totalSorties / $totalStock) : ($totalSorties > 0 ? 1 : 0);
 
-            // --- 2. LOGIQUE DES 60 JOURS (EXISTANTE) ---
+            // --- 2. LOGIQUE DES 60 JOURS ---
             $diff = $aujourdhui->diff($categorie->getDateCreation());
             $joursPasses = $diff->days;
             $joursRestants = 60 - $joursPasses;
@@ -89,7 +95,6 @@ class CategorieController extends AbstractController
                     'nbProduits' => $nbProduits,
                     'afficherAlerte' => $afficherAlerte,
                     'joursRestants' => $joursRestants,
-                    // Nouvelles données de rotation
                     'totalSorties' => $totalSorties,
                     'indiceRotation' => round($indiceRotation, 2),
                 ];
@@ -108,6 +113,9 @@ class CategorieController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $categorie = new Categorie();
+        // On définit l'agriculteur automatiquement
+        $categorie->setAgriculteur($this->getUser());
+
         $form = $this->createForm(CategorieType::class, $categorie);
         $form->handleRequest($request);
 
