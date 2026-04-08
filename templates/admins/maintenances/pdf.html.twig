@@ -151,10 +151,10 @@
       <thead>
         <tr>
           <th>Type de panne</th>
+          <th>Matériel</th>
           <th>Coût (DT)</th>
           <th>Date</th>
           <th>Description</th>
-          <th>ID Matériel</th>
         </tr>
       </thead>
       <tbody>
@@ -166,27 +166,34 @@
               {% elseif m.typePanne == 'Mécanique' %}badge-info
               {% elseif m.typePanne == 'Hydraulique' %}badge-primary
               {% elseif m.typePanne == 'Pneumatique' %}badge-secondary
-              {% elseif m.typePanne == 'logicielle' %}badge-dark
+              {% elseif m.typePanne == 'Logicielle' %}badge-dark
               {% elseif m.typePanne == 'Moteur' %}badge-success
               {% elseif m.typePanne == 'Transmission' %}badge-danger
               {% else %}badge-secondary{% endif %}">
               {{ m.typePanne }}
             </span>
           </td>
+          <td>
+            {% if m.nom %}
+              <strong>{{ m.nom }}</strong><br>
+              <small>ID: {{ m.idM }}</small>
+            {% else %}
+              <span style="color:#999;">— Non lié —</span>
+            {% endif %}
+          </td>
           <td style="font-weight:bold; color:#1a472a;">
             {{ m.cout|number_format(2, ',', ' ') }} DT
           </td>
           <td>{{ m.dateMain ? m.dateMain|date('d/m/Y') : '—' }}</td>
           <td style="max-width:250px;">{{ m.description ?? '—' }}</td>
-          <td>{{ m.idM ? 'M-' ~ m.idM : '—' }}</td>
         </tr>
         {% endfor %}
       </tbody>
       <tfoot>
         <tr>
-          <td><strong>TOTAL</strong></td>
+          <td colspan="2"><strong>TOTAL</strong></td>
           <td><strong>{{ totalCout|number_format(2, ',', ' ') }} DT</strong></td>
-          <td colspan="3"></td>
+          <td colspan="2"></td>
         </tr>
       </tfoot>
     </table>

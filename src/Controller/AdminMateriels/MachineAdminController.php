@@ -3,7 +3,9 @@
 namespace App\Controller\AdminMateriels;
 
 use App\Entity\Materiels\Machine;
+use App\Entity\User\User;
 use App\Repository\Materiels\MachineRepository;
+use App\Repository\User\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,8 +35,20 @@ class MachineAdminController extends AbstractController
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         $machine = new Machine();
+        
+        // Récupérer la liste des agriculteurs (role = 2)
+        $agriculteurs = $this->getAgriculteurs($em);
 
         if ($request->isMethod('POST')) {
+            // Récupérer le CIN de l'agriculteur sélectionné
+            $cinAgriculteur = $request->request->get('agriculteur');
+            if ($cinAgriculteur) {
+                $agriculteur = $em->getRepository(User::class)->find($cinAgriculteur);
+                if ($agriculteur) {
+                    $machine->setAgriculteur($agriculteur);
+                }
+            }
+            
             $this->hydrateMachine($machine, $request);
             $errors = $this->validateMachine($machine, $request);
 
@@ -44,6 +58,7 @@ class MachineAdminController extends AbstractController
                 }
                 return $this->render('admin/machines/new.html.twig', [
                     'machine' => $machine,
+                    'agriculteurs' => $agriculteurs,
                     'errors'  => $errors,
                 ]);
             }
@@ -57,6 +72,7 @@ class MachineAdminController extends AbstractController
 
         return $this->render('admin/machines/new.html.twig', [
             'machine' => $machine,
+            'agriculteurs' => $agriculteurs,
             'errors'  => [],
         ]);
     }
@@ -81,7 +97,21 @@ class MachineAdminController extends AbstractController
         Machine $machine,
         EntityManagerInterface $em
     ): Response {
+        // Récupérer la liste des agriculteurs (role = 2)
+        $agriculteurs = $this->getAgriculteurs($em);
+        
         if ($request->isMethod('POST')) {
+            // Récupérer le CIN de l'agriculteur sélectionné
+            $cinAgriculteur = $request->request->get('agriculteur');
+            if ($cinAgriculteur) {
+                $agriculteur = $em->getRepository(User::class)->find($cinAgriculteur);
+                if ($agriculteur) {
+                    $machine->setAgriculteur($agriculteur);
+                }
+            } else {
+                $machine->setAgriculteur(null);
+            }
+            
             $this->hydrateMachine($machine, $request);
             $errors = $this->validateMachine($machine, $request);
 
@@ -91,6 +121,7 @@ class MachineAdminController extends AbstractController
                 }
                 return $this->render('admin/machines/edit.html.twig', [
                     'machine' => $machine,
+                    'agriculteurs' => $agriculteurs,
                     'errors'  => $errors,
                 ]);
             }
@@ -103,6 +134,7 @@ class MachineAdminController extends AbstractController
 
         return $this->render('admin/machines/edit.html.twig', [
             'machine' => $machine,
+            'agriculteurs' => $agriculteurs,
             'errors'  => [],
         ]);
     }
@@ -134,6 +166,11 @@ class MachineAdminController extends AbstractController
     private function validateMachine(Machine $machine, Request $request): array
     {
         $errors = [];
+
+        // Vérifier que l'agriculteur est sélectionné
+        if ($machine->getAgriculteur() === null) {
+            $errors[] = 'Veuillez sélectionner un agriculteur propriétaire de la machine.';
+        }
 
         // Nom
         $nom = trim($machine->getNom());
@@ -204,6 +241,15 @@ class MachineAdminController extends AbstractController
     /* ════════════════════════════════════════════
        HELPERS PRIVÉS
     ════════════════════════════════════════════ */
+    
+    /**
+     * Récupère la liste des agriculteurs (role = 2)
+     */
+    private function getAgriculteurs(EntityManagerInterface $em): array
+    {
+        return $em->getRepository(User::class)->findBy(['role' => 2]);
+    }
+    
     private function hydrateMachine(Machine $machine, Request $request): void
     {
         $machine->setNom(trim($request->request->get('nom', '')));
@@ -237,10 +283,20 @@ class MachineAdminController extends AbstractController
                 'date'   => $m->getDateAchat()
                             ? $m->getDateAchat()->format('Y-m-d')
                             : null,
+                // Infos propriétaire
+                'cinAgriculteur' => $m->getCinAgriculteur(),
+                'nomAgriculteur' => $m->getNomAgriculteur(),
                 'csrf'   => 'delete' . $m->getId(),
             ];
         }, $machines);
 
         return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG);
     }
+    #[Route('/{id}/delete-confirm', name: 'delete_confirm', methods: ['GET'])]
+public function deleteConfirm(Machine $machine): Response
+{
+    return $this->render('admin/machines/delete.html.twig', [
+        'machine' => $machine,
+    ]);
+}
 }

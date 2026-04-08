@@ -398,38 +398,28 @@
                 </ul>
             </div>
                 <!-- Gestion Matériels -->
-
-                        <div class="nav-item {% if app.request.get('_route') starts with 'agri_machine' or app.request.get('_route') == 'agri_machines' or app.request.get('_route') starts with 'maintenance_' %}open{% endif %}">
-            <div class="nav-link {% if app.request.get('_route') starts with 'agri_machine' or app.request.get('_route') == 'agri_machines' or app.request.get('_route') starts with 'maintenance_' %}active{% endif %}"
-                onclick="toggleMenu(this)">
-                <span class="nav-icon"><i class="fa fa-tractor"></i></span>
-                <span class="nav-label">Gestion Matériels</span>
-                <i class="fa fa-chevron-right nav-arrow"></i>
-            </div>
-            <ul class="nav-sub">
-                <li>
-                
-                 <a href="{{ path('admin_machines_index') }}"
-            class="{% if app.request.get('_route') starts with 'admin_machines_' %}active{% endif %}">
+<div class="nav-item {% if app.request.get('_route') starts with 'admin_machines' or app.request.get('_route') starts with 'admin_maintenances' %}open{% endif %}">
+    <div class="nav-link {% if app.request.get('_route') starts with 'admin_machines' or app.request.get('_route') starts with 'admin_maintenances' %}active{% endif %}"
+         onclick="toggleMenu(this)">
+        <span class="nav-icon"><i class="fa fa-tractor"></i></span>
+        <span class="nav-label">Gestion Matériels</span>
+        <i class="fa fa-chevron-right nav-arrow"></i>
+    </div>
+    <ul class="nav-sub">
+        <li>
+            <a href="{{ path('admin_machines_index') }}"
+               class="{% if app.request.get('_route') starts with 'admin_machines' %}active{% endif %}">
                 <span class="sub-dot"></span> Machines
             </a>
-            
-                </li>
-                <li>
-                    {# <a href="#"
-        class="{% if app.request.get('_route') starts with 'maintenance_' %}active{% endif %}">
-            <span class="sub-dot"></span> Maintenances
-        </a> #}
-
-                            <a href="{{ path('admin_maintenances_index') }}"
-        class="{% if app.request.get('_route') starts with 'agri_maintenances' %}active{% endif %}">
-            <span class="sub-dot"></span> Maintenances
-        </a>
-                </li>
-            </ul>
-        </div>
-
-        </nav>
+        </li>
+        <li>
+            <a href="{{ path('admin_maintenances_index') }}"
+               class="{% if app.request.get('_route') starts with 'admin_maintenances' %}active{% endif %}">
+                <span class="sub-dot"></span> Maintenances
+            </a>
+        </li>
+    </ul>
+</div>
 
         <!-- Footer -->
         <div class="sidebar-footer">

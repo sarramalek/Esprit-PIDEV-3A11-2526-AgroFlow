@@ -1,9 +1,6 @@
-7a9406,127.0.0.1,GET,https://127.0.0.1:8000/,1775641724,,200,request
-b2e316,127.0.0.1,GET,https://127.0.0.1:8000/login,1775641728,,302,request
-0cd22b,127.0.0.1,GET,https://127.0.0.1:8000/agriculteur/,1775641729,,200,request
-8f6ca5,127.0.0.1,GET,https://127.0.0.1:8000/agriculteur/materiels/machines,1775641732,,200,request
-6d7efa,127.0.0.1,GET,https://127.0.0.1:8000/agriculteur/materiels/machines/new,1775641739,,200,request
-e5ef67,127.0.0.1,POST,https://127.0.0.1:8000/agriculteur/materiels/machines/new,1775641772,,422,request
-410c11,127.0.0.1,POST,https://127.0.0.1:8000/agriculteur/materiels/machines/new,1775641785,,422,request
-f5604e,127.0.0.1,POST,https://127.0.0.1:8000/agriculteur/materiels/machines/new,1775641801,,302,request
-f4d3fc,127.0.0.1,GET,https://127.0.0.1:8000/agriculteur/materiels/machines,1775641801,,200,request
+9cac40,127.0.0.1,GET,https://127.0.0.1:8000/,1775660618,,200,request
+92458d,127.0.0.1,GET,https://127.0.0.1:8000/login,1775660621,,302,request
+c80068,127.0.0.1,GET,https://127.0.0.1:8000/agriculteur/,1775660622,,200,request
+3ece9c,127.0.0.1,GET,https://127.0.0.1:8000/agriculteur/maintenances,1775660627,,200,request
+aca471,127.0.0.1,GET,https://127.0.0.1:8000/agriculteur/maintenances/new,1775660630,,200,request
+e40177,127.0.0.1,GET,https://127.0.0.1:8000/agriculteur/maintenances,1775660642,,200,request
