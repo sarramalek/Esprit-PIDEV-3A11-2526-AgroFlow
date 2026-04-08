@@ -29,13 +29,20 @@ class Maintenance
     #[ORM\Column(name: 'idM', type: 'integer', nullable: true)]
     private ?int $idM = null;
 
+    // Propriété non persistée pour le nom de la machine
+    private ?string $nom = null;
+
     // ====================== Getters & Setters ======================
 
     public function getIdMain(): ?int
     {
         return $this->idMain;
     }
-
+        public function setIdMain(int $idMain): static
+        {
+            $this->idMain = $idMain;
+            return $this;
+        }
     public function getId(): ?int
     {
         return $this->idMain;
@@ -93,6 +100,17 @@ class Maintenance
     public function setIdM(?int $idM): static
     {
         $this->idM = $idM;
+        return $this;
+    }
+
+    public function getNom(): ?string
+    {
+        return $this->nom;
+    }
+
+    public function setNom(?string $nom): static
+    {
+        $this->nom = $nom;
         return $this;
     }
 }

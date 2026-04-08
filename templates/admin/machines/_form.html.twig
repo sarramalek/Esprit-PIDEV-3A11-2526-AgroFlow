@@ -67,7 +67,32 @@ select.field-input { cursor: pointer; }
 </style>
 
 {# ══════════════════════════════════════════
-   SECTION 1 — Identification
+   SECTION 1 — Propriétaire (NOUVEAU)
+══════════════════════════════════════════ #}
+<div class="form-section"><i class="fa fa-user"></i> Propriétaire</div>
+
+<div class="form-grid-2">
+    {# Sélection de l'agriculteur #}
+    <div class="field-group">
+        <label for="agriculteur">Agriculteur <span class="required">*</span></label>
+        <select id="agriculteur" name="agriculteur" class="field-input" required>
+            <option value="" disabled {{ machine.agriculteur is empty ? 'selected' : '' }}>
+                — Sélectionnez un agriculteur —
+            </option>
+            {% for agriculteur in agriculteurs %}
+                <option value="{{ agriculteur.cin }}"
+                    {{ machine.agriculteur and machine.agriculteur.cin == agriculteur.cin ? 'selected' : '' }}>
+                    {{ agriculteur.nom }} {{ agriculteur.prenom }} (CIN: {{ agriculteur.cin }})
+                </option>
+            {% endfor %}
+        </select>
+        <div class="field-error" id="err-agriculteur">Veuillez sélectionner un agriculteur</div>
+        <div class="field-hint">Le propriétaire de la machine</div>
+    </div>
+</div>
+
+{# ══════════════════════════════════════════
+   SECTION 2 — Identification
 ══════════════════════════════════════════ #}
 <div class="form-section"><i class="fa fa-tag"></i> Identification</div>
 
@@ -133,7 +158,7 @@ select.field-input { cursor: pointer; }
 </div>{# /grid #}
 
 {# ══════════════════════════════════════════
-   SECTION 2 — État & Date
+   SECTION 3 — État & Date
 ══════════════════════════════════════════ #}
 <div class="form-section"><i class="fa fa-info-circle"></i> État & Acquisition</div>
 
@@ -178,6 +203,7 @@ select.field-input { cursor: pointer; }
 
     /* ── Règles de validation ── */
     const RULES = {
+        agriculteur:  { min: 1,  max: null, pattern: null,              msg: 'Veuillez sélectionner un agriculteur' },
         nom:          { min: 3,  max: 100, pattern: null,              msg: 'Champ obligatoire (3 à 100 caractères)' },
         marque:       { min: 2,  max: 80,  pattern: null,              msg: 'Champ obligatoire (2 à 80 caractères)' },
         modele:       { min: 1,  max: 80,  pattern: null,              msg: 'Champ obligatoire (1 à 80 caractères)' },
@@ -202,7 +228,7 @@ select.field-input { cursor: pointer; }
             else if (len >= max * .8) cc.classList.add('warn');
         }
         input.addEventListener('input', updateCounter);
-        updateCounter(); /* init */
+        updateCounter();
     });
 
     /* ── Valide un champ unique ── */
@@ -214,7 +240,12 @@ select.field-input { cursor: pointer; }
         const err   = document.getElementById('err-' + id);
         if (!input) return true;
 
-        const val = input.value.trim();
+        let val = input.value.trim();
+        
+        /* Pour le select, la valeur peut être vide ou non */
+        if (id === 'agriculteur') {
+            val = input.value;
+        }
 
         /* champ optionnel vide → toujours valide */
         if (rule.optional && val === '') {
@@ -224,7 +255,7 @@ select.field-input { cursor: pointer; }
         }
 
         /* vide ou trop court */
-        if (val.length < rule.min) {
+        if (val === '' || val.length < rule.min) {
             setInvalid(input, err);
             return false;
         }
@@ -273,19 +304,19 @@ select.field-input { cursor: pointer; }
         if (!input) return;
         input.addEventListener('blur',  () => validateField(id));
         input.addEventListener('input', () => {
-            /* ne montrer le vert que si déjà touché */
             if (input.classList.contains('is-invalid') ||
                 input.classList.contains('is-valid')) {
                 validateField(id);
             }
         });
+        input.addEventListener('change', () => validateField(id));
     });
 
     /* ── Validation globale à la soumission ── */
     const form = document.querySelector('form');
     if (form) {
         form.addEventListener('submit', function (e) {
-            const fields  = ['nom','marque','modele','numeroSerie','etatM','dateAchat'];
+            const fields  = ['agriculteur', 'nom', 'marque', 'modele', 'numeroSerie', 'etatM', 'dateAchat'];
             let   allOk   = true;
             let   firstBad = null;
 
@@ -303,13 +334,11 @@ select.field-input { cursor: pointer; }
                     firstBad.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     firstBad.focus();
                 }
-                /* bannière d'erreur globale */
                 showBanner('Veuillez corriger les erreurs avant d\'enregistrer.', 'error');
             }
         });
     }
 
-    /* ── Bannière flash JS ── */
     function showBanner(msg, type) {
         const existing = document.getElementById('js-banner');
         if (existing) existing.remove();

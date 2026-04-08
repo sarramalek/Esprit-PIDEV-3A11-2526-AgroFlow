@@ -59,6 +59,19 @@
         transition: background 0.14s;
     }
     .btn-show:hover { background: #f2f8ee; }
+
+    .alert-error {
+        background-color: #fef2f2;
+        border: 1px solid #f5c6cb;
+        color: #c53030;
+        padding: 12px 16px;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.95rem;
+    }
 </style>
 
 <div class="me-page">
@@ -80,7 +93,12 @@
         </a>
     </div>
 
-    {# Inclusion du formulaire avec le nouveau nom #}
+    {% if form.vars.submitted and not form.vars.valid %}
+        <div class="alert-error">
+            ⚠️ Le formulaire contient des erreurs. Veuillez les corriger avant de continuer.
+        </div>
+    {% endif %}
+
     {% include 'maintenances/form.html.twig' with {
         'form': form,
         'btn_label': '💾 Mettre à jour',

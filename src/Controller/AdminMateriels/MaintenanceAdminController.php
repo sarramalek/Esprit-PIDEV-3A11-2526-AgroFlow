@@ -3,29 +3,34 @@
 namespace App\Controller\AdminMateriels;
 
 use App\Entity\Materiels\Maintenance;
+use App\Entity\Materiels\Machine;
 use App\Repository\Materiels\MaintenanceRepository;
+use App\Repository\Materiels\MachineRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/admin/materiels/maintenances', name: 'admin_maintenances_')]
 class MaintenanceAdminController extends AbstractController
 {
-    // ─────────────────────────────────────────────
-    // INDEX
-    // ─────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────────────
+    // INDEX - Liste des maintenances
+    // ─────────────────────────────────────────────────────────────────────────
     #[Route('', name: 'index', methods: ['GET'])]
     public function index(
         Request $request,
-        MaintenanceRepository $repo
+        MaintenanceRepository $repo,
+        MachineRepository $machineRepo
     ): Response {
         $search     = $request->query->get('search', '');
         $type       = $request->query->get('type', '');
         $sort       = $request->query->get('sort', 'dateMain');
         $dir        = $request->query->get('dir', 'DESC');
         $coutFilter = $request->query->get('coutFilter', '');
+        $idM        = $request->query->get('idM', '');
 
         if ($coutFilter === 'asc') {
             $sort = 'cout'; $dir = 'ASC';
@@ -33,9 +38,10 @@ class MaintenanceAdminController extends AbstractController
             $sort = 'cout'; $dir = 'DESC';
         }
 
-        $maintenances = $repo->search($search, $type, $sort, $dir);
+        $maintenances = $repo->searchWithMaterielName($search, $type, $sort, $dir, $idM);
         $types        = array_column($repo->countByTypePanne(), 'type');
         $totalCout    = $repo->getTotalCout();
+        $machines     = $machineRepo->findAll();
 
         return $this->render('admins/maintenances/index.html.twig', [
             'maintenances' => $maintenances,
@@ -43,15 +49,17 @@ class MaintenanceAdminController extends AbstractController
             'totalCout'    => $totalCout,
             'search'       => $search,
             'selectedType' => $type,
+            'selectedIdM'  => $idM,
             'sort'         => $sort,
             'dir'          => $dir,
             'coutFilter'   => $coutFilter,
+            'machines'     => $machines,
         ]);
     }
 
-    // ─────────────────────────────────────────────
-    // STATISTIQUES — Bar Chart
-    // ─────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────────────
+    // STATISTIQUES
+    // ─────────────────────────────────────────────────────────────────────────
     #[Route('/statistiques/bar', name: 'stats_bar', methods: ['GET'])]
     public function statsBar(MaintenanceRepository $repo): Response
     {
@@ -68,9 +76,9 @@ class MaintenanceAdminController extends AbstractController
         ]);
     }
 
-    // ─────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────────────
     // EXPORT PDF
-    // ─────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────────────
     #[Route('/export/pdf', name: 'export_pdf', methods: ['GET'])]
     public function exportPdf(MaintenanceRepository $repo): Response
     {
@@ -88,36 +96,125 @@ class MaintenanceAdminController extends AbstractController
         return new Response($html, 200, ['Content-Type' => 'text/html']);
     }
 
-    // ─────────────────────────────────────────────
-    // NEW
-    // ─────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────────────
+    // NEW - Créer une nouvelle maintenance (AVEC CONTROLE DE SAISIE PHP)
+    // ─────────────────────────────────────────────────────────────────────────
     #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
     public function new(
         Request $request,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        MachineRepository $machineRepo
     ): Response {
         $maintenance = new Maintenance();
+        $machines = $machineRepo->findAll();
+        $errors = [];
 
         if ($request->isMethod('POST')) {
-            $this->handleForm($request, $maintenance);
-            $em->persist($maintenance);
-            $em->flush();
-            $this->addFlash('success', 'Maintenance ajoutée avec succès.');
-            return $this->redirectToRoute('admin_maintenances_index');
+            // =============================================================
+            // CONTROLE DE SAISIE PHP - Validation des champs
+            // =============================================================
+            
+            // 1. Validation du type de panne
+            $typePanne = trim($request->request->get('typePanne', ''));
+            if (empty($typePanne)) {
+                $errors['typePanne'] = 'Le type de panne est obligatoire.';
+            } else {
+                $maintenance->setTypePanne($typePanne);
+            }
+
+            // 2. Validation du coût
+            $cout = $request->request->get('cout');
+            if ($cout === null || $cout === '') {
+                $errors['cout'] = 'Le coût est obligatoire.';
+            } else {
+                $coutFloat = (float) $cout;
+                if ($coutFloat <= 0) {
+                    $errors['cout'] = 'Le coût doit être supérieur à 0.';
+                } elseif ($coutFloat > 999999.99) {
+                    $errors['cout'] = 'Le coût ne peut pas dépasser 999 999,99 DT.';
+                } else {
+                    $maintenance->setCout($coutFloat);
+                }
+            }
+
+            // 3. Validation de la date
+            $dateStr = $request->request->get('dateMain');
+            if (empty($dateStr)) {
+                $errors['dateMain'] = 'La date de maintenance est obligatoire.';
+            } else {
+                try {
+                    $date = new \DateTime($dateStr);
+                    $today = new \DateTime('today');
+                    if ($date > $today) {
+                        $errors['dateMain'] = 'La date ne peut pas être dans le futur.';
+                    } else {
+                        $maintenance->setDateMain($date);
+                    }
+                } catch (\Exception $e) {
+                    $errors['dateMain'] = 'Format de date invalide.';
+                }
+            }
+
+            // 4. Validation de la description
+            $description = trim($request->request->get('description', ''));
+            if (empty($description)) {
+                $errors['description'] = 'La description est obligatoire.';
+            } elseif (strlen($description) < 5) {
+                $errors['description'] = 'La description doit contenir au moins 5 caractères.';
+            } elseif (strlen($description) > 1000) {
+                $errors['description'] = 'La description ne peut pas dépasser 1000 caractères.';
+            } elseif (preg_match('/[<>{}]/', $description)) {
+                $errors['description'] = 'La description ne doit pas contenir les caractères < > { }.';
+            } else {
+                $maintenance->setDescription($description);
+            }
+
+            // 5. Validation de la machine (optionnelle)
+            $idM = $request->request->get('idM');
+            if (!empty($idM)) {
+                $idMInt = (int) $idM;
+                $machine = $machineRepo->find($idMInt);
+                if ($machine) {
+                    $maintenance->setIdM($idMInt);
+                    $maintenance->setNom($machine->getNom());
+                } else {
+                    $errors['idM'] = 'La machine sélectionnée n\'existe pas.';
+                }
+            } else {
+                $maintenance->setIdM(null);
+                $maintenance->setNom(null);
+            }
+
+            // =============================================================
+            // SI AUCUNE ERREUR, ON SAUVEGARDE
+            // =============================================================
+            if (empty($errors)) {
+                $em->persist($maintenance);
+                $em->flush();
+                $this->addFlash('success', 'Maintenance ajoutée avec succès.');
+                return $this->redirectToRoute('admin_maintenances_index');
+            } else {
+                // Afficher toutes les erreurs
+                foreach ($errors as $field => $error) {
+                    $this->addFlash('error', $error);
+                }
+            }
         }
 
         return $this->render('admins/maintenances/new.html.twig', [
             'maintenance' => $maintenance,
+            'machines'    => $machines,
+            'errors'      => $errors,
         ]);
     }
 
-    // ─────────────────────────────────────────────
-    // SHOW
-    // ─────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────────────
+    // SHOW - Afficher une maintenance
+    // ─────────────────────────────────────────────────────────────────────────
     #[Route('/{id}', name: 'show', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function show(int $id, MaintenanceRepository $repo): Response
     {
-        $maintenance = $repo->find($id);
+        $maintenance = $repo->findOneWithMaterielName($id);
         if (!$maintenance) {
             $this->addFlash('error', 'Maintenance introuvable.');
             return $this->redirectToRoute('admin_maintenances_index');
@@ -128,14 +225,15 @@ class MaintenanceAdminController extends AbstractController
         ]);
     }
 
-    // ─────────────────────────────────────────────
-    // EDIT
-    // ─────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────────────
+    // EDIT - Modifier une maintenance (AVEC CONTROLE DE SAISIE PHP)
+    // ─────────────────────────────────────────────────────────────────────────
     #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
     public function edit(
         int $id,
         Request $request,
         MaintenanceRepository $repo,
+        MachineRepository $machineRepo,
         EntityManagerInterface $em
     ): Response {
         $maintenance = $repo->find($id);
@@ -144,21 +242,110 @@ class MaintenanceAdminController extends AbstractController
             return $this->redirectToRoute('admin_maintenances_index');
         }
 
+        $machines = $machineRepo->findAll();
+        $errors = [];
+
         if ($request->isMethod('POST')) {
-            $this->handleForm($request, $maintenance);
-            $em->flush();
-            $this->addFlash('success', 'Maintenance mise à jour.');
-            return $this->redirectToRoute('admin_maintenances_index');
+            // =============================================================
+            // CONTROLE DE SAISIE PHP - Validation des champs
+            // =============================================================
+            
+            // 1. Validation du type de panne
+            $typePanne = trim($request->request->get('typePanne', ''));
+            if (empty($typePanne)) {
+                $errors['typePanne'] = 'Le type de panne est obligatoire.';
+            } else {
+                $maintenance->setTypePanne($typePanne);
+            }
+
+            // 2. Validation du coût
+            $cout = $request->request->get('cout');
+            if ($cout === null || $cout === '') {
+                $errors['cout'] = 'Le coût est obligatoire.';
+            } else {
+                $coutFloat = (float) $cout;
+                if ($coutFloat <= 0) {
+                    $errors['cout'] = 'Le coût doit être supérieur à 0.';
+                } elseif ($coutFloat > 999999.99) {
+                    $errors['cout'] = 'Le coût ne peut pas dépasser 999 999,99 DT.';
+                } else {
+                    $maintenance->setCout($coutFloat);
+                }
+            }
+
+            // 3. Validation de la date
+            $dateStr = $request->request->get('dateMain');
+            if (empty($dateStr)) {
+                $errors['dateMain'] = 'La date de maintenance est obligatoire.';
+            } else {
+                try {
+                    $date = new \DateTime($dateStr);
+                    $today = new \DateTime('today');
+                    if ($date > $today) {
+                        $errors['dateMain'] = 'La date ne peut pas être dans le futur.';
+                    } else {
+                        $maintenance->setDateMain($date);
+                    }
+                } catch (\Exception $e) {
+                    $errors['dateMain'] = 'Format de date invalide.';
+                }
+            }
+
+            // 4. Validation de la description
+            $description = trim($request->request->get('description', ''));
+            if (empty($description)) {
+                $errors['description'] = 'La description est obligatoire.';
+            } elseif (strlen($description) < 5) {
+                $errors['description'] = 'La description doit contenir au moins 5 caractères.';
+            } elseif (strlen($description) > 1000) {
+                $errors['description'] = 'La description ne peut pas dépasser 1000 caractères.';
+            } elseif (preg_match('/[<>{}]/', $description)) {
+                $errors['description'] = 'La description ne doit pas contenir les caractères < > { }.';
+            } else {
+                $maintenance->setDescription($description);
+            }
+
+            // 5. Validation de la machine (optionnelle)
+            $idM = $request->request->get('idM');
+            if (!empty($idM)) {
+                $idMInt = (int) $idM;
+                $machine = $machineRepo->find($idMInt);
+                if ($machine) {
+                    $maintenance->setIdM($idMInt);
+                    $maintenance->setNom($machine->getNom());
+                } else {
+                    $errors['idM'] = 'La machine sélectionnée n\'existe pas.';
+                }
+            } else {
+                $maintenance->setIdM(null);
+                $maintenance->setNom(null);
+            }
+
+            // =============================================================
+            // SI AUCUNE ERREUR, ON SAUVEGARDE
+            // =============================================================
+            if (empty($errors)) {
+                $em->flush();
+                $this->addFlash('success', 'Maintenance mise à jour avec succès.');
+                return $this->redirectToRoute('admin_maintenances_index');
+            } else {
+                // Afficher toutes les erreurs
+                foreach ($errors as $field => $error) {
+                    $this->addFlash('error', $error);
+                }
+            }
         }
 
         return $this->render('admins/maintenances/edit.html.twig', [
             'maintenance' => $maintenance,
+            'machines'    => $machines,
+            'errors'      => $errors,
         ]);
     }
 
-    // ─────────────────────────────────────────────
-    // DELETE
-    // ─────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────────────
+    // DELETE - Supprimer une maintenance
+    // ─────────────────────────────────────────────────────────────────────────
     #[Route('/{id}/delete', name: 'delete', methods: ['POST'], requirements: ['id' => '\d+'])]
     public function delete(
         int $id,
@@ -172,30 +359,14 @@ class MaintenanceAdminController extends AbstractController
             return $this->redirectToRoute('admin_maintenances_index');
         }
 
-        if ($this->isCsrfTokenValid(
-            'delete_maintenance_' . $id,
-            $request->request->get('_token')
-        )) {
+        if ($this->isCsrfTokenValid('delete_maintenance_' . $id, $request->request->get('_token'))) {
             $em->remove($maintenance);
             $em->flush();
-            $this->addFlash('success', 'Maintenance supprimée.');
+            $this->addFlash('success', 'Maintenance supprimée avec succès.');
         } else {
             $this->addFlash('error', 'Token CSRF invalide.');
         }
 
         return $this->redirectToRoute('admin_maintenances_index');
-    }
-
-    // ─────────────────────────────────────────────
-    // HELPER PRIVÉ — sans idM
-    // ─────────────────────────────────────────────
-    private function handleForm(Request $request, Maintenance $maintenance): void
-    {
-        $maintenance->setTypePanne($request->request->get('typePanne', ''));
-        $maintenance->setCout((float) $request->request->get('cout', 0));
-        $maintenance->setDescription($request->request->get('description'));
-
-        $dateStr = $request->request->get('dateMain');
-        $maintenance->setDateMain($dateStr ? new \DateTime($dateStr) : null);
     }
 }
