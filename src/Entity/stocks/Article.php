@@ -2,6 +2,7 @@
 
 namespace App\Entity\stocks;
 
+use App\Entity\User\User;
 use App\Entity\stocks\MouvementStock;
 use App\Repository\stocks\ArticleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -15,7 +16,7 @@ class Article
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: "id_article")]
+    #[ORM\Column(name: "id_article", type: "integer")]
     private ?int $id = null;
 
     #[ORM\Column(length: 150)]
@@ -46,12 +47,18 @@ class Article
     #[ORM\JoinColumn(name: "id_categorie", referencedColumnName: "id_categorie", nullable: true)]
     private ?Categorie $categorie = null;
 
+    // Ajout du lien vers l'agriculteur (User)
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: "id_user", referencedColumnName: "cin", nullable: true)]
+    private ?User $user = null;
+
+    // Correction : Le nom de la propriété doit être 'mouvements' pour matcher ton MouvementStock
     #[ORM\OneToMany(targetEntity: MouvementStock::class, mappedBy: 'article', orphanRemoval: true)]
-    private Collection $mouvementStocks;
+    private Collection $mouvements;
 
     public function __construct()
     {
-        $this->mouvementStocks = new ArrayCollection();
+        $this->mouvements = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -119,25 +126,38 @@ class Article
         return $this;
     }
 
-    public function getMouvementStocks(): Collection
+    public function getUser(): ?User
     {
-        return $this->mouvementStocks;
+        return $this->user;
+    }
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+        return $this;
     }
 
-    public function addMouvementStock(MouvementStock $mouvementStock): static
+    /**
+     * @return Collection<int, MouvementStock>
+     */
+    public function getMouvements(): Collection
     {
-        if (!$this->mouvementStocks->contains($mouvementStock)) {
-            $this->mouvementStocks->add($mouvementStock);
-            $mouvementStock->setArticle($this);
+        return $this->mouvements;
+    }
+
+    public function addMouvement(MouvementStock $mouvement): static
+    {
+        if (!$this->mouvements->contains($mouvement)) {
+            $this->mouvements->add($mouvement);
+            $mouvement->setArticle($this);
         }
         return $this;
     }
 
-    public function removeMouvementStock(MouvementStock $mouvementStock): static
+    public function removeMouvement(MouvementStock $mouvement): static
     {
-        if ($this->mouvementStocks->removeElement($mouvementStock)) {
-            if ($mouvementStock->getArticle() === $this) {
-                $mouvementStock->setArticle(null);
+        if ($this->mouvements->removeElement($mouvement)) {
+            if ($mouvement->getArticle() === $this) {
+                $mouvement->setArticle(null);
             }
         }
         return $this;

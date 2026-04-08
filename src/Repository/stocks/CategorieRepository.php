@@ -15,4 +15,17 @@ class CategorieRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Categorie::class);
     }
+
+    /**
+     * Récupère les catégories d'un agriculteur spécifique
+     */
+    public function findByAgriculteur($user)
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.agriculteur = :user')
+            ->setParameter('user', $user)
+            ->orderBy('c.dateCreation', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }
