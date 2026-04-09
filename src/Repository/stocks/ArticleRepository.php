@@ -13,27 +13,45 @@ class ArticleRepository extends ServiceEntityRepository
         parent::__construct($registry, Article::class);
     }
 
-    public function findBySearchCriteria(?string $search, ?string $categoryId, $user): array
+    /**
+     * Recherche, filtre et trie les articles
+     */
+    public function findBySearchCriteria(?string $search, ?string $categoryId, $user, string $sortBy = 'nom'): array
     {
         $qb = $this->createQueryBuilder('a');
 
-        // Filtrer par l'utilisateur connecté (sécurité)
+        // 1. Filtrer par l'utilisateur connecté (Sécurité & Isolation des données)
         $qb->andWhere('a.user = :user')
             ->setParameter('user', $user);
 
+        // 2. Filtre de recherche par nom
         if ($search) {
             $qb->andWhere('a.nom LIKE :search')
                 ->setParameter('search', '%' . $search . '%');
         }
 
+        // 3. Filtre par catégorie
         if ($categoryId && $categoryId !== '') {
-            // Utiliser 'a.categorie' directement pour que Doctrine gère 
-            // lui-même la correspondance avec 'id_categorie'
             $qb->andWhere('a.categorie = :catId')
                 ->setParameter('catId', $categoryId);
         }
 
-        $qb->orderBy('a.nom', 'ASC');
+        // 4. Gestion dynamique du Tri
+        switch ($sortBy) {
+            case 'prix_asc':
+                $qb->orderBy('a.prixUnitaire', 'ASC');
+                break;
+            case 'prix_desc':
+                $qb->orderBy('a.prixUnitaire', 'DESC');
+                break;
+            case 'nom_desc':
+                $qb->orderBy('a.nom', 'DESC');
+                break;
+            case 'nom':
+            default:
+                $qb->orderBy('a.nom', 'ASC');
+                break;
+        }
 
         return $qb->getQuery()->getResult();
     }

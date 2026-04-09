@@ -51,50 +51,94 @@ class MouvementController extends AbstractController
         ]);
     }
 
+    #[Route('/agriculteur/mouvements/new/{id}', name: 'app_mouvement_new_alias', methods: ['GET', 'POST'])]
+    public function gestionStockAlias(Article $article, Request $request, EntityManagerInterface $em): Response
+    {
+        if ($article->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
+        }
+
+        $mouvement = new MouvementStock();
+        $mouvement->setArticle($article);
+        $mouvement->setDateMouvement(new \DateTimeImmutable());
+        $mouvement->setUser($this->getUser());
+
+        $type = $request->request->get('type');
+        $quantite = floatval($request->request->get('quantite'));
+        $motif = $request->request->get('motif');
+
+        if ($quantite <= 0) {
+            $this->addFlash('danger', 'La quantité doit être supérieure à 0.');
+            return $this->redirectToRoute('agri_produits');
+        }
+
+        $stockActuel = $article->getQuantiteEnStock();
+
+        if ($type === 'ENTREE') {
+            $article->setQuantiteEnStock($stockActuel + $quantite);
+        } elseif ($type === 'SORTIE') {
+            if ($stockActuel < $quantite) {
+                $this->addFlash('danger', 'Stock insuffisant pour ' . $article->getNom());
+                return $this->redirectToRoute('agri_produits');
+            }
+            $article->setQuantiteEnStock($stockActuel - $quantite);
+        }
+
+        $mouvement->setType($type);
+        $mouvement->setQuantite($quantite);
+        $mouvement->setMotif($motif);
+
+        $em->persist($mouvement);
+        $em->flush();
+
+        $this->addFlash('success', 'Mouvement enregistré avec succès.');
+        return $this->redirectToRoute('agri_produits');
+    }
     #[Route('/agriculteur/mouvements/rotation', name: 'app_mouvement_rotation')]
     public function rotation(Request $request, CategorieRepository $catRepo, EntityManagerInterface $em): Response
     {
         $user = $this->getUser();
+
+        // RÃ©cupÃ©ration des dates (on force le format pour Ã©viter les erreurs de calcul)
         $dateDebutStr = $request->query->get('debut', (new \DateTime('-30 days'))->format('Y-m-d'));
         $dateFinStr = $request->query->get('fin', (new \DateTime())->format('Y-m-d'));
 
-        $dateDebut = new \DateTime($dateDebutStr);
-        $dateFin = new \DateTime($dateFinStr);
+        $dateDebut = new \DateTime($dateDebutStr . ' 00:00:00');
+        $dateFin = new \DateTime($dateFinStr . ' 23:59:59');
 
         $categories = $catRepo->findBy(['agriculteur' => $user]);
         $stats = [];
 
         foreach ($categories as $cat) {
-            $totalSorties = $em->getRepository(MouvementStock::class)->createQueryBuilder('m')
-                ->select('SUM(m.quantite)')
+            // On rÃ©cupÃ¨re TOUS les mouvements de la catÃ©gorie d'un coup pour gagner en performance
+            $mouvements = $em->getRepository(MouvementStock::class)->createQueryBuilder('m')
+                ->select('m.type, SUM(m.quantite) as total')
                 ->join('m.article', 'art')
                 ->where('art.categorie = :cat')
-                ->andWhere('m.type = :type')
                 ->andWhere('m.user = :user')
                 ->andWhere('m.dateMouvement BETWEEN :debut AND :fin')
                 ->setParameter('cat', $cat)
-                ->setParameter('type', 'SORTIE')
                 ->setParameter('user', $user)
                 ->setParameter('debut', $dateDebut)
                 ->setParameter('fin', $dateFin)
+                ->groupBy('m.type')
                 ->getQuery()
-                ->getSingleScalarResult() ?: 0;
+                ->getResult();
 
-            $totalEntrees = $em->getRepository(MouvementStock::class)->createQueryBuilder('m')
-                ->select('SUM(m.quantite)')
-                ->join('m.article', 'art')
-                ->where('art.categorie = :cat')
-                ->andWhere('m.type = :type')
-                ->andWhere('m.user = :user')
-                ->andWhere('m.dateMouvement BETWEEN :debut AND :fin')
-                ->setParameter('cat', $cat)
-                ->setParameter('type', 'ENTREE')
-                ->setParameter('user', $user)
-                ->setParameter('debut', $dateDebut)
-                ->setParameter('fin', $dateFin)
-                ->getQuery()
-                ->getSingleScalarResult() ?: 0;
+            $totalEntrees = 0;
+            $totalSorties = 0;
 
+            foreach ($mouvements as $mov) {
+                // On compare en ignorant la casse et les espaces
+                $type = trim(strtoupper($mov['type']));
+                if ($type === 'ENTREE') {
+                    $totalEntrees = (float)$mov['total'];
+                } elseif ($type === 'SORTIE') {
+                    $totalSorties = (float)$mov['total'];
+                }
+            }
+
+            // Calcul du stock actuel de la catÃ©gorie
             $totalStock = 0;
             foreach ($cat->getArticles() as $article) {
                 $totalStock += $article->getQuantiteEnStock();
@@ -102,8 +146,8 @@ class MouvementController extends AbstractController
 
             $stats[] = [
                 'categorie' => $cat,
-                'entrees'   => (float)$totalEntrees,
-                'sorties'   => (float)$totalSorties,
+                'entrees'   => $totalEntrees,
+                'sorties'   => $totalSorties,
                 'indice'    => ($totalStock > 0) ? round($totalSorties / $totalStock, 2) : 0
             ];
         }

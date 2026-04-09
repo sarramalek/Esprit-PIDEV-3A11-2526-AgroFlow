@@ -1,225 +1,169 @@
-{% extends 'base_agriculteur.html.twig' %}
+{# Ce fichier est conçu pour être injecté dans une modal via render(controller) #}
 
-{% block title %}Nouveau Produit - AgroFlow{% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
-    <style>
-        /* ─── Variables de Design ─── */
-        :root {
-            --primary: #2D5A27;
-            --primary-light: #EAF3DE;
-            --text-dark: #1A2A19;
-            --text-gray: #6C757D;
-            --white: #FFFFFF;
-            --border: #EEE;
-            --radius-md: 16px;
-            --radius-sm: 12px;
-            --shadow-md: 0 10px 40px rgba(0,0,0,0.04); /* Ombre plus douce */
-            --transition: all 0.25s ease;
-            --danger: #dc3545;
-            --warning: #fd7e14;
-        }
-
-        /* Suppression du background gris global */
-        .dash-wrapper {
-            padding: 40px;
-            background-color: transparent !important; /* Force la transparence */
-            font-family: 'DM Sans', sans-serif;
-        }
-
-        .agro-form-container {
-            max-width: 850px;
-            margin: 0 auto;
-            background: var(--white);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-md);
-            overflow: hidden;
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-
-        .agro-form-body { padding: 40px; }
-
-        .agro-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 24px;
-            margin-bottom: 32px;
-        }
-
-        .full-width { grid-column: span 2; }
-
-        .form-group label {
-            display: block;
-            font-size: 12px;
-            color: var(--text-gray);
-            font-weight: 700;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .validation-msg {
-            font-size: 11px;
-            font-weight: 700;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 14px 16px;
-            font-size: 15px;
-            color: var(--text-dark);
-            border: 1px solid #F0F0F0;
-            border-radius: var(--radius-sm);
-            transition: var(--transition);
-            background-color: #FCFCFC; /* Très léger gris pour les champs */
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-            background-color: var(--white);
-            box-shadow: 0 0 0 4px rgba(45, 90, 39, 0.05);
-        }
-
-        .form-actions {
-            border-top: 1px solid var(--border);
-            padding: 24px 40px;
-            background-color: #FAFAFA;
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-        }
-
-        .btn {
-            padding: 12px 24px;
-            font-size: 14px;
-            font-weight: 700;
-            border-radius: 10px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-            border: none;
-            transition: var(--transition);
-        }
-
-        .btn-primary { background-color: #1a1a1a; color: var(--white); }
-        .btn-primary:hover { background-color: var(--primary); transform: translateY(-2px); }
-        
-        .btn-secondary { background-color: var(--white); color: var(--text-gray); border: 1px solid var(--border); }
-        .btn-secondary:hover { border-color: #1a1a1a; color: #1a1a1a; }
-
-        .field-icon {
-            position: absolute;
-            left: 16px;
-            top: 42px; 
-            color: #ADB5BD;
-            font-size: 14px;
-            pointer-events: none;
-        }
-        
-        .has-icon { position: relative; }
-        .has-icon .form-control { padding-left: 44px; }
-    </style>
-{% endblock %}
-
-{% block body %}
-<div class="dash-wrapper">
+<style>
+    .agro-popup-container {
+        font-family: 'DM Sans', sans-serif;
+        padding: 10px;
+    }
+    .agro-grid { 
+        display: grid; 
+        grid-template-columns: 1fr 1fr; 
+        gap: 20px; 
+    }
+    .full-width { grid-column: span 2; }
     
-    {# EN-TÊTE #}
-    <div style="margin-bottom: 40px; display: flex; align-items: flex-end; justify-content: space-between; max-width: 850px; margin-left: auto; margin-right: auto;">
-        <div>
-            <span style="color: var(--primary); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 2px;">Inventaire</span>
-            <h2 style="margin:5px 0 0; color: var(--text-dark); font-size:32px; font-weight: 800; letter-spacing: -1px;">Nouveau Produit</h2>
+    .form-group label { 
+        display: block; 
+        font-size: 11px; 
+        color: #6C757D; 
+        font-weight: 700; 
+        text-transform: uppercase; 
+        margin-bottom: 5px; 
+        letter-spacing: 0.5px;
+    }
+    
+    .form-control-modern { 
+        width: 100%; 
+        padding: 12px 15px; 
+        border: 1px solid #E2E8F0; 
+        border-radius: 10px; 
+        background: #F8FAFC; 
+        transition: all 0.3s ease; 
+        box-sizing: border-box;
+    }
+    
+    .form-control-modern:focus { 
+        border-color: #2D5A27; 
+        background: white; 
+        outline: none; 
+        box-shadow: 0 0 0 3px rgba(45, 90, 39, 0.1); 
+    }
+
+    .validation-msg { font-size: 11px; font-weight: 700; }
+    
+    .field-icon-wrapper { position: relative; }
+    .field-icon { 
+        position: absolute; 
+        left: 12px; 
+        top: 50%; 
+        transform: translateY(-50%); 
+        color: #ADB5BD; 
+        font-size: 14px; 
+        pointer-events: none;
+    }
+    .has-icon .form-control-modern { padding-left: 38px; }
+
+    .modal-actions {
+        margin-top: 25px; 
+        display: flex; 
+        justify-content: flex-end; 
+        gap: 12px; 
+        border-top: 1px solid #F1F1F1; 
+        padding-top: 20px;
+    }
+    
+    .btn-save-popup { 
+        background: #2D5A27; 
+        color: white; 
+        border: none; 
+        padding: 12px 25px; 
+        border-radius: 10px; 
+        font-weight: 700; 
+        cursor: pointer; 
+        transition: 0.2s;
+    }
+    .btn-save-popup:hover { background: #1e3d1a; transform: translateY(-1px); }
+    
+    .btn-cancel-popup { 
+        background: #F1F5F9; 
+        color: #64748B; 
+        border: none; 
+        padding: 12px 25px; 
+        border-radius: 10px; 
+        font-weight: 700; 
+        cursor: pointer; 
+    }
+</style>
+
+<div class="agro-popup-container">
+    {{ form_start(form, {'attr': {'id': 'ajax-add-product-form'}}) }}
+        <div class="agro-grid">
+            
+            {# NOM #}
+            <div class="form-group full-width">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    {{ form_label(form.nom) }}
+                    <span id="msg-nom-ajax" class="validation-msg"></span>
+                </div>
+                {{ form_widget(form.nom, {'attr': {'class': 'form-control-modern', 'placeholder': 'Ex: Engrais Azoté NPK'}}) }}
+            </div>
+
+            {# CATEGORIE #}
+            <div class="form-group">
+                {{ form_label(form.categorie) }}
+                {{ form_widget(form.categorie, {'attr': {'class': 'form-control-modern'}}) }}
+            </div>
+
+            {# PRIX #}
+            <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    {{ form_label(form.prix_unitaire) }}
+                    <span id="msg-prix-ajax" class="validation-msg"></span>
+                </div>
+                <div class="field-icon-wrapper has-icon">
+                    <i class="fa fa-tag field-icon"></i>
+                    {{ form_widget(form.prix_unitaire, {'attr': {'class': 'form-control-modern', 'placeholder': '0.000'}}) }}
+                </div>
+            </div>
+
+            {# UNITE #}
+            <div class="form-group">
+                {{ form_label(form.unite_mesure) }}
+                {{ form_widget(form.unite_mesure, {'attr': {'class': 'form-control-modern'}}) }}
+            </div>
+
+            {# STOCK #}
+            <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    {{ form_label(form.quantite_en_stock) }}
+                    <span id="msg-stock-ajax" class="validation-msg"></span>
+                </div>
+                <div class="field-icon-wrapper has-icon">
+                    <i class="fa fa-box field-icon"></i>
+                    {{ form_widget(form.quantite_en_stock, {'attr': {'class': 'form-control-modern'}}) }}
+                </div>
+            </div>
+
+            {# SEUIL #}
+            <div class="form-group full-width">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    {{ form_label(form.seuil_alerte) }}
+                    <span id="msg-seuil-ajax" class="validation-msg"></span>
+                </div>
+                <div class="field-icon-wrapper has-icon">
+                    <i class="fa fa-bell field-icon"></i>
+                    {{ form_widget(form.seuil_alerte, {'attr': {'class': 'form-control-modern'}}) }}
+                </div>
+            </div>
         </div>
-        <a href="{{ path('agri_produits') }}" class="btn btn-secondary">
-            <i class="fa fa-arrow-left"></i> Retour
-        </a>
-    </div>
 
-    <div class="agro-form-container">
-        {{ form_start(form, {'attr': {'id': 'product-form'}}) }}
-            <div class="agro-form-body">
-                
-                <div style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #F1F1F1;">
-                    <h4 style="margin: 0 0 8px; color: var(--text-dark); font-weight: 700;">Détails de l'article</h4>
-                    <p style="margin:0; color: var(--text-gray); font-size: 14px;">Remplissez les informations pour ajouter un produit au stock.</p>
-                </div>
-
-                <div class="agro-grid">
-                    {# NOM #}
-                    <div class="form-group full-width">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                            {{ form_label(form.nom) }}
-                            <span id="msg-nom" class="validation-msg"></span>
-                        </div>
-                        {{ form_widget(form.nom, {'attr': {'class': 'form-control', 'placeholder': 'ex: Engrais Azoté NPK'}}) }}
-                    </div>
-
-                    {# CATEGORIE #}
-                    <div class="form-group">
-                        {{ form_label(form.categorie) }}
-                        {{ form_widget(form.categorie, {'attr': {'class': 'form-control'}}) }}
-                    </div>
-
-                    {# PRIX #}
-                    <div class="form-group has-icon">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                            {{ form_label(form.prix_unitaire) }}
-                            <span id="msg-prix" class="validation-msg"></span>
-                        </div>
-                        {{ form_widget(form.prix_unitaire, {'attr': {'class': 'form-control', 'placeholder': '0.000'}}) }}
-                        <i class="fa fa-tag field-icon"></i>
-                    </div>
-
-                    {# UNITE #}
-                    <div class="form-group">
-                        {{ form_label(form.unite_mesure) }}
-                        {{ form_widget(form.unite_mesure, {'attr': {'class': 'form-control'}}) }}
-                    </div>
-
-                    {# STOCK #}
-                    <div class="form-group has-icon">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                            {{ form_label(form.quantite_en_stock) }}
-                            <span id="msg-stock" class="validation-msg"></span>
-                        </div>
-                        {{ form_widget(form.quantite_en_stock, {'attr': {'class': 'form-control'}}) }}
-                        <i class="fa fa-box field-icon"></i>
-                    </div>
-
-                    {# SEUIL #}
-                    <div class="form-group has-icon">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                            {{ form_label(form.seuil_alerte) }}
-                            <span id="msg-seuil" class="validation-msg"></span>
-                        </div>
-                        {{ form_widget(form.seuil_alerte, {'attr': {'class': 'form-control'}}) }}
-                        <i class="fa fa-exclamation-circle field-icon"></i>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-actions">
-                <a href="{{ path('agri_produits') }}" class="btn btn-secondary">Annuler</a>
-                <button type="submit" class="btn btn-primary">
-                    <i class="fa fa-check"></i> Enregistrer le produit
-                </button>
-            </div>
-        {{ form_end(form) }}
-    </div>
+        <div class="modal-actions">
+            <button type="button" onclick="closeAddProductModal()" class="btn-cancel-popup">Annuler</button>
+            <button type="submit" class="btn-save-popup">
+                <i class="fa fa-check"></i> Enregistrer le produit
+            </button>
+        </div>
+    {{ form_end(form) }}
 </div>
-{% endblock %}
 
-{% block javascripts %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+(function() {
+    const form = document.getElementById('ajax-add-product-form');
+    
     const validations = [
         {
-            input: document.querySelector('[name*="[nom]"]'),
-            msg: document.getElementById('msg-nom'),
+            input: form.querySelector('[name*="[nom]"]'),
+            msg: document.getElementById('msg-nom-ajax'),
             check: (val) => {
                 if (val.length === 0) return { text: "Requis", color: "#dc3545" };
                 if (val.length < 3) return { text: "Trop court", color: "#fd7e14" };
@@ -227,24 +171,24 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         },
         {
-            input: document.querySelector('[name*="[prix_unitaire]"]'),
-            msg: document.getElementById('msg-prix'),
+            input: form.querySelector('[name*="[prix_unitaire]"]'),
+            msg: document.getElementById('msg-prix-ajax'),
             check: (val) => {
                 if (val === "" || parseFloat(val) <= 0) return { text: "Prix > 0 requis", color: "#dc3545" };
                 return { text: "Valide ✓", color: "#2D5A27" };
             }
         },
         {
-            input: document.querySelector('[name*="[quantite_en_stock]"]'),
-            msg: document.getElementById('msg-stock'),
+            input: form.querySelector('[name*="[quantite_en_stock]"]'),
+            msg: document.getElementById('msg-stock-ajax'),
             check: (val) => {
                 if (val === "" || parseFloat(val) < 0) return { text: "Min 0", color: "#dc3545" };
                 return { text: "Valide ✓", color: "#2D5A27" };
             }
         },
         {
-            input: document.querySelector('[name*="[seuil_alerte]"]'),
-            msg: document.getElementById('msg-seuil'),
+            input: form.querySelector('[name*="[seuil_alerte]"]'),
+            msg: document.getElementById('msg-seuil-ajax'),
             check: (val) => {
                 if (val === "" || parseFloat(val) < 0) return { text: "Min 0", color: "#dc3545" };
                 return { text: "Valide ✓", color: "#2D5A27" };
@@ -263,9 +207,9 @@ document.addEventListener('DOMContentLoaded', function() {
     validations.forEach(v => {
         if (v.input) {
             v.input.addEventListener('input', () => validateField(v));
+            // Optionnel : valider au chargement si les champs sont pré-remplis
             validateField(v);
         }
     });
-});
+})();
 </script>
-{% endblock %}

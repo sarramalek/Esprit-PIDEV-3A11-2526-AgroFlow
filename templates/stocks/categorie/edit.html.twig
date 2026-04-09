@@ -1,207 +1,52 @@
-{% extends 'base_agriculteur.html.twig' %}
-
-{% block title %}Modifier Catégorie - AgroFlow{% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
-    <style>
-        :root {
-            --primary: #2D5A27;
-            --text-dark: #1A2A19;
-            --text-gray: #6C757D;
-            --white: #FFFFFF;
-            --border: #EEE;
-            --radius-md: 16px;
-            --radius-sm: 12px;
-            --shadow-md: 0 10px 40px rgba(0,0,0,0.04);
-            --transition: all 0.25s ease;
-        }
-
-        .dash-wrapper {
-            padding: 40px;
-            background-color: transparent !important;
-            font-family: 'DM Sans', sans-serif;
-        }
-
-        .agro-form-container {
-            max-width: 700px;
-            margin: 0 auto;
-            background: var(--white);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-md);
-            overflow: hidden;
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-
-        .agro-form-body { padding: 40px; }
-
-        .form-group { margin-bottom: 24px; }
-
-        .form-group label {
-            display: block;
-            font-size: 12px;
-            color: var(--text-gray);
-            font-weight: 700;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 14px 16px;
-            font-size: 15px;
-            color: var(--text-dark);
-            border: 1px solid #F0F0F0;
-            border-radius: var(--radius-sm);
-            transition: var(--transition);
-            background-color: #FCFCFC;
-            box-sizing: border-box; /* Crucial pour que ça ne dépasse pas */
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
-            background-color: var(--white);
-            box-shadow: 0 0 0 4px rgba(45, 90, 39, 0.05);
-        }
-
-        /* Style spécifique pour le textarea */
-        textarea.form-control {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        .validation-msg {
-            font-size: 11px;
-            font-weight: 700;
-        }
-
-        .form-actions {
-            border-top: 1px solid var(--border);
-            padding: 24px 40px;
-            background-color: #FAFAFA;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .btn {
-            padding: 12px 24px;
-            font-size: 14px;
-            font-weight: 700;
-            border-radius: 10px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-            border: none;
-            transition: var(--transition);
-        }
-
-        .btn-primary { background-color: #1a1a1a; color: var(--white); }
-        .btn-primary:hover { background-color: var(--primary); transform: translateY(-2px); }
-        
-        .btn-secondary { background-color: var(--white); color: var(--text-gray); border: 1px solid var(--border); }
-        .btn-secondary:hover { border-color: #1a1a1a; color: #1a1a1a; }
-
-        .delete-link {
-            display: block;
-            text-align: center;
-            margin-top: 20px;
-            color: #dc3545;
-            font-size: 13px;
-            font-weight: 600;
-            text-decoration: none;
-        }
-        .delete-link:hover { text-decoration: underline; }
-    </style>
-{% endblock %}
-
-{% block body %}
-<div class="dash-wrapper">
-    
-    <div style="text-align: center; margin-bottom: 40px;">
-        <span style="color: var(--primary); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 2px;">Configuration</span>
-        <h2 style="margin:5px 0 0; color: var(--text-dark); font-size:32px; font-weight: 800; letter-spacing: -1px;">Modifier la Catégorie</h2>
+<div style="padding: 30px;">
+    <div style="margin-bottom: 25px;">
+        <span style="color: #2D5A27; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px;">Édition</span>
+        <h2 style="margin: 5px 0 0; color: #1a1a1a; font-size: 24px; font-weight: 800;">Modifier la Catégorie</h2>
     </div>
 
-    <div class="agro-form-container">
-        {{ form_start(form) }}
-            <div class="agro-form-body">
-                
-                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid #F1F1F1;">
-                    <div style="background: var(--primary-light); color: var(--primary); padding: 12px; border-radius: 10px;">
-                        <i class="fa fa-folder-open fa-lg"></i>
-                    </div>
-                    <div>
-                        <h4 style="margin:0; color: var(--text-dark); font-weight: 700;">Détails de la catégorie</h4>
-    
-                    </div>
-                </div>
-
-                {# NOM #}
-                <div class="form-group">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                        {{ form_label(form.nom) }}
-                        <span id="msg-nom" class="validation-msg"></span>
-                    </div>
-                    {{ form_widget(form.nom, {'attr': {'class': 'form-control', 'placeholder': 'Ex: Semences'}}) }}
-                </div>
-
-                {# DESCRIPTION #}
-                <div class="form-group">
-                    {{ form_label(form.description) }}
-                    {{ form_widget(form.description, {'attr': {'class': 'form-control', 'placeholder': 'Description de la catégorie...'}}) }}
-                </div>
+    {{ form_start(form, {'attr': {'id': 'category-form'}}) }}
+        <div style="margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <label style="font-weight: 700; color: #444; font-size: 13px;">Nom de la catégorie</label>
+                <span id="msg-nom-edit" style="font-size: 11px; font-weight: 700; color: #2D5A27;">Valide ✓</span>
             </div>
+            {{ form_widget(form.nom, {'attr': {
+                'class': 'agro-input',
+                'style': 'width:100%; padding:14px; border-radius:12px; border:1px solid #2D5A27; outline:none; transition:0.3s; box-sizing:border-box;'
+            }}) }}
+        </div>
 
-            <div class="form-actions">
-                <a href="{{ path('agri_categories') }}" class="btn btn-secondary">
-                    <i class="fa fa-chevron-left"></i> Retour
-                </a>
-                <button type="submit" class="btn btn-primary">
-                    <i class="fa fa-check-circle"></i> Enregistrer les modifications
-                </button>
-            </div>
-        {{ form_end(form) }}
-    </div>
+        <div style="margin-bottom: 25px;">
+            <label style="display:block; font-weight: 700; color: #444; font-size: 13px; margin-bottom: 8px;">Description</label>
+            {{ form_widget(form.description, {'attr': {
+                'class': 'agro-input',
+                'style': 'width:100%; padding:14px; border-radius:12px; border:1px solid #ddd; outline:none; min-height:100px; box-sizing:border-box;'
+            }}) }}
+        </div>
 
-    <form method="post" action="{{ path('agri_categories_delete', {'id': categorie.id}) }}" onsubmit="return confirm('Supprimer définitivement ?');">
-        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ categorie.id) }}">
-        <button type="submit" class="delete-link" style="background:none; border:none; width:100%; cursor:pointer;">
-            Supprimer définitivement la catégorie
-        </button>
-    </form>
+        <div style="display: flex; gap: 12px; justify-content: flex-end; border-top: 1px solid #eee; padding-top: 20px;">
+            <button type="button" onclick="closeCategoryModal()" style="padding:12px 20px; border-radius:10px; border:none; background:#eee; color:#666; font-weight:600; cursor:pointer;">Annuler</button>
+            <button type="submit" style="padding:12px 25px; border-radius:10px; border:none; background:#1a1a1a; color:white; font-weight:700; cursor:pointer; transition:0.3s;" onmouseover="this.style.background='#2D5A27'" onmouseout="this.style.background='#1a1a1a'">
+                Mettre à jour
+            </button>
+        </div>
+    {{ form_end(form) }}
 </div>
-{% endblock %}
 
-{% block javascripts %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const nomInput = document.querySelector('[name*="[nom]"]');
-    const msgNom = document.getElementById('msg-nom');
+(function() {
+    const inputNom = document.querySelector('#category-form [name*="[nom]"]');
+    const msgNom = document.getElementById('msg-nom-edit');
 
-    function validateNom() {
-        const val = nomInput.value.trim();
+    inputNom.addEventListener('input', function() {
+        const val = inputNom.value.trim();
         if (val.length === 0) {
-            msgNom.textContent = "Obligatoire";
-            msgNom.style.color = "#dc3545";
-            nomInput.style.borderColor = "#dc3545";
+            msgNom.textContent = "Obligatoire"; msgNom.style.color = "#dc3545"; inputNom.style.borderColor = "#dc3545";
         } else if (val.length < 3) {
-            msgNom.textContent = "Trop court (min 3)";
-            msgNom.style.color = "#fd7e14";
-            nomInput.style.borderColor = "#fd7e14";
+            msgNom.textContent = "Trop court"; msgNom.style.color = "#e67e22"; inputNom.style.borderColor = "#e67e22";
         } else {
-            msgNom.textContent = "Valide ✓";
-            msgNom.style.color = "#2D5A27";
-            nomInput.style.borderColor = "#2D5A27";
+            msgNom.textContent = "Valide ✓"; msgNom.style.color = "#2D5A27"; inputNom.style.borderColor = "#2D5A27";
         }
-    }
-
-    nomInput.addEventListener('input', validateNom);
-    validateNom(); // Appel initial
-});
+    });
+})();
 </script>
-{% endblock %}

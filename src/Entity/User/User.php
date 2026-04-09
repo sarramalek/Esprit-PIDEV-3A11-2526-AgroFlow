@@ -70,14 +70,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
+        // On aligne les chiffres avec tes routes de sécurité
         $roles = match ((int)$this->role) {
-            1 => ['ROLE_OUVRIER'],
-            2 => ['ROLE_AGRICULTEUR'],
-            3 => ['ROLE_ADMIN'],
+            3 => ['ROLE_OUVRIER'],      // Correspond à ^/ouvrier
+            2 => ['ROLE_AGRICULTEUR'],  // Correspond à ^/agriculteur
+            1 => ['ROLE_ADMIN'],        // Correspond à ^/admin
             default => [],
         };
 
-        // On ajoute toujours ROLE_USER par défaut en plus du reste
+        // Toujours ajouter ROLE_USER par défaut
         $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
