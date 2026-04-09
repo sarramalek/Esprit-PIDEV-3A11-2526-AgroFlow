@@ -1,0 +1,104 @@
+{% extends 'base_agriculteur.html.twig' %}
+
+{% block title %}AgroFlow - Recherche de Partenaire{% endblock %}
+
+{% block body %}
+<div style="padding: 10px;">
+    <!-- Breadcrumb -->
+    <div style="margin-bottom: 25px; font-size: 14px; color: #666;">
+        <a href="{{ path('app_animaux_index') }}" style="text-decoration: none; color: #666;">Mes Animaux</a> 
+        <i class="fa fa-chevron-right" style="font-size: 10px; margin: 0 5px;"></i> 
+        <strong style="color: #2C3E50;">Matchmaking</strong>
+    </div>
+
+    <!-- Header Section -->
+    <div style="background: white; border-radius: 20px; padding: 35px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-bottom: 30px; display: flex; align-items: center; justify-content: space-between; position: relative; overflow: hidden;">
+        <div style="position: absolute; right: -20px; top: -20px; opacity: 0.05;">
+            <i class="fa fa-heart" style="font-size: 200px; color: #e91e63;"></i>
+        </div>
+        
+        <div style="display: flex; align-items: center; gap: 30px; position: relative; z-index: 1;">
+            <div style="width: 80px; height: 80px; background: #FFF0F5; border-radius: 20px; display: flex; align-items: center; justify-content: center; border: 2px solid #e91e63;">
+                <i class="fa fa-{{ animal.espece|lower == 'vache' ? 'cow' : (animal.espece|lower == 'chien' ? 'dog' : 'paw') }}" style="font-size: 35px; color: #e91e63;"></i>
+            </div>
+            <div>
+                <h1 style="margin: 0; color: #2C3E50; font-size: 28px; font-weight: 800;">Partenaires pour {{ animal.nom }}</h1>
+                <p style="margin: 5px 0 0 0; color: #7f8c8d; font-weight: 600;">
+                    Critères : <span style="background: #F1F3F5; padding: 3px 10px; border-radius: 15px; color: #2C3E50;">{{ animal.espece }}</span> 
+                    + <span style="background: #F1F3F5; padding: 3px 10px; border-radius: 15px; color: #3498db;">{{ animal.sexe == 'MALE' ? 'FEMELLE' : 'MALE' }}</span>
+                </p>
+            </div>
+        </div>
+
+        <div style="text-align: right; position: relative; z-index: 1;">
+            <span style="display: block; font-size: 12px; color: #999; font-weight: 700; text-transform: uppercase;">Résultats trouvés</span>
+            <strong style="font-size: 32px; color: #e91e63;">{{ partners|length }}</strong>
+        </div>
+    </div>
+
+    {% if partners|length > 0 %}
+        <!-- Résultats Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px;">
+            {% for p in partners %}
+                <div style="background: white; border-radius: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); border: 1px solid #F1F3F5; overflow: hidden; transition: 0.3s;" onmouseover="this.style.transform='translateY(-10px)'; this.style.boxShadow='0 15px 35px rgba(0,0,0,0.1)';">
+                    <div style="background: {{ (p.user and p.user == app.user) ? '#FFFDF5' : '#fcfcfc' }}; padding: 25px; position: relative;">
+                        {% if p.user and p.user == app.user %}
+                            <span style="position: absolute; top: 15px; right: 15px; background: #FFD700; color: #000; font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: 20px; text-transform: uppercase;">Vôtre</span>
+                        {% endif %}
+                        
+                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                            <div style="width: 50px; height: 50px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                                <i class="fa fa-{{ p.sexe == 'MALE' ? 'mars' : 'venus' }}" style="color: {{ p.sexe == 'MALE' ? '#3498db' : '#e91e63' }}; font-size: 20px;"></i>
+                            </div>
+                            <div>
+                                <h3 style="margin: 0; color: #2C3E50; font-size: 18px;">{{ p.nom }}</h3>
+                                <span style="font-size: 13px; color: #999;">{{ p.espece }}</span>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                            <div style="background: #F8F9FA; padding: 12px; border-radius: 12px; text-align: center;">
+                                <span style="display: block; font-size: 10px; color: #999; text-transform: uppercase; margin-bottom: 3px;">Poids</span>
+                                <strong style="color: #2D5A27;">{{ p.poids }} <small>kg</small></strong>
+                            </div>
+                            <div style="background: #F8F9FA; padding: 12px; border-radius: 12px; text-align: center;">
+                                <span style="display: block; font-size: 10px; color: #999; text-transform: uppercase; margin-bottom: 3px;">Âge</span>
+                                <strong style="color: #2C3E50;">{{ p.dateNaissance ? date().diff(p.dateNaissance).y : '?' }} <small>ans</small></strong>
+                            </div>
+                        </div>
+
+                        <div style="border-top: 1px solid #F1F3F5; padding-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                {% if p.user %}
+                                    <div style="width: 25px; height: 25px; background: #e9ecef; border-radius: 5px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800;">
+                                        {{ p.user.prenom|first }}{{ p.user.nom|first }}
+                                    </div>
+                                    <span style="font-size: 12px; color: #666; font-weight: 600;">{{ p.user.prenom }} {{ p.user.nom }}</span>
+                                {% else %}
+                                    <span style="font-size: 12px; color: #999;">Éleveur inconnu</span>
+                                {% endif %}
+                            </div>
+                            {% if p.user %}
+                                <a href="mailto:{{ p.user.email }}" style="background: #2D5A27; color: white; padding: 8px 12px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 5px;">
+                                    <i class="fa fa-envelope"></i> Contact
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div style="background: white; border-radius: 20px; padding: 80px 40px; text-align: center; border: 2px dashed #EEE;">
+            <div style="width: 80px; height: 80px; background: #F8F9FA; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto;">
+                <i class="fa fa-heart-crack" style="font-size: 40px; color: #DDD;"></i>
+            </div>
+            <h3 style="color: #999; margin: 0;">Aucun partenaire compatible trouvé</h3>
+            <p style="color: #BBB; margin-top: 10px;">Réessayez plus tard ou élargissez votre cheptel !</p>
+            <a href="{{ path('app_animaux_index') }}" style="display: inline-block; margin-top: 20px; color: #2D5A27; font-weight: 700; text-decoration: none;">
+                <i class="fa fa-arrow-left"></i> Retour à ma liste
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -399,23 +399,23 @@
             </ul>
         </div>
 
-        <!-- Gestion Animaux -->
-        <div class="nav-item {% if app.request.get('_route') in ['admin_animaux','admin_examens'] %}open{% endif %}">
-            <div class="nav-link {% if app.request.get('_route') in ['admin_animaux','admin_examens'] %}active{% endif %}"
-                 onclick="toggleMenu(this)">
-                <span class="nav-icon"><i class="fa fa-paw"></i></span>
-                <span class="nav-label">Gestion Animaux</span>
-                <i class="fa fa-chevron-right nav-arrow"></i>
+         <!-- Gestion Animaux -->
+            <div class="nav-item {% if app.request.get('_route') in ['admin_animaux_index','admin_animaux_new','admin_animaux_edit','admin_examens_index','admin_examens_new','admin_examens_edit'] %}open{% endif %}">
+                <div class="nav-link {% if app.request.get('_route') in ['admin_animaux_index','admin_animaux_new','admin_animaux_edit','admin_examens_index','admin_examens_new','admin_examens_edit'] %}active{% endif %}"
+                     onclick="toggleMenu(this)">
+                    <span class="nav-icon"><i class="fa fa-paw"></i></span>
+                    <span class="nav-label">Gestion Animaux</span>
+                    <i class="fa fa-chevron-right nav-arrow"></i>
+                </div>
+                <ul class="nav-sub">
+                    <li><a href="{{ path('admin_animaux_index') }}" class="{% if app.request.get('_route') in ['admin_animaux_index','admin_animaux_new','admin_animaux_edit'] %}active{% endif %}">
+                        <span class="sub-dot"></span> Animaux
+                    </a></li>
+                    <li><a href="{{ path('admin_examens_index') }}" class="{% if app.request.get('_route') in ['admin_examens_index','admin_examens_new','admin_examens_edit'] %}active{% endif %}">
+                        <span class="sub-dot"></span> Examens
+                    </a></li>
+                </ul>
             </div>
-            <ul class="nav-sub">
-                <li><a href="#" class="{% if app.request.get('_route') == 'admin_animaux' %}active{% endif %}">
-                    <span class="sub-dot"></span> Animaux
-                </a></li>
-                <li><a href="#" class="{% if app.request.get('_route') == 'admin_examens' %}active{% endif %}">
-                    <span class="sub-dot"></span> Examens
-                </a></li>
-            </ul>
-        </div>
 
         <!-- Gestion Stocks -->
         <div class="nav-item {% if app.request.get('_route') in ['admin_categories','admin_produits'] %}open{% endif %}">

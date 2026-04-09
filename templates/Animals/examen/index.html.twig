@@ -1,0 +1,410 @@
+{% extends 'base_agriculteur.html.twig' %}
+
+{% block title %}AgroFlow - Examens Vétérinaires{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .search-container {
+            background: white;
+            padding: 20px 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #f1f3f5;
+            border-radius: 10px;
+            outline: none;
+            transition: all 0.3s;
+            background: #fafbfc;
+        }
+        .search-input:focus { border-color: #2D5A27; background: white; }
+        .btn-stats {
+            background: #3498db;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-stats:hover { background: #2980b9; }
+
+        /* Health Score Tooltip */
+        .health-tooltip {
+            position: relative;
+            cursor: help;
+            display: inline-block;
+            margin-left: 5px;
+            font-size: 16px;
+        }
+        .health-tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2C3E50;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 100;
+        }
+        .health-tooltip:hover::after {
+            opacity: 1;
+            visibility: visible;
+            bottom: 150%;
+        }
+
+        /* Modal Matchmaker-Style Pop-up - CENTRAGE ROBUSTE */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 99999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+            width: 90%;
+            max-width: 850px;
+            animation: modalPop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            margin: auto;
+        }
+        @keyframes modalPop {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        
+        .expenses-table { width: 100%; border-collapse: collapse; }
+        .expenses-table th { padding: 12px; border-bottom: 2px solid #eee; text-align: left; color: #7f8c8d; font-size: 13px; }
+        .expenses-table td { padding: 12px; border-bottom: 1px solid #eee; font-size: 14px; }
+        .expenses-table tr:nth-child(even) { background: #fafafa; }
+
+        /* Fragility Cards Design */
+        .fragility-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+        .fragility-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            min-width: 260px;
+            flex: 1;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid #f1f3f5;
+            transition: transform 0.3s ease;
+        }
+        .fragility-card:hover { transform: translateY(-5px); }
+        .fragility-icon-box {
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+        .progress-bar-bg {
+            background: #f1f3f5;
+            height: 8px;
+            border-radius: 10px;
+            margin: 15px 0 8px 0;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .status-badge {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 20px 0 0 0;
+            display: block;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div style="padding: 10px;">
+        <!-- Header : Breadcrumb -->
+        <div style="margin-bottom: 25px; color: #666; font-size: 14px;">
+            <span>Gestion</span> <i class="fa fa-chevron-right" style="font-size: 10px; margin: 0 5px;"></i> 
+            <strong style="color: #2C3E50;">Examens Vétérinaires</strong>
+        </div>
+
+        <div class="search-container">
+            <form action="{{ path('app_examens_index') }}" method="get" style="display: flex; gap: 15px; flex: 1;">
+                <input type="text" name="q" value="{{ searchTerm }}" class="search-input" placeholder="Diagnostic, traitement, animal...">
+                <select name="type" onchange="this.form.submit()" style="padding: 10px 15px; border-radius: 10px; border: 2px solid #f1f3f5; outline: none; background: #fafbfc; cursor: pointer; min-width: 180px;">
+                    <option value="">Tous les types</option>
+                    <option value="Vaccin" {{ currentType == 'Vaccin' ? 'selected' : '' }}>Vaccin</option>
+                    <option value="Radio" {{ currentType == 'Radio' ? 'selected' : '' }}>Radio</option>
+                    <option value="Scanner" {{ currentType == 'Scanner' ? 'selected' : '' }}>Scanner</option>
+                    <option value="Consultation" {{ currentType == 'Consultation' ? 'selected' : '' }}>Consultation</option>
+                </select>
+                <button type="submit" style="background: #2D5A27; color: white; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-weight: 700;">Filtrer</button>
+            </form>
+            <div style="display: flex; gap: 10px;">
+                <button type="button" onclick="openFragilityModal()" style="background: #00d2ff; color: white; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(0, 210, 255, 0.2);">
+                    <i class="fa fa-heartbeat"></i> Santé Groupe
+                </button>
+                <button type="button" onclick="openExpensesModal()" style="background: #f39c12; color: white; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(243, 156, 18, 0.2);">
+                    <i class="fa fa-wallet"></i> Dépenses
+                </button>
+                <a href="{{ path('app_examens_stats') }}" class="btn-stats" style="padding: 12px 20px;">
+                    <i class="fa fa-chart-pie"></i> Statistiques
+                </a>
+            </div>
+        </div>
+
+        <!-- Tableau CRUD -->
+        <div style="background: white; border-radius: 15px; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h2 style="margin: 0; color: #2C3E50; font-size: 20px;">Rapports de santé</h2>
+                <a href="{{ path('app_examens_new') }}" style="background: #2D5A27; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px;">
+                    <i class="fa fa-plus"></i> Nouveau Rapport
+                </a>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #EEE;">
+                            {% set nextDirection = (currentDirection == 'ASC') ? 'DESC' : 'ASC' %}
+                            <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">
+                                <a href="{{ path('app_examens_index', { q: searchTerm, type: currentType, sort: 'date_examen', direction: (currentSort == 'date_examen' ? nextDirection : 'DESC') }) }}" style="text-decoration:none; color:inherit;">Date</a>
+                            </th>
+                            <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">Animal</th>
+                            <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">Type</th>
+                            <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">Diagnostic</th>
+                            <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">Traitement</th>
+                            <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600; text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for e in examens %}
+                        <tr style="border-bottom: 1px solid #EEE; transition: background 0.2s;" onmouseover="this.style.backgroundColor='#fcfcf0'" onmouseout="this.style.backgroundColor='transparent'">
+                            <td style="padding: 15px 10px; color: #2C3E50;">{{ e.dateExamen ? e.dateExamen|date('d/m/Y') : '' }}</td>
+                            <td style="padding: 15px 10px; font-weight: 600; color: #2D5A27;">
+                                {{ e.animal ? e.animal.nom : '-' }}
+                                <span class="health-tooltip" data-tooltip="Indice de santé : {{ e.healthScore }}%">
+                                    {{ e.healthEmoji }}
+                                </span>
+                            </td>
+                            <td style="padding: 15px 10px;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    {% if e.typeExamen == 'Vaccin' %}
+                                        <i class="fa fa-syringe" style="color: #2ecc71; font-size: 14px;"></i>
+                                    {% elseif e.typeExamen == 'Radio' %}
+                                        <i class="fa fa-radiation" style="color: #3498db; font-size: 14px;"></i>
+                                    {% elseif e.typeExamen == 'Scanner' %}
+                                        <i class="fa fa-magnifying-glass" style="color: #9b59b6; font-size: 14px;"></i>
+                                    {% else %}
+                                        <i class="fa fa-stethoscope" style="color: #e74c3c; font-size: 14px;"></i>
+                                    {% endif %}
+                                    <span style="font-weight: 600; color: #2C3E50; font-size: 14px;">{{ e.typeExamen }}</span>
+                                </div>
+                            </td>
+                            <td style="padding: 15px 10px;">
+                                <span style="background: {{ e.diagnostic == 'En bonne santé' ? '#E8F5E2' : '#FFF0F0' }}; color: {{ e.diagnostic == 'En bonne santé' ? '#2D5A27' : '#E74C3C' }}; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; border: 1px solid {{ e.diagnostic == 'En bonne santé' ? '#D5EBC9' : '#FFDada' }};">
+                                    {{ e.diagnostic }}
+                                </span>
+                            </td>
+                            <td style="padding: 15px 10px; color: #555; font-size: 14px;">
+                                <i class="fa fa-capsules" style="color: #999; font-size: 12px; margin-right: 5px;"></i> {{ e.traitement }}
+                            </td>
+                            <td style="padding: 15px 10px; text-align: center;">
+                                <a href="{{ path('app_examens_show', {'id': e.id}) }}" style="color: #7f8c8d; margin: 0 8px;"><i class="fa fa-eye"></i></a>
+                                <a href="{{ path('app_examens_edit', {'id': e.id}) }}" style="color: #3498db; margin: 0 8px;"><i class="fa fa-edit"></i></a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" style="padding: 30px; text-align: center; color: #999;">Aucun rapport médical trouvé.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Dépenses Vétérinaires (Style Matchmaker) -->
+    <div id="expensesModal" class="modal">
+        <div class="modal-content">
+            <div style="background: #e91e63; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0; font-size: 18px;"><i class="fa fa-wallet"></i> Dépenses Vétérinaires Estimées</h3>
+                <span onclick="closeExpensesModal()" style="cursor: pointer; font-size: 24px;">&times;</span>
+            </div>
+            
+            <div style="padding: 25px; max-height: 70vh; overflow-y: auto;" id="invoiceArea">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #f1f3f5; padding-bottom: 15px;">
+                    <div>
+                        <strong style="color: #e91e63; font-size: 14px; text-transform: uppercase;">Récapitulatif de santé</strong>
+                        <p style="margin: 5px 0; font-size: 13px; color: #666;">Propriétaire : <strong>{{ app.user.prenom }} {{ app.user.nom }}</strong></p>
+                    </div>
+                    <div style="text-align: right; color: #999; font-size: 12px;">
+                        Date: <strong>{{ "now"|date("d/m/Y") }}</strong>
+                    </div>
+                </div>
+
+                <table class="expenses-table">
+                    <thead>
+                        <tr>
+                            <th>Animal</th>
+                            <th>Type Examen</th>
+                            <th>Détails</th>
+                            <th style="text-align: right;">Prix</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set totalGeneral = 0 %}
+                        {% for e in examens %}
+                            {% set price = e.estimatedPrice %}
+                            {% set totalGeneral = totalGeneral + price %}
+                            <tr>
+                                <td style="font-weight: 700; color: #2D5A27;">{{ e.animal ? e.animal.nom : '-' }}</td>
+                                <td style="font-size: 13px;">{{ e.typeExamen }}</td>
+                                <td style="color: #666; font-size: 12px;">{{ e.traitement }}</td>
+                                <td style="text-align: right; font-weight: 700;">{{ price }} DT</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <div style="margin-top: 25px; padding: 20px; border-radius: 12px; background: #FFF0F5; border: 1px solid #FFD1DC; text-align: right;">
+                    <span style="font-size: 16px; color: #666;">Total Général estimé :</span>
+                    <strong style="font-size: 24px; color: #e91e63; display: block;">{{ totalGeneral }} DT</strong>
+                </div>
+            </div>
+
+            <div style="padding: 20px; background: #fcfcfc; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" onclick="closeExpensesModal()" style="padding: 10px 20px; border: 1px solid #ddd; border-radius: 10px; background: white; cursor: pointer;">Annuler</button>
+                <button type="button" onclick="printInvoice()" style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 700;">
+                    <i class="fa fa-print"></i> Imprimer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Santé Groupée (Fragilité) -->
+    <div id="fragilityModal" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div style="background: #3498db; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0; font-size: 18px;"><i class="fa fa-heartbeat"></i> Détecteur de Fragilité par Espèce</h3>
+                <span onclick="closeFragilityModal()" style="cursor: pointer; font-size: 24px;">&times;</span>
+            </div>
+            <div style="padding: 30px;">
+                <p style="color: #666; margin-bottom: 25px; font-size: 14px;">Analyse de la santé globale basée sur le pourcentage d'animaux ayant nécessité des soins (diagnostics hors "En bonne santé").</p>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px;">
+                    {% for stat in fragilityStats %}
+                        {% set color = stat.percent < 20 ? '#27ae60' : (stat.percent < 50 ? '#f39c12' : '#e74c3c') %}
+                        {% set bg_light = stat.percent < 20 ? '#e8f6ef' : (stat.percent < 50 ? '#fef5e7' : '#fdedec') %}
+                        
+                        <div style="border: 1px solid #f1f3f5; border-radius: 15px; padding: 20px; background: #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+                                <div style="width: 45px; height: 45px; border-radius: 12px; background: {{ bg_light }}; color: {{ color }}; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+                                    {% set icon = 'paw' %}
+                                    {% set esp = stat.espece|lower %}
+                                    {% if 'vache' in esp or 'boeuf' in esp %}{% set icon = 'cow' %}
+                                    {% elseif 'mouton' in esp or 'brebis' in esp or 'agneau' in esp %}{% set icon = 'sheep' %}
+                                    {% elseif 'cheval' in esp or 'equin' in esp %}{% set icon = 'horse' %}
+                                    {% elseif 'chien' in esp %}{% set icon = 'dog' %}
+                                    {% elseif 'chat' in esp %}{% set icon = 'cat' %}
+                                    {% elseif 'poule' in esp or 'coq' in esp or 'oiseau' in esp %}{% set icon = 'dove' %}
+                                    {% elseif 'chevre' in esp or 'bouc' in esp %}{% set icon = 'mountain' %}
+                                    {% endif %}
+                                    <i class="fa fa-{{ icon }}"></i>
+                                </div>
+                                <div style="text-align: right;">
+                                    <span style="display: block; font-size: 20px; font-weight: 800; color: {{ color }};">{{ stat.percent }}%</span>
+                                    <span style="font-size: 11px; color: #999; text-transform: uppercase;">Fragilité</span>
+                                </div>
+                            </div>
+                            
+                            <h4 style="margin: 0; color: #2C3E50; font-size: 16px;">{{ stat.espece }}</h4>
+                            <p style="margin: 5px 0; font-size: 12px; color: #777;">{{ stat.malades }} cas sur {{ stat.total }} animaux</p>
+                            
+                            <div style="background: #f1f3f5; height: 6px; border-radius: 10px; margin: 15px 0; overflow: hidden;">
+                                <div style="width: {{ stat.percent }}%; height: 100%; background: {{ color }}; border-radius: 10px;"></div>
+                            </div>
+                            
+                            <div style="display: flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; color: {{ color }}; text-transform: uppercase;">
+                                <i class="fa fa-{{ stat.percent < 20 ? 'check-circle' : (stat.percent < 50 ? 'exclamation-circle' : 'biohazard') }}"></i>
+                                {{ stat.percent < 20 ? 'SANTÉ OPTIMALE' : (stat.percent < 50 ? 'ATTENTION' : 'CRITIQUE') }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div style="padding: 20px; background: #f8f9fa; border-top: 1px solid #eee; display: flex; justify-content: flex-end;">
+                <button type="button" onclick="closeFragilityModal()" style="padding: 10px 25px; background: #2C3E50; color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: 700;">Fermer</button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        function openExpensesModal() {
+            document.getElementById('expensesModal').style.display = 'flex';
+        }
+        function closeExpensesModal() {
+            document.getElementById('expensesModal').style.display = 'none';
+        }
+        function openFragilityModal() {
+            document.getElementById('fragilityModal').style.display = 'flex';
+        }
+        function closeFragilityModal() {
+            document.getElementById('fragilityModal').style.display = 'none';
+        }
+        function printInvoice() {
+            const printContent = document.getElementById('invoiceArea').innerHTML;
+            const originalContent = document.body.innerHTML;
+            document.body.innerHTML = printContent;
+            window.print();
+            document.body.innerHTML = originalContent;
+            window.location.reload(); 
+        }
+        window.onclick = function(event) {
+            let modalE = document.getElementById('expensesModal');
+            let modalF = document.getElementById('fragilityModal');
+            if (event.target == modalE) { modalE.style.display = "none"; }
+            if (event.target == modalF) { modalF.style.display = "none"; }
+        }
+    </script>
+{% endblock %}
