@@ -4,7 +4,6 @@
 
 {% block body %}
 <div style="padding: 30px; min-height: 100vh;">
-    
     <!-- Header -->
     <div style="margin-bottom: 40px; display: flex; align-items: flex-end; justify-content: space-between; gap: 25px;">
         <div style="flex-shrink: 0;">
@@ -21,12 +20,14 @@
                 </button>
             </form>
 
-            <a href="{{ path('app_mouvement_rotation') }}" class="btn-modern" style="background-color: #2D5A27; margin-right: 10px;">
-    <i class="fa fa-chart-bar"></i> Voir les Statistiques
-</a>
-            <a href="{{ path('agri_categories_new') }}" class="btn-modern" style="flex-shrink: 0;">
+            {# MODIFIÉ : APPEL MODAL STATISTIQUES #}
+            <button onclick="openStatsModal('{{ path('app_mouvement_rotation') }}')" class="btn-modern" style="background-color: #2D5A27; cursor:pointer;">
+                <i class="fa fa-chart-bar"></i> Statistiques Flux
+            </button>
+
+            <button onclick="openCategoryModal('{{ path('agri_categories_new') }}')" class="btn-modern" style="flex-shrink: 0; cursor: pointer;">
                 <i class="fa fa-plus"></i> Nouvelle Catégorie
-            </a>
+            </button>
         </div>
     </div>
 
@@ -48,21 +49,15 @@
                     <tr class="tr-modern">
                         <td style="padding: 24px 20px; font-weight: 700; color: #1a1a1a;">
                             {{ categorie.nom }}
-                            
                             {% if data.afficherAlerte %}
-                                <i class="fa fa-exclamation-triangle" 
-                                   style="color: #e67e22; cursor: pointer; margin-left: 10px;" 
-                                   onclick="showSursisInfo('{{ categorie.nom }}', {{ data.joursRestants }})">
-                                </i>
+                                <i class="fa fa-exclamation-triangle" style="color: #e67e22; cursor: pointer; margin-left: 10px;" onclick="showSursisInfo('{{ categorie.nom }}', {{ data.joursRestants }})"></i>
                             {% endif %}
                         </td>
                         <td style="padding: 24px 20px; color: #666; font-size: 14px;">{{ categorie.description ?: 'Aucune description' }}</td>
-                        
                         <td style="padding: 24px 20px;">
                             <div style="font-weight: 700; color: #2D5A27; font-size: 14px;">{{ data.totalStock }} unités</div>
                             <div style="font-size: 11px; color: #999;">sur {{ data.nbProduits }} produits</div>
                         </td>
-
                         <td style="padding: 24px 20px;">
                             <div style="display: flex; flex-direction: column; gap: 8px; max-width: 180px;">
                                 <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -77,23 +72,26 @@
                                     {% endif %}
                                     <span style="font-size: 10px; color: #999; font-weight: 700;">{{ data.totalSorties }} sorties</span>
                                 </div>
-                                
-                                {# Barre de rotation visuelle #}
                                 <div style="height: 4px; width: 100%; background: #eee; border-radius: 2px; overflow: hidden;">
                                     {% set progress = (data.indiceRotation * 100) > 100 ? 100 : (data.indiceRotation * 100) %}
                                     <div style="height: 100%; width: {{ progress }}%; background: {{ data.indiceRotation > 0.7 ? '#e74c3c' : '#2D5A27' }};"></div>
                                 </div>
                             </div>
                         </td>
-
                         <td style="padding: 24px 20px; text-align: right;">
                              <div style="display: flex; justify-content: flex-end; gap: 10px;">
-                                <a href="{{ path('agri_categories_edit', {'id': categorie.id}) }}" class="action-btn-modern edit"><i class="fa fa-pencil-alt"></i></a>
-                                <form method="post" action="{{ path('agri_categories_delete', {'id': categorie.id}) }}" onsubmit="return confirm('Supprimer ?');" style="display:inline;">
+                                <button onclick="openCategoryModal('{{ path('agri_categories_edit', {'id': categorie.id}) }}')" class="action-btn-modern edit"><i class="fa fa-pencil-alt"></i></button>
+                                <form method="post" action="{{ path('agri_categories_delete', {'id': categorie.id}) }}" onsubmit="return confirm('Supprimer définitivement cette catégorie ?');" style="display:inline;">
                                     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ categorie.id) }}">
                                     <button class="action-btn-modern delete"><i class="fa fa-trash-alt"></i></button>
                                 </form>
                             </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="5" style="padding: 50px; text-align: center; color: #999;">
+                            Aucune catégorie trouvée.
                         </td>
                     </tr>
                 {% endfor %}
@@ -102,13 +100,73 @@
     </div>
 </div>
 
+<!-- MODAL STANDARD (Formulaires) -->
+<div id="categoryModal" class="agro-modal-overlay">
+    <div class="agro-modal-container">
+        <button onclick="closeCategoryModal()" class="agro-modal-close">&times;</button>
+        <div id="modalContent"></div>
+    </div>
+</div>
+
+<!-- MODAL LARGE (Statistiques) -->
+<div id="statsModal" class="agro-modal-overlay">
+    <div class="agro-modal-container" style="max-width: 1200px; height: 90vh;">
+        <button onclick="closeStatsModal()" class="agro-modal-close">&times;</button>
+        <div id="statsModalContent" style="height: 100%; overflow-y: auto;"></div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+// --- GESTION MODAL FORMULAIRES ---
+function openCategoryModal(url) {
+    const modal = document.getElementById('categoryModal');
+    const content = document.getElementById('modalContent');
+    modal.style.display = 'flex';
+    content.innerHTML = '<div style="padding:50px; text-align:center;"><i class="fa fa-spinner fa-spin fa-2x" style="color:#2D5A27;"></i></div>';
+
+    fetch(url)
+        .then(res => res.text())
+        .then(html => {
+            content.innerHTML = html;
+            executeScripts(content);
+        });
+}
+
+function closeCategoryModal() { document.getElementById('categoryModal').style.display = 'none'; }
+
+// --- GESTION MODAL STATISTIQUES ---
+function openStatsModal(url) {
+    const modal = document.getElementById('statsModal');
+    const content = document.getElementById('statsModalContent');
+    modal.style.display = 'flex';
+    content.innerHTML = '<div style="padding:100px; text-align:center;"><i class="fa fa-spinner fa-spin fa-3x" style="color:#2D5A27;"></i><p style="margin-top:15px; font-weight:700;">Chargement des analyses...</p></div>';
+
+    fetch(url)
+        .then(res => res.text())
+        .then(html => {
+            content.innerHTML = html;
+            executeScripts(content);
+        });
+}
+
+function closeStatsModal() { document.getElementById('statsModal').style.display = 'none'; }
+
+// Utilitaire pour forcer l'exécution du JS chargé en AJAX (pour Chart.js)
+function executeScripts(container) {
+    const scripts = container.querySelectorAll("script");
+    scripts.forEach(oldScript => {
+        const newScript = document.createElement("script");
+        newScript.text = oldScript.text;
+        document.body.appendChild(newScript).parentNode.removeChild(newScript);
+    });
+}
+
 function showSursisInfo(nom, jours) {
     Swal.fire({
         title: 'Nettoyage imminent',
         html: `La catégorie <b>${nom}</b> est vide depuis plus de 30 jours.<br><br>` +
-              `Il vous reste <b>${jours} jours</b> pour ajouter des articles avant sa suppression automatique (Limite totale : 60 jours).`,
+              `Il vous reste <b>${jours} jours</b> pour ajouter des articles avant sa suppression automatique.`,
         icon: 'warning',
         confirmButtonColor: '#2D5A27',
         confirmButtonText: 'D\'accord'
@@ -117,20 +175,33 @@ function showSursisInfo(nom, jours) {
 </script>
 
 <style>
+    /* Styles généraux */
     .btn-modern { background-color: #1a1a1a; color: white; padding: 14px 26px; border-radius: 14px; text-decoration: none; font-weight: 600; font-size: 14px; transition: 0.3s; display: flex; align-items: center; gap: 10px; border: none; }
     .btn-modern:hover { background-color: #2D5A27; transform: translateY(-2px); }
     .th-modern { padding: 20px; font-size: 11px; font-weight: 800; color: #aaa; text-transform: uppercase; text-align: left; }
     .tr-modern { border-bottom: 1px solid #f1f1f1; transition: 0.2s; }
     .tr-modern:hover { background-color: #fcfcfc; }
     
+    /* Badges */
     .badge-modern { padding: 4px 10px; border-radius: 8px; font-size: 9px; font-weight: 800; letter-spacing: 0.5px; }
     .badge-modern.nouveau { background: #E8F5E9; color: #2D5A27; }
     .badge-modern.established { background: #f0f0f0; color: #666; }
     .badge-modern.danger { background: #FDEDEC; color: #E74C3C; }
     .badge-modern.dormant { background: #F8F9F9; color: #95A5A6; }
-
+    
+    /* Boutons actions */
     .action-btn-modern { width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid #edf0f2; cursor: pointer; background: white; transition: 0.2s; color: #666; text-decoration: none; }
     .action-btn-modern.edit:hover { border-color: #2D5A27; color: #2D5A27; background: #F1F9F1; }
     .action-btn-modern.delete:hover { border-color: #E74C3C; color: #E74C3C; background: #FDEDEC; }
+
+    /* Modales */
+    .agro-modal-overlay { display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter: blur(8px); align-items:center; justify-content:center; }
+    .agro-modal-container { background:white; width:95%; max-width:600px; border-radius:28px; padding:0; position:relative; box-shadow:0 25px 60px rgba(0,0,0,0.3); overflow:hidden; animation: fadeInScale 0.3s ease-out; }
+    .agro-modal-close { position:absolute; right:20px; top:20px; background:white; border:none; width:35px; height:35px; border-radius:50%; font-size:22px; cursor:pointer; color:#333; z-index:100; box-shadow:0 5px 15px rgba(0,0,0,0.1); display:flex; align-items:center; justify-content:center; }
+    
+    @keyframes fadeInScale {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+    }
 </style>
 {% endblock %}
