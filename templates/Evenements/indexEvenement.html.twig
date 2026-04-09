@@ -1,0 +1,233 @@
+{% extends 'base_admin.html.twig' %}
+
+{% block title %}Gestion des Événements — AGROFLOW{% endblock %}
+{% block page_title %}Gestion des Événements{% endblock %}
+{% block breadcrumb %}Événements / Liste{% endblock %}
+
+{% block stylesheets %}
+<style>
+    /* Réutilisation des mêmes styles que pour les catégories */
+    .af-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px; margin-bottom: 20px; }
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .page-header h1 { font-size: 1.5rem; font-weight: 700; color: var(--navy); }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; border: none; text-decoration: none; transition: all 0.2s; }
+    .btn-success { background: var(--green-accent); color: #fff; }
+    .btn-primary { background: var(--navy); color: #fff; }
+    .btn-outline { background: transparent; color: var(--text-muted); border: 1px solid var(--cream-dark); }
+    .btn-warning { background: #F6AD55; color: #fff; }
+    .btn-danger { background: #E53E3E; color: #fff; }
+    .btn-ghost { background: transparent; color: var(--text-muted); border: 1px solid var(--cream-dark); }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+    .search-bar { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+    .search-field { flex: 1; min-width: 180px; }
+    .search-field label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 6px; }
+    .search-field input, .search-field select { width: 100%; padding: 10px 14px; border: 1px solid var(--cream-dark); border-radius: 8px; background: var(--cream); font-size: 14px; outline: none; }
+    .search-field input:focus, .search-field select:focus { border-color: var(--green-accent); background: #fff; }
+    .filter-row { display: flex; gap: 15px; flex-wrap: wrap; margin-top: 15px; }
+    .af-table { width: 100%; border-collapse: collapse; }
+    .af-table thead th { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); padding: 10px 14px; border-bottom: 2px solid var(--cream-dark); background: var(--cream); text-align: left; }
+    .af-table tbody tr { border-bottom: 1px solid var(--cream-dark); transition: background 0.15s; }
+    .af-table tbody tr:hover { background: #fafdf8; }
+    .af-table td { padding: 14px; font-size: 14px; vertical-align: middle; }
+    .statut-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .statut-Planifié { background: #E8F5E9; color: #2E7D32; }
+    .statut-Terminé { background: #E3F2FD; color: #1976D2; }
+    .statut-Annulé { background: #FFEBEE; color: #C62828; }
+    .actions-group { display: flex; gap: 8px; justify-content: center; }
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+    .flash-msg { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; margin-bottom: 8px; animation: slideIn 0.3s ease; }
+    .flash-success { background: #f0fff4; border: 1px solid #9ae6b4; color: #276749; }
+    .flash-error { background: #fff5f5; border: 1px solid #feb2b2; color: #c53030; }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 999; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal-box { background: var(--white); border-radius: 14px; box-shadow: 0 20px 60px rgba(0,0,0,0.2); width: 440px; max-width: 94vw; overflow: hidden; }
+    .modal-header { padding: 20px 24px 12px; display: flex; justify-content: space-between; align-items: center; }
+    .modal-header h5 { font-size: 16px; font-weight: 700; color: #c53030; display: flex; gap: 8px; }
+    .modal-body { padding: 4px 24px 16px; }
+    .modal-footer { padding: 14px 24px 20px; border-top: 1px solid var(--cream-dark); display: flex; justify-content: flex-end; gap: 10px; }
+    @keyframes slideIn { from { transform: translateY(-6px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="page-header">
+    <div>
+        <h1><i class="fa fa-calendar-alt" style="color:var(--green-accent);margin-right:8px;"></i>Gestion des Événements</h1>
+        <p>Organisez, filtrez et suivez tous vos événements agricoles</p>
+    </div>
+    <a href="{{ path('evenement_ajouter') }}" class="btn btn-success">
+        <i class="fa fa-plus"></i> Nouvel événement
+    </a>
+</div>
+
+{# Flash messages #}
+{% if app.flashes|length > 0 %}
+<div class="flash-list">
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="flash-msg flash-{{ label == 'success' ? 'success' : 'error' }}">
+                <i class="fa fa-{{ label == 'success' ? 'circle-check' : 'triangle-exclamation' }}"></i>
+                {{ message }}
+                <button class="flash-close" onclick="this.parentElement.remove()">✕</button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+</div>
+{% endif %}
+
+{# Formulaire de filtres #}
+<div class="af-card">
+    <form method="GET" action="{{ path('evenement_index') }}">
+        <div class="search-bar">
+            <div class="search-field" style="flex:2;">
+                <label>Rechercher par titre</label>
+                <input type="text" name="search" value="{{ search }}" placeholder="Ex: Formation, Foire...">
+            </div>
+            <div class="search-field">
+                <label>Date début</label>
+                <input type="date" name="dateDebut" value="{{ dateDebutFiltre }}">
+            </div>
+            <div class="search-field">
+                <label>Date fin</label>
+                <input type="date" name="dateFin" value="{{ dateFinFiltre }}">
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fa fa-magnifying-glass"></i> Filtrer</button>
+            {% if search or dateDebutFiltre or dateFinFiltre or lieuFiltre or statutFiltre or categorieFiltre %}
+                <a href="{{ path('evenement_index') }}" class="btn btn-outline"><i class="fa fa-xmark"></i> Réinitialiser</a>
+            {% endif %}
+        </div>
+        <div class="filter-row">
+            <div class="search-field">
+                <label>Lieu</label>
+                <input type="text" name="lieu" value="{{ lieuFiltre }}" placeholder="Lieu...">
+            </div>
+            <div class="search-field">
+                <label>Statut</label>
+                <select name="statut">
+                    <option value="">Tous les statuts</option>
+                    {% for s in statuts %}
+                        <option value="{{ s }}" {% if statutFiltre == s %}selected{% endif %}>{{ s }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="search-field">
+                <label>Catégorie</label>
+                <select name="categorie">
+                    <option value="">Toutes</option>
+                    {% for cat in categories %}
+                        <option value="{{ cat.idCategorie }}" {% if categorieFiltre == cat.idCategorie %}selected{% endif %}>{{ cat.nomCategorie }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <p class="search-hint mt-2">{{ total }} événement(s) trouvé(s)</p>
+    </form>
+</div>
+
+{# Tableau des événements #}
+<div class="af-card">
+    <div class="section-header d-flex justify-content-between align-items-center mb-3">
+        <div class="section-title"><i class="fa fa-list"></i> Liste des événements</div>
+        <a href="{{ path('evenement_index') }}" class="btn btn-ghost btn-sm"><i class="fa fa-rotate-right"></i> Actualiser</a>
+    </div>
+
+    {% if evenements is empty %}
+        <div class="empty-state">
+            <i class="fa fa-inbox"></i>
+            <p>Aucun événement trouvé.</p>
+            <a href="{{ path('evenement_ajouter') }}" class="btn btn-success mt-3">Créer un événement</a>
+        </div>
+    {% else %}
+        <div style="overflow-x:auto;">
+            <table class="af-table">
+                <thead>
+                    <tr>
+                        <th>Titre</th>
+                        <th>Type</th>
+                        <th>Début</th>
+                        <th>Fin</th>
+                        <th>Lieu</th>
+                        <th>Catégorie</th>
+                        <th>Statut</th>
+                        <th style="width:180px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for evenement in evenements %}
+                        <tr>
+                            <td><strong>{{ evenement.titre }}</strong></td>
+                            <td>{{ evenement.typeEvenement }}</td>
+                            <td>{{ evenement.dateDebut|date('d/m/Y') }}</td>
+                            <td>{{ evenement.dateFin|date('d/m/Y') }}</td>
+                            <td>{{ evenement.lieu }}</td>
+                            <td>{{ evenement.categorie.nomCategorie }}</td>
+                            <td>
+                                <span class="statut-badge statut-{{ evenement.statut }}">
+                                    {{ evenement.statut }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="actions-group">
+                                    <a href="{{ path('evenement_modifier', {id: evenement.idEvenement}) }}" class="btn btn-warning btn-sm">
+                                        <i class="fa fa-pencil"></i> Modifier
+                                    </a>
+                                    <button type="button" class="btn btn-danger btn-sm" onclick="openModal('modal-{{ evenement.idEvenement }}')">
+                                        <i class="fa fa-trash"></i> Supprimer
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</div>
+
+{# Modales de confirmation de suppression #}
+{% for evenement in evenements %}
+<div class="modal-overlay" id="modal-{{ evenement.idEvenement }}">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h5><i class="fa fa-triangle-exclamation"></i> Confirmation de suppression</h5>
+            <button class="modal-close" onclick="closeModal('modal-{{ evenement.idEvenement }}')">✕</button>
+        </div>
+        <div class="modal-body">
+            <p>Voulez-vous vraiment supprimer l'événement :</p>
+            <div class="modal-cat-name fw-bold fs-5 my-2">"{{ evenement.titre }}"</div>
+            <div class="modal-warning bg-warning-subtle p-2 rounded">
+                <i class="fa fa-circle-info"></i> Cette action est <strong>irréversible</strong>.
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" onclick="closeModal('modal-{{ evenement.idEvenement }}')"><i class="fa fa-xmark"></i> Annuler</button>
+            <form method="POST" action="{{ path('evenement_supprimer', {id: evenement.idEvenement}) }}" style="display:inline;">
+                <input type="hidden" name="_token" value="{{ csrf_token('supprimer_' ~ evenement.idEvenement) }}">
+                <button type="submit" class="btn btn-danger"><i class="fa fa-trash"></i> Oui, supprimer</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    function openModal(id) {
+        document.getElementById(id).classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('open');
+        document.body.style.overflow = '';
+    }
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === this) closeModal(this.id);
+        });
+    });
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(m => closeModal(m.id));
+    });
+</script>
+{% endblock %}
