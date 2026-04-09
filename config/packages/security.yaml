@@ -37,7 +37,7 @@ security:
         - { path: ^/register, roles: PUBLIC_ACCESS }
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/agriculteur, roles: ROLE_AGRICULTEUR }
-        - { path: ^/ouvrier, roles: ROLE_OUVRIER }
+
 
 when@test:
     security:

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Form\Admin;
+namespace App\Form\Animals\Admin;
 
 use App\Entity\Animals\Animaux;
 use App\Entity\User\User;

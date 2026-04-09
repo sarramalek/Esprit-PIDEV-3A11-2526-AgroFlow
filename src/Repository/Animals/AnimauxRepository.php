@@ -46,6 +46,35 @@ class AnimauxRepository extends ServiceEntityRepository
     }
 
     /**
+     * Recherche les animaux par nom, espèce ou sexe pour l'admin (en filtrant par ID).
+     */
+    public function searchDashboardAdmin(?string $term, ?string $sortBy = 'id', ?string $direction = 'DESC', array $ids = []): array
+    {
+        if (empty($ids)) {
+            return [];
+        }
+
+        $qb = $this->createQueryBuilder('a')
+                   ->andWhere('a.id IN (:ids)')
+                   ->setParameter('ids', $ids);
+
+        if ($term && trim($term) !== '') {
+            $qb->andWhere('(a.nom LIKE :term OR a.espece LIKE :term OR a.sexe LIKE :term)')
+               ->setParameter('term', '%' . $term . '%');
+        }
+
+        // Liste blanche des colonnes de tri
+        $validSorts = ['id', 'nom', 'espece', 'sexe', 'poids', 'date_naissance'];
+        if (!in_array($sortBy, $validSorts)) {
+            $sortBy = 'id';
+        }
+        
+        $direction = strtoupper($direction) === 'ASC' ? 'ASC' : 'DESC';
+
+        return $qb->orderBy('a.' . $sortBy, $direction)->getQuery()->getResult();
+    }
+
+    /**
      * Statistiques par espèce, filtrées par utilisateur si nécessaire.
      */
     public function countByEspece(?User $user = null): array

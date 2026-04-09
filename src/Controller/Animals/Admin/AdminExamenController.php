@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Admin;
+namespace App\Controller\Animals\Admin;
 
 use App\Entity\Animals\Examen;
 use App\Form\Animals\ExamenType;
@@ -24,10 +24,13 @@ final class AdminExamenController extends AbstractController
         $direction   = $request->query->get('direction', 'DESC');
         $typeFilter  = $request->query->get('type');
 
-        // Admin voit tous les examens (null = pas de filtre user)
-        $examens = $examenRepository->searchExamen($searchTerm, $sortBy, $direction, $typeFilter, null);
+        // Admin ne voit que les examens qu'il a ajoutés
+        $session = $request->getSession();
+        $adminExamenIds = $session->get('admin_added_examens', []);
 
-        return $this->render('admin/examen/index.html.twig', [
+        $examens = $examenRepository->searchExamenAdmin($searchTerm, $sortBy, $direction, $typeFilter, $adminExamenIds);
+
+        return $this->render('Animals/admin/examen/index.html.twig', [
             'examens'          => $examens,
             'searchTerm'       => $searchTerm,
             'currentSort'      => $sortBy,
@@ -46,11 +49,18 @@ final class AdminExamenController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $em->persist($examen);
             $em->flush();
+
+            // Mémoriser l'examen ajouté dans la session pour l'admin
+            $session = $request->getSession();
+            $adminExamenIds = $session->get('admin_added_examens', []);
+            $adminExamenIds[] = $examen->getId();
+            $session->set('admin_added_examens', $adminExamenIds);
+
             $this->addFlash('success', 'Examen ajouté avec succès.');
             return $this->redirectToRoute('admin_examens_index');
         }
 
-        return $this->render('admin/examen/form.html.twig', [
+        return $this->render('Animals/admin/examen/form.html.twig', [
             'form'   => $form,
             'title'  => 'Ajouter un examen',
             'examen' => $examen,
@@ -69,7 +79,7 @@ final class AdminExamenController extends AbstractController
             return $this->redirectToRoute('admin_examens_index');
         }
 
-        return $this->render('admin/examen/form.html.twig', [
+        return $this->render('Animals/admin/examen/form.html.twig', [
             'form'   => $form,
             'title'  => 'Modifier l\'examen',
             'examen' => $examen,
