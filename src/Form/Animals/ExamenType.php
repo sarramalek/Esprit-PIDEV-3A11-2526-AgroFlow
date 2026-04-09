@@ -58,14 +58,18 @@ class ExamenType extends AbstractType
             ->add('animal', EntityType::class, [
                 'class' => Animaux::class,
                 'query_builder' => function (AnimauxRepository $er) use ($user) {
-                    return $er->createQueryBuilder('a')
-                        ->where('a.user = :user')
-                        ->setParameter('user', $user)
-                        ->orderBy('a.nom', 'ASC');
+                    $qb = $er->createQueryBuilder('a')->orderBy('a.nom', 'ASC');
+                    // Si user est défini (agriculteur), on filtre ; sinon (admin) on voit tout
+                    if ($user !== null) {
+                        $qb->where('a.user = :user')->setParameter('user', $user);
+                    }
+                    return $qb;
                 },
-                'choice_label' => 'nom',
+                'choice_label' => function (Animaux $a) {
+                    return $a->getNom() . ' (' . $a->getEspece() . ')';
+                },
                 'label' => 'Animal concerné',
-                'attr' => ['class' => 'form-select'],
+                'attr'  => ['class' => 'form-select'],
             ])
         ;
     }
