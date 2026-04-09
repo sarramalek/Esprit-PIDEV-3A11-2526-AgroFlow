@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity\Animals; // Correction ici : On reste dans App\Entity
+namespace App\Entity\Animals;
 
 use App\Repository\Animals\ExamenRepository;
 use Doctrine\DBAL\Types\Types;
@@ -24,22 +24,28 @@ class Examen
 
     #[ORM\Column(length: 100, nullable: true)]
     #[Assert\NotBlank(message: "Le type d'examen est obligatoire.")]
-    #[Assert\Regex(
-        pattern: "/^[a-zA-ZÀ-ÿ\s\-]+$/u",
-        message: "Le type d'examen ne doit contenir que des lettres."
+    #[Assert\Choice(
+        choices: ["Vaccin", "Radio", "Scanner", "Consultation"],
+        message: "Veuillez sélectionner un type d'examen valide."
     )]
     private ?string $type_examen = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Assert\NotBlank(message: "Le diagnostic est obligatoire.")]
-    #[Assert\Length(min: 5, minMessage: "Le diagnostic doit contenir au moins 5 caractères.")]
+    #[Assert\Choice(
+        choices: ["En bonne santé", "Infection", "Fracture", "Urgence"],
+        message: "Le diagnostic sélectionné n'est pas valide."
+    )]
     private ?string $diagnostic = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\NotBlank(message: "Le traitement est obligatoire.")]
+    #[Assert\Choice(
+        choices: ["Repos", "Antibiotiques", "Observation", "Chirurgie"],
+        message: "Le traitement sélectionné n'est pas valide."
+    )]
     private ?string $traitement = null;
 
-    // Attention : Vérifie que ton entité Animaux utilise bien "inversedBy: 'examen'" (sans s)
     #[ORM\ManyToOne(targetEntity: Animaux::class, inversedBy: 'examen')]
     #[ORM\JoinColumn(name: 'id_animal', referencedColumnName: 'id', nullable: false)]
     #[Assert\NotNull(message: "L'examen doit être relié à un animal.")]
@@ -105,5 +111,64 @@ class Examen
     {
         $this->animal = $animal;
         return $this;
+    }
+
+    /**
+     * Calcule le score de santé de l'animal basé sur l'examen (0-100)
+     */
+    public function getHealthScore(): int
+    {
+        $score = 50; // Base de départ
+
+        // Bonus
+        if ($this->type_examen === 'Vaccin') {
+            $score += 20;
+        }
+        if ($this->diagnostic === 'En bonne santé') {
+            $score += 10;
+        }
+
+        // Malus
+        if ($this->diagnostic === 'Infection' || $this->diagnostic === 'Urgence') {
+            $score -= 40;
+        }
+        if ($this->traitement === 'Chirurgie' || $this->traitement === 'Antibiotiques') {
+            $score -= 30;
+        }
+
+        // Clamp le score entre 0 et 100
+        return max(0, min(100, $score));
+    }
+
+    /**
+     * Retourne l'emoji correspondant au score de santé
+     */
+    public function getHealthEmoji(): string
+    {
+        $score = $this->getHealthScore();
+
+        if ($score >= 80) return '🌟';
+        if ($score >= 50) return '🙂';
+        return '⚠️';
+    }
+
+    /**
+     * Calcule le prix estimé de l'acte vétérinaire (DT)
+     */
+    public function getEstimatedPrice(): int
+    {
+        $price = 0;
+        switch ($this->type_examen) {
+            case 'Vaccin': $price = 50; break;
+            case 'Consultation': $price = 80; break;
+            case 'Radio':
+            case 'Scanner': $price = 150; break;
+        }
+
+        if ($this->traitement === 'Chirurgie') {
+            $price += 200;
+        }
+
+        return $price;
     }
 }
