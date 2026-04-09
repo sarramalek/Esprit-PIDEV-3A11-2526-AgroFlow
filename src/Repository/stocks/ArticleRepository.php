@@ -55,4 +55,28 @@ class ArticleRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
+
+    /**
+     * Trouve les articles créés par des utilisateurs ayant un rôle spécifique
+     */
+    public function findByUserRole(int $role): array
+    {
+        return $this->createQueryBuilder('a')
+            ->join('a.user', 'u')
+            ->where('u.role = :role')
+            ->setParameter('role', $role)
+            ->orderBy('a.nom', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findByAdminCin(int $adminCin): array
+    {
+        return $this->createQueryBuilder('a')
+            ->andWhere('a.idAdmin = :cin')
+            ->setParameter('cin', $adminCin)
+            ->orderBy('a.nom', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

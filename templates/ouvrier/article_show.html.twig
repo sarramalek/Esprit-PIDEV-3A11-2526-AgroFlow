@@ -1,0 +1,62 @@
+{% extends 'base_ouvrier.html.twig' %}
+
+{% block title %}Détail produit – Ouvrier | AgroFlow{% endblock %}
+
+{% block body %}
+<div class="main-content" style="max-width:900px; margin:auto;">
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:24px;">
+        <div>
+            <h1 style="margin-bottom:8px;">{{ article.nom }}</h1>
+            <p style="color:#56646a;">Détails du produit lié à l’agriculteur {{ agriculteur.nom }} {{ agriculteur.prenom }}.</p>
+        </div>
+        <a href="{{ path('ouvrier_produits') }}" class="card-button-outline" style="padding: 12px 18px;">Retour aux produits</a>
+    </div>
+
+    <div style="background:white; border-radius:24px; padding:32px; box-shadow:0 24px 60px rgba(47,79,79,0.08);">
+        <div style="display:grid; grid-template-columns: minmax(220px, 1fr) minmax(220px, 1fr); gap: 24px;">
+            <div>
+                <p style="margin:0 0 10px; color:#7a8b82; font-weight:600;">Catégorie</p>
+                <h2 style="margin:0 0 18px; color:#213127;">{{ article.categorie ? article.categorie.nom : 'Sans catégorie' }}</h2>
+
+                <p style="margin:0 0 10px; color:#7a8b82; font-weight:600;">Stock actuel</p>
+                <div style="display:inline-flex; align-items:center; gap:10px; padding:14px 18px; border-radius:18px; background:#f3faf2; color:#215424; font-weight:700;">
+                    <i class="fa fa-boxes-stacked"></i>
+                    {{ article.quantiteEnStock }} {{ article.uniteMesure ?: 'U' }}
+                </div>
+            </div>
+            <div>
+                <p style="margin:0 0 10px; color:#7a8b82; font-weight:600;">Prix unitaire</p>
+                <div style="font-size:2rem; font-weight:700; color:#1f3d21;">{{ article.prixUnitaire ? article.prixUnitaire ~ ' DT' : 'Non défini' }}</div>
+
+                <p style="margin:24px 0 10px; color:#7a8b82; font-weight:600;">Agriculteur lié</p>
+                <div style="padding:14px 18px; border-radius:18px; background:#f7f9f6; color:#34423e;">
+                    {{ agriculteur.nom }} {{ agriculteur.prenom }}<br>
+                    CIN {{ agriculteur.cin }}
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top:32px; display:grid; gap:16px;">
+            <div style="background:#f7faf6; border-radius:20px; padding:22px;">
+                <p style="margin:0 0 10px; color:#7a8b82; font-weight:600;">Description</p>
+                <p style="margin:0; color:#4f6257; line-height:1.8;">{{ article.categorie ? article.categorie.description ?: 'Aucune description fournie pour cette catégorie.' : 'Aucune description fournie.' }}</p>
+            </div>
+
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:14px;">
+                <div style="background:#fff; border-radius:20px; padding:20px; border:1px solid #e5ede5;">
+                    <p style="margin:0 0 8px; color:#7a8b82; font-weight:600;">Unités</p>
+                    <p style="margin:0; color:#28372f;">{{ article.uniteMesure ?: 'U' }}</p>
+                </div>
+                <div style="background:#fff; border-radius:20px; padding:20px; border:1px solid #e5ede5;">
+                    <p style="margin:0 0 8px; color:#7a8b82; font-weight:600;">Quantité</p>
+                    <p style="margin:0; color:#28372f;">{{ article.quantiteEnStock }}</p>
+                </div>
+                <div style="background:#fff; border-radius:20px; padding:20px; border:1px solid #e5ede5;">
+                    <p style="margin:0 0 8px; color:#7a8b82; font-weight:600;">Dernière mise à jour</p>
+                    <p style="margin:0; color:#28372f;">{{ article.id ? 'En stock' : 'Non disponible' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

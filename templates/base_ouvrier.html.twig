@@ -458,7 +458,7 @@
         btnSave.innerHTML = '<i class="fa fa-spinner fa-spin" style="font-size:10px;"></i> Envoi…';
         var data = new FormData(document.getElementById('ouvProfileForm'));
 
-        fetch('{{ path('profile_update') }}', {
+        fetch('{{ path('ouvrier_profile_update') }}', {
             method: 'POST',
             body: data,
             headers: { 'X-Requested-With': 'XMLHttpRequest' }

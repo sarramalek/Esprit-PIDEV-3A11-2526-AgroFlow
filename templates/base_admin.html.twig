@@ -366,8 +366,8 @@
             </div>
 
             <!-- Gestion Stocks -->
-<div class="nav-item {% if app.request.get('_route') in ['admin_categories', 'admin_stock_new'] %}open{% endif %}">
-    <div class="nav-link {% if app.request.get('_route') in ['admin_categories', 'admin_stock_new'] %}active{% endif %}"
+<div class="nav-item {% if app.request.get('_route') in ['admin_categories', 'admin_stock_new', 'admin_stock_index', 'admin_stock_edit'] %}open{% endif %}">
+    <div class="nav-link {% if app.request.get('_route') in ['admin_categories_index', 'admin_stock_new', 'admin_stock_index', 'admin_stock_edit', 'admin_categorie_new', 'admin_categorie_edit'] %}active{% endif %}"
          onclick="toggleMenu(this)">
         <span class="nav-icon"><i class="fa fa-boxes-stacked"></i></span>
         <span class="nav-label">Gestion Stocks</span>
@@ -375,14 +375,12 @@
     </div>
     <ul class="nav-sub">
         <li>
-            {# Remplace '#' par ta route catégories si elle existe déjà #}
-            <a href="{{ path('admin_categorie_new') }}" class="{% if app.request.get('_route') == 'admin_categories' %}active{% endif %}">
+            <a href="{{ path('admin_categories_index') }}" class="{% if app.request.get('_route') == 'admin_categories_index' %}active{% endif %}">
                 <span class="sub-dot"></span> Catégories
             </a>
         </li>
         <li>
-            {# LIEN VERS TON FORMULAIRE PRODUIT #}
-            <a href="{{ path('admin_stock_new') }}" class="{% if app.request.get('_route') == 'admin_stock_new' %}active{% endif %}">
+            <a href="{{ path('admin_stock_index') }}" class="{% if app.request.get('_route') in ['admin_stock_index', 'admin_stock_edit'] %}active{% endif %}">
                 <span class="sub-dot"></span> Produits
             </a>
         </li>

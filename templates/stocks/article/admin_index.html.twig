@@ -1,0 +1,171 @@
+{% extends 'base_admin.html.twig' %}
+
+{% block title %}Gestion des Produits - AgroFlow{% endblock %}
+
+{% block body %}
+<div class="dash-wrapper" style="padding: 30px; font-family: 'DM Sans', sans-serif; background-color: transparent !important;">
+
+    {# --- MESSAGES FLASH --- #}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div style="padding: 15px; margin-bottom: 20px; border-radius: 10px; color: white; background-color: {{ label == 'success' ? '#2ecc71' : '#e74c3c' }}; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                <i class="fa {{ label == 'success' ? 'fa-check-circle' : 'fa-exclamation-circle' }} mr-2"></i> {{ message }}
+            </div>
+        {% endfor %}
+    {% endfor %}
+
+    {# --- EN-TÊTE --- #}
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+        <div>
+            <h2 style="margin:0; color:#1a2a19; font-size:28px; font-weight: 800; letter-spacing: -0.5px;">
+                <i class="fa fa-boxes-stacked" style="color: #2D5A27; margin-right: 10px;"></i>Gestion des Produits
+            </h2>
+            <p style="margin:5px 0 0; color:#6c757d; font-size:15px;">Liste des produits que vous avez créés.</p>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <a href="{{ path('admin_stock_new') }}" class="btn-primary-action">
+                <i class="fa fa-plus"></i> Ajouter un Produit
+            </a>
+        </div>
+    </div>
+
+    {# --- LISTE DES ARTICLES --- #}
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead style="background-color: #f8f9fa;">
+                <tr>
+                    <th>Nom</th>
+                    <th>Quantité en Stock</th>
+                    <th>Seuil d'Alerte</th>
+                    <th>Unité</th>
+                    <th>Prix Unitaire</th>
+                    <th>Catégorie</th>
+                    <th>Agriculteur</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for article in articles %}
+                    <tr>
+                        <td>{{ article.nom }}</td>
+                        <td>
+                            {% if article.quantiteEnStock <= article.seuilAlerte %}
+                                <span style="color: #e74c3c; font-weight: bold;">{{ article.quantiteEnStock }}</span>
+                            {% else %}
+                                {{ article.quantiteEnStock }}
+                            {% endif %}
+                        </td>
+                        <td>{{ article.seuilAlerte }}</td>
+                        <td>{{ article.uniteMesure }}</td>
+                        <td>{{ article.prixUnitaire ? article.prixUnitaire ~ ' DT' : 'N/A' }}</td>
+                        <td>{{ article.categorie ? article.categorie.nom : 'Aucune' }}</td>
+                        <td>{{ article.user ? article.user.nom ~ ' ' ~ article.user.prenom : 'N/A' }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{{ path('admin_stock_edit', {'id': article.id}) }}" class="btn btn-sm btn-action btn-action-edit" title="Modifier">
+                                    <i class="fa fa-pen"></i>
+                                </a>
+                                <form method="post" action="{{ path('admin_stock_delete', {'id': article.id}) }}" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ article.id) }}">
+                                    <button class="btn btn-sm btn-action btn-action-delete" title="Supprimer" type="submit">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center">Aucun article trouvé.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+.btn-primary-action {
+    background: linear-gradient(135deg, #2D5A27, #4CAF50);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary-action:hover {
+    background: linear-gradient(135deg, #4CAF50, #2D5A27);
+    color: white;
+    text-decoration: none;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(45, 90, 39, 0.3);
+}
+
+.table-responsive {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    overflow: hidden;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #2D5A27;
+    padding: 15px;
+}
+
+.table td {
+    padding: 15px;
+    vertical-align: middle;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.875rem;
+}
+
+.action-buttons{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.btn-action{
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    border: 1px solid #E2E8F0;
+    background: #fff;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+}
+.btn-action:hover{
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+.btn-action-edit{
+    color: #2D5A27;
+    border-color: rgba(45, 90, 39, 0.25);
+}
+.btn-action-edit:hover{
+    border-color: #2D5A27;
+}
+.btn-action-delete{
+    color: #c0392b;
+    border-color: rgba(192, 57, 43, 0.25);
+}
+.btn-action-delete:hover{
+    border-color: #c0392b;
+}
+</style>
+{% endblock %}

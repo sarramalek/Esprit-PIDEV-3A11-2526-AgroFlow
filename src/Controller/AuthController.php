@@ -81,10 +81,10 @@ public function login(AuthenticationUtils $authenticationUtils): Response
    private function redirectByRole($user): Response
 {
     return match((int)$user->getRole()) {
-        1       => $this->redirectToRoute('ouvrier_dashboard'),
+        1       => $this->redirectToRoute('ouvrier_home'),
         2       => $this->redirectToRoute('agri_home'),
         3       => $this->redirectToRoute('admin_dashboard'),
-        default => $this->redirectToRoute('app_login'), // ← add this
+        default => $this->redirectToRoute('app_login'),
     };
 }
 }

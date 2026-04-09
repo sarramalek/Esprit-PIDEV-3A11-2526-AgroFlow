@@ -26,7 +26,7 @@ class MouvementController extends AbstractController
         $repo = $em->getRepository(MouvementStock::class);
         $qb = $repo->createQueryBuilder('m')
             ->join('m.article', 'a')
-            ->where('m.user = :user')
+            ->where('a.user = :user')
             ->setParameter('user', $user);
 
         if (!empty($articleId)) {
@@ -68,7 +68,7 @@ class MouvementController extends AbstractController
         $motif = $request->request->get('motif');
 
         if ($quantite <= 0) {
-            $this->addFlash('danger', 'La quantité doit être supérieure à 0.');
+            $this->addFlash('danger', 'La quantitï¿½ doit ï¿½tre supï¿½rieure ï¿½ 0.');
             return $this->redirectToRoute('agri_produits');
         }
 
@@ -91,7 +91,7 @@ class MouvementController extends AbstractController
         $em->persist($mouvement);
         $em->flush();
 
-        $this->addFlash('success', 'Mouvement enregistré avec succès.');
+        $this->addFlash('success', 'Mouvement enregistrï¿½ avec succï¿½s.');
         return $this->redirectToRoute('agri_produits');
     }
     #[Route('/agriculteur/mouvements/rotation', name: 'app_mouvement_rotation')]
@@ -115,7 +115,7 @@ class MouvementController extends AbstractController
                 ->select('m.type, SUM(m.quantite) as total')
                 ->join('m.article', 'art')
                 ->where('art.categorie = :cat')
-                ->andWhere('m.user = :user')
+                ->andWhere('art.user = :user')
                 ->andWhere('m.dateMouvement BETWEEN :debut AND :fin')
                 ->setParameter('cat', $cat)
                 ->setParameter('user', $user)
@@ -162,7 +162,13 @@ class MouvementController extends AbstractController
     #[Route('/agriculteur/mouvements/export', name: 'app_mouvement_export_pdf')]
     public function exportPdf(EntityManagerInterface $em): Response
     {
-        $mouvements = $em->getRepository(MouvementStock::class)->findBy(['user' => $this->getUser()]);
+        $mouvements = $em->getRepository(MouvementStock::class)->createQueryBuilder('m')
+            ->join('m.article', 'a')
+            ->where('a.user = :user')
+            ->setParameter('user', $this->getUser())
+            ->orderBy('m.dateMouvement', 'DESC')
+            ->getQuery()
+            ->getResult();
         $html = $this->renderView('stocks/article/mouvement/pdf_export.html.twig', ['mouvements' => $mouvements]);
 
         $dompdf = new Dompdf(new Options(['defaultFont' => 'Arial']));

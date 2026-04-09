@@ -62,6 +62,7 @@
                 <tr style="border-bottom: 1px solid #f1f1f1;">
                     <th class="th-style">DATE & HEURE</th>
                     <th class="th-style">PRODUIT CONCERNÉ</th>
+                    <th class="th-style">OUVRIER</th>
                     <th class="th-style">TYPE D'OPÉRATION</th>
                     <th class="th-style">QUANTITÉ FLUX</th>
                     <th class="th-style">NOTES / MOTIF</th>
@@ -76,6 +77,9 @@
                     </td>
                     <td style="padding: 18px 25px;">
                         <span style="font-weight: 700; color: #1a2a19;">{{ mouvement.article.nom }}</span>
+                    </td>
+                    <td style="padding: 18px 25px; color: #4a5568; font-weight: 700;">
+                        {{ mouvement.user.prenom|default('') }} {{ mouvement.user.nom|default('') }}
                     </td>
                     <td style="padding: 18px 25px;">
                         {% if mouvement.type == 'ENTREE' %}

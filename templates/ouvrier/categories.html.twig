@@ -1,0 +1,226 @@
+{% extends 'base_ouvrier.html.twig' %}
+
+{% block title %}Catégories – Ouvrier | AgroFlow{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 18px;
+        margin-top: 24px;
+    }
+    .stock-card {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        background: #ffffff;
+        border: 1px solid rgba(34, 79, 46, 0.12);
+        border-radius: 24px;
+        padding: 20px;
+        box-shadow: 0 16px 36px rgba(31, 61, 33, 0.08);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        overflow: hidden;
+    }
+    .stock-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 24px 50px rgba(31, 61, 33, 0.12);
+        border-color: rgba(34, 79, 46, 0.16);
+    }
+    .stock-card .card-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: flex-start;
+    }
+    .stock-card .card-title {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #163923;
+        line-height: 1.25;
+        margin: 0;
+    }
+    .stock-card .card-meta {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #5f7163;
+        font-size: 0.92rem;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: #f4faf4;
+    }
+    .stock-card .card-description {
+        color: #4f6056;
+        min-height: 48px;
+        line-height: 1.65;
+        margin: 0;
+        font-size: 0.95rem;
+    }
+    .stock-card .card-footer {
+        margin-top: auto;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+    }
+    .stock-card .card-button,
+    .stock-card .card-button-outline {
+        border: none;
+        border-radius: 999px;
+        padding: 10px 16px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+        font-size: 0.92rem;
+    }
+    .stock-card .card-button {
+        background: linear-gradient(135deg, #2f6f3d 0%, #1f4d2f 100%);
+        color: white;
+        box-shadow: 0 8px 20px rgba(34, 79, 46, 0.12);
+    }
+    .stock-card .card-button:hover {
+        transform: translateY(-1px);
+        background: #2b5f35;
+    }
+    .stock-card .card-button-outline {
+        background: #ffffff;
+        color: #1f4f2d;
+        border: 1px solid rgba(34, 79, 46, 0.15);
+    }
+    .stock-card .card-button-outline:hover {
+        background: #f5faf4;
+    }
+    .stock-card .hover-actions {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        display: flex;
+        gap: 8px;
+        opacity: 0;
+        transform: translateY(-8px);
+        transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .stock-card:hover .hover-actions {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .stock-card .hover-button {
+        width: 42px;
+        height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.96);
+        border: 1px solid rgba(34, 79, 46, 0.12);
+        color: #1f472d;
+    }
+    .stock-card .hover-button:hover {
+        background: #2d5a27;
+        color: white;
+        border-color: transparent;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="main-content">
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px;">
+        <div>
+            <h1>Catégories</h1>
+        </div>
+    </div>
+    <div style="margin-top: 24px; margin-bottom: 16px;">
+        <div style="position: relative; max-width: 400px;">
+            <input type="text" id="categorySearch" placeholder="Rechercher une catégorie..." style="width: 100%; padding: 12px 16px 12px 40px; border: 1px solid rgba(34, 79, 46, 0.15); border-radius: 20px; background: #ffffff; color: #24372e; font-size: 0.95rem; outline: none; transition: border-color 0.2s ease;">
+            <i class="fa fa-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #6c757d;"></i>
+        </div>
+    </div>
+    {% if error is defined %}
+        <div class="flash-success" style="background:#fff4e5; border-left-color:#ffa940; color:#6a4b0d;">{{ error }}</div>
+    {% endif %}
+
+    {% if categories is empty %}
+        <p style="margin-top:24px; color:#596662;">Aucune catégorie trouvée pour l'agriculteur lié.</p>
+    {% else %}
+        <div class="cards-grid">
+            {% for categorie in categories %}
+                <article class="stock-card">
+                    <div class="hover-actions">
+                        <a href="{{ path('ouvrier_produits', {'category': categorie.id}) }}" class="hover-button" title="Voir les produits de cette catégorie">
+                            <i class="fa fa-box"></i>
+                        </a>
+                    </div>
+                    <div class="card-head">
+                        <div>
+                            <h2 class="card-title">{{ categorie.nom }}</h2>
+                            <div class="card-meta">{{ categorie.articles|length }} produit{{ categorie.articles|length > 1 ? 's' : '' }}</div>
+                        </div>
+                    </div>
+                    <p class="card-description">{{ categorie.description ?: 'Pas de description fournie.' }}</p>
+                    <div class="card-footer">
+                        <span style="color:#7a8b82; font-size:0.95rem;">Créée le {{ categorie.dateCreation ? categorie.dateCreation|date('d/m/Y') : '—' }}</span>
+                        <a href="{{ path('ouvrier_produits', {'category': categorie.id}) }}" class="card-button">Voir produits</a>
+                    </div>
+                </article>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Recherche de catégories
+            const searchInput = document.getElementById('categorySearch');
+            const categoryCards = document.querySelectorAll('.stock-card');
+
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase().trim();
+                const cardsGrid = document.querySelector('.cards-grid');
+
+                if (searchTerm === '') {
+                    // Afficher toutes les cartes
+                    categoryCards.forEach(card => {
+                        card.style.display = 'block';
+                    });
+                    return;
+                }
+
+                let visibleCount = 0;
+                categoryCards.forEach(card => {
+                    const categoryName = card.querySelector('.card-title').textContent.toLowerCase();
+                    const categoryMeta = card.querySelector('.card-meta').textContent.toLowerCase();
+
+                    if (categoryName.includes(searchTerm) || categoryMeta.includes(searchTerm)) {
+                        card.style.display = 'block';
+                        visibleCount++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                // Message si aucun résultat
+                let noResultsMsg = cardsGrid.querySelector('.no-results-msg');
+                if (visibleCount === 0) {
+                    if (!noResultsMsg) {
+                        noResultsMsg = document.createElement('p');
+                        noResultsMsg.className = 'no-results-msg';
+                        noResultsMsg.style.cssText = 'margin-top: 24px; color: #596662; text-align: center; font-style: italic;';
+                        noResultsMsg.textContent = 'Aucune catégorie trouvée pour "' + searchTerm + '"';
+                        cardsGrid.appendChild(noResultsMsg);
+                    }
+                } else {
+                    if (noResultsMsg) {
+                        noResultsMsg.remove();
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}

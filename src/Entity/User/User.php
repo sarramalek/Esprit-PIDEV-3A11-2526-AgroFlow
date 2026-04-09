@@ -61,6 +61,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $img = null;
 
+    #[ORM\ManyToOne(targetEntity: self::class)]
+    #[ORM\JoinColumn(name: 'id_agricole', referencedColumnName: 'cin', nullable: true, onDelete: 'SET NULL')]
+    private ?self $agriculteur = null;
+
     // ==================== UserInterface ====================
 
     public function getUserIdentifier(): string
@@ -244,6 +248,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setTwoFactorBackupCodes(?string $twoFactorBackupCodes): self
     {
         $this->twoFactorBackupCodes = $twoFactorBackupCodes;
+        return $this;
+    }
+
+    public function getAgriculteur(): ?self
+    {
+        return $this->agriculteur;
+    }
+
+    public function setAgriculteur(?self $agriculteur): self
+    {
+        $this->agriculteur = $agriculteur;
         return $this;
     }
 

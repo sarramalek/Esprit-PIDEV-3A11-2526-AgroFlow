@@ -7,9 +7,11 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\BirthdayType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -91,6 +93,21 @@ class RegistrationFormType extends AbstractType
                 'constraints' => [
                     new NotBlank(['message' => 'Veuillez choisir un rôle.']),
                 ],
+            ])
+            ->add('agriculteur', EntityType::class, [
+                'class' => User::class,
+                'choice_label' => function (User $user) {
+                    return sprintf('%s - %s %s', $user->getCin(), $user->getNom(), $user->getPrenom());
+                },
+                'query_builder' => function (EntityRepository $repository) {
+                    return $repository->createQueryBuilder('u')
+                        ->where('u.role = :role')
+                        ->setParameter('role', 2)
+                        ->orderBy('u.nom', 'ASC');
+                },
+                'placeholder' => '-- Choisissez l\'agriculteur --',
+                'required' => false,
+                'label' => false,
             ])
             ->add('cin', IntegerType::class, [
     'label' => false,

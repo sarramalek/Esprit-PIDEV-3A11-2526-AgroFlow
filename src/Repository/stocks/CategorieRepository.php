@@ -28,4 +28,28 @@ class CategorieRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    /**
+     * Trouve les catégories créées par des utilisateurs ayant un rôle spécifique
+     */
+    public function findByUserRole(int $role): array
+    {
+        return $this->createQueryBuilder('c')
+            ->join('c.agriculteur', 'u')
+            ->where('u.role = :role')
+            ->setParameter('role', $role)
+            ->orderBy('c.nom', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findByAdminCin(int $adminCin): array
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.idAdmin = :cin')
+            ->setParameter('cin', $adminCin)
+            ->orderBy('c.nom', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }
