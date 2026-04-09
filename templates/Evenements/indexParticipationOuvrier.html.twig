@@ -1,0 +1,116 @@
+{% extends 'base_ouvrier.html.twig' %}
+
+{% block title %}Mes participations - AgroFlow (Ouvrier){% endblock %}
+
+{% block stylesheets %}
+<style>
+    .stats-card { background: white; border-radius: 12px; padding: 15px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .stats-number { font-size: 28px; font-weight: bold; }
+    .statut-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .statut-Inscrit { background: #FFF9C4; color: #F57F17; }
+    .statut-Confirmé { background: #E8F5E9; color: #2E7D32; }
+    .statut-Annulé { background: #FFEBEE; color: #C62828; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="display-6">Mes participations</h1>
+            <p class="text-muted">Suivez et gérez vos inscriptions (espace ouvrier)</p>
+        </div>
+        <a href="{{ path('ouvrier_evenement_index') }}" class="btn btn-outline-primary">
+            <i class="fa fa-calendar"></i> Voir les événements
+        </a>
+    </div>
+
+    <!-- Statistiques -->
+    <div class="row mb-4 g-3">
+        <div class="col-md-3"><div class="stats-card"><div class="stats-number text-primary">{{ total }}</div><div class="text-muted">Total inscriptions</div></div></div>
+        <div class="col-md-3"><div class="stats-card"><div class="stats-number text-success">{{ confirme }}</div><div class="text-muted">Confirmées</div></div></div>
+        <div class="col-md-3"><div class="stats-card"><div class="stats-number text-warning">{{ inscrit }}</div><div class="text-muted">En attente</div></div></div>
+        <div class="col-md-3"><div class="stats-card"><div class="stats-number text-danger">{{ annule }}</div><div class="text-muted">Annulées</div></div></div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" action="{{ path('ouvrier_participation_index') }}" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label small">Rechercher par événement</label>
+                    <input type="text" name="search" class="form-control" value="{{ search }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small">Date inscription</label>
+                    <input type="date" name="dateInscription" class="form-control" value="{{ dateInscriptionFiltre }}">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small">Statut</label>
+                    <select name="statut" class="form-select">
+                        <option value="">Tous</option>
+                        <option value="Inscrit" {% if statutFiltre == 'Inscrit' %}selected{% endif %}>Inscrit</option>
+                        <option value="Confirmé" {% if statutFiltre == 'Confirmé' %}selected{% endif %}>Confirmé</option>
+                        <option value="Annulé" {% if statutFiltre == 'Annulé' %}selected{% endif %}>Annulé</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small">Présence</label>
+                    <select name="presence" class="form-select">
+                        <option value="">Toutes</option>
+                        <option value="Oui" {% if presenceFiltre == 'Oui' %}selected{% endif %}>Oui</option>
+                        <option value="Non" {% if presenceFiltre == 'Non' %}selected{% endif %}>Non</option>
+                    </select>
+                </div>
+                <div class="col-md-1 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+                </div>
+                <div class="col-12 text-end">
+                    <a href="{{ path('ouvrier_participation_index') }}" class="btn btn-sm btn-secondary">Réinitialiser</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Événement</th>
+                            <th>Date inscription</th>
+                            <th>Statut</th>
+                            <th>Présence</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in participations %}
+                            <tr>
+                                <td><strong>{{ p.evenement.titre }}</strong></td>
+                                <td>{{ p.dateInscription|date('d/m/Y') }}</td>
+                                <td><span class="statut-badge statut-{{ p.statutParticipation }}">{{ p.statutParticipation }}</span></td>
+                                <td>{{ p.presence ? '✓ Oui' : '✗ Non' }}</td>
+                                <td>
+                                    {% if p.statutParticipation != 'Annulé' %}
+                                        <a href="{{ path('ouvrier_participation_modifier', {id: p.idParticipation}) }}" class="btn btn-sm btn-warning me-2">Modifier présence</a>
+                                        <form method="POST" action="{{ path('ouvrier_participation_annuler', {id: p.idParticipation}) }}" style="display:inline-block;">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('annuler_' ~ p.idParticipation) }}">
+                                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Annuler votre participation ?')">Annuler</button>
+                                        </form>
+                                    {% else %}
+                                        <span class="text-muted">Annulée</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr><td colspan="5" class="text-center">Aucune participation trouvée.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
