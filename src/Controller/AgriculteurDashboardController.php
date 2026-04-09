@@ -183,11 +183,7 @@ class AgriculteurDashboardController extends AbstractController
 
     // ── Événements ───────────────────────────────────────────────────────────
 
-    #[Route('/evenements', name: 'evenements')]
-    public function evenements(): Response
-    {
-        return new Response('Module Événements — à implémenter');
-    }
+   
 
     #[Route('/evenements/participations', name: 'participations')]
     public function participations(): Response

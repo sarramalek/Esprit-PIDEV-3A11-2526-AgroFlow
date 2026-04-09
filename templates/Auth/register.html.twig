@@ -5,103 +5,54 @@
 {% block stylesheets %}
 <style>
     .role-selector { display: flex; gap: 16px; margin-bottom: 24px; }
-
     .role-card input[type="radio"] { display: none; }
-
     .role-card label {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        flex: 1;
-        padding: 20px;
-        border: 2px solid #eee;
-        border-radius: 12px;
-        cursor: pointer;
-        transition: all 0.25s;
-        color: #555;
-        font-weight: 600;
-        font-size: 15px;
+        display: flex; flex-direction: column; align-items: center;
+        justify-content: center; gap: 10px; flex: 1; padding: 20px;
+        border: 2px solid #eee; border-radius: 12px; cursor: pointer;
+        transition: all 0.25s; color: #555; font-weight: 600; font-size: 15px;
     }
-
     .role-card label i { font-size: 32px; color: #aaa; transition: color 0.25s; }
-
-    .role-card input[type="radio"]:checked + label {
-        border-color: #2D5A27;
-        background-color: #f0f7ee;
-        color: #2D5A27;
-    }
-
+    .role-card input[type="radio"]:checked + label { border-color: #2D5A27; background-color: #f0f7ee; color: #2D5A27; }
     .role-card input[type="radio"]:checked + label i { color: #2D5A27; }
-
     .role-card label:hover { border-color: #2D5A27; color: #2D5A27; }
     .role-card label:hover i { color: #2D5A27; }
-
     .field-row { display: flex; gap: 16px; }
     .field-row > div { flex: 1; }
-
     .form-input {
-        width: 100%;
-        padding: 12px 15px;
-        border: 2px solid #eee;
-        border-radius: 8px;
-        font-size: 15px;
-        box-sizing: border-box;
-        transition: border-color 0.3s;
-        outline: none;
-        font-family: inherit;
+        width: 100%; padding: 12px 15px; border: 2px solid #eee;
+        border-radius: 8px; font-size: 15px; box-sizing: border-box;
+        transition: border-color 0.3s; outline: none; font-family: inherit;
     }
     .form-input:focus { border-color: #2D5A27; }
-
-    .form-label {
-        display: block;
-        color: #2C3E50;
-        font-weight: 600;
-        margin-bottom: 8px;
-        font-size: 14px;
-    }
-
+    .form-label { display: block; color: #2C3E50; font-weight: 600; margin-bottom: 8px; font-size: 14px; }
     .field-group { margin-bottom: 20px; }
-
     .submit-btn {
-        width: 100%;
-        background-color: #2D5A27;
-        color: white;
-        padding: 14px;
-        border: none;
-        border-radius: 8px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background-color 0.3s;
-        margin-top: 8px;
+        width: 100%; background-color: #2D5A27; color: white; padding: 14px;
+        border: none; border-radius: 8px; font-size: 16px; font-weight: 600;
+        cursor: pointer; transition: background-color 0.3s; margin-top: 8px;
     }
     .submit-btn:hover { background-color: #1e3d1a; }
-
-    .error-msg {
-        color: #c0392b;
-        font-size: 12px;
-        margin-top: 4px;
-    }
 </style>
 {% endblock %}
 
 {% block body %}
-<section style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background-color: #FCF8E6; padding: 40px 0;">
-    <div style="background: white; padding: 50px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 560px;">
+<section style="min-height:100vh;display:flex;align-items:center;justify-content:center;background-color:#FCF8E6;padding:40px 0;">
+    <div style="background:white;padding:50px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.1);width:100%;max-width:560px;">
 
-        {# Logo & Titre #}
-        <div style="text-align: center; margin-bottom: 30px;">
-            <img src="{{ asset('assets/img/Logo.png') }}" alt="Logo" style="height: 60px; margin-bottom: 15px;">
-            <h2 style="color: #2C3E50; font-family: 'Marcellus', serif; margin: 0;">Créer un compte</h2>
-            <p style="color: #666; margin-top: 6px;">Rejoignez AgroFlow</p>
+        <div style="text-align:center;margin-bottom:30px;">
+            <img src="{{ asset('assets/img/Logo.png') }}" alt="Logo" style="height:60px;margin-bottom:15px;">
+            <h2 style="color:#2C3E50;font-family:'Marcellus',serif;margin:0;">Créer un compte</h2>
+            <p style="color:#666;margin-top:6px;">Rejoignez AgroFlow</p>
         </div>
 
         {{ form_errors(registrationForm) }}
-        {{ form_start(registrationForm) }}
 
-            {# ── Rôle (boutons radio stylisés) ── #}
+        {# On ouvre le form SANS form_end pour contrôler le rendu #}
+        <form method="post" action="{{ path('app_register') }}">
+            {{ form_widget(registrationForm._token) }}
+
+            {# ── Rôle ── #}
             <div class="field-group">
                 <label class="form-label">Je suis...</label>
                 <div class="role-selector">
@@ -120,24 +71,17 @@
                 </div>
                 {{ form_errors(registrationForm.role) }}
             </div>
-{# ── CIN ── #}
-<div class="field-group">
-    <label class="form-label" for="{{ registrationForm.cin.vars.id }}">
-        Numéro CIN
-    </label>
-    {{ form_widget(registrationForm.cin, {'attr': {
-        'class': 'form-input',
-        'maxlength': 8,
-        'inputmode': 'numeric',
-        'pattern': '[0-9]{8}'
-    }}) }}
-    {{ form_errors(registrationForm.cin) }}
-</div>
+
+            {# ── CIN ── #}
+            <div class="field-group">
+                <label class="form-label" for="{{ registrationForm.cin.vars.id }}">Numéro CIN</label>
+                {{ form_widget(registrationForm.cin, {'attr': {'class': 'form-input', 'maxlength': 8, 'inputmode': 'numeric', 'pattern': '[0-9]{8}'}}) }}
+                {{ form_errors(registrationForm.cin) }}
+            </div>
+
             {# ── Date de naissance ── #}
             <div class="field-group">
-                <label class="form-label" for="{{ registrationForm.dateNaiss.vars.id }}">
-                    Date de naissance
-                </label>
+                <label class="form-label" for="{{ registrationForm.dateNaiss.vars.id }}">Date de naissance</label>
                 {{ form_widget(registrationForm.dateNaiss, {'attr': {'class': 'form-input'}}) }}
                 {{ form_errors(registrationForm.dateNaiss) }}
             </div>
@@ -171,8 +115,16 @@
                     {{ form_errors(registrationForm.ville) }}
                 </div>
                 <div>
-                    <label class="form-label" for="{{ registrationForm.adresse.vars.id }}">Quartier</label>
-                    {{ form_widget(registrationForm.adresse, {'attr': {'class': 'form-input', 'id': 'adresse-select'}}) }}
+                    <label class="form-label">Quartier</label>
+
+                    {# Champ caché HTML pur — Symfony ne le re-génère pas #}
+                    <input type="hidden" id="adresse-hidden" name="registration_form[adresse]" value="">
+
+                    {# Select visuel 100% JS #}
+                    <select id="adresse-select" class="form-input" disabled>
+                        <option value="">-- Choisissez d'abord une ville --</option>
+                    </select>
+
                     {{ form_errors(registrationForm.adresse) }}
                 </div>
             </div>
@@ -185,12 +137,11 @@
             </div>
 
             <button type="submit" class="submit-btn">S'inscrire</button>
+        </form>
 
-        {{ form_end(registrationForm) }}
-
-        <p style="text-align: center; margin-top: 20px; color: #666;">
+        <p style="text-align:center;margin-top:20px;color:#666;">
             Déjà un compte ?
-            <a href="{{ path('app_login') }}" style="color: #2D5A27; font-weight: 600;">Se connecter</a>
+            <a href="{{ path('app_login') }}" style="color:#2D5A27;font-weight:600;">Se connecter</a>
         </p>
     </div>
 </section>
@@ -198,46 +149,51 @@
 
 {% block javascripts %}
 <script>
-// Données villes → quartiers
-const villesAdresses = {
-    "Tunis":    ["Centre-ville","La Marsa","Le Bardo","Carthage","Ariana","La Goulette","Sidi Bou Saïd","Menzah"],
-    "Sfax":     ["Centre-ville","Sakiet Ezzit","Sakiet Eddaier","Thyna","El Ain","Chihia"],
-    "Sousse":   ["Centre-ville","Hammam Sousse","Akouda","Kalaa Kebira","Msaken","Kantaoui"],
-    "Nabeul":   ["Centre-ville","Hammamet","Kelibia","Korba","Menzel Temime","Dar Chaabane"],
-    "Bizerte":  ["Centre-ville","Menzel Bourguiba","Mateur","Ras Jebel","Zarzouna","Utique"],
-    "Gabès":    ["Centre-ville","Mareth","El Hamma","Matmata","Chenini","Ghannouch"],
-    "Kairouan": ["Centre-ville","Sbikha","Haffouz","El Alaa","Nasrallah","Oueslatia"],
-    "Monastir": ["Centre-ville","Ksar Hellal","Moknine","Jemmal","Sahline","Bembla"],
-    "Gafsa":    ["Centre-ville","Metlaoui","El Ksar","Redeyef","Moulares","Sened"],
-    "Médenine": ["Centre-ville","Djerba","Zarzis","Ben Gardane","Beni Khedache","Sidi Makhlouf"],
-};
+document.addEventListener('DOMContentLoaded', function () {
+    const villesAdresses = {
+        "Tunis":    ["Centre-ville","La Marsa","Le Bardo","Carthage","Ariana","La Goulette","Sidi Bou Saïd","Menzah"],
+        "Sfax":     ["Centre-ville","Sakiet Ezzit","Sakiet Eddaier","Thyna","El Ain","Chihia"],
+        "Sousse":   ["Centre-ville","Hammam Sousse","Akouda","Kalaa Kebira","Msaken","Kantaoui"],
+        "Nabeul":   ["Centre-ville","Hammamet","Kelibia","Korba","Menzel Temime","Dar Chaabane"],
+        "Bizerte":  ["Centre-ville","Menzel Bourguiba","Mateur","Ras Jebel","Zarzouna","Utique"],
+        "Gabès":    ["Centre-ville","Mareth","El Hamma","Matmata","Chenini","Ghannouch"],
+        "Kairouan": ["Centre-ville","Sbikha","Haffouz","El Alaa","Nasrallah","Oueslatia"],
+        "Monastir": ["Centre-ville","Ksar Hellal","Moknine","Jemmal","Sahline","Bembla"],
+        "Gafsa":    ["Centre-ville","Metlaoui","El Ksar","Redeyef","Moulares","Sened"],
+        "Médenine": ["Centre-ville","Djerba","Zarzis","Ben Gardane","Beni Khedache","Sidi Makhlouf"],
+    };
 
-const villeSelect   = document.getElementById('ville-select');
-const adresseSelect = document.getElementById('adresse-select');
+const villeSelect = document.getElementById('registration_form_ville');
+    const adresseSelect = document.getElementById('adresse-select');
+    const adresseHidden = document.getElementById('adresse-hidden');
 
-function updateAdresses(ville, selectedAdresse) {
-    adresseSelect.innerHTML = '<option value="">-- Choisissez un quartier --</option>';
-
-    if (ville && villesAdresses[ville]) {
-        villesAdresses[ville].forEach(function(quartier) {
-            const opt = document.createElement('option');
-            opt.value = quartier;
-            opt.textContent = quartier;
-            if (quartier === selectedAdresse) opt.selected = true;
-            adresseSelect.appendChild(opt);
-        });
-        adresseSelect.disabled = false;
-    } else {
-        adresseSelect.disabled = true;
+    function updateAdresses(ville, selectedAdresse) {
+        adresseSelect.innerHTML = '<option value="">-- Choisissez un quartier --</option>';
+        if (ville && villesAdresses[ville]) {
+            villesAdresses[ville].forEach(function(quartier) {
+                const opt = document.createElement('option');
+                opt.value = quartier;
+                opt.textContent = quartier;
+                if (quartier === selectedAdresse) opt.selected = true;
+                adresseSelect.appendChild(opt);
+            });
+            adresseSelect.disabled = false;
+        } else {
+            adresseSelect.disabled = true;
+            adresseHidden.value = '';
+        }
     }
-}
 
-// Init au chargement (si édition / retour arrière)
-updateAdresses(villeSelect.value, adresseSelect.dataset.selected || '');
+    adresseSelect.addEventListener('change', function () {
+        adresseHidden.value = this.value;
+    });
 
-// Mise à jour au changement
-villeSelect.addEventListener('change', function () {
-    updateAdresses(this.value, '');
+    updateAdresses(villeSelect.value, adresseHidden.value);
+
+    villeSelect.addEventListener('change', function () {
+        updateAdresses(this.value, '');
+        adresseHidden.value = '';
+    });
 });
 </script>
 {% endblock %}

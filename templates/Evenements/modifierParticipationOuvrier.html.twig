@@ -1,0 +1,173 @@
+{% extends 'base_ouvrier.html.twig' %}
+
+{% block title %}Modifier ma participation{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .mod-wrap {
+        max-width: 520px;
+        margin: 0 auto;
+    }
+
+    .mod-back {
+        display: inline-flex; align-items: center; gap: 7px;
+        color: #2D5A27; font-size: 13px; font-weight: 600;
+        text-decoration: none; margin-bottom: 22px;
+        transition: gap 0.2s;
+    }
+    .mod-back:hover { gap: 10px; color: #1B3A20; }
+
+    .mod-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+        overflow: hidden;
+    }
+
+    .mod-card-top { height: 6px; background: linear-gradient(90deg, #4A8C3F, #2D5A27); }
+
+    .mod-card-body { padding: 28px 32px; }
+
+    .mod-card-body h2 {
+        font-family: 'Playfair Display', serif;
+        font-size: 20px; color: #1B3A20; margin: 0 0 4px;
+    }
+    .mod-card-body .mod-subtitle { font-size: 13px; color: #7a9070; margin: 0 0 22px; }
+
+    .mod-info-box {
+        background: #fafdf8;
+        border: 1.5px solid #e8f0e6;
+        border-radius: 10px;
+        padding: 14px 18px;
+        margin-bottom: 24px;
+        display: flex; flex-direction: column; gap: 7px;
+    }
+    .mod-info-row {
+        display: flex; align-items: center; gap: 9px;
+        font-size: 13px; color: #444;
+    }
+    .mod-info-row i { width: 16px; text-align: center; color: #4A8C3F; font-size: 12px; }
+    .mod-info-row strong { color: #1B3A20; }
+
+    .mod-badge {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 3px 10px; border-radius: 20px;
+        font-size: 11px; font-weight: 700;
+    }
+    .mod-badge::before { content:''; width:6px; height:6px; border-radius:50%; background:currentColor; opacity:0.6; }
+    .mod-badge-inscrit  { background:#FFF9C4; color:#b7860c; }
+    .mod-badge-confirme { background:#E8F5E9; color:#2E7D32; }
+    .mod-badge-annule   { background:#FFEBEE; color:#C62828; }
+
+    .mod-divider { border: none; border-top: 1.5px solid #f0f0f0; margin: 0 0 22px; }
+
+    .mod-field-label {
+        display: block; font-size: 11px; font-weight: 600;
+        color: #aaa; text-transform: uppercase; letter-spacing: 0.07em;
+        margin-bottom: 8px;
+    }
+
+    .mod-card-body select {
+        width: 100%;
+        border: 1.5px solid #e8e8e8;
+        border-radius: 10px;
+        padding: 11px 14px;
+        font-size: 14px;
+        color: #2C3E50;
+        background: #fafafa;
+        outline: none;
+        transition: border 0.2s;
+        font-family: 'DM Sans', sans-serif;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%234A8C3F' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 14px center;
+        cursor: pointer;
+    }
+    .mod-card-body select:focus { border-color: #4A8C3F; background-color: white; }
+
+    .mod-actions { display: flex; gap: 12px; margin-top: 24px; }
+
+    .btn-save {
+        flex: 1; padding: 12px;
+        border-radius: 10px;
+        background: #2D5A27; color: white;
+        border: none; font-size: 14px; font-weight: 600;
+        cursor: pointer; font-family: 'DM Sans', sans-serif;
+        transition: background 0.2s;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-save:hover { background: #1B3A20; }
+
+    .btn-retour {
+        flex: 1; padding: 12px;
+        border-radius: 10px;
+        background: #f5f5f5; color: #555;
+        border: 1.5px solid #e0e0e0;
+        font-size: 14px; font-weight: 600;
+        text-decoration: none; text-align: center;
+        font-family: 'DM Sans', sans-serif;
+        transition: background 0.2s;
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-retour:hover { background: #ebebeb; color: #333; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="mod-wrap">
+
+    <a href="{{ path('ouvrier_participation_index') }}" class="mod-back">
+        <i class="fa fa-arrow-left"></i> Retour à mes participations
+    </a>
+
+    <div class="mod-card">
+        <div class="mod-card-top"></div>
+        <div class="mod-card-body">
+
+            <h2>Modifier ma participation</h2>
+            <p class="mod-subtitle">Mettez à jour votre présence à l'événement</p>
+
+            <div class="mod-info-box">
+                <div class="mod-info-row">
+                    <i class="fa fa-calendar-days"></i>
+                    <span><strong>{{ participation.evenement.titre }}</strong></span>
+                </div>
+                <div class="mod-info-row">
+                    <i class="fa fa-clock"></i>
+                    <span>Inscrit le {{ participation.dateInscription|date('d/m/Y') }}</span>
+                </div>
+                <div class="mod-info-row">
+                    <i class="fa fa-circle-info"></i>
+                    {% set s = participation.statutParticipation %}
+                    <span class="mod-badge mod-badge-{{ s|lower|replace({'é':'e','è':'e'}) }}">{{ s }}</span>
+                </div>
+            </div>
+
+            <hr class="mod-divider">
+
+            {{ form_start(form) }}
+
+                <label class="mod-field-label">
+                    <i class="fa fa-user-check" style="margin-right:5px;color:#4A8C3F;"></i>
+                    Confirmer votre présence
+                </label>
+                {{ form_widget(form.presence) }}
+
+                <div class="mod-actions">
+                    {{ form_widget(form.submit, {
+                        'label': 'Enregistrer',
+                        'attr': {'class': 'btn-save'}
+                    }) }}
+                    <a href="{{ path('ouvrier_participation_index') }}" class="btn-retour">
+                        <i class="fa fa-xmark"></i> Annuler
+                    </a>
+                </div>
+
+            {{ form_end(form) }}
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

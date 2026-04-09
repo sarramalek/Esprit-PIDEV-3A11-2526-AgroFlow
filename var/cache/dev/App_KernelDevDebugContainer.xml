@@ -423,6 +423,55 @@
         <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\AuthController"/>
       </call>
     </service>
+    <service id="App\Controller\Evenements\Agriculteur\EvenementController" class="App\Controller\Evenements\Agriculteur\EvenementController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\Evenements\Agriculteur\EvenementController"/>
+      </call>
+    </service>
+    <service id="App\Controller\Evenements\Agriculteur\ParticipationController" class="App\Controller\Evenements\Agriculteur\ParticipationController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\Evenements\Agriculteur\ParticipationController"/>
+      </call>
+    </service>
+    <service id="App\Controller\Evenements\CategorieEvenementController" class="App\Controller\Evenements\CategorieEvenementController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\Evenements\CategorieEvenementController"/>
+      </call>
+    </service>
+    <service id="App\Controller\Evenements\EvenementController" class="App\Controller\Evenements\EvenementController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\Evenements\EvenementController"/>
+      </call>
+    </service>
+    <service id="App\Controller\Evenements\Ouvrier\EvenementController" class="App\Controller\Evenements\Ouvrier\EvenementController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\Evenements\Ouvrier\EvenementController"/>
+      </call>
+    </service>
+    <service id="App\Controller\Evenements\Ouvrier\ParticipationController" class="App\Controller\Evenements\Ouvrier\ParticipationController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\Evenements\Ouvrier\ParticipationController"/>
+      </call>
+    </service>
+    <service id="App\Controller\Evenements\ParticipationController" class="App\Controller\Evenements\ParticipationController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\Evenements\ParticipationController"/>
+      </call>
+    </service>
     <service id="App\Controller\HomeController" class="App\Controller\HomeController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
@@ -589,6 +638,21 @@
     <service id="App\Form\Animals\ExamenType" class="App\Form\Animals\ExamenType" autowire="true" autoconfigure="true">
       <tag name="form.type"/>
     </service>
+    <service id="App\Form\Evenements\EvenementType" class="App\Form\Evenements\EvenementType" autowire="true" autoconfigure="true">
+      <tag name="form.type"/>
+    </service>
+    <service id="App\Form\Evenements\InscriptionEvenementType" class="App\Form\Evenements\InscriptionEvenementType" autowire="true" autoconfigure="true">
+      <tag name="container.error" message="The autoloader expected class &quot;App\Form\Evenements\InscriptionEvenementType&quot; to be defined in file &quot;C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\Form\Evenements\InscriptionEvenementType.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
+    </service>
+    <service id="App\Form\Evenements\ModifierParticipationUserType" class="App\Form\Evenements\ModifierParticipationUserType" autowire="true" autoconfigure="true">
+      <tag name="container.error" message="The autoloader expected class &quot;App\Form\Evenements\ModifierParticipationUserType&quot; to be defined in file &quot;C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\Form\Evenements\ModifierParticipationUserType.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
+    </service>
+    <service id="App\Form\Evenements\ParticipationType" class="App\Form\Evenements\ParticipationType" autowire="true" autoconfigure="true">
+      <tag name="form.type"/>
+    </service>
+    <service id="App\Form\Evenements\categorieevenementType" class="App\Form\Evenements\categorieevenementType" autowire="true" autoconfigure="true">
+      <tag name="form.type"/>
+    </service>
     <service id="App\Form\Materiels\MachineType" class="App\Form\Materiels\MachineType" autowire="true" autoconfigure="true">
       <tag name="form.type"/>
     </service>
@@ -652,6 +716,18 @@
       <argument type="service" id="doctrine"/>
     </service>
     <service id="App\Repository\Animals\ExamenRepository" class="App\Repository\Animals\ExamenRepository" autowire="true" autoconfigure="true">
+      <tag name="doctrine.repository_service"/>
+      <argument type="service" id="doctrine"/>
+    </service>
+    <service id="App\Repository\Evenements\EvenementRepository" class="App\Repository\Evenements\EvenementRepository" autowire="true" autoconfigure="true">
+      <tag name="doctrine.repository_service"/>
+      <argument type="service" id="doctrine"/>
+    </service>
+    <service id="App\Repository\Evenements\ParticipationRepository" class="App\Repository\Evenements\ParticipationRepository" autowire="true" autoconfigure="true">
+      <tag name="doctrine.repository_service"/>
+      <argument type="service" id="doctrine"/>
+    </service>
+    <service id="App\Repository\Evenements\categorieevenementRepository" class="App\Repository\Evenements\categorieevenementRepository" autowire="true" autoconfigure="true">
       <tag name="doctrine.repository_service"/>
       <argument type="service" id="doctrine"/>
     </service>
@@ -736,7 +812,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.pAlK.nC"/>
+      <argument type="service" id=".service_locator.pWWlFtI"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -1656,6 +1732,7 @@
         <argument>Symfony\Component\Form\Extension\Core\Type</argument>
         <argument>App\Form\Animals\Admin</argument>
         <argument>App\Form\Animals</argument>
+        <argument>App\Form\Evenements</argument>
         <argument>App\Form\Materiels</argument>
         <argument>App\Form\Terrain</argument>
         <argument>App\Form\User</argument>
@@ -1666,6 +1743,9 @@
         <argument>App\Form\Animals\Admin\AdminAnimauxType</argument>
         <argument>App\Form\Animals\AnimauxType</argument>
         <argument>App\Form\Animals\ExamenType</argument>
+        <argument>App\Form\Evenements\EvenementType</argument>
+        <argument>App\Form\Evenements\ParticipationType</argument>
+        <argument>App\Form\Evenements\categorieevenementType</argument>
         <argument>App\Form\Materiels\MachineType</argument>
         <argument>App\Form\Materiels\MaintenanceType</argument>
         <argument>App\Form\Terrain\AgriTerrainType</argument>
@@ -3647,7 +3727,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.pAlK.nC"/>
+      <argument type="service" id=".service_locator.pWWlFtI"/>
     </service>
     <service id="debug.log_processor" class="Symfony\Bridge\Monolog\Processor\DebugProcessor">
       <tag name="kernel.reset" method="reset"/>
@@ -4139,7 +4219,7 @@
       <argument type="service" id="form.registry"/>
     </service>
     <service id="form.extension" class="Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension">
-      <argument type="service" id=".service_locator.nTxA9yf"/>
+      <argument type="service" id=".service_locator.xOkKGYY"/>
       <argument type="collection">
         <argument key="Symfony\Component\Form\Extension\Core\Type\FormType" type="iterator">
           <argument type="service" id="form.type_extension.form.transformation_failure_handling"/>
@@ -5395,7 +5475,7 @@
     <service id="doctrine.orm.configuration" class="Doctrine\ORM\Configuration" abstract="true"/>
     <service id="doctrine.orm.entity_manager.abstract" class="Doctrine\ORM\EntityManager" lazy="true" abstract="true"/>
     <service id="doctrine.orm.container_repository_factory" class="Doctrine\Bundle\DoctrineBundle\Repository\ContainerRepositoryFactory">
-      <argument type="service" id=".service_locator.528x3BG"/>
+      <argument type="service" id=".service_locator.385wgf1"/>
     </service>
     <service id="doctrine.orm.manager_configurator.abstract" class="Doctrine\Bundle\DoctrineBundle\ManagerConfigurator" abstract="true">
       <argument type="collection"/>
@@ -7671,6 +7751,27 @@
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\AuthController" class="App\Controller\AuthController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\AuthController" class="App\Controller\AuthController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\AuthController" class="App\Controller\AuthController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Evenements\Agriculteur\EvenementController" class="App\Controller\Evenements\Agriculteur\EvenementController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Evenements\Agriculteur\EvenementController" class="App\Controller\Evenements\Agriculteur\EvenementController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\Evenements\Agriculteur\EvenementController" class="App\Controller\Evenements\Agriculteur\EvenementController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Evenements\Agriculteur\ParticipationController" class="App\Controller\Evenements\Agriculteur\ParticipationController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Evenements\Agriculteur\ParticipationController" class="App\Controller\Evenements\Agriculteur\ParticipationController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\Evenements\Agriculteur\ParticipationController" class="App\Controller\Evenements\Agriculteur\ParticipationController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Evenements\CategorieEvenementController" class="App\Controller\Evenements\CategorieEvenementController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Evenements\CategorieEvenementController" class="App\Controller\Evenements\CategorieEvenementController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\Evenements\CategorieEvenementController" class="App\Controller\Evenements\CategorieEvenementController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Evenements\EvenementController" class="App\Controller\Evenements\EvenementController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Evenements\EvenementController" class="App\Controller\Evenements\EvenementController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\Evenements\EvenementController" class="App\Controller\Evenements\EvenementController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Evenements\Ouvrier\EvenementController" class="App\Controller\Evenements\Ouvrier\EvenementController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Evenements\Ouvrier\EvenementController" class="App\Controller\Evenements\Ouvrier\EvenementController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\Evenements\Ouvrier\EvenementController" class="App\Controller\Evenements\Ouvrier\EvenementController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Evenements\Ouvrier\ParticipationController" class="App\Controller\Evenements\Ouvrier\ParticipationController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Evenements\Ouvrier\ParticipationController" class="App\Controller\Evenements\Ouvrier\ParticipationController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\Evenements\Ouvrier\ParticipationController" class="App\Controller\Evenements\Ouvrier\ParticipationController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Evenements\ParticipationController" class="App\Controller\Evenements\ParticipationController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Evenements\ParticipationController" class="App\Controller\Evenements\ParticipationController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\Evenements\ParticipationController" class="App\Controller\Evenements\ParticipationController" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\HomeController" class="App\Controller\HomeController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\HomeController" class="App\Controller\HomeController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\HomeController" class="App\Controller\HomeController" autowire="true" autoconfigure="true" abstract="true"/>
@@ -7743,6 +7844,12 @@
     <service id=".abstract.instanceof.App\Form\Animals\AnimauxType" class="App\Form\Animals\AnimauxType" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\Animals\ExamenType" class="App\Form\Animals\ExamenType" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Form\Animals\ExamenType" class="App\Form\Animals\ExamenType" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\Evenements\EvenementType" class="App\Form\Evenements\EvenementType" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Form\Evenements\EvenementType" class="App\Form\Evenements\EvenementType" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\Evenements\ParticipationType" class="App\Form\Evenements\ParticipationType" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Form\Evenements\ParticipationType" class="App\Form\Evenements\ParticipationType" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\Evenements\categorieevenementType" class="App\Form\Evenements\categorieevenementType" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Form\Evenements\categorieevenementType" class="App\Form\Evenements\categorieevenementType" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\Materiels\MachineType" class="App\Form\Materiels\MachineType" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Form\Materiels\MachineType" class="App\Form\Materiels\MachineType" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\Materiels\MaintenanceType" class="App\Form\Materiels\MaintenanceType" autowire="true" abstract="true"/>
@@ -7773,6 +7880,12 @@
     <service id=".abstract.instanceof.App\Repository\Animals\AnimauxRepository" class="App\Repository\Animals\AnimauxRepository" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\Animals\ExamenRepository" class="App\Repository\Animals\ExamenRepository" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Repository\Animals\ExamenRepository" class="App\Repository\Animals\ExamenRepository" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\Evenements\EvenementRepository" class="App\Repository\Evenements\EvenementRepository" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Repository\Evenements\EvenementRepository" class="App\Repository\Evenements\EvenementRepository" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\Evenements\ParticipationRepository" class="App\Repository\Evenements\ParticipationRepository" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Repository\Evenements\ParticipationRepository" class="App\Repository\Evenements\ParticipationRepository" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\Evenements\categorieevenementRepository" class="App\Repository\Evenements\categorieevenementRepository" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Repository\Evenements\categorieevenementRepository" class="App\Repository\Evenements\categorieevenementRepository" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\Materiels\MachineRepository" class="App\Repository\Materiels\MachineRepository" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Repository\Materiels\MachineRepository" class="App\Repository\Materiels\MachineRepository" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepositoryInterface.0.App\Repository\Materiels\MaintenanceRepository" class="App\Repository\Materiels\MaintenanceRepository" autowire="true" abstract="true"/>
@@ -8388,6 +8501,72 @@
         <argument key="passwordHasher" type="service_closure" id="security.user_password_hasher"/>
       </argument>
     </service>
+    <service id=".service_locator.bTRClTF" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="repo" type="service_closure" id="App\Repository\Evenements\EvenementRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.F7gwLgd" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="repo" type="service_closure" id="App\Repository\Evenements\ParticipationRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.csIWZan" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="doctrine" type="service_closure" id="doctrine"/>
+        <argument key="repo" type="service_closure" id="App\Repository\Evenements\ParticipationRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.gEgRL26" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="repo" type="service_closure" id="App\Repository\Evenements\categorieevenementRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.fkMffnS" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="d" type="service_closure" id="doctrine"/>
+      </argument>
+    </service>
+    <service id=".service_locator.cbLra7B" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="d" type="service_closure" id="doctrine"/>
+        <argument key="repo" type="service_closure" id="App\Repository\Evenements\categorieevenementRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.cBE01og" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="categorieRepo" type="service_closure" id="App\Repository\Evenements\categorieevenementRepository"/>
+        <argument key="repo" type="service_closure" id="App\Repository\Evenements\EvenementRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.o6sN0hZ" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="doctrine" type="service_closure" id="doctrine"/>
+      </argument>
+    </service>
+    <service id=".service_locator.md0EV5q" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="doctrine" type="service_closure" id="doctrine"/>
+        <argument key="repo" type="service_closure" id="App\Repository\Evenements\EvenementRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.VGXccJ4" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="doctrine" type="service_closure" id="doctrine"/>
+        <argument key="eventRepo" type="service_closure" id="App\Repository\Evenements\EvenementRepository"/>
+        <argument key="participationRepo" type="service_closure" id="App\Repository\Evenements\ParticipationRepository"/>
+      </argument>
+    </service>
     <service id=".service_locator._.8m7iI" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -8659,7 +8838,7 @@
         <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
       </argument>
     </service>
-    <service id=".service_locator.pAlK.nC" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.pWWlFtI" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Controller\AdminDashboardController::index" type="service_closure" id=".service_locator.qni5W9T"/>
@@ -8708,6 +8887,28 @@
         <argument key="App\Controller\Animals\ExamensController::stats" type="service_closure" id=".service_locator.tl.X0ws"/>
         <argument key="App\Controller\AuthController::login" type="service_closure" id=".service_locator.rSTd.nA"/>
         <argument key="App\Controller\AuthController::register" type="service_closure" id=".service_locator.t8346QO"/>
+        <argument key="App\Controller\Evenements\Agriculteur\EvenementController::index" type="service_closure" id=".service_locator.bTRClTF"/>
+        <argument key="App\Controller\Evenements\Agriculteur\EvenementController::inscrire" type="service_closure" id=".service_locator.VGXccJ4"/>
+        <argument key="App\Controller\Evenements\Agriculteur\ParticipationController::annuler" type="service_closure" id=".service_locator.csIWZan"/>
+        <argument key="App\Controller\Evenements\Agriculteur\ParticipationController::index" type="service_closure" id=".service_locator.F7gwLgd"/>
+        <argument key="App\Controller\Evenements\Agriculteur\ParticipationController::modifier" type="service_closure" id=".service_locator.csIWZan"/>
+        <argument key="App\Controller\Evenements\CategorieEvenementController::ajouter" type="service_closure" id=".service_locator.fkMffnS"/>
+        <argument key="App\Controller\Evenements\CategorieEvenementController::index" type="service_closure" id=".service_locator.gEgRL26"/>
+        <argument key="App\Controller\Evenements\CategorieEvenementController::modifier" type="service_closure" id=".service_locator.cbLra7B"/>
+        <argument key="App\Controller\Evenements\CategorieEvenementController::supprimer" type="service_closure" id=".service_locator.cbLra7B"/>
+        <argument key="App\Controller\Evenements\EvenementController::ajouter" type="service_closure" id=".service_locator.o6sN0hZ"/>
+        <argument key="App\Controller\Evenements\EvenementController::index" type="service_closure" id=".service_locator.cBE01og"/>
+        <argument key="App\Controller\Evenements\EvenementController::modifier" type="service_closure" id=".service_locator.md0EV5q"/>
+        <argument key="App\Controller\Evenements\EvenementController::supprimer" type="service_closure" id=".service_locator.md0EV5q"/>
+        <argument key="App\Controller\Evenements\Ouvrier\EvenementController::index" type="service_closure" id=".service_locator.bTRClTF"/>
+        <argument key="App\Controller\Evenements\Ouvrier\EvenementController::inscrire" type="service_closure" id=".service_locator.VGXccJ4"/>
+        <argument key="App\Controller\Evenements\Ouvrier\ParticipationController::annuler" type="service_closure" id=".service_locator.csIWZan"/>
+        <argument key="App\Controller\Evenements\Ouvrier\ParticipationController::index" type="service_closure" id=".service_locator.F7gwLgd"/>
+        <argument key="App\Controller\Evenements\Ouvrier\ParticipationController::modifier" type="service_closure" id=".service_locator.csIWZan"/>
+        <argument key="App\Controller\Evenements\ParticipationController::ajouter" type="service_closure" id=".service_locator.o6sN0hZ"/>
+        <argument key="App\Controller\Evenements\ParticipationController::index" type="service_closure" id=".service_locator.F7gwLgd"/>
+        <argument key="App\Controller\Evenements\ParticipationController::modifier" type="service_closure" id=".service_locator.csIWZan"/>
+        <argument key="App\Controller\Evenements\ParticipationController::supprimer" type="service_closure" id=".service_locator.csIWZan"/>
         <argument key="App\Controller\Materiels\MachineController::machineDelete" type="service_closure" id=".service_locator.pt54IVS"/>
         <argument key="App\Controller\Materiels\MachineController::machineEdit" type="service_closure" id=".service_locator.pt54IVS"/>
         <argument key="App\Controller\Materiels\MachineController::machineIndex" type="service_closure" id=".service_locator._.8m7iI"/>
@@ -8859,6 +9060,28 @@
         <argument key="App\Controller\Animals\ExamensController:stats" type="service_closure" id=".service_locator.tl.X0ws"/>
         <argument key="App\Controller\AuthController:login" type="service_closure" id=".service_locator.rSTd.nA"/>
         <argument key="App\Controller\AuthController:register" type="service_closure" id=".service_locator.t8346QO"/>
+        <argument key="App\Controller\Evenements\Agriculteur\EvenementController:index" type="service_closure" id=".service_locator.bTRClTF"/>
+        <argument key="App\Controller\Evenements\Agriculteur\EvenementController:inscrire" type="service_closure" id=".service_locator.VGXccJ4"/>
+        <argument key="App\Controller\Evenements\Agriculteur\ParticipationController:annuler" type="service_closure" id=".service_locator.csIWZan"/>
+        <argument key="App\Controller\Evenements\Agriculteur\ParticipationController:index" type="service_closure" id=".service_locator.F7gwLgd"/>
+        <argument key="App\Controller\Evenements\Agriculteur\ParticipationController:modifier" type="service_closure" id=".service_locator.csIWZan"/>
+        <argument key="App\Controller\Evenements\CategorieEvenementController:ajouter" type="service_closure" id=".service_locator.fkMffnS"/>
+        <argument key="App\Controller\Evenements\CategorieEvenementController:index" type="service_closure" id=".service_locator.gEgRL26"/>
+        <argument key="App\Controller\Evenements\CategorieEvenementController:modifier" type="service_closure" id=".service_locator.cbLra7B"/>
+        <argument key="App\Controller\Evenements\CategorieEvenementController:supprimer" type="service_closure" id=".service_locator.cbLra7B"/>
+        <argument key="App\Controller\Evenements\EvenementController:ajouter" type="service_closure" id=".service_locator.o6sN0hZ"/>
+        <argument key="App\Controller\Evenements\EvenementController:index" type="service_closure" id=".service_locator.cBE01og"/>
+        <argument key="App\Controller\Evenements\EvenementController:modifier" type="service_closure" id=".service_locator.md0EV5q"/>
+        <argument key="App\Controller\Evenements\EvenementController:supprimer" type="service_closure" id=".service_locator.md0EV5q"/>
+        <argument key="App\Controller\Evenements\Ouvrier\EvenementController:index" type="service_closure" id=".service_locator.bTRClTF"/>
+        <argument key="App\Controller\Evenements\Ouvrier\EvenementController:inscrire" type="service_closure" id=".service_locator.VGXccJ4"/>
+        <argument key="App\Controller\Evenements\Ouvrier\ParticipationController:annuler" type="service_closure" id=".service_locator.csIWZan"/>
+        <argument key="App\Controller\Evenements\Ouvrier\ParticipationController:index" type="service_closure" id=".service_locator.F7gwLgd"/>
+        <argument key="App\Controller\Evenements\Ouvrier\ParticipationController:modifier" type="service_closure" id=".service_locator.csIWZan"/>
+        <argument key="App\Controller\Evenements\ParticipationController:ajouter" type="service_closure" id=".service_locator.o6sN0hZ"/>
+        <argument key="App\Controller\Evenements\ParticipationController:index" type="service_closure" id=".service_locator.F7gwLgd"/>
+        <argument key="App\Controller\Evenements\ParticipationController:modifier" type="service_closure" id=".service_locator.csIWZan"/>
+        <argument key="App\Controller\Evenements\ParticipationController:supprimer" type="service_closure" id=".service_locator.csIWZan"/>
         <argument key="App\Controller\Materiels\MachineController:machineDelete" type="service_closure" id=".service_locator.pt54IVS"/>
         <argument key="App\Controller\Materiels\MachineController:machineEdit" type="service_closure" id=".service_locator.pt54IVS"/>
         <argument key="App\Controller\Materiels\MachineController:machineIndex" type="service_closure" id=".service_locator._.8m7iI"/>
@@ -9121,12 +9344,15 @@
       <argument type="service" id="argument_resolver.query_parameter_value_resolver"/>
       <argument type="service" id="debug.stopwatch"/>
     </service>
-    <service id=".service_locator.nTxA9yf" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.xOkKGYY" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Form\Animals\Admin\AdminAnimauxType" type="service_closure" id="App\Form\Animals\Admin\AdminAnimauxType"/>
         <argument key="App\Form\Animals\AnimauxType" type="service_closure" id="App\Form\Animals\AnimauxType"/>
         <argument key="App\Form\Animals\ExamenType" type="service_closure" id="App\Form\Animals\ExamenType"/>
+        <argument key="App\Form\Evenements\EvenementType" type="service_closure" id="App\Form\Evenements\EvenementType"/>
+        <argument key="App\Form\Evenements\ParticipationType" type="service_closure" id="App\Form\Evenements\ParticipationType"/>
+        <argument key="App\Form\Evenements\categorieevenementType" type="service_closure" id="App\Form\Evenements\categorieevenementType"/>
         <argument key="App\Form\Materiels\MachineType" type="service_closure" id="App\Form\Materiels\MachineType"/>
         <argument key="App\Form\Materiels\MaintenanceType" type="service_closure" id="App\Form\Materiels\MaintenanceType"/>
         <argument key="App\Form\Terrain\AgriTerrainType" type="service_closure" id="App\Form\Terrain\AgriTerrainType"/>
@@ -9265,11 +9491,14 @@
         <argument key="turbo.doctrine.event_listener" type="service_closure" id="turbo.doctrine.event_listener"/>
       </argument>
     </service>
-    <service id=".service_locator.528x3BG" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.385wgf1" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Repository\Animals\AnimauxRepository" type="service_closure" id="App\Repository\Animals\AnimauxRepository"/>
         <argument key="App\Repository\Animals\ExamenRepository" type="service_closure" id="App\Repository\Animals\ExamenRepository"/>
+        <argument key="App\Repository\Evenements\EvenementRepository" type="service_closure" id="App\Repository\Evenements\EvenementRepository"/>
+        <argument key="App\Repository\Evenements\ParticipationRepository" type="service_closure" id="App\Repository\Evenements\ParticipationRepository"/>
+        <argument key="App\Repository\Evenements\categorieevenementRepository" type="service_closure" id="App\Repository\Evenements\categorieevenementRepository"/>
         <argument key="App\Repository\Materiels\MachineRepository" type="service_closure" id="App\Repository\Materiels\MachineRepository"/>
         <argument key="App\Repository\Materiels\MaintenanceRepository" type="service_closure" id="App\Repository\Materiels\MaintenanceRepository"/>
         <argument key="App\Repository\Terrain\PlanteRepository" type="service_closure" id="App\Repository\Terrain\PlanteRepository"/>
@@ -9695,6 +9924,48 @@
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.O2p6Lk7" method="withContext"/>
     </service>
+    <service id=".service_locator.O2p6Lk7.App\Controller\Evenements\Agriculteur\EvenementController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\Evenements\Agriculteur\EvenementController"/>
+      <argument>App\Controller\Evenements\Agriculteur\EvenementController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.O2p6Lk7" method="withContext"/>
+    </service>
+    <service id=".service_locator.O2p6Lk7.App\Controller\Evenements\Agriculteur\ParticipationController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\Evenements\Agriculteur\ParticipationController"/>
+      <argument>App\Controller\Evenements\Agriculteur\ParticipationController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.O2p6Lk7" method="withContext"/>
+    </service>
+    <service id=".service_locator.O2p6Lk7.App\Controller\Evenements\CategorieEvenementController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\Evenements\CategorieEvenementController"/>
+      <argument>App\Controller\Evenements\CategorieEvenementController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.O2p6Lk7" method="withContext"/>
+    </service>
+    <service id=".service_locator.O2p6Lk7.App\Controller\Evenements\EvenementController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\Evenements\EvenementController"/>
+      <argument>App\Controller\Evenements\EvenementController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.O2p6Lk7" method="withContext"/>
+    </service>
+    <service id=".service_locator.O2p6Lk7.App\Controller\Evenements\Ouvrier\EvenementController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\Evenements\Ouvrier\EvenementController"/>
+      <argument>App\Controller\Evenements\Ouvrier\EvenementController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.O2p6Lk7" method="withContext"/>
+    </service>
+    <service id=".service_locator.O2p6Lk7.App\Controller\Evenements\Ouvrier\ParticipationController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\Evenements\Ouvrier\ParticipationController"/>
+      <argument>App\Controller\Evenements\Ouvrier\ParticipationController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.O2p6Lk7" method="withContext"/>
+    </service>
+    <service id=".service_locator.O2p6Lk7.App\Controller\Evenements\ParticipationController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\Evenements\ParticipationController"/>
+      <argument>App\Controller\Evenements\ParticipationController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.O2p6Lk7" method="withContext"/>
+    </service>
     <service id=".service_locator.O2p6Lk7.App\Controller\HomeController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\HomeController"/>
       <argument>App\Controller\HomeController</argument>
@@ -10011,6 +10282,13 @@
           <argument>App\Controller\Animals\AnimauxController</argument>
           <argument>App\Controller\Animals\ExamensController</argument>
           <argument>App\Controller\AuthController</argument>
+          <argument>App\Controller\Evenements\Agriculteur\EvenementController</argument>
+          <argument>App\Controller\Evenements\Agriculteur\ParticipationController</argument>
+          <argument>App\Controller\Evenements\CategorieEvenementController</argument>
+          <argument>App\Controller\Evenements\EvenementController</argument>
+          <argument>App\Controller\Evenements\Ouvrier\EvenementController</argument>
+          <argument>App\Controller\Evenements\Ouvrier\ParticipationController</argument>
+          <argument>App\Controller\Evenements\ParticipationController</argument>
           <argument>App\Controller\HomeController</argument>
           <argument>App\Controller\Materiels\MachineController</argument>
           <argument>App\Controller\Materiels\MaintenancesController</argument>
@@ -11515,7 +11793,7 @@
     <service id="Psr\Log\LoggerInterface" alias="monolog.logger"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.w7.f4fT" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.pAlK.nC"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.pWWlFtI"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id=".Psr\Log\LoggerInterface $request.logger" alias="monolog.logger.request"/>
@@ -11560,6 +11838,8 @@
     <service id=".service_locator.s4yyZIP" alias=".service_locator.ST3E3fc"/>
     <service id=".service_locator.ontUAUs" alias=".service_locator.wH4nX8g"/>
     <service id=".service_locator.81LTOQ7" alias=".service_locator.t8346QO"/>
+    <service id=".service_locator.sEaJncE" alias=".service_locator.cBE01og"/>
+    <service id=".service_locator.Dq589Yi" alias=".service_locator.VGXccJ4"/>
     <service id=".service_locator.XvTo7NF" alias=".service_locator.kLp2YUI"/>
     <service id=".service_locator.9_5m.zA" alias=".service_locator.yjHtSb5"/>
     <service id=".service_locator.TSrp4XK" alias=".service_locator.QoKtgh5"/>
@@ -11575,9 +11855,9 @@
     <service id=".service_locator.5pebkNV" alias=".service_locator.xxq2prQ"/>
     <service id=".service_locator.4ZCMkQz" alias=".service_locator.1CkTyg5"/>
     <service id=".service_locator.8J1nalj" alias=".service_locator.SsD9eLO"/>
-    <service id=".service_locator.NuXtFmH" alias=".service_locator.pAlK.nC"/>
+    <service id=".service_locator.8zXHxTU" alias=".service_locator.pWWlFtI"/>
     <service id=".service_locator.BFrsqsn" alias=".service_locator.F9PKc.7"/>
-    <service id=".service_locator.Qjofa_r" alias=".service_locator.nTxA9yf"/>
+    <service id=".service_locator.oIHygA7" alias=".service_locator.xOkKGYY"/>
     <service id=".service_locator.XtmiKbi" alias=".service_locator.MfxSDRP"/>
     <service id=".service_locator.O24_MAy" alias=".service_locator.yY.p4P7"/>
     <service id=".service_locator.jUv.zyj" alias=".service_locator.O2p6Lk7"/>
@@ -11626,6 +11906,16 @@
     <service id=".service_locator.JTtEETS" alias=".service_locator.wH4nX8g"/>
     <service id=".service_locator.7NIAq8D" alias=".service_locator.rSTd.nA"/>
     <service id=".service_locator.PgYGRUQ" alias=".service_locator.t8346QO"/>
+    <service id=".service_locator.sKW_vib" alias=".service_locator.bTRClTF"/>
+    <service id=".service_locator.RFFOZR2" alias=".service_locator.F7gwLgd"/>
+    <service id=".service_locator.n86R_3M" alias=".service_locator.csIWZan"/>
+    <service id=".service_locator.v6wG.Gp" alias=".service_locator.gEgRL26"/>
+    <service id=".service_locator.RQVO0QU" alias=".service_locator.fkMffnS"/>
+    <service id=".service_locator.Br8g7ea" alias=".service_locator.cbLra7B"/>
+    <service id=".service_locator.wAV7i7T" alias=".service_locator.cBE01og"/>
+    <service id=".service_locator.eQ296SW" alias=".service_locator.o6sN0hZ"/>
+    <service id=".service_locator.pKyWZ4m" alias=".service_locator.md0EV5q"/>
+    <service id=".service_locator.b9UTYfn" alias=".service_locator.VGXccJ4"/>
     <service id=".service_locator.b3SM2he" alias=".service_locator._.8m7iI"/>
     <service id=".service_locator.VIwhQZf" alias=".service_locator.IOi49kI"/>
     <service id=".service_locator.JG4uyKr" alias=".service_locator.kLp2YUI"/>
