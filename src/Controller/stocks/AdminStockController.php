@@ -26,7 +26,8 @@ class AdminStockController extends AbstractController
             $em->persist($article);
             $em->flush();
 
-            return $this->redirectToRoute('admin_stock_index'); // Remplace par ta route de liste
+            $this->addFlash('success', 'Votre article a été ajouté avec succès.');
+            return $this->redirectToRoute('admin_dashboard');
         }
 
         return $this->render('stocks/article/Admin_new_article.html.twig', [
