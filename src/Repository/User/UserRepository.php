@@ -25,11 +25,6 @@ class UserRepository extends ServiceEntityRepository
         return $this->findBy(['role' => $role]);
     }
 
-    // ==================== FIND ALL OUVRIERS ====================
-    public function findAllOuvriers(): array
-    {
-        return $this->findBy(['role' => 1]);
-    }
 
     // ==================== FIND ALL AGRICULTEURS ====================
     public function findAllAgriculteurs(): array

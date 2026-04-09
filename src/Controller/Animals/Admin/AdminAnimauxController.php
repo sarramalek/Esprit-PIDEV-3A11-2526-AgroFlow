@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Controller\Admin;
+namespace App\Controller\Animals\Admin;
 
 use App\Entity\Animals\Animaux;
-use App\Form\Admin\AdminAnimauxType;
+use App\Form\Animals\Admin\AdminAnimauxType;
 use App\Repository\Animals\AnimauxRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,11 +23,14 @@ final class AdminAnimauxController extends AbstractController
         $sortBy     = $request->query->get('sort', 'id');
         $direction  = $request->query->get('direction', 'DESC');
 
-        // L'admin voit TOUT (null = pas de filtre par user)
-        $animaux  = $animauxRepository->searchDashboard($searchTerm, $sortBy, $direction, null);
+        // L'admin ne voit que ce qu'il a ajouté (via session)
+        $session = $request->getSession();
+        $adminAnimauxIds = $session->get('admin_added_animaux', []);
+
+        $animaux  = $animauxRepository->searchDashboardAdmin($searchTerm, $sortBy, $direction, $adminAnimauxIds);
         $averages = $animauxRepository->getAverageWeightsBySpecies();
 
-        return $this->render('admin/animaux/index.html.twig', [
+        return $this->render('Animals/admin/animaux/index.html.twig', [
             'animaux'          => $animaux,
             'searchTerm'       => $searchTerm,
             'currentSort'      => $sortBy,
@@ -46,11 +49,18 @@ final class AdminAnimauxController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $em->persist($animal);
             $em->flush();
+
+            // Mémoriser l'animal ajouté dans la session pour l'admins
+            $session = $request->getSession();
+            $adminAnimauxIds = $session->get('admin_added_animaux', []);
+            $adminAnimauxIds[] = $animal->getId();
+            $session->set('admin_added_animaux', $adminAnimauxIds);
+
             $this->addFlash('success', 'Animal ajouté avec succès.');
             return $this->redirectToRoute('admin_animaux_index');
         }
 
-        return $this->render('admin/animaux/form.html.twig', [
+        return $this->render('Animals/admin/animaux/form.html.twig', [
             'form'  => $form,
             'title' => 'Ajouter un animal',
             'animal' => $animal,
@@ -69,7 +79,7 @@ final class AdminAnimauxController extends AbstractController
             return $this->redirectToRoute('admin_animaux_index');
         }
 
-        return $this->render('admin/animaux/form.html.twig', [
+        return $this->render('Animals/admin/animaux/form.html.twig', [
             'form'   => $form,
             'title'  => 'Modifier : ' . $animal->getNom(),
             'animal' => $animal,

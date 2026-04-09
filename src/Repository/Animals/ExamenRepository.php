@@ -53,6 +53,42 @@ class ExamenRepository extends ServiceEntityRepository
     }
 
     /**
+     * Recherche avancée d'examens pour l'admin (en filtrant par ID).
+     */
+    public function searchExamenAdmin(?string $term, ?string $sortBy = 'id', ?string $direction = 'DESC', ?string $type = null, array $ids = []): array
+    {
+        if (empty($ids)) {
+            return [];
+        }
+
+        $qb = $this->createQueryBuilder('e')
+            ->leftJoin('e.animal', 'a')
+            ->addSelect('a')
+            ->andWhere('e.id IN (:ids)')
+            ->setParameter('ids', $ids);
+
+        if ($term && trim($term) !== '') {
+            $qb->andWhere('(e.diagnostic LIKE :term OR e.traitement LIKE :term OR a.nom LIKE :term OR e.type_examen LIKE :term)')
+               ->setParameter('term', '%' . $term . '%');
+        }
+
+        if ($type && trim($type) !== '') {
+            $qb->andWhere('e.type_examen = :type')
+               ->setParameter('type', $type);
+        }
+
+        // Liste blanche des colonnes de tri
+        $validSorts = ['id', 'date_examen', 'type_examen', 'diagnostic', 'traitement'];
+        if (!in_array($sortBy, $validSorts)) {
+            $sortBy = 'id';
+        }
+
+        $direction = strtoupper($direction) === 'ASC' ? 'ASC' : 'DESC';
+
+        return $qb->orderBy('e.' . $sortBy, $direction)->getQuery()->getResult();
+    }
+
+    /**
      * Statistiques par type d'examen, filtrées par utilisateur.
      */
     public function countByType(?User $user = null): array
