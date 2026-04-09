@@ -279,6 +279,27 @@
             background: var(--cream);
         }
 
+        .flash {
+            margin-bottom: 20px;
+            padding: 0;
+        }
+        .flash-message {
+            padding: 16px 20px;
+            border-radius: 14px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .flash-success .flash-message {
+            background: #E6F4EA;
+            border: 1px solid #9EE0A8;
+            color: #195B34;
+        }
+        .flash-danger .flash-message {
+            background: #FDE8E8;
+            border: 1px solid #F3A9A9;
+            color: #9F2A2B;
+        }
+
         {% block stylesheets %}{% endblock %}
     </style>
 </head>
@@ -467,6 +488,13 @@
 
     <!-- ═══════ CONTENT ═══════ -->
     <main class="main-wrapper">
+        {% for label, messages in app.flashes %}
+            <div class="flash flash-{{ label }}">
+                {% for message in messages %}
+                    <div class="flash-message">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endfor %}
         {% block body %}{% endblock %}
     </main>
 
