@@ -16,20 +16,36 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/agriculteur/stocks')]
 class ArticleController extends AbstractController
 {
-    #[Route('/', name: 'agri_produits', methods: ['GET'])]
-    public function index(Request $request, ArticleRepository $articleRepository, CategorieRepository $catRepo): Response
+    #[Route('/', name: 'agri_produits', methods: ['GET', 'POST'])]
+    public function index(Request $request, ArticleRepository $articleRepository, CategorieRepository $catRepo, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
+
+        // --- PARTIE AJOUTÉE : PRÉPARATION DU FORMULAIRE POUR LA MODAL ---
+        $newArticle = new Article();
+        $form = $this->createForm(ArticleType::class, $newArticle, ['agriculteur' => $user]);
+
+        $form->handleRequest($request);
+
+        // Si le formulaire de la modal est soumis
+        if ($form->isSubmitted() && $form->isValid()) {
+            $newArticle->setUser($user);
+            $entityManager->persist($newArticle);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Le produit a été ajouté avec succès.');
+            return $this->redirectToRoute('agri_produits');
+        }
+        // -----------------------------------------------------------
+
         $searchTerm = $request->query->get('search');
         $categoryId = $request->query->get('category');
+        $sortBy = $request->query->get('sort', 'nom');
 
-        // Appel du repository avec l'utilisateur
-        $articles = $articleRepository->findBySearchCriteria($searchTerm, $categoryId, $user);
+        $articles = $articleRepository->findBySearchCriteria($searchTerm, $categoryId, $user, $sortBy);
 
-        // Statistiques basées sur les articles de l'utilisateur uniquement
         $allArticles = $articleRepository->findBy(['user' => $user]);
         $totalArticles = count($allArticles);
-
         $alerteCount = 0;
         $valeurTotaleStock = 0;
 
@@ -37,23 +53,26 @@ class ArticleController extends AbstractController
             if ($art->getQuantiteEnStock() <= $art->getSeuilAlerte()) {
                 $alerteCount++;
             }
-
             $prix = $art->getPrixUnitaire() ?? 0;
             $quantite = $art->getQuantiteEnStock() ?? 0;
             $valeurTotaleStock += ($quantite * $prix);
         }
 
         return $this->render('stocks/article/index.html.twig', [
-            'articles' => $articles,
-            'categories' => $catRepo->findBy(['agriculteur' => $user]),
-            'currentSearch' => $searchTerm,
-            'currentCategory' => $categoryId,
-            'totalArticles' => $totalArticles,
-            'alerteCount' => $alerteCount,
+            'articles'          => $articles,
+            'categories'        => $catRepo->findBy(['agriculteur' => $user]),
+            'currentSearch'     => $searchTerm,
+            'currentCategory'   => $categoryId,
+            'currentSort'       => $sortBy,
+            'totalArticles'     => $totalArticles,
+            'alerteCount'       => $alerteCount,
             'valeurTotaleStock' => $valeurTotaleStock,
+            // ON ENVOIE LE FORMULAIRE À LA VUE INDEX
+            'form'              => $form->createView(),
         ]);
     }
 
+    // Gardez la méthode new au cas où vous auriez besoin d'un accès direct par URL
     #[Route('/new', name: 'app_article_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -64,7 +83,7 @@ class ArticleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $article->setUser($user); // Important pour lier au CIN
+            $article->setUser($user);
             $entityManager->persist($article);
             $entityManager->flush();
 
@@ -116,7 +135,9 @@ class ArticleController extends AbstractController
         return $this->redirectToRoute('agri_produits');
     }
 
-    #[Route('/{id}/mouvement', name: 'app_article_mouvement', methods: ['POST'])]
+
+    #[Route('/mouvements/new/{id}', name: 'app_mouvement_new', methods: ['GET', 'POST'])]
+
     public function gestionStock(Article $article, Request $request, EntityManagerInterface $em): Response
     {
         if ($article->getUser() !== $this->getUser()) {
@@ -126,6 +147,7 @@ class ArticleController extends AbstractController
         $mouvement = new MouvementStock();
         $mouvement->setArticle($article);
         $mouvement->setDateMouvement(new \DateTimeImmutable());
+        $mouvement->setUser($this->getUser());
 
         $type = $request->request->get('type');
         $quantite = floatval($request->request->get('quantite'));
