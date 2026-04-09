@@ -1,0 +1,213 @@
+{% extends 'base_admin.html.twig' %}
+{% block title %}Admin – Gestion des Examens{% endblock %}
+{% block page_title %}Gestion Examens{% endblock %}
+{% block breadcrumb %}Examens{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .admin-table th {
+        padding: 12px 16px; text-align: left; font-size: 11px;
+        color: #999; text-transform: uppercase; border-bottom: 2px solid #eee;
+        font-weight: 600; white-space: nowrap;
+    }
+    .admin-table td {
+        padding: 14px 16px; border-bottom: 1px solid #f5f5f5;
+        color: #444; vertical-align: middle;
+    }
+    .admin-table tr:hover td { background: #FCF8E6; }
+    .admin-table tr:last-child td { border-bottom: none; }
+
+    .btn-action {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 6px 12px; border-radius: 7px; font-size: 12px;
+        font-weight: 600; text-decoration: none; cursor: pointer;
+        border: none; transition: all 0.2s;
+    }
+    .btn-edit  { background: #EBF5FB; color: #1A6FA3; }
+    .btn-edit:hover  { background: #1A6FA3; color: white; }
+    .btn-del   { background: #FCEBEB; color: #A32D2D; }
+    .btn-del:hover   { background: #A32D2D; color: white; }
+    .btn-add   { background: #2D5A27; color: white; border: none; }
+    .btn-add:hover   { background: #1e3f1b; }
+
+    .search-bar {
+        display: flex; gap: 10px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;
+    }
+    .search-bar input, .search-bar select {
+        padding: 10px 16px; border: 1px solid #ddd;
+        border-radius: 8px; font-size: 14px; outline: none; transition: 0.2s;
+        background: white;
+    }
+    .search-bar input { flex: 1; min-width: 200px; }
+    .search-bar input:focus, .search-bar select:focus { border-color: #2D5A27; box-shadow: 0 0 0 3px rgba(45,90,39,0.1); }
+
+    .type-badge {
+        display: inline-block; padding: 4px 10px; border-radius: 20px;
+        font-size: 11px; font-weight: 700; text-transform: uppercase;
+    }
+    .type-vaccin      { background: #E8F5E9; color: #27ae60; border: 1px solid #b2dfdb; }
+    .type-consultation { background: #EBF5FB; color: #1A6FA3; border: 1px solid #bde0f5; }
+    .type-radio, .type-scanner { background: #F3E5F5; color: #8E24AA; border: 1px solid #e1bee7; }
+
+    .diag-badge {
+        display: inline-block; padding: 3px 9px; border-radius: 6px;
+        font-size: 12px; font-weight: 500;
+    }
+    .diag-sain    { background: #E8F5E9; color: #27ae60; }
+    .diag-urgence { background: #FCEBEB; color: #A32D2D; }
+    .diag-default { background: #FEF5E7; color: #f39c12; }
+
+    .health-score-mini {
+        display: inline-flex; align-items: center; gap: 4px;
+        font-size: 13px; font-weight: 700;
+    }
+
+    .flash-success {
+        background: #EAF3DE; color: #3B6D11; padding: 12px 18px;
+        border-radius: 8px; margin-bottom: 20px; font-size: 14px;
+        border-left: 4px solid #3B6D11;
+    }
+    .page-header {
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 24px;
+    }
+    .page-header h2 { font-size: 20px; font-weight: 700; color: #1C2B3A; margin: 0; }
+    .page-header p  { font-size: 13px; color: #888; margin: 4px 0 0; }
+
+    .filter-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .chip {
+        padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
+        text-decoration: none; border: 1px solid #e0e0e0; color: #555;
+        background: white; transition: 0.2s;
+    }
+    .chip:hover     { border-color: #2D5A27; color: #2D5A27; }
+    .chip.active    { background: #2D5A27; color: white; border-color: #2D5A27; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="dash-wrapper">
+
+    {% for msg in app.flashes('success') %}
+        <div class="flash-success"><i class="fa fa-check-circle"></i> {{ msg }}</div>
+    {% endfor %}
+
+    {# ── En-tête ── #}
+    <div class="page-header">
+        <div>
+            <h2><i class="fa fa-stethoscope" style="color:#2D5A27; margin-right:8px;"></i>Gestion des Examens</h2>
+            <p>{{ examens|length }} examens vétérinaires enregistrés</p>
+        </div>
+        <a href="{{ path('admin_examens_new') }}" class="btn-action btn-add">
+            <i class="fa fa-plus"></i> Ajouter
+        </a>
+    </div>
+
+    {# ── Filtres type ── #}
+    <div class="filter-chips">
+        <a href="{{ path('admin_examens_index', {q: searchTerm}) }}" class="chip {% if not currentType %}active{% endif %}">Tous</a>
+        {% for t in ['Vaccin', 'Consultation', 'Radio', 'Scanner'] %}
+            <a href="{{ path('admin_examens_index', {q: searchTerm, type: t}) }}" class="chip {% if currentType == t %}active{% endif %}">{{ t }}</a>
+        {% endfor %}
+    </div>
+
+    {# ── Barre de recherche ── #}
+    <form method="GET" class="search-bar">
+        <input type="hidden" name="type" value="{{ currentType }}">
+        <input type="text" name="q" value="{{ searchTerm }}" placeholder="Rechercher par animal, diagnostic…">
+        <button type="submit" class="btn-action btn-add">
+            <i class="fa fa-search"></i> Rechercher
+        </button>
+        {% if searchTerm or currentType %}
+            <a href="{{ path('admin_examens_index') }}" class="btn-action" style="background:#f0f0f0;color:#555;">
+                <i class="fa fa-times"></i> Effacer
+            </a>
+        {% endif %}
+    </form>
+
+    {# ── Tableau ── #}
+    <div style="background:white; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.06); overflow:hidden;">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Animal</th>
+                    <th>Propriétaire</th>
+                    <th>Date</th>
+                    <th>Type d'Examen</th>
+                    <th>Diagnostic</th>
+                    <th>Traitement</th>
+                    <th>Score Santé</th>
+                    <th style="text-align:right; padding-right:20px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for e in examens %}
+                {% set score = e.healthScore %}
+                <tr>
+                    <td style="font-weight:600; color:#2D5A27;">
+                        <i class="fa fa-paw" style="color:#A8C69F; margin-right:5px;"></i>
+                        {{ e.animal.nom }}
+                        <div style="font-size:11px; color:#aaa; font-weight:400;">{{ e.animal.espece }}</div>
+                    </td>
+                    <td>
+                        {% if e.animal.user %}
+                            <span style="display:inline-flex;align-items:center;gap:5px;background:#f0f4f8;padding:3px 10px;border-radius:20px;font-size:12px;">
+                                <i class="fa fa-user" style="color:#2D5A27;font-size:10px;"></i>
+                                {{ e.animal.user.prenom }} {{ e.animal.user.nom }}
+                            </span>
+                        {% else %}
+                            <span style="color:#ccc;font-size:12px;">—</span>
+                        {% endif %}
+                    </td>
+                    <td style="color:#888; white-space:nowrap;">
+                        <i class="fa fa-calendar" style="opacity:.4; margin-right:4px;"></i>
+                        {{ e.dateExamen ? e.dateExamen|date('d/m/Y') : '-' }}
+                    </td>
+                    <td>
+                        <span class="type-badge type-{{ e.typeExamen|lower|replace({' ': ''}) }}">{{ e.typeExamen }}</span>
+                    </td>
+                    <td>
+                        {% if e.diagnostic == 'En bonne santé' %}
+                            <span class="diag-badge diag-sain">{{ e.diagnostic }}</span>
+                        {% elseif e.diagnostic == 'Urgence' %}
+                            <span class="diag-badge diag-urgence">{{ e.diagnostic }}</span>
+                        {% else %}
+                            <span class="diag-badge diag-default">{{ e.diagnostic }}</span>
+                        {% endif %}
+                    </td>
+                    <td style="font-size:13px;">{{ e.traitement }}</td>
+                    <td>
+                        <span class="health-score-mini" style="color:{% if score >= 70 %}#27ae60{% elseif score >= 40 %}#f39c12{% else %}#e74c3c{% endif %};">
+                            {{ e.healthEmoji }} {{ score }}/100
+                        </span>
+                    </td>
+                    <td style="text-align:right; padding-right:20px;">
+                        <div style="display:flex;gap:6px;justify-content:flex-end;">
+                            <a href="{{ path('admin_examens_edit', {id: e.id}) }}" class="btn-action btn-edit">
+                                <i class="fa fa-pen"></i> Modifier
+                            </a>
+                            <form method="POST" action="{{ path('admin_examens_delete', {id: e.id}) }}"
+                                  onsubmit="return confirm('Supprimer cet examen ?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete_examen_' ~ e.id) }}">
+                                <button type="submit" class="btn-action btn-del">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8" style="text-align:center; padding:40px; color:#aaa;">
+                        <i class="fa fa-stethoscope" style="font-size:32px; margin-bottom:10px; display:block;"></i>
+                        Aucun examen trouvé{% if searchTerm %} pour "{{ searchTerm }}"{% endif %}.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% endblock %}

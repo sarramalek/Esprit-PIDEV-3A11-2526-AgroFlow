@@ -1,0 +1,308 @@
+{% extends 'base_agriculteur.html.twig' %}
+
+{% block title %}AgroFlow - Gestion des Animaux{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Styles pour la barre de recherche */
+        .search-container {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .search-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            outline: none;
+            transition: all 0.3s;
+            background: #fcfcfc;
+        }
+        .search-input:focus {
+            border-color: #2D5A27;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(45, 90, 39, 0.1);
+        }
+        .btn-search {
+            background: #2D5A27;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .btn-search:hover { background: #1e3f1b; }
+
+        /* Modal Partenaire */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 8% auto;
+            padding: 0;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 600px;
+            animation: modalPop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        /* IQ Badge & Tooltip Styles */
+        .iq-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: help;
+            transition: 0.3s;
+            position: relative;
+        }
+        .iq-badge:hover { transform: scale(1.05); }
+        
+        .iq-tooltip {
+            position: relative;
+        }
+        .iq-tooltip::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2C3E50;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 100;
+        }
+        .iq-tooltip:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div style="padding: 10px;">
+        <!-- Header : Breadcrumb -->
+        <div style="margin-bottom: 25px; color: #666; font-size: 14px;">
+            <span>Gestion</span> <i class="fa fa-chevron-right" style="font-size: 10px; margin: 0 5px;"></i> 
+            <strong style="color: #2C3E50;">Mes Animaux</strong>
+        </div>
+
+        <!-- Barre de Recherche -->
+        <form action="{{ path('app_animaux_index') }}" method="get" class="search-container">
+            <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
+                <i class="fa fa-search" style="color: #999;"></i>
+                <input type="text" name="q" value="{{ searchTerm }}" class="search-input" placeholder="Rechercher par nom, espèce ou sexe...">
+            </div>
+            <button type="submit" class="btn-search">Rechercher</button>
+            {% if searchTerm %}
+                <a href="{{ path('app_animaux_index') }}" style="color: #666; text-decoration: none; font-size: 14px; margin-left: 10px;"><i class="fa fa-times"></i> Annuler</a>
+            {% endif %}
+        </form>
+
+        <!-- Stats Rapides -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px;">
+            <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 3px 6px rgba(0,0,0,0.05); border-left: 5px solid #2C3E50;">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <i class="fa fa-cow" style="color: #2C3E50; font-size: 24px;"></i>
+                    <div>
+                        <h3 style="margin: 0; font-size: 18px;">{{ animaux|length }}</h3>
+                        <span style="color: #777; font-size: 12px; font-weight: 600;">Animaux</span>
+                    </div>
+                </div>
+            </div>
+            <a href="{{ path('app_animaux_stats') }}" style="text-decoration: none;">
+                <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 3px 6px rgba(0,0,0,0.05); border-left: 5px solid #3498db;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <i class="fa fa-chart-pie" style="color: #3498db; font-size: 24px;"></i>
+                        <div>
+                            <h3 style="margin: 0; font-size: 16px; color: #333;">Statistiques</h3>
+                            <span style="color: #3498db; font-size: 12px; font-weight: 600;">Répartition</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            <div onclick="openMatingModal()" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 3px 6px rgba(0,0,0,0.05); border-left: 5px solid #e91e63; cursor: pointer; transition: 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                 <div style="display: flex; align-items: center; gap: 15px;">
+                    <i class="fa fa-heart" style="color: #e91e63; font-size: 24px;"></i>
+                    <div>
+                        <h3 style="margin: 0; font-size: 16px; color: #333;">Accouplement</h3>
+                        <span style="color: #e91e63; font-size: 12px; font-weight: 600;">Trouver un partenaire</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Sélection d'Animal pour l'Accouplement -->
+        <div id="matingModal" class="modal">
+            <div class="modal-content" style="max-width: 500px;">
+                <div style="background: #e91e63; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="margin: 0; font-size: 18px;"><i class="fa fa-heart"></i> Trouver un partenaire</h3>
+                    <span style="cursor: pointer; font-size: 24px;" onclick="closeMatingModal()">&times;</span>
+                </div>
+                <div style="padding: 25px;">
+                    <p style="color: #666; font-size: 14px; margin-bottom: 20px;">Choisissez l'animal pour lequel vous souhaitez trouver un partenaire compatible (même espèce, sexe opposé) :</p>
+                    
+                    <div style="max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;">
+                        {% for a in animaux %}
+                            {% if a.user == app.user %}
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border: 1px solid #eee; border-radius: 10px; transition: 0.2s;" onmouseover="this.style.borderColor='#e91e63';">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <div style="width: 35px; height: 35px; background: #FFF0F5; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fa fa-{{ a.espece|lower == 'vache' ? 'cow' : (a.espece|lower == 'chien' ? 'dog' : 'paw') }}" style="color: #e91e63;"></i>
+                                        </div>
+                                        <div>
+                                            <strong style="display: block; font-size: 14px;">{{ a.nom }}</strong>
+                                            <span style="font-size: 12px; color: #999;">{{ a.espece }} • {{ a.sexe }}</span>
+                                        </div>
+                                    </div>
+                                    <a href="{{ path('app_animaux_match', {'id': a.id}) }}" style="background: #e91e63; color: white; padding: 8px 15px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: 700;">
+                                        Match
+                                    </a>
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <p style="text-align: center; color: #999; font-size: 13px;">Vous n'avez pas encore d'animaux.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function openMatingModal() {
+                document.getElementById('matingModal').style.display = 'block';
+            }
+            function closeMatingModal() {
+                document.getElementById('matingModal').style.display = 'none';
+            }
+            window.onclick = function(event) {
+                let modal = document.getElementById('matingModal');
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
+        </script>
+
+        <!-- Tableau CRUD -->
+        <div style="background: white; border-radius: 15px; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0; color: #2C3E50; font-size: 22px;">Liste de l'exploitation</h2>
+                <a href="{{ path('app_animaux_new') }}" style="background: #2D5A27; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px;">
+                    <i class="fa fa-plus"></i> Ajouter
+                </a>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #F1F3F5;">
+                            {% set nextDirection = (currentDirection == 'ASC') ? 'DESC' : 'ASC' %}
+
+                            <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">
+                                <a href="{{ path('app_animaux_index', { q: searchTerm, sort: 'nom', direction: (currentSort == 'nom' ? nextDirection : 'ASC') }) }}" style="text-decoration:none; color:inherit;">Nom</a>
+                            </th>
+                            <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">Espèce</th>
+                            <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">Sexe</th>
+                            <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">Poids</th>
+                            <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">Naissance</th>
+                            {% if is_granted('ROLE_ADMIN') %}<th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">Éleveur</th>{% endif %}
+                            <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600; text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in animaux %}
+                        <tr style="border-bottom: 1px solid #EEE; transition: background 0.2s;" onmouseover="this.style.backgroundColor='#fcfcf0'" onmouseout="this.style.backgroundColor='transparent'">
+
+                            <td style="padding: 15px 10px; font-weight: 600; color: #2D5A27;">{{ a.nom }}</td>
+                            <td style="padding: 15px 10px;">{{ a.espece }}</td>
+                            <td style="padding: 15px 10px;">
+                                <span style="display: flex; align-items: center; gap: 5px;">
+                                    <i class="fa fa-{{ a.sexe == 'MALE' ? 'mars' : 'venus' }}" style="color: {{ a.sexe == 'MALE' ? '#3498db' : '#e91e63' }};"></i>
+                                    {{ a.sexe }}
+                                </span>
+                            </td>
+                            <td style="padding: 15px 10px;">
+                                <div style="display: flex; flex-direction: column; gap: 4px;">
+                                    <span style="font-weight: 700; color: #2C3E50;">{{ a.poids }} kg</span>
+                                    
+                                    {% set species_key = a.espece|lower %}
+                                    {% if averages[species_key] is defined and a.poids > 0 %}
+                                        {% set avg = averages[species_key] %}
+                                        {% set diff = ((a.poids - avg) / avg) * 100 %}
+                                        
+                                        {# Scoring Logic #}
+                                        {% if diff > 15 %}
+                                            {% set badge_color = "#3498db" %}{# Blue #}
+                                            {% set badge_bg = "#EBF5FB" %}
+                                            {% set label = "Élite" %}
+                                            {% set icon = "star" %}
+                                        {% elseif diff >= -5 %}
+                                            {% set badge_color = "#27ae60" %}{# Green #}
+                                            {% set badge_bg = "#E8F5E9" %}
+                                            {% set label = "Conforme" %}
+                                            {% set icon = "check-circle" %}
+                                        {% else %}
+                                            {% set badge_color = "#f39c12" %}{# Orange #}
+                                            {% set badge_bg = "#FEF5E7" %}
+                                            {% set label = "À surveiller" %}
+                                            {% set icon = "exclamation-triangle" %}
+                                        {% endif %}
+                                        
+                                        <div class="iq-tooltip" data-tip="{{ diff > 0 ? '+' : '' }}{{ diff|round(1) }}% par rapport à la moyenne {{ a.espece }}">
+                                            <span class="iq-badge" style="background: {{ badge_bg }}; color: {{ badge_color }}; border: 1px solid {{ badge_color }}40;">
+                                                <i class="fa fa-{{ icon }}" style="margin-right: 5px;"></i> {{ label }}
+                                            </span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td style="padding: 15px 10px;">{{ a.dateNaissance ? a.dateNaissance|date('d/m/Y') : '-' }}</td>
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <td style="padding: 15px 10px; font-size: 13px;">{{ a.user ? a.user.prenom ~ ' ' ~ a.user.nom : 'Inconnu' }}</td>
+                            {% endif %}
+                            <td style="padding: 15px 10px; text-align: center;">
+                                <a href="{{ path('app_animaux_show', {'id': a.id}) }}" style="color: #7f8c8d; margin-right: 12px;"><i class="fa fa-eye"></i></a>
+                                <a href="{{ path('app_animaux_edit', {'id': a.id}) }}" style="color: #3498db; margin-right: 12px;"><i class="fa fa-edit"></i></a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="8" style="padding: 30px; text-align: center; color: #999;">Aucun animal trouvé dans cette catégorie.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
