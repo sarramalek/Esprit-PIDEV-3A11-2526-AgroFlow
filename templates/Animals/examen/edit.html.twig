@@ -14,10 +14,10 @@
         <div style="background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); max-width: 800px; margin: 0 auto;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
                 <h2 style="color: #2C3E50; margin: 0; font-size: 24px; border-bottom: 3px solid #3498db; display: inline-block; padding-bottom: 8px;">Modifier Rapport #{{ examen.id }}</h2>
-                {{ include('examen/_delete_form.html.twig') }}
+                {{ include('Animals/examen/_delete_form.html.twig') }}
             </div>
             
-            {{ include('examen/_form.html.twig', {'button_label': 'Mettre à jour le rapport'}) }}
+            {{ include('Animals/examen/_form.html.twig', {'button_label': 'Mettre à jour le rapport'}) }}
             
             <div style="margin-top: 25px; border-top: 1px solid #EEE; padding-top: 20px;">
                 <a href="{{ path('app_examens_index') }}" style="color: #7f8c8d; text-decoration: none; font-size: 14px; font-weight: 600;">

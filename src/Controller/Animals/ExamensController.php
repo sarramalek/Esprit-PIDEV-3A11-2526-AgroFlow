@@ -33,7 +33,7 @@ final class ExamensController extends AbstractController
         // Données de fragilité par espèce (pour les dashboard cards)
         $fragilityStats = $user instanceof \App\Entity\User\User ? $examenRepository->getFragilityData($user) : [];
 
-        return $this->render('examen/index.html.twig', [
+        return $this->render('Animals/examen/index.html.twig', [
             'examens' => $examens,
             'searchTerm' => $searchTerm,
             'currentSort' => $sortBy,
@@ -50,7 +50,7 @@ final class ExamensController extends AbstractController
         $filterUser = $this->isGranted('ROLE_ADMIN') ? null : $user;
         $stats = $examenRepository->countByType($filterUser);
 
-        return $this->render('examen/stats.html.twig', [
+        return $this->render('Animals/examen/stats.html.twig', [
             'stats' => $stats,
         ]);
     }
@@ -79,7 +79,7 @@ final class ExamensController extends AbstractController
             return $this->redirectToRoute('app_examens_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('examen/new.html.twig', [
+        return $this->render('Animals/examen/new.html.twig', [
             'examen' => $examen,
             'form' => $form,
         ]);
@@ -92,7 +92,7 @@ final class ExamensController extends AbstractController
             throw $this->createAccessDeniedException("Accès refusé.");
         }
 
-        return $this->render('examen/show.html.twig', [
+        return $this->render('Animals/examen/show.html.twig', [
             'examen' => $examen,
         ]);
     }
@@ -114,7 +114,7 @@ final class ExamensController extends AbstractController
             return $this->redirectToRoute('app_examens_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('examen/edit.html.twig', [
+        return $this->render('Animals/examen/edit.html.twig', [
             'examen' => $examen,
             'form' => $form,
         ]);

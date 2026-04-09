@@ -113,10 +113,11 @@
                     {% set nd = (currentDirection == 'ASC') ? 'DESC' : 'ASC' %}
                     <th><a href="{{ path('admin_animaux_index', {q: searchTerm, sort:'nom',      direction: currentSort=='nom'      ? nd : 'ASC'}) }}" style="color:inherit;text-decoration:none;">Nom <i class="fa fa-sort" style="opacity:.4"></i></a></th>
                     <th><a href="{{ path('admin_animaux_index', {q: searchTerm, sort:'espece',   direction: currentSort=='espece'   ? nd : 'ASC'}) }}" style="color:inherit;text-decoration:none;">Espèce <i class="fa fa-sort" style="opacity:.4"></i></a></th>
+                    <th>Propriétaire</th>
                     <th>Sexe</th>
                     <th><a href="{{ path('admin_animaux_index', {q: searchTerm, sort:'poids',    direction: currentSort=='poids'    ? nd : 'DESC'}) }}" style="color:inherit;text-decoration:none;">Poids / IQ <i class="fa fa-sort" style="opacity:.4"></i></a></th>
                     <th><a href="{{ path('admin_animaux_index', {q: searchTerm, sort:'date_naissance', direction: currentSort=='date_naissance' ? nd : 'DESC'}) }}" style="color:inherit;text-decoration:none;">Naissance <i class="fa fa-sort" style="opacity:.4"></i></a></th>
-                    <th style="text-align:center;">Actions</th>
+                    <th style="text-align:right; padding-right: 20px;">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -124,6 +125,16 @@
                 <tr>
                     <td style="font-weight:600; color:#2D5A27;">{{ a.nom }}</td>
                     <td>{{ a.espece }}</td>
+                    <td>
+                        {% if a.user %}
+                            <span class="owner-chip">
+                                <i class="fa fa-user" style="color:#2D5A27;font-size:10px;"></i>
+                                {{ a.user.prenom }} {{ a.user.nom }}
+                            </span>
+                        {% else %}
+                            <span style="color:#ccc;font-size:12px;">—</span>
+                        {% endif %}
+                    </td>
                     <td>
                         <span class="sex-badge {% if a.sexe == 'MALE' %}sex-male{% else %}sex-female{% endif %}">
                             <i class="fa fa-{% if a.sexe == 'MALE' %}mars{% else %}venus{% endif %}"></i>
@@ -149,8 +160,8 @@
                         </div>
                     </td>
                     <td style="color:#888;">{{ a.dateNaissance ? a.dateNaissance|date('d/m/Y') : '-' }}</td>
-                    <td style="text-align:center;">
-                        <div style="display:flex;gap:6px;justify-content:center;">
+                    <td style="text-align:right; padding-right: 20px;">
+                        <div style="display:flex;gap:6px;justify-content:flex-end;">
                             <a href="{{ path('admin_animaux_edit', {id: a.id}) }}" class="btn-action btn-edit">
                                 <i class="fa fa-pen"></i> Modifier
                             </a>
@@ -166,7 +177,7 @@
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="6" style="text-align:center; padding:40px; color:#aaa;">
+                    <td colspan="7" style="text-align:center; padding:40px; color:#aaa;">
                         <i class="fa fa-paw" style="font-size:32px; margin-bottom:10px; display:block;"></i>
                         Aucun animal trouvé{% if searchTerm %} pour "{{ searchTerm }}"{% endif %}.
                     </td>

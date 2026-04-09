@@ -121,17 +121,6 @@
         </div>
 
         <div class="metric-card">
-            <div class="metric-icon" style="background:#FAEEDA;">
-                <i class="fa fa-hard-hat" style="color:#BA7517;"></i>
-            </div>
-            <div>
-                <p class="metric-label">Ouvriers</p>
-                <p class="metric-value">{{ stats.ouvriers }}</p>
-                <p class="metric-sub">{{ stats.ouvriersPct }}% des inscrits</p>
-            </div>
-        </div>
-
-        <div class="metric-card">
             <div class="metric-icon" style="background:#E1F5EE;">
                 <i class="fa fa-check-circle" style="color:#0F6E56;"></i>
             </div>
@@ -149,7 +138,6 @@
             <p class="card-title">Répartition par rôle</p>
             <div class="legend">
                 <div class="legend-item"><span class="legend-dot" style="background:#3B6D11;"></span> Agriculteurs {{ stats.agriculteursPct }}%</div>
-                <div class="legend-item"><span class="legend-dot" style="background:#185FA5;"></span> Ouvriers {{ stats.ouvriersPct }}%</div>
                 <div class="legend-item"><span class="legend-dot" style="background:#888;"></span> Admins {{ stats.adminsPct }}%</div>
             </div>
             <div style="position:relative; height:220px;">
@@ -161,7 +149,6 @@
             <p class="card-title">Inscriptions mensuelles</p>
             <div class="legend">
                 <div class="legend-item"><span class="legend-dot" style="background:#3B6D11;"></span> Agriculteurs</div>
-                <div class="legend-item"><span class="legend-dot" style="background:#185FA5;"></span> Ouvriers</div>
             </div>
             <div style="position:relative; height:220px;">
                 <canvas id="inscriptionsChart"></canvas>
@@ -228,8 +215,6 @@
                     <td>
                         {% if user.role == 2 %}
                             <span class="badge badge-blue">Agriculteur</span>
-                        {% elseif user.role == 1 %}
-                            <span class="badge badge-amber">Ouvrier</span>
                         {% else %}
                             <span class="badge badge-gray">Admin</span>
                         {% endif %}
@@ -252,15 +237,14 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
     const agriculteurs = {{ stats.agriculteurs }};
-    const ouvriers     = {{ stats.ouvriers }};
     const admins       = {{ stats.admins }};
 
     // Répartition par rôle
     new Chart(document.getElementById('roleChart'), {
         type: 'doughnut',
         data: {
-            labels: ['Agriculteurs', 'Ouvriers', 'Admins'],
-            datasets: [{ data: [agriculteurs, ouvriers, admins], backgroundColor: ['#3B6D11','#185FA5','#888780'], borderWidth: 0 }]
+            labels: ['Agriculteurs', 'Admins'],
+            datasets: [{ data: [agriculteurs, admins], backgroundColor: ['#3B6D11','#888780'], borderWidth: 0 }]
         },
         options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { display: false } } }
     });
@@ -271,8 +255,7 @@
         data: {
             labels: {{ inscriptionsLabels|json_encode|raw }},
             datasets: [
-                { label: 'Agriculteurs', data: {{ inscriptionsAgriculteurs|json_encode|raw }}, backgroundColor: '#3B6D11', borderRadius: 4 },
-                { label: 'Ouvriers',     data: {{ inscriptionsOuvriers|json_encode|raw }},     backgroundColor: '#185FA5', borderRadius: 4 }
+                { label: 'Agriculteurs', data: {{ inscriptionsAgriculteurs|json_encode|raw }}, backgroundColor: '#3B6D11', borderRadius: 4 }
             ]
         },
         options: {

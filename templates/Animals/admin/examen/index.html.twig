@@ -138,7 +138,7 @@
                     <th>Diagnostic</th>
                     <th>Traitement</th>
                     <th>Score Santé</th>
-                    <th style="text-align:center;">Actions</th>
+                    <th style="text-align:right; padding-right:20px;">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -182,8 +182,8 @@
                             {{ e.healthEmoji }} {{ score }}/100
                         </span>
                     </td>
-                    <td style="text-align:center;">
-                        <div style="display:flex;gap:6px;justify-content:center;">
+                    <td style="text-align:right; padding-right:20px;">
+                        <div style="display:flex;gap:6px;justify-content:flex-end;">
                             <a href="{{ path('admin_examens_edit', {id: e.id}) }}" class="btn-action btn-edit">
                                 <i class="fa fa-pen"></i> Modifier
                             </a>

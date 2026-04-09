@@ -33,7 +33,7 @@ final class AnimauxController extends AbstractController
         // Moyennes globales par espèce pour le calcul de l'IQ (Index Qualité)
         $averages = $animauxRepository->getAverageWeightsBySpecies();
 
-        return $this->render('animaux/index.html.twig', [
+        return $this->render('Animals/animaux/index.html.twig', [
             'animaux' => $animaux,
             'searchTerm' => $searchTerm,
             'currentSort' => $sortBy,
@@ -50,7 +50,7 @@ final class AnimauxController extends AbstractController
         $filterUser = $this->isGranted('ROLE_ADMIN') ? null : $user;
         $stats = $animauxRepository->countByEspece($filterUser);
 
-        return $this->render('animaux/stats.html.twig', [
+        return $this->render('Animals/animaux/stats.html.twig', [
             'stats' => $stats,
         ]);
     }
@@ -73,7 +73,7 @@ final class AnimauxController extends AbstractController
             return $this->redirectToRoute('app_animaux_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('animaux/new.html.twig', [
+        return $this->render('Animals/animaux/new.html.twig', [
             'animaux' => $animaux,
             'form' => $form,
         ]);
@@ -87,7 +87,7 @@ final class AnimauxController extends AbstractController
             throw $this->createAccessDeniedException("Vous n'avez pas accès à cet animal.");
         }
 
-        return $this->render('animaux/show.html.twig', [
+        return $this->render('Animals/animaux/show.html.twig', [
             'animaux' => $animaux,
         ]);
     }
@@ -99,7 +99,7 @@ final class AnimauxController extends AbstractController
             throw $this->createAccessDeniedException("Accès refusé.");
         }
 
-        $html = $this->renderView('pdf/animal_card.html.twig', [
+        $html = $this->renderView('Animals/pdf/animal_card.html.twig', [
             'animal' => $animaux
         ]);
 
@@ -118,7 +118,7 @@ final class AnimauxController extends AbstractController
             throw $this->createAccessDeniedException("Accès refusé.");
         }
 
-        $html = $this->renderView('pdf/medical_record.html.twig', [
+        $html = $this->renderView('Animals/pdf/medical_record.html.twig', [
             'animal' => $animaux
         ]);
 
@@ -145,7 +145,7 @@ final class AnimauxController extends AbstractController
             return $this->redirectToRoute('app_animaux_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('animaux/edit.html.twig', [
+        return $this->render('Animals/animaux/edit.html.twig', [
             'animaux' => $animaux,
             'form' => $form,
         ]);
@@ -161,7 +161,7 @@ final class AnimauxController extends AbstractController
 
         $partners = $repository->findPotentialPartners($animaux);
 
-        return $this->render('animaux/match.html.twig', [
+        return $this->render('Animals/animaux/match.html.twig', [
             'animal' => $animaux,
             'partners' => $partners,
         ]);
