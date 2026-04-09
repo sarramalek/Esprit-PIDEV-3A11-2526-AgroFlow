@@ -1,0 +1,165 @@
+{% extends 'base_admin.html.twig' %}
+
+{% block body %}
+<div style="padding: 40px; background-color: #fdfbf7; min-height: 100vh; font-family: 'DM Sans', sans-serif;">
+    <div style="max-width: 900px; margin: 0 auto;">
+        {{ form_start(form, {'attr': {'id': 'article-form', 'novalidate': 'novalidate'}}) }}
+            
+            {# --- BLOC USER (AGRICULTEUR) --- #}
+            <div style="margin-bottom: 30px; padding: 25px; background: #f0f7f0; border-radius: 20px; border: 1px dashed #2D5A27;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <label style="font-weight: 800; color: #2D5A27;">AGRICULTEUR BÉNÉFICIAIRE (RÔLE 2)</label>
+                    <span id="msg-user" style="color: #e74c3c; font-size: 12px; font-weight: bold;">
+                        {{ form_errors(form.user)|striptags ?: 'Sélection requise' }}
+                    </span>
+                </div>
+                {{ form_widget(form.user, {'attr': {'style': 'width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd;'}}) }}
+            </div>
+
+            <div style="background: white; padding: 40px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                <div class="row" style="display: flex; flex-wrap: wrap; gap: 0;">
+                    
+                    {# --- NOM DU PRODUIT --- #}
+                    <div style="flex: 0 0 100%; margin-bottom: 25px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <label style="font-weight: bold; color: #555;">NOM DU PRODUIT</label>
+                            <span id="msg-nom" style="color: #e74c3c; font-size: 12px; font-weight: bold;">
+                                {{ form_errors(form.nom)|striptags ?: 'Requis' }}
+                            </span>
+                        </div>
+                        {{ form_widget(form.nom, {'attr': {'placeholder': 'ex: Engrais Azoté NPK', 'style': 'width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #e0e0e0;'}}) }}
+                    </div>
+
+                    {# --- CATEGORIE --- #}
+                    <div style="flex: 0 0 100%; margin-bottom: 25px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <label style="font-weight: bold; color: #555;">CATÉGORIE</label>
+                            <span id="msg-categorie" style="color: #e74c3c; font-size: 12px; font-weight: bold;">{{ form_errors(form.categorie)|striptags }}</span>
+                        </div>
+                        {{ form_widget(form.categorie, {'attr': {'style': 'width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd;'}}) }}
+                    </div>
+
+                    {# --- PRIX UNITAIRE --- #}
+                    <div style="flex: 0 0 50%; padding-right: 10px; margin-bottom: 25px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <label style="font-weight: bold; color: #555;">PRIX UNITAIRE (DT)</label>
+                            <span id="msg-prix" style="color: #e74c3c; font-size: 12px; font-weight: bold;">
+                                {{ form_errors(form.prix_unitaire)|striptags ?: 'Prix > 0 requis' }}
+                            </span>
+                        </div>
+                        {{ form_widget(form.prix_unitaire, {'attr': {'style': 'width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd;'}}) }}
+                    </div>
+
+                    {# --- UNITE --- #}
+                    <div style="flex: 0 0 50%; padding-left: 10px; margin-bottom: 25px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <label style="font-weight: bold; color: #555;">UNITÉ (KG, LITRE...)</label>
+                            <span id="msg-unite" style="color: #e74c3c; font-size: 12px; font-weight: bold;">{{ form_errors(form.unite_mesure)|striptags }}</span>
+                        </div>
+                        {{ form_widget(form.unite_mesure, {'attr': {'placeholder': 'Ex: Kg', 'style': 'width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd;'}}) }}
+                    </div>
+
+                    {# --- QUANTITE EN STOCK --- #}
+                    <div style="flex: 0 0 50%; padding-right: 10px; margin-bottom: 25px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <label style="font-weight: bold; color: #555;">QUANTITÉ EN STOCK</label>
+                            <span id="msg-stock" style="color: #e74c3c; font-size: 12px; font-weight: bold;">
+                                {{ form_errors(form.quantite_en_stock)|striptags ?: 'Min 0' }}
+                            </span>
+                        </div>
+                        {{ form_widget(form.quantite_en_stock, {'attr': {'style': 'width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd;'}}) }}
+                    </div>
+
+                    {# --- SEUIL ALERTE --- #}
+                    <div style="flex: 0 0 50%; padding-left: 10px; margin-bottom: 25px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <label style="font-weight: bold; color: #555;">SEUIL D'ALERTE</label>
+                            <span id="msg-seuil" style="color: #e74c3c; font-size: 12px; font-weight: bold;">
+                                {{ form_errors(form.seuil_alerte)|striptags ?: 'Min 0' }}
+                            </span>
+                        </div>
+                        {{ form_widget(form.seuil_alerte, {'attr': {'style': 'width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd;'}}) }}
+                    </div>
+                </div>
+
+                <div style="text-align: right; margin-top: 30px;">
+                    <button type="submit" style="background: #111; color: white; padding: 15px 40px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s;">
+                        Enregistrer le produit
+                    </button>
+                </div>
+            </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const validations = [
+        {
+            input: document.querySelector('[name*="[user]"]'),
+            msg: document.getElementById('msg-user'),
+            check: (val) => {
+                if (!val) return { text: "Sélection requise", color: "#e74c3c" };
+                return { text: "Agriculteur sélectionné ✓", color: "#2D5A27" };
+            }
+        },
+        {
+            input: document.querySelector('[name*="[nom]"]'),
+            msg: document.getElementById('msg-nom'),
+            check: (val) => {
+                if (val.length === 0) return { text: "Requis", color: "#e74c3c" };
+                if (val.length < 3) return { text: "Trop court", color: "#fd7e14" };
+                return { text: "Valide ✓", color: "#2D5A27" };
+            }
+        },
+        {
+            input: document.querySelector('[name*="[prix_unitaire]"]'),
+            msg: document.getElementById('msg-prix'),
+            check: (val) => {
+                if (val === "" || parseFloat(val) <= 0) return { text: "Prix > 0 requis", color: "#e74c3c" };
+                return { text: "Prix correct ✓", color: "#2D5A27" };
+            }
+        },
+        {
+            input: document.querySelector('[name*="[quantite_en_stock]"]'),
+            msg: document.getElementById('msg-stock'),
+            check: (val) => {
+                if (val === "" || parseFloat(val) < 0) return { text: "Min 0", color: "#e74c3c" };
+                return { text: "Stock valide ✓", color: "#2D5A27" };
+            }
+        },
+        {
+            input: document.querySelector('[name*="[seuil_alerte]"]'),
+            msg: document.getElementById('msg-seuil'),
+            check: (val) => {
+                if (val === "" || parseFloat(val) < 0) return { text: "Min 0", color: "#e74c3c" };
+                return { text: "Seuil valide ✓", color: "#2D5A27" };
+            }
+        }
+    ];
+
+    function validateField(v) {
+        if (!v.input) return;
+        const result = v.check(v.input.value.trim());
+        v.msg.textContent = result.text;
+        v.msg.style.color = result.color;
+        v.input.style.borderColor = result.color;
+        
+        // Effet visuel sur le label
+        v.input.style.backgroundColor = result.color === "#2D5A27" ? "#fafffa" : "#fffcfc";
+    }
+
+    validations.forEach(v => {
+        if (v.input) {
+            // Déclenche la validation à chaque saisie
+            v.input.addEventListener('input', () => validateField(v));
+            v.input.addEventListener('change', () => validateField(v));
+            // Validation initiale au chargement
+            if(v.input.value) validateField(v);
+        }
+    });
+});
+</script>
+{% endblock %}

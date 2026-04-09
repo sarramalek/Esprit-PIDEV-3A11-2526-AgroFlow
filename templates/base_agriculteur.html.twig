@@ -234,17 +234,18 @@
                 </div>
             </div>
 
-        <div class="nav-item">
-            <a href="{{ path('agri_categories') }}"
-               class="nav-link {% if app.request.get('_route') in ['agri_categories','agri_produits'] %}active{% endif %}">
-                <i class="fa fa-boxes-stacked"></i> Stocks
-                <i class="fa fa-chevron-down chevron"></i>
-            </a>
-            <div class="dropdown">
-                <a href="{{ path('agri_categories') }}"><i class="fa fa-tags"></i> Catégories</a>
-                <a href="{{ path('agri_produits') }}"><i class="fa fa-box"></i> Produits</a>
+       {# Stocks #}
+            <div class="nav-item">
+                <a href="{{ path('agri_categories') }}"
+                   class="nav-link {% if app.request.get('_route') in ['agri_categories','agri_produits'] %}active{% endif %}">
+                    <i class="fa fa-boxes-stacked"></i> Stocks
+                    <i class="fa fa-chevron-down chevron"></i>
+                </a>
+                <div class="dropdown">
+                    <a href="{{ path('agri_categories') }}"><i class="fa fa-tags"></i> Catégories</a>
+                    <a href="{{ path('agri_produits') }}"><i class="fa fa-box"></i> Produits</a>
+                </div>
             </div>
-        </div>
 
         <div class="nav-item">
             <a href="{{ path('agri_terrains') }}"
