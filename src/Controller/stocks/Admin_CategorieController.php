@@ -27,8 +27,8 @@ class Admin_CategorieController extends AbstractController
             $em->persist($categorie);
             $em->flush();
 
-            $this->addFlash('success', 'Catégorie ajoutée !');
-            return $this->redirectToRoute('admin_categorie_new');
+            $this->addFlash('success', 'Votre catégorie a été ajoutée avec succès.');
+            return $this->redirectToRoute('admin_dashboard');
         }
 
         return $this->render('stocks/categorie/Admin_new_categorie.html.twig', [
