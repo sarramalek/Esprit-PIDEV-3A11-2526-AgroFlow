@@ -1,0 +1,30 @@
+{# templates/machines/delete_form.html.twig
+   Réutilisable dans show.html.twig et edit.html.twig #}
+<form method="post"
+      action="{{ path('agri_machine_delete', {'id': machine.id}) }}"
+      onsubmit="return confirm('⚠️ Supprimer définitivement « {{ machine.nom }} » ?\nCette action est irréversible.');"
+      style="display: inline;">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete_machine_' ~ machine.id) }}">
+    <button type="submit" class="btn btn-delete" style="
+        background: transparent;
+        color: #c53030;
+        border: 1.5px solid #f5c6cb;
+        cursor: pointer;
+        padding: 0.65rem 1.4rem;
+        border-radius: 10px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        text-decoration: none;
+        transition: all 0.2s;
+        font-size: 0.9rem;">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6l-1 14H6L5 6"/>
+            <path d="M10 11v6M14 11v6"/>
+            <path d="M9 6V4h6v2"/>
+        </svg>
+        Supprimer
+    </button>
+</form>
