@@ -174,68 +174,59 @@
     {% endfor %}
 
     {# Stats #}
-    <div class="stats-row">
-        <div class="stat-card">
-            <div class="stat-icon" style="background:#EAF3E6;">
-                <i class="fa fa-users" style="color:#2D5A27;"></i>
-            </div>
-            <div>
-                <div class="stat-val">{{ stats.total }}</div>
-                <div class="stat-label">Total utilisateurs</div>
-            </div>
+<div class="stats-row" style="grid-template-columns: repeat(3, 1fr);">
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#D1FAE5;">
+            <i class="fa fa-tractor" style="color:#065F46;"></i>
         </div>
-        <div class="stat-card">
-            <div class="stat-icon" style="background:#FEF3C7;">
-                <i class="fa fa-shield-halved" style="color:#B45309;"></i>
-            </div>
-            <div>
-                <div class="stat-val">{{ stats.admins }}</div>
-                <div class="stat-label">Administrateurs</div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon" style="background:#D1FAE5;">
-                <i class="fa fa-tractor" style="color:#065F46;"></i>
-            </div>
-            <div>
-                <div class="stat-val">{{ stats.agriculteurs }}</div>
-                <div class="stat-label">Agriculteurs</div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon" style="background:#DBEAFE;">
-                <i class="fa fa-person-digging" style="color:#1D4ED8;"></i>
-            </div>
-            <div>
-                <div class="stat-val">{{ stats.ouvriers }}</div>
-                <div class="stat-label">Ouvriers</div>
-            </div>
+        <div>
+            <div class="stat-val">{{ stats.agriculteurs }}</div>
+            <div class="stat-label">Agriculteurs actifs</div>
         </div>
     </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#FEE2E2;">
+            <i class="fa fa-ban" style="color:#DC2626;"></i>
+        </div>
+        <div>
+            <div class="stat-val">{{ stats.bannis }}</div>
+            <div class="stat-label">Comptes bannis</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#EAF3E6;">
+            <i class="fa fa-users" style="color:#2D5A27;"></i>
+        </div>
+        <div>
+            <div class="stat-val">{{ stats.total }}</div>
+            <div class="stat-label">Total agriculteurs</div>
+        </div>
+    </div>
+</div>
 
     {# Toolbar #}
-    <div class="toolbar">
-        <div class="search-wrap">
-            <i class="fa fa-search"></i>
-            <input type="text" id="searchInput"
-                   class="search-input" placeholder="Rechercher par nom, prénom ou email…">
-        </div>
-        <select id="roleFilter" class="filter-select">
-            <option value="">Tous les rôles</option>
-            <option value="3">Administrateurs</option>
-            <option value="2">Agriculteurs</option>
-            <option value="1">Ouvriers</option>
-        </select>
-        <button onclick="resetFilters()" class="btn btn-secondary">
-            <i class="fa fa-xmark"></i> Réinitialiser
-        </button>
-        <a href="{{ path('admin_users_new') }}" class="btn btn-primary">
+    {# Toolbar #}
+<div class="toolbar">
+    <div class="search-wrap">
+        <i class="fa fa-search"></i>
+        <input type="text" id="searchInput"
+               class="search-input" placeholder="Rechercher par nom, prénom ou email…">
+    </div>
+    <select id="roleFilter" class="filter-select">
+        <option value="">Tous les statuts</option>
+        <option value="2">Actifs</option>
+        <option value="0">Bannis</option>
+    </select>
+    <button onclick="resetFilters()" class="btn btn-secondary">
+        <i class="fa fa-xmark"></i> Réinitialiser
+    </button>
+     <a href="{{ path('admin_users_new') }}" class="btn btn-primary">
             <i class="fa fa-plus"></i> Nouvel utilisateur
         </a>
-        <a href="{{ path('admin_users_excel') }}" class="btn btn-secondary">
-            <i class="fa fa-file-csv" style="color:#1D6F42;"></i> Exporter CSV
-        </a>
-    </div>
+    <a href="{{ path('admin_users_excel') }}" class="btn btn-secondary">
+        <i class="fa fa-file-csv" style="color:#1D6F42;"></i> Exporter Excel
+    </a>
+</div>
 
     {# Table #}
     <div class="table-card">
@@ -293,46 +284,66 @@
                     </td>
                     <td data-val="{{ user.tel ?? '' }}">{{ user.tel ?? '—' }}</td>
                     <td data-val="{{ user.ville ?? '' }}">{{ user.ville ?? '—' }}</td>
-                    <td data-val="{{ user.role }}">
-                        {% if user.role == 3 %}
-                            <span class="badge badge-admin"><i class="fa fa-shield-halved"></i> Admin</span>
-                        {% elseif user.role == 2 %}
-                            <span class="badge badge-agri"><i class="fa fa-tractor"></i> Agriculteur</span>
-                        {% elseif user.role == 1 %}
-                            <span class="badge badge-ouv"><i class="fa fa-person-digging"></i> Ouvrier</span>
-                        {% else %}
-                            <span class="badge badge-other">Inconnu</span>
-                        {% endif %}
-                    </td>
+                    {# Badge rôle #}
+<td data-val="{{ user.role }}">
+    {% if user.role == 2 %}
+        <span class="badge badge-agri"><i class="fa fa-tractor"></i> Agriculteur</span>
+    {% elseif user.role == 0 %}
+        <span class="badge" style="background:#FEE2E2; color:#DC2626;">
+            <i class="fa fa-ban"></i> Banni
+        </span>
+    {% else %}
+        <span class="badge badge-other">Inconnu</span>
+    {% endif %}
+</td>
                     <td data-val="{{ user.dateCreationcpt ? user.dateCreationcpt|date('Ymd') : '0' }}"
                         style="font-size:13px; color:var(--text-muted);">
                         {{ user.dateCreationcpt ? user.dateCreationcpt|date('d/m/Y') : '—' }}
                     </td>
-                    <td>
-                        <div class="actions">
-                            <a href="{{ path('admin_users_show', {cin: user.cin}) }}"
-                               class="btn btn-sm btn-secondary btn-icon" title="Voir">
-                                <i class="fa fa-eye"></i>
-                            </a>
-                            <a href="{{ path('admin_users_edit', {cin: user.cin}) }}"
-                               class="btn btn-sm btn-secondary btn-icon" title="Modifier">
-                                <i class="fa fa-pen"></i>
-                            </a>
-                            <a href="{{ path('admin_users_pdf', {cin: user.cin}) }}"
-                               class="btn btn-sm btn-secondary btn-icon" title="Télécharger PDF">
-                                <i class="fa fa-file-pdf" style="color:#DC2626;"></i>
-                            </a>
-                            <form method="POST"
-                                  action="{{ path('admin_users_delete', {cin: user.cin}) }}"
-                                  onsubmit="return confirm('Supprimer {{ user.prenom }} {{ user.nom }} ?')"
-                                  style="margin:0;">
-                                <input type="hidden" name="_token"
-                                       value="{{ csrf_token('delete_user_' ~ user.cin) }}">
-                                <button type="submit" class="btn btn-sm btn-danger btn-icon" title="Supprimer">
-                                    <i class="fa fa-trash"></i>
-                                </button>
-                            </form>
-                        </div>
+                {# Actions #}
+<td>
+    <div class="actions">
+        <a href="{{ path('admin_users_show', {cin: user.cin}) }}"
+           class="btn btn-sm btn-secondary btn-icon" title="Voir">
+            <i class="fa fa-eye"></i>
+        </a>
+        <a href="{{ path('admin_users_edit', {cin: user.cin}) }}"
+   class="btn btn-sm btn-secondary btn-icon" title="Modifier email">
+    <i class="fa fa-envelope" style="color:#2D5A27;"></i>
+</a>
+        <a href="{{ path('admin_users_pdf', {cin: user.cin}) }}"
+           class="btn btn-sm btn-secondary btn-icon" title="PDF">
+            <i class="fa fa-file-pdf" style="color:#DC2626;"></i>
+        </a>
+
+        {% if user.role == 2 %}
+            {# Bannir #}
+            <form method="post"
+                  action="{{ path('admin_users_ban', {cin: user.cin}) }}"
+                  onsubmit="return confirm('Bannir {{ user.prenom }} {{ user.nom }} ?')"
+                  style="margin:0;">
+                <input type="hidden" name="_token" value="{{ csrf_token('ban_user_' ~ user.cin) }}">
+                <button type="submit" class="btn btn-sm btn-danger btn-icon" title="Bannir">
+                    <i class="fa fa-ban"></i>
+                </button>
+            </form>
+        {% elseif user.role == 0 %}
+            {# Débannir #}
+            <form method="post"
+                  action="{{ path('admin_users_unban', {cin: user.cin}) }}"
+                  onsubmit="return confirm('Réactiver {{ user.prenom }} {{ user.nom }} ?')"
+                  style="margin:0;">
+                <input type="hidden" name="_token" value="{{ csrf_token('unban_user_' ~ user.cin) }}">
+                <button type="submit"
+                        class="btn btn-sm btn-icon"
+                        style="background:#D1FAE5; color:#065F46; border:1px solid #A7F3D0;"
+                        title="Débannir">
+                    <i class="fa fa-check"></i>
+                </button>
+            </form>
+        {% endif %}
+    </div>
+</td>
                     </td>
                 </tr>
             {% endfor %}

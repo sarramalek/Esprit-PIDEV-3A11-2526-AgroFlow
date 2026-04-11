@@ -73,7 +73,6 @@ class AuthController extends AbstractController
     #[Route('/logout', name: 'app_logout')]
     public function logout(): void
     {
-        // Géré automatiquement par Symfony Security
     }
 
     // ==================== REDIRECTION PAR ROLE ====================
@@ -86,4 +85,28 @@ class AuthController extends AbstractController
             default => $this->redirectToRoute('ouvrier_home'),   // ← corrigé
         };
     }
+    // ── CHECK SESSION (appelé par JS toutes les 2s) ───────────────────────────
+#[Route('/check-session', name: 'app_check_session')]
+public function checkSession(): Response
+{
+    if (!$this->getUser()) {
+        return new Response('Unauthorized', 401);
+    }
+    return new Response('OK', 200);
+}
+//------------------------------------------------------------------------
+#[Route('/api/terrains/{cinAgriculteur}', name: 'api_terrains_by_agriculteur')]
+public function terrainsByAgriculteur(
+    int $cinAgriculteur,
+    \App\Repository\Terrain\TerrainRepository $terrainRepo
+): Response {
+    $terrains = $terrainRepo->findByAgriculteur($cinAgriculteur);
+
+    $data = array_map(fn($t) => [
+        'id'  => $t->getId(),
+        'nom' => $t->getNomTerrain(),
+    ], $terrains);
+
+    return $this->json($data);
+}
 }
