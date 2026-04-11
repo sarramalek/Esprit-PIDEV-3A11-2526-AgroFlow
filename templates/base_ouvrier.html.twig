@@ -130,6 +130,38 @@
 
     {% block stylesheets %}{% endblock %}
 </head>
+{# Dans base.html.twig, avant </body> #}
+
+{% set protectedPrefixes = ['/admin', '/agriculteur', '/ouvrier'] %}
+{% set isProtected = false %}
+{% for prefix in protectedPrefixes %}
+    {% if app.request.pathInfo starts with prefix %}
+        {% set isProtected = true %}
+    {% endif %}
+{% endfor %}
+
+{% if isProtected %}
+<script>
+function checkAndRedirect() {
+    fetch('{{ path("app_check_session") }}', { credentials: 'same-origin' })
+        .then(r => {
+            if (r.status === 401 || r.redirected) {
+                window.location.replace('{{ path("app_login") }}');
+            }
+        });
+}
+
+window.addEventListener('pageshow', function (e) {
+    if (e.persisted) { checkAndRedirect(); }
+});
+
+document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'visible') { checkAndRedirect(); }
+});
+
+checkAndRedirect();
+</script>
+{% endif %}
 <body>
 
 <header class="header">

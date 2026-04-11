@@ -355,6 +355,34 @@
         {% block stylesheets %}{% endblock %}
     </style>
 </head>
+{# Dans base_admin.html.twig, avant </body> #}
+<script>
+function checkAndRedirect() {
+    fetch('{{ path("app_check_session") }}', { credentials: 'same-origin' })
+        .then(r => {
+            if (r.status === 401 || r.redirected) {
+                window.location.replace('{{ path("app_login") }}');
+            }
+        });
+}
+
+// ── Détection immédiate bouton retour ─────────────────────────────────────
+window.addEventListener('pageshow', function (e) {
+    if (e.persisted) {
+        checkAndRedirect();
+    }
+});
+
+// ── Dès que l'onglet redevient visible ───────────────────────────────────
+document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'visible') {
+        checkAndRedirect();
+    }
+});
+
+// ── Au chargement initial de la page ─────────────────────────────────────
+checkAndRedirect();
+</script>
 <body>
 
 <!-- ═══════ SIDEBAR ═══════ -->
@@ -393,9 +421,7 @@
                 <li><a href="{{ path('admin_abonnements_index') }}" class="{% if app.request.get('_route') == 'admin_abonnements' %}active{% endif %}">
                     <span class="sub-dot"></span> Abonnements
                 </a></li>
-                <li><a href="{{ path('app_tache_index') }}" class="{% if app.request.get('_route') == 'admin_taches' %}active{% endif %}">
-                    <span class="sub-dot"></span> Tâches
-                </a></li>
+               
             </ul>
         </div>
 
@@ -483,6 +509,12 @@
                        class="{% if app.request.get('_route') starts with 'admin_rotations' %}active{% endif %}">
                         <span class="sub-dot"></span> Rotations
                     </a></li>
+                     <li>
+            <a href="{{ path('admin_plantes') }}"
+               class="{% if app.request.get('_route') starts with 'admin_plantes' %}active{% endif %}">
+                <span class="sub-dot"></span> Plantes
+            </a>
+        </li>
                 </ul>
             </div>
 

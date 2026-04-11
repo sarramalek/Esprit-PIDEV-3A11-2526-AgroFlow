@@ -1,367 +1,345 @@
+{# templates/User/FrontTache.html.twig #}
 {% extends 'base_agriculteur.html.twig' %}
-{% block title %}Tâches - AgroFlow{% endblock %}
+
+{% block title %}Gestion des Terrains & Ouvriers{% endblock %}
 
 {% block stylesheets %}
 <style>
-    .front-wrapper { padding: 35px 40px; font-family: Arial, sans-serif; background: #F4F6F9; min-height: 100vh; }
-    .split-layout { display: grid; grid-template-columns: 320px 1fr; gap: 25px; align-items: start; }
-    .panel { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); overflow: hidden; }
-    .panel-header { padding: 18px 20px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
-    .panel-title { font-size: 15px; font-weight: 700; color: #2C3E50; margin: 0; }
-    .panel-count { background: #EAF3DE; color: #3B6D11; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-    .ouvrier-item { display: flex; align-items: center; gap: 12px; padding: 14px 20px; cursor: pointer; border-bottom: 1px solid #f8f8f8; transition: all 0.2s; border-left: 4px solid transparent; }
-    .ouvrier-item:last-child { border-bottom: none; }
-    .ouvrier-item:hover { background: #FAFDF8; border-left-color: #a8d5a2; }
-    .ouvrier-item.active { background: #EAF3DE; border-left-color: #2D5A27; }
-    .avatar { width: 42px; height: 42px; border-radius: 50%; background: #EAF3DE; color: #3B6D11; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; transition: all 0.2s; }
-    .ouvrier-item.active .avatar { background: #2D5A27; color: white; }
-    .ouvrier-info { flex: 1; min-width: 0; }
-    .ouvrier-name { font-weight: 600; color: #2C3E50; font-size: 14px; margin: 0 0 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .ouvrier-email { font-size: 12px; color: #aaa; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .ouvrier-badge { background: #f0f0f0; color: #888; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; flex-shrink: 0; transition: all 0.2s; }
-    .ouvrier-item.active .ouvrier-badge { background: #2D5A27; color: white; }
-    .tache-panel { min-height: 500px; }
-    .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; color: #ccc; text-align: center; }
-    .empty-state i { font-size: 50px; margin-bottom: 20px; }
-    .empty-state p { font-size: 15px; margin: 0; color: #bbb; }
-    .tache-card { padding: 18px 20px; border-bottom: 1px solid #f8f8f8; transition: background 0.2s; display: flex; align-items: flex-start; gap: 15px; }
-    .tache-card:last-child { border-bottom: none; }
-    .tache-card:hover { background: #FAFDF8; }
-    .tache-indicator { width: 4px; border-radius: 4px; flex-shrink: 0; align-self: stretch; min-height: 50px; }
-    .tache-content { flex: 1; min-width: 0; }
-    .tache-name { font-weight: 700; color: #2C3E50; font-size: 15px; margin: 0 0 5px; }
-    .tache-desc { font-size: 13px; color: #aaa; margin: 0 0 10px; line-height: 1.5; }
-    .tache-meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-    .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
-    .badge-green  { background: #EAF3DE; color: #3B6D11; }
-    .badge-blue   { background: #E6F1FB; color: #185FA5; }
-    .badge-amber  { background: #FAEEDA; color: #854F0B; }
-    .badge-red    { background: #FCEBEB; color: #A32D2D; }
-    .badge-gray   { background: #f0f0f0; color: #666; }
-    .echeance-tag { font-size: 12px; color: #888; display: flex; align-items: center; gap: 4px; }
-    .echeance-tag.retard { color: #A32D2D; font-weight: 600; }
-    .loader { display: flex; align-items: center; justify-content: center; padding: 80px 20px; color: #aaa; font-size: 14px; gap: 10px; }
-    .ouvrier-header { padding: 18px 20px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; gap: 12px; background: #FAFDF8; }
-    .ouvrier-header-avatar { width: 44px; height: 44px; border-radius: 50%; background: #2D5A27; color: white; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; }
-    .ouvrier-search { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; }
-    .ouvrier-search input { width: 100%; padding: 9px 14px; border: 1.5px solid #eee; border-radius: 8px; font-size: 13px; outline: none; box-sizing: border-box; transition: border 0.3s; font-family: Arial, sans-serif; }
-    .ouvrier-search input:focus { border-color: #2D5A27; }
-    .tache-actions { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
-    .btn-action { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 13px; border: none; cursor: pointer; color: white; }
-    .btn-edit   { background: #3498db; }
-    .btn-edit:hover { background: #2176ae; }
-    .btn-delete { background: #e74c3c; }
-    .btn-delete:hover { background: #b03a2e; }
+    :root {
+        --vert:   #2d6a4f;
+        --vert-l: #52b788;
+        --terre:  #bc6c25;
+        --beige:  #fefae0;
+        --gris:   #f1f1f1;
+        --danger: #d62828;
+    }
+
+    body { background: var(--beige); font-family: 'Segoe UI', sans-serif; }
+
+    .page-header {
+        background: linear-gradient(135deg, var(--vert), var(--vert-l));
+        color: white;
+        padding: 2rem;
+        border-radius: 0 0 1.5rem 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .page-header h1 { margin: 0; font-size: 1.8rem; }
+    .page-header p  { margin: .25rem 0 0; opacity: .85; }
+
+    /* ---- Cards Terrains ---- */
+    .terrain-card {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,.08);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+        border-left: 5px solid var(--vert);
+        transition: box-shadow .2s;
+    }
+    .terrain-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,.13); }
+
+    .terrain-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        background: var(--gris);
+        cursor: pointer;
+    }
+    .terrain-header .terrain-info h5 {
+        margin: 0;
+        font-size: 1.1rem;
+        color: var(--vert);
+    }
+    .terrain-header .terrain-info small { color: #666; }
+    .terrain-header .badge-count {
+        background: var(--vert-l);
+        color: white;
+        border-radius: 2rem;
+        padding: .25rem .75rem;
+        font-size: .85rem;
+        font-weight: 600;
+    }
+
+    .terrain-body { padding: 1.25rem 1.5rem; display: none; }
+    .terrain-body.open { display: block; }
+
+    /* ---- Table Ouvriers ---- */
+    .table-ouvriers {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: .9rem;
+    }
+    .table-ouvriers th {
+        background: var(--vert);
+        color: white;
+        padding: .6rem .9rem;
+        text-align: left;
+    }
+    .table-ouvriers td { padding: .6rem .9rem; border-bottom: 1px solid #eee; }
+    .table-ouvriers tr:last-child td { border-bottom: none; }
+    .table-ouvriers tr:hover td { background: #f7fff7; }
+
+    /* ---- Formulaire assignation ---- */
+    .assign-form {
+        display: flex;
+        gap: .75rem;
+        align-items: center;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+    }
+    .assign-form select {
+        flex: 1;
+        min-width: 200px;
+        padding: .5rem .75rem;
+        border: 1px solid #ccc;
+        border-radius: .5rem;
+        font-size: .9rem;
+    }
+    .btn-assign {
+        background: var(--vert);
+        color: white;
+        border: none;
+        padding: .5rem 1.2rem;
+        border-radius: .5rem;
+        cursor: pointer;
+        font-size: .9rem;
+        transition: background .2s;
+    }
+    .btn-assign:hover { background: var(--vert-l); }
+
+    .btn-remove {
+        background: transparent;
+        border: 1px solid var(--danger);
+        color: var(--danger);
+        padding: .25rem .6rem;
+        border-radius: .4rem;
+        font-size: .8rem;
+        cursor: pointer;
+        transition: all .2s;
+    }
+    .btn-remove:hover { background: var(--danger); color: white; }
+
+    /* ---- Toast ---- */
+    #toast {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: var(--vert);
+        color: white;
+        padding: .8rem 1.4rem;
+        border-radius: .75rem;
+        box-shadow: 0 4px 16px rgba(0,0,0,.2);
+        font-size: .95rem;
+        opacity: 0;
+        transform: translateY(1rem);
+        transition: all .3s;
+        z-index: 9999;
+        pointer-events: none;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+    #toast.error { background: var(--danger); }
+
+    .empty-state {
+        text-align: center;
+        padding: 2rem;
+        color: #999;
+    }
+    .empty-state i { font-size: 2rem; display: block; margin-bottom: .5rem; }
 </style>
 {% endblock %}
 
 {% block body %}
-<div id="jsData"
-     data-new-tache-url="{{ path('app_tache_new') }}"
-     data-edit-tache-url="{{ path('app_tache_edit', {'idTache': 0}) }}"
-     data-delete-tache-url="{{ path('app_tache_delete', {'idTache': 0}) }}">
+<div class="page-header">
+    <div class="container">
+        <h1>🌾 Mes Terrains & Ouvriers</h1>
+        <p>Gérez l'assignation de vos ouvriers à chaque terrain</p>
+    </div>
 </div>
 
-<div class="front-wrapper">
+<div class="container">
 
-    {# ── Header ── #}
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
-        <div>
-            <p style="margin:0 0 4px; color:#999; font-size:13px;">
-                <i class="fa fa-home"></i> Front Office &rsaquo; <strong style="color:#2C3E50;">Tâches</strong>
-            </p>
-            <h2 style="margin:0; color:#2C3E50; font-size:24px;">Gestion des Tâches par Ouvrier</h2>
+    {% if terrains is empty %}
+        <div class="terrain-card">
+            <div class="empty-state">
+                <i>🏜️</i>
+                Aucun terrain enregistré pour votre compte.
+            </div>
         </div>
-        <button onclick="autoAssigner()"
-                style="background:#2D5A27; color:white; padding:12px 22px; border:none; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:8px; transition:background 0.2s;"
-                onmouseover="this.style.background='#1e3d1a'"
-                onmouseout="this.style.background='#2D5A27'">
-            <i class="fa fa-magic"></i> Auto-assigner les tâches
-        </button>
-    </div>
-
-    {# ── Modal résultat auto-assignation ── #}
-    <div id="autoModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:88888; align-items:center; justify-content:center;">
-        <div style="background:white; border-radius:16px; padding:30px; max-width:500px; width:90%; box-shadow:0 20px 60px rgba(0,0,0,0.2);">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h3 style="margin:0; color:#2C3E50; font-size:18px;">
-                    <i class="fa fa-magic" style="color:#2D5A27;"></i> Résultat auto-assignation
-                </h3>
-                <button onclick="closeModal()" style="background:none; border:none; font-size:20px; cursor:pointer; color:#aaa;">×</button>
-            </div>
-            <div id="autoModalContent"></div>
-            <button onclick="closeModal()"
-                    style="width:100%; margin-top:20px; background:#2D5A27; color:white; padding:12px; border:none; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer;">
-                Fermer
-            </button>
-        </div>
-    </div>
-
-    {# ── Layout 2 colonnes ── #}
-    <div class="split-layout">
-
-        {# Colonne gauche : ouvriers #}
-        <div class="panel">
-            <div class="panel-header">
-                <h3 class="panel-title">
-                    <i class="fa fa-users" style="color:#2D5A27; margin-right:6px;"></i> Ouvriers
-                </h3>
-                <span class="panel-count">{{ ouvriers|length }}</span>
-            </div>
-
-            <div class="ouvrier-search">
-                <input type="text" id="ouvrierSearch" placeholder="Rechercher un ouvrier...">
-            </div>
-
-            <div id="ouvrierList">
-                {% for ouvrier in ouvriers %}
-                <div class="ouvrier-item"
-                     data-cin="{{ ouvrier.cin }}"
-                     data-name="{{ ouvrier.nom }} {{ ouvrier.prenom }}"
-                     data-initials="{{ ouvrier.nom|first|upper }}{{ ouvrier.prenom ? ouvrier.prenom|first|upper : '' }}"
-                     data-search="{{ (ouvrier.nom ~ ' ' ~ ouvrier.prenom ~ ' ' ~ ouvrier.email)|lower }}"
-                     onclick="selectOuvrier(this)">
-                    <div class="avatar">
-                        {{ ouvrier.nom|first|upper }}{{ ouvrier.prenom ? ouvrier.prenom|first|upper : '' }}
-                    </div>
-                    <div class="ouvrier-info">
-                        <p class="ouvrier-name">{{ ouvrier.nom }} {{ ouvrier.prenom }}</p>
-                        <p class="ouvrier-email">{{ ouvrier.email }}</p>
-                    </div>
-                    <span class="ouvrier-badge" id="badge-{{ ouvrier.cin }}">—</span>
+    {% else %}
+        {% for terrain in terrains %}
+        <div class="terrain-card">
+            {# En-tête cliquable #}
+            <div class="terrain-header" onclick="toggleTerrain(this)">
+                <div class="terrain-info">
+                    <h5>{{ terrain.nomTerrain }}</h5>
+                    <small>
+                        📍 {{ terrain.localisation }} &nbsp;|&nbsp;
+                        📐 {{ terrain.surface }} m² &nbsp;|&nbsp;
+                        🧱 {{ terrain.typeSol }}
+                    </small>
                 </div>
+                <span class="badge-count">
+                    {{ terrain.ouvriers|length }} ouvrier{{ terrain.ouvriers|length != 1 ? 's' : '' }}
+                </span>
+            </div>
+
+            {# Corps du terrain #}
+            <div class="terrain-body" id="body-terrain-{{ terrain.id }}">
+
+                {# Liste des ouvriers actuels #}
+                {% if terrain.ouvriers is empty %}
+                    <p style="color:#999; font-style:italic;">Aucun ouvrier assigné à ce terrain.</p>
                 {% else %}
-                <div class="empty-state">
-                    <i class="fa fa-user-times"></i>
-                    <p>Aucun ouvrier trouvé.</p>
+                    <table class="table-ouvriers">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Prénom</th>
+                                <th>Téléphone</th>
+                                <th>Email</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ouvriers-{{ terrain.id }}">
+                            {% for ouvrier in terrain.ouvriers %}
+                            <tr id="row-{{ ouvrier.cin }}">
+                                <td>{{ ouvrier.nom }}</td>
+                                <td>{{ ouvrier.prenom }}</td>
+                                <td>{{ ouvrier.tel ?? '—' }}</td>
+                                <td>{{ ouvrier.email }}</td>
+                                <td>
+                                    <button
+                                        class="btn-remove"
+                                        onclick="desassignerOuvrier({{ ouvrier.cin }}, this)"
+                                        title="Retirer de ce terrain">
+                                        ✕ Retirer
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+
+                {# Formulaire d'assignation d'un nouvel ouvrier #}
+                <div class="assign-form">
+                    <select id="select-ouvrier-{{ terrain.id }}">
+                        <option value="">— Choisir un ouvrier disponible —</option>
+                        {% for o in ouvriersDispo %}
+                            <option value="{{ o.cin }}">{{ o.prenom }} {{ o.nom }}</option>
+                        {% endfor %}
+                    </select>
+                    <button
+                        class="btn-assign"
+                        onclick="assignerOuvrier({{ terrain.id }}, this)">
+                        ➕ Assigner
+                    </button>
                 </div>
-                {% endfor %}
-            </div>
-        </div>
 
-        {# Colonne droite : tâches #}
-        <div class="panel tache-panel" id="tachePanel">
-            <div class="empty-state" id="emptyState">
-                <i class="fa fa-hand-o-left"></i>
-                <p>Sélectionnez un ouvrier<br>pour voir ses tâches</p>
-            </div>
-        </div>
+                {# Lien vers les tâches de ce terrain #}
+                <div style="margin-top:1rem; text-align:right;">
+                    <a href="#" style="color:var(--vert-l); font-size:.85rem;"
+                       onclick="voirTachesOuvriers({{ terrain.id }}); return false;">
+                        📋 Voir les tâches des ouvriers
+                    </a>
+                </div>
 
-    </div>
-</div>
+            </div>{# /terrain-body #}
+        </div>
+        {% endfor %}
+    {% endif %}
+
+</div>{# /container #}
+
+{# Toast notification #}
+<div id="toast"></div>
+
 {% endblock %}
 
 {% block javascripts %}
-    {{ parent() }}  {# ← CRUCIAL : hérite de toggleProfilePanel() du base #}
-    <script>
-    const newTacheUrl    = document.getElementById('jsData').dataset.newTacheUrl;
-    const editTacheUrl   = document.getElementById('jsData').dataset.editTacheUrl;
-    const deleteTacheUrl = document.getElementById('jsData').dataset.deleteTacheUrl;
+<script>
+// ---- Accordéon terrain ----
+function toggleTerrain(header) {
+    const body = header.nextElementSibling;
+    body.classList.toggle('open');
+}
 
-    let currentCin = null;
+// ---- Assigner un ouvrier à un terrain ----
+function assignerOuvrier(idTerrain, btn) {
+    const select = document.getElementById('select-ouvrier-' + idTerrain);
+    const cin    = select.value;
 
-    function selectOuvrier(el) {
-        document.querySelectorAll('.ouvrier-item').forEach(i => i.classList.remove('active'));
-        el.classList.add('active');
-        currentCin = el.dataset.cin;
-        loadTaches(el.dataset.cin, el.dataset.name, el.dataset.initials);
+    if (!cin) {
+        showToast('Veuillez sélectionner un ouvrier.', true);
+        return;
     }
 
-    function loadTaches(cin, name, initials) {
-        const panel = document.getElementById('tachePanel');
-        panel.innerHTML = `
-            <div class="loader">
-                <i class="fa fa-spinner fa-spin"></i> Chargement des tâches...
-            </div>`;
+    const form = new FormData();
+    form.append('cin_ouvrier', cin);
 
-        fetch(`/agriculteur/tache/front/agriculteur/${cin}`)
-            .then(res => res.json())
-            .then(taches => {
-                const badge = document.getElementById(`badge-${cin}`);
-                if (badge) badge.textContent = taches.length;
+    fetch(`/agriculteur/tache/terrain/${idTerrain}/assigner-ouvrier`, {
+        method: 'POST',
+        body:   form,
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message);
+            // Recharger la page pour refléter les changements
+            setTimeout(() => location.reload(), 1200);
+        } else {
+            showToast(data.error ?? 'Erreur lors de l\'assignation.', true);
+        }
+    })
+    .catch(() => showToast('Erreur réseau.', true));
+}
 
-                let html = `
-                    <div class="ouvrier-header">
-                        <div class="ouvrier-header-avatar">${initials}</div>
-                        <div style="flex:1;">
-                            <p style="margin:0; font-weight:700; color:#2C3E50; font-size:15px;">${name}</p>
-                            <p style="margin:0; font-size:13px; color:#888;">
-                                ${taches.length} tâche${taches.length > 1 ? 's' : ''} assignée${taches.length > 1 ? 's' : ''}
-                            </p>
-                        </div>
-                        <a href="${newTacheUrl}?assignee=${cin}"
-                           style="width:36px; height:36px; background:#2D5A27; color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none; font-size:20px; font-weight:700; flex-shrink:0; transition:background 0.2s;"
-                           title="Ajouter une tâche à ${name}"
-                           onmouseover="this.style.background='#1e3d1a'"
-                           onmouseout="this.style.background='#2D5A27'">+</a>
-                    </div>`;
+// ---- Désassigner un ouvrier ----
+function desassignerOuvrier(cin, btn) {
+    if (!confirm('Voulez-vous retirer cet ouvrier du terrain ?')) return;
 
-                if (taches.length === 0) {
-                    html += `
-                        <div class="empty-state">
-                            <i class="fa fa-check-circle" style="color:#EAF3DE;"></i>
-                            <p>Aucune tâche assignée à cet ouvrier.</p>
-                            <a href="${newTacheUrl}?assignee=${cin}"
-                               style="margin-top:16px; background:#2D5A27; color:white; padding:10px 20px; border-radius:8px; text-decoration:none; font-size:14px; font-weight:600; display:inline-flex; align-items:center; gap:8px;">
-                                <i class="fa fa-plus"></i> Ajouter une tâche
-                            </a>
-                        </div>`;
-                } else {
-                    taches.forEach(t => {
-                        const etatBadge      = getEtatBadge(t.etat);
-                        const prioriteBadge  = getPrioriteBadge(t.priorite);
-                        const indicatorColor = getIndicatorColor(t.priorite);
-                        const echeanceHtml   = t.echeance
-                            ? `<span class="echeance-tag ${t.enRetard ? 'retard' : ''}">
-                                   <i class="fa fa-${t.enRetard ? 'exclamation-triangle' : 'calendar'}"></i>
-                                   ${t.echeance}
-                               </span>`
-                            : '';
+    const form = new FormData();
 
-                        const editUrl   = editTacheUrl.replace('/0/', '/' + t.id + '/') + '?assignee=' + cin;
-                        const deleteUrl = deleteTacheUrl.replace('/0/', '/' + t.id + '/');
+    fetch(`/agriculteur/tache/ouvrier/${cin}/desassigner`, {
+        method: 'POST',
+        body:   form,
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message);
+            const row = document.getElementById('row-' + cin);
+            if (row) row.remove();
+        } else {
+            showToast(data.error ?? 'Erreur.', true);
+        }
+    })
+    .catch(() => showToast('Erreur réseau.', true));
+}
 
-                        html += `
-                            <div class="tache-card">
-                                <div class="tache-indicator" style="background:${indicatorColor};"></div>
-                                <div class="tache-content">
-                                    <p class="tache-name">${t.nom}</p>
-                                    ${t.description
-                                        ? `<p class="tache-desc">${t.description.substring(0,80)}${t.description.length > 80 ? '...' : ''}</p>`
-                                        : ''}
-                                    <div class="tache-meta">
-                                        ${etatBadge}
-                                        ${prioriteBadge}
-                                        ${echeanceHtml}
-                                    </div>
-                                </div>
-                                <div class="tache-actions">
-                                    <a href="${editUrl}" class="btn-action btn-edit" title="Modifier">
-                                        <i class="fa fa-pencil"></i>
-                                    </a>
-                                    <form method="post" action="${deleteUrl}" onsubmit="return confirm('Supprimer cette tâche ?')" style="margin:0;">
-                                        <input type="hidden" name="_token" value="${t.csrfToken}">
-                                        <button type="submit" class="btn-action btn-delete" title="Supprimer">
-                                            <i class="fa fa-trash"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>`;
-                    });
-                }
-
-                panel.innerHTML = html;
-            })
-            .catch(() => {
-                panel.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fa fa-exclamation-triangle" style="color:#FCEBEB;"></i>
-                        <p>Erreur lors du chargement des tâches.</p>
-                    </div>`;
-            });
-    }
-
-    function getEtatBadge(etat) {
-        const map = {
-            'terminée': ['badge-green', 'fa-check',   'Terminée'],
-            'en cours': ['badge-blue',  'fa-spinner', 'En cours'],
-            'annulée':  ['badge-red',   'fa-times',   'Annulée'],
-            'à faire':  ['badge-gray',  'fa-clock-o', 'À faire'],
-        };
-        const [cls, icon, label] = map[etat] || ['badge-gray', 'fa-question', etat ?? '—'];
-        return `<span class="badge ${cls}"><i class="fa ${icon}"></i> ${label}</span>`;
-    }
-
-    function getPrioriteBadge(priorite) {
-        const map = {
-            'haute':   ['badge-red',   'fa-arrow-up',   'Haute'],
-            'moyenne': ['badge-amber', 'fa-minus',      'Moyenne'],
-            'basse':   ['badge-blue',  'fa-arrow-down', 'Basse'],
-        };
-        const [cls, icon, label] = map[priorite] || ['badge-gray', 'fa-question', priorite ?? '—'];
-        return `<span class="badge ${cls}"><i class="fa ${icon}"></i> ${label}</span>`;
-    }
-
-    function getIndicatorColor(priorite) {
-        return { 'haute': '#e74c3c', 'moyenne': '#f39c12', 'basse': '#3498db' }[priorite] || '#ddd';
-    }
-
-    document.getElementById('ouvrierSearch').addEventListener('input', function () {
-        const q = this.value.toLowerCase().trim();
-        document.querySelectorAll('.ouvrier-item').forEach(item => {
-            item.style.display = item.dataset.search.includes(q) ? '' : 'none';
-        });
-    });
-
-    function autoAssigner() {
-        const btn = document.querySelector('button[onclick="autoAssigner()"]');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Assignation en cours...';
-
-        fetch('{{ path("app_tache_auto_assigner") }}', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-        })
-        .then(res => res.json())
-        .then(data => {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fa fa-magic"></i> Auto-assigner les tâches';
-
-            const modal   = document.getElementById('autoModal');
-            const content = document.getElementById('autoModalContent');
-
-            if (!data.success) {
-                content.innerHTML = `
-                    <div style="text-align:center; padding:20px; color:#888;">
-                        <i class="fa fa-info-circle" style="font-size:40px; margin-bottom:12px; display:block; color:#aaa;"></i>
-                        <p>${data.message}</p>
-                    </div>`;
-            } else {
-                let html = `<p style="font-size:13px; color:#888; margin-bottom:16px;">${data.total} tâche(s) traitée(s)</p>`;
-                html += '<div style="display:flex; flex-direction:column; gap:10px; max-height:300px; overflow-y:auto;">';
-
-                data.assignations.forEach(a => {
-                    if (a.ouvrier) {
-                        html += `
-                        <div style="display:flex; align-items:center; gap:12px; padding:12px; background:#EAF3DE; border-radius:10px;">
-                            <i class="fa fa-check-circle" style="color:#2D5A27; font-size:18px; flex-shrink:0;"></i>
-                            <div>
-                                <div style="font-weight:700; color:#2C3E50; font-size:13px;">${a.tache}</div>
-                                <div style="font-size:12px; color:#666;">Assignée à <strong>${a.ouvrier}</strong></div>
-                            </div>
-                        </div>`;
-                    } else {
-                        html += `
-                        <div style="display:flex; align-items:center; gap:12px; padding:12px; background:#FCEBEB; border-radius:10px;">
-                            <i class="fa fa-exclamation-triangle" style="color:#A32D2D; font-size:18px; flex-shrink:0;"></i>
-                            <div>
-                                <div style="font-weight:700; color:#2C3E50; font-size:13px;">${a.tache}</div>
-                                <div style="font-size:12px; color:#A32D2D;">${a.message}</div>
-                            </div>
-                        </div>`;
-                    }
-                });
-
-                html += '</div>';
-                content.innerHTML = html;
+// ---- Voir tâches des ouvriers d'un terrain ----
+function voirTachesOuvriers(idTerrain) {
+    fetch(`/agriculteur/tache/terrain/${idTerrain}/ouvriers`)
+        .then(r => r.json())
+        .then(ouvriers => {
+            if (ouvriers.length === 0) {
+                showToast('Aucun ouvrier dans ce terrain.', true);
+                return;
             }
-
-            modal.style.display = 'flex';
-
-            if (currentCin) {
-                const activeItem = document.querySelector('.ouvrier-item.active');
-                if (activeItem) loadTaches(currentCin, activeItem.dataset.name, activeItem.dataset.initials);
-            }
-        })
-        .catch(() => {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fa fa-magic"></i> Auto-assigner les tâches';
-            alert('Erreur lors de l\'auto-assignation.');
+            // Charger les tâches du premier ouvrier à titre d'exemple
+            // Vous pouvez adapter pour afficher une modale complète
+            const cin = ouvriers[0].cin;
+            window.location.href = `/agriculteur/tache/front/agriculteur/${cin}`;
         });
-    }
+}
 
-    function closeModal() {
-        document.getElementById('autoModal').style.display = 'none';
-    }
-    </script>
+// ---- Toast ----
+function showToast(msg, isError = false) {
+    const t = document.getElementById('toast');
+    t.textContent  = msg;
+    t.className    = 'show' + (isError ? ' error' : '');
+    setTimeout(() => { t.className = ''; }, 3500);
+}
+</script>
 {% endblock %}

@@ -33,6 +33,32 @@
         cursor: pointer; transition: background-color 0.3s; margin-top: 8px;
     }
     .submit-btn:hover { background-color: #1e3d1a; }
+
+    /* ── Employeur / Terrain ── */
+    .dynamic-group { display: none; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-6px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    .field-icon-label {
+        display: flex; align-items: center; gap: 8px;
+        color: #2C3E50; font-weight: 600; margin-bottom: 8px; font-size: 14px;
+    }
+    .field-icon-label i { color: #2D5A27; }
+    select.form-input:disabled { background: #f5f5f5; color: #aaa; cursor: not-allowed; }
+
+    /* Loading spinner */
+    .loading-text {
+        font-size: 13px; color: #888; margin-top: 6px;
+        display: none; align-items: center; gap: 6px;
+    }
+    .loading-text.visible { display: flex; }
+    .spinner {
+        width: 14px; height: 14px; border: 2px solid #ddd;
+        border-top-color: #2D5A27; border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 {% endblock %}
 
@@ -48,7 +74,6 @@
 
         {{ form_errors(registrationForm) }}
 
-        {# On ouvre le form SANS form_end pour contrôler le rendu #}
         <form method="post" action="{{ path('app_register') }}">
             {{ form_widget(registrationForm._token) }}
 
@@ -70,6 +95,37 @@
                     {% endfor %}
                 </div>
                 {{ form_errors(registrationForm.role) }}
+            </div>
+
+            {# ── Employeur (visible si Ouvrier) ── #}
+            <div class="field-group dynamic-group" id="employeur-group">
+                <div class="field-icon-label">
+                    <i class="fas fa-tractor"></i>
+                    <span>Employeur (Agriculteur)</span>
+                </div>
+                {{ form_widget(registrationForm.employeur, {'attr': {'class': 'form-input', 'id': 'employeur-select'}}) }}
+                {{ form_errors(registrationForm.employeur) }}
+            </div>
+
+            {# ── Terrain (visible après choix agriculteur) ── #}
+            <div class="field-group dynamic-group" id="terrain-group">
+                <div class="field-icon-label">
+                    <i class="fas fa-map-marked-alt"></i>
+                    <span>Terrain assigné</span>
+                </div>
+
+                {# Champ caché Symfony — reçoit la valeur via JS #}
+                {{ form_widget(registrationForm.terrain, {'attr': {'style': 'display:none', 'id': 'terrain-hidden-value'}}) }}
+
+                {# Select visuel uniquement pour l'UX #}
+                <select id="terrain-select-visual" class="form-input" disabled>
+                    <option value="">-- Choisissez d'abord un agriculteur --</option>
+                </select>
+
+                <div class="loading-text" id="terrain-loading">
+                    <div class="spinner"></div> Chargement des terrains…
+                </div>
+                {{ form_errors(registrationForm.terrain) }}
             </div>
 
             {# ── CIN ── #}
@@ -116,15 +172,10 @@
                 </div>
                 <div>
                     <label class="form-label">Quartier</label>
-
-                    {# Champ caché HTML pur — Symfony ne le re-génère pas #}
                     <input type="hidden" id="adresse-hidden" name="registration_form[adresse]" value="">
-
-                    {# Select visuel 100% JS #}
                     <select id="adresse-select" class="form-input" disabled>
                         <option value="">-- Choisissez d'abord une ville --</option>
                     </select>
-
                     {{ form_errors(registrationForm.adresse) }}
                 </div>
             </div>
@@ -150,6 +201,8 @@
 {% block javascripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+
+    // ==================== Villes / Quartiers ====================
     const villesAdresses = {
         "Tunis":    ["Centre-ville","La Marsa","Le Bardo","Carthage","Ariana","La Goulette","Sidi Bou Saïd","Menzah"],
         "Sfax":     ["Centre-ville","Sakiet Ezzit","Sakiet Eddaier","Thyna","El Ain","Chihia"],
@@ -163,37 +216,110 @@ document.addEventListener('DOMContentLoaded', function () {
         "Médenine": ["Centre-ville","Djerba","Zarzis","Ben Gardane","Beni Khedache","Sidi Makhlouf"],
     };
 
-const villeSelect = document.getElementById('registration_form_ville');
+    const villeSelect   = document.getElementById('registration_form_ville');
     const adresseSelect = document.getElementById('adresse-select');
     const adresseHidden = document.getElementById('adresse-hidden');
 
-    function updateAdresses(ville, selectedAdresse) {
+    function updateAdresses(ville) {
         adresseSelect.innerHTML = '<option value="">-- Choisissez un quartier --</option>';
         if (ville && villesAdresses[ville]) {
-            villesAdresses[ville].forEach(function(quartier) {
-                const opt = document.createElement('option');
-                opt.value = quartier;
-                opt.textContent = quartier;
-                if (quartier === selectedAdresse) opt.selected = true;
+            villesAdresses[ville].forEach(quartier => {
+                const opt = new Option(quartier, quartier);
                 adresseSelect.appendChild(opt);
             });
             adresseSelect.disabled = false;
         } else {
             adresseSelect.disabled = true;
-            adresseHidden.value = '';
         }
     }
 
-    adresseSelect.addEventListener('change', function () {
-        adresseHidden.value = this.value;
-    });
-
-    updateAdresses(villeSelect.value, adresseHidden.value);
-
-    villeSelect.addEventListener('change', function () {
-        updateAdresses(this.value, '');
+    adresseSelect.addEventListener('change', () => adresseHidden.value = adresseSelect.value);
+    villeSelect.addEventListener('change', () => {
+        updateAdresses(villeSelect.value);
         adresseHidden.value = '';
     });
+
+    // Initialisation villes
+    updateAdresses(villeSelect.value);
+
+    // ==================== Gestion Rôle (Ouvrier / Agriculteur) ====================
+    const employeurGroup = document.getElementById('employeur-group');
+    const terrainGroup   = document.getElementById('terrain-group');
+    const employeurSelect = document.getElementById('employeur-select');
+    const terrainVisual   = document.getElementById('terrain-select-visual');
+    const terrainHidden   = document.getElementById('terrain-hidden-value');
+    const terrainLoading  = document.getElementById('terrain-loading');
+
+    // Fonction qui affiche/masque les champs selon le rôle
+    function toggleRoleFields() {
+        const ouvrierTab = document.querySelector('.role-tab.active'); // ou selon ton HTML
+        const isOuvrier = ouvrierTab && ouvrierTab.textContent.trim() === 'Ouvrier';
+
+        if (isOuvrier) {
+            employeurGroup.style.display = 'block';
+            terrainGroup.style.display   = 'block';
+        } else {
+            employeurGroup.style.display = 'none';
+            terrainGroup.style.display   = 'none';
+            // Reset
+            employeurSelect.value = '';
+            terrainHidden.value = '';
+            terrainVisual.innerHTML = '<option value="">-- Choisissez d\'abord un agriculteur --</option>';
+            terrainVisual.disabled = true;
+        }
+    }
+
+    // Détection du clic sur les onglets
+    const roleTabs = document.querySelectorAll('.role-tab'); // ← À adapter selon ton HTML exact
+
+    roleTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Enlever active à tous
+            roleTabs.forEach(t => t.classList.remove('active'));
+            // Ajouter active à celui cliqué
+            tab.classList.add('active');
+            
+            toggleRoleFields();
+        });
+    });
+
+    // Chargement des terrains quand on sélectionne un employeur
+    employeurSelect.addEventListener('change', function () {
+        const cinAgriculteur = this.value;
+        if (!cinAgriculteur) return;
+
+        terrainLoading.classList.add('visible');
+        terrainVisual.innerHTML = '<option value="">-- Chargement... --</option>';
+
+        fetch(`/api/terrains/${cinAgriculteur}`)
+            .then(r => r.json())
+            .then(terrains => {
+                terrainLoading.classList.remove('visible');
+                terrainVisual.innerHTML = '<option value="">-- Choisissez un terrain --</option>';
+
+                if (terrains.length === 0) {
+                    terrainVisual.innerHTML = '<option value="">Aucun terrain disponible</option>';
+                } else {
+                    terrains.forEach(t => {
+                        const opt = new Option(t.nom, t.id);
+                        terrainVisual.appendChild(opt);
+                    });
+                    terrainVisual.disabled = false;
+                }
+            })
+            .catch(() => {
+                terrainLoading.classList.remove('visible');
+                terrainVisual.innerHTML = '<option value="">Erreur de chargement</option>';
+            });
+    });
+
+    // Sync terrain visual → hidden field
+    terrainVisual.addEventListener('change', () => {
+        terrainHidden.value = terrainVisual.value;
+    });
+
+    // Initialisation au chargement
+    toggleRoleFields();
 });
 </script>
 {% endblock %}

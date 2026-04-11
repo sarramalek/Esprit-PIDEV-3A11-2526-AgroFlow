@@ -158,10 +158,73 @@
     .flash { padding: 12px 18px; border-radius: 8px; font-size: 14px; font-weight: 500; margin-bottom: 4px; }
     .flash-success { background: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0; }
     .flash-danger  { background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA; }
+
+    /* ── Popup auto-update ── */
+    #abonnement-popup {
+        position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+        background: #fff; border-radius: 14px;
+        box-shadow: 0 8px 32px rgba(0,0,0,.18);
+        padding: 22px 28px 18px; min-width: 320px; max-width: 400px;
+        border-left: 5px solid #2D5A27;
+        animation: slideIn .4s ease;
+    }
+    #abonnement-popup .close-btn {
+        position: absolute; top: 10px; right: 14px;
+        background: none; border: none; font-size: 18px; cursor: pointer; color: #999;
+    }
+    #abonnement-popup .close-btn:hover { color: #333; }
+    .popup-title { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .popup-title .popup-icon { font-size: 26px; }
+    .popup-title strong { color: #2D5A27; font-size: 15px; }
+    #abonnement-popup p { margin: 0 0 6px; font-size: 13px; color: #374151; }
+    .popup-time { font-size: 11px; color: #9CA3AF; text-align: right; margin-top: 12px; }
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateY(30px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
 </style>
 {% endblock %}
 
 {% block body %}
+
+{# ── Popup mise à jour automatique ── #}
+{# ── Popup mise à jour automatique ── #}
+{% set updatedList = app.flashes('abonnement_updated') %}
+{% set purgedList  = app.flashes('abonnement_purged') %}
+{% set countUpdated = updatedList is not empty ? updatedList[0] : 0 %}
+{% set countPurged  = purgedList is not empty  ? purgedList[0]  : 0 %}
+
+{% if countUpdated > 0 or countPurged > 0 %}
+<div id="abonnement-popup">
+    <button class="close-btn" onclick="document.getElementById('abonnement-popup').remove()">✕</button>
+    <div class="popup-title">
+        <span class="popup-icon">🔔</span>
+        <strong>Mise à jour automatique</strong>
+    </div>
+    {% if countUpdated > 0 %}
+        <p>✅ <strong>{{ countUpdated }}</strong>
+           abonnement{{ countUpdated > 1 ? 's' : '' }}
+           passé{{ countUpdated > 1 ? 's' : '' }} au statut <em>Expiré</em>.</p>
+    {% endif %}
+    {% if countPurged > 0 %}
+        <p>🗑️ <strong>{{ countPurged }}</strong>
+           abonnement{{ countPurged > 1 ? 's' : '' }}
+           supprimé{{ countPurged > 1 ? 's' : '' }} (expirés depuis +1 mois).</p>
+    {% endif %}
+    <p class="popup-time">{{ 'now'|date('H:i') }} — AgroFlow</p>
+</div>
+<script>
+    setTimeout(() => {
+        const p = document.getElementById('abonnement-popup');
+        if (p) {
+            p.style.transition = 'opacity .5s';
+            p.style.opacity = 0;
+            setTimeout(() => p.remove(), 500);
+        }
+    }, 8000);
+</script>
+{% endif %}
+
 <div class="page">
 
     {# ── Flash messages ── #}
@@ -218,52 +281,39 @@
     </div>
 
     {# ── Toolbar ── #}
-    <form method="GET" class="toolbar">
-        <div class="search-wrap">
-            <i class="fa fa-search"></i>
-            <input type="text" name="q" value="{{ search ?? '' }}"
-                   class="search-input" id="searchInput"
-                   placeholder="Rechercher par CIN, offre, situation…">
-        </div>
-        <select name="situation" class="filter-select" onchange="this.form.submit()">
-            <option value="">Toutes situations</option>
-            <option value="actif"   {% if (situation ?? '') == 'actif'   %}selected{% endif %}>Actif</option>
-            <option value="inactif" {% if (situation ?? '') == 'inactif' %}selected{% endif %}>Inactif</option>
-            <option value="expire"  {% if (situation ?? '') == 'expire'  %}selected{% endif %}>Expiré</option>
-        </select>
-        <button type="submit" class="btn btn-secondary"><i class="fa fa-filter"></i> Filtrer</button>
-        {% if (search ?? '') or (situation ?? '') %}
-            <a href="{{ path('admin_abonnements_index') }}" class="btn btn-secondary">
-                <i class="fa fa-xmark"></i> Réinitialiser
-            </a>
-        {% endif %}
-        <a href="{{ path('admin_abonnements_new') }}" class="btn btn-primary">
-            <i class="fa fa-plus"></i> Nouvel abonnement
+   {# ── Toolbar ── #}
+<form method="GET" class="toolbar">
+    <div class="search-wrap">
+        <i class="fa fa-search"></i>
+        <input type="text" name="q" value="{{ search is defined ? search : '' }}"
+               class="search-input" id="searchInput"
+               placeholder="Rechercher par CIN, offre, situation…">
+    </div>
+    <select name="situation" class="filter-select" onchange="this.form.submit()">
+        <option value="">Toutes situations</option>
+        <option value="actif"   {% if situation is defined and situation == 'actif'   %}selected{% endif %}>Actif</option>
+        <option value="inactif" {% if situation is defined and situation == 'inactif' %}selected{% endif %}>Inactif</option>
+        <option value="expire"  {% if situation is defined and situation == 'expire'  %}selected{% endif %}>Expiré</option>
+    </select>
+    <button type="submit" class="btn btn-secondary">
+        <i class="fa fa-filter"></i> Filtrer
+    </button>
+
+    {# ── Bouton reset uniquement si filtre actif ── #}
+    {% if (search is defined and search != '') or (situation is defined and situation != '') %}
+        <a href="{{ path('admin_abonnements_index') }}" class="btn btn-secondary">
+            <i class="fa fa-xmark"></i> Réinitialiser
         </a>
-        <a href="{{ path('admin_abonnements_export_pdf') }}" class="btn btn-secondary">
-    <i class="fa fa-file-pdf" style="color:#DC2626;"></i> Exporter PDF
-</a>
-    </form>
-{# ── Actions automatiques ── #}
-<div style="display:flex; gap:12px; flex-wrap:wrap;">
+    {% endif %}
 
-    <form method="POST" action="{{ path('admin_abonnements_update_etats') }}"
-          onsubmit="return confirm('Mettre à jour tous les abonnements dont la date est dépassée ?')">
-        <input type="hidden" name="_token" value="{{ csrf_token('update_etats') }}">
-        <button type="submit" class="btn btn-secondary">
-            <i class="fa fa-rotate"></i> Mettre à jour les états expirés
-        </button>
-    </form>
+    <a href="{{ path('admin_abonnements_new') }}" class="btn btn-primary">
+        <i class="fa fa-plus"></i> Nouvel abonnement
+    </a>
+    <a href="{{ path('admin_abonnements_export_pdf') }}" class="btn btn-secondary">
+        <i class="fa fa-file-pdf" style="color:#DC2626;"></i> Exporter PDF
+    </a>
+</form>
 
-    <form method="POST" action="{{ path('admin_abonnements_purge_expires') }}"
-          onsubmit="return confirm('Supprimer définitivement tous les abonnements expirés depuis plus d\'un mois ?')">
-        <input type="hidden" name="_token" value="{{ csrf_token('purge_expires') }}">
-        <button type="submit" class="btn btn-danger">
-            <i class="fa fa-trash-can"></i> Purger les expirés (&gt;1 mois)
-        </button>
-    </form>
-
-</div>
     {# ── Table ── #}
     <div class="table-card">
         <div class="table-header">
@@ -328,10 +378,10 @@
                                 </button>
                             </form>
                             <a href="{{ path('admin_abonnements_pdf', {idAbonn: abonnement.idAbonn}) }}"
-   class="btn btn-sm btn-secondary btn-icon" title="Télécharger PDF"
-   style="color:#DC2626;">
-    <i class="fa fa-file-pdf"></i>
-</a>
+                               class="btn btn-sm btn-secondary btn-icon" title="Télécharger PDF"
+                               style="color:#DC2626;">
+                                <i class="fa fa-file-pdf"></i>
+                            </a>
                         </div>
                     </td>
                 </tr>
