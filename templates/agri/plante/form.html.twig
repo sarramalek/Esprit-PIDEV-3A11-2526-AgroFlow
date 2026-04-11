@@ -1,0 +1,76 @@
+{% extends 'base_agriculteur.html.twig' %}
+{% block title %}{{ title }} — AgroFlow{% endblock %}
+
+{% block stylesheets %}
+<style>
+.form-wrap { max-width:600px; margin:0 auto; }
+.form-card { background:white; border-radius:16px; box-shadow:0 2px 16px rgba(0,0,0,0.08); padding:36px; }
+.form-card-header { display:flex; align-items:center; gap:12px; margin-bottom:28px; padding-bottom:20px; border-bottom:2px solid #EAF3E6; }
+.form-card-header .icon { width:44px; height:44px; background:linear-gradient(135deg,#4A8C3F,#2D5A27); border-radius:11px; display:flex; align-items:center; justify-content:center; color:white; font-size:18px; }
+.form-card-header h2 { font-size:18px; font-weight:700; color:#1B3A20; margin:0; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+.form-group { display:flex; flex-direction:column; gap:6px; }
+.form-group.full { grid-column:1 / -1; }
+.form-label { font-size:13px; font-weight:600; color:#1B3A20; }
+.form-control { padding:11px 14px; border:1.5px solid #ddd; border-radius:10px; font-size:14px; font-family:'DM Sans',sans-serif; color:#1B3A20; background:#FAFFF9; width:100%; transition:border-color 0.2s; }
+.form-control:focus { outline:none; border-color:#2D5A27; background:white; }
+.form-errors { color:#DC2626; font-size:12px; margin-top:4px; }
+.form-errors ul { margin:0; padding:0; list-style:none; }
+.form-errors li::before { content:'⚠ '; }
+.form-actions { display:flex; gap:12px; margin-top:28px; padding-top:20px; border-top:1px solid #f0f0f0; }
+.btn-submit { display:inline-flex; align-items:center; gap:8px; background:#2D5A27; color:white; padding:12px 26px; border-radius:10px; font-size:14px; font-weight:600; border:none; cursor:pointer; }
+.btn-submit:hover { background:#1B3A20; }
+.btn-cancel { display:inline-flex; align-items:center; gap:8px; background:#f0f0f0; color:#333; padding:12px 22px; border-radius:10px; font-size:14px; font-weight:600; text-decoration:none; }
+.btn-cancel:hover { background:#e0e0e0; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="form-wrap">
+    <div class="form-card">
+        <div class="form-card-header">
+            <div class="icon"><i class="fa fa-seedling"></i></div>
+            <h2>{{ title }}</h2>
+        </div>
+
+        {{ form_start(form, {attr: {novalidate: 'novalidate'}}) }}
+        <div class="form-grid">
+
+            <div class="form-group full">
+                {{ form_label(form.nomP, null, {label_attr: {class: 'form-label'}}) }}
+                {{ form_widget(form.nomP, {attr: {class: 'form-control'}}) }}
+                {{ form_errors(form.nomP) }}
+            </div>
+
+            <div class="form-group full">
+                {{ form_label(form.variete, null, {label_attr: {class: 'form-label'}}) }}
+                {{ form_widget(form.variete, {attr: {class: 'form-control'}}) }}
+                {{ form_errors(form.variete) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.besoinEau, null, {label_attr: {class: 'form-label'}}) }}
+                {{ form_widget(form.besoinEau, {attr: {class: 'form-control'}}) }}
+                {{ form_errors(form.besoinEau) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.cycleJours, null, {label_attr: {class: 'form-label'}}) }}
+                {{ form_widget(form.cycleJours, {attr: {class: 'form-control'}}) }}
+                {{ form_errors(form.cycleJours) }}
+            </div>
+
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn-submit">
+                <i class="fa fa-{{ edit ? 'floppy-disk' : 'plus' }}"></i>
+                {{ edit ? 'Enregistrer' : 'Créer la plante' }}
+            </button>
+            <a href="{{ path('agri_plantes') }}" class="btn-cancel">
+                <i class="fa fa-arrow-left"></i> Annuler
+            </a>
+        </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}

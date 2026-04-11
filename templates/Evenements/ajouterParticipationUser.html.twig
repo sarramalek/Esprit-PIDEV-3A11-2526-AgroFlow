@@ -1,0 +1,33 @@
+{% extends 'base_agriculteur.html.twig' %}
+
+{% block title %}S'inscrire - {{ evenement.titre }}{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Inscription à "{{ evenement.titre }}"</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-6"><strong>Du</strong> {{ evenement.dateDebut|date('d/m/Y') }}</div>
+                        <div class="col-6"><strong>Au</strong> {{ evenement.dateFin|date('d/m/Y') }}</div>
+                        <div class="col-12 mt-2"><strong>Lieu :</strong> {{ evenement.lieu }}</div>
+                    </div>
+
+                    {{ form_start(form) }}
+                        {{ form_row(form.dateInscription, {attr: {class: 'form-control'}}) }}
+                        {{ form_row(form.presence, {attr: {class: 'form-select'}}) }}
+                        <div class="d-grid gap-2 mt-4">
+                            {{ form_widget(form.submit, {attr: {class: 'btn btn-success'}}) }}
+                            <a href="{{ path('agriculteur_evenement_index') }}" class="btn btn-secondary">Annuler</a>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
