@@ -1,0 +1,146 @@
+{% extends 'base_agriculteur.html.twig' %}
+{% block title %}Mes Ouvriers{% endblock %}
+
+{% block stylesheets %}
+<style>
+:root {
+    --vert: #2d6a4f; --vert-l: #52b788; --terre: #bc6c25;
+    --beige: #fefae0; --gris: #f4f4f4; --danger: #c1121f;
+}
+body { background: var(--beige); font-family: 'Segoe UI', sans-serif; }
+
+.page-header {
+    background: linear-gradient(135deg, var(--vert), var(--vert-l));
+    color: white; padding: 1.75rem 2rem;
+    border-radius: 0 0 1.5rem 1.5rem; margin-bottom: 2rem;
+    display: flex; justify-content: space-between; align-items: center;
+}
+.page-header h1 { margin: 0; font-size: 1.6rem; color: white; }
+
+.btn-primary {
+    background: white; color: var(--vert); border: none;
+    padding: .6rem 1.3rem; border-radius: .6rem; font-weight: 600;
+    text-decoration: none; font-size: .95rem; transition: all .2s;
+}
+.btn-primary:hover { background: var(--terre); color: white; }
+
+/* Grille terrains */
+.terrain-section { margin-bottom: 2.5rem; }
+.terrain-title {
+    background: white;
+      padding: 0.6rem 1rem;
+    border-radius: 8px;
+    border: 0.5px solid var(--color-border-tertiary);
+    margin-bottom: 1rem;
+    font-size: 1.1rem; font-weight: 700; color: var(--vert);
+    border-left: 4px solid var(--vert-l); padding-left: .75rem;
+}
+.terrain-header {
+    
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    border: 0.5px solid var(--color-border-tertiary);
+    margin-bottom: 1rem;
+}
+/* Cards ouvriers */
+.ouvrier-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+}
+.ouvrier-card {
+    background: white; border-radius: .9rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,.07);
+    padding: 1.25rem; display: flex; flex-direction: column; gap: .6rem;
+    border-top: 4px solid var(--vert-l);
+    transition: box-shadow .2s;
+}
+.ouvrier-card:hover { box-shadow: 0 4px 18px rgba(0,0,0,.12); }
+.ouvrier-name { font-weight: 700; font-size: 1rem; color: #222; }
+.ouvrier-info { font-size: .85rem; color: #555; }
+.ouvrier-actions { display: flex; gap: .5rem; margin-top: .4rem; flex-wrap: wrap; }
+
+.btn-sm {
+    padding: .35rem .85rem; border-radius: .45rem; font-size: .82rem;
+    border: none; cursor: pointer; text-decoration: none; font-weight: 500;
+    transition: all .2s;
+}
+.btn-taches  { background: var(--vert);   color: white; }
+.btn-edit    { background: #e9c46a;        color: #333;  }
+.btn-delete  { background: var(--danger);  color: white; }
+.btn-taches:hover { background: var(--vert-l); }
+.btn-edit:hover   { background: #f4a261; }
+.btn-delete:hover { background: #9b1c1c; }
+
+.badge-taches {
+    background: var(--vert-l); color: white;
+    border-radius: 2rem; padding: .15rem .55rem;
+    font-size: .75rem; font-weight: 700;
+}
+.empty { color: #aaa; font-style: italic; padding: 1rem 0; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="page-header container-fluid px-4">
+    <h1>👷 Mes Ouvriers</h1>
+    <a href="{{ path('app_ouvrier_new') }}" class="btn-primary">➕ Nouvel ouvrier</a>
+</div>
+
+<div class="container">
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+
+    {% if terrains is empty %}
+        <p class="empty">Aucun terrain enregistré. Créez d'abord un terrain pour y affecter des ouvriers.</p>
+    {% else %}
+        {% for terrain in terrains %}
+        <div class="terrain-section">
+            <div class="terrain-title">
+                🌿 {{ terrain.nomTerrain }}
+                <span class="terrain-meta">
+                    {{ terrain.localisation }} · {{ terrain.surface }} m²
+                </span>
+            </div>
+
+            {% set ouvriersTerrain = terrain.ouvriers %}
+            {% if ouvriersTerrain is empty %}
+                <p class="empty">Aucun ouvrier assigné à ce terrain.</p>
+            {% else %}
+            <div class="ouvrier-grid">
+                {% for ouvrier in ouvriersTerrain %}
+                <div class="ouvrier-card">
+                    <div class="ouvrier-name">
+                        {{ ouvrier.prenom }} {{ ouvrier.nom }}
+                    </div>
+                    <div class="ouvrier-info">📧 {{ ouvrier.email }}</div>
+                    <div class="ouvrier-info">📞 {{ ouvrier.tel ?? '—' }}</div>
+                    <div class="ouvrier-info">📍 {{ ouvrier.ville ?? '—' }}</div>
+
+                    <div class="ouvrier-actions">
+                        <a href="{{ path('app_ouvrier_taches', {cin: ouvrier.cin}) }}"
+                           class="btn-sm btn-taches">
+                            📋 Tâches
+                        </a>
+                        <a href="{{ path('app_ouvrier_edit', {cin: ouvrier.cin}) }}"
+                           class="btn-sm btn-edit">
+                            ✏️ Modifier
+                        </a>
+                        <form method="post"
+                              action="{{ path('app_ouvrier_delete', {cin: ouvrier.cin}) }}"
+                              onsubmit="return confirm('Supprimer cet ouvrier ?')">
+                            <button type="submit" class="btn-sm btn-delete">🗑 Supprimer</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    {% endif %}
+
+</div>
+{% endblock %}

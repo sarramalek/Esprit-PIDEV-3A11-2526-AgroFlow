@@ -1,6 +1,11 @@
 <?php
 
 namespace App\Controller;
+use App\Entity\Materiels\Machine;
+use App\Form\Materiels\MachineType;
+use App\Repository\Materiels\MachineRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 use App\Repository\User\AbonnementRepository;
 use App\Repository\User\OffreRepository;
@@ -96,12 +101,79 @@ class AgriculteurDashboardController extends AbstractController
     }
 
     // ── Matériels ────────────────────────────────────────────────────────────
-
-    #[Route('/materiels/machines', name: 'machines')]
+  // ── Matériels — Machines (CRUD complet) ──────────────────────────────────
+ 
+    #[Route('/materiels/machines', name: 'machine_index', methods: ['GET'])]
+    public function machineIndex(MachineRepository $repo): Response
+    {
+        return $this->render('machines/index.html.twig', [
+            'machines' => $repo->findAll(),
+        ]);
+    }
+ 
+    #[Route('/materiels/machines/new', name: 'machine_new', methods: ['GET', 'POST'])]
+    public function machineNew(Request $request, EntityManagerInterface $em): Response
+    {
+        $machine = new Machine();
+        $form    = $this->createForm(MachineType::class, $machine);
+        $form->handleRequest($request);
+ 
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->persist($machine);
+            $em->flush();
+            $this->addFlash('success', 'Machine « '.$machine->getNom().' » ajoutée.');
+            return $this->redirectToRoute('agri_machine_index');
+        }
+ 
+        return $this->render('machines/new.html.twig', [
+            'form'    => $form,
+            'machine' => $machine,
+        ]);
+    }
+ 
+    #[Route('/materiels/machines/{id}', name: 'machine_show', methods: ['GET'], requirements: ['id' => '\d+'])]
+    public function machineShow(Machine $machine): Response
+    {
+        return $this->render('machines/show.html.twig', [
+            'machine' => $machine,
+        ]);
+    }
+ 
+    #[Route('/materiels/machines/{id}/edit', name: 'machine_edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
+    public function machineEdit(Request $request, Machine $machine, EntityManagerInterface $em): Response
+    {
+        $form = $this->createForm(MachineType::class, $machine);
+        $form->handleRequest($request);
+ 
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->flush();
+            $this->addFlash('success', 'Machine « '.$machine->getNom().' » mise à jour.');
+            return $this->redirectToRoute('agri_machine_index');
+        }
+ 
+        return $this->render('machines/edit.html.twig', [
+            'form'    => $form,
+            'machine' => $machine,
+        ]);
+    }
+ 
+    #[Route('/materiels/machines/{id}', name: 'machine_delete', methods: ['POST'], requirements: ['id' => '\d+'])]
+    public function machineDelete(Request $request, Machine $machine, EntityManagerInterface $em): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$machine->getId(), $request->getPayload()->getString('_token'))) {
+            $em->remove($machine);
+            $em->flush();
+            $this->addFlash('success', 'Machine supprimée.');
+        }
+ 
+        return $this->redirectToRoute('agri_machine_index');
+    }
+ 
+    /*#[Route('/materiels/machines', name: 'machines')]
     public function machines(): Response
     {
         return new Response('Module Machines — à implémenter');
-    }
+    }*/
 
     #[Route('/materiels/maintenances', name: 'maintenances')]
     public function maintenances(): Response
@@ -111,11 +183,7 @@ class AgriculteurDashboardController extends AbstractController
 
     // ── Événements ───────────────────────────────────────────────────────────
 
-    #[Route('/evenements', name: 'evenements')]
-    public function evenements(): Response
-    {
-        return new Response('Module Événements — à implémenter');
-    }
+   
 
     #[Route('/evenements/participations', name: 'participations')]
     public function participations(): Response

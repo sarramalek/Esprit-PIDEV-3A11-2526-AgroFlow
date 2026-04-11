@@ -89,7 +89,6 @@
             padding: 14px 20px 6px;
         }
 
-        /* Parent item */
         .nav-item { position: relative; }
 
         .nav-link {
@@ -133,7 +132,6 @@
             transform: rotate(90deg);
         }
 
-        /* Sub-menu */
         .nav-sub {
             list-style: none;
             max-height: 0;
@@ -182,7 +180,12 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            cursor: pointer;
+            padding: 6px 8px;
+            border-radius: 10px;
+            transition: background 0.2s;
         }
+        .sidebar-user:hover { background: rgba(255,255,255,0.05); }
         .sidebar-avatar {
             width: 36px; height: 36px;
             border-radius: 10px;
@@ -200,13 +203,57 @@
         .sidebar-user-role {
             font-size: 11px; color: rgba(255,255,255,0.4);
         }
-        .sidebar-logout {
-            color: rgba(255,255,255,0.4);
-            font-size: 14px;
-            transition: color 0.2s;
-            text-decoration: none;
+
+        /* Profile panel inputs */
+        .pf-input {
+            display: none;
+            width: 100%;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 12px;
+            padding: 5px 8px;
+            margin-top: 3px;
+            outline: none;
+            font-family: 'DM Sans', sans-serif;
+            transition: border 0.15s;
         }
-        .sidebar-logout:hover { color: #ff7b7b; }
+        .pf-input:focus {
+            border-color: rgba(74,140,63,0.8);
+            background: rgba(255,255,255,0.12);
+        }
+        .pf-input.mono { font-family: 'DM Mono', monospace; }
+
+        /* Toolbar buttons */
+        .pf-btn {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.65);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.15s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .pf-btn:hover { background: rgba(255,255,255,0.14); color: #fff; }
+        .pf-btn.save {
+            background: rgba(74,140,63,0.3);
+            border-color: rgba(74,140,63,0.5);
+            color: #C8E6C0;
+        }
+        .pf-btn.save:hover { background: rgba(74,140,63,0.5); color: #fff; }
+        .pf-btn.cancel {
+            background: rgba(220,60,60,0.1);
+            border-color: rgba(220,60,60,0.25);
+            color: #ff9090;
+        }
+        .pf-btn.cancel:hover { background: rgba(220,60,60,0.22); }
 
         /* ═══════════════════════════════
            TOPBAR
@@ -254,9 +301,7 @@
         }
         .topbar-btn:hover { background: var(--cream-dark); color: var(--navy); }
 
-        .topbar-badge {
-            position: relative;
-        }
+        .topbar-badge { position: relative; }
         .topbar-badge::after {
             content: '';
             position: absolute;
@@ -279,315 +324,384 @@
             background: var(--cream);
         }
 
+        /* Flash messages */
+        .flash-success {
+            background: #e8f5e2;
+            border: 1px solid #a3d48a;
+            color: #2D5A27;
+            padding: 12px 18px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .flash-error {
+            background: #fdecea;
+            border: 1px solid #f5a7a7;
+            color: #8b1a1a;
+            padding: 12px 18px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
         {% block stylesheets %}{% endblock %}
     </style>
 </head>
+{# Dans base_admin.html.twig, avant </body> #}
+<script>
+function checkAndRedirect() {
+    fetch('{{ path("app_check_session") }}', { credentials: 'same-origin' })
+        .then(r => {
+            if (r.status === 401 || r.redirected) {
+                window.location.replace('{{ path("app_login") }}');
+            }
+        });
+}
+
+// ── Détection immédiate bouton retour ─────────────────────────────────────
+window.addEventListener('pageshow', function (e) {
+    if (e.persisted) {
+        checkAndRedirect();
+    }
+});
+
+// ── Dès que l'onglet redevient visible ───────────────────────────────────
+document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'visible') {
+        checkAndRedirect();
+    }
+});
+
+// ── Au chargement initial de la page ─────────────────────────────────────
+checkAndRedirect();
+</script>
 <body>
 
-    <!-- ═══════ SIDEBAR ═══════ -->
-    <aside class="sidebar" id="sidebar">
+<!-- ═══════ SIDEBAR ═══════ -->
+<aside class="sidebar" id="sidebar">
 
-        <div class="sidebar-brand">
-            <img src="{{ asset('assets/img/Logo.png') }}" alt="AgroFlow">
-            <div class="sidebar-brand-text">Agro<span>Flow</span></div>
+    <div class="sidebar-brand">
+        <img src="{{ asset('assets/img/Logo.png') }}" alt="AgroFlow">
+        <div class="sidebar-brand-text">Agro<span>Flow</span></div>
+    </div>
+
+    <nav class="sidebar-nav">
+
+        <!-- Dashboard -->
+        <a href="{{ path('admin_dashboard') }}" class="nav-link {% if app.request.get('_route') == 'admin_dashboard' %}active{% endif %}">
+            <span class="nav-icon"><i class="fa fa-gauge-high"></i></span>
+            <span class="nav-label">Tableau de bord</span>
+        </a>
+
+        <div class="nav-section-label">Gestion</div>
+
+        <!-- Gestion Utilisateurs -->
+        <div class="nav-item {% if app.request.get('_route') in ['admin_users','admin_offres','admin_abonnements','admin_taches'] %}open{% endif %}">
+            <div class="nav-link {% if app.request.get('_route') in ['admin_users','admin_offres','admin_abonnements','admin_taches'] %}active{% endif %}"
+                 onclick="toggleMenu(this)">
+                <span class="nav-icon"><i class="fa fa-users"></i></span>
+                <span class="nav-label">Gestion Utilisateurs</span>
+                <i class="fa fa-chevron-right nav-arrow"></i>
+            </div>
+            <ul class="nav-sub">
+                <li><a href="{{ path('admin_users_list') }}" class="{% if app.request.get('_route') == 'admin_users' %}active{% endif %}">
+                    <span class="sub-dot"></span> Utilisateurs
+                </a></li>
+                <li><a href="{{ path('app_offre_list') }}" class="{% if app.request.get('_route') == 'admin_offres' %}active{% endif %}">
+                    <span class="sub-dot"></span> Offres
+                </a></li>
+                <li><a href="{{ path('admin_abonnements_index') }}" class="{% if app.request.get('_route') == 'admin_abonnements' %}active{% endif %}">
+                    <span class="sub-dot"></span> Abonnements
+                </a></li>
+               
+            </ul>
         </div>
 
-        <nav class="sidebar-nav">
-
-            <!-- Dashboard -->
-            <a href="{{ path('admin_dashboard') }}" class="nav-link {% if app.request.get('_route') == 'admin_dashboard' %}active{% endif %}">
-                <span class="nav-icon"><i class="fa fa-gauge-high"></i></span>
-                <span class="nav-label">Tableau de bord</span>
-            </a>
-
-            <div class="nav-section-label">Gestion</div>
-
-            <!-- Gestion Utilisateurs -->
-            <div class="nav-item {% if app.request.get('_route') in ['admin_users','admin_offres','admin_abonnements','admin_taches'] %}open{% endif %}">
-                <div class="nav-link {% if app.request.get('_route') in ['admin_users','admin_offres','admin_abonnements','admin_taches'] %}active{% endif %}"
-                     onclick="toggleMenu(this)">
-                    <span class="nav-icon"><i class="fa fa-users"></i></span>
-                    <span class="nav-label">Gestion Utilisateurs</span>
-                    <i class="fa fa-chevron-right nav-arrow"></i>
-                </div>
-                <ul class="nav-sub">
-                    <li><a href="{{ path('admin_users_list') }}" class="{% if app.request.get('_route') == 'admin_users' %}active{% endif %}">
-                        <span class="sub-dot"></span> Utilisateurs
-                    </a></li>
-                    <li><a href="{{ path('app_offre_list') }}" class="{% if app.request.get('_route') == 'admin_offres' %}active{% endif %}">
-                        <span class="sub-dot"></span> Offres
-                    </a></li>
-                    <li><a href="{{ path('admin_abonnements_index') }}" class="{% if app.request.get('_route') == 'admin_abonnements' %}active{% endif %}">
-                        <span class="sub-dot"></span> Abonnements
-                    </a></li>
-                    <li><a href="{{ path('app_tache_index') }}" class="{% if app.request.get('_route') == 'admin_taches' %}active{% endif %}">
-                        <span class="sub-dot"></span> Tâches
-                    </a></li>
-                </ul>
-            </div>
-
-            <!-- Gestion Animaux -->
-            <div class="nav-item {% if app.request.get('_route') in ['admin_animaux','admin_examens'] %}open{% endif %}">
-                <div class="nav-link {% if app.request.get('_route') in ['admin_animaux','admin_examens'] %}active{% endif %}"
+         <!-- Gestion Animaux -->
+            <div class="nav-item {% if app.request.get('_route') in ['admin_animaux_index','admin_animaux_new','admin_animaux_edit','admin_examens_index','admin_examens_new','admin_examens_edit'] %}open{% endif %}">
+                <div class="nav-link {% if app.request.get('_route') in ['admin_animaux_index','admin_animaux_new','admin_animaux_edit','admin_examens_index','admin_examens_new','admin_examens_edit'] %}active{% endif %}"
                      onclick="toggleMenu(this)">
                     <span class="nav-icon"><i class="fa fa-paw"></i></span>
                     <span class="nav-label">Gestion Animaux</span>
                     <i class="fa fa-chevron-right nav-arrow"></i>
                 </div>
                 <ul class="nav-sub">
-                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_animaux' %}active{% endif %}">
+                    <li><a href="{{ path('admin_animaux_index') }}" class="{% if app.request.get('_route') in ['admin_animaux_index','admin_animaux_new','admin_animaux_edit'] %}active{% endif %}">
                         <span class="sub-dot"></span> Animaux
                     </a></li>
-                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_examens' %}active{% endif %}">
+                    <li><a href="{{ path('admin_examens_index') }}" class="{% if app.request.get('_route') in ['admin_examens_index','admin_examens_new','admin_examens_edit'] %}active{% endif %}">
                         <span class="sub-dot"></span> Examens
                     </a></li>
                 </ul>
             </div>
 
+        <!-- Gestion Stocks -->
+        
             <!-- Gestion Stocks -->
-            <div class="nav-item {% if app.request.get('_route') in ['admin_categories','admin_produits'] %}open{% endif %}">
-                <div class="nav-link {% if app.request.get('_route') in ['admin_categories','admin_produits'] %}active{% endif %}"
-                     onclick="toggleMenu(this)">
-                    <span class="nav-icon"><i class="fa fa-boxes-stacked"></i></span>
-                    <span class="nav-label">Gestion Stocks</span>
-                    <i class="fa fa-chevron-right nav-arrow"></i>
-                </div>
-                <ul class="nav-sub">
-                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_categories' %}active{% endif %}">
-                        <span class="sub-dot"></span> Catégories
-                    </a></li>
-                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_produits' %}active{% endif %}">
-                        <span class="sub-dot"></span> Produits
-                    </a></li>
-                </ul>
-            </div>
+<div class="nav-item {% if app.request.get('_route') in ['admin_categories', 'admin_stock_new'] %}open{% endif %}">
+    <div class="nav-link {% if app.request.get('_route') in ['admin_categories', 'admin_stock_new'] %}active{% endif %}"
+         onclick="toggleMenu(this)">
+        <span class="nav-icon"><i class="fa fa-boxes-stacked"></i></span>
+        <span class="nav-label">Gestion Stocks</span>
+        <i class="fa fa-chevron-right nav-arrow"></i>
+    </div>
+    <ul class="nav-sub">
+        <li>
+            {# Remplace '#' par ta route catégories si elle existe déjà #}
+            <a href="{{ path('admin_categorie_new') }}" class="{% if app.request.get('_route') == 'admin_categories' %}active{% endif %}">
+                <span class="sub-dot"></span> Catégories
+            </a>
+        </li>
+        <li>
+            {# LIEN VERS TON FORMULAIRE PRODUIT #}
+            <a href="{{ path('admin_stock_new') }}" class="{% if app.request.get('_route') == 'admin_stock_new' %}active{% endif %}">
+                <span class="sub-dot"></span> Produits
+            </a>
+        </li>
+    </ul>
+</div>
 
-            <!-- Gestion Événements -->
-            <div class="nav-item {% if app.request.get('_route') in ['admin_evenements','admin_participations'] %}open{% endif %}">
-                <div class="nav-link {% if app.request.get('_route') in ['admin_evenements','admin_participations'] %}active{% endif %}"
+         <!-- Gestion Événements -->
+            <div class="nav-item {% if app.request.get('_route') in ['evenement_index','participation_index'] %}open{% endif %}">
+                <div class="nav-link {% if app.request.get('_route') in ['evenement_index','participation_index'] %}active{% endif %}"
                      onclick="toggleMenu(this)">
                     <span class="nav-icon"><i class="fa fa-calendar-days"></i></span>
                     <span class="nav-label">Gestion Événements</span>
                     <i class="fa fa-chevron-right nav-arrow"></i>
                 </div>
                 <ul class="nav-sub">
-                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_evenements' %}active{% endif %}">
+                    <li><a href="{{ path('evenement_index') }}" class="{% if app.request.get('_route') == 'evenement_index' %}active{% endif %}">
                         <span class="sub-dot"></span> Événements
                     </a></li>
-                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_participations' %}active{% endif %}">
+                    <li><a href="{{ path('categorie_evenement_index') }}" class="{% if app.request.get('_route') == 'categorie_evenement_index' %}active{% endif %}">
+                        <span class="sub-dot"></span> Categories Événements
+                    </a></li>
+                    <li><a href="{{ path('participation_index') }}" class="{% if app.request.get('_route') == 'participation_index' %}active{% endif %}">
                         <span class="sub-dot"></span> Participations
                     </a></li>
                 </ul>
             </div>
-
-            <!-- Gestion Terrains -->
-            <div class="nav-item {% if app.request.get('_route') in ['admin_terrains','admin_rotations'] %}open{% endif %}">
-                <div class="nav-link {% if app.request.get('_route') in ['admin_terrains','admin_rotations'] %}active{% endif %}"
-                     onclick="toggleMenu(this)">
-                    <span class="nav-icon"><i class="fa fa-map"></i></span>
-                    <span class="nav-label">Gestion Terrains</span>
-                    <i class="fa fa-chevron-right nav-arrow"></i>
-                </div>
-                <ul class="nav-sub">
-                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_terrains' %}active{% endif %}">
+        <!-- Gestion Terrains -->
+        <div class="nav-item {% if app.request.get('_route') in ['admin_terrains','admin_terrains_new','admin_terrains_edit','admin_terrains_show','admin_rotations','admin_rotations_new','admin_rotations_edit','admin_plantes','admin_plantes_new','admin_plantes_edit'] %}open{% endif %}">
+            <div class="nav-link {% if app.request.get('_route') in ['admin_terrains','admin_terrains_new','admin_terrains_edit','admin_terrains_show','admin_rotations','admin_rotations_new','admin_rotations_edit','admin_plantes','admin_plantes_new','admin_plantes_edit'] %}active{% endif %}"
+                 onclick="toggleMenu(this)">
+                <span class="nav-icon"><i class="fa fa-map"></i></span>
+                <span class="nav-label">Gestion Terrains</span>
+                <i class="fa fa-chevron-right nav-arrow"></i>
+            </div>
+            <ul class="nav-sub">
+                <li>
+                    <a href="{{ path('admin_terrains') }}"
+                       class="{% if app.request.get('_route') starts with 'admin_terrains' %}active{% endif %}">
                         <span class="sub-dot"></span> Terrains
-                    </a></li>
-                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_rotations' %}active{% endif %}">
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ path('admin_rotations') }}"
+                       class="{% if app.request.get('_route') starts with 'admin_rotations' %}active{% endif %}">
                         <span class="sub-dot"></span> Rotations
                     </a></li>
+                     <li>
+            <a href="{{ path('admin_plantes') }}"
+               class="{% if app.request.get('_route') starts with 'admin_plantes' %}active{% endif %}">
+                <span class="sub-dot"></span> Plantes
+            </a>
+        </li>
                 </ul>
             </div>
 
             <!-- Gestion Matériels -->
-            <div class="nav-item {% if app.request.get('_route') in ['admin_machines','admin_maintenances'] %}open{% endif %}">
-                <div class="nav-link {% if app.request.get('_route') in ['admin_machines','admin_maintenances'] %}active{% endif %}"
+            <div class="nav-item {% if app.request.get('_route') starts with 'admin_machines' or app.request.get('_route') starts with 'admin_maintenances' %}open{% endif %}">
+    <div class="nav-link {% if app.request.get('_route') starts with 'admin_machines' or app.request.get('_route') starts with 'admin_maintenances' %}active{% endif %}"
                      onclick="toggleMenu(this)">
                     <span class="nav-icon"><i class="fa fa-tractor"></i></span>
                     <span class="nav-label">Gestion Matériels</span>
                     <i class="fa fa-chevron-right nav-arrow"></i>
                 </div>
-                <ul class="nav-sub">
-                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_machines' %}active{% endif %}">
-                        <span class="sub-dot"></span> Machines
-                    </a></li>
-                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_maintenances' %}active{% endif %}">
-                        <span class="sub-dot"></span> Maintenances
-                    </a></li>
-                </ul>
+                 <ul class="nav-sub">
+        <li>
+            <a href="{{ path('admin_machines_index') }}"
+               class="{% if app.request.get('_route') starts with 'admin_machines' %}active{% endif %}">
+                <span class="sub-dot"></span> Machines
+            </a>
+        </li>
+        <li>
+            <a href="{{ path('admin_maintenances_index') }}"
+               class="{% if app.request.get('_route') starts with 'admin_maintenances' %}active{% endif %}">
+                <span class="sub-dot"></span> Maintenances
+            </a>
+        </li>
+    </ul>
             </div>
 
         </nav>
 
-        <!-- Footer -->
-         <!-- ═══════ SIDEBAR FOOTER (remplace l'ancien sidebar-footer) ═══════ -->
-        <div class="sidebar-footer">
-            <div class="sidebar-user" id="sidebarUserBtn" onclick="toggleUserPanel()" title="Mon compte">
-                <div class="sidebar-avatar">
-                    {{ app.user ? (app.user.prenom|first|upper ~ app.user.nom|first|upper) : 'AD' }}
-                </div>
-                <div class="sidebar-user-info">
-                    <div class="sidebar-user-name">
-                        {{ app.user ? (app.user.prenom ~ ' ' ~ app.user.nom) : 'Administrateur' }}
-                    </div>
-                    <div class="sidebar-user-role">Administrateur</div>
-                </div>
-                <i class="fa fa-chevron-up" id="userChevron"
-                   style="font-size:10px; color:rgba(255,255,255,0.35); transition:transform 0.25s;"></i>
+    <!-- ═══════ SIDEBAR FOOTER ═══════ -->
+    <div class="sidebar-footer">
+
+        <div class="sidebar-user" id="sidebarUserBtn" onclick="toggleUserPanel()">
+            <div class="sidebar-avatar" id="pfAvatarSmall">
+                {{ app.user ? (app.user.prenom|first|upper ~ app.user.nom|first|upper) : 'AD' }}
             </div>
+            <div class="sidebar-user-info">
+                <div class="sidebar-user-name" id="pfNameSmall">
+                    {{ app.user ? (app.user.prenom ~ ' ' ~ app.user.nom) : 'Administrateur' }}
+                </div>
+                <div class="sidebar-user-role">Administrateur</div>
+            </div>
+            <i class="fa fa-chevron-up" id="userChevron"
+               style="font-size:10px; color:rgba(255,255,255,0.35); transition:transform 0.25s; flex-shrink:0;"></i>
+        </div>
 
-            {# ── Dropdown infos compte ── #}
-            <div id="userPanel" style="
-                max-height: 0;
-                overflow: hidden;
-                transition: max-height 0.35s ease;
-                margin-top: 0;
-            ">
-                <div style="
-                    background: rgba(0,0,0,0.25);
-                    border-radius: 10px;
-                    margin-top: 10px;
-                    overflow: hidden;
-                ">
-                    {# Avatar + nom centré #}
-                    <div style="
-                        padding: 18px 16px 14px;
-                        text-align: center;
-                        border-bottom: 1px solid rgba(255,255,255,0.07);
-                    ">
-                        <div style="
-                            width: 52px; height: 52px; border-radius: 14px;
-                            background: linear-gradient(135deg, #4A8C3F, #2D5A27);
-                            display: flex; align-items: center; justify-content: center;
-                            font-size: 18px; font-weight: 700; color: white;
-                            margin: 0 auto 10px;
-                        ">
-                            {{ app.user ? (app.user.prenom|first|upper ~ app.user.nom|first|upper) : 'AD' }}
-                        </div>
-                        <div style="font-size: 14px; font-weight: 700; color: #fff;">
-                            {{ app.user ? (app.user.prenom ~ ' ' ~ app.user.nom) : '—' }}
-                        </div>
-                        <div style="
-                            display: inline-flex; align-items: center; gap: 5px;
-                            background: rgba(74,140,63,0.25); border: 1px solid rgba(74,140,63,0.35);
-                            color: #C8E6C0; font-size: 11px; font-weight: 600;
-                            padding: 3px 10px; border-radius: 20px; margin-top: 6px;
-                        ">
-                            <span style="width:5px;height:5px;border-radius:50%;background:#6FE065;display:inline-block;"></span>
-                            Administrateur
-                        </div>
+        <div id="userPanel" style="max-height:0; overflow:hidden; transition:max-height 0.4s ease; margin-top:0;">
+            <div style="background:rgba(0,0,0,0.25); border-radius:10px; margin-top:10px; overflow:hidden;">
+
+                <!-- En-tête avatar -->
+                <div style="padding:18px 16px 14px; text-align:center; border-bottom:1px solid rgba(255,255,255,0.07);">
+                    <div id="pfAvatarBig" style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#4A8C3F,#2D5A27);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:white;margin:0 auto 10px;">
+                        {{ app.user ? (app.user.prenom|first|upper ~ app.user.nom|first|upper) : 'AD' }}
                     </div>
+                    <div id="pfNameBig" style="font-size:14px;font-weight:700;color:#fff;">
+                        {{ app.user ? (app.user.prenom ~ ' ' ~ app.user.nom) : '—' }}
+                    </div>
+                    <div style="display:inline-flex;align-items:center;gap:5px;background:rgba(74,140,63,0.25);border:1px solid rgba(74,140,63,0.35);color:#C8E6C0;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;margin-top:6px;">
+                        <span style="width:5px;height:5px;border-radius:50%;background:#6FE065;display:inline-block;"></span>
+                        Administrateur
+                    </div>
+                </div>
 
-                    {# Infos #}
-                    <div style="padding: 10px 0;">
+                <!-- Barre d'outils édition -->
+                <div style="display:flex;justify-content:flex-end;padding:8px 12px 4px;gap:6px;">
+                    <button class="pf-btn" id="btnEdit" onclick="startProfileEdit()">
+                        <i class="fa fa-pen" style="font-size:10px;"></i> Modifier
+                    </button>
+                    <button class="pf-btn save" id="btnSave" onclick="submitProfileEdit()" style="display:none;">
+                        <i class="fa fa-check" style="font-size:10px;"></i> Enregistrer
+                    </button>
+                    <button class="pf-btn cancel" id="btnCancel" onclick="cancelProfileEdit()" style="display:none;">
+                        <i class="fa fa-times" style="font-size:10px;"></i> Annuler
+                    </button>
+                </div>
 
-                        {% if app.user and app.user.email %}
-                        <div style="
-                            display: flex; align-items: center; gap: 10px;
-                            padding: 9px 16px;
-                            border-bottom: 1px solid rgba(255,255,255,0.05);
-                        ">
-                            <div style="
-                                width: 28px; height: 28px; border-radius: 8px;
-                                background: rgba(255,255,255,0.07);
-                                display: flex; align-items: center; justify-content: center;
-                                flex-shrink: 0;
-                            ">
-                                <i class="fa fa-envelope" style="font-size:11px; color:rgba(255,255,255,0.5);"></i>
+                <!-- Formulaire de profil — action AJAX, pas de submit classique -->
+                <form id="profileForm" onsubmit="return false;">
+
+                    <div style="padding:4px 0;">
+
+                        <!-- Email -->
+                        {% if app.user and app.user.email is defined %}
+                        <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">
+                            <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
+                                <i class="fa fa-envelope" style="font-size:11px;color:rgba(255,255,255,0.5);"></i>
                             </div>
-                            <div>
-                                <div style="font-size:10px; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.06em;">Email</div>
-                                <div style="font-size:12px; color:rgba(255,255,255,0.75); margin-top:1px; word-break:break-all;">
-                                    {{ app.user.email }}
-                                </div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.06em;">Email</div>
+                                <div class="pf-view" style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:1px;word-break:break-all;">{{ app.user.email }}</div>
+                                <input class="pf-input" name="email" type="email" value="{{ app.user.email }}">
                             </div>
                         </div>
                         {% endif %}
 
-                        {% if app.user and app.user.cin %}
-                        <div style="
-                            display: flex; align-items: center; gap: 10px;
-                            padding: 9px 16px;
-                            border-bottom: 1px solid rgba(255,255,255,0.05);
-                        ">
-                            <div style="
-                                width: 28px; height: 28px; border-radius: 8px;
-                                background: rgba(255,255,255,0.07);
-                                display: flex; align-items: center; justify-content: center;
-                                flex-shrink: 0;
-                            ">
-                                <i class="fa fa-id-card" style="font-size:11px; color:rgba(255,255,255,0.5);"></i>
+                        <!-- Prénom -->
+                        {% if app.user and app.user.prenom is defined %}
+                        <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">
+                            <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
+                                <i class="fa fa-user" style="font-size:11px;color:rgba(255,255,255,0.5);"></i>
                             </div>
-                            <div>
-                                <div style="font-size:10px; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.06em;">CIN</div>
-                                <div style="font-size:12px; color:rgba(255,255,255,0.75); margin-top:1px; font-family:'DM Mono',monospace;">
-                                    {{ app.user.cin }}
-                                </div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.06em;">Prénom</div>
+                                <div class="pf-view" style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:1px;">{{ app.user.prenom }}</div>
+                                <input class="pf-input" name="prenom" type="text" value="{{ app.user.prenom }}">
                             </div>
                         </div>
                         {% endif %}
 
-                        {% if app.user and app.user.tel %}
-                        <div style="
-                            display: flex; align-items: center; gap: 10px;
-                            padding: 9px 16px;
-                            border-bottom: 1px solid rgba(255,255,255,0.05);
-                        ">
-                            <div style="
-                                width: 28px; height: 28px; border-radius: 8px;
-                                background: rgba(255,255,255,0.07);
-                                display: flex; align-items: center; justify-content: center;
-                                flex-shrink: 0;
-                            ">
-                                <i class="fa fa-phone" style="font-size:11px; color:rgba(255,255,255,0.5);"></i>
+                        <!-- Nom -->
+                        {% if app.user and app.user.nom is defined %}
+                        <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">
+                            <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
+                                <i class="fa fa-user" style="font-size:11px;color:rgba(255,255,255,0.5);"></i>
                             </div>
-                            <div>
-                                <div style="font-size:10px; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.06em;">Téléphone</div>
-                                <div style="font-size:12px; color:rgba(255,255,255,0.75); margin-top:1px;">
-                                    {{ app.user.tel }}
-                                </div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.06em;">Nom</div>
+                                <div class="pf-view" style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:1px;">{{ app.user.nom }}</div>
+                                <input class="pf-input" name="nom" type="text" value="{{ app.user.nom }}">
                             </div>
                         </div>
                         {% endif %}
 
-                        {% if app.user and app.user.ville %}
-                        <div style="
-                            display: flex; align-items: center; gap: 10px;
-                            padding: 9px 16px;
-                            border-bottom: 1px solid rgba(255,255,255,0.05);
-                        ">
-                            <div style="
-                                width: 28px; height: 28px; border-radius: 8px;
-                                background: rgba(255,255,255,0.07);
-                                display: flex; align-items: center; justify-content: center;
-                                flex-shrink: 0;
-                            ">
-                                <i class="fa fa-location-dot" style="font-size:11px; color:rgba(255,255,255,0.5);"></i>
+                        <!-- CIN -->
+                        {% if app.user and app.user.cin is defined %}
+                        <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">
+                            <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
+                                <i class="fa fa-id-card" style="font-size:11px;color:rgba(255,255,255,0.5);"></i>
                             </div>
-                            <div>
-                                <div style="font-size:10px; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.06em;">Ville</div>
-                                <div style="font-size:12px; color:rgba(255,255,255,0.75); margin-top:1px;">
-                                    {{ app.user.ville }}
-                                </div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.06em;">CIN</div>
+                                <div class="pf-view" style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:1px;font-family:'DM Mono',monospace;">{{ app.user.cin }}</div>
+                                <input class="pf-input mono" name="cin" type="text" value="{{ app.user.cin }}" maxlength="8">
                             </div>
                         </div>
                         {% endif %}
 
-                        {% if app.user and app.user.dateCreationcpt %}
-                        <div style="
-                            display: flex; align-items: center; gap: 10px;
-                            padding: 9px 16px;
-                        ">
-                            <div style="
-                                width: 28px; height: 28px; border-radius: 8px;
-                                background: rgba(255,255,255,0.07);
-                                display: flex; align-items: center; justify-content: center;
-                                flex-shrink: 0;
-                            ">
-                                <i class="fa fa-calendar" style="font-size:11px; color:rgba(255,255,255,0.5);"></i>
+                        <!-- Téléphone -->
+                        {% if app.user and app.user.tel is defined %}
+                        <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">
+                            <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
+                                <i class="fa fa-phone" style="font-size:11px;color:rgba(255,255,255,0.5);"></i>
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.06em;">Téléphone</div>
+                                <div class="pf-view" style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:1px;">{{ app.user.tel }}</div>
+                                <input class="pf-input" name="tel" type="tel" value="{{ app.user.tel }}">
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Ville -->
+                        {% if app.user and app.user.ville is defined %}
+                        <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">
+                            <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
+                                <i class="fa fa-location-dot" style="font-size:11px;color:rgba(255,255,255,0.5);"></i>
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.06em;">Ville</div>
+                                <div class="pf-view" style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:1px;">{{ app.user.ville }}</div>
+                                <input class="pf-input" name="ville" type="text" value="{{ app.user.ville }}">
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Nouveau mot de passe — visible uniquement en mode édition -->
+                        <div id="pwdRow" style="display:none;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">
+                            <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
+                                <i class="fa fa-lock" style="font-size:11px;color:rgba(255,255,255,0.5);"></i>
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.06em;">Nouveau mot de passe</div>
+                                <input class="pf-input" name="password" type="password"
+                                       placeholder="Laisser vide pour ne pas changer"
+                                       style="display:block;">
+                            </div>
+                        </div>
+
+                        <!-- Date création — lecture seule -->
+                        {% if app.user and app.user.dateCreationcpt is defined %}
+                        <div style="display:flex;align-items:center;gap:10px;padding:9px 16px;">
+                            <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="fa fa-calendar" style="font-size:11px;color:rgba(255,255,255,0.5);"></i>
                             </div>
                             <div>
-                                <div style="font-size:10px; color:rgba(255,255,255,0.35); text-transform:uppercase; letter-spacing:0.06em;">Membre depuis</div>
-                                <div style="font-size:12px; color:rgba(255,255,255,0.75); margin-top:1px;">
+                                <div style="font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.06em;">Membre depuis</div>
+                                <div style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:1px;">
                                     {{ app.user.dateCreationcpt|date('d/m/Y') }}
                                 </div>
                             </div>
@@ -595,88 +709,234 @@
                         {% endif %}
 
                     </div>
+                </form>
 
-                    {# Déconnexion #}
-                    <div style="padding: 10px 12px; border-top: 1px solid rgba(255,255,255,0.07);">
-                        <a href="{{ path('app_logout') }}" style="
-                            display: flex; align-items: center; justify-content: center; gap: 8px;
-                            padding: 10px; border-radius: 8px;
-                            background: rgba(220,60,60,0.1); border: 1px solid rgba(220,60,60,0.2);
-                            color: #ff8080; text-decoration: none;
-                            font-size: 13px; font-weight: 600;
-                            transition: all 0.2s;
-                        " onmouseover="this.style.background='rgba(220,60,60,0.22)'"
-                           onmouseout="this.style.background='rgba(220,60,60,0.1)'">
-                            <i class="fa fa-arrow-right-from-bracket"></i>
-                            Déconnexion
-                        </a>
-                    </div>
+                <!-- Déconnexion -->
+                <div style="padding:10px 12px;border-top:1px solid rgba(255,255,255,0.07);">
+                    <a href="{{ path('app_logout') }}"
+                       style="display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;border-radius:8px;background:rgba(220,60,60,0.1);border:1px solid rgba(220,60,60,0.2);color:#ff8080;text-decoration:none;font-size:13px;font-weight:600;transition:all 0.2s;"
+                       onmouseover="this.style.background='rgba(220,60,60,0.22)'"
+                       onmouseout="this.style.background='rgba(220,60,60,0.1)'">
+                        <i class="fa fa-arrow-right-from-bracket"></i>
+                        Déconnexion
+                    </a>
                 </div>
+
             </div>
         </div>
+    </div>
+    {# /sidebar-footer #}
 
-        {# Script toggle panel #}
-        <script>
-            var _userPanelOpen = false;
-            function toggleUserPanel() {
-                _userPanelOpen = !_userPanelOpen;
-                const panel   = document.getElementById('userPanel');
-                const chevron = document.getElementById('userChevron');
-                const btn     = document.getElementById('sidebarUserBtn');
-                panel.style.maxHeight   = _userPanelOpen ? '500px' : '0';
-                chevron.style.transform = _userPanelOpen ? 'rotate(180deg)' : 'rotate(0deg)';
-                btn.style.background    = _userPanelOpen ? 'rgba(255,255,255,0.06)' : '';
-                btn.style.borderRadius  = _userPanelOpen ? '10px' : '';
-            }
-        </script>
+</aside>
 
-    </aside>
-
-    <!-- ═══════ TOPBAR ═══════ -->
-    <header class="topbar">
-        <div class="topbar-left">
-            <div class="topbar-title">{% block page_title %}Dashboard{% endblock %}</div>
-            <div class="topbar-breadcrumb">
-                AgroFlow / <span>{% block breadcrumb %}Admin{% endblock %}</span>
-            </div>
+<!-- ═══════ TOPBAR ═══════ -->
+<header class="topbar">
+    <div class="topbar-left">
+        <div class="topbar-title">{% block page_title %}Dashboard{% endblock %}</div>
+        <div class="topbar-breadcrumb">
+            AgroFlow / <span>{% block breadcrumb %}Admin{% endblock %}</span>
         </div>
-        <div class="topbar-right">
-            <a href="{{ path('app_about') }}" class="topbar-btn" title="Site public">
-                <i class="fa fa-globe"></i>
-            </a>
-            <div class="topbar-btn topbar-badge" title="Notifications">
-                <i class="fa fa-bell"></i>
-            </div>
-            <a href="{{ path('app_logout') }}" class="topbar-btn" title="Déconnexion">
-                <i class="fa fa-power-off"></i>
-            </a>
+    </div>
+    <div class="topbar-right">
+        <a href="{{ path('app_about') }}" class="topbar-btn" title="Site public">
+            <i class="fa fa-globe"></i>
+        </a>
+        <div class="topbar-btn topbar-badge" title="Notifications">
+            <i class="fa fa-bell"></i>
         </div>
-    </header>
+        <a href="{{ path('app_logout') }}" class="topbar-btn" title="Déconnexion">
+            <i class="fa fa-power-off"></i>
+        </a>
+    </div>
+</header>
 
-    <!-- ═══════ CONTENT ═══════ -->
-    <main class="main-wrapper">
-        {% block body %}{% endblock %}
-    </main>
+<!-- ═══════ CONTENT ═══════ -->
+<main class="main-wrapper">
 
-    <script>
-        function toggleMenu(el) {
-            const item = el.closest('.nav-item');
-            const isOpen = item.classList.contains('open');
-            // Close all
-            document.querySelectorAll('.nav-item.open').forEach(i => i.classList.remove('open'));
-            // Open clicked if it was closed
-            if (!isOpen) item.classList.add('open');
+    {% for message in app.flashes('success') %}
+        <div class="flash-success">
+            <i class="fa fa-circle-check"></i> {{ message }}
+        </div>
+    {% endfor %}
+    {% for message in app.flashes('error') %}
+        <div class="flash-error">
+            <i class="fa fa-circle-xmark"></i> {{ message }}
+        </div>
+    {% endfor %}
+
+    {% block body %}{% endblock %}
+</main>
+
+<!-- ═══════ SCRIPTS ═══════ -->
+<script>
+    /* ── Navigation sidebar ── */
+    function toggleMenu(el) {
+        var item = el.closest('.nav-item');
+        var isOpen = item.classList.contains('open');
+        document.querySelectorAll('.nav-item.open').forEach(function(i) { i.classList.remove('open'); });
+        if (!isOpen) item.classList.add('open');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var active = document.querySelector('.nav-sub a.active');
+        if (active) active.closest('.nav-item') && active.closest('.nav-item').classList.add('open');
+    });
+
+    /* ── Panneau utilisateur ── */
+    var _userPanelOpen = false;
+
+    function toggleUserPanel() {
+        _userPanelOpen = !_userPanelOpen;
+        var panel   = document.getElementById('userPanel');
+        var chevron = document.getElementById('userChevron');
+        var btn     = document.getElementById('sidebarUserBtn');
+        panel.style.maxHeight   = _userPanelOpen ? '700px' : '0';
+        chevron.style.transform = _userPanelOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+        btn.style.background    = _userPanelOpen ? 'rgba(255,255,255,0.06)' : '';
+    }
+
+    /* ── Édition profil ── */
+    var _pfOriginals = {};
+
+    function startProfileEdit() {
+        document.querySelectorAll('.pf-input[name]').forEach(function(inp) {
+            _pfOriginals[inp.name] = inp.value;
+        });
+
+        document.querySelectorAll('.pf-view').forEach(function(el) { el.style.display = 'none'; });
+        document.querySelectorAll('.pf-input').forEach(function(el) { el.style.display = 'block'; });
+        document.getElementById('pwdRow').style.display = 'flex';
+
+        document.getElementById('btnEdit').style.display   = 'none';
+        document.getElementById('btnSave').style.display   = 'inline-flex';
+        document.getElementById('btnCancel').style.display = 'inline-flex';
+
+        document.getElementById('userPanel').style.maxHeight = '900px';
+
+        var first = document.querySelector('.pf-input[name="email"]');
+        if (first) first.focus();
+    }
+
+    function cancelProfileEdit() {
+        document.querySelectorAll('.pf-input[name]').forEach(function(inp) {
+            if (_pfOriginals[inp.name] !== undefined) inp.value = _pfOriginals[inp.name];
+        });
+        var pwd = document.querySelector('.pf-input[name="password"]');
+        if (pwd) pwd.value = '';
+
+        document.querySelectorAll('.pf-view').forEach(function(el) { el.style.display = 'block'; });
+        document.querySelectorAll('.pf-input').forEach(function(el) { el.style.display = 'none'; });
+        document.getElementById('pwdRow').style.display = 'none';
+
+        document.getElementById('btnEdit').style.display   = 'inline-flex';
+        document.getElementById('btnSave').style.display   = 'none';
+        document.getElementById('btnCancel').style.display = 'none';
+    }
+
+    function submitProfileEdit() {
+        var emailInp = document.querySelector('.pf-input[name="email"]');
+        if (emailInp && !emailInp.value.trim()) {
+            emailInp.style.borderColor = 'rgba(220,60,60,0.7)';
+            emailInp.focus();
+            return;
         }
 
-        // Auto-open active parent on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            const active = document.querySelector('.nav-sub a.active');
-            if (active) {
-                active.closest('.nav-item')?.classList.add('open');
-            }
-        });
-    </script>
+        /* Désactiver le bouton pendant l'envoi */
+        var btnSave = document.getElementById('btnSave');
+        btnSave.disabled = true;
+        btnSave.innerHTML = '<i class="fa fa-spinner fa-spin" style="font-size:10px;"></i> Envoi…';
 
-    {% block javascripts %}{% endblock %}
+        var form = document.getElementById('profileForm');
+        var data = new FormData(form);
+
+       fetch('{{ path('profile_update') }}',  {
+            method: 'POST',
+            body: data,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(json) {
+            btnSave.disabled = false;
+            btnSave.innerHTML = '<i class="fa fa-check" style="font-size:10px;"></i> Enregistrer';
+
+            if (json.success) {
+                /* ── Mise à jour des libellés visibles dans la sidebar ── */
+                var views = document.querySelectorAll('.pf-view');
+                views.forEach(function(view) {
+                    var inp = view.parentElement.querySelector('.pf-input');
+                    if (inp && inp.value.trim()) {
+                        view.textContent = inp.value.trim();
+                    }
+                });
+
+                /* ── Mise à jour du nom affiché (header + avatar) ── */
+                if (json.prenom && json.nom) {
+                    var fullName = json.prenom + ' ' + json.nom;
+                    var initials = json.prenom.charAt(0).toUpperCase() + json.nom.charAt(0).toUpperCase();
+
+                    var nameSmall = document.getElementById('pfNameSmall');
+                    var nameBig   = document.getElementById('pfNameBig');
+                    var avatarSmall = document.getElementById('pfAvatarSmall');
+                    var avatarBig   = document.getElementById('pfAvatarBig');
+
+                    if (nameSmall)   nameSmall.textContent   = fullName;
+                    if (nameBig)     nameBig.textContent     = fullName;
+                    if (avatarSmall) avatarSmall.textContent = initials;
+                    if (avatarBig)   avatarBig.textContent   = initials;
+                }
+
+                cancelProfileEdit();
+                showToast('Profil mis à jour avec succès');
+            } else {
+                showToast(json.error || 'Une erreur est survenue', true);
+            }
+        })
+        .catch(function() {
+            btnSave.disabled = false;
+            btnSave.innerHTML = '<i class="fa fa-check" style="font-size:10px;"></i> Enregistrer';
+            showToast('Erreur réseau, veuillez réessayer.', true);
+        });
+    }
+
+    /* ── Toast notification ── */
+    function showToast(msg, isError) {
+        var existing = document.getElementById('pfToast');
+        if (existing) existing.remove();
+
+        var t = document.createElement('div');
+        t.id = 'pfToast';
+        t.style.cssText = [
+            'position:fixed',
+            'bottom:24px',
+            'right:24px',
+            'z-index:9999',
+            'background:' + (isError ? 'rgba(160,30,30,0.95)' : 'rgba(30,90,35,0.95)'),
+            'color:#fff',
+            'font-size:13px',
+            'font-weight:600',
+            'font-family:DM Sans,sans-serif',
+            'padding:12px 20px',
+            'border-radius:10px',
+            'display:flex',
+            'align-items:center',
+            'gap:9px',
+            'box-shadow:0 4px 24px rgba(0,0,0,0.25)',
+            'transition:opacity 0.4s ease',
+            'opacity:1'
+        ].join(';');
+
+        var icon = document.createElement('i');
+        icon.className = isError ? 'fa fa-circle-xmark' : 'fa fa-circle-check';
+        icon.style.fontSize = '14px';
+        t.appendChild(icon);
+        t.appendChild(document.createTextNode(msg));
+        document.body.appendChild(t);
+
+        setTimeout(function() { t.style.opacity = '0'; }, 2800);
+        setTimeout(function() { if (t.parentNode) t.remove(); }, 3300);
+    }
+</script>
+
+{% block javascripts %}{% endblock %}
 </body>
 </html>
