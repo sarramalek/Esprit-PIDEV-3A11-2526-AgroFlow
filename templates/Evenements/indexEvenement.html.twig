@@ -160,7 +160,7 @@
                             <td>{{ evenement.dateDebut|date('d/m/Y') }}</td>
                             <td>{{ evenement.dateFin|date('d/m/Y') }}</td>
                             <td>{{ evenement.lieu }}</td>
-                            <td>{{ evenement.categorie.nomCategorie }}</td>
+                            <td>{{ evenement.categorie ? evenement.categorie.nomCategorie : '—' }}</td>
                             <td>
                                 <span class="statut-badge statut-{{ evenement.statut }}">
                                     {{ evenement.statut }}

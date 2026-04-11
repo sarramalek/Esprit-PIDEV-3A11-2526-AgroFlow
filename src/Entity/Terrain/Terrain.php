@@ -5,6 +5,8 @@ use App\Repository\Terrain\TerrainRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use App\Entity\User\User;
+
 
 #[ORM\Entity(repositoryClass: TerrainRepository::class)]
 #[ORM\Table(name: 'terrain')]
@@ -35,10 +37,14 @@ class Terrain
 
     #[ORM\OneToMany(mappedBy: 'terrain', targetEntity: Rotation::class, cascade: ['remove'])]
     private Collection $rotations;
-
+ #[ORM\OneToMany(mappedBy: 'terrain', targetEntity: User::class, cascade: ['persist'])]
+    private Collection $ouvriers;
+ 
+   
     public function __construct()
     {
         $this->rotations = new ArrayCollection();
+        $this->ouvriers  = new ArrayCollection();   
     }
 
     public function getId(): ?int { return $this->id; }
@@ -62,4 +68,27 @@ class Terrain
     public function setCin(?int $v): static { $this->cin = $v; return $this; }
 
     public function getRotations(): Collection { return $this->rotations; }
+     public function getOuvriers(): Collection
+    {
+        return $this->ouvriers;
+    }
+ 
+    public function addOuvrier(User $ouvrier): self
+    {
+        if (!$this->ouvriers->contains($ouvrier)) {
+            $this->ouvriers->add($ouvrier);
+            $ouvrier->setTerrain($this);
+        }
+        return $this;
+    }
+ 
+    public function removeOuvrier(User $ouvrier): self
+    {
+        if ($this->ouvriers->removeElement($ouvrier)) {
+            if ($ouvrier->getTerrain() === $this) {
+                $ouvrier->setTerrain(null);
+            }
+        }
+        return $this;
+    }
 }

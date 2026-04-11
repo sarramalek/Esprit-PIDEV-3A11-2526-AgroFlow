@@ -57,7 +57,7 @@ class Animaux
     #[ORM\OneToMany(mappedBy: 'animal', targetEntity: Examen::class, orphanRemoval: true)]
     private Collection $examen;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'animaux')]
+#[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'cin', nullable: true)]
     private ?User $user = null;
 
