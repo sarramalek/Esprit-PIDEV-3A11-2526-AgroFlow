@@ -431,3 +431,6 @@ a966eb,127.0.0.1,GET,http://127.0.0.1:8000/agriculteur/ouvriers/nouveau,17759308
 fcf290,127.0.0.1,GET,http://127.0.0.1:8000/check-session,1775930870,,200,request
 d9fa5b,127.0.0.1,GET,http://127.0.0.1:8000/agriculteur/ouvriers,1775930874,,200,request
 285fd5,127.0.0.1,GET,http://127.0.0.1:8000/check-session,1775930874,,200,request
+8a154d,127.0.0.1,GET,http://127.0.0.1:8000/check-session,1775931569,,200,request
+127abf,127.0.0.1,GET,http://127.0.0.1:8000/check-session,1775931571,,200,request
+f05b74,127.0.0.1,GET,http://127.0.0.1:8000/check-session,1775931601,,200,request
