@@ -13,3 +13,7 @@ a27dd9,127.0.0.1,GET,http://127.0.0.1:8000/ouvrier/tache/14/statut/terminee,1775
 991421,127.0.0.1,GET,http://127.0.0.1:8000/ouvrier/,1775558837,,200,request
 772275,127.0.0.1,GET,http://127.0.0.1:8000/logout,1775558840,,302,request
 eb2a82,127.0.0.1,GET,http://127.0.0.1:8000/login,1775558840,,200,request
+60e31b,127.0.0.1,GET,http://127.0.0.1:8000/check-session,1775932216,11d1b1,404,request
+11d1b1,127.0.0.1,GET,http://127.0.0.1:8000/check-session,1775932216,,404,request
+9dba8f,127.0.0.1,GET,http://127.0.0.1:8000/check-session,1775932276,e5380e,404,request
+e5380e,127.0.0.1,GET,http://127.0.0.1:8000/check-session,1775932276,,404,request
