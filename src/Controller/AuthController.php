@@ -39,35 +39,48 @@ class AuthController extends AbstractController
 
     // ==================== REGISTER ====================
     #[Route('/register', name: 'app_register')]
-    public function register(
-        Request $request,
-        UserPasswordHasherInterface $passwordHasher,
-        EntityManagerInterface $em
-    ): Response {
-        $user = new User();
-        $form = $this->createForm(RegistrationFormType::class, $user);
-        $form->handleRequest($request);
+public function register(
+    Request $request,
+    UserPasswordHasherInterface $passwordHasher,
+    EntityManagerInterface $em,
+    \App\Repository\Terrain\TerrainRepository $terrainRepo  // ✅ Ajouter
+): Response {
+    $user = new User();
+    $form = $this->createForm(RegistrationFormType::class, $user);
+    $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Hash du mot de passe
-            $user->setMdp(
-                $passwordHasher->hashPassword($user, $form->get('plainPassword')->getData())
-            );
+    if ($form->isSubmitted() && $form->isValid()) {
 
-            // Date de création
-            $user->setDateCreationcpt(new \DateTime());
-            $user->setDateDernierchg(new \DateTime());
+        // Hash du mot de passe
+        $user->setMdp(
+            $passwordHasher->hashPassword($user, $form->get('plainPassword')->getData())
+        );
 
-            $em->persist($user);
-            $em->flush();
-
-            return $this->redirectByRole($user);
+        // ✅ Assigner le terrain si l'utilisateur est un ouvrier
+        if ((int)$user->getRole() === 1) {
+            $terrainId = $form->get('terrain')->getData(); // récupère la valeur du champ hidden
+            if ($terrainId) {
+                $terrain = $terrainRepo->find((int)$terrainId);
+                if ($terrain) {
+                    $user->setTerrain($terrain);
+                }
+            }
         }
 
-        return $this->render('auth/register.html.twig', [
-            'registrationForm' => $form->createView(),
-        ]);
+        // Date de création
+        $user->setDateCreationcpt(new \DateTime());
+        $user->setDateDernierchg(new \DateTime());
+
+        $em->persist($user);
+        $em->flush();
+
+        return $this->redirectByRole($user);
     }
+
+    return $this->render('auth/register.html.twig', [
+        'registrationForm' => $form->createView(),
+    ]);
+}
 
     // ==================== LOGOUT ====================
     #[Route('/logout', name: 'app_logout')]

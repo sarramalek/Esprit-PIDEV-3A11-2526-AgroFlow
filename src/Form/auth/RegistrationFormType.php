@@ -66,7 +66,7 @@ class RegistrationFormType extends AbstractType
                     ->where('u.role = :role')
                     ->setParameter('role', 2),
                 'choice_label'  => fn(User $u) => $u->getNom() . ' ' . $u->getPrenom(),
-                'choice_value'  => fn(?User $u) => $u?->getCin(),
+'choice_value' => fn(?User $u) => $u?->getCin(),
                 'attr'          => ['id' => 'employeur-select', 'class' => 'form-input'],
                 'label'         => false,
             ])
