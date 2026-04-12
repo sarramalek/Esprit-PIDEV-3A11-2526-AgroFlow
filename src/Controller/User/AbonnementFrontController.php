@@ -4,6 +4,7 @@ namespace App\Controller\User;
 
 use App\Repository\User\AbonnementRepository;
 use App\Repository\User\OffreRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,11 +15,26 @@ use Symfony\Component\Routing\Annotation\Route;
 class AbonnementFrontController extends AbstractController
 {
     #[Route('/front', name: 'app_abonnement_front', methods: ['GET'])]
-    public function front(AbonnementRepository $abonnRepo, OffreRepository $offreRepo): Response
-    {
+    public function front(
+        AbonnementRepository $abonnRepo,
+        OffreRepository $offreRepo,
+        EntityManagerInterface $em  // ← ajouté
+    ): Response {
         /** @var \App\Entity\User\User $user */
         $user = $this->getUser();
         $cin  = $user->getCin();
+
+        // ── Suppression automatique des abonnements expirés ──
+        $today   = new \DateTime('today');
+        $expires = $abonnRepo->findAll();
+
+        foreach ($expires as $abonnement) {
+            if ($abonnement->getDateExpiration() <= $today) {
+                $em->remove($abonnement);
+            }
+        }
+        $em->flush();
+        // ─────────────────────────────────────────────────────
 
         $abonnements = $abonnRepo->findByCin($cin);
 
