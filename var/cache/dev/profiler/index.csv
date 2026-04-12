@@ -245,3 +245,9 @@ ba1aa6,127.0.0.1,GET,http://127.0.0.1:8000/check-session,1775991692,,200,request
 aeca88,127.0.0.1,GET,http://127.0.0.1:8000/check-session,1775991694,,200,request
 93b0cd,127.0.0.1,GET,http://127.0.0.1:8000/logout,1775991698,,302,request
 26ac81,127.0.0.1,GET,http://127.0.0.1:8000/login,1775991698,,200,request
+4bf42c,127.0.0.1,GET,http://127.0.0.1:8000/login,1775992690,,200,request
+2ee742,127.0.0.1,GET,http://127.0.0.1:8000/login,1775992692,,200,request
+99d581,127.0.0.1,GET,http://127.0.0.1:8000/register,1775992694,70877a,500,request
+70877a,127.0.0.1,GET,http://127.0.0.1:8000/register,1775992694,,500,request
+e20c2c,127.0.0.1,GET,http://127.0.0.1:8000/register,1775992715,,200,request
+e4d1b9,127.0.0.1,GET,http://127.0.0.1:8000/api/terrains/14532929,1775993130,,200,request
