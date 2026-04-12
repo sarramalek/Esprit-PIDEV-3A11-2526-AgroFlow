@@ -10,6 +10,43 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('assets/css/main.css') }}">
 
+    {# ═══════════════════════════════════════════════════
+       CLOUDINARY — SDK JavaScript (transformation d'URL)
+    ═══════════════════════════════════════════════════ #}
+    <script>
+        function cloudinaryAvatar(rawUrl, w, h) {
+            if (!rawUrl) return null;
+            var uploadPattern = /\/upload\//;
+            if (!uploadPattern.test(rawUrl)) return rawUrl;
+            var transform = 'c_fill,g_face,w_' + w + ',h_' + h + ',q_auto,f_auto/';
+            return rawUrl.replace('/upload/', '/upload/' + transform);
+        }
+
+        function initCloudinaryAvatars() {
+            document.querySelectorAll('[data-cloudinary-src]').forEach(function(el) {
+                var rawUrl = el.dataset.cloudinarySrc;
+                var w = parseInt(el.dataset.w || 52, 10);
+                var h = parseInt(el.dataset.h || 52, 10);
+                var fbId = el.dataset.fallbackId;
+                var fb = fbId ? document.getElementById(fbId) : null;
+
+                if (rawUrl && rawUrl.trim() !== '' && rawUrl !== 'null') {
+                    el.src = cloudinaryAvatar(rawUrl.trim(), w, h);
+                    el.style.display = 'block';
+                    if (fb) fb.style.display = 'none';
+                    el.onerror = function() {
+                        el.style.display = 'none';
+                        if (fb) fb.style.display = 'flex';
+                    };
+                } else {
+                    el.style.display = 'none';
+                    if (fb) fb.style.display = 'flex';
+                }
+            });
+        }
+        document.addEventListener('DOMContentLoaded', initCloudinaryAvatars);
+    </script>
+
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
@@ -116,6 +153,45 @@
         .ouv-pf-btn.cancel { background: #fdecea; border-color: #f5a7a7; color: #c0392b; }
         .ouv-pf-btn.cancel:hover { background: #fbd5d5; }
 
+        /* Bouton upload photo */
+        .ouv-photo-upload {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 12px;
+            background: #f5faf4;
+            border: 1px dashed #c8e6c0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 11px;
+            color: #888;
+            transition: all 0.2s;
+            margin: 4px 16px 8px;
+        }
+        .ouv-photo-upload:hover {
+            background: #eaf3de;
+            color: #2D5A27;
+            border-color: #4A8C3F;
+        }
+        .ouv-photo-upload input { display: none; }
+
+        /* Barre de progression upload */
+        .ouv-upload-progress {
+            display: none;
+            height: 3px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            margin: 0 16px 8px;
+            overflow: hidden;
+        }
+        .ouv-upload-progress-bar {
+            height: 100%;
+            background: #4A8C3F;
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
         /* ── Main ── */
         .main-content { flex: 1; padding: 32px 40px; }
 
@@ -130,7 +206,6 @@
 
     {% block stylesheets %}{% endblock %}
 </head>
-{# Dans base.html.twig, avant </body> #}
 
 {% set protectedPrefixes = ['/admin', '/agriculteur', '/ouvrier'] %}
 {% set isProtected = false %}
@@ -150,18 +225,12 @@ function checkAndRedirect() {
             }
         });
 }
-
-window.addEventListener('pageshow', function (e) {
-    if (e.persisted) { checkAndRedirect(); }
-});
-
-document.addEventListener('visibilitychange', function () {
-    if (document.visibilityState === 'visible') { checkAndRedirect(); }
-});
-
+window.addEventListener('pageshow', function (e) { if (e.persisted) checkAndRedirect(); });
+document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') checkAndRedirect(); });
 checkAndRedirect();
 </script>
 {% endif %}
+
 <body>
 
 <header class="header">
@@ -204,24 +273,52 @@ checkAndRedirect();
                  style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:6px 12px;border-radius:10px;transition:background 0.2s;"
                  onmouseover="this.style.background='#f5faf4'"
                  onmouseout="this.style.background='transparent'">
-                <div class="user-avatar-sm" id="ouvAvatarSmall">
-                    {{ app.user.prenom|first|upper }}{{ app.user.nom|first|upper }}
+
+                {# ── Avatar small navbar ── #}
+                <div style="position:relative;width:34px;height:34px;flex-shrink:0;">
+                    <img id="ouvPhotoSmall"
+                         style="display:none;width:34px;height:34px;border-radius:9px;object-fit:cover;"
+                         data-cloudinary-src="{{ app.user.img is defined ? app.user.img : '' }}"
+                         data-w="34" data-h="34"
+                         data-fallback-id="ouvAvatarSmall"
+                         src="" alt="Photo de profil">
+                    <div class="user-avatar-sm" id="ouvAvatarSmall">
+                        {{ app.user.prenom|first|upper }}{{ app.user.nom|first|upper }}
+                    </div>
                 </div>
+
                 <div style="line-height:1.3;">
-                    <div id="ouvNameSmall" style="font-size:13px;font-weight:600;color:#2C3E50;">{{ app.user.prenom }} {{ app.user.nom }}</div>
+                    <div id="ouvNameSmall" style="font-size:13px;font-weight:600;color:#2C3E50;">
+                        {{ app.user.prenom }} {{ app.user.nom }}
+                    </div>
                     <div style="font-size:11px;color:#aaa;">Ouvrier</div>
                 </div>
-                <i class="fa fa-chevron-down" id="profileChevron" style="font-size:9px;color:#aaa;transition:transform 0.25s;"></i>
+                <i class="fa fa-chevron-down" id="profileChevron"
+                   style="font-size:9px;color:#aaa;transition:transform 0.25s;"></i>
             </div>
 
             <div id="profilePanel">
 
-                {# En-tête #}
+                {# En-tête avatar #}
                 <div style="padding:18px 16px 14px;text-align:center;border-bottom:1px solid #f0f0f0;background:#fafdf8;">
-                    <div id="ouvAvatarBig" style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#4A8C3F,#2D5A27);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:white;margin:0 auto 10px;">
-                        {{ app.user.prenom|first|upper }}{{ app.user.nom|first|upper }}
+
+                    {# ── Avatar big panel ── #}
+                    <div style="position:relative;width:52px;height:52px;margin:0 auto 10px;">
+                        <img id="ouvPhotoBig"
+                             style="display:none;width:52px;height:52px;border-radius:14px;object-fit:cover;"
+                             data-cloudinary-src="{{ app.user.img is defined ? app.user.img : '' }}"
+                             data-w="52" data-h="52"
+                             data-fallback-id="ouvAvatarBig"
+                             src="" alt="Photo de profil">
+                        <div id="ouvAvatarBig"
+                             style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#4A8C3F,#2D5A27);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:white;">
+                            {{ app.user.prenom|first|upper }}{{ app.user.nom|first|upper }}
+                        </div>
                     </div>
-                    <div id="ouvNameBig" style="font-size:14px;font-weight:700;color:#2C3E50;">{{ app.user.prenom }} {{ app.user.nom }}</div>
+
+                    <div id="ouvNameBig" style="font-size:14px;font-weight:700;color:#2C3E50;">
+                        {{ app.user.prenom }} {{ app.user.nom }}
+                    </div>
                     <div style="display:inline-flex;align-items:center;gap:5px;background:#EAF3DE;border:1px solid #c8e6c0;color:#2D5A27;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;margin-top:6px;">
                         <span style="width:5px;height:5px;border-radius:50%;background:#6FE065;display:inline-block;"></span>
                         Ouvrier
@@ -241,8 +338,23 @@ checkAndRedirect();
                     </button>
                 </div>
 
-                {# Formulaire — soumis via fetch uniquement #}
+                {# Bouton upload photo (visible uniquement en édition) #}
+                <label class="ouv-photo-upload" id="ouvPhotoUploadLabel">
+                    <i class="fa fa-camera" style="font-size:12px;color:#4A8C3F;"></i>
+                    <span id="ouvPhotoUploadText">Changer la photo de profil</span>
+                    <input type="file" id="ouvPhotoFileInput" accept="image/*"
+                           onchange="ouvUploadPhoto(this)">
+                </label>
+                <div class="ouv-upload-progress" id="ouvUploadProgress">
+                    <div class="ouv-upload-progress-bar" id="ouvUploadProgressBar"></div>
+                </div>
+
+                {# Formulaire profil #}
                 <form id="ouvProfileForm" onsubmit="return false;">
+
+                    {# Champ caché URL Cloudinary #}
+                    <input type="hidden" name="photo" id="ouvPhotoUrl"
+                           value="{{ app.user.img is defined ? app.user.img : '' }}">
 
                     <div style="padding:4px 0;">
 
@@ -384,6 +496,99 @@ checkAndRedirect();
 
 {% block javascripts %}
 <script>
+    /* ══════════════════════════════════════════════════════
+       CLOUDINARY — Upload direct (unsigned preset)
+    ══════════════════════════════════════════════════════ */
+    var CLOUDINARY_CLOUD_NAME    = 'dp0ily6qa';
+    var CLOUDINARY_UPLOAD_PRESET = 'agroflow';
+
+    function ouvUploadPhoto(input) {
+        if (!input.files || !input.files[0]) return;
+        var file  = input.files[0];
+        var bar   = document.getElementById('ouvUploadProgressBar');
+        var prog  = document.getElementById('ouvUploadProgress');
+        var txt   = document.getElementById('ouvPhotoUploadText');
+        var label = document.getElementById('ouvPhotoUploadLabel');
+
+        prog.style.display = 'block';
+        bar.style.width = '0%';
+        txt.textContent = 'Upload en cours…';
+        label.style.pointerEvents = 'none';
+
+        var fd = new FormData();
+        fd.append('file', file);
+        fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+        fd.append('folder', 'agroflow/avatars');
+
+        var xhr = new XMLHttpRequest();
+
+        xhr.upload.onprogress = function(e) {
+            if (e.lengthComputable) {
+                bar.style.width = Math.round(e.loaded / e.total * 100) + '%';
+            }
+        };
+
+        xhr.onload = function() {
+            label.style.pointerEvents = 'auto';
+            prog.style.display = 'none';
+
+            if (xhr.status === 200) {
+                var res = JSON.parse(xhr.responseText);
+                var secureUrl = res.secure_url;
+
+                document.getElementById('ouvPhotoUrl').value = secureUrl;
+
+                _ouvUpdateAvatar('ouvPhotoSmall', 'ouvAvatarSmall', secureUrl, 34, 34);
+                _ouvUpdateAvatar('ouvPhotoBig',   'ouvAvatarBig',   secureUrl, 52, 52);
+
+                txt.textContent = 'Photo mise à jour ✓';
+
+                // Auto-save immédiat en base
+                var fd2 = new FormData();
+                fd2.append('photo', secureUrl);
+                fetch('{{ path("profile_update") }}', {
+                    method: 'POST',
+                    body: fd2,
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(json) {
+                    if (json.success) {
+                        ouvShowToast('Photo sauvegardée ✓');
+                    } else {
+                        ouvShowToast('Upload OK mais sauvegarde échouée', true);
+                    }
+                });
+            } else {
+                txt.textContent = 'Changer la photo de profil';
+                ouvShowToast('Erreur lors de l\'upload', true);
+            }
+        };
+
+        xhr.onerror = function() {
+            label.style.pointerEvents = 'auto';
+            prog.style.display = 'none';
+            txt.textContent = 'Changer la photo de profil';
+            ouvShowToast('Erreur réseau', true);
+        };
+
+        xhr.open('POST', 'https://api.cloudinary.com/v1_1/' + CLOUDINARY_CLOUD_NAME + '/image/upload');
+        xhr.send(fd);
+    }
+
+    function _ouvUpdateAvatar(imgId, fbId, rawUrl, w, h) {
+        var img = document.getElementById(imgId);
+        var fb  = document.getElementById(fbId);
+        if (!img) return;
+        img.src = cloudinaryAvatar(rawUrl, w, h);
+        img.style.display = 'block';
+        if (fb) fb.style.display = 'none';
+        img.onerror = function() {
+            img.style.display = 'none';
+            if (fb) fb.style.display = 'flex';
+        };
+    }
+
     /* ── Ouvrir / fermer le panel ── */
     function toggleProfilePanel() {
         var panel   = document.getElementById('profilePanel');
@@ -413,6 +618,10 @@ checkAndRedirect();
         document.querySelectorAll('.ouv-pf-input').forEach(function(el) { el.style.display = 'block'; });
         document.getElementById('ouvPwdRow').style.display = 'flex';
 
+        // Afficher le bouton upload photo
+        document.getElementById('ouvPhotoUploadLabel').style.display = 'flex';
+        document.getElementById('ouvPhotoUploadText').textContent = 'Changer la photo de profil';
+
         document.getElementById('ouvBtnEdit').style.display   = 'none';
         document.getElementById('ouvBtnSave').style.display   = 'inline-flex';
         document.getElementById('ouvBtnCancel').style.display = 'inline-flex';
@@ -431,6 +640,10 @@ checkAndRedirect();
         document.querySelectorAll('.ouv-pf-view').forEach(function(el) { el.style.display = 'block'; });
         document.querySelectorAll('.ouv-pf-input').forEach(function(el) { el.style.display = 'none'; });
         document.getElementById('ouvPwdRow').style.display = 'none';
+
+        // Masquer le bouton upload photo
+        document.getElementById('ouvPhotoUploadLabel').style.display = 'none';
+        document.getElementById('ouvUploadProgress').style.display   = 'none';
 
         document.getElementById('ouvBtnEdit').style.display   = 'inline-flex';
         document.getElementById('ouvBtnSave').style.display   = 'none';
@@ -451,7 +664,7 @@ checkAndRedirect();
 
         var data = new FormData(document.getElementById('ouvProfileForm'));
 
-        fetch('{{ path('profile_update') }}', {
+        fetch('{{ path("profile_update") }}', {
             method: 'POST',
             body: data,
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
@@ -462,26 +675,32 @@ checkAndRedirect();
             btnSave.innerHTML = '<i class="fa fa-check" style="font-size:10px;"></i> Enregistrer';
 
             if (json.success) {
-                /* Mise à jour des libellés visibles */
+                // Mise à jour des libellés visibles
                 document.querySelectorAll('.ouv-pf-view').forEach(function(view) {
                     var inp = view.parentElement.querySelector('.ouv-pf-input');
                     if (inp && inp.value.trim()) view.textContent = inp.value.trim();
                 });
 
-                /* Mise à jour nom + initiales dans la navbar */
+                // Mise à jour nom + initiales
                 if (json.prenom && json.nom) {
                     var fullName = json.prenom + ' ' + json.nom;
                     var initials = json.prenom.charAt(0).toUpperCase() + json.nom.charAt(0).toUpperCase();
-
                     var nameSmall   = document.getElementById('ouvNameSmall');
                     var nameBig     = document.getElementById('ouvNameBig');
                     var avatarSmall = document.getElementById('ouvAvatarSmall');
                     var avatarBig   = document.getElementById('ouvAvatarBig');
-
                     if (nameSmall)   nameSmall.textContent   = fullName;
                     if (nameBig)     nameBig.textContent     = fullName;
                     if (avatarSmall) avatarSmall.textContent = initials;
                     if (avatarBig)   avatarBig.textContent   = initials;
+                }
+
+                // Mise à jour data-cloudinary-src si nouvelle photo
+                if (json.photo) {
+                    ['ouvPhotoSmall', 'ouvPhotoBig'].forEach(function(id) {
+                        var el = document.getElementById(id);
+                        if (el) el.dataset.cloudinarySrc = json.photo;
+                    });
                 }
 
                 ouvCancelEdit();
