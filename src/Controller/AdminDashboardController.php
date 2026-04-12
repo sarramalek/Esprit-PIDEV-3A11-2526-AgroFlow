@@ -6,6 +6,10 @@ use App\Repository\User\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AdminDashboardController extends AbstractController
 {
@@ -62,4 +66,44 @@ class AdminDashboardController extends AbstractController
             'revenus'                  => [3200, 3800, 2900, 4500, 4200, 5100], // à brancher sur Abonnement
         ]);
     }
+    #[Route('/profile/update', name: 'profile_update', methods: ['POST'])]
+public function profileUpdate(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $hasher): JsonResponse
+{
+    $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY'); // ← tous les rôles connectés
+
+ 
+
+    $user = $this->getUser();
+
+    if ($email = $request->request->get('email')) {
+        $user->setEmail(trim($email));
+    }
+    if ($prenom = $request->request->get('prenom')) {
+        $user->setPrenom(trim($prenom));
+    }
+    if ($nom = $request->request->get('nom')) {
+        $user->setNom(trim($nom));
+    }
+    if ($cin = $request->request->get('cin')) {
+        $user->setCin(trim($cin));
+    }
+    if ($tel = $request->request->get('tel')) {
+        $user->setTel(trim($tel));
+    }
+    if ($ville = $request->request->get('ville')) {
+        $user->setVille(trim($ville));
+    }
+    if ($pwd = $request->request->get('password')) {
+        $user->setMdp($hasher->hashPassword($user, $pwd));
+    }
+
+    $em->flush();
+
+    return new JsonResponse([
+        'success' => true,
+        'prenom'  => $user->getPrenom(),
+        'nom'     => $user->getNom(),
+        'email'   => $user->getEmail(),
+    ]);
+}
 }

@@ -1,0 +1,204 @@
+{% extends 'base_admin.html.twig' %}
+
+{% block title %}{{ user.prenom }} {{ user.nom }} — AgroFlow Admin{% endblock %}
+{% block page_title %}Détail utilisateur{% endblock %}
+{% block breadcrumb %}Utilisateurs / {{ user.prenom }} {{ user.nom }}{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .page { display: flex; flex-direction: column; gap: 24px; }
+
+    .back-btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        color: var(--text-muted); text-decoration: none;
+        font-size: 13px; font-weight: 500;
+        transition: color 0.2s;
+    }
+    .back-btn:hover { color: var(--navy); }
+
+    .show-grid {
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        gap: 20px;
+        align-items: start;
+    }
+
+    /* ── Profile card ── */
+    .profile-card {
+        background: var(--white);
+        border: 1px solid var(--cream-dark);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+    .profile-banner {
+        height: 80px;
+        background: linear-gradient(135deg, var(--green-dark), var(--green-mid));
+    }
+    .profile-body {
+        padding: 0 24px 24px;
+        text-align: center;
+        margin-top: -32px;
+    }
+    .profile-av {
+        width: 64px; height: 64px; border-radius: 16px;
+        background: linear-gradient(135deg, var(--green-accent), var(--green-mid));
+        display: flex; align-items: center; justify-content: center;
+        font-size: 22px; font-weight: 700; color: white;
+        margin: 0 auto 12px;
+        border: 3px solid white;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
+    .profile-name { font-size: 18px; font-weight: 700; color: var(--navy); }
+    .profile-email { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
+    .profile-badge {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 5px 14px; border-radius: 20px;
+        font-size: 12px; font-weight: 600; margin-top: 12px;
+    }
+    .badge-admin  { background: #FEF3C7; color: #B45309; }
+    .badge-agri   { background: #D1FAE5; color: #065F46; }
+    .badge-ouv    { background: #DBEAFE; color: #1D4ED8; }
+
+    .profile-actions {
+        display: flex; flex-direction: column; gap: 8px;
+        margin-top: 20px; padding-top: 20px;
+        border-top: 1px solid var(--cream-dark);
+    }
+    .btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        padding: 10px 18px; border-radius: 8px;
+        font-size: 13px; font-weight: 600;
+        text-decoration: none; border: none; cursor: pointer;
+        transition: all 0.2s;
+    }
+    .btn-primary { background: var(--green-mid); color: white; }
+    .btn-primary:hover { background: var(--green-dark); color: white; }
+    .btn-danger { background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA; }
+    .btn-danger:hover { background: #DC2626; color: white; }
+
+    /* ── Info card ── */
+    .info-card {
+        background: var(--white);
+        border: 1px solid var(--cream-dark);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+    .info-card-header {
+        padding: 16px 22px;
+        border-bottom: 1px solid var(--cream-dark);
+        font-size: 14px; font-weight: 600; color: var(--navy);
+        display: flex; align-items: center; gap: 9px;
+    }
+    .info-card-header i { color: var(--green-accent); }
+    .info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+    }
+    .info-row {
+        padding: 14px 22px;
+        border-bottom: 1px solid var(--cream-dark);
+        display: flex; flex-direction: column; gap: 3px;
+    }
+    .info-row:nth-last-child(-n+2) { border-bottom: none; }
+    .info-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); }
+    .info-val { font-size: 14px; color: var(--navy); font-weight: 500; }
+    .info-val.mono { font-family: 'DM Mono', monospace; }
+    .info-val.empty { color: var(--text-muted); font-style: italic; font-weight: 400; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="page">
+
+    <a href="{{ path('admin_users_list') }}" class="back-btn">
+        <i class="fa fa-arrow-left"></i> Retour à la liste
+    </a>
+
+    <div class="show-grid">
+
+        {# Profile card #}
+        <div class="profile-card">
+            <div class="profile-banner"></div>
+            <div class="profile-body">
+                <div class="profile-av">
+                    {{ user.prenom|first|upper }}{{ user.nom|first|upper }}
+                </div>
+                <div class="profile-name">{{ user.prenom }} {{ user.nom }}</div>
+                <div class="profile-email">{{ user.email }}</div>
+
+                {% if user.role == 3 %}
+                    <div class="profile-badge badge-admin"><i class="fa fa-shield-halved"></i> Administrateur</div>
+                {% elseif user.role == 2 %}
+                    <div class="profile-badge badge-agri"><i class="fa fa-tractor"></i> Agriculteur</div>
+                {% elseif user.role == 1 %}
+                    <div class="profile-badge badge-ouv"><i class="fa fa-person-digging"></i> Ouvrier</div>
+                {% endif %}
+
+                <div class="profile-actions">
+                    <a href="{{ path('admin_users_edit', {cin: user.cin}) }}" class="btn btn-primary">
+                        <i class="fa fa-pen"></i> Modifier
+                    </a>
+                    <form method="POST" action="{{ path('admin_users_delete', {cin: user.cin}) }}"
+                          onsubmit="return confirm('Supprimer définitivement cet utilisateur ?')">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete_user_' ~ user.cin) }}">
+                        <button type="submit" class="btn btn-danger" style="width:100%;">
+                            <i class="fa fa-trash"></i> Supprimer
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {# Info card #}
+        <div class="info-card">
+            <div class="info-card-header">
+                <i class="fa fa-circle-info"></i> Informations personnelles
+            </div>
+            <div class="info-grid">
+                <div class="info-row">
+                    <div class="info-label">CIN</div>
+                    <div class="info-val mono">{{ user.cin }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Téléphone</div>
+                    <div class="info-val {% if not user.tel %}empty{% endif %}">{{ user.tel ?? 'Non renseigné' }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Date de naissance</div>
+                    <div class="info-val {% if not user.dateNaiss %}empty{% endif %}">
+                        {{ user.dateNaiss ? user.dateNaiss|date('d/m/Y') : 'Non renseignée' }}
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Ville</div>
+                    <div class="info-val {% if not user.ville %}empty{% endif %}">{{ user.ville ?? 'Non renseignée' }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Adresse</div>
+                    <div class="info-val {% if not user.adresse %}empty{% endif %}">{{ user.adresse ?? 'Non renseignée' }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">2FA activé</div>
+                    <div class="info-val">{{ user.twoFactorEnabled ? '✅ Oui' : '❌ Non' }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Date d'inscription</div>
+                    <div class="info-val {% if not user.dateCreationcpt %}empty{% endif %}">
+                        {{ user.dateCreationcpt ? user.dateCreationcpt|date('d/m/Y') : '—' }}
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Dernière modification</div>
+                    <div class="info-val {% if not user.dateDernierchg %}empty{% endif %}">
+                        {{ user.dateDernierchg ? user.dateDernierchg|date('d/m/Y') : '—' }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

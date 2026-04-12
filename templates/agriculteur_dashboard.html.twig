@@ -203,12 +203,17 @@
         font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 2px;
     }
     .abo-plan-badge {
-        background: rgba(111,224,101,0.2);
-        border: 1px solid rgba(111,224,101,0.35);
-        color: #8FD987; font-size: 11px; font-weight: 600;
-        padding: 3px 10px; border-radius: 20px;
-        display: flex; align-items: center; gap: 5px;
-    }
+    background: rgba(111,224,101,0.2);
+    border: 1px solid rgba(111,224,101,0.35);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
     .abo-plan-badge::before {
         content: ''; width: 6px; height: 6px;
         border-radius: 50%; background: #6FE065;
@@ -312,10 +317,7 @@
                 <div class="wstat-val">{{ terrains|default(0) }}</div>
                 <div class="wstat-label">Terrains</div>
             </div>
-            <div class="wstat">
-                <div class="wstat-val">{{ taches|default(0) }}</div>
-                <div class="wstat-label">Tâches</div>
-            </div>
+            
             <div class="wstat">
                 <div class="wstat-val">{{ machines|default(0) }}</div>
                 <div class="wstat-label">Machines</div>
@@ -354,7 +356,7 @@
                 <div class="module-count">Terrains & rotations</div>
             </a>
 
-            <a href="{{ path('agri_evenements') }}" class="module-card" style="--accent:#7F77DD;">
+            <a href="{{ path('agriculteur_evenement_index') }}" class="module-card" style="--accent:#7F77DD;">
                 <div class="module-icon-wrap" style="background:#EEEDFE;">
                     <i class="fa fa-calendar-days" style="color:#7F77DD; font-size:22px;"></i>
                 </div>
@@ -362,12 +364,12 @@
                 <div class="module-count">Événements & particip.</div>
             </a>
 
-            <a href="{{ path('agri_machines') }}" class="module-card" style="--accent:#D85A30;">
+             <a href="{{ path('agri_machines') }}" class="module-card" style="--accent:#D85A30;">
                 <div class="module-icon-wrap" style="background:#FAECE7;">
                     <i class="fa fa-tractor" style="color:#D85A30; font-size:22px;"></i>
                 </div>
                 <div class="module-name">Matériels</div>
-                <div class="module-count">Machines & mainten.</div>
+                <div class="module-count">Machines & maintenances.</div>
             </a>
 
         </div>
@@ -377,76 +379,51 @@
     <div class="two-col">
 
         {# Abonnement #}
-        <div class="abo-card">
-            <div class="abo-header">
-                <div class="section-head" style="margin-bottom:0;">
-                    <div class="section-title"><i class="fa fa-crown"></i> Mon abonnement</div>
-                    <a href="{{ path('agri_abonnements') }}" class="section-link">Gérer <i class="fa fa-arrow-right" style="font-size:10px;"></i></a>
-                </div>
-            </div>
-            <div class="abo-body">
-
-                {% if abonnement is defined and abonnement %}
-                <div class="abo-plan">
-                    <div class="abo-plan-icon">
-                        <i class="fa fa-crown"></i>
-                    </div>
-                    <div class="abo-plan-info">
-                        <div class="abo-plan-name">{{ abonnement.offre.nom ?? 'Plan Premium' }}</div>
-                        <div class="abo-plan-price">{{ abonnement.offre.prix ?? '49' }} TND / mois</div>
-                    </div>
-                    <div class="abo-plan-badge">Actif</div>
-                </div>
-
-                <div class="abo-perks">
-                    <div class="abo-perk">
-                        <div class="abo-perk-icon"><i class="fa fa-paw" style="color:#2D5A27;"></i></div>
-                        <div class="abo-perk-label">Suivi animaux</div>
-                    </div>
-                    <div class="abo-perk">
-                        <div class="abo-perk-icon"><i class="fa fa-boxes-stacked" style="color:#185FA5;"></i></div>
-                        <div class="abo-perk-label">Gestion stocks</div>
-                    </div>
-                    <div class="abo-perk">
-                        <div class="abo-perk-icon"><i class="fa fa-map" style="color:#8B6914;"></i></div>
-                        <div class="abo-perk-label">Terrains illimités</div>
-                    </div>
-                    <div class="abo-perk">
-                        <div class="abo-perk-icon"><i class="fa fa-headset" style="color:#7F77DD;"></i></div>
-                        <div class="abo-perk-label">Support prioritaire</div>
-                    </div>
-                </div>
-
-                <div class="abo-progress">
-                    {% set joursTotal = 30 %}
-                    {% set joursRestants = abonnement.joursRestants ?? 18 %}
-                    {% set pct = ((joursTotal - joursRestants) / joursTotal * 100)|round %}
-                    <div class="abo-progress-label">
-                        <span>Renouvellement dans {{ joursRestants }} jours</span>
-                        <span style="color:var(--g3); font-weight:600;">{{ pct }}%</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width:{{ pct }}%;"></div>
-                    </div>
-                </div>
-
-                {% else %}
-                {# Pas d'abonnement #}
-                <div style="text-align:center; padding: 30px 20px;">
-                    <div style="width:64px;height:64px;border-radius:18px;background:var(--gm);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
-                        <i class="fa fa-crown" style="font-size:26px;color:var(--g3);"></i>
-                    </div>
-                    <div style="font-size:15px;font-weight:600;color:var(--navy);margin-bottom:6px;">Aucun abonnement actif</div>
-                    <div style="font-size:13px;color:var(--muted);margin-bottom:18px;">Souscrivez à une offre pour accéder à toutes les fonctionnalités</div>
-                    <a href="{{ path('agri_offres') }}"
-                       style="display:inline-flex;align-items:center;gap:8px;background:var(--g2);color:white;padding:10px 22px;border-radius:10px;text-decoration:none;font-size:13px;font-weight:600;transition:background 0.2s;">
-                        <i class="fa fa-star"></i> Voir les offres
-                    </a>
-                </div>
-                {% endif %}
-
-            </div>
+        {# Abonnement #}
+<div class="abo-card">
+    <div class="abo-header">
+        <div class="section-head" style="margin-bottom:0;">
+            <div class="section-title"><i class="fa fa-crown"></i> Mes abonnements actifs</div>
+            <a href="{{ path('app_abonnement_front') }}" class="section-link">Gérer <i class="fa fa-arrow-right" style="font-size:10px;"></i></a>
         </div>
+    </div>
+    <div class="abo-body">
+
+       {% if abonnementsActifs is defined and abonnementsActifs|length > 0 %}
+    {% set gradients = [
+        'linear-gradient(135deg, #3a7d44 0%, #57a55a 100%)',
+        'linear-gradient(135deg, #4a8c3f 0%, #6db56b 100%)',
+        'linear-gradient(135deg, #2d7a4f 0%, #4aad7a 100%)',
+    ] %}
+    {% for a in abonnementsActifs %}
+    <div class="abo-plan" style="background: {{ gradients[loop.index0 % 3] }}; margin-bottom: {{ not loop.last ? '12px' : '0' }};">
+        <div class="abo-plan-icon">
+            <i class="fa fa-crown"></i>
+        </div>
+        <div class="abo-plan-info">
+            <div class="abo-plan-name">{{ a.nomOffre }}</div>
+            <div class="abo-plan-price">{{ a.duree }} jours</div>
+        </div>
+        <div class="abo-plan-badge">Actif</div>
+    </div>
+    {% endfor %}
+
+        {% else %}
+            <div style="text-align:center; padding: 30px 20px;">
+                <div style="width:64px;height:64px;border-radius:18px;background:var(--gm);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                    <i class="fa fa-crown" style="font-size:26px;color:var(--g3);"></i>
+                </div>
+                <div style="font-size:15px;font-weight:600;color:var(--navy);margin-bottom:6px;">Aucun abonnement actif</div>
+                <div style="font-size:13px;color:var(--muted);margin-bottom:18px;">Souscrivez à une offre pour accéder à toutes les fonctionnalités</div>
+                <a href="{{ path('app_offre_front') }}"
+                   style="display:inline-flex;align-items:center;gap:8px;background:var(--g2);color:white;padding:10px 22px;border-radius:10px;text-decoration:none;font-size:13px;font-weight:600;">
+                    <i class="fa fa-star"></i> Voir les offres
+                </a>
+            </div>
+        {% endif %}
+
+    </div>
+</div>
 
         {# Événements #}
         <div class="events-card">
@@ -482,7 +459,7 @@
                     </div>
                     <div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:6px;">Aucune participation</div>
                     <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">Inscrivez-vous à des événements agricoles</div>
-                    <a href="{{ path('agri_evenements') }}"
+                    <a href="{{ path('agriculteur_evenement_index') }}"
                        style="display:inline-flex;align-items:center;gap:7px;background:#EEEDFE;color:#534AB7;padding:9px 18px;border-radius:10px;text-decoration:none;font-size:12px;font-weight:600;">
                         <i class="fa fa-search"></i> Explorer les événements
                     </a>

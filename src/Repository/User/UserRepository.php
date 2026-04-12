@@ -145,4 +145,57 @@ public function findAllForSelect(): array
         ->getQuery()
         ->getResult();
 }
+
+ 
+ 
+    /**
+     * Ouvriers qui travaillent sur les terrains d'un agriculteur donné.
+     * Ce sont les ouvriers que l'agriculteur "possède".
+     *
+     * @return User[]
+     */
+    public function findOuvriersByAgriculteur(int $cinAgriculteur): array
+    {
+        return $this->createQueryBuilder('u')
+            ->join('u.terrain', 't')
+            ->where('u.role = 1')
+            ->andWhere('t.cin = :cin')
+            ->setParameter('cin', $cinAgriculteur)
+            ->orderBy('t.nomTerrain', 'ASC')
+            ->addOrderBy('u.nom', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+ 
+    /**
+     * Ouvriers assignés à un terrain précis.
+     *
+     * @return User[]
+     */
+    public function findOuvriersByTerrain(int $idTerrain): array
+    {
+        return $this->createQueryBuilder('u')
+            ->join('u.terrain', 't')
+            ->where('u.role = 1')
+            ->andWhere('t.id = :id')
+            ->setParameter('id', $idTerrain)
+            ->orderBy('u.nom', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+ 
+    /**
+     * Ouvriers sans terrain (disponibles pour être assignés).
+     *
+     * @return User[]
+     */
+    public function findOuvriersDisponibles(): array
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.role = 1')
+            ->andWhere('u.terrain IS NULL')
+            ->orderBy('u.nom', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }
