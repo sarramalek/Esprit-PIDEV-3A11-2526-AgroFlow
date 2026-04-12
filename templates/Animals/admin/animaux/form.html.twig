@@ -1,0 +1,123 @@
+{% extends 'base_admin.html.twig' %}
+{% block title %}Admin – {{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block breadcrumb %}Animaux{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .form-card {
+        background: white; border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        padding: 32px; max-width: 680px;
+    }
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+        display: block; font-size: 13px; font-weight: 600;
+        color: #444; margin-bottom: 6px;
+    }
+    .form-group input, .form-group select {
+        width: 100%; padding: 11px 14px;
+        border: 1px solid #ddd; border-radius: 8px;
+        font-size: 14px; outline: none; transition: 0.2s;
+        background: #fafafa; color: #1C2B3A;
+    }
+    .form-group input:focus, .form-group select:focus {
+        border-color: #2D5A27; background: white;
+        box-shadow: 0 0 0 3px rgba(45,90,39,0.1);
+    }
+    .form-actions { display: flex; gap: 12px; margin-top: 28px; }
+    .btn-save {
+        background: #2D5A27; color: white; border: none;
+        padding: 11px 28px; border-radius: 8px; font-size: 14px;
+        font-weight: 600; cursor: pointer; transition: 0.2s;
+        display: inline-flex; align-items: center; gap: 7px;
+    }
+    .btn-save:hover { background: #1e3f1b; }
+    .btn-cancel {
+        background: #f0f0f0; color: #555; text-decoration: none;
+        padding: 11px 24px; border-radius: 8px; font-size: 14px;
+        font-weight: 600; transition: 0.2s;
+        display: inline-flex; align-items: center; gap: 7px;
+    }
+    .btn-cancel:hover { background: #e0e0e0; }
+    .form-errors { color: #A32D2D; font-size: 12px; margin-top: 4px; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="dash-wrapper">
+    <div style="margin-bottom:20px;">
+        <a href="{{ path('admin_animaux_index') }}" style="color:#888; text-decoration:none; font-size:13px;">
+            <i class="fa fa-arrow-left"></i> Retour à la liste
+        </a>
+    </div>
+
+    <div class="form-card">
+        <h2 style="margin:0 0 24px; font-size:18px; color:#1C2B3A;">
+            <i class="fa fa-paw" style="color:#2D5A27; margin-right:8px;"></i>{{ title }}
+        </h2>
+
+        {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+            {{- form_errors(form) -}}
+
+            {# Infos de base #}
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                <div class="form-group" style="grid-column:1/-1;">
+                    {{ form_label(form.nom) }}
+                    {{ form_widget(form.nom) }}
+                    {% if form_errors(form.nom) %}<div class="form-errors">{{ form_errors(form.nom) }}</div>{% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form_label(form.espece) }}
+                    {{ form_widget(form.espece) }}
+                    {% if form_errors(form.espece) %}<div class="form-errors">{{ form_errors(form.espece) }}</div>{% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form_label(form.sexe) }}
+                    {{ form_widget(form.sexe) }}
+                    {% if form_errors(form.sexe) %}<div class="form-errors">{{ form_errors(form.sexe) }}</div>{% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form_label(form.date_naissance) }}
+                    {{ form_widget(form.date_naissance) }}
+                    {% if form_errors(form.date_naissance) %}<div class="form-errors">{{ form_errors(form.date_naissance) }}</div>{% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form_label(form.poids) }}
+                    {{ form_widget(form.poids) }}
+                    {% if form_errors(form.poids) %}<div class="form-errors">{{ form_errors(form.poids) }}</div>{% endif %}
+                </div>
+            </div>
+
+            {# Champ Propriétaire - mise en valeur spéciale #}
+            <div style="margin-top:8px; padding:16px; background:#F0F7EE; border-radius:10px; border-left:4px solid #2D5A27;">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+                    <i class="fa fa-user-tie" style="color:#2D5A27;"></i>
+                    <span style="font-size:13px; font-weight:700; color:#2D5A27; text-transform:uppercase; letter-spacing:.04em;">Assignation du Propriétaire</span>
+                </div>
+                <div class="form-group" style="margin:0;">
+                    {{ form_label(form.user, 'Sélectionner l\'agriculteur responsable') }}
+                    {{ form_widget(form.user, {'attr': {'style': 'background:white;'}}) }}
+                    {% if form_errors(form.user) %}<div class="form-errors">{{ form_errors(form.user) }}</div>{% endif %}
+                    <p style="font-size:11px; color:#6a8f66; margin-top:5px;">
+                        <i class="fa fa-info-circle"></i> Si aucun propriétaire n'est sélectionné, l'animal sera visible par tous les agriculteurs.
+                    </p>
+                </div>
+            </div>
+
+            {{ form_rest(form) }}
+
+            <div class="form-actions">
+                <button type="submit" class="btn-save">
+                    <i class="fa fa-save"></i>
+                    {% if animal.id %}Enregistrer les modifications{% else %}Ajouter l'animal{% endif %}
+                </button>
+                <a href="{{ path('admin_animaux_index') }}" class="btn-cancel">
+                    <i class="fa fa-times"></i> Annuler
+                </a>
+            </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,224 @@
+{% extends 'base_agriculteur.html.twig' %}
+{% block title %}Tâches de {{ ouvrier.prenom }} {{ ouvrier.nom }}{% endblock %}
+
+{% block stylesheets %}
+<style>
+:root {
+    --vert: #2d6a4f; --vert-l: #52b788; --terre: #bc6c25;
+    --beige: #fefae0; --danger: #c1121f; --warn: #e9c46a;
+}
+body { background: var(--beige); font-family: 'Segoe UI', sans-serif; }
+
+.page-header {
+    background: linear-gradient(135deg, var(--vert), var(--vert-l));
+    color: white; padding: 1.5rem 2rem;
+    border-radius: 0 0 1.5rem 1.5rem; margin-bottom: 2rem;
+    display: flex; justify-content: space-between; align-items: center;
+}
+
+.layout { display: grid; grid-template-columns: 1fr 360px; gap: 1.5rem; }
+@media(max-width:768px) { .layout { grid-template-columns: 1fr; } }
+
+/* ---- Tableau tâches ---- */
+.card {
+    background: white; border-radius: 1rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,.07); overflow: hidden;
+}
+.card-header {
+    padding: 1rem 1.5rem; background: var(--vert); color: white;
+    font-weight: 700; font-size: 1rem;
+}
+table { width: 100%; border-collapse: collapse; }
+th { background: #f4f4f4; padding: .65rem 1rem; text-align: left; font-size: .85rem; color: #444; }
+td { padding: .7rem 1rem; border-bottom: 1px solid #f0f0f0; font-size: .9rem; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #f9fff9; }
+
+/* badges état */
+.badge {
+    display: inline-block; padding: .2rem .65rem;
+    border-radius: 2rem; font-size: .75rem; font-weight: 700;
+}
+.badge-afaire    { background: #dce8f5; color: #1d4e89; }
+.badge-encours   { background: #fff3cd; color: #856404; }
+.badge-terminee  { background: #d4edda; color: #155724; }
+.badge-retard    { background: #f8d7da; color: #842029; }
+
+/* badge priorité */
+.prio-haute   { color: var(--danger); font-weight: 700; }
+.prio-normale { color: var(--vert);   font-weight: 600; }
+.prio-basse   { color: #888; }
+
+.btn-del {
+    background: transparent; border: 1px solid var(--danger); color: var(--danger);
+    padding: .25rem .6rem; border-radius: .4rem; font-size: .8rem;
+    cursor: pointer; transition: all .2s;
+}
+.btn-del:hover { background: var(--danger); color: white; }
+
+/* ---- Formulaire ajout tâche ---- */
+.form-card {
+    background: white; border-radius: 1rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,.07); padding: 1.5rem;
+    position: sticky; top: 1rem;
+}
+.form-card h3 { margin: 0 0 1.25rem; color: var(--vert); font-size: 1rem; }
+.form-group { display: flex; flex-direction: column; gap: .3rem; margin-bottom: .85rem; }
+label { font-size: .82rem; font-weight: 600; color: #444; }
+input, select, textarea {
+    padding: .5rem .75rem; border: 1px solid #ddd; border-radius: .5rem;
+    font-size: .9rem; font-family: inherit; transition: border .2s;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--vert); outline: none; }
+textarea { resize: vertical; min-height: 70px; }
+.btn-add {
+    width: 100%; background: var(--vert); color: white;
+    border: none; padding: .7rem; border-radius: .6rem;
+    font-size: .95rem; font-weight: 600; cursor: pointer; transition: background .2s;
+}
+.btn-add:hover { background: var(--vert-l); }
+
+.retard-label { font-size: .75rem; color: var(--danger); font-weight: 700; }
+
+.back-link {
+    display: inline-block; margin-bottom: 1.5rem;
+    color: var(--vert); text-decoration: none; font-size: .9rem;
+}
+.back-link:hover { text-decoration: underline; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="page-header container-fluid px-4">
+    <div>
+        <h1 style="margin:0; font-size:1.4rem;">
+            📋 Tâches de {{ ouvrier.prenom }} {{ ouvrier.nom }}
+        </h1>
+        <small style="opacity:.85;">
+            {% if ouvrier.terrain %}
+                🌿 {{ ouvrier.terrain.nomTerrain }}
+            {% else %}
+                Aucun terrain assigné
+            {% endif %}
+        </small>
+    </div>
+</div>
+
+<div class="container">
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+
+    <a href="{{ path('app_ouvrier_index') }}" class="back-link">← Retour aux ouvriers</a>
+
+    <div class="layout">
+
+        {# ---- Liste des tâches ---- #}
+        <div class="card">
+            <div class="card-header">
+                {{ taches|length }} tâche{{ taches|length != 1 ? 's' : '' }} assignée{{ taches|length != 1 ? 's' : '' }}
+            </div>
+
+            {% if taches is empty %}
+                <p style="padding:1.5rem; color:#aaa; text-align:center; font-style:italic;">
+                    Aucune tâche pour cet ouvrier.
+                </p>
+            {% else %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tâche</th>
+                        <th>État</th>
+                        <th>Priorité</th>
+                        <th>Échéance</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tache in taches %}
+                    {% set enRetard = tache.dateEcheancee and tache.dateEcheancee < date() and tache.etat != 'terminée' %}
+                    <tr>
+                        <td>
+                            <strong>{{ tache.nomTache }}</strong><br>
+                            <small style="color:#777;">{{ tache.description }}</small>
+                        </td>
+                        <td>
+                            {% if tache.etat == 'à faire' %}
+                                <span class="badge badge-afaire">À faire</span>
+                            {% elseif tache.etat == 'en cours' %}
+                                <span class="badge badge-encours">En cours</span>
+                            {% elseif tache.etat == 'terminée' %}
+                                <span class="badge badge-terminee">Terminée</span>
+                            {% else %}
+                                <span class="badge">{{ tache.etat }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="prio-{{ tache.priorite == 'haute' ? 'haute' : (tache.priorite == 'basse' ? 'basse' : 'normale') }}">
+                                {{ tache.priorite|capitalize }}
+                            </span>
+                        </td>
+                        <td>
+                            {{ tache.dateEcheancee ? tache.dateEcheancee|date('d/m/Y') : '—' }}
+                            {% if enRetard %}
+                                <br><span class="retard-label">⚠ En retard</span>
+                            {% endif %}
+                        </td>
+<td>
+<form method="post" action="{{ path('app_ouvrier_tache_delete', {'id': tache.id}) }}"
+      onsubmit="return confirm('Supprimer cette tâche ?')">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete'~tache.id) }}">
+    <button type="submit" class="btn-del">🗑 Supprimer</button>
+</form>
+</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+
+        {# ---- Formulaire ajout tâche ---- #}
+        <div class="form-card">
+            <h3>➕ Assigner une nouvelle tâche</h3>
+            <form method="post" action="{{ path('app_ouvrier_tache_add', {cin: ouvrier.cin}) }}">
+
+                <div class="form-group">
+                    <label>Nom de la tâche *</label>
+                    <input type="text" name="nom_tache" required placeholder="Ex: Arrosage parcelle A">
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description" placeholder="Détails de la tâche..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>État</label>
+                    <select name="etat">
+                        <option value="à faire">À faire</option>
+                        <option value="en cours">En cours</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Priorité</label>
+                    <select name="priorite">
+                        <option value="normale">Normale</option>
+                        <option value="haute">Haute</option>
+                        <option value="basse">Basse</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Date d'échéance</label>
+                    <input type="date" name="date_echeancee">
+                </div>
+
+                <button type="submit" class="btn-add">✅ Assigner la tâche</button>
+            </form>
+        </div>
+
+    </div>{# /layout #}
+</div>
+{% endblock %}

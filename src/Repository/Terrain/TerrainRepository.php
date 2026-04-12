@@ -21,4 +21,51 @@ class TerrainRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+     public function findByAgriculteur(int $cinAgriculteur): array
+    {
+        return $this->createQueryBuilder('t')
+            ->where('t.cin = :cin')
+            ->setParameter('cin', $cinAgriculteur)
+            ->orderBy('t.nomTerrain', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+ 
+    /**
+     * Terrains d'un agriculteur avec leurs ouvriers chargés en une seule requête.
+     *
+     * @return Terrain[]
+     */
+    public function findByAgriculteurWithOuvriers(int $cinAgriculteur): array
+    {
+        return $this->createQueryBuilder('t')
+            ->leftJoin('t.ouvriers', 'o')
+            ->addSelect('o')
+            ->where('t.cin = :cin')
+            ->setParameter('cin', $cinAgriculteur)
+            ->orderBy('t.nomTerrain', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+ 
+    /**
+     * Retourne les CINs de tous les ouvriers des terrains d'un agriculteur.
+     * Utilisé pour vérifier qu'un ouvrier "appartient" à cet agriculteur,
+     * même s'il n'a pas encore de terrain assigné.
+     *
+     * @return int[]
+     */
+    public function findCinsOuvriersAgriculteur(int $cinAgriculteur): array
+    {
+        $rows = $this->createQueryBuilder('t')
+            ->select('o.cin')
+            ->join('t.ouvriers', 'o')
+            ->where('t.cin = :cin')
+            ->setParameter('cin', $cinAgriculteur)
+            ->getQuery()
+            ->getScalarResult();
+ 
+        return array_column($rows, 'cin');
+    }
 }

@@ -1,0 +1,135 @@
+{% extends 'base_admin.html.twig' %}
+
+{% block title %}Abonnement #{{ abonnement.idAbonn }} — AgroFlow Admin{% endblock %}
+{% block page_title %}Détail de l'Abonnement{% endblock %}
+{% block breadcrumb %}
+    <a href="{{ path('admin_abonnements_index') }}" style="color:var(--green-accent);text-decoration:none;">Abonnements</a>
+    / #{{ abonnement.idAbonn }}
+{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .detail-card {
+        background: var(--white);
+        border: 1px solid var(--cream-dark);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        max-width: 760px;
+        margin-bottom: 16px;
+    }
+    .card-header {
+        padding: 16px 22px;
+        border-bottom: 1px solid var(--cream-dark);
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .card-header-left { display:flex; align-items:center; gap:10px; }
+    .card-icon {
+        width:36px; height:36px; border-radius:10px;
+        display:flex; align-items:center; justify-content:center;
+    }
+    .card-title { font-size:15px; font-weight:600; color:var(--navy); }
+    .card-sub   { font-size:12px; color:var(--text-muted); margin-top:2px; }
+
+    .detail-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        border-top: none;
+    }
+    .detail-item {
+        padding: 16px 22px;
+        border-bottom: 1px solid var(--cream-dark);
+        border-right: 1px solid var(--cream-dark);
+    }
+    .detail-item:nth-child(even) { border-right: none; }
+    .detail-item:nth-last-child(-n+2) { border-bottom: none; }
+    .detail-item.full { grid-column: 1/-1; border-right: none; }
+    .detail-label { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:var(--text-muted); margin-bottom:5px; }
+    .detail-value { font-size:14px; color:var(--navy); font-weight:500; }
+
+    .badge { display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:600; }
+    .badge::before { content:''; width:5px; height:5px; border-radius:50%; background:currentColor; }
+    .badge-actif   { background:#D1FAE5; color:#065F46; }
+    .badge-inactif { background:#FEF3C7; color:#B45309; }
+    .badge-expire  { background:#FEE2E2; color:#DC2626; }
+
+    .actions-bar { display:flex; gap:10px; flex-wrap:wrap; max-width:760px; }
+    .btn { display:inline-flex; align-items:center; gap:7px; padding:9px 18px; border-radius:8px; font-size:13px; font-weight:600; text-decoration:none; border:none; cursor:pointer; transition:all 0.2s; }
+    .btn-primary   { background:var(--green-mid); color:white; }
+    .btn-primary:hover { background:var(--green-dark); color:white; }
+    .btn-secondary { background:var(--cream); border:1px solid var(--cream-dark); color:var(--navy); }
+    .btn-secondary:hover { background:var(--cream-dark); }
+    .btn-danger    { background:#FEE2E2; color:#DC2626; border:1px solid #FECACA; }
+    .btn-danger:hover { background:#DC2626; color:white; }
+
+    @media(max-width:560px){ .detail-grid{grid-template-columns:1fr;} .detail-item{border-right:none;} }
+</style>
+{% endblock %}
+
+{% block body %}
+
+    {# ── Fiche détail ── #}
+    <div class="detail-card">
+        <div class="card-header">
+            <div class="card-header-left">
+                <div class="card-icon" style="background:#EAF3E6;">
+                    <i class="fa fa-file-contract" style="color:#2D5A27;"></i>
+                </div>
+                <div>
+                    <div class="card-title">Abonnement <span style="font-family:'DM Mono',monospace;">#{{ abonnement.idAbonn }}</span></div>
+                    <div class="card-sub">Informations complètes</div>
+                </div>
+            </div>
+            <span class="badge badge-{{ abonnement.situation }}">{{ abonnement.situation|capitalize }}</span>
+        </div>
+
+        <div class="detail-grid">
+            <div class="detail-item">
+                <div class="detail-label"><i class="fa fa-hashtag" style="margin-right:4px;"></i>ID Abonnement</div>
+                <div class="detail-value" style="font-family:'DM Mono',monospace;">#{{ abonnement.idAbonn }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label"><i class="fa fa-id-card" style="margin-right:4px;"></i>CIN</div>
+                <div class="detail-value" style="font-family:'DM Mono',monospace;">{{ abonnement.cin }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label"><i class="fa fa-tag" style="margin-right:4px;"></i>ID Offre</div>
+                <div class="detail-value">{{ abonnement.idOffre }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label"><i class="fa fa-circle-dot" style="margin-right:4px;"></i>Situation</div>
+                <div class="detail-value">
+                    <span class="badge badge-{{ abonnement.situation }}">{{ abonnement.situation|capitalize }}</span>
+                </div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label"><i class="fa fa-calendar-plus" style="margin-right:4px;"></i>Date d'inscription</div>
+                <div class="detail-value">{{ abonnement.dateInscription|date('d/m/Y') }}</div>
+            </div>
+            <div class="detail-item">
+                <div class="detail-label"><i class="fa fa-calendar-xmark" style="margin-right:4px;"></i>Date d'expiration</div>
+                <div class="detail-value">{{ abonnement.dateExpiration|date('d/m/Y') }}</div>
+            </div>
+        </div>
+    </div>
+
+    {# ── Actions ── #}
+    <div class="actions-bar">
+        <a href="{{ path('admin_abonnements_edit', {idAbonn: abonnement.idAbonn}) }}" class="btn btn-primary">
+            <i class="fa fa-pen"></i> Modifier
+        </a>
+        <form method="POST"
+              action="{{ path('admin_abonnements_delete', {idAbonn: abonnement.idAbonn}) }}"
+              onsubmit="return confirm('Supprimer l\'abonnement #{{ abonnement.idAbonn }} définitivement ?')"
+              style="margin:0">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ abonnement.idAbonn) }}">
+            <button type="submit" class="btn btn-danger">
+                <i class="fa fa-trash"></i> Supprimer
+            </button>
+        </form>
+        <a href="{{ path('admin_abonnements_index') }}" class="btn btn-secondary">
+            <i class="fa fa-arrow-left"></i> Retour à la liste
+        </a>
+    </div>
+
+{% endblock %}
