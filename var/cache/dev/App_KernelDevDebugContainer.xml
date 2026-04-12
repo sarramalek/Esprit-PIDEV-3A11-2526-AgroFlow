@@ -824,7 +824,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.WzZ_eHj"/>
+      <argument type="service" id=".service_locator.BbGTEN0"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -3747,7 +3747,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.WzZ_eHj"/>
+      <argument type="service" id=".service_locator.BbGTEN0"/>
     </service>
     <service id="debug.log_processor" class="Symfony\Bridge\Monolog\Processor\DebugProcessor">
       <tag name="kernel.reset" method="reset"/>
@@ -8519,11 +8519,12 @@
         <argument key="authenticationUtils" type="service_closure" id="security.authentication_utils"/>
       </argument>
     </service>
-    <service id=".service_locator.t8346QO" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.vI_CVe2" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
         <argument key="passwordHasher" type="service_closure" id="security.user_password_hasher"/>
+        <argument key="terrainRepo" type="service_closure" id="App\Repository\Terrain\TerrainRepository"/>
       </argument>
     </service>
     <service id=".service_locator.S6We5vz" class="Symfony\Component\DependencyInjection\ServiceLocator">
@@ -8882,7 +8883,7 @@
         <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
       </argument>
     </service>
-    <service id=".service_locator.WzZ_eHj" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.BbGTEN0" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Controller\AdminDashboardController::index" type="service_closure" id=".service_locator.qni5W9T"/>
@@ -8930,7 +8931,7 @@
         <argument key="App\Controller\Animals\ExamensController::show" type="service_closure" id=".service_locator.Uyi5bSJ"/>
         <argument key="App\Controller\Animals\ExamensController::stats" type="service_closure" id=".service_locator.tl.X0ws"/>
         <argument key="App\Controller\AuthController::login" type="service_closure" id=".service_locator.rSTd.nA"/>
-        <argument key="App\Controller\AuthController::register" type="service_closure" id=".service_locator.t8346QO"/>
+        <argument key="App\Controller\AuthController::register" type="service_closure" id=".service_locator.vI_CVe2"/>
         <argument key="App\Controller\AuthController::terrainsByAgriculteur" type="service_closure" id=".service_locator.S6We5vz"/>
         <argument key="App\Controller\Evenements\Agriculteur\EvenementController::index" type="service_closure" id=".service_locator.bTRClTF"/>
         <argument key="App\Controller\Evenements\Agriculteur\EvenementController::inscrire" type="service_closure" id=".service_locator.VGXccJ4"/>
@@ -9011,6 +9012,7 @@
         <argument key="App\Controller\User\AbonnementFrontController::front" type="service_closure" id=".service_locator.CLxInnv"/>
         <argument key="App\Controller\User\AbonnementFrontController::pdf" type="service_closure" id=".service_locator.CLxInnv"/>
         <argument key="App\Controller\User\AdminUserController::ban" type="service_closure" id=".service_locator.S18McA7"/>
+        <argument key="App\Controller\User\AdminUserController::delete" type="service_closure" id=".service_locator.S18McA7"/>
         <argument key="App\Controller\User\AdminUserController::edit" type="service_closure" id=".service_locator.S18McA7"/>
         <argument key="App\Controller\User\AdminUserController::pdf" type="service_closure" id=".service_locator.S18McA7"/>
         <argument key="App\Controller\User\AdminUserController::show" type="service_closure" id=".service_locator.S18McA7"/>
@@ -9112,7 +9114,7 @@
         <argument key="App\Controller\Animals\ExamensController:show" type="service_closure" id=".service_locator.Uyi5bSJ"/>
         <argument key="App\Controller\Animals\ExamensController:stats" type="service_closure" id=".service_locator.tl.X0ws"/>
         <argument key="App\Controller\AuthController:login" type="service_closure" id=".service_locator.rSTd.nA"/>
-        <argument key="App\Controller\AuthController:register" type="service_closure" id=".service_locator.t8346QO"/>
+        <argument key="App\Controller\AuthController:register" type="service_closure" id=".service_locator.vI_CVe2"/>
         <argument key="App\Controller\AuthController:terrainsByAgriculteur" type="service_closure" id=".service_locator.S6We5vz"/>
         <argument key="App\Controller\Evenements\Agriculteur\EvenementController:index" type="service_closure" id=".service_locator.bTRClTF"/>
         <argument key="App\Controller\Evenements\Agriculteur\EvenementController:inscrire" type="service_closure" id=".service_locator.VGXccJ4"/>
@@ -9193,6 +9195,7 @@
         <argument key="App\Controller\User\AbonnementFrontController:front" type="service_closure" id=".service_locator.CLxInnv"/>
         <argument key="App\Controller\User\AbonnementFrontController:pdf" type="service_closure" id=".service_locator.CLxInnv"/>
         <argument key="App\Controller\User\AdminUserController:ban" type="service_closure" id=".service_locator.S18McA7"/>
+        <argument key="App\Controller\User\AdminUserController:delete" type="service_closure" id=".service_locator.S18McA7"/>
         <argument key="App\Controller\User\AdminUserController:edit" type="service_closure" id=".service_locator.S18McA7"/>
         <argument key="App\Controller\User\AdminUserController:pdf" type="service_closure" id=".service_locator.S18McA7"/>
         <argument key="App\Controller\User\AdminUserController:show" type="service_closure" id=".service_locator.S18McA7"/>
@@ -11867,7 +11870,7 @@
     <service id="Psr\Log\LoggerInterface" alias="monolog.logger"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.w7.f4fT" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.WzZ_eHj"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.BbGTEN0"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id=".Psr\Log\LoggerInterface $request.logger" alias="monolog.logger.request"/>
@@ -11911,7 +11914,7 @@
     <service id=".service_locator.Ye5OOWs" alias=".service_locator.cZxzGoz"/>
     <service id=".service_locator.s4yyZIP" alias=".service_locator.ST3E3fc"/>
     <service id=".service_locator.ontUAUs" alias=".service_locator.wH4nX8g"/>
-    <service id=".service_locator.81LTOQ7" alias=".service_locator.t8346QO"/>
+    <service id=".service_locator.roCFsj8" alias=".service_locator.vI_CVe2"/>
     <service id=".service_locator.sEaJncE" alias=".service_locator.cBE01og"/>
     <service id=".service_locator.Dq589Yi" alias=".service_locator.VGXccJ4"/>
     <service id=".service_locator.XvTo7NF" alias=".service_locator.kLp2YUI"/>
@@ -11931,7 +11934,7 @@
     <service id=".service_locator.5pebkNV" alias=".service_locator.xxq2prQ"/>
     <service id=".service_locator.whdse4m" alias=".service_locator.yd.AI8F"/>
     <service id=".service_locator.8J1nalj" alias=".service_locator.SsD9eLO"/>
-    <service id=".service_locator.U1MbHAM" alias=".service_locator.WzZ_eHj"/>
+    <service id=".service_locator.QJi_DzF" alias=".service_locator.BbGTEN0"/>
     <service id=".service_locator.BFrsqsn" alias=".service_locator.F9PKc.7"/>
     <service id=".service_locator.oIHygA7" alias=".service_locator.xOkKGYY"/>
     <service id=".service_locator.XtmiKbi" alias=".service_locator.MfxSDRP"/>
@@ -11981,7 +11984,7 @@
     <service id=".service_locator._D8eTcZ" alias=".service_locator.Uyi5bSJ"/>
     <service id=".service_locator.JTtEETS" alias=".service_locator.wH4nX8g"/>
     <service id=".service_locator.7NIAq8D" alias=".service_locator.rSTd.nA"/>
-    <service id=".service_locator.PgYGRUQ" alias=".service_locator.t8346QO"/>
+    <service id=".service_locator.gL3NmIv" alias=".service_locator.vI_CVe2"/>
     <service id=".service_locator.NY0XfPp" alias=".service_locator.S6We5vz"/>
     <service id=".service_locator.sKW_vib" alias=".service_locator.bTRClTF"/>
     <service id=".service_locator.RFFOZR2" alias=".service_locator.F7gwLgd"/>
