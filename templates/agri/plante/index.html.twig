@@ -6,48 +6,112 @@
 .stats-row { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:28px; }
 .stat-card { background:white; border-radius:14px; box-shadow:0 2px 12px rgba(0,0,0,0.07); padding:20px 24px; display:flex; align-items:center; gap:16px; }
 .stat-icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
-.stat-icon.green  { background:#D1FAE5; color:#065F46; }
-.stat-icon.blue   { background:#DBEAFE; color:#1D4ED8; }
+.stat-icon.green { background:#D1FAE5; color:#065F46; }
+.stat-icon.blue { background:#DBEAFE; color:#1D4ED8; }
 .stat-icon.yellow { background:#FEF3C7; color:#92400E; }
 .stat-value { font-size:26px; font-weight:700; color:#1B3A20; }
 .stat-label { font-size:12px; color:#888; margin-top:2px; }
+
 .toolbar { display:flex; align-items:center; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
 .search-wrap { position:relative; flex:1; min-width:240px; }
 .search-wrap input { width:100%; padding:11px 16px 11px 40px; border:1.5px solid #ddd; border-radius:10px; font-size:14px; font-family:'DM Sans',sans-serif; background:white; }
 .search-wrap input:focus { outline:none; border-color:#2D5A27; }
 .search-wrap i { position:absolute; left:13px; top:50%; transform:translateY(-50%); color:#aaa; }
+
 .result-count { font-size:13px; color:#888; white-space:nowrap; }
-.btn-add { display:inline-flex; align-items:center; gap:8px; background:#2D5A27; color:white; padding:11px 22px; border-radius:10px; font-size:14px; font-weight:600; text-decoration:none; white-space:nowrap; }
+
+.btn-add { 
+    display:inline-flex; align-items:center; gap:8px; 
+    background:#2D5A27; color:white; padding:11px 22px; 
+    border-radius:10px; font-size:14px; font-weight:600; 
+    text-decoration:none; white-space:nowrap; 
+}
 .btn-add:hover { background:#1B3A20; color:white; }
-.plante-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:20px; }
-.plante-card { background:white; border-radius:16px; box-shadow:0 2px 12px rgba(0,0,0,0.07); overflow:hidden; transition:transform 0.2s, box-shadow 0.2s; }
+
+.btn-pdf { 
+    display:inline-flex; align-items:center; gap:8px; 
+    background:#1D4ED8; color:white; padding:11px 22px; 
+    border-radius:10px; font-size:14px; font-weight:600; 
+    border:none; cursor:pointer; white-space:nowrap; 
+}
+.btn-pdf:hover { background:#1E40AF; }
+
+.plante-grid { 
+    display:grid; 
+    grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); 
+    gap:20px; 
+}
+
+.plante-card { 
+    background:white; border-radius:16px; box-shadow:0 2px 12px rgba(0,0,0,0.07); 
+    overflow:hidden; transition:transform 0.2s, box-shadow 0.2s; 
+}
 .plante-card:hover { transform:translateY(-3px); box-shadow:0 8px 24px rgba(0,0,0,0.12); }
+
 .plante-card-header { background:linear-gradient(135deg,#4A8C3F,#2D5A27); padding:20px; display:flex; align-items:center; gap:14px; }
 .plante-avatar { width:50px; height:50px; border-radius:12px; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:24px; }
 .plante-name { font-size:17px; font-weight:700; color:white; }
 .plante-variete { font-size:12px; color:rgba(255,255,255,0.75); margin-top:2px; }
+
 .plante-card-body { padding:16px 20px; }
 .plante-info-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #f0f0f0; font-size:13px; }
 .plante-info-row:last-child { border-bottom:none; }
 .plante-info-label { color:#888; font-weight:500; display:flex; align-items:center; gap:6px; }
 .plante-info-label i { color:#2D5A27; width:14px; }
 .plante-info-value { font-weight:600; color:#1B3A20; }
+
 .plante-card-footer { padding:12px 20px; border-top:1px solid #f5f5f5; display:flex; gap:8px; }
 .btn-sm-show { flex:1; display:inline-flex; align-items:center; justify-content:center; gap:6px; background:#EFF6FF; color:#2563EB; border:1px solid #BFDBFE; padding:8px; border-radius:8px; font-size:13px; text-decoration:none; font-weight:500; }
 .btn-sm-edit { flex:1; display:inline-flex; align-items:center; justify-content:center; gap:6px; background:#f0f0f0; color:#333; border:1px solid #ddd; padding:8px; border-radius:8px; font-size:13px; text-decoration:none; font-weight:500; }
 .btn-sm-edit:hover { background:#e0e0e0; }
 .btn-sm-del { display:inline-flex; align-items:center; justify-content:center; gap:6px; background:#FEE2E2; color:#DC2626; border:none; padding:8px 12px; border-radius:8px; font-size:13px; cursor:pointer; font-weight:500; }
 .btn-sm-del:hover { background:#FECACA; }
+
 .flash-success { background:#D1FAE5; color:#065F46; padding:12px 18px; border-radius:10px; margin-bottom:20px; font-size:14px; display:flex; align-items:center; gap:8px; }
 .flash-success i { font-size:16px; }
 .empty-state { text-align:center; padding:60px 20px; color:#aaa; }
 .empty-state i { font-size:56px; margin-bottom:16px; opacity:0.2; display:block; }
 .no-results { text-align:center; padding:40px; color:#aaa; display:none; }
+
+/* === PAGINATION === */
+.pagination-wrap { 
+    display:flex; 
+    align-items:center; 
+    justify-content:space-between; 
+    padding:20px 0; 
+    margin-top:30px; 
+    border-top:1px solid #eee; 
+    font-size:13px; 
+    flex-wrap:wrap; 
+    gap:12px; 
+}
+.pagination-info { color:#888; }
+.pagination-btns { display:flex; gap:4px; }
+.page-btn { 
+    min-width:36px; 
+    height:36px; 
+    border-radius:8px; 
+    border:1px solid #ddd; 
+    background:white; 
+    color:#333; 
+    font-size:13px; 
+    font-weight:600; 
+    cursor:pointer; 
+    display:inline-flex; 
+    align-items:center; 
+    justify-content:center; 
+}
+.page-btn:hover { border-color:#2D5A27; color:#2D5A27; }
+.page-btn.active { 
+    background:#2D5A27; 
+    color:white; 
+    border-color:#2D5A27; 
+}
+.page-btn:disabled { opacity:0.4; cursor:not-allowed; }
 </style>
 {% endblock %}
 
 {% block body %}
-
 {% for msg in app.flashes('success') %}
 <div class="flash-success"><i class="fa fa-check-circle"></i> {{ msg }}</div>
 {% endfor %}
@@ -72,6 +136,7 @@
         <i class="fa fa-magnifying-glass"></i>
         <input type="text" id="searchInput" placeholder="Rechercher par nom, variété…">
     </div>
+
     <select id="sortSelect" style="padding:11px 14px;border:1.5px solid #ddd;border-radius:10px;font-size:14px;background:white;cursor:pointer;">
         <option value="">— Trier par —</option>
         <option value="nom-asc">Nom A→Z</option>
@@ -81,7 +146,14 @@
         <option value="cycle-asc">Cycle ↑</option>
         <option value="cycle-desc">Cycle ↓</option>
     </select>
+
     <span class="result-count" id="resultCount"></span>
+
+    <!-- Bouton Export PDF -->
+    <button class="btn-pdf" onclick="exportPDF()">
+        <i class="fa fa-file-pdf"></i> Exporter PDF
+    </button>
+
     <a href="{{ path('agri_plantes_new') }}" class="btn-add">
         <i class="fa fa-plus"></i> Nouvelle plante
     </a>
@@ -102,7 +174,11 @@
          data-nom="{{ plante.nomP|lower }}"
          data-variete="{{ plante.variete ? plante.variete|lower : '' }}"
          data-eau="{{ plante.besoinEau ?? 0 }}"
-         data-cycle="{{ plante.cycleJours ?? 0 }}">
+         data-cycle="{{ plante.cycleJours ?? 0 }}"
+         data-nom-raw="{{ plante.nomP }}"
+         data-variete-raw="{{ plante.variete ?? '—' }}"
+         data-eau-raw="{{ plante.besoinEau ?? '—' }}"
+         data-cycle-raw="{{ plante.cycleJours ?? '—' }}">
         <div class="plante-card-header">
             <div class="plante-avatar">🌱</div>
             <div>
@@ -136,62 +212,195 @@
     </div>
     {% endfor %}
 </div>
+
 <div class="no-results" id="noResults">
     <i class="fa fa-magnifying-glass" style="font-size:40px;opacity:0.2;display:block;margin-bottom:12px"></i>
     Aucun résultat trouvé.
 </div>
-{% endif %}
 
+{# PAGINATION #}
+<div class="pagination-wrap">
+    <div class="pagination-info" id="paginationInfo"></div>
+    <div class="pagination-btns" id="paginationBtns"></div>
+</div>
+{% endif %}
 {% endblock %}
 
 {% block javascripts %}
-{{ parent() }}  {# ← FIX : charge le JS du base (toggleProfilePanel) #}
+{{ parent() }}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
 <script>
+// Variables globales
+let allCards = [];
+let filteredCards = [];
+let currentPage = 1;
+let perPage = 9;   // 9 cartes par page (adapté à la grille)
+
 const searchInput = document.getElementById('searchInput');
-const sortSelect  = document.getElementById('sortSelect');
+const sortSelect = document.getElementById('sortSelect');
 const resultCount = document.getElementById('resultCount');
-const noResults   = document.getElementById('noResults');
-const grid        = document.getElementById('planteGrid');
+const noResults = document.getElementById('noResults');
+const grid = document.getElementById('planteGrid');
 
-function getCards() {
-    return grid ? Array.from(grid.querySelectorAll('.plante-card')) : [];
-}
+window.addEventListener('DOMContentLoaded', () => {
+    if (!grid) return;
+    allCards = Array.from(grid.querySelectorAll('.plante-card'));
+    applyFilterSortAndPaginate();
+});
 
-function filterAndSort() {
-    const q    = searchInput ? searchInput.value.toLowerCase().trim() : '';
-    const sort = sortSelect ? sortSelect.value : '';
-    let cards  = getCards();
-    let visible = 0;
+// Filtrage + Tri + Pagination
+function applyFilterSortAndPaginate() {
+    const q = searchInput ? searchInput.value.toLowerCase().trim() : '';
+    const sortValue = sortSelect ? sortSelect.value : '';
 
-    cards.forEach(card => {
-        const nom     = card.dataset.nom     || '';
+    // Filtrage
+    filteredCards = allCards.filter(card => {
+        const nom = card.dataset.nom || '';
         const variete = card.dataset.variete || '';
-        const match   = !q || nom.includes(q) || variete.includes(q);
-        card.style.display = match ? '' : 'none';
-        if (match) visible++;
+        return !q || nom.includes(q) || variete.includes(q);
     });
 
-    if (resultCount) resultCount.textContent = visible + ' résultat' + (visible > 1 ? 's' : '');
-    if (noResults)   noResults.style.display  = visible === 0 ? 'block' : 'none';
+    // Tri
+    if (sortValue) {
+        filteredCards.sort((a, b) => {
+            switch(sortValue) {
+                case 'nom-asc': return (a.dataset.nom||'').localeCompare(b.dataset.nom||'', 'fr');
+                case 'nom-desc': return (b.dataset.nom||'').localeCompare(a.dataset.nom||'', 'fr');
+                case 'eau-asc': return parseFloat(a.dataset.eau||0) - parseFloat(b.dataset.eau||0);
+                case 'eau-desc': return parseFloat(b.dataset.eau||0) - parseFloat(a.dataset.eau||0);
+                case 'cycle-asc': return parseInt(a.dataset.cycle||0) - parseInt(b.dataset.cycle||0);
+                case 'cycle-desc': return parseInt(b.dataset.cycle||0) - parseInt(a.dataset.cycle||0);
+                default: return 0;
+            }
+        });
+    }
 
-    if (!sort || !grid) return;
-    const visibleCards = cards.filter(c => c.style.display !== 'none');
-    visibleCards.sort((a, b) => {
-        switch(sort) {
-            case 'nom-asc':    return (a.dataset.nom||'').localeCompare(b.dataset.nom||'', 'fr');
-            case 'nom-desc':   return (b.dataset.nom||'').localeCompare(a.dataset.nom||'', 'fr');
-            case 'eau-asc':    return parseFloat(a.dataset.eau||0) - parseFloat(b.dataset.eau||0);
-            case 'eau-desc':   return parseFloat(b.dataset.eau||0) - parseFloat(a.dataset.eau||0);
-            case 'cycle-asc':  return parseInt(a.dataset.cycle||0) - parseInt(b.dataset.cycle||0);
-            case 'cycle-desc': return parseInt(b.dataset.cycle||0) - parseInt(a.dataset.cycle||0);
-            default: return 0;
+    currentPage = 1;
+    renderPage();
+}
+
+if (searchInput) searchInput.addEventListener('input', applyFilterSortAndPaginate);
+if (sortSelect) sortSelect.addEventListener('change', applyFilterSortAndPaginate);
+
+function renderPage() {
+    const total = filteredCards.length;
+    const totalPages = Math.max(1, Math.ceil(total / perPage));
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    const start = (currentPage - 1) * perPage;
+    const end = Math.min(start + perPage, total);
+
+    // Masquer toutes les cartes
+    allCards.forEach(card => card.style.display = 'none');
+
+    // Afficher seulement la page courante
+    filteredCards.slice(start, end).forEach(card => {
+        card.style.display = '';
+    });
+
+    // Mise à jour compteur
+    if (resultCount) resultCount.textContent = total + ' résultat' + (total > 1 ? 's' : '');
+    if (noResults) noResults.style.display = total === 0 ? 'block' : 'none';
+
+    // Info pagination
+    const info = document.getElementById('paginationInfo');
+    if (info) {
+        info.textContent = total === 0 
+            ? 'Aucun résultat' 
+            : `${start + 1}–${end} sur ${total} plante${total > 1 ? 's' : ''}`;
+    }
+
+    renderPaginationBtns(totalPages);
+}
+
+function renderPaginationBtns(totalPages) {
+    const wrap = document.getElementById('paginationBtns');
+    if (!wrap) return;
+    wrap.innerHTML = '';
+
+    const mkBtn = (label, page, disabled, active) => {
+        const b = document.createElement('button');
+        b.className = 'page-btn' + (active ? ' active' : '');
+        b.innerHTML = label;
+        b.disabled = disabled;
+        if (!disabled) b.addEventListener('click', () => { currentPage = page; renderPage(); });
+        return b;
+    };
+
+    wrap.appendChild(mkBtn('<i class="fa fa-chevron-left"></i>', currentPage - 1, currentPage === 1, false));
+
+    let pages = [];
+    if (totalPages <= 7) {
+        for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+        pages = [1];
+        if (currentPage > 3) pages.push('…');
+        for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) pages.push(i);
+        if (currentPage < totalPages - 2) pages.push('…');
+        pages.push(totalPages);
+    }
+
+    pages.forEach(p => {
+        if (p === '…') {
+            const sp = document.createElement('span');
+            sp.textContent = '…';
+            sp.style.cssText = 'padding:0 8px;color:#888;line-height:36px;';
+            wrap.appendChild(sp);
+        } else {
+            wrap.appendChild(mkBtn(p, p, false, p === currentPage));
         }
     });
-    visibleCards.forEach(c => grid.appendChild(c));
+
+    wrap.appendChild(mkBtn('<i class="fa fa-chevron-right"></i>', currentPage + 1, currentPage === totalPages, false));
 }
 
-if (searchInput) searchInput.addEventListener('input', filterAndSort);
-if (sortSelect)  sortSelect.addEventListener('change', filterAndSort);
-window.addEventListener('DOMContentLoaded', filterAndSort);
+// ====================== EXPORT PDF ======================
+function exportPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+    doc.setFillColor(45, 90, 39);
+    doc.rect(0, 0, 210, 25, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'bold');
+    doc.text('AgroFlow — Mes Plantes', 14, 16);
+
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Exporté le ' + new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }), 120, 16);
+
+    const rows = filteredCards.map(card => [
+        card.dataset.nomRaw || '—',
+        card.dataset.varieteRaw || '—',
+        card.dataset.eauRaw !== '—' ? card.dataset.eauRaw + ' L/j' : '—',
+        card.dataset.cycleRaw !== '—' ? card.dataset.cycleRaw + ' jours' : '—'
+    ]);
+
+    doc.autoTable({
+        head: [['Nom', 'Variété', 'Besoin en eau', 'Cycle de culture']],
+        body: rows,
+        startY: 32,
+        theme: 'striped',
+        headStyles: { fillColor: [74, 140, 63], textColor: 255, fontStyle: 'bold' },
+        bodyStyles: { fontSize: 10 },
+        alternateRowStyles: { fillColor: [240, 255, 240] },
+        margin: { left: 14, right: 14 }
+    });
+
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(150);
+        doc.text('AgroFlow — Confidentiel', 14, 290);
+        doc.text(`Page ${i} / ${pageCount}`, 180, 290);
+    }
+
+    doc.save('mes_plantes_agroflow_' + new Date().toISOString().slice(0,10) + '.pdf');
+}
 </script>
 {% endblock %}

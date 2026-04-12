@@ -138,6 +138,18 @@ class AdminUserController extends AbstractController
 
         return $this->redirectToRoute('admin_users_list');
     }
+    // ── DELETE ────────────────────────────────────────────────────────────────
+    #[Route('/{cin}/delete', name: '_delete', requirements: ['cin' => '\d+'], methods: ['POST'])]
+    public function delete(Request $request, User $user): Response
+    {
+        if ($this->isCsrfTokenValid('delete_user_' . $user->getCin(), $request->request->get('_token'))) {
+            $this->em->remove($user);
+            $this->em->flush();
+            $this->addFlash('success', 'Utilisateur supprimé.');
+        }
+
+        return $this->redirectToRoute('admin_users_list');
+    }
 
     // ── PDF un user ───────────────────────────────────────────────────────────
     #[Route('/{cin}/pdf', name: '_pdf', requirements: ['cin' => '\d+'], methods: ['GET'])]
