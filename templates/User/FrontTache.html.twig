@@ -1,0 +1,345 @@
+{# templates/User/FrontTache.html.twig #}
+{% extends 'base_agriculteur.html.twig' %}
+
+{% block title %}Gestion des Terrains & Ouvriers{% endblock %}
+
+{% block stylesheets %}
+<style>
+    :root {
+        --vert:   #2d6a4f;
+        --vert-l: #52b788;
+        --terre:  #bc6c25;
+        --beige:  #fefae0;
+        --gris:   #f1f1f1;
+        --danger: #d62828;
+    }
+
+    body { background: var(--beige); font-family: 'Segoe UI', sans-serif; }
+
+    .page-header {
+        background: linear-gradient(135deg, var(--vert), var(--vert-l));
+        color: white;
+        padding: 2rem;
+        border-radius: 0 0 1.5rem 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .page-header h1 { margin: 0; font-size: 1.8rem; }
+    .page-header p  { margin: .25rem 0 0; opacity: .85; }
+
+    /* ---- Cards Terrains ---- */
+    .terrain-card {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 2px 12px rgba(0,0,0,.08);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+        border-left: 5px solid var(--vert);
+        transition: box-shadow .2s;
+    }
+    .terrain-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,.13); }
+
+    .terrain-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        background: var(--gris);
+        cursor: pointer;
+    }
+    .terrain-header .terrain-info h5 {
+        margin: 0;
+        font-size: 1.1rem;
+        color: var(--vert);
+    }
+    .terrain-header .terrain-info small { color: #666; }
+    .terrain-header .badge-count {
+        background: var(--vert-l);
+        color: white;
+        border-radius: 2rem;
+        padding: .25rem .75rem;
+        font-size: .85rem;
+        font-weight: 600;
+    }
+
+    .terrain-body { padding: 1.25rem 1.5rem; display: none; }
+    .terrain-body.open { display: block; }
+
+    /* ---- Table Ouvriers ---- */
+    .table-ouvriers {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: .9rem;
+    }
+    .table-ouvriers th {
+        background: var(--vert);
+        color: white;
+        padding: .6rem .9rem;
+        text-align: left;
+    }
+    .table-ouvriers td { padding: .6rem .9rem; border-bottom: 1px solid #eee; }
+    .table-ouvriers tr:last-child td { border-bottom: none; }
+    .table-ouvriers tr:hover td { background: #f7fff7; }
+
+    /* ---- Formulaire assignation ---- */
+    .assign-form {
+        display: flex;
+        gap: .75rem;
+        align-items: center;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+    }
+    .assign-form select {
+        flex: 1;
+        min-width: 200px;
+        padding: .5rem .75rem;
+        border: 1px solid #ccc;
+        border-radius: .5rem;
+        font-size: .9rem;
+    }
+    .btn-assign {
+        background: var(--vert);
+        color: white;
+        border: none;
+        padding: .5rem 1.2rem;
+        border-radius: .5rem;
+        cursor: pointer;
+        font-size: .9rem;
+        transition: background .2s;
+    }
+    .btn-assign:hover { background: var(--vert-l); }
+
+    .btn-remove {
+        background: transparent;
+        border: 1px solid var(--danger);
+        color: var(--danger);
+        padding: .25rem .6rem;
+        border-radius: .4rem;
+        font-size: .8rem;
+        cursor: pointer;
+        transition: all .2s;
+    }
+    .btn-remove:hover { background: var(--danger); color: white; }
+
+    /* ---- Toast ---- */
+    #toast {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: var(--vert);
+        color: white;
+        padding: .8rem 1.4rem;
+        border-radius: .75rem;
+        box-shadow: 0 4px 16px rgba(0,0,0,.2);
+        font-size: .95rem;
+        opacity: 0;
+        transform: translateY(1rem);
+        transition: all .3s;
+        z-index: 9999;
+        pointer-events: none;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+    #toast.error { background: var(--danger); }
+
+    .empty-state {
+        text-align: center;
+        padding: 2rem;
+        color: #999;
+    }
+    .empty-state i { font-size: 2rem; display: block; margin-bottom: .5rem; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="page-header">
+    <div class="container">
+        <h1>🌾 Mes Terrains & Ouvriers</h1>
+        <p>Gérez l'assignation de vos ouvriers à chaque terrain</p>
+    </div>
+</div>
+
+<div class="container">
+
+    {% if terrains is empty %}
+        <div class="terrain-card">
+            <div class="empty-state">
+                <i>🏜️</i>
+                Aucun terrain enregistré pour votre compte.
+            </div>
+        </div>
+    {% else %}
+        {% for terrain in terrains %}
+        <div class="terrain-card">
+            {# En-tête cliquable #}
+            <div class="terrain-header" onclick="toggleTerrain(this)">
+                <div class="terrain-info">
+                    <h5>{{ terrain.nomTerrain }}</h5>
+                    <small>
+                        📍 {{ terrain.localisation }} &nbsp;|&nbsp;
+                        📐 {{ terrain.surface }} m² &nbsp;|&nbsp;
+                        🧱 {{ terrain.typeSol }}
+                    </small>
+                </div>
+                <span class="badge-count">
+                    {{ terrain.ouvriers|length }} ouvrier{{ terrain.ouvriers|length != 1 ? 's' : '' }}
+                </span>
+            </div>
+
+            {# Corps du terrain #}
+            <div class="terrain-body" id="body-terrain-{{ terrain.id }}">
+
+                {# Liste des ouvriers actuels #}
+                {% if terrain.ouvriers is empty %}
+                    <p style="color:#999; font-style:italic;">Aucun ouvrier assigné à ce terrain.</p>
+                {% else %}
+                    <table class="table-ouvriers">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Prénom</th>
+                                <th>Téléphone</th>
+                                <th>Email</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ouvriers-{{ terrain.id }}">
+                            {% for ouvrier in terrain.ouvriers %}
+                            <tr id="row-{{ ouvrier.cin }}">
+                                <td>{{ ouvrier.nom }}</td>
+                                <td>{{ ouvrier.prenom }}</td>
+                                <td>{{ ouvrier.tel ?? '—' }}</td>
+                                <td>{{ ouvrier.email }}</td>
+                                <td>
+                                    <button
+                                        class="btn-remove"
+                                        onclick="desassignerOuvrier({{ ouvrier.cin }}, this)"
+                                        title="Retirer de ce terrain">
+                                        ✕ Retirer
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+
+                {# Formulaire d'assignation d'un nouvel ouvrier #}
+                <div class="assign-form">
+                    <select id="select-ouvrier-{{ terrain.id }}">
+                        <option value="">— Choisir un ouvrier disponible —</option>
+                        {% for o in ouvriersDispo %}
+                            <option value="{{ o.cin }}">{{ o.prenom }} {{ o.nom }}</option>
+                        {% endfor %}
+                    </select>
+                    <button
+                        class="btn-assign"
+                        onclick="assignerOuvrier({{ terrain.id }}, this)">
+                        ➕ Assigner
+                    </button>
+                </div>
+
+                {# Lien vers les tâches de ce terrain #}
+                <div style="margin-top:1rem; text-align:right;">
+                    <a href="#" style="color:var(--vert-l); font-size:.85rem;"
+                       onclick="voirTachesOuvriers({{ terrain.id }}); return false;">
+                        📋 Voir les tâches des ouvriers
+                    </a>
+                </div>
+
+            </div>{# /terrain-body #}
+        </div>
+        {% endfor %}
+    {% endif %}
+
+</div>{# /container #}
+
+{# Toast notification #}
+<div id="toast"></div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script>
+// ---- Accordéon terrain ----
+function toggleTerrain(header) {
+    const body = header.nextElementSibling;
+    body.classList.toggle('open');
+}
+
+// ---- Assigner un ouvrier à un terrain ----
+function assignerOuvrier(idTerrain, btn) {
+    const select = document.getElementById('select-ouvrier-' + idTerrain);
+    const cin    = select.value;
+
+    if (!cin) {
+        showToast('Veuillez sélectionner un ouvrier.', true);
+        return;
+    }
+
+    const form = new FormData();
+    form.append('cin_ouvrier', cin);
+
+    fetch(`/agriculteur/tache/terrain/${idTerrain}/assigner-ouvrier`, {
+        method: 'POST',
+        body:   form,
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message);
+            // Recharger la page pour refléter les changements
+            setTimeout(() => location.reload(), 1200);
+        } else {
+            showToast(data.error ?? 'Erreur lors de l\'assignation.', true);
+        }
+    })
+    .catch(() => showToast('Erreur réseau.', true));
+}
+
+// ---- Désassigner un ouvrier ----
+function desassignerOuvrier(cin, btn) {
+    if (!confirm('Voulez-vous retirer cet ouvrier du terrain ?')) return;
+
+    const form = new FormData();
+
+    fetch(`/agriculteur/tache/ouvrier/${cin}/desassigner`, {
+        method: 'POST',
+        body:   form,
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message);
+            const row = document.getElementById('row-' + cin);
+            if (row) row.remove();
+        } else {
+            showToast(data.error ?? 'Erreur.', true);
+        }
+    })
+    .catch(() => showToast('Erreur réseau.', true));
+}
+
+// ---- Voir tâches des ouvriers d'un terrain ----
+function voirTachesOuvriers(idTerrain) {
+    fetch(`/agriculteur/tache/terrain/${idTerrain}/ouvriers`)
+        .then(r => r.json())
+        .then(ouvriers => {
+            if (ouvriers.length === 0) {
+                showToast('Aucun ouvrier dans ce terrain.', true);
+                return;
+            }
+            // Charger les tâches du premier ouvrier à titre d'exemple
+            // Vous pouvez adapter pour afficher une modale complète
+            const cin = ouvriers[0].cin;
+            window.location.href = `/agriculteur/tache/front/agriculteur/${cin}`;
+        });
+}
+
+// ---- Toast ----
+function showToast(msg, isError = false) {
+    const t = document.getElementById('toast');
+    t.textContent  = msg;
+    t.className    = 'show' + (isError ? ' error' : '');
+    setTimeout(() => { t.className = ''; }, 3500);
+}
+</script>
+{% endblock %}

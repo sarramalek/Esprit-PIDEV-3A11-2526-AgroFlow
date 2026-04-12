@@ -1,0 +1,20 @@
+{% extends 'base_admin.html.twig' %}
+{% block title %}Nouvelle Offre - AgroFlow{% endblock %}
+{% block body %}
+<div style="padding:35px 40px; background:#F4F6F9; min-height:100vh; font-family:Arial,sans-serif;">
+    <div style="max-width:650px; margin:0 auto;">
+        <div style="margin-bottom:25px;">
+            <a href="{{ path('app_offre_list') }}" style="color:#888; text-decoration:none; font-size:14px;"><i class="fa fa-arrow-left"></i> Retour</a>
+            <h2 style="margin:10px 0 0; color:#2C3E50;">Nouvelle offre</h2>
+        </div>
+        <div style="background:white; border-radius:16px; padding:35px; box-shadow:0 4px 20px rgba(0,0,0,0.06);">
+            {{ form_start(form) }}
+                {% include 'User/formOffre.html.twig' %}
+                <button type="submit" style="width:100%; background:#2D5A27; color:white; padding:14px; border:none; border-radius:10px; font-size:15px; font-weight:600; cursor:pointer; margin-top:5px;">
+                    <i class="fa fa-save"></i> Créer l'offre
+                </button>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

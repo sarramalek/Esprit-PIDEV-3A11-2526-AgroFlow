@@ -55,7 +55,6 @@
 <div class="flash-error"><i class="fa fa-circle-xmark"></i> {{ msg }}</div>
 {% endfor %}
 
-{# ══ STATS ══ #}
 <div class="stats-row">
     <div class="stat-card">
         <div class="stat-icon green"><i class="fa fa-rotate"></i></div>
@@ -75,7 +74,6 @@
     </div>
 </div>
 
-{# ══ TOOLBAR ══ #}
 <div class="toolbar">
     <div class="search-wrap">
         <i class="fa fa-magnifying-glass"></i>
@@ -92,7 +90,6 @@
     </a>
 </div>
 
-{# ══ TABLE ══ #}
 <div class="card">
     {% if rotations is empty %}
     <div class="empty-state">
@@ -159,6 +156,7 @@
 {% endblock %}
 
 {% block javascripts %}
+{{ parent() }}  {# ← FIX : charge le JS du base (toggleProfilePanel) #}
 <script>
 const searchInput  = document.getElementById('searchInput');
 const filterStatus = document.getElementById('filterStatus');
@@ -177,10 +175,8 @@ function filterTable() {
         const terrain = row.dataset.terrain || '';
         const plante  = row.dataset.plante  || '';
         const st      = row.dataset.status  || '';
-
         const matchSearch = !q || terrain.includes(q) || plante.includes(q);
         const matchStatus = !status || st === status;
-
         row.style.display = (matchSearch && matchStatus) ? '' : 'none';
         if (matchSearch && matchStatus) visible++;
     });
@@ -193,27 +189,21 @@ if (searchInput)  searchInput.addEventListener('input', filterTable);
 if (filterStatus) filterStatus.addEventListener('change', filterTable);
 window.addEventListener('DOMContentLoaded', filterTable);
 
-// ── Tri ──────────────────────────────────────────────────
 let sortCol = -1, sortAsc = true;
-
 document.querySelectorAll('th[data-col]').forEach(th => {
     th.addEventListener('click', () => {
         if (!tbody) return;
         const col = parseInt(th.dataset.col);
-
         document.querySelectorAll('th[data-col]').forEach(t => {
             t.classList.remove('sort-asc','sort-desc');
             const icon = t.querySelector('.sort-icon');
             if (icon) icon.className = 'fa fa-sort sort-icon';
         });
-
         sortAsc = (sortCol === col) ? !sortAsc : true;
         sortCol = col;
-
         th.classList.add(sortAsc ? 'sort-asc' : 'sort-desc');
         const icon = th.querySelector('.sort-icon');
         if (icon) icon.className = 'fa fa-sort-' + (sortAsc ? 'up' : 'down') + ' sort-icon';
-
         const rows = Array.from(tbody.getElementsByTagName('tr'));
         rows.sort((a, b) => {
             const aVal = a.cells[col]?.textContent.trim() || '';

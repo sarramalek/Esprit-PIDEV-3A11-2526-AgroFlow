@@ -1,0 +1,56 @@
+<style>
+    .form-group { margin-bottom: 25px; }
+    .form-label { display: block; margin-bottom: 10px; font-weight: 700; color: #2C3E50; font-size: 15px; }
+    .form-control { width: 100%; padding: 14px 18px; border: 2px solid #E9ECEF; border-radius: 12px; font-size: 15px; outline: none; transition: all 0.3s; background: #FAFAFB; }
+    .form-control:focus { border-color: #2D5A27; background: white; box-shadow: 0 0 0 4px rgba(45, 90, 39, 0.1); }
+    
+    /* État invalide */
+    .form-control.is-invalid { border-color: #e74c3c !important; background: #FFF9F9; }
+    .form-control.is-invalid:focus { box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.1); }
+    
+    .invalid-feedback { color: #e74c3c; font-size: 13px; margin-top: 8px; font-weight: 600; }
+    .invalid-feedback ul { margin: 0; padding: 0; list-style: none; }
+    
+    .btn-submit { background: #2D5A27; color: white; border: none; padding: 15px 35px; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 16px; transition: all 0.3s; display: inline-flex; align-items: center; gap: 10px; }
+    .btn-submit:hover { background: #1B3A20; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(45, 90, 39, 0.2); }
+</style>
+
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div class="form-group">
+            <label class="form-label">Nom de l'animal</label>
+            {{ form_widget(form.nom, {'attr': {'class': 'form-control ' ~ (form.nom.vars.valid ? '' : 'is-invalid'), 'placeholder': 'Ex: Marguerite'}}) }}
+            <div class="invalid-feedback">{{ form_errors(form.nom) }}</div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Espèce</label>
+            {{ form_widget(form.espece, {'attr': {'class': 'form-control ' ~ (form.espece.vars.valid ? '' : 'is-invalid')}}) }}
+            <div class="invalid-feedback">{{ form_errors(form.espece) }}</div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Sexe</label>
+            {{ form_widget(form.sexe, {'attr': {'class': 'form-control ' ~ (form.sexe.vars.valid ? '' : 'is-invalid')}}) }}
+            <div class="invalid-feedback">{{ form_errors(form.sexe) }}</div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Poids (kg)</label>
+            {{ form_widget(form.poids, {'attr': {'class': 'form-control ' ~ (form.poids.vars.valid ? '' : 'is-invalid'), 'placeholder': 'Ex: 450'}}) }}
+            <div class="invalid-feedback">{{ form_errors(form.poids) }}</div>
+        </div>
+
+        <div class="form-group" style="grid-column: span 2;">
+            <label class="form-label">Date de Naissance</label>
+            {{ form_widget(form.date_naissance, {'attr': {'class': 'form-control ' ~ (form.date_naissance.vars.valid ? '' : 'is-invalid')}}) }}
+            <div class="invalid-feedback">{{ form_errors(form.date_naissance) }}</div>
+        </div>
+    </div>
+
+    <div style="margin-top: 30px; text-align: right;">
+        <button class="btn-submit">
+            <i class="fa fa-save"></i> {{ button_label|default('Enregistrer') }}
+        </button>
+    </div>
+{{ form_end(form) }}

@@ -6,6 +6,7 @@ use App\Repository\User\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use App\Entity\Terrain\Terrain;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'users')]
@@ -57,8 +58,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $twoFactorBackupCodes = null;
 
-    #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    private ?string $img = null;
+    #[ORM\Column(type: 'string', length: 255, nullable: false, options: ['default' => 'default.png'])]
+    private ?string $img = 'default.png';
+
+    /**
+     * Terrain auquel l'ouvrier est assigné (nullable).
+     * Un ouvrier appartient à un seul terrain à la fois.
+     */
+    #[ORM\ManyToOne(targetEntity: Terrain::class, inversedBy: 'ouvriers')]
+    #[ORM\JoinColumn(name: 'id_terrain', referencedColumnName: 'id_terrain', nullable: true, onDelete: 'SET NULL')]
+    private ?Terrain $terrain = null;
 
     // ==================== UserInterface ====================
 
@@ -82,10 +91,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return (string) $this->mdp;
     }
 
-    public function eraseCredentials(): void
-    {
-        // Nettoyer les données sensibles temporaires si besoin
-    }
+    public function eraseCredentials(): void {}
 
     // ==================== GETTERS & SETTERS ====================
 
@@ -136,4 +142,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getImg(): ?string { return $this->img; }
     public function setImg(?string $img): self { $this->img = $img; return $this; }
+
+    // ==================== TERRAIN ====================
+
+    public function getTerrain(): ?Terrain { return $this->terrain; }
+    public function setTerrain(?Terrain $terrain): self { $this->terrain = $terrain; return $this; }
 }
