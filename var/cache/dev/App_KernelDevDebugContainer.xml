@@ -696,6 +696,9 @@
     <service id="App\Form\User\OffreType" class="App\Form\User\OffreType" autowire="true" autoconfigure="true">
       <tag name="form.type"/>
     </service>
+    <service id="App\Form\User\Resetpasswordcontroller" class="App\Form\User\Resetpasswordcontroller" autowire="true" autoconfigure="true">
+      <tag name="container.error" message="The autoloader expected class &quot;App\Form\User\Resetpasswordcontroller&quot; to be defined in file &quot;C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\Form\User\Resetpasswordcontroller.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
+    </service>
     <service id="App\Form\User\TacheType" class="App\Form\User\TacheType" autowire="true" autoconfigure="true">
       <tag name="container.error" message="The autoloader expected class &quot;App\Form\User\TacheType&quot; to be defined in file &quot;C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\Form\User\TacheType.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
     </service>
@@ -824,7 +827,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.BbGTEN0"/>
+      <argument type="service" id=".service_locator.r6vr34n"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -2418,6 +2421,12 @@
       <argument type="service" id=".debug.http_client" on-invalid="ignore"/>
       <argument type="service" id="monolog.logger.mailer" on-invalid="ignore"/>
     </service>
+    <service id="mailer.transport_factory.gmail" class="Symfony\Component\Mailer\Bridge\Google\Transport\GmailTransportFactory">
+      <tag name="mailer.transport_factory"/>
+      <argument type="service" id="debug.event_dispatcher"/>
+      <argument type="service" id=".debug.http_client" on-invalid="ignore"/>
+      <argument type="service" id="monolog.logger.mailer" on-invalid="ignore"/>
+    </service>
     <service id="mailer.transport_factory.null" class="Symfony\Component\Mailer\Transport\NullTransportFactory">
       <tag name="mailer.transport_factory"/>
       <argument type="service" id="debug.event_dispatcher"/>
@@ -3747,7 +3756,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.BbGTEN0"/>
+      <argument type="service" id=".service_locator.r6vr34n"/>
     </service>
     <service id="debug.log_processor" class="Symfony\Bridge\Monolog\Processor\DebugProcessor">
       <tag name="kernel.reset" method="reset"/>
@@ -8533,6 +8542,24 @@
         <argument key="terrainRepo" type="service_closure" id="App\Repository\Terrain\TerrainRepository"/>
       </argument>
     </service>
+    <service id=".service_locator.P9wQXFg" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="hasher" type="service_closure" id="security.user_password_hasher"/>
+        <argument key="userRepo" type="service_closure" id="App\Repository\User\UserRepository"/>
+      </argument>
+    </service>
+    <service id=".errored.VrgtPmJ" class="App\Controller\MailerInterface">
+      <tag name="container.error" message="Cannot determine controller argument for &quot;App\Controller\AuthController::resend()&quot;: the $mailer argument is type-hinted with the non-existent class or interface: &quot;App\Controller\MailerInterface&quot;. Did you forget to add a use statement?"/>
+    </service>
+    <service id=".service_locator.TvXqsTL" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="mailer" type="service_closure" id=".errored.VrgtPmJ"/>
+        <argument key="userRepo" type="service_closure" id="App\Repository\User\UserRepository"/>
+      </argument>
+    </service>
     <service id=".service_locator.bTRClTF" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -8883,7 +8910,7 @@
         <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
       </argument>
     </service>
-    <service id=".service_locator.BbGTEN0" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.r6vr34n" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Controller\AdminDashboardController::index" type="service_closure" id=".service_locator.qni5W9T"/>
@@ -8931,7 +8958,10 @@
         <argument key="App\Controller\Animals\ExamensController::show" type="service_closure" id=".service_locator.Uyi5bSJ"/>
         <argument key="App\Controller\Animals\ExamensController::stats" type="service_closure" id=".service_locator.tl.X0ws"/>
         <argument key="App\Controller\AuthController::login" type="service_closure" id=".service_locator.rSTd.nA"/>
+        <argument key="App\Controller\AuthController::newPassword" type="service_closure" id=".service_locator.P9wQXFg"/>
         <argument key="App\Controller\AuthController::register" type="service_closure" id=".service_locator.vI_CVe2"/>
+        <argument key="App\Controller\AuthController::request" type="service_closure" id=".service_locator.qni5W9T"/>
+        <argument key="App\Controller\AuthController::resend" type="service_closure" id=".service_locator.TvXqsTL"/>
         <argument key="App\Controller\AuthController::terrainsByAgriculteur" type="service_closure" id=".service_locator.S6We5vz"/>
         <argument key="App\Controller\Evenements\Agriculteur\EvenementController::index" type="service_closure" id=".service_locator.bTRClTF"/>
         <argument key="App\Controller\Evenements\Agriculteur\EvenementController::inscrire" type="service_closure" id=".service_locator.VGXccJ4"/>
@@ -9114,7 +9144,10 @@
         <argument key="App\Controller\Animals\ExamensController:show" type="service_closure" id=".service_locator.Uyi5bSJ"/>
         <argument key="App\Controller\Animals\ExamensController:stats" type="service_closure" id=".service_locator.tl.X0ws"/>
         <argument key="App\Controller\AuthController:login" type="service_closure" id=".service_locator.rSTd.nA"/>
+        <argument key="App\Controller\AuthController:newPassword" type="service_closure" id=".service_locator.P9wQXFg"/>
         <argument key="App\Controller\AuthController:register" type="service_closure" id=".service_locator.vI_CVe2"/>
+        <argument key="App\Controller\AuthController:request" type="service_closure" id=".service_locator.qni5W9T"/>
+        <argument key="App\Controller\AuthController:resend" type="service_closure" id=".service_locator.TvXqsTL"/>
         <argument key="App\Controller\AuthController:terrainsByAgriculteur" type="service_closure" id=".service_locator.S6We5vz"/>
         <argument key="App\Controller\Evenements\Agriculteur\EvenementController:index" type="service_closure" id=".service_locator.bTRClTF"/>
         <argument key="App\Controller\Evenements\Agriculteur\EvenementController:inscrire" type="service_closure" id=".service_locator.VGXccJ4"/>
@@ -11870,7 +11903,7 @@
     <service id="Psr\Log\LoggerInterface" alias="monolog.logger"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.w7.f4fT" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.BbGTEN0"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.r6vr34n"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id=".Psr\Log\LoggerInterface $request.logger" alias="monolog.logger.request"/>
@@ -11915,6 +11948,8 @@
     <service id=".service_locator.s4yyZIP" alias=".service_locator.ST3E3fc"/>
     <service id=".service_locator.ontUAUs" alias=".service_locator.wH4nX8g"/>
     <service id=".service_locator.roCFsj8" alias=".service_locator.vI_CVe2"/>
+    <service id=".service_locator.GnAFEbN" alias=".service_locator.P9wQXFg"/>
+    <service id=".service_locator.v1HWWk7" alias=".service_locator.TvXqsTL"/>
     <service id=".service_locator.sEaJncE" alias=".service_locator.cBE01og"/>
     <service id=".service_locator.Dq589Yi" alias=".service_locator.VGXccJ4"/>
     <service id=".service_locator.XvTo7NF" alias=".service_locator.kLp2YUI"/>
@@ -11934,7 +11969,7 @@
     <service id=".service_locator.5pebkNV" alias=".service_locator.xxq2prQ"/>
     <service id=".service_locator.whdse4m" alias=".service_locator.yd.AI8F"/>
     <service id=".service_locator.8J1nalj" alias=".service_locator.SsD9eLO"/>
-    <service id=".service_locator.QJi_DzF" alias=".service_locator.BbGTEN0"/>
+    <service id=".service_locator.hP4uCUx" alias=".service_locator.r6vr34n"/>
     <service id=".service_locator.BFrsqsn" alias=".service_locator.F9PKc.7"/>
     <service id=".service_locator.oIHygA7" alias=".service_locator.xOkKGYY"/>
     <service id=".service_locator.XtmiKbi" alias=".service_locator.MfxSDRP"/>
@@ -11986,6 +12021,8 @@
     <service id=".service_locator.7NIAq8D" alias=".service_locator.rSTd.nA"/>
     <service id=".service_locator.gL3NmIv" alias=".service_locator.vI_CVe2"/>
     <service id=".service_locator.NY0XfPp" alias=".service_locator.S6We5vz"/>
+    <service id=".service_locator.UX8yGbW" alias=".service_locator.P9wQXFg"/>
+    <service id=".service_locator.NZg700b" alias=".service_locator.TvXqsTL"/>
     <service id=".service_locator.sKW_vib" alias=".service_locator.bTRClTF"/>
     <service id=".service_locator.RFFOZR2" alias=".service_locator.F7gwLgd"/>
     <service id=".service_locator.n86R_3M" alias=".service_locator.csIWZan"/>
