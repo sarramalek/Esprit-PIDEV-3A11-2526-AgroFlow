@@ -8,6 +8,69 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
+    {# ═══════════════════════════════════════════════════
+       CLOUDINARY — SDK JavaScript (transformation d'URL)
+       Remplace "your_cloud_name" par ton cloud name réel
+    ═══════════════════════════════════════════════════ #}
+    <script>
+        /**
+         * Génère une URL Cloudinary optimisée à partir d'une URL brute
+         * stockée en base (ex: https://res.cloudinary.com/cloud/image/upload/v123/avatar.jpg)
+         *
+         * @param {string} rawUrl   – URL brute issue de la BDD
+         * @param {number} w        – largeur souhaitée (px)
+         * @param {number} h        – hauteur souhaitée (px)
+         * @returns {string}        – URL transformée (crop + face-detection)
+         */
+        function cloudinaryAvatar(rawUrl, w, h) {
+            if (!rawUrl) return null;
+
+            // Détecter si c'est déjà une URL Cloudinary
+            var uploadPattern = /\/upload\//;
+            if (!uploadPattern.test(rawUrl)) return rawUrl; // URL externe, on la retourne telle quelle
+
+            // Injecter les transformations juste après "/upload/"
+            var transform = 'c_fill,g_face,w_' + w + ',h_' + h + ',q_auto,f_auto/';
+            return rawUrl.replace('/upload/', '/upload/' + transform);
+        }
+
+        /**
+         * Initialise tous les éléments <img class="cloudinary-avatar">
+         * en appliquant la transformation et en gérant le fallback initiales.
+         */
+        function initCloudinaryAvatars() {
+            document.querySelectorAll('[data-cloudinary-src]').forEach(function(el) {
+                var rawUrl = el.dataset.cloudinarySrc;
+                var w = parseInt(el.dataset.w || el.width || 52, 10);
+                var h = parseInt(el.dataset.h || el.height || 52, 10);
+                var fallback = el.dataset.fallback || '';   // initiales
+
+                if (rawUrl && rawUrl.trim() !== '' && rawUrl !== 'null') {
+                    var optimized = cloudinaryAvatar(rawUrl.trim(), w, h);
+                    el.src = optimized;
+                    el.style.display = 'block';
+
+                    // Masquer le fallback initiales s'il existe
+                    var fbEl = document.getElementById(el.dataset.fallbackId);
+                    if (fbEl) fbEl.style.display = 'none';
+
+                    // En cas d'erreur de chargement → fallback initiales
+                    el.onerror = function() {
+                        el.style.display = 'none';
+                        if (fbEl) fbEl.style.display = 'flex';
+                    };
+                } else {
+                    // Pas d'URL → afficher initiales, cacher l'img
+                    el.style.display = 'none';
+                    var fbEl2 = document.getElementById(el.dataset.fallbackId);
+                    if (fbEl2) fbEl2.style.display = 'flex';
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initCloudinaryAvatars);
+    </script>
+
     <style>
         :root {
             --green-dark:   #1A3A1F;
@@ -186,14 +249,43 @@
             transition: background 0.2s;
         }
         .sidebar-user:hover { background: rgba(255,255,255,0.05); }
+
+        /* ─── Avatar wrapper ─────────────────────────────────
+           Contient soit l'<img> Cloudinary soit les initiales
+        ──────────────────────────────────────────────────── */
+        .avatar-wrap {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        /* Image Cloudinary */
+        .avatar-photo {
+            display: none;          /* caché par défaut; JS l'active si URL valide */
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        .avatar-photo.small { width: 36px; height: 36px; }
+        .avatar-photo.big   { width: 52px; height: 52px; border-radius: 14px; }
+
+        /* Fallback initiales */
         .sidebar-avatar {
-            width: 36px; height: 36px;
             border-radius: 10px;
             background: var(--green-accent);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 13px; font-weight: 700;
-            color: white; flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: white;
         }
+        .sidebar-avatar.small { width: 36px; height: 36px; }
+        .sidebar-avatar.big   {
+            width: 52px; height: 52px;
+            border-radius: 14px;
+            background: linear-gradient(135deg,#4A8C3F,#2D5A27);
+            font-size: 18px;
+        }
+
         .sidebar-user-info { flex: 1; overflow: hidden; }
         .sidebar-user-name {
             font-size: 13px; font-weight: 600;
@@ -254,6 +346,41 @@
             color: #ff9090;
         }
         .pf-btn.cancel:hover { background: rgba(220,60,60,0.22); }
+
+        /* Bouton upload photo */
+        .pf-photo-upload {
+            display: none;          /* visible uniquement en mode édition */
+            align-items: center;
+            gap: 8px;
+            padding: 7px 12px;
+            background: rgba(255,255,255,0.06);
+            border: 1px dashed rgba(255,255,255,0.2);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 11px;
+            color: rgba(255,255,255,0.55);
+            transition: all 0.2s;
+            margin: 4px 16px 8px;
+        }
+        .pf-photo-upload:hover { background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(74,140,63,0.5); }
+        .pf-photo-upload input { display: none; }
+
+        /* Barre de progression upload */
+        .pf-upload-progress {
+            display: none;
+            height: 3px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            margin: 0 16px 8px;
+            overflow: hidden;
+        }
+        .pf-upload-progress-bar {
+            height: 100%;
+            background: var(--green-accent);
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
 
         /* ═══════════════════════════════
            TOPBAR
@@ -355,7 +482,8 @@
         {% block stylesheets %}{% endblock %}
     </style>
 </head>
-{# Dans base_admin.html.twig, avant </body> #}
+
+{# Vérification session — inchangée #}
 <script>
 function checkAndRedirect() {
     fetch('{{ path("app_check_session") }}', { credentials: 'same-origin' })
@@ -365,24 +493,11 @@ function checkAndRedirect() {
             }
         });
 }
-
-// ── Détection immédiate bouton retour ─────────────────────────────────────
-window.addEventListener('pageshow', function (e) {
-    if (e.persisted) {
-        checkAndRedirect();
-    }
-});
-
-// ── Dès que l'onglet redevient visible ───────────────────────────────────
-document.addEventListener('visibilitychange', function () {
-    if (document.visibilityState === 'visible') {
-        checkAndRedirect();
-    }
-});
-
-// ── Au chargement initial de la page ─────────────────────────────────────
+window.addEventListener('pageshow', function (e) { if (e.persisted) checkAndRedirect(); });
+document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') checkAndRedirect(); });
 checkAndRedirect();
 </script>
+
 <body>
 
 <!-- ═══════ SIDEBAR ═══════ -->
@@ -395,7 +510,6 @@ checkAndRedirect();
 
     <nav class="sidebar-nav">
 
-        <!-- Dashboard -->
         <a href="{{ path('admin_dashboard') }}" class="nav-link {% if app.request.get('_route') == 'admin_dashboard' %}active{% endif %}">
             <span class="nav-icon"><i class="fa fa-gauge-high"></i></span>
             <span class="nav-label">Tableau de bord</span>
@@ -421,74 +535,70 @@ checkAndRedirect();
                 <li><a href="{{ path('admin_abonnements_index') }}" class="{% if app.request.get('_route') == 'admin_abonnements' %}active{% endif %}">
                     <span class="sub-dot"></span> Abonnements
                 </a></li>
-               
             </ul>
         </div>
 
-         <!-- Gestion Animaux -->
-            <div class="nav-item {% if app.request.get('_route') in ['admin_animaux_index','admin_animaux_new','admin_animaux_edit','admin_examens_index','admin_examens_new','admin_examens_edit'] %}open{% endif %}">
-                <div class="nav-link {% if app.request.get('_route') in ['admin_animaux_index','admin_animaux_new','admin_animaux_edit','admin_examens_index','admin_examens_new','admin_examens_edit'] %}active{% endif %}"
-                     onclick="toggleMenu(this)">
-                    <span class="nav-icon"><i class="fa fa-paw"></i></span>
-                    <span class="nav-label">Gestion Animaux</span>
-                    <i class="fa fa-chevron-right nav-arrow"></i>
-                </div>
-                <ul class="nav-sub">
-                    <li><a href="{{ path('admin_animaux_index') }}" class="{% if app.request.get('_route') in ['admin_animaux_index','admin_animaux_new','admin_animaux_edit'] %}active{% endif %}">
-                        <span class="sub-dot"></span> Animaux
-                    </a></li>
-                    <li><a href="{{ path('admin_examens_index') }}" class="{% if app.request.get('_route') in ['admin_examens_index','admin_examens_new','admin_examens_edit'] %}active{% endif %}">
-                        <span class="sub-dot"></span> Examens
-                    </a></li>
-                </ul>
+        <!-- Gestion Animaux -->
+        <div class="nav-item {% if app.request.get('_route') in ['admin_animaux_index','admin_animaux_new','admin_animaux_edit','admin_examens_index','admin_examens_new','admin_examens_edit'] %}open{% endif %}">
+            <div class="nav-link {% if app.request.get('_route') in ['admin_animaux_index','admin_animaux_new','admin_animaux_edit','admin_examens_index','admin_examens_new','admin_examens_edit'] %}active{% endif %}"
+                 onclick="toggleMenu(this)">
+                <span class="nav-icon"><i class="fa fa-paw"></i></span>
+                <span class="nav-label">Gestion Animaux</span>
+                <i class="fa fa-chevron-right nav-arrow"></i>
             </div>
+            <ul class="nav-sub">
+                <li><a href="{{ path('admin_animaux_index') }}" class="{% if app.request.get('_route') in ['admin_animaux_index','admin_animaux_new','admin_animaux_edit'] %}active{% endif %}">
+                    <span class="sub-dot"></span> Animaux
+                </a></li>
+                <li><a href="{{ path('admin_examens_index') }}" class="{% if app.request.get('_route') in ['admin_examens_index','admin_examens_new','admin_examens_edit'] %}active{% endif %}">
+                    <span class="sub-dot"></span> Examens
+                </a></li>
+            </ul>
+        </div>
 
         <!-- Gestion Stocks -->
-        
-            <!-- Gestion Stocks -->
-<div class="nav-item {% if app.request.get('_route') in ['admin_categories', 'admin_stock_new'] %}open{% endif %}">
-    <div class="nav-link {% if app.request.get('_route') in ['admin_categories', 'admin_stock_new'] %}active{% endif %}"
-         onclick="toggleMenu(this)">
-        <span class="nav-icon"><i class="fa fa-boxes-stacked"></i></span>
-        <span class="nav-label">Gestion Stocks</span>
-        <i class="fa fa-chevron-right nav-arrow"></i>
-    </div>
-    <ul class="nav-sub">
-        <li>
-            {# Remplace '#' par ta route catégories si elle existe déjà #}
-            <a href="{{ path('admin_categorie_new') }}" class="{% if app.request.get('_route') == 'admin_categories' %}active{% endif %}">
-                <span class="sub-dot"></span> Catégories
-            </a>
-        </li>
-        <li>
-            {# LIEN VERS TON FORMULAIRE PRODUIT #}
-            <a href="{{ path('admin_stock_new') }}" class="{% if app.request.get('_route') == 'admin_stock_new' %}active{% endif %}">
-                <span class="sub-dot"></span> Produits
-            </a>
-        </li>
-    </ul>
-</div>
-
-         <!-- Gestion Événements -->
-            <div class="nav-item {% if app.request.get('_route') in ['evenement_index','participation_index'] %}open{% endif %}">
-                <div class="nav-link {% if app.request.get('_route') in ['evenement_index','participation_index'] %}active{% endif %}"
-                     onclick="toggleMenu(this)">
-                    <span class="nav-icon"><i class="fa fa-calendar-days"></i></span>
-                    <span class="nav-label">Gestion Événements</span>
-                    <i class="fa fa-chevron-right nav-arrow"></i>
-                </div>
-                <ul class="nav-sub">
-                    <li><a href="{{ path('evenement_index') }}" class="{% if app.request.get('_route') == 'evenement_index' %}active{% endif %}">
-                        <span class="sub-dot"></span> Événements
-                    </a></li>
-                    <li><a href="{{ path('categorie_evenement_index') }}" class="{% if app.request.get('_route') == 'categorie_evenement_index' %}active{% endif %}">
-                        <span class="sub-dot"></span> Categories Événements
-                    </a></li>
-                    <li><a href="{{ path('participation_index') }}" class="{% if app.request.get('_route') == 'participation_index' %}active{% endif %}">
-                        <span class="sub-dot"></span> Participations
-                    </a></li>
-                </ul>
+        <div class="nav-item {% if app.request.get('_route') in ['admin_categories', 'admin_stock_new'] %}open{% endif %}">
+            <div class="nav-link {% if app.request.get('_route') in ['admin_categories', 'admin_stock_new'] %}active{% endif %}"
+                 onclick="toggleMenu(this)">
+                <span class="nav-icon"><i class="fa fa-boxes-stacked"></i></span>
+                <span class="nav-label">Gestion Stocks</span>
+                <i class="fa fa-chevron-right nav-arrow"></i>
             </div>
+            <ul class="nav-sub">
+                <li>
+                    <a href="{{ path('admin_categorie_new') }}" class="{% if app.request.get('_route') == 'admin_categories' %}active{% endif %}">
+                        <span class="sub-dot"></span> Catégories
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ path('admin_stock_new') }}" class="{% if app.request.get('_route') == 'admin_stock_new' %}active{% endif %}">
+                        <span class="sub-dot"></span> Produits
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Gestion Événements -->
+        <div class="nav-item {% if app.request.get('_route') in ['evenement_index','participation_index'] %}open{% endif %}">
+            <div class="nav-link {% if app.request.get('_route') in ['evenement_index','participation_index'] %}active{% endif %}"
+                 onclick="toggleMenu(this)">
+                <span class="nav-icon"><i class="fa fa-calendar-days"></i></span>
+                <span class="nav-label">Gestion Événements</span>
+                <i class="fa fa-chevron-right nav-arrow"></i>
+            </div>
+            <ul class="nav-sub">
+                <li><a href="{{ path('evenement_index') }}" class="{% if app.request.get('_route') == 'evenement_index' %}active{% endif %}">
+                    <span class="sub-dot"></span> Événements
+                </a></li>
+                <li><a href="{{ path('categorie_evenement_index') }}" class="{% if app.request.get('_route') == 'categorie_evenement_index' %}active{% endif %}">
+                    <span class="sub-dot"></span> Categories Événements
+                </a></li>
+                <li><a href="{{ path('participation_index') }}" class="{% if app.request.get('_route') == 'participation_index' %}active{% endif %}">
+                    <span class="sub-dot"></span> Participations
+                </a></li>
+            </ul>
+        </div>
+
         <!-- Gestion Terrains -->
         <div class="nav-item {% if app.request.get('_route') in ['admin_terrains','admin_terrains_new','admin_terrains_edit','admin_terrains_show','admin_rotations','admin_rotations_new','admin_rotations_edit','admin_plantes','admin_plantes_new','admin_plantes_edit'] %}open{% endif %}">
             <div class="nav-link {% if app.request.get('_route') in ['admin_terrains','admin_terrains_new','admin_terrains_edit','admin_terrains_show','admin_rotations','admin_rotations_new','admin_rotations_edit','admin_plantes','admin_plantes_new','admin_plantes_edit'] %}active{% endif %}"
@@ -508,49 +618,68 @@ checkAndRedirect();
                     <a href="{{ path('admin_rotations') }}"
                        class="{% if app.request.get('_route') starts with 'admin_rotations' %}active{% endif %}">
                         <span class="sub-dot"></span> Rotations
-                    </a></li>
-                     <li>
-            <a href="{{ path('admin_plantes') }}"
-               class="{% if app.request.get('_route') starts with 'admin_plantes' %}active{% endif %}">
-                <span class="sub-dot"></span> Plantes
-            </a>
-        </li>
-                </ul>
-            </div>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ path('admin_plantes') }}"
+                       class="{% if app.request.get('_route') starts with 'admin_plantes' %}active{% endif %}">
+                        <span class="sub-dot"></span> Plantes
+                    </a>
+                </li>
+            </ul>
+        </div>
 
-            <!-- Gestion Matériels -->
-            <div class="nav-item {% if app.request.get('_route') starts with 'admin_machines' or app.request.get('_route') starts with 'admin_maintenances' %}open{% endif %}">
-    <div class="nav-link {% if app.request.get('_route') starts with 'admin_machines' or app.request.get('_route') starts with 'admin_maintenances' %}active{% endif %}"
-                     onclick="toggleMenu(this)">
-                    <span class="nav-icon"><i class="fa fa-tractor"></i></span>
-                    <span class="nav-label">Gestion Matériels</span>
-                    <i class="fa fa-chevron-right nav-arrow"></i>
-                </div>
-                 <ul class="nav-sub">
-        <li>
-            <a href="{{ path('admin_machines_index') }}"
-               class="{% if app.request.get('_route') starts with 'admin_machines' %}active{% endif %}">
-                <span class="sub-dot"></span> Machines
-            </a>
-        </li>
-        <li>
-            <a href="{{ path('admin_maintenances_index') }}"
-               class="{% if app.request.get('_route') starts with 'admin_maintenances' %}active{% endif %}">
-                <span class="sub-dot"></span> Maintenances
-            </a>
-        </li>
-    </ul>
+        <!-- Gestion Matériels -->
+        <div class="nav-item {% if app.request.get('_route') starts with 'admin_machines' or app.request.get('_route') starts with 'admin_maintenances' %}open{% endif %}">
+            <div class="nav-link {% if app.request.get('_route') starts with 'admin_machines' or app.request.get('_route') starts with 'admin_maintenances' %}active{% endif %}"
+                 onclick="toggleMenu(this)">
+                <span class="nav-icon"><i class="fa fa-tractor"></i></span>
+                <span class="nav-label">Gestion Matériels</span>
+                <i class="fa fa-chevron-right nav-arrow"></i>
             </div>
+            <ul class="nav-sub">
+                <li>
+                    <a href="{{ path('admin_machines_index') }}"
+                       class="{% if app.request.get('_route') starts with 'admin_machines' %}active{% endif %}">
+                        <span class="sub-dot"></span> Machines
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ path('admin_maintenances_index') }}"
+                       class="{% if app.request.get('_route') starts with 'admin_maintenances' %}active{% endif %}">
+                        <span class="sub-dot"></span> Maintenances
+                    </a>
+                </li>
+            </ul>
+        </div>
 
-        </nav>
+    </nav>
 
     <!-- ═══════ SIDEBAR FOOTER ═══════ -->
     <div class="sidebar-footer">
 
         <div class="sidebar-user" id="sidebarUserBtn" onclick="toggleUserPanel()">
-            <div class="sidebar-avatar" id="pfAvatarSmall">
-                {{ app.user ? (app.user.prenom|first|upper ~ app.user.nom|first|upper) : 'AD' }}
+
+            {# ── Avatar sidebar (petit, 36×36) ──────────────────────────────
+               data-cloudinary-src  : URL brute stockée en BDD (champ photo/avatar de l'entité User)
+               data-w / data-h      : dimensions souhaitées pour Cloudinary
+               data-fallback-id     : ID du div initiales à afficher si pas d'image
+            ──────────────────────────────────────────────────────────────── #}
+            <div class="avatar-wrap">
+                <img
+                    class="avatar-photo small"
+                    id="pfPhotoSmall"
+                    alt="Photo de profil"
+data-cloudinary-src="{{ app.user and app.user.img is defined ? app.user.img : '' }}"
+                    data-w="36" data-h="36"
+                    data-fallback-id="pfAvatarSmall"
+                    src=""
+                >
+                <div class="sidebar-avatar small" id="pfAvatarSmall">
+                    {{ app.user ? (app.user.prenom|first|upper ~ app.user.nom|first|upper) : 'AD' }}
+                </div>
             </div>
+
             <div class="sidebar-user-info">
                 <div class="sidebar-user-name" id="pfNameSmall">
                     {{ app.user ? (app.user.prenom ~ ' ' ~ app.user.nom) : 'Administrateur' }}
@@ -566,9 +695,24 @@ checkAndRedirect();
 
                 <!-- En-tête avatar -->
                 <div style="padding:18px 16px 14px; text-align:center; border-bottom:1px solid rgba(255,255,255,0.07);">
-                    <div id="pfAvatarBig" style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#4A8C3F,#2D5A27);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:white;margin:0 auto 10px;">
-                        {{ app.user ? (app.user.prenom|first|upper ~ app.user.nom|first|upper) : 'AD' }}
+
+                    {# ── Avatar grand format (52×52) ───────────────────────── #}
+                    <div style="position:relative; width:52px; height:52px; margin:0 auto 10px;">
+                        <img
+                            class="avatar-photo big"
+                            id="pfPhotoBig"
+                            alt="Photo de profil"
+                            data-cloudinary-src="{{ app.user and app.user.photo is defined ? app.user.photo : '' }}"
+                            data-w="52" data-h="52"
+                            data-fallback-id="pfAvatarBig"
+                            src=""
+                            style="width:52px;height:52px;"
+                        >
+                        <div class="sidebar-avatar big" id="pfAvatarBig">
+                            {{ app.user ? (app.user.prenom|first|upper ~ app.user.nom|first|upper) : 'AD' }}
+                        </div>
                     </div>
+
                     <div id="pfNameBig" style="font-size:14px;font-weight:700;color:#fff;">
                         {{ app.user ? (app.user.prenom ~ ' ' ~ app.user.nom) : '—' }}
                     </div>
@@ -591,12 +735,24 @@ checkAndRedirect();
                     </button>
                 </div>
 
-                <!-- Formulaire de profil — action AJAX, pas de submit classique -->
+                {# ── Bouton upload photo (visible uniquement en édition) ───── #}
+                <label class="pf-photo-upload" id="photoUploadLabel">
+                    <i class="fa fa-camera" style="font-size:12px;"></i>
+                    <span id="photoUploadText">Changer la photo de profil</span>
+                    <input type="file" id="photoFileInput" accept="image/*" onchange="uploadPhotoToCloudinary(this)">
+                </label>
+                <div class="pf-upload-progress" id="uploadProgress">
+                    <div class="pf-upload-progress-bar" id="uploadProgressBar"></div>
+                </div>
+
+                <!-- Formulaire de profil -->
                 <form id="profileForm" onsubmit="return false;">
+                    {# Champ caché pour l'URL Cloudinary mise à jour #}
+                    <input type="hidden" name="photo" id="pfPhotoUrl"
+                           value="{{ app.user and app.user.photo is defined ? app.user.photo : '' }}">
 
                     <div style="padding:4px 0;">
 
-                        <!-- Email -->
                         {% if app.user and app.user.email is defined %}
                         <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">
                             <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
@@ -610,7 +766,6 @@ checkAndRedirect();
                         </div>
                         {% endif %}
 
-                        <!-- Prénom -->
                         {% if app.user and app.user.prenom is defined %}
                         <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">
                             <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
@@ -624,7 +779,6 @@ checkAndRedirect();
                         </div>
                         {% endif %}
 
-                        <!-- Nom -->
                         {% if app.user and app.user.nom is defined %}
                         <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">
                             <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
@@ -638,7 +792,6 @@ checkAndRedirect();
                         </div>
                         {% endif %}
 
-                        <!-- CIN -->
                         {% if app.user and app.user.cin is defined %}
                         <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">
                             <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
@@ -652,7 +805,6 @@ checkAndRedirect();
                         </div>
                         {% endif %}
 
-                        <!-- Téléphone -->
                         {% if app.user and app.user.tel is defined %}
                         <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">
                             <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
@@ -666,7 +818,6 @@ checkAndRedirect();
                         </div>
                         {% endif %}
 
-                        <!-- Ville -->
                         {% if app.user and app.user.ville is defined %}
                         <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">
                             <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
@@ -680,7 +831,6 @@ checkAndRedirect();
                         </div>
                         {% endif %}
 
-                        <!-- Nouveau mot de passe — visible uniquement en mode édition -->
                         <div id="pwdRow" style="display:none;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">
                             <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
                                 <i class="fa fa-lock" style="font-size:11px;color:rgba(255,255,255,0.5);"></i>
@@ -693,7 +843,6 @@ checkAndRedirect();
                             </div>
                         </div>
 
-                        <!-- Date création — lecture seule -->
                         {% if app.user and app.user.dateCreationcpt is defined %}
                         <div style="display:flex;align-items:center;gap:10px;padding:9px 16px;">
                             <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
@@ -725,7 +874,6 @@ checkAndRedirect();
             </div>
         </div>
     </div>
-    {# /sidebar-footer #}
 
 </aside>
 
@@ -752,26 +900,114 @@ checkAndRedirect();
 
 <!-- ═══════ CONTENT ═══════ -->
 <main class="main-wrapper">
-
     {% for message in app.flashes('success') %}
-        <div class="flash-success">
-            <i class="fa fa-circle-check"></i> {{ message }}
-        </div>
+        <div class="flash-success"><i class="fa fa-circle-check"></i> {{ message }}</div>
     {% endfor %}
     {% for message in app.flashes('error') %}
-        <div class="flash-error">
-            <i class="fa fa-circle-xmark"></i> {{ message }}
-        </div>
+        <div class="flash-error"><i class="fa fa-circle-xmark"></i> {{ message }}</div>
     {% endfor %}
-
     {% block body %}{% endblock %}
 </main>
 
 <!-- ═══════ SCRIPTS ═══════ -->
 <script>
+    /* ══════════════════════════════════════════════════════
+       CLOUDINARY — Upload direct (unsigned preset)
+       ▸ Remplace VOTRE_CLOUD_NAME   par ton cloud name
+       ▸ Remplace VOTRE_UPLOAD_PRESET par ton unsigned preset
+    ══════════════════════════════════════════════════════ */
+    var CLOUDINARY_CLOUD_NAME   = 'dp0ily6qa';
+    var CLOUDINARY_UPLOAD_PRESET = 'agroflow';  // preset non signé (unsigned)
+
+    /**
+     * Upload une photo vers Cloudinary et met à jour les avatars en temps réel.
+     * Appelé quand l'utilisateur sélectionne un fichier via #photoFileInput.
+     */
+    function uploadPhotoToCloudinary(input) {
+        if (!input.files || !input.files[0]) return;
+
+        var file   = input.files[0];
+        var label  = document.getElementById('photoUploadLabel');
+        var bar    = document.getElementById('uploadProgressBar');
+        var prog   = document.getElementById('uploadProgress');
+        var txt    = document.getElementById('photoUploadText');
+
+        // Afficher la barre de progression
+        prog.style.display = 'block';
+        bar.style.width    = '0%';
+        txt.textContent    = 'Upload en cours…';
+        label.style.pointerEvents = 'none';
+
+        var formData = new FormData();
+        formData.append('file',          file);
+        formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+        formData.append('folder',        'agroflow/avatars');
+
+        var xhr = new XMLHttpRequest();
+
+        // Progression
+        xhr.upload.onprogress = function(e) {
+            if (e.lengthComputable) {
+                bar.style.width = Math.round((e.loaded / e.total) * 100) + '%';
+            }
+        };
+
+        xhr.onload = function() {
+            label.style.pointerEvents = 'auto';
+            prog.style.display = 'none';
+
+            if (xhr.status === 200) {
+                var res = JSON.parse(xhr.responseText);
+                var secureUrl = res.secure_url;
+
+                // Stocker l'URL dans le champ caché du formulaire
+                document.getElementById('pfPhotoUrl').value = secureUrl;
+
+                // Mettre à jour les deux avatars immédiatement
+                _updateAvatarPhoto('pfPhotoSmall', 'pfAvatarSmall', secureUrl, 36, 36);
+                _updateAvatarPhoto('pfPhotoBig',   'pfAvatarBig',   secureUrl, 52, 52);
+
+                txt.textContent = 'Photo mise à jour ✓';
+                showToast('Photo uploadée avec succès');
+            } else {
+                txt.textContent = 'Changer la photo de profil';
+                showToast('Erreur lors de l\'upload', true);
+            }
+        };
+
+        xhr.onerror = function() {
+            label.style.pointerEvents = 'auto';
+            prog.style.display = 'none';
+            txt.textContent = 'Changer la photo de profil';
+            showToast('Erreur réseau lors de l\'upload', true);
+        };
+
+        xhr.open('POST', 'https://api.cloudinary.com/v1_1/' + CLOUDINARY_CLOUD_NAME + '/image/upload');
+        xhr.send(formData);
+    }
+
+    /**
+     * Met à jour un avatar (img + fallback initiales) avec une URL Cloudinary.
+     */
+    function _updateAvatarPhoto(imgId, fallbackId, rawUrl, w, h) {
+        var img = document.getElementById(imgId);
+        var fb  = document.getElementById(fallbackId);
+        if (!img) return;
+
+        var optimized = cloudinaryAvatar(rawUrl, w, h);
+        img.src = optimized;
+        img.style.display = 'block';
+        if (fb) fb.style.display = 'none';
+
+        img.onerror = function() {
+            img.style.display = 'none';
+            if (fb) fb.style.display = 'flex';
+        };
+    }
+
     /* ── Navigation sidebar ── */
     function toggleMenu(el) {
-        var item = el.closest('.nav-item');
+        var item   = el.closest('.nav-item');
         var isOpen = item.classList.contains('open');
         document.querySelectorAll('.nav-item.open').forEach(function(i) { i.classList.remove('open'); });
         if (!isOpen) item.classList.add('open');
@@ -779,7 +1015,7 @@ checkAndRedirect();
 
     document.addEventListener('DOMContentLoaded', function() {
         var active = document.querySelector('.nav-sub a.active');
-        if (active) active.closest('.nav-item') && active.closest('.nav-item').classList.add('open');
+        if (active && active.closest('.nav-item')) active.closest('.nav-item').classList.add('open');
     });
 
     /* ── Panneau utilisateur ── */
@@ -807,6 +1043,10 @@ checkAndRedirect();
         document.querySelectorAll('.pf-input').forEach(function(el) { el.style.display = 'block'; });
         document.getElementById('pwdRow').style.display = 'flex';
 
+        // Afficher le bouton upload photo
+        document.getElementById('photoUploadLabel').style.display = 'flex';
+        document.getElementById('photoUploadText').textContent    = 'Changer la photo de profil';
+
         document.getElementById('btnEdit').style.display   = 'none';
         document.getElementById('btnSave').style.display   = 'inline-flex';
         document.getElementById('btnCancel').style.display = 'inline-flex';
@@ -826,7 +1066,9 @@ checkAndRedirect();
 
         document.querySelectorAll('.pf-view').forEach(function(el) { el.style.display = 'block'; });
         document.querySelectorAll('.pf-input').forEach(function(el) { el.style.display = 'none'; });
-        document.getElementById('pwdRow').style.display = 'none';
+        document.getElementById('pwdRow').style.display         = 'none';
+        document.getElementById('photoUploadLabel').style.display = 'none';
+        document.getElementById('uploadProgress').style.display   = 'none';
 
         document.getElementById('btnEdit').style.display   = 'inline-flex';
         document.getElementById('btnSave').style.display   = 'none';
@@ -841,7 +1083,6 @@ checkAndRedirect();
             return;
         }
 
-        /* Désactiver le bouton pendant l'envoi */
         var btnSave = document.getElementById('btnSave');
         btnSave.disabled = true;
         btnSave.innerHTML = '<i class="fa fa-spinner fa-spin" style="font-size:10px;"></i> Envoi…';
@@ -849,7 +1090,7 @@ checkAndRedirect();
         var form = document.getElementById('profileForm');
         var data = new FormData(form);
 
-       fetch('{{ path('profile_update') }}',  {
+        fetch('{{ path('profile_update') }}', {
             method: 'POST',
             body: data,
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
@@ -860,22 +1101,19 @@ checkAndRedirect();
             btnSave.innerHTML = '<i class="fa fa-check" style="font-size:10px;"></i> Enregistrer';
 
             if (json.success) {
-                /* ── Mise à jour des libellés visibles dans la sidebar ── */
-                var views = document.querySelectorAll('.pf-view');
-                views.forEach(function(view) {
+                // Mise à jour des labels texte
+                document.querySelectorAll('.pf-view').forEach(function(view) {
                     var inp = view.parentElement.querySelector('.pf-input');
-                    if (inp && inp.value.trim()) {
-                        view.textContent = inp.value.trim();
-                    }
+                    if (inp && inp.value.trim()) view.textContent = inp.value.trim();
                 });
 
-                /* ── Mise à jour du nom affiché (header + avatar) ── */
+                // Mise à jour nom + initiales
                 if (json.prenom && json.nom) {
                     var fullName = json.prenom + ' ' + json.nom;
                     var initials = json.prenom.charAt(0).toUpperCase() + json.nom.charAt(0).toUpperCase();
 
-                    var nameSmall = document.getElementById('pfNameSmall');
-                    var nameBig   = document.getElementById('pfNameBig');
+                    var nameSmall   = document.getElementById('pfNameSmall');
+                    var nameBig     = document.getElementById('pfNameBig');
                     var avatarSmall = document.getElementById('pfAvatarSmall');
                     var avatarBig   = document.getElementById('pfAvatarBig');
 
@@ -883,6 +1121,14 @@ checkAndRedirect();
                     if (nameBig)     nameBig.textContent     = fullName;
                     if (avatarSmall) avatarSmall.textContent = initials;
                     if (avatarBig)   avatarBig.textContent   = initials;
+                }
+
+                // Si une nouvelle photo Cloudinary a été envoyée, mettre à jour data-cloudinary-src
+                if (json.photo) {
+                    ['pfPhotoSmall','pfPhotoBig'].forEach(function(id) {
+                        var el = document.getElementById(id);
+                        if (el) el.dataset.cloudinarySrc = json.photo;
+                    });
                 }
 
                 cancelProfileEdit();
@@ -906,23 +1152,13 @@ checkAndRedirect();
         var t = document.createElement('div');
         t.id = 'pfToast';
         t.style.cssText = [
-            'position:fixed',
-            'bottom:24px',
-            'right:24px',
-            'z-index:9999',
+            'position:fixed','bottom:24px','right:24px','z-index:9999',
             'background:' + (isError ? 'rgba(160,30,30,0.95)' : 'rgba(30,90,35,0.95)'),
-            'color:#fff',
-            'font-size:13px',
-            'font-weight:600',
-            'font-family:DM Sans,sans-serif',
-            'padding:12px 20px',
-            'border-radius:10px',
-            'display:flex',
-            'align-items:center',
-            'gap:9px',
-            'box-shadow:0 4px 24px rgba(0,0,0,0.25)',
-            'transition:opacity 0.4s ease',
-            'opacity:1'
+            'color:#fff','font-size:13px','font-weight:600',
+            'font-family:DM Sans,sans-serif','padding:12px 20px',
+            'border-radius:10px','display:flex','align-items:center',
+            'gap:9px','box-shadow:0 4px 24px rgba(0,0,0,0.25)',
+            'transition:opacity 0.4s ease','opacity:1'
         ].join(';');
 
         var icon = document.createElement('i');
