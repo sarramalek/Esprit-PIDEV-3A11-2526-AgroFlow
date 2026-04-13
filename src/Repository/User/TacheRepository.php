@@ -190,4 +190,35 @@ public function findTachesConflict($ouvrier, \DateTime $debut, \DateTime $fin): 
         ->getQuery()
         ->getResult();
 }
+// src/Repository/User/TacheRepository.php
+
+// Compte les tâches actives (non terminées) d'un ouvrier
+public function countTachesActives(User $ouvrier): int
+{
+    return (int) $this->createQueryBuilder('t')
+        ->select('COUNT(t.idTache)')
+        ->andWhere('t.assignee = :ouvrier')
+        ->andWhere('t.etat != :done')
+        ->setParameter('ouvrier', $ouvrier)
+        ->setParameter('done', 'terminée')
+        ->getQuery()
+        ->getSingleScalarResult();
+}
+
+// Vérifie si un ouvrier a une tâche qui chevauche la date donnée
+public function hasConflitDate(User $ouvrier, \DateTime $date): bool
+{
+    $count = (int) $this->createQueryBuilder('t')
+        ->select('COUNT(t.idTache)')
+        ->andWhere('t.assignee = :ouvrier')
+        ->andWhere('t.dateEcheancee = :date')
+        ->andWhere('t.etat != :done')
+        ->setParameter('ouvrier', $ouvrier)
+        ->setParameter('date', $date->format('Y-m-d'))
+        ->setParameter('done', 'terminée')
+        ->getQuery()
+        ->getSingleScalarResult();
+
+    return $count > 0;
+}
 }
