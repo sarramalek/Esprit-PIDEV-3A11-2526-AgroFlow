@@ -18,16 +18,48 @@ use Symfony\Component\Routing\Annotation\Route;
 class Ouvrier_agriController extends AbstractController
 {
     #[Route('', name: 'app_ouvrier_index', methods: ['GET'])]
-    public function index(UserRepository $userRepo, TerrainRepository $terrainRepo): Response
-    {
-        $agriculteur = $this->getUser();
-        $terrains = $terrainRepo->findByAgriculteur($agriculteur->getCin());
-        $ouvriers = $userRepo->findOuvriersByAgriculteur($agriculteur->getCin());
-        return $this->render('User/ouvriers_index.html.twig', [
-            'ouvriers' => $ouvriers,
-            'terrains' => $terrains,
-        ]);
+public function index(
+    Request $request,
+    UserRepository $userRepo,
+    TerrainRepository $terrainRepo
+): Response {
+    $agriculteur = $this->getUser();
+    $terrains    = $terrainRepo->findByAgriculteur($agriculteur->getCin());
+    $tousOuvriers = $userRepo->findOuvriersByAgriculteur($agriculteur->getCin());
+
+    $parPage =4 ;
+
+    // Pagination par terrain
+    $ouvriersByTerrain = [];
+    $paginationByTerrain = [];
+
+    foreach ($terrains as $terrain) {
+        $tid = $terrain->getId();
+
+        // Ouvriers de ce terrain
+        $ouvriersTerrain = array_values(array_filter(
+            $tousOuvriers,
+            fn($o) => $o->getTerrain() && $o->getTerrain()->getId() === $tid
+        ));
+
+        $total      = count($ouvriersTerrain);
+        $totalPages = max(1, (int) ceil($total / $parPage));
+        $page       = max(1, min((int) $request->query->get("page_terrain_$tid", 1), $totalPages));
+
+        $ouvriersByTerrain[$tid]   = array_slice($ouvriersTerrain, ($page - 1) * $parPage, $parPage);
+        $paginationByTerrain[$tid] = [
+            'page'       => $page,
+            'totalPages' => $totalPages,
+            'total'      => $total,
+        ];
     }
+
+    return $this->render('User/ouvriers_index.html.twig', [
+        'terrains'            => $terrains,
+        'ouvriersByTerrain'   => $ouvriersByTerrain,
+        'paginationByTerrain' => $paginationByTerrain,
+    ]);
+}
 
     #[Route('/nouveau', name: 'app_ouvrier_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $hasher, TerrainRepository $terrainRepo): Response
@@ -100,12 +132,11 @@ class Ouvrier_agriController extends AbstractController
         }
 
         return $this->render('User/ouvriers_edit.html.twig', [
-            'ouvrier' => $ouvrier,
+            'ouvrier'  => $ouvrier,
             'terrains' => $terrains,
         ]);
     }
 
-    // ✅ SUPPRIMER UN OUVRIER — route corrigée
     #[Route('/{cin}/supprimer', name: 'app_ouvrier_delete', methods: ['POST'])]
     public function deleteOuvrier(int $cin, UserRepository $userRepo, TerrainRepository $terrainRepo, EntityManagerInterface $em): Response
     {
@@ -131,7 +162,7 @@ class Ouvrier_agriController extends AbstractController
         $taches = $tacheRepo->findByAssignee($ouvrier);
         return $this->render('User/ouvriers_taches.html.twig', [
             'ouvrier' => $ouvrier,
-            'taches' => $taches,
+            'taches'  => $taches,
         ]);
     }
 
@@ -179,7 +210,6 @@ class Ouvrier_agriController extends AbstractController
         return $this->json(['success' => true]);
     }
 
-    // ✅ SUPPRIMER UNE TÂCHE — nom de route corrigé
     #[Route('/tache/{id}/supprimer', name: 'app_ouvrier_tache_delete', methods: ['POST'])]
     public function supprimerTache(int $id, TacheRepository $tacheRepo, TerrainRepository $terrainRepo, EntityManagerInterface $em): Response
     {
