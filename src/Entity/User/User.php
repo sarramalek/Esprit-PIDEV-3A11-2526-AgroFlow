@@ -7,10 +7,12 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use App\Entity\Terrain\Terrain;
+use Scheb\TwoFactorBundle\Model\Google\TwoFactorInterface;
+use Scheb\TwoFactorBundle\Model\BackupCodeInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'users')]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface , TwoFactorInterface
 {
     #[ORM\Id]
     #[ORM\Column(type: 'integer')]
@@ -69,6 +71,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\JoinColumn(name: 'id_terrain', referencedColumnName: 'id_terrain', nullable: true, onDelete: 'SET NULL')]
     private ?Terrain $terrain = null;
 
+    //----------------------------------------------------------
+    #[ORM\Column(type: 'string', nullable: true)]
+    private ?string $googleAuthenticatorSecret = null;
+
+    #[ORM\Column(type: 'json', nullable: true)]
+    private array $backupCodes = [];
     // ==================== UserInterface ====================
 
     public function getUserIdentifier(): string
@@ -147,4 +155,48 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getTerrain(): ?Terrain { return $this->terrain; }
     public function setTerrain(?Terrain $terrain): self { $this->terrain = $terrain; return $this; }
+    // Interface Google 2FA
+    public function isGoogleAuthenticatorEnabled(): bool
+    {
+        return $this->googleAuthenticatorSecret !== null;
+    }
+
+    public function getGoogleAuthenticatorUsername(): string
+    {
+        return $this->email;
+    }
+
+    public function getGoogleAuthenticatorSecret(): ?string
+    {
+        return $this->googleAuthenticatorSecret;
+    }
+
+    public function setGoogleAuthenticatorSecret(?string $secret): void
+    {
+        $this->googleAuthenticatorSecret = $secret;
+    }
+
+    // Interface Backup codes
+    public function isBackupCode(string $code): bool
+    {
+        return in_array($code, $this->backupCodes);
+    }
+
+    public function invalidateBackupCode(string $code): void
+    {
+        $this->backupCodes = array_filter(
+            $this->backupCodes,
+            fn($c) => $c !== $code
+        );
+    }
+
+    public function setBackupCodes(array $codes): void
+    {
+        $this->backupCodes = $codes;
+    }
+
+    public function getBackupCodes(): array
+    {
+        return $this->backupCodes;
+    }
 }

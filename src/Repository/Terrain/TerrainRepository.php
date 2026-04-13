@@ -48,7 +48,21 @@ class TerrainRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
- 
+ // src/Repository/Terrain/TerrainRepository.php
+
+/** Retourne tous les ouvriers (User) appartenant aux terrains de l'agriculteur */
+public function findOuvriersDeAgriculteur(int $cinAgriculteur): array
+{
+    return $this->getEntityManager()
+        ->getRepository(\App\Entity\User\User::class)
+        ->createQueryBuilder('u')
+        ->join('u.terrain', 't')
+        ->andWhere('t.cin = :cin')
+        ->andWhere('u.role = 1')
+        ->setParameter('cin', $cinAgriculteur)
+        ->getQuery()
+        ->getResult();
+}
     /**
      * Retourne les CINs de tous les ouvriers des terrains d'un agriculteur.
      * Utilisé pour vérifier qu'un ouvrier "appartient" à cet agriculteur,
