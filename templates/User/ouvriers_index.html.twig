@@ -108,6 +108,85 @@ body { background: var(--beige); font-family: 'Segoe UI', sans-serif; }
     {% if terrains is empty %}
         <p class="empty">Aucun terrain enregistré. Créez d'abord un terrain pour y affecter des ouvriers.</p>
     {% else %}
+    {# ── Assignation automatique ── #}
+<div style="background:white;border-radius:1rem;box-shadow:0 2px 12px rgba(0,0,0,.08);
+            padding:1.5rem;margin-bottom:2rem;border-left:4px solid var(--vert-l);">
+
+    <h5 style="color:var(--vert);margin:0 0 1rem;">
+        🤖 Assignation automatique
+    </h5>
+    <p style="font-size:.88rem;color:#666;margin-bottom:1rem;">
+        Renseignez la tâche — l'ouvrier sera choisi automatiquement selon
+        sa disponibilité et sa charge de travail.
+    </p>
+
+    <form method="post" action="{{ path('app_ouvrier_tache_auto') }}">
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+            <div>
+                <label style="font-size:.85rem;font-weight:600;color:#444;display:block;margin-bottom:.3rem;">
+                    Nom de la tâche *
+                </label>
+                <input type="text" name="nom_tache" required
+                       style="width:100%;padding:.5rem .75rem;border:1px solid #ddd;
+                              border-radius:.5rem;font-size:.9rem;">
+            </div>
+            <div>
+                <label style="font-size:.85rem;font-weight:600;color:#444;display:block;margin-bottom:.3rem;">
+                    Date d'échéance *
+                </label>
+                <input type="date" name="date_echeancee" required
+                       min="{{ 'now'|date('Y-m-d') }}"
+                       style="width:100%;padding:.5rem .75rem;border:1px solid #ddd;
+                              border-radius:.5rem;font-size:.9rem;">
+            </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem;">
+            <div>
+                <label style="font-size:.85rem;font-weight:600;color:#444;display:block;margin-bottom:.3rem;">
+                    Description
+                </label>
+                <textarea name="description" rows="2"
+                          style="width:100%;padding:.5rem .75rem;border:1px solid #ddd;
+                                 border-radius:.5rem;font-size:.9rem;resize:vertical;"></textarea>
+            </div>
+            <div>
+                <label style="font-size:.85rem;font-weight:600;color:#444;display:block;margin-bottom:.3rem;">
+                    État
+                </label>
+                <select name="etat"
+                        style="width:100%;padding:.5rem .75rem;border:1px solid #ddd;
+                               border-radius:.5rem;font-size:.9rem;">
+                    <option value="à faire">À faire</option>
+                    <option value="en cours">En cours</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-size:.85rem;font-weight:600;color:#444;display:block;margin-bottom:.3rem;">
+                    Priorité
+                </label>
+                <select name="priorite"
+                        style="width:100%;padding:.5rem .75rem;border:1px solid #ddd;
+                               border-radius:.5rem;font-size:.9rem;">
+                    <option value="basse">Basse</option>
+                    <option value="normale" selected>Normale</option>
+                    <option value="haute">Haute</option>
+                    <option value="urgente">Urgente</option>
+                </select>
+            </div>
+        </div>
+
+        <button type="submit"
+                style="background:var(--vert);color:white;border:none;padding:.6rem 1.4rem;
+                       border-radius:.6rem;font-weight:600;font-size:.95rem;cursor:pointer;
+                       transition:background .2s;"
+                onmouseover="this.style.background='var(--vert-l)'"
+                onmouseout="this.style.background='var(--vert)'">
+            🤖 Assigner automatiquement
+        </button>
+    </form>
+</div>
         {% for terrain in terrains %}
             {% set tid         = terrain.id %}
             {% set paramKey    = 'page_terrain_' ~ tid %}

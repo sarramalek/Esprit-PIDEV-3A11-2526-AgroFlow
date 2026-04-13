@@ -18,9 +18,9 @@ class ComposerStaticInitaa57762fbf7f56050082c2c4c3fd945d
         'ffecb95d45175fd40f75be8a23b34f90' => __DIR__ . '/..' . '/twig/twig/src/Resources/debug.php',
         'c7baa00073ee9c61edf148c51917cfb4' => __DIR__ . '/..' . '/twig/twig/src/Resources/escaper.php',
         'f844ccf1d25df8663951193c3fc307c8' => __DIR__ . '/..' . '/twig/twig/src/Resources/string_loader.php',
+        '2203a247e6fda86070a5e4e07aed533a' => __DIR__ . '/..' . '/symfony/clock/Resources/now.php',
         'f598d06aa772fa33d905e87be6398fb1' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/bootstrap.php',
         '9d2b9fc6db0f153a0a149fefb182415e' => __DIR__ . '/..' . '/symfony/polyfill-php84/bootstrap.php',
-        '2203a247e6fda86070a5e4e07aed533a' => __DIR__ . '/..' . '/symfony/clock/Resources/now.php',
         '72243e5536b63e298acb6476f01f1aff' => __DIR__ . '/..' . '/thecodingmachine/safe/lib/special_cases.php',
         '3f648889e687f31c52f949ba8a9d0873' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/apache.php',
         'eeb4581d958421a4244aaa4167c6a575' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/apcu.php',
@@ -205,6 +205,7 @@ class ComposerStaticInitaa57762fbf7f56050082c2c4c3fd945d
             'Symfony\\Bridge\\Monolog\\' => 23,
             'Symfony\\Bridge\\Doctrine\\' => 24,
             'Svg\\' => 4,
+            'Scheb\\TwoFactorBundle\\' => 22,
             'Sabberworm\\CSS\\' => 15,
         ),
         'P' => 
@@ -218,8 +219,13 @@ class ComposerStaticInitaa57762fbf7f56050082c2c4c3fd945d
             'Psr\\Cache\\' => 10,
             'PhpParser\\' => 10,
             'PhpOffice\\PhpSpreadsheet\\' => 25,
+            'ParagonIE\\ConstantTime\\' => 23,
             'PHPStan\\PhpDocParser\\' => 21,
             'PHPMailer\\PHPMailer\\' => 20,
+        ),
+        'O' => 
+        array (
+            'OTPHP\\' => 6,
         ),
         'M' => 
         array (
@@ -590,6 +596,12 @@ class ComposerStaticInitaa57762fbf7f56050082c2c4c3fd945d
         array (
             0 => __DIR__ . '/..' . '/dompdf/php-svg-lib/src/Svg',
         ),
+        'Scheb\\TwoFactorBundle\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/scheb/2fa-totp',
+            1 => __DIR__ . '/..' . '/scheb/2fa-google-authenticator',
+            2 => __DIR__ . '/..' . '/scheb/2fa-bundle',
+        ),
         'Sabberworm\\CSS\\' => 
         array (
             0 => __DIR__ . '/..' . '/sabberworm/php-css-parser/src',
@@ -630,6 +642,10 @@ class ComposerStaticInitaa57762fbf7f56050082c2c4c3fd945d
         array (
             0 => __DIR__ . '/..' . '/phpoffice/phpspreadsheet/src/PhpSpreadsheet',
         ),
+        'ParagonIE\\ConstantTime\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src',
+        ),
         'PHPStan\\PhpDocParser\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src',
@@ -637,6 +653,10 @@ class ComposerStaticInitaa57762fbf7f56050082c2c4c3fd945d
         'PHPMailer\\PHPMailer\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
+        ),
+        'OTPHP\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/spomky-labs/otphp/src',
         ),
         'Monolog\\' => 
         array (

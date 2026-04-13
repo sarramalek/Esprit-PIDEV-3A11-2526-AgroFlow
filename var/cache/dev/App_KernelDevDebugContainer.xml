@@ -25,6 +25,7 @@
       <parameter key="SecurityBundle">Symfony\Bundle\SecurityBundle\SecurityBundle</parameter>
       <parameter key="MonologBundle">Symfony\Bundle\MonologBundle\MonologBundle</parameter>
       <parameter key="MakerBundle">Symfony\Bundle\MakerBundle\MakerBundle</parameter>
+      <parameter key="SchebTwoFactorBundle">Scheb\TwoFactorBundle\SchebTwoFactorBundle</parameter>
     </parameter>
     <parameter key="kernel.bundles_metadata" type="collection">
       <parameter key="FrameworkBundle" type="collection">
@@ -74,6 +75,10 @@
       <parameter key="MakerBundle" type="collection">
         <parameter key="path">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\maker-bundle</parameter>
         <parameter key="namespace">Symfony\Bundle\MakerBundle</parameter>
+      </parameter>
+      <parameter key="SchebTwoFactorBundle" type="collection">
+        <parameter key="path">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle</parameter>
+        <parameter key="namespace">Scheb\TwoFactorBundle</parameter>
       </parameter>
     </parameter>
     <parameter key="kernel.charset">UTF-8</parameter>
@@ -248,6 +253,14 @@
         </parameter>
       </parameter>
     </parameter>
+    <parameter key="scheb_two_factor.model_manager_name">null</parameter>
+    <parameter key="scheb_two_factor.security_tokens" type="collection">
+      <parameter>Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken</parameter>
+      <parameter>Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken</parameter>
+    </parameter>
+    <parameter key="scheb_two_factor.ip_whitelist" type="collection"/>
+    <parameter key="scheb_two_factor.code_reuse_cache_duration">60</parameter>
+    <parameter key="scheb_two_factor.trusted_device.enabled">false</parameter>
     <parameter key="data_collector.templates" type="collection">
       <parameter key="data_collector.request" type="collection">
         <parameter>request</parameter>
@@ -797,6 +810,10 @@
     <service id="App\Security\TerrainVoter" class="App\Security\TerrainVoter" autowire="true" autoconfigure="true">
       <tag name="security.voter"/>
     </service>
+    <service id="App\Service\AssignationAutoService" class="App\Service\AssignationAutoService" autowire="true" autoconfigure="true">
+      <argument type="service" id="App\Repository\User\TacheRepository"/>
+      <argument type="service" id="App\Repository\Terrain\TerrainRepository"/>
+    </service>
     <service id="App\Service\PdfService" class="App\Service\PdfService" autowire="true" autoconfigure="true">
       <argument type="service" id="twig"/>
     </service>
@@ -827,7 +844,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.q_cdh.r"/>
+      <argument type="service" id=".service_locator.kYtwA7Y"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -1639,6 +1656,7 @@
         <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations</argument>
         <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations</argument>
         <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations</argument>
+        <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations</argument>
       </argument>
       <argument type="collection">
         <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\twig-bridge/Resources/views/Email</argument>
@@ -1665,6 +1683,7 @@
         <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations</argument>
         <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations</argument>
         <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations</argument>
+        <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations</argument>
       </argument>
       <argument type="collection">
         <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\twig-bridge/Resources/views/Email</argument>
@@ -2536,6 +2555,7 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.cs.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.cs.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.cs.xlf</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.cs.yml</argument>
           </argument>
           <argument key="cy" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.cy.xlf</argument>
@@ -2551,6 +2571,7 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.de.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.de.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.de.xlf</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.de.yml</argument>
           </argument>
           <argument key="el" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.el.xlf</argument>
@@ -2561,11 +2582,13 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.en.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.en.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.en.xlf</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.en.yml</argument>
           </argument>
           <argument key="es" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.es.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.es.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.es.xlf</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.es.yml</argument>
           </argument>
           <argument key="et" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.et.xlf</argument>
@@ -2591,6 +2614,7 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.fr.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.fr.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.fr.xlf</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.fr.yml</argument>
           </argument>
           <argument key="gl" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.gl.xlf</argument>
@@ -2606,11 +2630,13 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.hr.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.hr.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.hr.xlf</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.hr.yml</argument>
           </argument>
           <argument key="hu" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.hu.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.hu.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.hu.xlf</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.hu.yml</argument>
           </argument>
           <argument key="hy" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.hy.xlf</argument>
@@ -2621,6 +2647,7 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.id.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.id.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.id.xlf</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.id.yml</argument>
           </argument>
           <argument key="it" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.it.xlf</argument>
@@ -2671,6 +2698,7 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.nl.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.nl.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.nl.xlf</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.nl.yml</argument>
           </argument>
           <argument key="nn" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.nn.xlf</argument>
@@ -2686,6 +2714,7 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.pl.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.pl.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.pl.xlf</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.pl.yml</argument>
           </argument>
           <argument key="pt" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.pt.xlf</argument>
@@ -2701,16 +2730,19 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.ro.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.ro.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.ro.xlf</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.ro.yml</argument>
           </argument>
           <argument key="ru" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.ru.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.ru.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.ru.xlf</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.ru.yml</argument>
           </argument>
           <argument key="sk" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.sk.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.sk.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.sk.xlf</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.sk.yml</argument>
           </argument>
           <argument key="sl" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.sl.xlf</argument>
@@ -2736,6 +2768,7 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.sv.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.sv.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.sv.xlf</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.sv.yml</argument>
           </argument>
           <argument key="th" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.th.xlf</argument>
@@ -2751,11 +2784,13 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.tr.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.tr.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.tr.xlf</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.tr.yml</argument>
           </argument>
           <argument key="uk" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.uk.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.uk.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.uk.xlf</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.uk.yml</argument>
           </argument>
           <argument key="ur" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.ur.xlf</argument>
@@ -2787,6 +2822,7 @@
           <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations</argument>
           <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations</argument>
           <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations</argument>
+          <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations</argument>
           <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/translations</argument>
           <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\framework-bundle/translations</argument>
           <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\doctrine\doctrine-bundle/translations</argument>
@@ -2806,6 +2842,7 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations</argument>
             <argument>translations</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\framework-bundle/translations</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\doctrine\doctrine-bundle/translations</argument>
@@ -3729,6 +3766,46 @@
       <call method="addListener">
         <argument>Symfony\Component\Security\Http\Event\CheckPassportEvent</argument>
         <argument type="collection">
+          <argument type="service_closure" id="scheb_two_factor.security.listener.check_two_factor_code"/>
+          <argument>checkPassport</argument>
+        </argument>
+        <argument>0</argument>
+      </call>
+      <call method="addListener">
+        <argument>scheb_two_factor.authentication.check</argument>
+        <argument type="collection">
+          <argument type="service_closure" id="scheb_two_factor.security.listener.check_two_factor_code_reuse"/>
+          <argument>checkForCodeReuse</argument>
+        </argument>
+        <argument>0</argument>
+      </call>
+      <call method="addListener">
+        <argument>scheb_two_factor.authentication.code_reused</argument>
+        <argument type="collection">
+          <argument type="service_closure" id="scheb_two_factor.security.listener.throw_exception_on_two_factor_code_reuse"/>
+          <argument>handle</argument>
+        </argument>
+        <argument>-256</argument>
+      </call>
+      <call method="addListener">
+        <argument>Symfony\Component\Security\Http\Event\LoginSuccessEvent</argument>
+        <argument type="collection">
+          <argument type="service_closure" id="scheb_two_factor.security.listener.suppress_remember_me"/>
+          <argument>onSuccessfulLogin</argument>
+        </argument>
+        <argument>-63</argument>
+      </call>
+      <call method="addListener">
+        <argument>security.authentication.success</argument>
+        <argument type="collection">
+          <argument type="service_closure" id="scheb_two_factor.security.authentication_success_event_suppressor"/>
+          <argument>onLogin</argument>
+        </argument>
+        <argument>9223372036854775806</argument>
+      </call>
+      <call method="addListener">
+        <argument>Symfony\Component\Security\Http\Event\CheckPassportEvent</argument>
+        <argument type="collection">
           <argument type="service_closure" id="security.listener.csrf_protection"/>
           <argument>checkPassport</argument>
         </argument>
@@ -3756,7 +3833,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.q_cdh.r"/>
+      <argument type="service" id=".service_locator.kYtwA7Y"/>
     </service>
     <service id="debug.log_processor" class="Symfony\Bridge\Monolog\Processor\DebugProcessor">
       <tag name="kernel.reset" method="reset"/>
@@ -6321,6 +6398,14 @@
         <argument>!Maker</argument>
       </call>
       <call method="addPath">
+        <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/views</argument>
+        <argument>SchebTwoFactor</argument>
+      </call>
+      <call method="addPath">
+        <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/views</argument>
+        <argument>!SchebTwoFactor</argument>
+      </call>
+      <call method="addPath">
         <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/templates</argument>
       </call>
       <call method="addPath">
@@ -6647,7 +6732,6 @@
       <tag priority="120" name="Symfony\Component\Security\Http\Controller\SecurityTokenValueResolver">controller.argument_value_resolver</tag>
       <argument type="service" id="security.token_storage"/>
     </service>
-    <service id="security.authentication.trust_resolver" class="Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver"/>
     <service id="security.authentication.session_strategy" class="Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy">
       <argument>migrate</argument>
       <argument type="service" id="security.csrf.token_storage" on-invalid="ignore"/>
@@ -6675,12 +6759,12 @@
     </service>
     <service id="security.access.authenticated_voter" class="Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter">
       <tag name="security.voter" priority="250"/>
-      <argument type="service" id="security.authentication.trust_resolver"/>
+      <argument type="service" id="scheb_two_factor.security.authentication.trust_resolver"/>
     </service>
     <service id="security.access.expression_voter" class="Symfony\Component\Security\Core\Authorization\Voter\ExpressionVoter">
       <tag name="security.voter" priority="245"/>
       <argument type="service" id="security.expression_language"/>
-      <argument type="service" id="security.authentication.trust_resolver"/>
+      <argument type="service" id="scheb_two_factor.security.authentication.trust_resolver"/>
       <argument type="service" id="security.authorization_checker"/>
       <argument type="service" id="security.role_hierarchy" on-invalid="null"/>
     </service>
@@ -6903,7 +6987,7 @@
       <argument type="abstract">Provider Key</argument>
       <argument type="service" id="monolog.logger.security" on-invalid="null"/>
       <argument type="service" id="debug.event_dispatcher" on-invalid="null"/>
-      <argument type="service" id="security.authentication.trust_resolver"/>
+      <argument type="service" id="scheb_two_factor.security.authentication.trust_resolver"/>
       <argument type="collection">
         <argument type="service" id="security.token_storage"/>
         <argument>enableUsageTracking</argument>
@@ -6959,7 +7043,7 @@
     <service id="security.exception_listener" class="Symfony\Component\Security\Http\Firewall\ExceptionListener" abstract="true">
       <tag name="monolog.logger" channel="security"/>
       <argument type="service" id="security.token_storage"/>
-      <argument type="service" id="security.authentication.trust_resolver"/>
+      <argument type="service" id="scheb_two_factor.security.authentication.trust_resolver"/>
       <argument type="service" id="security.http_utils"/>
       <argument type="abstract">Provider-shared Key</argument>
       <argument type="service" id="security.authentication.entry_point" on-invalid="null"/>
@@ -7270,7 +7354,7 @@
       <argument>main</argument>
       <argument type="service" id="monolog.logger.security" on-invalid="null"/>
       <argument type="service" id="debug.security.event_dispatcher.main"/>
-      <argument type="service" id="security.authentication.trust_resolver"/>
+      <argument type="service" id="scheb_two_factor.security.authentication.trust_resolver"/>
       <argument type="collection">
         <argument type="service" id="security.token_storage"/>
         <argument>enableUsageTracking</argument>
@@ -7372,7 +7456,7 @@
     </service>
     <service id="security.exception_listener.main" class="Symfony\Component\Security\Http\Firewall\ExceptionListener">
       <argument type="service" id="security.token_storage"/>
-      <argument type="service" id="security.authentication.trust_resolver"/>
+      <argument type="service" id="scheb_two_factor.security.authentication.trust_resolver"/>
       <argument type="service" id="security.http_utils"/>
       <argument>main</argument>
       <argument type="service" id="security.authenticator.form_login.main"/>
@@ -7749,6 +7833,155 @@
       <tag name="maker.command"/>
       <argument type="service" id="maker.file_manager"/>
       <argument type="service" id="maker.generator"/>
+    </service>
+    <service id="scheb_two_factor.security.authenticator" class="Scheb\TwoFactorBundle\Security\Http\Authenticator\TwoFactorAuthenticator">
+      <tag name="monolog.logger" channel="security"/>
+      <argument type="abstract">Two-factor firewall config</argument>
+      <argument type="service" id="security.token_storage"/>
+      <argument type="abstract">Authentication success handler</argument>
+      <argument type="abstract">Authentication failure handler</argument>
+      <argument type="abstract">Authentication required handler</argument>
+      <argument type="service" id="debug.event_dispatcher"/>
+      <argument type="service" id="monolog.logger.security" on-invalid="null"/>
+    </service>
+    <service id="scheb_two_factor.security.authentication.trust_resolver" class="Scheb\TwoFactorBundle\Security\Authentication\AuthenticationTrustResolver">
+      <tag name="container.decorator" id="security.authentication.trust_resolver" inner="scheb_two_factor.security.authentication.trust_resolver.inner"/>
+      <argument type="service" id="scheb_two_factor.security.authentication.trust_resolver.inner"/>
+    </service>
+    <service id="scheb_two_factor.security.access.authenticated_voter" class="Scheb\TwoFactorBundle\Security\Authorization\Voter\TwoFactorInProgressVoter">
+      <tag name="security.voter" priority="249"/>
+    </service>
+    <service id="scheb_two_factor.security.access.access_decider" class="Scheb\TwoFactorBundle\Security\Authorization\TwoFactorAccessDecider">
+      <argument type="service" id="security.access_map"/>
+      <argument type="service" id="debug.security.access.decision_manager"/>
+      <argument type="service" id="security.http_utils"/>
+      <argument type="service" id="security.logout_url_generator"/>
+    </service>
+    <service id="scheb_two_factor.security.listener.token_created" class="Scheb\TwoFactorBundle\Security\TwoFactor\Event\AuthenticationTokenListener">
+      <argument type="abstract">Firewall name</argument>
+      <argument type="service" id="scheb_two_factor.condition_registry"/>
+      <argument type="service" id="scheb_two_factor.provider_initiator"/>
+      <argument type="service" id="scheb_two_factor.authentication_context_factory"/>
+      <argument type="service" id="request_stack"/>
+    </service>
+    <service id="scheb_two_factor.security.listener.check_two_factor_code" class="Scheb\TwoFactorBundle\Security\Http\EventListener\CheckTwoFactorCodeListener">
+      <tag name="kernel.event_subscriber"/>
+      <argument type="service" id="scheb_two_factor.provider_preparation_recorder"/>
+      <argument type="service" id="scheb_two_factor.provider_registry"/>
+      <argument type="service" id="debug.event_dispatcher"/>
+    </service>
+    <service id="scheb_two_factor.security.listener.check_two_factor_code_reuse" class="Scheb\TwoFactorBundle\Security\Http\EventListener\CheckTwoFactorCodeReuseListener">
+      <tag name="kernel.event_subscriber"/>
+      <argument type="service" id="debug.event_dispatcher"/>
+      <argument>null</argument>
+      <argument>60</argument>
+      <argument type="service" id="monolog.logger" on-invalid="null"/>
+    </service>
+    <service id="scheb_two_factor.security.listener.throw_exception_on_two_factor_code_reuse" class="Scheb\TwoFactorBundle\Security\Http\EventListener\ThrowExceptionOnTwoFactorCodeReuseListener">
+      <tag name="kernel.event_subscriber"/>
+    </service>
+    <service id="scheb_two_factor.security.listener.suppress_remember_me" class="Scheb\TwoFactorBundle\Security\Http\EventListener\SuppressRememberMeListener">
+      <tag name="kernel.event_subscriber"/>
+    </service>
+    <service id="scheb_two_factor.security.provider_preparation_listener" class="Scheb\TwoFactorBundle\Security\TwoFactor\Provider\TwoFactorProviderPreparationListener">
+      <argument type="service" id="scheb_two_factor.provider_registry"/>
+      <argument type="service" id="scheb_two_factor.provider_preparation_recorder"/>
+      <argument type="service" id="monolog.logger" on-invalid="null"/>
+      <argument type="abstract">Firewall name</argument>
+      <argument>false</argument>
+      <argument>false</argument>
+    </service>
+    <service id="scheb_two_factor.security.form_listener" class="Scheb\TwoFactorBundle\Security\TwoFactor\Event\TwoFactorFormListener">
+      <argument type="abstract">Two-factor firewall config</argument>
+      <argument type="service" id="security.token_storage"/>
+      <argument type="service" id="debug.event_dispatcher"/>
+    </service>
+    <service id="scheb_two_factor.security.authentication_success_event_suppressor" class="Scheb\TwoFactorBundle\Security\TwoFactor\Event\AuthenticationSuccessEventSuppressor">
+      <tag name="kernel.event_subscriber"/>
+    </service>
+    <service id="scheb_two_factor.security.kernel_exception_listener" class="Scheb\TwoFactorBundle\Security\Http\Firewall\ExceptionListener">
+      <argument type="abstract">Firewall name</argument>
+      <argument type="service" id="security.token_storage"/>
+      <argument type="abstract">Authentication required handler</argument>
+      <argument type="service" id="debug.event_dispatcher"/>
+    </service>
+    <service id="scheb_two_factor.security.access_listener" class="Scheb\TwoFactorBundle\Security\Http\Firewall\TwoFactorAccessListener">
+      <argument type="abstract">Two-factor firewall config</argument>
+      <argument type="service" id="security.token_storage"/>
+      <argument type="service" id="scheb_two_factor.security.access.access_decider"/>
+    </service>
+    <service id="scheb_two_factor.security.authentication.success_handler" class="Scheb\TwoFactorBundle\Security\Http\Authentication\DefaultAuthenticationSuccessHandler">
+      <argument type="service" id="security.http_utils"/>
+      <argument type="abstract">Two-factor firewall config</argument>
+    </service>
+    <service id="scheb_two_factor.security.authentication.failure_handler" class="Scheb\TwoFactorBundle\Security\Http\Authentication\DefaultAuthenticationFailureHandler">
+      <argument type="service" id="security.http_utils"/>
+      <argument type="abstract">Two-factor firewall config</argument>
+    </service>
+    <service id="scheb_two_factor.security.authentication.authentication_required_handler" class="Scheb\TwoFactorBundle\Security\Http\Authentication\DefaultAuthenticationRequiredHandler">
+      <argument type="service" id="security.http_utils"/>
+      <argument type="abstract">Two-factor firewall config</argument>
+    </service>
+    <service id="scheb_two_factor.null_csrf_token_manager" class="Scheb\TwoFactorBundle\Security\TwoFactor\Csrf\NullCsrfTokenManager"/>
+    <service id="scheb_two_factor.security.firewall_config" class="Scheb\TwoFactorBundle\Security\TwoFactor\TwoFactorFirewallConfig">
+      <argument type="collection"/>
+      <argument type="abstract">Firewall name</argument>
+      <argument type="service" id="security.http_utils"/>
+      <argument type="service" id="scheb_two_factor.security.request_data_reader"/>
+    </service>
+    <service id="scheb_two_factor.security.request_data_reader" class="Scheb\TwoFactorBundle\Security\Http\Utils\RequestDataReader"/>
+    <service id="scheb_two_factor.persister_factory.doctrine" class="Scheb\TwoFactorBundle\Model\Persister\DoctrinePersisterFactory">
+      <argument type="service" id="doctrine" on-invalid="null"/>
+      <argument>null</argument>
+    </service>
+    <service id="scheb_two_factor.persister.doctrine" class="Scheb\TwoFactorBundle\Model\Persister\DoctrinePersister" lazy="true">
+      <factory service="scheb_two_factor.persister_factory.doctrine" method="getPersister"/>
+    </service>
+    <service id="scheb_two_factor.provider_registry" class="Scheb\TwoFactorBundle\Security\TwoFactor\Provider\TwoFactorProviderRegistry">
+      <argument type="iterator"/>
+    </service>
+    <service id="scheb_two_factor.default_token_factory" class="Scheb\TwoFactorBundle\Security\Authentication\Token\TwoFactorTokenFactory"/>
+    <service id="scheb_two_factor.default_provider_decider" class="Scheb\TwoFactorBundle\Security\TwoFactor\Provider\TwoFactorProviderDecider"/>
+    <service id="scheb_two_factor.authentication_context_factory" class="Scheb\TwoFactorBundle\Security\TwoFactor\AuthenticationContextFactory">
+      <argument>Scheb\TwoFactorBundle\Security\TwoFactor\AuthenticationContext</argument>
+    </service>
+    <service id="scheb_two_factor.condition_registry" class="Scheb\TwoFactorBundle\Security\TwoFactor\Condition\TwoFactorConditionRegistry" lazy="true">
+      <argument type="iterator">
+        <argument type="service" id="scheb_two_factor.authenticated_token_condition"/>
+        <argument type="service" id="scheb_two_factor.ip_whitelist_condition"/>
+      </argument>
+    </service>
+    <service id="scheb_two_factor.authenticated_token_condition" class="Scheb\TwoFactorBundle\Security\TwoFactor\Condition\AuthenticatedTokenCondition" lazy="true">
+      <argument>%scheb_two_factor.security_tokens%</argument>
+    </service>
+    <service id="scheb_two_factor.ip_whitelist_condition" class="Scheb\TwoFactorBundle\Security\TwoFactor\Condition\IpWhitelistCondition" lazy="true">
+      <argument type="service" id="scheb_two_factor.default_ip_whitelist_provider"/>
+    </service>
+    <service id="scheb_two_factor.default_ip_whitelist_provider" class="Scheb\TwoFactorBundle\Security\TwoFactor\IpWhitelist\DefaultIpWhitelistProvider">
+      <argument type="collection"/>
+    </service>
+    <service id="scheb_two_factor.provider_initiator" class="Scheb\TwoFactorBundle\Security\TwoFactor\Provider\TwoFactorProviderInitiator" lazy="true">
+      <argument type="service" id="scheb_two_factor.provider_registry"/>
+      <argument type="service" id="scheb_two_factor.default_token_factory"/>
+      <argument type="service" id="scheb_two_factor.default_provider_decider"/>
+    </service>
+    <service id="scheb_two_factor.firewall_context" class="Scheb\TwoFactorBundle\Security\TwoFactor\TwoFactorFirewallContext" public="true">
+      <argument type="collection"/>
+    </service>
+    <service id="scheb_two_factor.provider_preparation_recorder" class="Scheb\TwoFactorBundle\Security\TwoFactor\Provider\TokenPreparationRecorder">
+      <argument type="service" id="security.token_storage"/>
+    </service>
+    <service id="scheb_two_factor.form_controller" class="Scheb\TwoFactorBundle\Controller\FormController" public="true">
+      <argument type="service" id="security.token_storage"/>
+      <argument type="service" id="scheb_two_factor.provider_registry"/>
+      <argument type="service" id="scheb_two_factor.firewall_context"/>
+      <argument type="service" id="security.logout_url_generator"/>
+      <argument>null</argument>
+      <argument>false</argument>
+    </service>
+    <service id="scheb_two_factor.security.form_renderer" class="Scheb\TwoFactorBundle\Security\TwoFactor\Provider\DefaultTwoFactorFormRenderer" lazy="true">
+      <argument type="service" id="twig"/>
+      <argument>@SchebTwoFactor/Authentication/form.html.twig</argument>
     </service>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\AboutController" class="App\Controller\AboutController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\AboutController" class="App\Controller\AboutController" autowire="true" abstract="true"/>
@@ -8830,6 +9063,14 @@
         <argument key="terrainRepo" type="service_closure" id="App\Repository\Terrain\TerrainRepository"/>
       </argument>
     </service>
+    <service id=".service_locator.IQrhfKn" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="assignationService" type="service_closure" id="App\Service\AssignationAutoService"/>
+        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="terrainRepo" type="service_closure" id="App\Repository\Terrain\TerrainRepository"/>
+      </argument>
+    </service>
     <service id=".service_locator.PhEk7tx" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -8918,7 +9159,7 @@
         <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
       </argument>
     </service>
-    <service id=".service_locator.q_cdh.r" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.kYtwA7Y" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Controller\AdminDashboardController::index" type="service_closure" id=".service_locator.qni5W9T"/>
@@ -9068,6 +9309,7 @@
         <argument key="App\Controller\User\OuvrierController::home" type="service_closure" id=".service_locator.3Vzszbx"/>
         <argument key="App\Controller\User\OuvrierController::taches" type="service_closure" id=".service_locator.3Vzszbx"/>
         <argument key="App\Controller\User\Ouvrier_agriController::ajouterTache" type="service_closure" id=".service_locator.X8q_9sW"/>
+        <argument key="App\Controller\User\Ouvrier_agriController::assignationAuto" type="service_closure" id=".service_locator.IQrhfKn"/>
         <argument key="App\Controller\User\Ouvrier_agriController::deleteOuvrier" type="service_closure" id=".service_locator.X8q_9sW"/>
         <argument key="App\Controller\User\Ouvrier_agriController::edit" type="service_closure" id=".service_locator.X8q_9sW"/>
         <argument key="App\Controller\User\Ouvrier_agriController::index" type="service_closure" id=".service_locator.sYplRBf"/>
@@ -9254,6 +9496,7 @@
         <argument key="App\Controller\User\OuvrierController:home" type="service_closure" id=".service_locator.3Vzszbx"/>
         <argument key="App\Controller\User\OuvrierController:taches" type="service_closure" id=".service_locator.3Vzszbx"/>
         <argument key="App\Controller\User\Ouvrier_agriController:ajouterTache" type="service_closure" id=".service_locator.X8q_9sW"/>
+        <argument key="App\Controller\User\Ouvrier_agriController:assignationAuto" type="service_closure" id=".service_locator.IQrhfKn"/>
         <argument key="App\Controller\User\Ouvrier_agriController:deleteOuvrier" type="service_closure" id=".service_locator.X8q_9sW"/>
         <argument key="App\Controller\User\Ouvrier_agriController:edit" type="service_closure" id=".service_locator.X8q_9sW"/>
         <argument key="App\Controller\User\Ouvrier_agriController:index" type="service_closure" id=".service_locator.sYplRBf"/>
@@ -9651,6 +9894,10 @@
       <argument type="service" id="security.access.authenticated_voter"/>
       <argument type="service" id="debug.event_dispatcher"/>
     </service>
+    <service id=".debug.security.voter.scheb_two_factor.security.access.authenticated_voter" class="Symfony\Component\Security\Core\Authorization\Voter\TraceableVoter">
+      <argument type="service" id="scheb_two_factor.security.access.authenticated_voter"/>
+      <argument type="service" id="debug.event_dispatcher"/>
+    </service>
     <service id=".debug.security.voter.security.access.simple_role_voter" class="Symfony\Component\Security\Core\Authorization\Voter\TraceableVoter">
       <argument type="service" id="security.access.simple_role_voter"/>
       <argument type="service" id="debug.event_dispatcher"/>
@@ -9944,6 +10191,30 @@
           <argument>onLoginSuccess</argument>
         </argument>
         <argument>0</argument>
+      </call>
+      <call method="addListener">
+        <argument>Symfony\Component\Security\Http\Event\CheckPassportEvent</argument>
+        <argument type="collection">
+          <argument type="service_closure" id="scheb_two_factor.security.listener.check_two_factor_code"/>
+          <argument>checkPassport</argument>
+        </argument>
+        <argument>0</argument>
+      </call>
+      <call method="addListener">
+        <argument>Symfony\Component\Security\Http\Event\LoginSuccessEvent</argument>
+        <argument type="collection">
+          <argument type="service_closure" id="scheb_two_factor.security.listener.suppress_remember_me"/>
+          <argument>onSuccessfulLogin</argument>
+        </argument>
+        <argument>-63</argument>
+      </call>
+      <call method="addListener">
+        <argument>security.authentication.success</argument>
+        <argument type="collection">
+          <argument type="service_closure" id="scheb_two_factor.security.authentication_success_event_suppressor"/>
+          <argument>onLogin</argument>
+        </argument>
+        <argument>9223372036854775806</argument>
       </call>
       <call method="addListener">
         <argument>Symfony\Component\Security\Http\Event\CheckPassportEvent</argument>
@@ -10600,6 +10871,7 @@
     <service id="debug.security.access.decision_manager.inner" class="Symfony\Component\Security\Core\Authorization\AccessDecisionManager">
       <argument type="iterator">
         <argument type="service" id=".debug.security.voter.security.access.authenticated_voter"/>
+        <argument type="service" id=".debug.security.voter.scheb_two_factor.security.access.authenticated_voter"/>
         <argument type="service" id=".debug.security.voter.security.access.simple_role_voter"/>
         <argument type="service" id=".debug.security.voter.security.access.expression_voter"/>
         <argument type="service" id=".debug.security.voter.App\Security\TerrainVoter"/>
@@ -10613,6 +10885,7 @@
     <service id="debug.security.firewall.authenticator.main.inner" class="Symfony\Component\Security\Http\Firewall\AuthenticatorManagerListener">
       <argument type="service" id="security.authenticator.manager.main"/>
     </service>
+    <service id="scheb_two_factor.security.authentication.trust_resolver.inner" class="Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver"/>
     <service id="debug.traced.messenger.bus.default.inner" class="Symfony\Component\Messenger\MessageBus">
       <argument type="iterator">
         <argument type="service" id="messenger.bus.default.middleware.traceable"/>
@@ -11909,9 +12182,17 @@
     <service id="Symfony\Component\Security\Core\User\UserCheckerInterface" alias="security.user_checker"/>
     <service id="logger" alias="monolog.logger"/>
     <service id="Psr\Log\LoggerInterface" alias="monolog.logger"/>
+    <service id="scheb_two_factor.csrf_token_manager" alias="security.csrf.token_manager"/>
+    <service id="Scheb\TwoFactorBundle\Model\PersisterInterface" alias="scheb_two_factor.persister.doctrine"/>
+    <service id="Scheb\TwoFactorBundle\Security\TwoFactor\TwoFactorFirewallContext" alias="scheb_two_factor.firewall_context"/>
+    <service id="Scheb\TwoFactorBundle\Security\TwoFactor\Provider\TwoFactorFormRendererInterface" alias="scheb_two_factor.security.form_renderer"/>
+    <service id="scheb_two_factor.persister" alias="scheb_two_factor.persister.doctrine"/>
+    <service id="scheb_two_factor.ip_whitelist_provider" alias="scheb_two_factor.default_ip_whitelist_provider"/>
+    <service id="scheb_two_factor.token_factory" alias="scheb_two_factor.default_token_factory"/>
+    <service id="scheb_two_factor.provider_decider" alias="scheb_two_factor.default_provider_decider"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.w7.f4fT" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.q_cdh.r"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.kYtwA7Y"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id=".Psr\Log\LoggerInterface $request.logger" alias="monolog.logger.request"/>
@@ -11973,12 +12254,13 @@
     <service id=".service_locator.F7aKy3I" alias=".service_locator.X8q_9sW"/>
     <service id=".service_locator.aNnJEK6" alias=".service_locator.DkDVX4k"/>
     <service id=".service_locator.tDbLDno" alias=".service_locator.xRuLM4F"/>
+    <service id=".service_locator.raRMufp" alias=".service_locator.IQrhfKn"/>
     <service id=".service_locator.Jc2xsDH" alias=".service_locator.z7LPJKP"/>
     <service id=".service_locator.nSvg3uO" alias=".service_locator.Mzhqy3N"/>
     <service id=".service_locator.5pebkNV" alias=".service_locator.xxq2prQ"/>
     <service id=".service_locator.whdse4m" alias=".service_locator.yd.AI8F"/>
     <service id=".service_locator.8J1nalj" alias=".service_locator.SsD9eLO"/>
-    <service id=".service_locator.yVdJ.u." alias=".service_locator.q_cdh.r"/>
+    <service id=".service_locator..osm1QF" alias=".service_locator.kYtwA7Y"/>
     <service id=".service_locator.BFrsqsn" alias=".service_locator.F9PKc.7"/>
     <service id=".service_locator.oIHygA7" alias=".service_locator.xOkKGYY"/>
     <service id=".service_locator.XtmiKbi" alias=".service_locator.MfxSDRP"/>
@@ -12000,6 +12282,7 @@
     <service id="turbo.broadcaster.imux" alias="turbo.broadcaster.action_renderer"/>
     <service id="security.access.decision_manager" alias="debug.security.access.decision_manager"/>
     <service id="security.firewall.authenticator.main" alias="debug.security.firewall.authenticator.main"/>
+    <service id="security.authentication.trust_resolver" alias="scheb_two_factor.security.authentication.trust_resolver"/>
     <service id="messenger.bus.default" alias="debug.traced.messenger.bus.default"/>
     <service id="doctrine.orm.default_metadata_driver" alias=".doctrine.orm.default_metadata_driver"/>
     <service id="security.event_dispatcher.main" alias="debug.security.event_dispatcher.main"/>
@@ -12072,6 +12355,7 @@
     <service id=".service_locator.fWXEh1S" alias=".service_locator.X8q_9sW"/>
     <service id=".service_locator.d1dNbYT" alias=".service_locator.DkDVX4k"/>
     <service id=".service_locator.txngRqi" alias=".service_locator.xRuLM4F"/>
+    <service id=".service_locator.Wm.ypLj" alias=".service_locator.IQrhfKn"/>
     <service id=".service_locator.bGJjvaT" alias=".service_locator.PhEk7tx"/>
     <service id=".service_locator.vO.9397" alias=".service_locator.WVGOjkY"/>
     <service id=".service_locator.U0KjzJw" alias=".service_locator.z7LPJKP"/>

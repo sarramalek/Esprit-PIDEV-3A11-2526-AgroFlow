@@ -7,6 +7,7 @@ use App\Entity\User\User;
 use App\Repository\User\TacheRepository;
 use App\Repository\User\UserRepository;
 use App\Repository\Terrain\TerrainRepository;
+use App\Service\AssignationAutoService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -238,4 +239,49 @@ public function index(
         $ouvriersAgriculteur = $terrainRepo->findCinsOuvriersAgriculteur($agriculteur->getCin());
         return in_array($ouvrier->getCin(), $ouvriersAgriculteur, true);
     }
+    // Injectez le service dans le constructeur ou en paramètre de méthode
+#[Route('/tache/assignation-auto', name: 'app_ouvrier_tache_auto', methods: ['POST'])]
+public function assignationAuto(
+    Request $request,
+    TerrainRepository $terrainRepo,
+    EntityManagerInterface $em,
+    AssignationAutoService $assignationService
+): Response {
+    $agriculteur = $this->getUser();
+
+    // Récupère la date saisie
+    $echeanceStr = $request->request->get('date_echeancee');
+    $echeance    = $echeanceStr ? new \DateTime($echeanceStr) : null;
+
+    // Choisit automatiquement l'ouvrier
+    $ouvrier = $assignationService->choisirOuvrier($agriculteur, $echeance);
+
+    if (!$ouvrier) {
+        $this->addFlash('danger', 'Aucun ouvrier disponible. Créez d\'abord des ouvriers.');
+        return $this->redirectToRoute('app_ouvrier_index');
+    }
+
+    // Crée la tâche
+    $tache = new Tache();
+    $tache->setNomTache($request->request->get('nom_tache'));
+    $tache->setDescription($request->request->get('description'));
+    $tache->setEtat($request->request->get('etat', 'à faire'));
+    $tache->setPriorite($request->request->get('priorite', 'normale'));
+    $tache->setAssignee($ouvrier);
+
+    if ($echeance) {
+        $tache->setDateEcheancee($echeance);
+    }
+
+    $em->persist($tache);
+    $em->flush();
+
+    $this->addFlash('success', sprintf(
+        'Tâche assignée automatiquement à %s %s.',
+        $ouvrier->getPrenom(),
+        $ouvrier->getNom()
+    ));
+
+    return $this->redirectToRoute('app_ouvrier_index');
+}
 }

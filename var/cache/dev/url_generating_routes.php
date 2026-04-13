@@ -4,6 +4,8 @@
 
 return [
     '_preview_error' => [['code', '_format'], ['_controller' => 'error_controller::preview', '_format' => 'html'], ['code' => '\\d+'], [['variable', '.', '[^/]++', '_format', true], ['variable', '/', '\\d+', 'code', true], ['text', '/_error']], [], [], []],
+    '2fa_login' => [[], ['_controller' => 'scheb_two_factor.form_controller::form'], [], [['text', '/2fa']], [], [], []],
+    '2fa_login_check' => [[], [], [], [['text', '/2fa_check']], [], [], []],
     '_wdt' => [['token'], ['_controller' => 'web_profiler.controller.profiler::toolbarAction'], [], [['variable', '/', '[^/]++', 'token', true], ['text', '/_wdt']], [], [], []],
     '_profiler_home' => [[], ['_controller' => 'web_profiler.controller.profiler::homeAction'], [], [['text', '/_profiler/']], [], [], []],
     '_profiler_search' => [[], ['_controller' => 'web_profiler.controller.profiler::searchAction'], [], [['text', '/_profiler/search']], [], [], []],
@@ -185,6 +187,7 @@ return [
     'app_ouvrier_tache_add' => [['cin'], ['_controller' => 'App\\Controller\\User\\Ouvrier_agriController::ajouterTache'], [], [['text', '/taches/ajouter'], ['variable', '/', '[^/]++', 'cin', true], ['text', '/agriculteur/ouvriers']], [], [], []],
     'app_tache_update_etat' => [['id'], ['_controller' => 'App\\Controller\\User\\Ouvrier_agriController::updateEtatTache'], [], [['text', '/etat'], ['variable', '/', '[^/]++', 'id', true], ['text', '/agriculteur/ouvriers/tache']], [], [], []],
     'app_ouvrier_tache_delete' => [['id'], ['_controller' => 'App\\Controller\\User\\Ouvrier_agriController::supprimerTache'], [], [['text', '/supprimer'], ['variable', '/', '[^/]++', 'id', true], ['text', '/agriculteur/ouvriers/tache']], [], [], []],
+    'app_ouvrier_tache_auto' => [[], ['_controller' => 'App\\Controller\\User\\Ouvrier_agriController::assignationAuto'], [], [['text', '/agriculteur/ouvriers/tache/assignation-auto']], [], [], []],
     'app_tache_index' => [[], ['_controller' => 'App\\Controller\\User\\TacheController::index'], [], [['text', '/tache/']], [], [], []],
     'app_tache_export_pdf' => [[], ['_controller' => 'App\\Controller\\User\\TacheController::exportPdf'], [], [['text', '/tache/export/pdf']], [], [], []],
     'app_tache_new' => [[], ['_controller' => 'App\\Controller\\User\\TacheController::new'], [], [['text', '/tache/new']], [], [], []],
@@ -389,6 +392,7 @@ return [
     'App\Controller\User\Ouvrier_agriController::ajouterTache' => [['cin'], ['_controller' => 'App\\Controller\\User\\Ouvrier_agriController::ajouterTache'], [], [['text', '/taches/ajouter'], ['variable', '/', '[^/]++', 'cin', true], ['text', '/agriculteur/ouvriers']], [], [], []],
     'App\Controller\User\Ouvrier_agriController::updateEtatTache' => [['id'], ['_controller' => 'App\\Controller\\User\\Ouvrier_agriController::updateEtatTache'], [], [['text', '/etat'], ['variable', '/', '[^/]++', 'id', true], ['text', '/agriculteur/ouvriers/tache']], [], [], []],
     'App\Controller\User\Ouvrier_agriController::supprimerTache' => [['id'], ['_controller' => 'App\\Controller\\User\\Ouvrier_agriController::supprimerTache'], [], [['text', '/supprimer'], ['variable', '/', '[^/]++', 'id', true], ['text', '/agriculteur/ouvriers/tache']], [], [], []],
+    'App\Controller\User\Ouvrier_agriController::assignationAuto' => [[], ['_controller' => 'App\\Controller\\User\\Ouvrier_agriController::assignationAuto'], [], [['text', '/agriculteur/ouvriers/tache/assignation-auto']], [], [], []],
     'App\Controller\User\TacheController::index' => [[], ['_controller' => 'App\\Controller\\User\\TacheController::index'], [], [['text', '/tache/']], [], [], []],
     'App\Controller\User\TacheController::exportPdf' => [[], ['_controller' => 'App\\Controller\\User\\TacheController::exportPdf'], [], [['text', '/tache/export/pdf']], [], [], []],
     'App\Controller\User\TacheController::new' => [[], ['_controller' => 'App\\Controller\\User\\TacheController::new'], [], [['text', '/tache/new']], [], [], []],
