@@ -24,25 +24,19 @@ body { background: var(--beige); font-family: 'Segoe UI', sans-serif; }
 }
 .btn-primary:hover { background: var(--terre); color: white; }
 
-/* Grille terrains */
 .terrain-section { margin-bottom: 2.5rem; }
 .terrain-title {
     background: white;
-      padding: 0.6rem 1rem;
+    padding: 0.6rem 1rem 0.6rem 0.75rem;
     border-radius: 8px;
-    border: 0.5px solid var(--color-border-tertiary);
+    border-left: 4px solid var(--vert-l);
     margin-bottom: 1rem;
     font-size: 1.1rem; font-weight: 700; color: var(--vert);
-    border-left: 4px solid var(--vert-l); padding-left: .75rem;
 }
-.terrain-header {
-    
-    padding: 0.6rem 1rem;
-    border-radius: 8px;
-    border: 0.5px solid var(--color-border-tertiary);
-    margin-bottom: 1rem;
+.terrain-meta {
+    font-size: 0.85rem; font-weight: 400; color: #777; margin-left: 0.5rem;
 }
-/* Cards ouvriers */
+
 .ouvrier-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -72,10 +66,28 @@ body { background: var(--beige); font-family: 'Segoe UI', sans-serif; }
 .btn-edit:hover   { background: #f4a261; }
 .btn-delete:hover { background: #9b1c1c; }
 
-.badge-taches {
-    background: var(--vert-l); color: white;
-    border-radius: 2rem; padding: .15rem .55rem;
-    font-size: .75rem; font-weight: 700;
+.pagination-wrapper {
+    display: flex; justify-content: center; align-items: center;
+    gap: 8px; margin-top: 20px;
+}
+.page-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; border-radius: 10px;
+    background: white; color: #2C3E50;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    text-decoration: none; font-weight: 600; font-size: 14px;
+}
+.page-btn.active {
+    background: var(--vert); color: white;
+    box-shadow: 0 2px 8px rgba(45,106,79,0.3);
+}
+.page-ellipsis {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; color: #aaa; font-weight: 600;
+}
+.pagination-info {
+    text-align: center; margin-top: 10px;
+    font-size: 13px; color: #aaa;
 }
 .empty { color: #aaa; font-style: italic; padding: 1rem 0; }
 </style>
@@ -97,48 +109,90 @@ body { background: var(--beige); font-family: 'Segoe UI', sans-serif; }
         <p class="empty">Aucun terrain enregistré. Créez d'abord un terrain pour y affecter des ouvriers.</p>
     {% else %}
         {% for terrain in terrains %}
-        <div class="terrain-section">
-            <div class="terrain-title">
-                🌿 {{ terrain.nomTerrain }}
-                <span class="terrain-meta">
-                    {{ terrain.localisation }} · {{ terrain.surface }} m²
-                </span>
-            </div>
+            {% set tid         = terrain.id %}
+            {% set paramKey    = 'page_terrain_' ~ tid %}
+            {% set ouvriersTerrain = ouvriersByTerrain[tid] ?? [] %}
+            {% set pagination  = paginationByTerrain[tid] ?? {page: 1, totalPages: 1, total: 0} %}
+            {% set currentPage = pagination.page %}
+            {% set totalPages  = pagination.totalPages %}
 
-            {% set ouvriersTerrain = terrain.ouvriers %}
-            {% if ouvriersTerrain is empty %}
-                <p class="empty">Aucun ouvrier assigné à ce terrain.</p>
-            {% else %}
-            <div class="ouvrier-grid">
-                {% for ouvrier in ouvriersTerrain %}
-                <div class="ouvrier-card">
-                    <div class="ouvrier-name">
-                        {{ ouvrier.prenom }} {{ ouvrier.nom }}
-                    </div>
-                    <div class="ouvrier-info">📧 {{ ouvrier.email }}</div>
-                    <div class="ouvrier-info">📞 {{ ouvrier.tel ?? '—' }}</div>
-                    <div class="ouvrier-info">📍 {{ ouvrier.ville ?? '—' }}</div>
-
-                    <div class="ouvrier-actions">
-                        <a href="{{ path('app_ouvrier_taches', {cin: ouvrier.cin}) }}"
-                           class="btn-sm btn-taches">
-                            📋 Tâches
-                        </a>
-                        <a href="{{ path('app_ouvrier_edit', {cin: ouvrier.cin}) }}"
-                           class="btn-sm btn-edit">
-                            ✏️ Modifier
-                        </a>
-                        <form method="post"
-                              action="{{ path('app_ouvrier_delete', {cin: ouvrier.cin}) }}"
-                              onsubmit="return confirm('Supprimer cet ouvrier ?')">
-                            <button type="submit" class="btn-sm btn-delete">🗑 Supprimer</button>
-                        </form>
-                    </div>
+            <div class="terrain-section">
+                <div class="terrain-title">
+                    🌿 {{ terrain.nomTerrain }}
+                    <span class="terrain-meta">
+                        {{ terrain.localisation }} · {{ terrain.surface }} m²
+                    </span>
                 </div>
-                {% endfor %}
+
+                {% if ouvriersTerrain is empty %}
+                    <p class="empty">Aucun ouvrier assigné à ce terrain.</p>
+                {% else %}
+                    <div class="ouvrier-grid">
+                        {% for ouvrier in ouvriersTerrain %}
+                        <div class="ouvrier-card">
+                            <div class="ouvrier-name">
+                                {{ ouvrier.prenom }} {{ ouvrier.nom }}
+                            </div>
+                            <div class="ouvrier-info">📧 {{ ouvrier.email }}</div>
+                            <div class="ouvrier-info">📞 {{ ouvrier.tel ?? '—' }}</div>
+                            <div class="ouvrier-info">📍 {{ ouvrier.ville ?? '—' }}</div>
+
+                            <div class="ouvrier-actions">
+                                <a href="{{ path('app_ouvrier_taches', {cin: ouvrier.cin}) }}"
+                                   class="btn-sm btn-taches">📋 Tâches</a>
+                                <a href="{{ path('app_ouvrier_edit', {cin: ouvrier.cin}) }}"
+                                   class="btn-sm btn-edit">✏️ Modifier</a>
+                                <form method="post"
+                                      action="{{ path('app_ouvrier_delete', {cin: ouvrier.cin}) }}"
+                                      onsubmit="return confirm('Supprimer cet ouvrier ?')">
+                                    <button type="submit" class="btn-sm btn-delete">🗑 Supprimer</button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    {# ── Pagination par terrain ── #}
+                    {% if totalPages > 1 %}
+                    <div class="pagination-wrapper">
+
+                        {# Bouton précédent #}
+                        {% if currentPage > 1 %}
+                            {% set prevParams = app.request.query.all|merge({(paramKey): currentPage - 1}) %}
+                            <a href="{{ path('app_ouvrier_index', prevParams) }}" class="page-btn">
+                                <i class="fa fa-chevron-left"></i>
+                            </a>
+                        {% endif %}
+
+                        {# Numéros de pages #}
+                        {% for p in 1..totalPages %}
+                            {% if p == currentPage %}
+                                <span class="page-btn active">{{ p }}</span>
+                            {% elseif p == 1 or p == totalPages or (p >= currentPage - 2 and p <= currentPage + 2) %}
+                                {% set pageParams = app.request.query.all|merge({(paramKey): p}) %}
+                                <a href="{{ path('app_ouvrier_index', pageParams) }}" class="page-btn">{{ p }}</a>
+                            {% elseif p == currentPage - 3 or p == currentPage + 3 %}
+                                <span class="page-ellipsis">…</span>
+                            {% endif %}
+                        {% endfor %}
+
+                        {# Bouton suivant #}
+                        {% if currentPage < totalPages %}
+                            {% set nextParams = app.request.query.all|merge({(paramKey): currentPage + 1}) %}
+                            <a href="{{ path('app_ouvrier_index', nextParams) }}" class="page-btn">
+                                <i class="fa fa-chevron-right"></i>
+                            </a>
+                        {% endif %}
+
+                    </div>
+                    <div class="pagination-info">
+                        Page {{ currentPage }} sur {{ totalPages }} — {{ pagination.total }} ouvrier(s)
+                    </div>
+                    {% endif %}
+                    {# ── fin pagination ── #}
+
+                {% endif %}
             </div>
-            {% endif %}
-        </div>
         {% endfor %}
     {% endif %}
 
