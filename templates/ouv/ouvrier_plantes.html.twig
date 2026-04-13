@@ -1,0 +1,719 @@
+{% extends 'base_ouvrier.html.twig' %}
+
+{% block title %}AgroFlow – Mes Plantes{% endblock %}
+
+{% block stylesheets %}
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+    --green-dark:   #2D5A27;
+    --green-mid:    #4A8C3F;
+    --green-light:  #EAF3DE;
+    --green-border: #C8E6C0;
+    --text-main:    #1E2D1A;
+    --text-muted:   #6B7C65;
+    --bg-card:      #FFFFFF;
+    --radius-sm:    8px;
+    --radius-md:    12px;
+    --radius-lg:    18px;
+    --shadow-card:  0 2px 12px rgba(45,90,39,0.09);
+    --shadow-hover: 0 8px 28px rgba(45,90,39,0.15);
+    --trans:        all 0.22s ease;
+}
+
+/* ── Hero ── */
+.plantes-hero {
+    background: linear-gradient(120deg, #2D5A27 0%, #4A8C3F 60%, #7CBF5E 100%);
+    border-radius: var(--radius-lg);
+    padding: 32px 36px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+}
+.plantes-hero::before {
+    content: ''; position: absolute; right: -40px; top: -40px;
+    width: 220px; height: 220px; border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+}
+.hero-text h1 { font-size: 26px; font-weight: 700; color: #fff; margin: 0 0 6px; }
+.hero-text p  { font-size: 14px; color: rgba(255,255,255,0.78); margin: 0; }
+
+/* ── Stats ── */
+.stats-strip { display: flex; gap: 14px; margin-bottom: 26px; flex-wrap: wrap; }
+.stat-card {
+    flex: 1; min-width: 140px; background: var(--bg-card);
+    border: 1px solid var(--green-border); border-radius: var(--radius-md);
+    padding: 16px 20px; display: flex; align-items: center; gap: 14px;
+    box-shadow: var(--shadow-card);
+}
+.stat-icon  { width: 42px; height: 42px; border-radius: var(--radius-sm); background: var(--green-light); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.stat-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+.stat-value { font-size: 22px; font-weight: 700; color: var(--green-dark); line-height: 1.1; }
+
+/* ── Toolbar ── */
+.toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 22px; }
+.search-wrap { position: relative; flex: 1; min-width: 220px; }
+.search-wrap i { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 13px; pointer-events: none; }
+.search-input {
+    width: 100%; height: 40px; border: 1.5px solid var(--green-border);
+    border-radius: var(--radius-sm); padding: 0 12px 0 36px;
+    font-size: 13.5px; font-family: 'DM Sans', sans-serif;
+    background: var(--bg-card); color: var(--text-main); outline: none; transition: var(--trans);
+}
+.search-input:focus { border-color: var(--green-mid); box-shadow: 0 0 0 3px rgba(74,140,63,0.12); }
+.sort-select {
+    height: 40px; border: 1.5px solid var(--green-border); border-radius: var(--radius-sm);
+    padding: 0 32px 0 12px; font-size: 13px; font-family: 'DM Sans', sans-serif;
+    background: var(--bg-card); color: var(--text-main); outline: none; cursor: pointer;
+    appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='%236B7C65'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center;
+    transition: var(--trans); min-width: 160px;
+}
+.sort-select:focus { border-color: var(--green-mid); }
+.btn-filter {
+    height: 40px; background: var(--green-dark); color: #fff;
+    border: none; border-radius: var(--radius-sm); padding: 0 18px;
+    font-size: 13.5px; font-weight: 600; font-family: 'DM Sans', sans-serif;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: var(--trans);
+    text-decoration: none;
+}
+.btn-filter:hover { background: var(--green-mid); }
+.btn-filter.grey  { background: #6B7C65; }
+.btn-filter.grey:hover { background: #556158; }
+
+/* ── Bouton PDF ── */
+.btn-pdf {
+    height: 40px; background: #DC2626; color: #fff;
+    border: none; border-radius: var(--radius-sm); padding: 0 18px;
+    font-size: 13.5px; font-weight: 600; font-family: 'DM Sans', sans-serif;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 7px;
+    transition: var(--trans); text-decoration: none; white-space: nowrap;
+}
+.btn-pdf:hover { background: #B91C1C; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(220,38,38,0.3); }
+.btn-pdf:active { transform: translateY(0); }
+
+/* ── Result info ── */
+.result-info { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.result-info strong { color: var(--green-dark); }
+
+/* ── Grid ── */
+.plantes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
+
+/* ── Card ── */
+.plante-card {
+    background: var(--bg-card); border: 1px solid var(--green-border);
+    border-radius: var(--radius-lg); padding: 22px;
+    box-shadow: var(--shadow-card); transition: var(--trans);
+    display: flex; flex-direction: column; gap: 14px;
+    position: relative; overflow: hidden;
+}
+.plante-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, var(--green-dark), var(--green-mid));
+    transform: scaleX(0); transform-origin: left; transition: transform 0.3s ease;
+}
+.plante-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-3px); border-color: #A5D48E; }
+.plante-card:hover::before { transform: scaleX(1); }
+
+.card-header  { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.card-avatar  { width: 50px; height: 50px; border-radius: 14px; background: linear-gradient(135deg, #EAF3DE, #C8E6C0); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+.card-title-block { flex: 1; min-width: 0; }
+.card-title   { font-size: 16px; font-weight: 700; color: var(--text-main); margin: 0 0 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-variete { font-size: 12px; color: var(--text-muted); font-style: italic; }
+.cycle-badge  { background: var(--green-light); color: var(--green-dark); border: 1px solid var(--green-border); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+
+.card-stats { display: flex; gap: 10px; }
+.card-stat  { flex: 1; background: #F7FAF5; border: 1px solid #E4F0DA; border-radius: var(--radius-sm); padding: 10px 12px; text-align: center; }
+.cs-label   { font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 3px; }
+.cs-val     { font-size: 15px; font-weight: 700; color: var(--green-dark); }
+.cs-unit    { font-size: 10px; color: var(--text-muted); font-weight: 400; }
+
+/* ── Bouton Arrosage ── */
+.btn-arrosage {
+    width: 100%; height: 38px;
+    background: #EFF6FF; color: #1D4ED8;
+    border: 1.5px solid #BFDBFE; border-radius: var(--radius-sm);
+    font-size: 13px; font-weight: 600; font-family: 'DM Sans', sans-serif;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    gap: 7px; transition: var(--trans);
+}
+.btn-arrosage:hover { background: #DBEAFE; border-color: #93C5FD; }
+
+/* ── Empty ── */
+.empty-state { grid-column: 1/-1; text-align: center; padding: 60px 20px; color: var(--text-muted); }
+.empty-state .empty-icon { font-size: 52px; margin-bottom: 14px; }
+.empty-state h3 { font-size: 18px; font-weight: 600; color: var(--text-main); margin: 0 0 8px; }
+.empty-state p  { font-size: 14px; margin: 0; }
+
+/* ══════════════════════════════
+   PAGINATION
+══════════════════════════════ */
+.pagination-wrap {
+    display: flex; align-items: center; justify-content: center;
+    gap: 6px; margin-top: 32px; flex-wrap: wrap;
+}
+.page-btn {
+    min-width: 38px; height: 38px;
+    border: 1.5px solid var(--green-border);
+    background: var(--bg-card); color: var(--text-main);
+    border-radius: var(--radius-sm); font-size: 13.5px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 0 10px; transition: var(--trans); text-decoration: none;
+}
+.page-btn:hover:not(.active):not(.disabled) {
+    background: var(--green-light); border-color: var(--green-mid); color: var(--green-dark);
+}
+.page-btn.active {
+    background: var(--green-dark); color: #fff;
+    border-color: var(--green-dark); cursor: default;
+}
+.page-btn.disabled {
+    opacity: 0.4; cursor: not-allowed; pointer-events: none;
+}
+.page-info {
+    font-size: 13px; color: var(--text-muted);
+    text-align: center; margin-top: 12px;
+}
+
+/* ══════════════════════════════
+   MODAL ARROSAGE
+══════════════════════════════ */
+.modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5); z-index: 9999;
+    align-items: center; justify-content: center; padding: 20px;
+}
+.modal-overlay.active { display: flex; }
+
+.modal-box {
+    background: #FFFDF5; border-radius: 16px; padding: 32px;
+    width: 90%; max-width: 460px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    position: relative; animation: modalIn 0.25s ease;
+    max-height: 90vh; overflow-y: auto;
+}
+@keyframes modalIn { from{transform:translateY(20px);opacity:0} to{transform:none;opacity:1} }
+
+.modal-close { position: absolute; top: 14px; right: 16px; background: none; border: none; font-size: 20px; cursor: pointer; color: #999; }
+.modal-close:hover { color: #333; }
+
+.modal-title    { font-size: 18px; font-weight: 700; color: #1B3A20; margin-bottom: 4px; display: flex; align-items: center; gap: 10px; }
+.modal-subtitle { font-size: 13px; color: #6B7280; margin-bottom: 20px; }
+
+.modal-loading   { text-align: center; padding: 30px 0; color: #6B7280; font-size: 14px; }
+.modal-loading i { font-size: 28px; display: block; margin-bottom: 10px; animation: spin 1s linear infinite; }
+@keyframes spin { to{transform:rotate(360deg)} }
+
+.arro-header     { text-align: center; margin-bottom: 20px; }
+.arro-icon       { font-size: 48px; }
+.arro-status     { font-size: 20px; font-weight: 700; margin-top: 8px; }
+.arro-grid       { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.arro-item       { border-radius: 10px; padding: 12px 14px; }
+.arro-item-label { font-size: 11px; color: #6B7280; font-weight: 600; text-transform: uppercase; }
+.arro-item-val   { font-size: 18px; font-weight: 700; margin-top: 3px; }
+.arro-conseil    { border-radius: 12px; padding: 14px 16px; font-size: 13px; line-height: 1.7; }
+.arro-conseil.go   { background: #D1FAE5; color: #065F46; }
+.arro-conseil.wait { background: #FEF3C7; color: #92400E; }
+.arro-conseil.stop { background: #FEE2E2; color: #991B1B; }
+.arro-bar-bg   { height: 10px; background: #E5E7EB; border-radius: 5px; overflow: hidden; }
+.arro-bar-fill { height: 100%; border-radius: 5px; transition: width 0.8s ease; }
+.arro-bar-label { font-size: 11px; color: #9CA3AF; margin-top: 3px; text-align: right; }
+
+/* ══ PDF LOADING OVERLAY ══ */
+.pdf-loading-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55); z-index: 10000;
+    align-items: center; justify-content: center;
+}
+.pdf-loading-overlay.active { display: flex; }
+.pdf-loading-box {
+    background: #fff; border-radius: 16px; padding: 32px 40px;
+    text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    animation: modalIn 0.2s ease;
+}
+.pdf-loading-box .pdf-spinner { font-size: 36px; display: block; margin-bottom: 12px; animation: spin 1s linear infinite; }
+.pdf-loading-box p { font-size: 15px; font-weight: 600; color: #1B3A20; margin: 0; }
+.pdf-loading-box small { font-size: 12px; color: #6B7280; margin-top: 6px; display: block; }
+</style>
+{% endblock %}
+
+{% block body %}
+
+{# ── PDF Loading Overlay ── #}
+<div class="pdf-loading-overlay" id="pdfLoadingOverlay">
+    <div class="pdf-loading-box">
+        <i class="fa fa-spinner pdf-spinner"></i>
+        <p>Génération du PDF…</p>
+        <small>Veuillez patienter quelques secondes</small>
+    </div>
+</div>
+
+{# ── Hero ── #}
+<div class="plantes-hero">
+    <div class="hero-text">
+        <h1>🌿 Catalogue des Plantes</h1>
+        <p>Consultez toutes les plantes et obtenez des recommandations d'arrosage en temps réel.</p>
+    </div>
+</div>
+
+{# ── Stats ── #}
+<div class="stats-strip">
+    <div class="stat-card">
+        <div class="stat-icon">🌱</div>
+        <div>
+            <div class="stat-label">Total plantes</div>
+            <div class="stat-value">{{ total }}</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">💧</div>
+        <div>
+            <div class="stat-label">Besoin eau moyen</div>
+            <div class="stat-value">{{ avgBesoinEau is not null ? avgBesoinEau ~ ' L/j' : '–' }}</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">📅</div>
+        <div>
+            <div class="stat-label">Cycle moyen</div>
+            <div class="stat-value">{{ avgCycleJours is not null ? avgCycleJours ~ ' j' : '–' }}</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon">🔍</div>
+        <div>
+            <div class="stat-label">Résultats affichés</div>
+            <div class="stat-value">{{ plantes|length }}</div>
+        </div>
+    </div>
+</div>
+
+{# ── Toolbar ── #}
+<form method="GET" action="{{ path('ouvrier_plantes') }}" id="filterForm">
+    <div class="toolbar">
+        <div class="search-wrap">
+            <i class="fa fa-search"></i>
+            <input type="text" name="q" class="search-input"
+                   placeholder="Rechercher par nom ou variété…"
+                   value="{{ q }}" autocomplete="off">
+        </div>
+        <select name="sort" class="sort-select" onchange="document.getElementById('filterForm').submit()">
+            <option value="nom"        {% if sort == 'nom'        %}selected{% endif %}>Trier : Nom A→Z</option>
+            <option value="nom_desc"   {% if sort == 'nom_desc'   %}selected{% endif %}>Trier : Nom Z→A</option>
+            <option value="eau"        {% if sort == 'eau'        %}selected{% endif %}>Trier : Eau ↑</option>
+            <option value="eau_desc"   {% if sort == 'eau_desc'   %}selected{% endif %}>Trier : Eau ↓</option>
+            <option value="cycle"      {% if sort == 'cycle'      %}selected{% endif %}>Trier : Cycle ↑</option>
+            <option value="cycle_desc" {% if sort == 'cycle_desc' %}selected{% endif %}>Trier : Cycle ↓</option>
+        </select>
+        <button type="submit" class="btn-filter">
+            <i class="fa fa-filter"></i> Filtrer
+        </button>
+        {% if q %}
+        <a href="{{ path('ouvrier_plantes') }}" class="btn-filter grey">
+            <i class="fa fa-times"></i> Effacer
+        </a>
+        {% endif %}
+
+        {# ── Bouton PDF ── #}
+        <button type="button" class="btn-pdf" onclick="exportPDF()">
+            <i class="fa fa-file-pdf"></i> Exporter PDF
+        </button>
+    </div>
+</form>
+
+{# ── Result info ── #}
+<div class="result-info">
+    <span>
+        {% if q %}
+            Résultats pour <strong>« {{ q }} »</strong> :
+            <strong>{{ plantes|length }}</strong> plante{{ plantes|length != 1 ? 's' : '' }} trouvée{{ plantes|length != 1 ? 's' : '' }}
+        {% else %}
+            <strong>{{ plantes|length }}</strong> plante{{ plantes|length != 1 ? 's' : '' }} au total
+        {% endif %}
+    </span>
+    <span id="pageInfoText" style="font-size:13px;color:var(--text-muted);"></span>
+</div>
+
+{# ── Grid ── #}
+<div class="plantes-grid" id="plantesGrid">
+    {% if plantes is empty %}
+    <div class="empty-state">
+        <div class="empty-icon">🌵</div>
+        <h3>Aucune plante trouvée</h3>
+        <p>{% if q %}Essayez un autre terme de recherche.{% else %}Il n'y a pas encore de plantes dans la base.{% endif %}</p>
+    </div>
+    {% else %}
+    {% for plante in plantes %}
+    <div class="plante-card"
+         data-nom="{{ plante.nomP }}"
+         data-variete="{{ plante.variete }}"
+         data-eau="{{ plante.besoinEau }}"
+         data-cycle="{{ plante.cycleJours }}">
+        <div class="card-header">
+            <div class="card-avatar">🌿</div>
+            <div class="card-title-block">
+                <div class="card-title">{{ plante.nomP }}</div>
+                <div class="card-variete">{{ plante.variete }}</div>
+            </div>
+            <div class="cycle-badge">{{ plante.cycleJours }} j</div>
+        </div>
+
+        <div class="card-stats">
+            <div class="card-stat">
+                <span class="cs-label">💧 Eau</span>
+                <span class="cs-val">{{ plante.besoinEau }}<span class="cs-unit"> L/j</span></span>
+            </div>
+            <div class="card-stat">
+                <span class="cs-label">📅 Cycle</span>
+                <span class="cs-val">{{ plante.cycleJours }}<span class="cs-unit"> jours</span></span>
+            </div>
+        </div>
+
+        <button class="btn-arrosage"
+            onclick="openArrosage('{{ plante.nomP|e('js') }}', {{ plante.besoinEau ?? 0 }}, {{ plante.cycleJours ?? 0 }})">
+            <i class="fa fa-droplet"></i> Recommandation d'arrosage
+        </button>
+    </div>
+    {% endfor %}
+    {% endif %}
+</div>
+
+{# ── Pagination ── #}
+{% if plantes is not empty %}
+<div class="pagination-wrap" id="paginationWrap"></div>
+<p class="page-info" id="paginationInfo"></p>
+{% endif %}
+
+{# ══ MODAL ARROSAGE ══ #}
+<div class="modal-overlay" id="arrosageModal">
+    <div class="modal-box">
+        <button class="modal-close" onclick="document.getElementById('arrosageModal').classList.remove('active')">×</button>
+        <div class="modal-title">
+            <i class="fa fa-droplet" style="color:#3B82F6"></i>
+            <span id="arrosageTitle">Arrosage</span>
+        </div>
+        <div class="modal-subtitle" id="arrosageSubtitle"></div>
+        <div id="arrosageContent">
+            <div class="modal-loading"><i class="fa fa-spinner"></i> Calcul en cours…</div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+
+{# jsPDF via CDN pour l'export PDF côté client #}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+<script>
+/* ══════════════════════════════════════════
+   PAGINATION
+══════════════════════════════════════════ */
+const CARDS_PER_PAGE = 9;
+let currentPage = 1;
+
+function initPagination() {
+    const allCards = Array.from(document.querySelectorAll('#plantesGrid .plante-card'));
+    if (!allCards.length) return;
+
+    const totalPages = Math.ceil(allCards.length / CARDS_PER_PAGE);
+
+    function showPage(page) {
+        currentPage = page;
+        const start = (page - 1) * CARDS_PER_PAGE;
+        const end   = start + CARDS_PER_PAGE;
+
+        allCards.forEach((card, i) => {
+            card.style.display = (i >= start && i < end) ? '' : 'none';
+        });
+
+        renderPagination(page, totalPages, allCards.length);
+    }
+
+    function renderPagination(page, total, totalItems) {
+        const wrap = document.getElementById('paginationWrap');
+        const info = document.getElementById('paginationInfo');
+        if (!wrap) return;
+
+        // Page info text (top)
+        const pageInfoTop = document.getElementById('pageInfoText');
+        if (pageInfoTop) {
+            const start = (page - 1) * CARDS_PER_PAGE + 1;
+            const end   = Math.min(page * CARDS_PER_PAGE, totalItems);
+            pageInfoTop.textContent = `Page ${page} / ${total}`;
+        }
+
+        if (total <= 1) { wrap.innerHTML = ''; if (info) info.textContent = ''; return; }
+
+        let html = '';
+
+        // Précédent
+        html += `<a href="#" class="page-btn ${page === 1 ? 'disabled' : ''}"
+                    onclick="goPage(${page - 1}); return false;">
+                    <i class="fa fa-chevron-left" style="font-size:11px"></i>
+                 </a>`;
+
+        // Pages
+        const range = buildRange(page, total);
+        range.forEach(p => {
+            if (p === '…') {
+                html += `<span class="page-btn disabled" style="cursor:default;border:none;background:none;color:var(--text-muted)">…</span>`;
+            } else {
+                html += `<a href="#" class="page-btn ${p === page ? 'active' : ''}"
+                             onclick="goPage(${p}); return false;">${p}</a>`;
+            }
+        });
+
+        // Suivant
+        html += `<a href="#" class="page-btn ${page === total ? 'disabled' : ''}"
+                    onclick="goPage(${page + 1}); return false;">
+                    <i class="fa fa-chevron-right" style="font-size:11px"></i>
+                 </a>`;
+
+        wrap.innerHTML = html;
+
+        const start = (page - 1) * CARDS_PER_PAGE + 1;
+        const end   = Math.min(page * CARDS_PER_PAGE, totalItems);
+        if (info) info.textContent = `Affichage de ${start}–${end} sur ${totalItems} plantes`;
+    }
+
+    function buildRange(page, total) {
+        if (total <= 7) return Array.from({length: total}, (_, i) => i + 1);
+        const pages = [];
+        if (page <= 4) {
+            for (let i = 1; i <= 5; i++) pages.push(i);
+            pages.push('…', total);
+        } else if (page >= total - 3) {
+            pages.push(1, '…');
+            for (let i = total - 4; i <= total; i++) pages.push(i);
+        } else {
+            pages.push(1, '…', page - 1, page, page + 1, '…', total);
+        }
+        return pages;
+    }
+
+    window.goPage = function(page) {
+        const allCards = Array.from(document.querySelectorAll('#plantesGrid .plante-card'));
+        const total    = Math.ceil(allCards.length / CARDS_PER_PAGE);
+        if (page < 1 || page > total) return;
+        showPage(page);
+        document.getElementById('plantesGrid').scrollIntoView({behavior: 'smooth', block: 'start'});
+    };
+
+    showPage(1);
+}
+
+document.addEventListener('DOMContentLoaded', initPagination);
+
+
+/* ══════════════════════════════════════════
+   EXPORT PDF
+══════════════════════════════════════════ */
+async function exportPDF() {
+    const overlay = document.getElementById('pdfLoadingOverlay');
+    overlay.classList.add('active');
+
+    await new Promise(r => setTimeout(r, 100)); // laisser l'overlay s'afficher
+
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+        // ── En-tête ──
+        doc.setFillColor(45, 90, 39);
+        doc.rect(0, 0, 210, 28, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(18);
+        doc.setFont('helvetica', 'bold');
+        doc.text('AgroFlow – Catalogue des Plantes', 14, 12);
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'normal');
+        doc.text('Généré le ' + new Date().toLocaleDateString('fr-FR', {
+            day: '2-digit', month: 'long', year: 'numeric'
+        }), 14, 20);
+        doc.text('Total : {{ plantes|length }} plante{{ plantes|length != 1 ? "s" : "" }}', 160, 20);
+
+        // ── Tableau ──
+        const rows = Array.from(document.querySelectorAll('#plantesGrid .plante-card')).map(card => [
+            card.dataset.nom    || '—',
+            card.dataset.variete || '—',
+            card.dataset.eau    ? card.dataset.eau + ' L/j' : '—',
+            card.dataset.cycle  ? card.dataset.cycle + ' jours' : '—',
+        ]);
+
+        doc.autoTable({
+            startY: 34,
+            head: [['Nom', 'Variété', 'Besoin eau', 'Cycle']],
+            body: rows,
+            theme: 'grid',
+            headStyles: {
+                fillColor: [45, 90, 39],
+                textColor: 255,
+                fontStyle: 'bold',
+                fontSize: 10,
+            },
+            bodyStyles: { fontSize: 9, textColor: [30, 45, 26] },
+            alternateRowStyles: { fillColor: [234, 243, 222] },
+            columnStyles: {
+                0: { fontStyle: 'bold', cellWidth: 55 },
+                1: { cellWidth: 65, fontStyle: 'italic' },
+                2: { cellWidth: 35, halign: 'center' },
+                3: { cellWidth: 35, halign: 'center' },
+            },
+            margin: { left: 14, right: 14 },
+            didDrawPage: function(data) {
+                // Pied de page
+                const pageCount = doc.internal.getNumberOfPages();
+                doc.setFontSize(8);
+                doc.setTextColor(120);
+                doc.text(
+                    `Page ${data.pageNumber} / ${pageCount}`,
+                    105,
+                    doc.internal.pageSize.height - 8,
+                    { align: 'center' }
+                );
+            }
+        });
+
+        doc.save('agroflow-plantes-' + new Date().toISOString().slice(0, 10) + '.pdf');
+    } catch (err) {
+        alert('Erreur lors de la génération du PDF. Veuillez réessayer.');
+        console.error(err);
+    } finally {
+        overlay.classList.remove('active');
+    }
+}
+
+
+/* ══════════════════════════════════════════
+   MODAL ARROSAGE
+══════════════════════════════════════════ */
+document.getElementById('arrosageModal').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('active');
+});
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') document.getElementById('arrosageModal').classList.remove('active');
+});
+
+async function openArrosage(nomPlante, besoinEau, cycleJours) {
+    document.getElementById('arrosageTitle').textContent    = 'Arrosage — ' + nomPlante;
+    document.getElementById('arrosageSubtitle').textContent = 'Recommandation personnalisée basée sur la météo';
+    document.getElementById('arrosageContent').innerHTML    =
+        '<div class="modal-loading"><i class="fa fa-spinner"></i> Calcul en cours…</div>';
+    document.getElementById('arrosageModal').classList.add('active');
+
+    const lat = 33.8869, lon = 9.5375;
+    let temp = 25, humidity = 50, precip = 0, windspeed = 10;
+
+    try {
+        const wResp = await fetch(
+            `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+            `&current_weather=true&hourly=relative_humidity_2m,precipitation,evapotranspiration&forecast_days=1&timezone=Africa/Tunis`
+        );
+        const wData = await wResp.json();
+        const h = new Date().getHours();
+
+        temp      = wData.current_weather?.temperature ?? 25;
+        windspeed = wData.current_weather?.windspeed   ?? 10;
+        humidity  = wData.hourly?.relative_humidity_2m?.[h] ?? 50;
+        precip    = wData.hourly?.precipitation?.[h]        ?? 0;
+
+        let besoinReel = besoinEau > 0 ? besoinEau : 5;
+        if      (temp > 35) besoinReel *= 1.4;
+        else if (temp > 28) besoinReel *= 1.2;
+        else if (temp < 15) besoinReel *= 0.7;
+        if      (humidity < 30) besoinReel *= 1.3;
+        else if (humidity > 70) besoinReel *= 0.8;
+        if (windspeed > 30) besoinReel *= 1.15;
+
+        const apportPluie = precip * 0.8;
+        const besoinNet   = Math.max(0, besoinReel - apportPluie).toFixed(1);
+
+        let statusIcon, statusText, statusColor, conseilClass, conseil, heure;
+
+        if (precip > 8) {
+            statusIcon = '🌧️'; statusText = "Pas d'arrosage"; statusColor = '#3B82F6';
+            conseilClass = 'stop';
+            conseil = `<strong>🚫 Arrosage inutile aujourd'hui</strong><br>
+                       La pluie apporte suffisamment d'eau (${precip} mm).<br>
+                       Reportez l'arrosage à demain.`;
+            heure = '—';
+        } else if (temp > 35 || humidity < 30) {
+            statusIcon = '🔥'; statusText = 'Arrosage urgent'; statusColor = '#DC2626';
+            conseilClass = 'go';
+            conseil = `<strong>⚠️ Arrosage urgent recommandé</strong><br>
+                       Conditions de stress hydrique détectées.<br>
+                       Apportez <strong>${besoinNet} L/plante</strong> dès maintenant.`;
+            heure = 'Avant 8h ou après 18h';
+        } else if (precip > 3) {
+            statusIcon = '🌦️'; statusText = 'Arrosage réduit'; statusColor = '#D97706';
+            conseilClass = 'wait';
+            conseil = `<strong>💧 Arrosage réduit conseillé</strong><br>
+                       La pluie contribue partiellement.<br>
+                       Besoin net : <strong>${besoinNet} L/plante</strong>.`;
+            heure = 'Matin de préférence';
+        } else {
+            statusIcon = '💧'; statusText = 'Arrosage normal'; statusColor = '#16A34A';
+            conseilClass = 'go';
+            conseil = `<strong>✅ Arrosage recommandé</strong><br>
+                       Apportez <strong>${besoinNet} L/plante</strong>.<br>
+                       ${cycleJours > 0 ? `Cycle de culture : ${cycleJours} jours.` : ''}`;
+            heure = 'Matin (7h–9h) ou soir (18h–20h)';
+        }
+
+        const humSol   = Math.min(100, Math.round(humidity * 0.6 + precip * 5));
+        const humColor = humSol > 60 ? '#16A34A' : humSol > 35 ? '#D97706' : '#DC2626';
+
+        document.getElementById('arrosageContent').innerHTML = `
+            <div class="arro-header">
+                <div class="arro-icon">${statusIcon}</div>
+                <div class="arro-status" style="color:${statusColor}">${statusText}</div>
+            </div>
+            <div class="arro-grid">
+                <div class="arro-item" style="background:#FFF7ED">
+                    <div class="arro-item-label">🌡️ Température</div>
+                    <div class="arro-item-val" style="color:#C2410C">${temp} °C</div>
+                </div>
+                <div class="arro-item" style="background:#EFF6FF">
+                    <div class="arro-item-label">💧 Humidité air</div>
+                    <div class="arro-item-val" style="color:#1D4ED8">${humidity} %</div>
+                </div>
+                <div class="arro-item" style="background:#F0FDF4">
+                    <div class="arro-item-label">🌧️ Précipitations</div>
+                    <div class="arro-item-val" style="color:#15803D">${precip} mm</div>
+                </div>
+                <div class="arro-item" style="background:#F5F3FF">
+                    <div class="arro-item-label">💨 Vent</div>
+                    <div class="arro-item-val" style="color:#6D28D9">${windspeed} km/h</div>
+                </div>
+            </div>
+            <div style="margin-bottom:16px;">
+                <div style="font-size:12px;color:#6B7280;font-weight:600;text-transform:uppercase;margin-bottom:6px;">
+                    💧 Humidité estimée du sol
+                </div>
+                <div class="arro-bar-bg">
+                    <div class="arro-bar-fill" style="width:${humSol}%;background:${humColor}"></div>
+                </div>
+                <div class="arro-bar-label">${humSol}%</div>
+            </div>
+            <div style="margin-bottom:14px;background:#F9FAFB;border-radius:10px;padding:10px 14px;font-size:13px;">
+                <span style="color:#6B7280;">⏰ Meilleure heure :</span>
+                <strong style="color:#1B3A20;margin-left:6px;">${heure}</strong><br>
+                <span style="color:#6B7280;">💧 Besoin net ajusté :</span>
+                <strong style="color:#1D4ED8;margin-left:6px;">${besoinNet} L/plante</strong>
+            </div>
+            <div class="arro-conseil ${conseilClass}">${conseil}</div>`;
+
+    } catch(e) {
+        document.getElementById('arrosageContent').innerHTML =
+            '<p style="color:#DC2626;text-align:center">Erreur de chargement météo.<br>Vérifiez votre connexion.</p>';
+    }
+}
+</script>
+{% endblock %}
