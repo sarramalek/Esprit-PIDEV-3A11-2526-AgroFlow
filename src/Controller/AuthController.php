@@ -93,11 +93,30 @@ public function register(
     public function logout(): void
     {
     }
+// ==================== PAGE COMPTE BANNI ====================
+#[Route('/banni', name: 'app_bann')]
+public function banni(
+    \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage,
+    \Symfony\Component\HttpFoundation\RequestStack $requestStack
+): Response
+{
+    // Déconnecter l'utilisateur
+    $tokenStorage->setToken(null);
+
+    // Invalider la session
+    $session = $requestStack->getSession();
+    if ($session) {
+        $session->invalidate();
+    }
+
+    return $this->render('auth/banni.html.twig');
+}
 
     // ==================== REDIRECTION PAR ROLE ====================
     private function redirectByRole($user): Response
     {
         return match((int)$user->getRole()) {
+            0       => $this->redirectToRoute('app_bann'),
             1       => $this->redirectToRoute('ouvrier_home'),   // ← corrigé
             2       => $this->redirectToRoute('agri_home'),
             3       => $this->redirectToRoute('admin_dashboard'),

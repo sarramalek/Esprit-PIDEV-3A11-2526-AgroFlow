@@ -50,6 +50,7 @@ return [
         '/login' => [[['_route' => 'app_login', '_controller' => 'App\\Controller\\AuthController::login'], null, null, null, false, false, null]],
         '/register' => [[['_route' => 'app_register', '_controller' => 'App\\Controller\\AuthController::register'], null, null, null, false, false, null]],
         '/logout' => [[['_route' => 'app_logout', '_controller' => 'App\\Controller\\AuthController::logout'], null, null, null, false, false, null]],
+        '/banni' => [[['_route' => 'app_bann', '_controller' => 'App\\Controller\\AuthController::banni'], null, null, null, false, false, null]],
         '/check-session' => [[['_route' => 'app_check_session', '_controller' => 'App\\Controller\\AuthController::checkSession'], null, null, null, false, false, null]],
         '/reset-password' => [[['_route' => 'app_reset_password', '_controller' => 'App\\Controller\\AuthController::request'], null, null, null, false, false, null]],
         '/reset-password/verify' => [[['_route' => 'app_reset_verify', '_controller' => 'App\\Controller\\AuthController::verify'], null, null, null, false, false, null]],
