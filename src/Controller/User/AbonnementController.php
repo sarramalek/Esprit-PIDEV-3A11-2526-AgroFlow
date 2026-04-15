@@ -86,13 +86,15 @@ private function noCacheResponse(Response $response): Response
     return $response;
 }
     // ── LIST ──────────────────────────────────────────────────────────────────
-   #[Route('', name: '_index', methods: ['GET'])]
+#[Route('', name: '_index', methods: ['GET'])]
 public function index(Request $request): Response
 {
     $this->autoUpdateAndFlash($request);
 
     $search    = $request->query->get('q', '');
     $situation = $request->query->get('situation', '');
+    $page      = max(1, (int) $request->query->get('page', 1));
+    $perPage   = 10;
 
     $qb = $this->repo->createQueryBuilder('a');
 
@@ -105,10 +107,28 @@ public function index(Request $request): Response
            ->setParameter('sit', $situation);
     }
 
+    $qb->orderBy('a.idAbonn', 'DESC');
+
+    // Total pour pagination
+    $totalQb = clone $qb;
+    $total   = count($totalQb->getQuery()->getResult());
+    $totalPages = max(1, (int) ceil($total / $perPage));
+    $page    = min($page, $totalPages);
+
+    $abonnements = $qb
+        ->setFirstResult(($page - 1) * $perPage)
+        ->setMaxResults($perPage)
+        ->getQuery()
+        ->getResult();
+
     return $this->render('User/listAbonn.html.twig', [
-        'abonnements' => $qb->getQuery()->getResult(),
+        'abonnements' => $abonnements,
         'search'      => $search,
         'situation'   => $situation,
+        'page'        => $page,
+        'totalPages'  => $totalPages,
+        'total'       => $total,
+        'perPage'     => $perPage,
     ]);
 }
     // ── EXPORT PDF LISTE ──────────────────────────────────────────────────────

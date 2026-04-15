@@ -72,9 +72,8 @@
             <p style="color:#666;margin-top:6px;">Rejoignez AgroFlow</p>
         </div>
 
-        {{ form_errors(registrationForm) }}
 
-        <form method="post" action="{{ path('app_register') }}">
+        <form method="post" action="{{ path('app_register') }}" novalidate >
             {{ form_widget(registrationForm._token) }}
 
             {# ── Rôle ── #}
@@ -131,7 +130,7 @@
             {# ── CIN ── #}
             <div class="field-group">
                 <label class="form-label" for="{{ registrationForm.cin.vars.id }}">Numéro CIN</label>
-                {{ form_widget(registrationForm.cin, {'attr': {'class': 'form-input', 'maxlength': 8, 'inputmode': 'numeric', 'pattern': '[0-9]{8}'}}) }}
+{{ form_widget(registrationForm.cin, {'attr': {'class': 'form-input'}}) }}
                 {{ form_errors(registrationForm.cin) }}
             </div>
 
