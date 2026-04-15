@@ -182,6 +182,25 @@
         from { opacity: 0; transform: translateY(30px); }
         to   { opacity: 1; transform: translateY(0); }
     }
+    /* ── Pagination ── */
+.pagination-wrap {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px; border-top: 1px solid var(--cream-dark);
+    background: var(--cream); font-size: 13px;
+}
+.pagination-info-txt { color: var(--text-muted); }
+.pagination-btns { display: flex; gap: 6px; align-items: center; }
+.pag-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 34px; height: 34px; border-radius: 8px;
+    border: 1px solid var(--cream-dark); background: var(--white);
+    color: var(--navy); font-size: 13px; font-weight: 600;
+    text-decoration: none; transition: all .15s; cursor: pointer;
+}
+.pag-btn:hover { background: var(--green-mid); color: white; border-color: var(--green-mid); }
+.pag-btn.active { background: var(--green-mid); color: white; border-color: var(--green-mid); pointer-events: none; }
+.pag-btn.disabled { opacity: .35; pointer-events: none; }
+.pag-ellipsis { width: 34px; text-align: center; color: var(--text-muted); line-height: 34px; }
 </style>
 {% endblock %}
 
@@ -314,89 +333,140 @@
     </a>
 </form>
 
-    {# ── Table ── #}
-    <div class="table-card">
-        <div class="table-header">
-            <div class="table-title">
-                <i class="fa fa-file-contract" style="color:var(--green-accent);margin-right:8px;"></i>
-                Liste des abonnements
-            </div>
-            <div class="table-count">{{ abonnements|length }} résultat(s)</div>
+   {# ── Table ── #}
+<div class="table-card">
+    <div class="table-header">
+        <div class="table-title">
+            <i class="fa fa-file-contract" style="color:var(--green-accent);margin-right:8px;"></i>
+            Liste des abonnements
         </div>
-
-        {% if abonnements|length > 0 %}
-        <table id="abonnTable">
-            <thead>
-                <tr>
-                    <th class="sortable" data-col="0">ID</th>
-                    <th class="sortable" data-col="1">CIN</th>
-                    <th class="sortable" data-col="2">ID Offre</th>
-                    <th class="sortable" data-col="3">Date inscription</th>
-                    <th class="sortable" data-col="4">Date expiration</th>
-                    <th class="sortable" data-col="5">Situation</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for abonnement in abonnements %}
-                <tr>
-                    <td><span class="id-chip">#{{ abonnement.idAbonn }}</span></td>
-                    <td style="font-family:'DM Mono',monospace; font-size:13px;">{{ abonnement.cin }}</td>
-                    <td>{{ abonnement.idOffre }}</td>
-                    <td style="font-size:13px; color:var(--text-muted);">{{ abonnement.dateInscription|date('d/m/Y') }}</td>
-                    <td style="font-size:13px; color:var(--text-muted);">{{ abonnement.dateExpiration|date('d/m/Y') }}</td>
-                    <td>
-                        <span class="badge badge-{{ abonnement.situation }}">
-                            {% if abonnement.situation == 'actif' %}
-                                <i class="fa fa-circle-check"></i>
-                            {% elseif abonnement.situation == 'inactif' %}
-                                <i class="fa fa-circle-pause"></i>
-                            {% else %}
-                                <i class="fa fa-circle-xmark"></i>
-                            {% endif %}
-                            {{ abonnement.situation|capitalize }}
-                        </span>
-                    </td>
-                    <td>
-                        <div class="actions">
-                            <a href="{{ path('admin_abonnements_show', {idAbonn: abonnement.idAbonn}) }}"
-                               class="btn btn-sm btn-secondary btn-icon" title="Voir">
-                                <i class="fa fa-eye"></i>
-                            </a>
-                            <a href="{{ path('admin_abonnements_edit', {idAbonn: abonnement.idAbonn}) }}"
-                               class="btn btn-sm btn-secondary btn-icon" title="Modifier">
-                                <i class="fa fa-pen"></i>
-                            </a>
-                            <form method="POST"
-                                  action="{{ path('admin_abonnements_delete', {idAbonn: abonnement.idAbonn}) }}"
-                                  onsubmit="return confirm('Supprimer l\'abonnement #{{ abonnement.idAbonn }} ?')"
-                                  style="margin:0">
-                                <input type="hidden" name="_token"
-                                       value="{{ csrf_token('delete' ~ abonnement.idAbonn) }}">
-                                <button type="submit" class="btn btn-sm btn-danger btn-icon" title="Supprimer">
-                                    <i class="fa fa-trash"></i>
-                                </button>
-                            </form>
-                            <a href="{{ path('admin_abonnements_pdf', {idAbonn: abonnement.idAbonn}) }}"
-                               class="btn btn-sm btn-secondary btn-icon" title="Télécharger PDF"
-                               style="color:#DC2626;">
-                                <i class="fa fa-file-pdf"></i>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-            <div class="empty">
-                <i class="fa fa-file-circle-xmark"></i>
-                <div style="font-size:15px; font-weight:600; color:var(--navy);">Aucun abonnement trouvé</div>
-                <div style="margin-top:6px; font-size:13px;">Modifiez vos filtres ou créez un abonnement</div>
-            </div>
-        {% endif %}
+        <div class="table-count">
+            {{ total }} résultat(s) — page {{ page }}/{{ totalPages }}
+        </div>
     </div>
 
+    {% if abonnements|length > 0 %}
+    <table id="abonnTable">
+        <thead>
+            <tr>
+                <th class="sortable" data-col="0">ID</th>
+                <th class="sortable" data-col="1">CIN</th>
+                <th class="sortable" data-col="2">ID Offre</th>
+                <th class="sortable" data-col="3">Date inscription</th>
+                <th class="sortable" data-col="4">Date expiration</th>
+                <th class="sortable" data-col="5">Situation</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for abonnement in abonnements %}
+            <tr>
+                <td><span class="id-chip">#{{ abonnement.idAbonn }}</span></td>
+                <td style="font-family:'DM Mono',monospace; font-size:13px;">{{ abonnement.cin }}</td>
+                <td>{{ abonnement.idOffre }}</td>
+                <td style="font-size:13px; color:var(--text-muted);">{{ abonnement.dateInscription|date('d/m/Y') }}</td>
+                <td style="font-size:13px; color:var(--text-muted);">{{ abonnement.dateExpiration|date('d/m/Y') }}</td>
+                <td>
+                    <span class="badge badge-{{ abonnement.situation }}">
+                        {% if abonnement.situation == 'actif' %}
+                            <i class="fa fa-circle-check"></i>
+                        {% elseif abonnement.situation == 'inactif' %}
+                            <i class="fa fa-circle-pause"></i>
+                        {% else %}
+                            <i class="fa fa-circle-xmark"></i>
+                        {% endif %}
+                        {{ abonnement.situation|capitalize }}
+                    </span>
+                </td>
+                <td>
+                    <div class="actions">
+                        <a href="{{ path('admin_abonnements_show', {idAbonn: abonnement.idAbonn}) }}"
+                           class="btn btn-sm btn-secondary btn-icon" title="Voir">
+                            <i class="fa fa-eye"></i>
+                        </a>
+                        <a href="{{ path('admin_abonnements_edit', {idAbonn: abonnement.idAbonn}) }}"
+                           class="btn btn-sm btn-secondary btn-icon" title="Modifier">
+                            <i class="fa fa-pen"></i>
+                        </a>
+                        <form method="POST"
+                              action="{{ path('admin_abonnements_delete', {idAbonn: abonnement.idAbonn}) }}"
+                              onsubmit="return confirm('Supprimer l\'abonnement #{{ abonnement.idAbonn }} ?')"
+                              style="margin:0">
+                            <input type="hidden" name="_token"
+                                   value="{{ csrf_token('delete' ~ abonnement.idAbonn) }}">
+                            <button type="submit" class="btn btn-sm btn-danger btn-icon" title="Supprimer">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </form>
+                        <a href="{{ path('admin_abonnements_pdf', {idAbonn: abonnement.idAbonn}) }}"
+                           class="btn btn-sm btn-secondary btn-icon" title="Télécharger PDF"
+                           style="color:#DC2626;">
+                            <i class="fa fa-file-pdf"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    {# ── Pagination ── #}
+    {% if totalPages > 1 %}
+    <div class="pagination-wrap">
+        <div class="pagination-info-txt">
+            Affichage {{ ((page - 1) * perPage) + 1 }}–{{ min(page * perPage, total) }}
+            sur {{ total }} abonnements
+        </div>
+        <div class="pagination-btns">
+
+            {# Précédent #}
+            {% if page > 1 %}
+                <a href="{{ path('admin_abonnements_index', app.request.query.all|merge({page: page - 1})) }}"
+                   class="pag-btn" title="Page précédente">
+                    <i class="fa fa-chevron-left" style="font-size:11px;"></i>
+                </a>
+            {% else %}
+                <span class="pag-btn disabled">
+                    <i class="fa fa-chevron-left" style="font-size:11px;"></i>
+                </span>
+            {% endif %}
+
+            {# Numéros #}
+            {% for p in 1..totalPages %}
+                {% if p == page %}
+                    <span class="pag-btn active">{{ p }}</span>
+                {% elseif p == 1 or p == totalPages or (p >= page - 2 and p <= page + 2) %}
+                    <a href="{{ path('admin_abonnements_index', app.request.query.all|merge({page: p})) }}"
+                       class="pag-btn">{{ p }}</a>
+                {% elseif p == page - 3 or p == page + 3 %}
+                    <span class="pag-ellipsis">…</span>
+                {% endif %}
+            {% endfor %}
+
+            {# Suivant #}
+            {% if page < totalPages %}
+                <a href="{{ path('admin_abonnements_index', app.request.query.all|merge({page: page + 1})) }}"
+                   class="pag-btn" title="Page suivante">
+                    <i class="fa fa-chevron-right" style="font-size:11px;"></i>
+                </a>
+            {% else %}
+                <span class="pag-btn disabled">
+                    <i class="fa fa-chevron-right" style="font-size:11px;"></i>
+                </span>
+            {% endif %}
+
+        </div>
+    </div>
+    {% endif %}
+    {# ── fin pagination ── #}
+
+    {% else %}
+        <div class="empty">
+            <i class="fa fa-file-circle-xmark"></i>
+            <div style="font-size:15px; font-weight:600; color:var(--navy);">Aucun abonnement trouvé</div>
+            <div style="margin-top:6px; font-size:13px;">Modifiez vos filtres ou créez un abonnement</div>
+        </div>
+    {% endif %}
 </div>
 
 <script>

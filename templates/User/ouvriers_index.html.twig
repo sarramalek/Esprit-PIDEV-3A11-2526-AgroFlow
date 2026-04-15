@@ -90,6 +90,26 @@ body { background: var(--beige); font-family: 'Segoe UI', sans-serif; }
     font-size: 13px; color: #aaa;
 }
 .empty { color: #aaa; font-style: italic; padding: 1rem 0; }
+.auto-field-error {
+    color: var(--danger);
+    font-size: .75rem;
+    font-weight: 600;
+    display: none;
+    margin-top: .25rem;
+}
+.auto-invalid {
+    border-color: var(--danger) !important;
+}
+#auto-form-errors {
+    display: none;
+    background: #f8d7da;
+    color: #842029;
+    border: 1px solid #f5c2c7;
+    border-radius: .5rem;
+    padding: .75rem 1rem;
+    margin-bottom: 1rem;
+    font-size: .85rem;
+}
 </style>
 {% endblock %}
 
@@ -120,72 +140,77 @@ body { background: var(--beige); font-family: 'Segoe UI', sans-serif; }
         sa disponibilité et sa charge de travail.
     </p>
 
-    <form method="post" action="{{ path('app_ouvrier_tache_auto') }}">
+    <form id="auto-form" method="post" action="{{ path('app_ouvrier_tache_auto') }}" novalidate>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
-            <div>
-                <label style="font-size:.85rem;font-weight:600;color:#444;display:block;margin-bottom:.3rem;">
-                    Nom de la tâche *
-                </label>
-                <input type="text" name="nom_tache" required
-                       style="width:100%;padding:.5rem .75rem;border:1px solid #ddd;
-                              border-radius:.5rem;font-size:.9rem;">
-            </div>
-            <div>
-                <label style="font-size:.85rem;font-weight:600;color:#444;display:block;margin-bottom:.3rem;">
-                    Date d'échéance *
-                </label>
-                <input type="date" name="date_echeancee" required
-                       min="{{ 'now'|date('Y-m-d') }}"
-                       style="width:100%;padding:.5rem .75rem;border:1px solid #ddd;
-                              border-radius:.5rem;font-size:.9rem;">
-            </div>
+    <div id="auto-form-errors"></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+        <div>
+            <label style="font-size:.85rem;font-weight:600;color:#444;display:block;margin-bottom:.3rem;">
+                Nom de la tâche *
+            </label>
+            <input type="text" id="auto-nom" name="nom_tache"
+                   style="width:100%;padding:.5rem .75rem;border:1px solid #ddd;
+                          border-radius:.5rem;font-size:.9rem;">
+            <span class="auto-field-error" id="auto-err-nom"></span>
         </div>
-
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem;">
-            <div>
-                <label style="font-size:.85rem;font-weight:600;color:#444;display:block;margin-bottom:.3rem;">
-                    Description
-                </label>
-                <textarea name="description" rows="2"
-                          style="width:100%;padding:.5rem .75rem;border:1px solid #ddd;
-                                 border-radius:.5rem;font-size:.9rem;resize:vertical;"></textarea>
-            </div>
-            <div>
-                <label style="font-size:.85rem;font-weight:600;color:#444;display:block;margin-bottom:.3rem;">
-                    État
-                </label>
-                <select name="etat"
-                        style="width:100%;padding:.5rem .75rem;border:1px solid #ddd;
-                               border-radius:.5rem;font-size:.9rem;">
-                    <option value="à faire">À faire</option>
-                    <option value="en cours">En cours</option>
-                </select>
-            </div>
-            <div>
-                <label style="font-size:.85rem;font-weight:600;color:#444;display:block;margin-bottom:.3rem;">
-                    Priorité
-                </label>
-                <select name="priorite"
-                        style="width:100%;padding:.5rem .75rem;border:1px solid #ddd;
-                               border-radius:.5rem;font-size:.9rem;">
-                    <option value="basse">Basse</option>
-                    <option value="normale" selected>Normale</option>
-                    <option value="haute">Haute</option>
-                    <option value="urgente">Urgente</option>
-                </select>
-            </div>
+        <div>
+            <label style="font-size:.85rem;font-weight:600;color:#444;display:block;margin-bottom:.3rem;">
+                Date d'échéance *
+            </label>
+            <input type="date" id="auto-date" name="date_echeancee"
+                   style="width:100%;padding:.5rem .75rem;border:1px solid #ddd;
+                          border-radius:.5rem;font-size:.9rem;">
+            <span class="auto-field-error" id="auto-err-date"></span>
         </div>
+    </div>
 
-        <button type="submit"
-                style="background:var(--vert);color:white;border:none;padding:.6rem 1.4rem;
-                       border-radius:.6rem;font-weight:600;font-size:.95rem;cursor:pointer;
-                       transition:background .2s;"
-                onmouseover="this.style.background='var(--vert-l)'"
-                onmouseout="this.style.background='var(--vert)'">
-            🤖 Assigner automatiquement
-        </button>
-    </form>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem;">
+        <div>
+            <label style="font-size:.85rem;font-weight:600;color:#444;display:block;margin-bottom:.3rem;">
+                Description
+            </label>
+            <textarea id="auto-desc" name="description" rows="2"
+                      style="width:100%;padding:.5rem .75rem;border:1px solid #ddd;
+                             border-radius:.5rem;font-size:.9rem;resize:vertical;"></textarea>
+            <span class="auto-field-error" id="auto-err-desc"></span>
+            <small id="auto-desc-counter" style="color:#aaa;font-size:.75rem;">0 / 1000</small>
+        </div>
+        <div>
+            <label style="font-size:.85rem;font-weight:600;color:#444;display:block;margin-bottom:.3rem;">
+                État
+            </label>
+            <select name="etat"
+                    style="width:100%;padding:.5rem .75rem;border:1px solid #ddd;
+                           border-radius:.5rem;font-size:.9rem;">
+                <option value="à faire">À faire</option>
+                <option value="en cours">En cours</option>
+            </select>
+        </div>
+        <div>
+            <label style="font-size:.85rem;font-weight:600;color:#444;display:block;margin-bottom:.3rem;">
+                Priorité
+            </label>
+            <select name="priorite"
+                    style="width:100%;padding:.5rem .75rem;border:1px solid #ddd;
+                           border-radius:.5rem;font-size:.9rem;">
+                <option value="basse">Basse</option>
+                <option value="normale" selected>Normale</option>
+                <option value="haute">Haute</option>
+                <option value="urgente">Urgente</option>
+            </select>
+        </div>
+    </div>
+
+    <button type="submit"
+            style="background:var(--vert);color:white;border:none;padding:.6rem 1.4rem;
+                   border-radius:.6rem;font-weight:600;font-size:.95rem;cursor:pointer;
+                   transition:background .2s;"
+            onmouseover="this.style.background='var(--vert-l)'"
+            onmouseout="this.style.background='var(--vert)'">
+        🤖 Assigner automatiquement
+    </button>
+</form>
 </div>
         {% for terrain in terrains %}
             {% set tid         = terrain.id %}
@@ -276,4 +301,120 @@ body { background: var(--beige); font-family: 'Segoe UI', sans-serif; }
     {% endif %}
 
 </div>
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+<script>
+function () {
+    const form    = document.getElementById('auto-form');
+    const nomEl   = document.getElementById('auto-nom');
+    const descEl  = document.getElementById('auto-desc');
+    const dateEl  = document.getElementById('auto-date');
+    const errBox  = document.getElementById('auto-form-errors');
+    const counter = document.getElementById('auto-desc-counter');
+
+    /* ── Compteur description ── */
+    descEl.addEventListener('input', () => {
+        counter.textContent = descEl.value.length + ' / 1000';
+    });
+
+    /* ── Helpers ── */
+    function markInvalid(el, errId, msg) {
+        el.classList.add('auto-invalid');
+        const span = document.getElementById(errId);
+        if (span) { span.textContent = msg; span.style.display = 'block'; }
+    }
+    function clearField(el, errId) {
+        el.classList.remove('auto-invalid');
+        const span = document.getElementById(errId);
+        if (span) { span.textContent = ''; span.style.display = 'none'; }
+    }
+
+    /* ── Règles (miroir exact de TacheType) ── */
+    function validateNom() {
+        clearField(nomEl, 'auto-err-nom');
+        const val   = nomEl.value.trim();
+        const regex = /^[\p{L}0-9 \-_.,!?'"()]+$/u;
+
+        if (!val) {
+            markInvalid(nomEl, 'auto-err-nom', 'Le nom de la tâche est obligatoire.');
+            return false;
+        }
+        if (val.length < 3) {
+            markInvalid(nomEl, 'auto-err-nom', 'Le nom doit contenir au moins 3 caractères.');
+            return false;
+        }
+        if (val.length > 100) {
+            markInvalid(nomEl, 'auto-err-nom', 'Le nom ne peut pas dépasser 100 caractères.');
+            return false;
+        }
+        if (!regex.test(val)) {
+            markInvalid(nomEl, 'auto-err-nom', 'Le nom contient des caractères non autorisés.');
+            return false;
+        }
+        return true;
+    }
+
+    function validateDesc() {
+        clearField(descEl, 'auto-err-desc');
+        if (descEl.value.length > 1000) {
+            markInvalid(descEl, 'auto-err-desc', 'La description ne peut pas dépasser 1000 caractères.');
+            return false;
+        }
+        return true;
+    }
+
+    function validateDate() {
+        clearField(dateEl, 'auto-err-date');
+        const val = dateEl.value;
+
+        if (!val) {
+            markInvalid(dateEl, 'auto-err-date', "La date d'échéance est obligatoire.");
+            return false;
+        }
+        const chosen = new Date(val);
+        chosen.setHours(0, 0, 0, 0);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (chosen < today) {
+            markInvalid(dateEl, 'auto-err-date', "La date d'échéance doit être aujourd'hui ou dans le futur.");
+            return false;
+        }
+        return true;
+    }
+
+    /* ── Validation live au blur ── */
+    nomEl.addEventListener('blur',  validateNom);
+    descEl.addEventListener('blur', validateDesc);
+    dateEl.addEventListener('blur', validateDate);
+
+    /* ── Soumission ── */
+    form.addEventListener('submit', function (e) {
+        errBox.style.display = 'none';
+        errBox.innerHTML     = '';
+
+        const okNom  = validateNom();
+        const okDesc = validateDesc();
+        const okDate = validateDate();
+
+        if (!okNom || !okDesc || !okDate) {
+            e.preventDefault();
+            const msgs = [
+                document.getElementById('auto-err-nom').textContent,
+                document.getElementById('auto-err-desc').textContent,
+                document.getElementById('auto-err-date').textContent,
+            ].filter(Boolean);
+
+            errBox.innerHTML =
+                '<strong>Veuillez corriger les erreurs suivantes :</strong>' +
+                '<ul style="margin:.4rem 0 0;padding-left:1.2rem;">' +
+                msgs.map(m => '<li>' + m + '</li>').join('') +
+                '</ul>';
+            errBox.style.display = 'block';
+            errBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    });
+})();
+</script>
 {% endblock %}

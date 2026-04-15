@@ -85,6 +85,16 @@ textarea { resize: vertical; min-height: 70px; }
     color: var(--vert); text-decoration: none; font-size: .9rem;
 }
 .back-link:hover { text-decoration: underline; }
+.field-error {
+    color: var(--danger);
+    font-size: .75rem;
+    font-weight: 600;
+    display: none;
+    margin-top: .2rem;
+}
+input.invalid, select.invalid, textarea.invalid {
+    border-color: var(--danger) !important;
+}
 </style>
 {% endblock %}
 
@@ -179,46 +189,165 @@ textarea { resize: vertical; min-height: 70px; }
         </div>
 
         {# ---- Formulaire ajout tâche ---- #}
-        <div class="form-card">
-            <h3>➕ Assigner une nouvelle tâche</h3>
-            <form method="post" action="{{ path('app_ouvrier_tache_add', {cin: ouvrier.cin}) }}">
+        {# ---- Formulaire ajout tâche ---- #}
+<div class="form-card">
+    <h3>➕ Assigner une nouvelle tâche</h3>
 
-                <div class="form-group">
-                    <label>Nom de la tâche *</label>
-                    <input type="text" name="nom_tache" required placeholder="Ex: Arrosage parcelle A">
-                </div>
+    {# Messages d'erreur JS #}
+    <div id="form-errors" style="display:none; background:#f8d7da; color:#842029; border:1px solid #f5c2c7; border-radius:.5rem; padding:.75rem 1rem; margin-bottom:1rem; font-size:.85rem;"></div>
 
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea name="description" placeholder="Détails de la tâche..."></textarea>
-                </div>
+    <form id="tache-form" method="post" action="{{ path('app_ouvrier_tache_add', {cin: ouvrier.cin}) }}" novalidate>
 
-                <div class="form-group">
-                    <label>État</label>
-                    <select name="etat">
-                        <option value="à faire">À faire</option>
-                        <option value="en cours">En cours</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Priorité</label>
-                    <select name="priorite">
-                        <option value="normale">Normale</option>
-                        <option value="haute">Haute</option>
-                        <option value="basse">Basse</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Date d'échéance</label>
-                    <input type="date" name="date_echeancee">
-                </div>
-
-                <button type="submit" class="btn-add">✅ Assigner la tâche</button>
-            </form>
+        <div class="form-group">
+            <label for="nom_tache">Nom de la tâche *</label>
+            <input type="text" id="nom_tache" name="nom_tache" placeholder="Ex: Arrosage parcelle A" maxlength="100">
+            <span class="field-error" id="err-nom"></span>
         </div>
 
-    </div>{# /layout #}
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" placeholder="Détails de la tâche..." maxlength="1000"></textarea>
+            <span class="field-error" id="err-desc"></span>
+            <small id="desc-counter" style="color:#aaa; font-size:.75rem; text-align:right;">0 / 1000</small>
+        </div>
+
+        <div class="form-group">
+            <label for="etat">État</label>
+            <select id="etat" name="etat">
+                <option value="à faire">À faire</option>
+                <option value="en cours">En cours</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="priorite">Priorité</label>
+            <select id="priorite" name="priorite">
+                <option value="normale">Normale</option>
+                <option value="haute">Haute</option>
+                <option value="basse">Basse</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="date_echeancee">Date d'échéance</label>
+            <input type="date" id="date_echeancee" name="date_echeancee">
+            <span class="field-error" id="err-date"></span>
+        </div>
+
+        <button type="submit" class="btn-add">✅ Assigner la tâche</button>
+    </form>
 </div>
+</div>
+{% endblock %}
+{% block javascripts %}
+{{ parent() }}
+<script>
+function () {
+    const form       = document.getElementById('tache-form');
+    const nomInput   = document.getElementById('nom_tache');
+    const descInput  = document.getElementById('description');
+    const dateInput  = document.getElementById('date_echeancee');
+    const errBox     = document.getElementById('form-errors');
+    const counter    = document.getElementById('desc-counter');
+
+    /* Compteur description */
+    descInput.addEventListener('input', () => {
+        counter.textContent = descInput.value.length + ' / 1000';
+    });
+
+    /* Helpers */
+    function showFieldError(id, msg) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.textContent = msg;
+        el.style.display = 'block';
+    }
+    function clearFieldError(id, inputEl) {
+        const el = document.getElementById(id);
+        if (el) { el.textContent = ''; el.style.display = 'none'; }
+        if (inputEl) inputEl.classList.remove('invalid');
+    }
+    function markInvalid(inputEl, errId, msg) {
+        inputEl.classList.add('invalid');
+        showFieldError(errId, msg);
+    }
+
+    /* Validation live sur blur */
+    nomInput.addEventListener('blur', () => validateNom());
+    descInput.addEventListener('blur', () => validateDesc());
+    dateInput.addEventListener('blur', () => validateDate());
+
+    function validateNom() {
+        clearFieldError('err-nom', nomInput);
+        const val = nomInput.value.trim();
+        const regex = /^[\p{L}0-9 \-_.,!?'"()]+$/u;
+
+        if (!val) {
+            markInvalid(nomInput, 'err-nom', 'Le nom de la tâche est obligatoire.');
+            return false;
+        }
+        if (val.length < 3) {
+            markInvalid(nomInput, 'err-nom', 'Le nom doit contenir au moins 3 caractères.');
+            return false;
+        }
+        if (val.length > 100) {
+            markInvalid(nomInput, 'err-nom', 'Le nom ne peut pas dépasser 100 caractères.');
+            return false;
+        }
+        if (!regex.test(val)) {
+            markInvalid(nomInput, 'err-nom', 'Le nom contient des caractères non autorisés.');
+            return false;
+        }
+        return true;
+    }
+
+    function validateDesc() {
+        clearFieldError('err-desc', descInput);
+        if (descInput.value.length > 1000) {
+            markInvalid(descInput, 'err-desc', 'La description ne peut pas dépasser 1000 caractères.');
+            return false;
+        }
+        return true;
+    }
+
+    function validateDate() {
+        clearFieldError('err-date', dateInput);
+        const val = dateInput.value;
+        if (!val) return true; /* facultatif */
+
+        const chosen = new Date(val);
+        chosen.setHours(0, 0, 0, 0);
+        const today  = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (chosen < today) {
+            markInvalid(dateInput, 'err-date', "La date d'échéance doit être aujourd'hui ou dans le futur.");
+            return false;
+        }
+        return true;
+    }
+
+    /* Validation globale à la soumission */
+    form.addEventListener('submit', function (e) {
+        errBox.style.display = 'none';
+        errBox.innerHTML     = '';
+
+        const okNom  = validateNom();
+        const okDesc = validateDesc();
+        const okDate = validateDate();
+
+        if (!okNom || !okDesc || !okDate) {
+            e.preventDefault();
+            const errors = [];
+            if (!okNom)  errors.push(document.getElementById('err-nom').textContent);
+            if (!okDesc) errors.push(document.getElementById('err-desc').textContent);
+            if (!okDate) errors.push(document.getElementById('err-date').textContent);
+            errBox.innerHTML     = '<strong>Veuillez corriger les erreurs suivantes :</strong><ul style="margin:.4rem 0 0; padding-left:1.2rem;">' +
+                errors.map(m => '<li>' + m + '</li>').join('') + '</ul>';
+            errBox.style.display = 'block';
+            errBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    });
+})();
+</script>
 {% endblock %}
