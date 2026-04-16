@@ -1,0 +1,87 @@
+{# templates/admin/Admin_new_categorie.html.twig #}
+{% extends 'base_admin.html.twig' %}
+
+{% block body %}
+<div style="padding: 40px; background-color: #fdfbf7; min-height: 100vh; font-family: 'DM Sans', sans-serif;">
+    <div style="max-width: 850px; margin: 0 auto;">
+        
+        <h2 style="color: #2D5A27; font-weight: 800; margin-bottom: 30px;">Configuration de la Catégorie</h2>
+
+        {{ form_start(form, {'attr': {'id': 'admin-cat-form', 'novalidate': 'novalidate'}}) }}
+            
+            {# --- SECTION AGRICULTEUR (ROLE 2) --- #}
+            <div style="margin-bottom: 25px; padding: 25px; background: #f0f7f0; border-radius: 20px; border: 1px dashed #2D5A27;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                    <label style="font-weight: 800; color: #2D5A27; font-size: 13px;">AFFECTER À UN AGRICOLE (RÔLE 2)</label>
+                    <span id="msg-agri" style="color: #e74c3c; font-size: 11px; font-weight: bold;">
+                        {{ form_errors(form.agriculteur)|striptags ?: 'Sélection obligatoire' }}
+                    </span>
+                </div>
+                {{ form_widget(form.agriculteur, {'attr': {'style': 'width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ddd;'}}) }}
+            </div>
+
+            {# --- SECTION INFOS --- #}
+            <div style="background: white; padding: 40px; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                
+                {# NOM #}
+                <div style="margin-bottom: 25px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <label style="font-weight: bold; color: #555;">NOM DE LA CATÉGORIE</label>
+                        <span id="msg-nom" style="color: #e74c3c; font-size: 12px; font-weight: bold;">
+                            {{ form_errors(form.nom)|striptags ?: 'Requis' }}
+                        </span>
+                    </div>
+                    {{ form_widget(form.nom, {'attr': {'style': 'width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #e0e0e0;'}}) }}
+                </div>
+
+                {# DESCRIPTION #}
+                <div style="margin-bottom: 25px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <label style="font-weight: bold; color: #555;">DESCRIPTION</label>
+                        <span id="msg-desc" style="color: #666; font-size: 12px; font-weight: bold;"></span>
+                    </div>
+                    {{ form_widget(form.description, {'attr': {'style': 'width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #e0e0e0; min-height: 100px;'}}) }}
+                </div>
+
+                <div style="text-align: right;">
+                    <button type="submit" style="background: #111; color: white; padding: 15px 45px; border-radius: 15px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s;">
+                        Créer la catégorie
+                    </button>
+                </div>
+            </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fields = [
+        {
+            el: document.querySelector('[name*="[agriculteur]"]'),
+            msg: document.getElementById('msg-agri'),
+            validate: (val) => val !== "" ? {t: "Agriculteur lié ✓", c: "#2D5A27"} : {t: "Sélection obligatoire", c: "#e74c3c"}
+        },
+        {
+            el: document.querySelector('[name*="[nom]"]'),
+            msg: document.getElementById('msg-nom'),
+            validate: (val) => val.length >= 3 ? {t: "Nom valide ✓", c: "#2D5A27"} : {t: "Trop court (min 3)", c: "#e74c3c"}
+        }
+    ];
+
+    fields.forEach(f => {
+        if(f.el) {
+            const run = () => {
+                const res = f.validate(f.el.value.trim());
+                f.msg.textContent = res.t;
+                f.msg.style.color = res.c;
+                f.el.style.borderColor = res.c;
+            };
+            f.el.addEventListener('input', run);
+            f.el.addEventListener('change', run);
+        }
+    });
+});
+</script>
+{% endblock %}

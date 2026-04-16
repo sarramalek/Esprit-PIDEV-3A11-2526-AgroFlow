@@ -1,0 +1,414 @@
+{% extends 'base_ouvrier.html.twig' %}
+
+{% block title %}Mes Tâches – Espace Ouvrier | AgroFlow{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 28px;
+        animation: fadeUp 0.35s ease both;
+    }
+    .page-header h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 26px;
+        color: #2C3E50;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .page-header h1 i { font-size: 20px; color: #2D5A27; }
+
+    .filter-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: white;
+        padding: 6px;
+        border-radius: 14px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        border: 1px solid #f0f0f0;
+        margin-bottom: 28px;
+        animation: fadeUp 0.35s ease 0.05s both;
+        flex-wrap: wrap;
+    }
+    .filter-btn {
+        padding: 8px 18px;
+        border-radius: 10px;
+        border: none;
+        background: transparent;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        color: #888;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+    }
+    .filter-btn .count-pill {
+        background: #eee;
+        color: #666;
+        font-size: 10px;
+        padding: 2px 7px;
+        border-radius: 20px;
+        font-weight: 700;
+        transition: all 0.2s;
+    }
+    .filter-btn:hover { background: #f5f5f5; color: #2C3E50; }
+    .filter-btn.active { background: #2D5A27; color: white; }
+    .filter-btn.active .count-pill { background: rgba(255,255,255,0.25); color: white; }
+    .filter-btn.active-orange { background: #E65100; color: white; }
+    .filter-btn.active-blue   { background: #1565C0; color: white; }
+    .filter-btn.active-green  { background: #2E7D32; color: white; }
+
+    .tasks-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 18px;
+        animation: fadeUp 0.35s ease 0.1s both;
+    }
+
+    .task-card {
+        background: white;
+        border-radius: 18px;
+        padding: 22px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        border: 1px solid #f0f0f0;
+        border-left: 4px solid #ddd;
+        transition: transform 0.2s, box-shadow 0.2s;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        animation: fadeUp 0.3s ease both;
+    }
+    .task-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 28px rgba(0,0,0,0.09);
+    }
+    .task-card.status-todo     { border-left-color: #FFA726; }
+    .task-card.status-progress { border-left-color: #42A5F5; }
+    .task-card.status-done     { border-left-color: #66BB6A; }
+
+    .task-card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+    }
+    .task-card-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: #2C3E50;
+        line-height: 1.35;
+        flex: 1;
+    }
+    .status-badge {
+        font-size: 10px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 20px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        flex-shrink: 0;
+    }
+    .badge-todo     { background: #FFF3E0; color: #E65100; }
+    .badge-progress { background: #E3F2FD; color: #1565C0; }
+    .badge-done     { background: #E8F5E9; color: #2E7D32; }
+
+    .task-desc { font-size: 13px; color: #777; line-height: 1.6; }
+
+    .task-meta {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: #aaa;
+        font-weight: 500;
+    }
+    .meta-item i { font-size: 11px; color: #2D5A27; }
+
+    .priority-badge {
+        font-size: 10px;
+        font-weight: 700;
+        padding: 3px 9px;
+        border-radius: 20px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+    .priority-haute   { background: #FFEBEE; color: #C62828; }
+    .priority-moyenne { background: #FFF8E1; color: #F57F17; }
+    .priority-basse   { background: #E8F5E9; color: #2E7D32; }
+
+    .task-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-statut {
+        flex: 1;
+        min-width: 100px;
+        padding: 9px 14px;
+        border-radius: 10px;
+        border: 1.5px solid #e0e0e0;
+        background: transparent;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        color: #555;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        text-decoration: none;
+    }
+    .btn-statut:hover { background: #EAF3E6; border-color: #2D5A27; color: #2D5A27; }
+    .btn-statut.primary { background: #2D5A27; border-color: #2D5A27; color: white; }
+    .btn-statut.primary:hover { background: #1B3A20; border-color: #1B3A20; }
+
+    .empty-full {
+        grid-column: 1 / -1;
+        background: white;
+        border-radius: 18px;
+        padding: 60px 24px;
+        text-align: center;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        border: 1px solid #f0f0f0;
+    }
+    .empty-full .empty-icon { font-size: 48px; color: #d0d0d0; margin-bottom: 16px; }
+    .empty-full h3 { font-family: 'Playfair Display', serif; font-size: 20px; color: #bbb; margin-bottom: 8px; }
+    .empty-full p { font-size: 13px; color: #ccc; }
+
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(14px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    {% for i in 1..12 %}
+    .task-card:nth-child({{ i }}) { animation-delay: {{ (i - 1) * 0.05 }}s; }
+    {% endfor %}
+</style>
+{% endblock %}
+
+{% block body %}
+
+<div class="page-header">
+    <h1>
+        <i class="fa fa-list-check"></i>
+        Mes Tâches
+    </h1>
+</div>
+
+{% set filtreCourant = filtre|default('all') %}
+
+<div class="filter-bar">
+    <button class="filter-btn {{ filtreCourant == 'all' ? 'active' : '' }}"
+            onclick="filterTasks('all', this)">
+        <i class="fa fa-grid-2"></i> Toutes
+        <span class="count-pill" id="count-all">0</span>
+    </button>
+    <button class="filter-btn {{ filtreCourant == 'a_faire' ? 'active active-orange' : '' }}"
+            onclick="filterTasks('a_faire', this)">
+        <i class="fa fa-circle-dot"></i> À faire
+        <span class="count-pill" id="count-todo">0</span>
+    </button>
+    <button class="filter-btn {{ filtreCourant == 'en_cours' ? 'active active-blue' : '' }}"
+            onclick="filterTasks('en_cours', this)">
+        <i class="fa fa-spinner"></i> En cours
+        <span class="count-pill" id="count-en_cours">0</span>
+    </button>
+    <button class="filter-btn {{ filtreCourant == 'terminee' ? 'active active-green' : '' }}"
+            onclick="filterTasks('terminee', this)">
+        <i class="fa fa-circle-check"></i> Terminées
+        <span class="count-pill" id="count-terminee">0</span>
+    </button>
+</div>
+
+<div class="tasks-grid" id="tasksGrid">
+
+    {% if taches is defined and taches is not empty %}
+        {% for tache in taches %}
+        <div class="task-card status-{{ tache.statut == 'en_cours' ? 'progress' : (tache.statut == 'terminee' ? 'done' : 'todo') }}"
+             data-statut="{{ tache.statut }}">
+
+            <div class="task-card-top">
+                <div class="task-card-title">{{ tache.titre }}</div>
+                <span class="status-badge {{ tache.statut == 'en_cours' ? 'badge-progress' : (tache.statut == 'terminee' ? 'badge-done' : 'badge-todo') }}">
+                    {{ tache.statut == 'en_cours' ? 'En cours' : (tache.statut == 'terminee' ? 'Terminée' : 'À faire') }}
+                </span>
+            </div>
+
+            {% if tache.description is not null and tache.description %}
+            <div class="task-desc">
+                {{ tache.description|slice(0, 120) }}{{ tache.description|length > 120 ? '…' : '' }}
+            </div>
+            {% endif %}
+
+            <div class="task-meta">
+                {% if tache.dateDebut is not null and tache.dateDebut %}
+                <div class="meta-item">
+                    <i class="fa fa-calendar-check"></i>
+                    {{ tache.dateDebut|date('d/m/Y') }}
+                </div>
+                {% endif %}
+
+                {% if tache.dateFin is not null and tache.dateFin %}
+                <div class="meta-item">
+                    <i class="fa fa-flag-checkered"></i>
+                    {{ tache.dateFin|date('d/m/Y') }}
+                </div>
+                {% endif %}
+
+                {% if tache.priorite is not null and tache.priorite %}
+                <span class="priority-badge
+                    {% if tache.priorite == 'haute' %}priority-haute
+                    {% elseif tache.priorite == 'moyenne' %}priority-moyenne
+                    {% else %}priority-basse{% endif %}">
+                    {{ tache.priorite|capitalize }}
+                </span>
+                {% endif %}
+            </div>
+
+            <div class="task-actions">
+                {% if tache.statut == 'a_faire' %}
+                <button class="btn-statut primary btn-changer-statut"
+                        data-id="{{ tache.id }}" data-statut="en_cours">
+                    <i class="fa fa-play"></i> Commencer
+                </button>
+                {% elseif tache.statut == 'en_cours' %}
+                <button class="btn-statut primary btn-changer-statut"
+                        data-id="{{ tache.id }}" data-statut="terminee">
+                    <i class="fa fa-check"></i> Marquer terminée
+                </button>
+                {% else %}
+                <span class="btn-statut" style="cursor:default;color:#66BB6A;border-color:#c8e6c9;">
+                    <i class="fa fa-circle-check"></i> Tâche complétée
+                </span>
+                {% endif %}
+            </div>
+
+        </div>
+        {% endfor %}
+
+    {% else %}
+        <div class="empty-full">
+            <div class="empty-icon"><i class="fa fa-list-check"></i></div>
+            <h3>Aucune tâche assignée</h3>
+            <p>Vous n'avez pas encore de tâches. Revenez plus tard !</p>
+        </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    updateCounts();
+});
+
+function filterTasks(statut, btn) {
+    // Reset tous les boutons
+    document.querySelectorAll('.filter-btn').forEach(b => {
+        b.classList.remove('active', 'active-orange', 'active-blue', 'active-green');
+    });
+
+    // Activer le bouton cliqué
+    btn.classList.add('active');
+    if (statut === 'a_faire')  btn.classList.add('active-orange');
+    if (statut === 'en_cours') btn.classList.add('active-blue');
+    if (statut === 'terminee') btn.classList.add('active-green');
+
+    // Afficher/masquer les cartes
+    document.querySelectorAll('.task-card').forEach(card => {
+        const cardStatut = card.getAttribute('data-statut');
+        if (statut === 'all' || cardStatut === statut) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+function updateCounts() {
+    const cards = document.querySelectorAll('.task-card[data-statut]');
+    const counts = { all: 0, a_faire: 0, en_cours: 0, terminee: 0 };
+    cards.forEach(c => {
+        const s = c.getAttribute('data-statut');
+        counts.all++;
+        if (counts[s] !== undefined) counts[s]++;
+    });
+    document.getElementById('count-all').textContent      = counts.all;
+    document.getElementById('count-todo').textContent     = counts.a_faire;
+    document.getElementById('count-en_cours').textContent = counts.en_cours;
+    document.getElementById('count-terminee').textContent = counts.terminee;
+}
+
+// ── AJAX changer statut ───────────────────────────────────
+document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.btn-changer-statut');
+    if (!btn) return;
+
+    const id     = btn.dataset.id;
+    const statut = btn.dataset.statut;
+
+    btn.disabled = true;
+
+    fetch(`/ouvrier/tache/${id}/statut/${statut}`)
+        .then(res => res.json())
+        .then(data => {
+            if (!data.success) {
+                alert(data.message || 'Erreur lors de la mise à jour.');
+                btn.disabled = false;
+                return;
+            }
+
+            const card = btn.closest('.task-card');
+
+            // Mettre à jour data-statut
+            card.setAttribute('data-statut', statut);
+
+            // Mettre à jour la classe couleur
+            card.classList.remove('status-todo', 'status-progress', 'status-done');
+            const classeMap = { a_faire: 'status-todo', en_cours: 'status-progress', terminee: 'status-done' };
+            card.classList.add(classeMap[statut]);
+
+            // Mettre à jour le badge
+            const badge = card.querySelector('.status-badge');
+            const labelMap = { a_faire: 'À faire', en_cours: 'En cours', terminee: 'Terminée' };
+            const badgeMap = { a_faire: 'badge-todo', en_cours: 'badge-progress', terminee: 'badge-done' };
+            badge.className = `status-badge ${badgeMap[statut]}`;
+            badge.textContent = labelMap[statut];
+
+            // Mettre à jour les boutons d'action
+            const actions = card.querySelector('.task-actions');
+            if (statut === 'en_cours') {
+                actions.innerHTML = `
+                    <button class="btn-statut primary btn-changer-statut"
+                            data-id="${id}" data-statut="terminee">
+                        <i class="fa fa-check"></i> Marquer terminée
+                    </button>`;
+            } else if (statut === 'terminee') {
+                actions.innerHTML = `
+                    <span class="btn-statut" style="cursor:default;color:#66BB6A;border-color:#c8e6c9;">
+                        <i class="fa fa-circle-check"></i> Tâche complétée
+                    </span>`;
+            }
+
+            updateCounts();
+        })
+        .catch(() => {
+            alert('Erreur réseau.');
+            btn.disabled = false;
+        });
+});
+</script>
+{% endblock %}

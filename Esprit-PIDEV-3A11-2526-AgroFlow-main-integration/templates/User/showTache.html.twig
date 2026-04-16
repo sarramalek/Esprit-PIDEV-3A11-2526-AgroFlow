@@ -1,0 +1,81 @@
+{% extends 'base_admin.html.twig' %}
+{% block title %}Tâche #{{ tache.idTache }} - AgroFlow{% endblock %}
+
+{% block body %}
+<div style="padding:30px; font-family:Arial,sans-serif; max-width:700px; margin:0 auto;">
+    <div style="margin-bottom:25px; display:flex; justify-content:space-between; align-items:center;">
+        <div>
+            <a href="{{ path('app_tache_index') }}" style="color:#888; text-decoration:none; font-size:14px;"><i class="fa fa-arrow-left"></i> Retour</a>
+            <h2 style="margin:10px 0 0; color:#2C3E50;">Tâche <span style="color:#2D5A27;">#{{ tache.idTache }}</span></h2>
+        </div>
+        <a href="{{ path('app_tache_edit', {idTache: tache.idTache}) }}" style="background:#185FA5; color:white; padding:10px 18px; border-radius:8px; text-decoration:none; font-size:14px; font-weight:600;">
+            <i class="fa fa-edit"></i> Modifier
+        </a>
+    </div>
+
+    <div style="background:white; border-radius:12px; padding:30px; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+        <table style="width:100%; border-collapse:collapse; font-size:14px;">
+            <tr style="border-bottom:1px solid #f5f5f5;">
+                <td style="padding:14px 0; color:#888; width:35%;">Nom</td>
+                <td style="padding:14px 0; color:#2C3E50; font-weight:600;">{{ tache.nomTache }}</td>
+            </tr>
+            <tr style="border-bottom:1px solid #f5f5f5;">
+                <td style="padding:14px 0; color:#888;">Description</td>
+                <td style="padding:14px 0; color:#555;">{{ tache.description ?? '—' }}</td>
+            </tr>
+            <tr style="border-bottom:1px solid #f5f5f5;">
+                <td style="padding:14px 0; color:#888;">Assigné à</td>
+                <td style="padding:14px 0; color:#555;">
+                    {% if tache.assignee %}
+                        {{ tache.assignee.nom }} {{ tache.assignee.prenom }}
+                    {% else %}—{% endif %}
+                </td>
+            </tr>
+            <tr style="border-bottom:1px solid #f5f5f5;">
+                <td style="padding:14px 0; color:#888;">État</td>
+                <td style="padding:14px 0;">
+                    {% if tache.etat == 'terminée' %}
+                        <span style="background:#EAF3DE; color:#3B6D11; font-size:12px; padding:4px 12px; border-radius:6px;">Terminée</span>
+                    {% elseif tache.etat == 'en cours' %}
+                        <span style="background:#E6F1FB; color:#185FA5; font-size:12px; padding:4px 12px; border-radius:6px;">En cours</span>
+                    {% elseif tache.etat == 'annulée' %}
+                        <span style="background:#FCEBEB; color:#A32D2D; font-size:12px; padding:4px 12px; border-radius:6px;">Annulée</span>
+                    {% else %}
+                        <span style="background:#f0f0f0; color:#555; font-size:12px; padding:4px 12px; border-radius:6px;">À faire</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr style="border-bottom:1px solid #f5f5f5;">
+                <td style="padding:14px 0; color:#888;">Priorité</td>
+                <td style="padding:14px 0;">
+                    {% if tache.priorite == 'haute' %}
+                        <span style="background:#FCEBEB; color:#A32D2D; font-size:12px; padding:4px 12px; border-radius:6px;"><i class="fa fa-arrow-up"></i> Haute</span>
+                    {% elseif tache.priorite == 'moyenne' %}
+                        <span style="background:#FAEEDA; color:#854F0B; font-size:12px; padding:4px 12px; border-radius:6px;"><i class="fa fa-minus"></i> Moyenne</span>
+                    {% else %}
+                        <span style="background:#E6F1FB; color:#185FA5; font-size:12px; padding:4px 12px; border-radius:6px;"><i class="fa fa-arrow-down"></i> Basse</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td style="padding:14px 0; color:#888;">Date d'échéance</td>
+                <td style="padding:14px 0; color:#555;">
+                    {{ tache.dateEcheancee ? tache.dateEcheancee|date('d/m/Y') : '—' }}
+                </td>
+            </tr>
+        </table>
+
+        <div style="margin-top:25px; display:flex; gap:12px;">
+            <a href="{{ path('app_tache_edit', {idTache: tache.idTache}) }}" style="background:#185FA5; color:white; padding:10px 20px; border-radius:8px; text-decoration:none; font-size:14px; font-weight:600;">
+                <i class="fa fa-edit"></i> Modifier
+            </a>
+            <form method="post" action="{{ path('app_tache_delete', {idTache: tache.idTache}) }}" onsubmit="return confirm('Supprimer cette tâche ?')">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ tache.idTache) }}">
+                <button type="submit" style="background:#e74c3c; color:white; padding:10px 20px; border:none; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer;">
+                    <i class="fa fa-trash"></i> Supprimer
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

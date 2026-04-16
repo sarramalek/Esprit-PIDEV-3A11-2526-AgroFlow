@@ -1,0 +1,773 @@
+{% extends 'base_agriculteur.html.twig' %}
+
+{% block title %}AgroFlow - Gestion des Animaux{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Styles pour la barre de recherche */
+        .search-container {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .search-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            outline: none;
+            transition: all 0.3s;
+            background: #fcfcfc;
+        }
+        .search-input:focus {
+            border-color: #2D5A27;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(45, 90, 39, 0.1);
+        }
+        .btn-search {
+            background: #2D5A27;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .btn-search:hover { background: #1e3f1b; }
+
+        /* Modal Partenaire */
+        .modal {
+            display: none !important;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            padding: 20px;
+            box-sizing: border-box;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal[style*="display: block"] {
+            display: flex !important;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 0;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalPop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        /* IQ Badge & Tooltip Styles */
+        .iq-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            cursor: help;
+            transition: 0.3s;
+            position: relative;
+        }
+        .iq-badge:hover { transform: scale(1.05); }
+        
+        .iq-tooltip {
+            position: relative;
+        }
+        .iq-tooltip::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2C3E50;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 100;
+        }
+        .iq-tooltip:hover::after {
+            opacity: 1;
+            visibility: visible;
+        }
+    </style>
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div style="padding: 10px;">
+        <!-- Header : Breadcrumb -->
+        <div style="margin-bottom: 25px; color: #666; font-size: 14px;">
+            <span>Gestion</span> <i class="fa fa-chevron-right" style="font-size: 10px; margin: 0 5px;"></i> 
+            <strong style="color: #2C3E50;">Mes Animaux</strong>
+        </div>
+
+        <!-- Barre de Recherche -->
+        <form action="{{ path('app_animaux_index') }}" method="get" class="search-container">
+            <div style="display: flex; align-items: center; gap: 10px; flex: 1;">
+                <i class="fa fa-search" style="color: #999;"></i>
+                <input type="text" name="q" value="{{ searchTerm }}" class="search-input" placeholder="Rechercher par nom, espèce ou sexe...">
+            </div>
+            <button type="submit" class="btn-search">Rechercher</button>
+            {% if searchTerm %}
+                <a href="{{ path('app_animaux_index') }}" style="color: #666; text-decoration: none; font-size: 14px; margin-left: 10px;"><i class="fa fa-times"></i> Annuler</a>
+            {% endif %}
+        </form>
+
+        <!-- Stats Rapides -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 25px;">
+            <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 3px 6px rgba(0,0,0,0.05); border-left: 5px solid #2C3E50;">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <i class="fa fa-cow" style="color: #2C3E50; font-size: 24px;"></i>
+                    <div>
+                        <h3 style="margin: 0; font-size: 18px;">{{ animaux|length }}</h3>
+                        <span style="color: #777; font-size: 12px; font-weight: 600;">Animaux</span>
+                    </div>
+                </div>
+            </div>
+            <a href="{{ path('app_animaux_stats') }}" style="text-decoration: none;">
+                <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 3px 6px rgba(0,0,0,0.05); border-left: 5px solid #3498db;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <i class="fa fa-chart-pie" style="color: #3498db; font-size: 24px;"></i>
+                        <div>
+                            <h3 style="margin: 0; font-size: 16px; color: #333;">Statistiques</h3>
+                            <span style="color: #3498db; font-size: 12px; font-weight: 600;">Répartition</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+            <div onclick="openMatingModal()" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 3px 6px rgba(0,0,0,0.05); border-left: 5px solid #e91e63; cursor: pointer; transition: 0.3s;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                 <div style="display: flex; align-items: center; gap: 15px;">
+                    <i class="fa fa-heart" style="color: #e91e63; font-size: 24px;"></i>
+                    <div>
+                        <h3 style="margin: 0; font-size: 16px; color: #333;">Accouplement</h3>
+                        <span style="color: #e91e63; font-size: 12px; font-weight: 600;">Trouver un partenaire</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cartes de Fonctionnalités -->
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 25px;">
+            <!-- Card Encyclopédie -->
+            <div onclick="openEncyclopediaModal()" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 3px 6px rgba(0,0,0,0.05); border-left: 5px solid #667eea; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 15px rgba(0,0,0,0.1)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 6px rgba(0,0,0,0.05)';">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="font-size: 32px;">📚</div>
+                    <div style="flex: 1;">
+                        <h3 style="margin: 0; font-size: 16px; color: #333; font-weight: 700;">Encyclopédie des Espèces</h3>
+                        <span style="color: #667eea; font-size: 12px; font-weight: 600;">Découvrez vos animaux</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card À compléter (placeholder pour future fonctionnalité) -->
+            <div onclick="openAgroFlowConnectGlobalModal()" style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 3px 6px rgba(0,0,0,0.05); border-left: 5px solid #2D5A27; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 15px rgba(0,0,0,0.1)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 3px 6px rgba(0,0,0,0.05)';">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div style="font-size: 32px;">🤝</div>
+                    <div style="flex: 1;">
+                        <h3 style="margin: 0; font-size: 16px; color: #333; font-weight: 700;">AgroFlow Connect</h3>
+                        <span style="color: #2D5A27; font-size: 12px; font-weight: 600;">Trouver vétérinaires & partenaires</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Encyclopédie des Espèces -->
+        <div id="encyclopediaModal" class="modal">
+            <div class="modal-content">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10;">
+                    <h3 style="margin: 0; font-size: 18px;"><i class="fa fa-book"></i> 📚 Encyclopédie des Espèces</h3>
+                    <span style="cursor: pointer; font-size: 24px;" onclick="closeEncyclopediaModal()">&times;</span>
+                </div>
+                
+                <div style="padding: 25px;">
+                    <!-- Sous-titre -->
+                    <p style="color: #666; font-size: 13px; margin-bottom: 20px; text-align: center;">
+                        Explorez les caractéristiques, tempérament et besoins spécifiques de chaque espèce animale
+                    </p>
+
+                    <!-- Barre de recherche/sélection -->
+                    <div style="margin-bottom: 25px;">
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: #999; text-transform: uppercase; margin-bottom: 10px;">
+                            <i class="fa fa-paw"></i> Sélectionner une espèce
+                        </label>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                            {% for espece, data in encyclopedias %}
+                                <button type="button" onclick="showEncyclopediaData('{{ espece }}')" style="padding: 12px; border: 2px solid #E9ECEF; background: white; border-radius: 10px; cursor: pointer; transition: all 0.3s; font-weight: 600; font-size: 13px; color: #2C3E50; display: flex; align-items: center; justify-content: center; gap: 8px;" onmouseover="this.style.borderColor='{{ data.color }}'; this.style.backgroundColor='#F8F9FA';" onmouseout="this.style.borderColor='#E9ECEF'; this.style.backgroundColor='white';">
+                                    <i class="fa {{ data.icon }}" style="color: {{ data.color }};"></i>
+                                    {{ espece }}
+                                </button>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Contenu dynamique -->
+                    <div id="encyclopediaContent" style="background: #F8F9FA; border-radius: 12px; padding: 25px; display: none;">
+                        <!-- Sera rempli par JavaScript -->
+                    </div>
+
+                    <!-- État initial (avant sélection) -->
+                    <div id="encyclopediaPlaceholder" style="text-align: center; padding: 40px 20px; color: #999;">
+                        <i class="fa fa-search" style="font-size: 48px; margin-bottom: 15px; opacity: 0.3; display: block;"></i>
+                        <p style="margin: 0; font-size: 14px;">Sélectionnez une espèce pour découvrir ses caractéristiques</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Sélection d'Animal pour l'Accouplement -->
+        <div id="matingModal" class="modal">
+            <div class="modal-content" style="max-width: 500px;">
+                <div style="background: #e91e63; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="margin: 0; font-size: 18px;"><i class="fa fa-heart"></i> Trouver un partenaire</h3>
+                    <span style="cursor: pointer; font-size: 24px;" onclick="closeMatingModal()">&times;</span>
+                </div>
+                <div style="padding: 25px;">
+                    <p style="color: #666; font-size: 14px; margin-bottom: 20px;">Choisissez l'animal pour lequel vous souhaitez trouver un partenaire compatible (même espèce, sexe opposé) :</p>
+                    
+                    <div style="max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;">
+                        {% for a in animaux %}
+                            {% if a.user == app.user %}
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border: 1px solid #eee; border-radius: 10px; transition: 0.2s;" onmouseover="this.style.borderColor='#e91e63';">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <div style="width: 35px; height: 35px; background: #FFF0F5; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fa fa-{{ a.espece|lower == 'vache' ? 'cow' : (a.espece|lower == 'chien' ? 'dog' : 'paw') }}" style="color: #e91e63;"></i>
+                                        </div>
+                                        <div>
+                                            <strong style="display: block; font-size: 14px;">{{ a.nom }}</strong>
+                                            <span style="font-size: 12px; color: #999;">{{ a.espece }} • {{ a.sexe }}</span>
+                                        </div>
+                                    </div>
+                                    <a href="{{ path('app_animaux_match', {'id': a.id}) }}" style="background: #e91e63; color: white; padding: 8px 15px; border-radius: 8px; text-decoration: none; font-size: 12px; font-weight: 700;">
+                                        Match
+                                    </a>
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <p style="text-align: center; color: #999; font-size: 13px;">Vous n'avez pas encore d'animaux.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Données encyclopédiques
+            const encyclopediaData = {
+                {% for espece, data in encyclopedias %}
+                    '{{ espece }}': {
+                        title: '{{ data.title }}',
+                        description: '{{ data.description }}',
+                        icon: '{{ data.icon }}',
+                        color: '{{ data.color }}',
+                        temperament: '{{ data.temperament|replace({"'": "\\'"}) }}',
+                        lifespan: '{{ data.lifespan }}',
+                        needs: [
+                            {% for need in data.needs %}
+                                '{{ need|replace({"'": "\\'"}) }}'{% if not loop.last %},{% endif %}
+                            {% endfor %}
+                        ]
+                    }{% if not loop.last %},{% endif %}
+                {% endfor %}
+            };
+
+            // Modal Encyclopédie
+            function openEncyclopediaModal() {
+                document.getElementById('encyclopediaModal').style.display = 'block';
+            }
+            
+            function closeEncyclopediaModal() {
+                document.getElementById('encyclopediaModal').style.display = 'none';
+            }
+            
+            function showEncyclopediaData(espece) {
+                const data = encyclopediaData[espece];
+                if (!data) return;
+                
+                const contentDiv = document.getElementById('encyclopediaContent');
+                const placeholder = document.getElementById('encyclopediaPlaceholder');
+                
+                let needsHTML = '<ul style="margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px;">';
+                data.needs.forEach(need => {
+                    needsHTML += `<li style="color: #555; font-size: 13px;">${need}</li>`;
+                });
+                needsHTML += '</ul>';
+                
+                contentDiv.innerHTML = `
+                    <div>
+                        <h3 style="margin: 0 0 15px 0; color: #2C3E50; font-size: 18px; display: flex; align-items: center; gap: 10px;">
+                            <i class="fa ${data.icon}" style="color: ${data.color}; font-size: 24px;"></i>
+                            ${data.title}
+                        </h3>
+                        
+                        <p style="margin: 0 0 15px 0; color: #666; font-size: 13px; font-style: italic;">
+                            ${data.description}
+                        </p>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                            <div style="background: white; padding: 15px; border-radius: 10px; border-left: 4px solid ${data.color};">
+                                <span style="display: block; font-size: 11px; color: #999; text-transform: uppercase; font-weight: 700; margin-bottom: 5px;">
+                                    <i class="fa fa-heart"></i> Tempérament
+                                </span>
+                                <p style="margin: 0; color: #555; font-size: 13px; line-height: 1.5;">
+                                    ${data.temperament}
+                                </p>
+                            </div>
+                            
+                            <div style="background: white; padding: 15px; border-radius: 10px; border-left: 4px solid ${data.color};">
+                                <span style="display: block; font-size: 11px; color: #999; text-transform: uppercase; font-weight: 700; margin-bottom: 5px;">
+                                    <i class="fa fa-clock"></i> Longévité
+                                </span>
+                                <p style="margin: 0; color: #2C3E50; font-size: 14px; font-weight: 600;">
+                                    ${data.lifespan}
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div style="background: white; padding: 15px; border-radius: 10px; border-left: 4px solid ${data.color};">
+                            <span style="display: block; font-size: 11px; color: #999; text-transform: uppercase; font-weight: 700; margin-bottom: 10px;">
+                                <i class="fa fa-list"></i> Besoins Spécifiques
+                            </span>
+                            ${needsHTML}
+                        </div>
+                    </div>
+                `;
+                
+                contentDiv.style.display = 'block';
+                placeholder.style.display = 'none';
+            }
+
+            // Modal Accouplement
+            function openMatingModal() {
+                document.getElementById('matingModal').style.display = 'block';
+            }
+            function closeMatingModal() {
+                document.getElementById('matingModal').style.display = 'none';
+            }
+            
+            // Fermer modales au clic en dehors
+            window.onclick = function(event) {
+                let matingModal = document.getElementById('matingModal');
+                let encyclopediaModal = document.getElementById('encyclopediaModal');
+                
+                if (event.target == matingModal) {
+                    matingModal.style.display = "none";
+                }
+                if (event.target == encyclopediaModal) {
+                    encyclopediaModal.style.display = "none";
+                }
+            }
+        </script>
+
+        <!-- Tableau CRUD -->
+        <div style="background: white; border-radius: 15px; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0; color: #2C3E50; font-size: 22px;">Liste de l'exploitation</h2>
+                <a href="{{ path('app_animaux_new') }}" style="background: #2D5A27; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 14px;">
+                    <i class="fa fa-plus"></i> Ajouter
+                </a>
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #F1F3F5;">
+                            {% set nextDirection = (currentDirection == 'ASC') ? 'DESC' : 'ASC' %}
+
+                            <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">
+                                <a href="{{ path('app_animaux_index', { q: searchTerm, sort: 'nom', direction: (currentSort == 'nom' ? nextDirection : 'ASC') }) }}" style="text-decoration:none; color:inherit;">Nom</a>
+                            </th>
+                            <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">Espèce</th>
+                            <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">Sexe</th>
+                            <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">Poids</th>
+                            <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">Naissance</th>
+                            {% if is_granted('ROLE_ADMIN') %}<th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">Éleveur</th>{% endif %}
+                            <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600; text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for a in animaux %}
+                        <tr style="border-bottom: 1px solid #EEE; transition: background 0.2s;" onmouseover="this.style.backgroundColor='#fcfcf0'" onmouseout="this.style.backgroundColor='transparent'">
+
+                            <td style="padding: 15px 10px; font-weight: 600; color: #2D5A27;">{{ a.nom }}</td>
+                            <td style="padding: 15px 10px;">{{ a.espece }}</td>
+                            <td style="padding: 15px 10px;">
+                                <span style="display: flex; align-items: center; gap: 5px;">
+                                    <i class="fa fa-{{ a.sexe == 'MALE' ? 'mars' : 'venus' }}" style="color: {{ a.sexe == 'MALE' ? '#3498db' : '#e91e63' }};"></i>
+                                    {{ a.sexe }}
+                                </span>
+                            </td>
+                            <td style="padding: 15px 10px;">
+                                <div style="display: flex; flex-direction: column; gap: 4px;">
+                                    <span style="font-weight: 700; color: #2C3E50;">{{ a.poids }} kg</span>
+                                    
+                                    {% set species_key = a.espece|lower %}
+                                    {% if averages[species_key] is defined and a.poids > 0 %}
+                                        {% set avg = averages[species_key] %}
+                                        {% set diff = ((a.poids - avg) / avg) * 100 %}
+                                        
+                                        {# Scoring Logic #}
+                                        {% if diff > 15 %}
+                                            {% set badge_color = "#3498db" %}{# Blue #}
+                                            {% set badge_bg = "#EBF5FB" %}
+                                            {% set label = "Élite" %}
+                                            {% set icon = "star" %}
+                                        {% elseif diff >= -5 %}
+                                            {% set badge_color = "#27ae60" %}{# Green #}
+                                            {% set badge_bg = "#E8F5E9" %}
+                                            {% set label = "Conforme" %}
+                                            {% set icon = "check-circle" %}
+                                        {% else %}
+                                            {% set badge_color = "#f39c12" %}{# Orange #}
+                                            {% set badge_bg = "#FEF5E7" %}
+                                            {% set label = "À surveiller" %}
+                                            {% set icon = "exclamation-triangle" %}
+                                        {% endif %}
+                                        
+                                        <div class="iq-tooltip" data-tip="{{ diff > 0 ? '+' : '' }}{{ diff|round(1) }}% par rapport à la moyenne {{ a.espece }}">
+                                            <span class="iq-badge" style="background: {{ badge_bg }}; color: {{ badge_color }}; border: 1px solid {{ badge_color }}40;">
+                                                <i class="fa fa-{{ icon }}" style="margin-right: 5px;"></i> {{ label }}
+                                            </span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td style="padding: 15px 10px;">{{ a.dateNaissance ? a.dateNaissance|date('d/m/Y') : '-' }}</td>
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <td style="padding: 15px 10px; font-size: 13px;">{{ a.user ? a.user.prenom ~ ' ' ~ a.user.nom : 'Inconnu' }}</td>
+                            {% endif %}
+                            <td style="padding: 15px 10px; text-align: center;">
+                                <a href="{{ path('app_animaux_show', {'id': a.id}) }}" style="color: #7f8c8d; margin-right: 12px;"><i class="fa fa-eye"></i></a>
+                                <a href="{{ path('app_animaux_edit', {'id': a.id}) }}" style="color: #3498db; margin-right: 12px;"><i class="fa fa-edit"></i></a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="8" style="padding: 30px; text-align: center; color: #999;">Aucun animal trouvé dans cette catégorie.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            <div style="margin-top: 25px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="color: #7f8c8d; font-size: 13px;">
+                    Affichage <strong>{{ animaux.getItemNumberPerPage() }} animaux</strong> par page
+                </div>
+                <nav style="display: flex; gap: 5px; justify-content: center; flex: 1;">
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; gap: 8px;">
+                        {# Page précédente #}
+                        {% if animaux.getCurrentPageNumber() > 1 %}
+                            <li>
+                                <a href="{{ path(app.request.attributes.get('_route'), {page: animaux.getCurrentPageNumber() - 1, q: searchTerm, sortBy: currentSort, sortDirection: currentDirection}) }}" style="padding: 8px 12px; border: 1px solid #E9ECEF; border-radius: 6px; text-decoration: none; color: #2D5A27; font-weight: 600; transition: 0.3s;" onmouseover="this.style.background='#E8F5E2'; this.style.borderColor='#2D5A27';" onmouseout="this.style.background='white'; this.style.borderColor='#E9ECEF';">
+                                    <i class="fa fa-chevron-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        {# Numéros de page #}
+                        {% for page_num in 1..animaux.getPageCount() %}
+                            {% if page_num == animaux.getCurrentPageNumber() %}
+                                <li>
+                                    <span style="padding: 8px 12px; border: 2px solid #2D5A27; border-radius: 6px; background: #2D5A27; color: white; font-weight: 600;">
+                                        {{ page_num }}
+                                    </span>
+                                </li>
+                            {% elseif page_num >= animaux.getCurrentPageNumber() - 2 and page_num <= animaux.getCurrentPageNumber() + 2 %}
+                                <li>
+                                    <a href="{{ path(app.request.attributes.get('_route'), {page: page_num, q: searchTerm, sortBy: currentSort, sortDirection: currentDirection}) }}" style="padding: 8px 12px; border: 1px solid #E9ECEF; border-radius: 6px; text-decoration: none; color: #2D5A27; font-weight: 600; transition: 0.3s;" onmouseover="this.style.background='#E8F5E2';" onmouseout="this.style.background='white';">
+                                        {{ page_num }}
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {# Page suivante #}
+                        {% if animaux.getCurrentPageNumber() < animaux.getPageCount() %}
+                            <li>
+                                <a href="{{ path(app.request.attributes.get('_route'), {page: animaux.getCurrentPageNumber() + 1, q: searchTerm, sortBy: currentSort, sortDirection: currentDirection}) }}" style="padding: 8px 12px; border: 1px solid #E9ECEF; border-radius: 6px; text-decoration: none; color: #2D5A27; font-weight: 600; transition: 0.3s;" onmouseover="this.style.background='#E8F5E2'; this.style.borderColor='#2D5A27';" onmouseout="this.style.background='white'; this.style.borderColor='#E9ECEF';">
+                                    <i class="fa fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                <div style="color: #7f8c8d; font-size: 13px;">
+                    Total: <strong>{{ animaux.getTotalItemCount() }}</strong> animaux
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal AgroFlow Connect Global (Page Index) -->
+    <div id="agroflowConnectGlobalModal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); padding: 20px; box-sizing: border-box; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 15px; width: 90%; max-width: 1000px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <!-- Header -->
+            <div style="background: linear-gradient(135deg, #2D5A27 0%, #1B3A20 100%); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="margin: 0; font-size: 20px;">🤝 AgroFlow Connect</h2>
+                <span onclick="closeAgroFlowConnectGlobalModal()" style="cursor: pointer; font-size: 28px; font-weight: bold; opacity: 0.8;">&times;</span>
+            </div>
+
+            <!-- Sélecteur d'animal -->
+            <div style="padding: 20px; background: #F9F9F9; border-bottom: 1px solid #E9ECEF;">
+                <label style="display: block; font-size: 13px; font-weight: 700; color: #2D5A27; margin-bottom: 10px;">
+                    <i class="fa fa-paw"></i> Sélectionnez votre animal
+                </label>
+                <select id="animalSelector" onchange="updateGlobalModalAnimal()" style="width: 100%; padding: 12px 15px; border: 2px solid #E9ECEF; border-radius: 10px; outline: none; font-size: 14px; background: white; cursor: pointer;">
+                    <option value="">-- Choisir un animal --</option>
+                    {% for a in animaux %}
+                        <option value="{{ a.nom }},{{ a.espece }}">🐾 {{ a.nom }} ({{ a.espece }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Contenu : Deux colonnes (Carte + Chat) -->
+            <div style="display: flex; flex: 1; overflow: hidden;">
+                <!-- Colonne Gauche : Carte Leaflet -->
+                <div style="flex: 1; display: flex; flex-direction: column; border-right: 1px solid #E9ECEF;">
+                    <div id="agroflowGlobalMap" style="flex: 1; background: #F5F5F5;"></div>
+                </div>
+
+                <!-- Colonne Droite : Chat IA -->
+                <div style="width: 350px; display: flex; flex-direction: column; background: #F9F9F9;">
+                    <!-- Messages Chat -->
+                    <div id="globalChatMessages" style="flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+                        <div style="background: white; padding: 12px 15px; border-radius: 10px; border-left: 4px solid #2D5A27; font-size: 13px; color: #555; line-height: 1.5;">
+                            <strong style="color: #2D5A27;">Assistant IA:</strong><br>
+                            Sélectionnez un animal pour commencer. Je vous aiderai à trouver le meilleur vétérinaire ou partenaire!
+                        </div>
+                    </div>
+
+                    <!-- Barre de Saisie -->
+                    <div style="padding: 15px; border-top: 1px solid #E9ECEF; background: white;">
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="globalChatInput" placeholder="Posez votre question..." style="flex: 1; padding: 10px 12px; border: 1px solid #E9ECEF; border-radius: 8px; outline: none; font-size: 13px;" onkeypress="if(event.key==='Enter') sendGlobalChatMessage();">
+                            <button type="button" onclick="sendGlobalChatMessage()" style="background: #2D5A27; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.3s;" onmouseover="this.style.background='#1B3A20';" onmouseout="this.style.background='#2D5A27';">
+                                📤 Envoyer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feuille de styles pour Leaflet -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script src="{{ asset('agroflow_connect.js') }}"></script>
+    <script>
+        let globalMap = null;
+        let globalMarkers = [];
+        let globalUserLocation = { lat: AGROFLOW_CONNECT.DEFAULT_LAT, lng: AGROFLOW_CONNECT.DEFAULT_LNG };
+        let selectedAnimalNom = '';
+        let selectedAnimalEspece = '';
+
+        // Ouvrir la modale globale
+        function openAgroFlowConnectGlobalModal() {
+            document.getElementById('agroflowConnectGlobalModal').style.display = 'flex';
+            document.getElementById('animalSelector').focus();
+
+            setTimeout(() => {
+                if (!globalMap) {
+                    initializeGlobalMap();
+                } else {
+                    globalMap.invalidateSize();
+                }
+            }, 100);
+
+            // Géolocalisation
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        globalUserLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        if (globalMap) {
+                            globalMap.setView([globalUserLocation.lat, globalUserLocation.lng], 12);
+                        }
+                    },
+                    function(error) {
+                        console.log('Géolocalisation refusée');
+                    }
+                );
+            }
+        }
+
+        // Fermer la modale globale
+        function closeAgroFlowConnectGlobalModal() {
+            document.getElementById('agroflowConnectGlobalModal').style.display = 'none';
+            if (globalMap) {
+                globalMap.remove();
+                globalMap = null;
+            }
+            globalMarkers = [];
+        }
+
+        // Initialiser la carte globale
+        function initializeGlobalMap() {
+            const mapContainer = document.getElementById('agroflowGlobalMap');
+            if (!mapContainer) return;
+
+            globalMap = L.map(mapContainer).setView([globalUserLocation.lat, globalUserLocation.lng], 12);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap',
+                maxZoom: 19
+            }).addTo(globalMap);
+
+            const userIcon = L.divIcon({
+                html: '<i class="fa fa-map-marker" style="font-size: 32px; color: #3498db; text-shadow: 0 0 3px white;"></i>',
+                iconSize: [32, 32],
+                className: 'user-marker'
+            });
+
+            L.marker([globalUserLocation.lat, globalUserLocation.lng], { icon: userIcon })
+                .addTo(globalMap)
+                .bindPopup('📍 Votre position');
+        }
+
+        // Mettre à jour quand animal sélectionné
+        function updateGlobalModalAnimal() {
+            const selector = document.getElementById('animalSelector');
+            const [nom, espece] = selector.value.split(',');
+            
+            if (nom && espece) {
+                selectedAnimalNom = nom.trim();
+                selectedAnimalEspece = espece.trim();
+                
+                addGlobalChatMessage('Assistant IA', `Excellent! Je vais chercher les meilleurs partenaires pour ${selectedAnimalNom} (${selectedAnimalEspece}).`);
+                loadGlobalPartners();
+            }
+        }
+
+        // Charger les partenaires sur la carte globale
+        function loadGlobalPartners() {
+            if (!selectedAnimalEspece) {
+                addGlobalChatMessage('Assistant IA', 'Veuillez d\'abord sélectionner un animal.');
+                return;
+            }
+
+            const vets = AGROFLOW_CONNECT.getVeterinairesForAnimal(selectedAnimalEspece);
+            const buyers = AGROFLOW_CONNECT.getAcheteursForAnimal(selectedAnimalEspece);
+            const allPartners = [...vets, ...buyers];
+
+            const sortedPartners = AGROFLOW_CONNECT.trierParDistance(allPartners, globalUserLocation.lat, globalUserLocation.lng);
+
+            globalMarkers.forEach(marker => globalMap.removeLayer(marker));
+            globalMarkers = [];
+
+            sortedPartners.slice(0, 5).forEach(partner => {
+                const isVet = partner.specialite && partner.specialite[0];
+                const icon = partner.telephone ? '🏥' : '🏪';
+                const color = partner.couleur || '#2D5A27';
+
+                const popupContent = `
+                    <div style="font-size: 12px; max-width: 200px;">
+                        <strong>${icon} ${partner.nom}</strong><br>
+                        📍 ${partner.distance} km<br>
+                        ⭐ ${partner.rating}/5<br>
+                        📞 ${partner.telephone}
+                    </div>
+                `;
+
+                const customIcon = L.divIcon({
+                    html: `<div style="background: ${color}; color: white; padding: 5px 10px; border-radius: 20px; font-weight: bold; font-size: 11px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">${icon}</div>`,
+                    iconSize: [40, 30],
+                    className: 'partner-marker'
+                });
+
+                const marker = L.marker([partner.lat, partner.lng], { icon: customIcon })
+                    .bindPopup(popupContent)
+                    .addTo(globalMap);
+
+                globalMarkers.push(marker);
+            });
+
+            if (globalMarkers.length > 0) {
+                const group = new L.featureGroup([...globalMarkers]);
+                globalMap.fitBounds(group.getBounds().pad(0.1));
+            }
+        }
+
+        // Ajouter message au chat global
+        function addGlobalChatMessage(sender, message) {
+            const messagesContainer = document.getElementById('globalChatMessages');
+            const msgDiv = document.createElement('div');
+            
+            if (sender === 'Assistant IA') {
+                msgDiv.style.cssText = 'background: white; padding: 12px 15px; border-radius: 10px; border-left: 4px solid #2D5A27; font-size: 13px; color: #555; line-height: 1.5;';
+            } else {
+                msgDiv.style.cssText = 'background: #2D5A27; color: white; padding: 12px 15px; border-radius: 10px; font-size: 13px; line-height: 1.5; text-align: right;';
+            }
+
+            msgDiv.innerHTML = `<strong>${sender}:</strong><br>${message}`;
+            messagesContainer.appendChild(msgDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Envoyer message global
+        function sendGlobalChatMessage() {
+            const input = document.getElementById('globalChatInput');
+            const message = input.value.trim();
+
+            if (!message || !selectedAnimalEspece) {
+                if (!selectedAnimalEspece) {
+                    addGlobalChatMessage('Assistant IA', 'Veuillez d\'abord sélectionner un animal.');
+                }
+                return;
+            }
+
+            addGlobalChatMessage('Vous', message);
+            input.value = '';
+
+            setTimeout(() => {
+                const aiResponse = AGROFLOW_CONNECT.generateAIResponse(
+                    message,
+                    selectedAnimalNom,
+                    selectedAnimalEspece,
+                    globalUserLocation.lat,
+                    globalUserLocation.lng
+                );
+
+                addGlobalChatMessage('Assistant IA', aiResponse.response);
+                loadGlobalPartners();
+            }, 500);
+        }
+
+        // Fermer au clic extérieur
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('agroflowConnectGlobalModal');
+            if (event.target === modal) {
+                closeAgroFlowConnectGlobalModal();
+            }
+        });
+    </script>
+{% endblock %}
