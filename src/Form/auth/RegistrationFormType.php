@@ -50,54 +50,9 @@ class RegistrationFormType extends AbstractType
         );
 
         $builder
-            // ── Rôle ─────────────────────────────────────────────────────────
-            ->add('role', ChoiceType::class, [
-                'label'    => false,
-                'error_bubbling' => false,   // ← ajouter sur chaque champ
-                'expanded' => true,
-                'multiple' => false,
-                'choices'  => ['Ouvrier' => 1, 'Agriculteur' => 2],
-                'constraints' => [
-                    new NotBlank(['message' => 'Veuillez choisir un rôle.']),
-                    new Type(['type' => 'integer', 'message' => 'Rôle invalide.']),
-                    new Range([
-                       
-    'min'                => 1,
-    'max'                => 2,
-    'notInRangeMessage'  => 'Rôle invalide.',
-]),
-                   
-                ],
-            ])
+            
 
-            // ── Employeur (Ouvrier uniquement — non mappé) ────────────────────
-            ->add('employeur', EntityType::class, [
-                'class'         => User::class,
-                'mapped'        => false,
-                'required'      => false,
-                'placeholder'   => '-- Choisissez un agriculteur --',
-                'query_builder' => fn(UserRepository $repo) => $repo
-                    ->createQueryBuilder('u')
-                    ->where('u.role = :role')
-                    ->setParameter('role', 2),
-                'choice_label'  => fn(User $u) => $u->getNom() . ' ' . $u->getPrenom(),
-                'choice_value'  => fn(?User $u) => $u?->getCin(),
-                'attr'          => ['id' => 'employeur-select', 'class' => 'form-input'],
-                'label'         => false,
-                // La validation conditionnelle (obligatoire si rôle = Ouvrier)
-                // doit être gérée via une contrainte personnalisée ou un Callback
-                // au niveau de l'entité / du formulaire parent.
-            ])
-
-            // ── Terrain (non mappé, valeur injectée par JS) ───────────────────
-            ->add('terrain', TextType::class, [
-                'mapped'   => false,
-                'required' => false,
-                'label'    => false,
-                'error_bubbling' => false,   // ← ajouter sur chaque champ
-                'attr'     => ['id' => 'terrain-hidden-value', 'style' => 'display:none'],
-            ])
-
+            
             // ── CIN ───────────────────────────────────────────────────────────
             ->add('cin', IntegerType::class, [
                 'label' => false,
