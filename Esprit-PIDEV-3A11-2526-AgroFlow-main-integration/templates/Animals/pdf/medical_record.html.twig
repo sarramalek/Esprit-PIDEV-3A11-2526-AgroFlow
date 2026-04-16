@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Dossier Médical - {{ animal.nom }}</title>
+    <style>
+        body { font-family: 'Helvetica', 'Arial', sans-serif; color: #2C3E50; margin: 0; padding: 0; line-height: 1.6; }
+        .header { background: #e74c3c; color: white; padding: 30px; text-align: center; }
+        .logo { font-size: 28px; font-weight: bold; letter-spacing: 2px; }
+        .footer { position: fixed; bottom: -30px; left: 0; right: 0; height: 50px; text-align: center; font-size: 10px; color: #95a5a6; }
+        
+        .container { padding: 40px; }
+        .animal-summary { margin-bottom: 40px; border-bottom: 2px solid #f1f3f5; padding-bottom: 20px; }
+        
+        .timeline { list-style: none; padding: 0; margin: 0; }
+        .timeline-item { border-left: 2px solid #e74c3c; padding-left: 25px; margin-bottom: 30px; position: relative; }
+        .timeline-item::before { content: ''; position: absolute; left: -8px; top: 0; width: 14px; height: 14px; border-radius: 50%; background: white; border: 2px solid #e74c3c; }
+        
+        .exam-date { font-weight: bold; color: #e74c3c; font-size: 14px; margin-bottom: 5px; }
+        .exam-type { font-size: 18px; font-weight: 800; color: #2C3E50; margin-bottom: 8px; }
+        .exam-details { background: #F8F9FA; border-radius: 10px; padding: 15px; display: table; width: 100%; border: 1px solid #E9ECEF; }
+        
+        .detail-row { display: table-row; }
+        .detail-label { display: table-cell; font-weight: bold; font-size: 11px; text-transform: uppercase; color: #95a5a6; width: 120px; padding: 5px 0; }
+        .detail-value { display: table-cell; font-size: 14px; padding: 5px 0; color: #1B3A20; }
+        
+        .no-data { text-align: center; color: #95a5a6; padding: 50px; font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">AGROFLOW</div>
+        <div style="font-size: 12px; opacity: 0.8; margin-top: 5px;">Rapport Médical Vétérinaire</div>
+    </div>
+
+    <div class="container">
+        <div class="animal-summary">
+            <h1 style="margin: 0; color: #e74c3c;">DOSSIER MÉDICAL</h1>
+            <p style="font-size: 18px; margin: 5px 0;"><strong>Animal : {{ animal.nom }}</strong> ({{ animal.espece }}, {{ animal.sexe }})</p>
+            <p style="color: #95a5a6; font-size: 12px;">Généré à la demande de l'Agriculteur le {{ "now"|date("d/m/Y à H:i") }}</p>
+        </div>
+
+        <div class="timeline">
+            {% if animal.examen|length > 0 %}
+                {% for examen in animal.examen|sort((a, b) => b.dateExamen <=> a.dateExamen) %}
+                    <div class="timeline-item">
+                        <div class="exam-date">{{ examen.dateExamen|date('d/m/Y') }}</div>
+                        <div class="exam-type">{{ examen.typeExamen }}</div>
+                        <div class="exam-details">
+                            <div class="detail-row">
+                                <div class="detail-label">Diagnostic</div>
+                                <div class="detail-value"><strong>{{ examen.diagnostic }}</strong></div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">Traitement</div>
+                                <div class="detail-value" style="color: #2D5A27;">{{ examen.traitement }}</div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-data">Aucun examen n'a été enregistré pour cet animal jusqu'à présent.</div>
+            {% endif %}
+        </div>
+
+        <div style="margin-top: 60px; padding: 25px; background: #EEEDFE; border-radius: 12px; border: 1px solid #7F77DD; text-align: center;">
+            <p style="margin: 0; font-weight: bold; color: #534AB7;">Document de Suivi Sanitaire Agricole</p>
+            <p style="margin: 5px 0 0 0; font-size: 11px; color: #7f8c8d;">AgroFlow facilite le suivi médical, mais ce document ne remplace pas une prescription vétérinaire officielle signée.</p>
+        </div>
+    </div>
+
+    <div class="footer">
+        AgroFlow — Historique Médical Numérique — document confidentiel.
+    </div>
+</body>
+</html>

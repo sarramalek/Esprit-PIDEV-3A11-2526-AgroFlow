@@ -1,0 +1,226 @@
+{% extends 'base_admin.html.twig' %}
+{% block title %}Rotations — AgroFlow{% endblock %}
+{% block page_title %}Gestion des Rotations{% endblock %}
+{% block breadcrumb %}Rotations{% endblock %}
+
+{% block stylesheets %}
+.stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
+.stat-card { background:var(--white); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px 24px; display:flex; align-items:center; gap:16px; }
+.stat-icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+.stat-icon.green  { background:#D1FAE5; color:#065F46; }
+.stat-icon.blue   { background:#DBEAFE; color:#1D4ED8; }
+.stat-icon.red    { background:#FEE2E2; color:#DC2626; }
+.stat-icon.yellow { background:#FEF3C7; color:#92400E; }
+.stat-value { font-size:24px; font-weight:700; color:var(--navy); line-height:1; }
+.stat-label { font-size:12px; color:var(--text-muted); margin-top:4px; }
+.toolbar { display:flex; align-items:center; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
+.search-box { position:relative; flex:1; min-width:220px; }
+.search-box input { width:100%; padding:10px 14px 10px 38px; border:1.5px solid var(--cream-dark); border-radius:8px; font-size:14px; font-family:'DM Sans',sans-serif; background:var(--white); color:var(--navy); }
+.search-box input:focus { outline:none; border-color:var(--green-accent); }
+.search-box i { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:13px; }
+.filter-select { padding:10px 14px; border:1.5px solid var(--cream-dark); border-radius:8px; font-size:14px; font-family:'DM Sans',sans-serif; background:var(--white); color:var(--navy); cursor:pointer; }
+.btn-primary { display:inline-flex; align-items:center; gap:8px; background:var(--green-accent); color:white; padding:10px 20px; border-radius:var(--radius); font-size:14px; font-weight:600; text-decoration:none; border:none; cursor:pointer; white-space:nowrap; }
+.btn-primary:hover { background:var(--green-mid); }
+.result-count { font-size:13px; color:var(--text-muted); }
+.card { background:var(--white); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
+.flash-success { background:#D1FAE5; color:#065F46; padding:12px 18px; border-radius:var(--radius); margin-bottom:20px; font-size:14px; font-weight:500; display:flex; align-items:center; gap:8px; }
+.data-table { width:100%; border-collapse:collapse; }
+.data-table thead th { background:var(--cream); padding:13px 18px; text-align:left; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); border-bottom:1px solid var(--cream-dark); white-space:nowrap; cursor:pointer; user-select:none; }
+.data-table thead th:hover { color:var(--green-accent); }
+.data-table thead th .sort-icon { margin-left:5px; opacity:0.4; font-size:10px; }
+.data-table thead th.sort-asc .sort-icon,
+.data-table thead th.sort-desc .sort-icon { opacity:1; color:var(--green-accent); }
+.data-table tbody td { padding:14px 18px; font-size:14px; border-bottom:1px solid var(--cream-dark); vertical-align:middle; }
+.data-table tbody tr:last-child td { border-bottom:none; }
+.data-table tbody tr:hover { background:#FAFDF8; }
+.data-table tbody tr.hidden-row { display:none; }
+.badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; }
+.badge-active { background:#D1FAE5; color:#065F46; }
+.badge-inactive { background:#FEE2E2; color:#991B1B; }
+.actions { display:flex; gap:8px; align-items:center; }
+.btn-danger { background:#FEE2E2; color:#DC2626; border:none; padding:6px 12px; border-radius:7px; font-size:13px; cursor:pointer; }
+.btn-danger:hover { background:#FECACA; }
+.btn-edit { display:inline-flex; align-items:center; gap:5px; background:var(--cream-dark); color:var(--navy); border:1px solid #ddd; padding:6px 12px; border-radius:7px; font-size:13px; text-decoration:none; }
+.btn-show { display:inline-flex; align-items:center; gap:5px; background:#EFF6FF; color:#2563EB; border:1px solid #BFDBFE; padding:6px 12px; border-radius:7px; font-size:13px; text-decoration:none; }
+.empty-state { text-align:center; padding:60px 20px; color:var(--text-muted); }
+.no-results { text-align:center; padding:40px; color:var(--text-muted); display:none; }
+{% endblock %}
+
+{% block body %}
+
+{% for msg in app.flashes('success') %}
+<div class="flash-success"><i class="fa fa-check-circle"></i> {{ msg }}</div>
+{% endfor %}
+
+{# ══ STATS ══ #}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon green"><i class="fa fa-rotate"></i></div>
+        <div><div class="stat-value">{{ total }}</div><div class="stat-label">Total rotations</div></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon blue"><i class="fa fa-circle-check"></i></div>
+        <div><div class="stat-value">{{ actifs }}</div><div class="stat-label">Actives</div></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon red"><i class="fa fa-circle-xmark"></i></div>
+        <div><div class="stat-value">{{ inactifs }}</div><div class="stat-label">Inactives</div></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon yellow"><i class="fa fa-calendar-days"></i></div>
+        <div><div class="stat-value">{{ dureeMoyenne ?? '—' }}</div><div class="stat-label">Durée moy. (jours)</div></div>
+    </div>
+</div>
+
+{# ══ TOOLBAR ══ #}
+<div class="toolbar">
+    <div class="search-box">
+        <i class="fa fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" placeholder="Rechercher par terrain, plante…">
+    </div>
+    <select class="filter-select" id="filterStatus">
+        <option value="">Tous les statuts</option>
+        <option value="Actif">Actif</option>
+        <option value="Inactif">Inactif</option>
+    </select>
+    <span class="result-count" id="resultCount"></span>
+    <a href="{{ path('admin_rotations_new') }}" class="btn-primary">
+        <i class="fa fa-plus"></i> Nouvelle rotation
+    </a>
+</div>
+
+{# ══ TABLE ══ #}
+<div class="card">
+    {% if rotations is empty %}
+    <div class="empty-state">
+        <i class="fa fa-rotate" style="font-size:48px;opacity:0.3;display:block;margin-bottom:16px"></i>
+        <p>Aucune rotation enregistrée.</p>
+    </div>
+    {% else %}
+    <table class="data-table" id="rotationTable">
+        <thead>
+            <tr>
+                <th data-col="0"># <i class="fa fa-sort sort-icon"></i></th>
+                <th data-col="1">Terrain <i class="fa fa-sort sort-icon"></i></th>
+                <th data-col="2">Plante <i class="fa fa-sort sort-icon"></i></th>
+                <th data-col="3">Date début <i class="fa fa-sort sort-icon"></i></th>
+                <th data-col="4">Date fin <i class="fa fa-sort sort-icon"></i></th>
+                <th data-col="5">Statut <i class="fa fa-sort sort-icon"></i></th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="rotationBody">
+        {% for rotation in rotations %}
+            <tr data-terrain="{{ rotation.terrain.nomTerrain|lower }}"
+                data-plante="{{ rotation.plante.nomP|lower }}"
+                data-status="{{ rotation.status ? 'Actif' : 'Inactif' }}">
+                <td style="color:var(--text-muted);font-family:'DM Mono',monospace;font-size:13px">#{{ rotation.id }}</td>
+                <td><strong>{{ rotation.terrain.nomTerrain }}</strong></td>
+                <td>{{ rotation.plante.nomP }}</td>
+                <td>{{ rotation.dateDebut|date('d/m/Y') }}</td>
+                <td>{{ rotation.dateFin|date('d/m/Y') }}</td>
+                <td>
+                    <span class="badge {{ rotation.status ? 'badge-active' : 'badge-inactive' }}">
+                        {{ rotation.status ? 'Actif' : 'Inactif' }}
+                    </span>
+                </td>
+                <td>
+                    <div class="actions">
+                        <a href="{{ path('admin_rotations_show', {id: rotation.id}) }}" class="btn-show">
+                            <i class="fa fa-eye"></i>
+                        </a>
+                        <a href="{{ path('admin_rotations_edit', {id: rotation.id}) }}" class="btn-edit">
+                            <i class="fa fa-pen"></i>
+                        </a>
+                        <form method="post"
+                              action="{{ path('admin_rotations_delete', {id: rotation.id}) }}"
+                              onsubmit="return confirm('Supprimer cette rotation ?')">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete'~rotation.id) }}">
+                            <button class="btn-danger"><i class="fa fa-trash"></i></button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="no-results" id="noResults">
+        <i class="fa fa-magnifying-glass" style="font-size:32px;opacity:0.3;display:block;margin-bottom:12px"></i>
+        Aucun résultat trouvé.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+const searchInput = document.getElementById('searchInput');
+const filterStatus = document.getElementById('filterStatus');
+const resultCount  = document.getElementById('resultCount');
+const noResults    = document.getElementById('noResults');
+const tbody        = document.getElementById('rotationBody');
+
+function filterTable() {
+    const q      = searchInput.value.toLowerCase().trim();
+    const status = filterStatus.value;
+    const rows   = tbody ? tbody.querySelectorAll('tr') : [];
+    let visible  = 0;
+
+    rows.forEach(row => {
+        const terrain = row.dataset.terrain || '';
+        const plante  = row.dataset.plante  || '';
+        const st      = row.dataset.status  || '';
+
+        const matchSearch = !q || terrain.includes(q) || plante.includes(q);
+        const matchStatus = !status || st === status;
+
+        if (matchSearch && matchStatus) {
+            row.classList.remove('hidden-row');
+            visible++;
+        } else {
+            row.classList.add('hidden-row');
+        }
+    });
+
+    resultCount.textContent = visible + ' résultat' + (visible > 1 ? 's' : '');
+    if (noResults) noResults.style.display = visible === 0 ? 'block' : 'none';
+}
+
+if (searchInput)  searchInput.addEventListener('input', filterTable);
+if (filterStatus) filterStatus.addEventListener('change', filterTable);
+window.addEventListener('DOMContentLoaded', filterTable);
+
+// ── Tri par colonne ──────────────────────────────────────
+let sortCol = -1, sortAsc = true;
+
+document.querySelectorAll('th[data-col]').forEach(th => {
+    th.addEventListener('click', () => {
+        const col = parseInt(th.dataset.col);
+
+        document.querySelectorAll('th[data-col]').forEach(t => {
+            t.classList.remove('sort-asc','sort-desc');
+            t.querySelector('.sort-icon').className = 'fa fa-sort sort-icon';
+        });
+
+        sortAsc = sortCol === col ? !sortAsc : true;
+        sortCol = col;
+
+        th.classList.add(sortAsc ? 'sort-asc' : 'sort-desc');
+        th.querySelector('.sort-icon').className =
+            'fa fa-sort-' + (sortAsc ? 'up' : 'down') + ' sort-icon';
+
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        rows.sort((a, b) => {
+            const aVal = a.cells[col]?.textContent.trim() || '';
+            const bVal = b.cells[col]?.textContent.trim() || '';
+            const aNum = parseFloat(aVal.replace(/[^\d.]/g, ''));
+            const bNum = parseFloat(bVal.replace(/[^\d.]/g, ''));
+            if (!isNaN(aNum) && !isNaN(bNum)) return sortAsc ? aNum-bNum : bNum-aNum;
+            return sortAsc ? aVal.localeCompare(bVal,'fr') : bVal.localeCompare(aVal,'fr');
+        });
+        rows.forEach(r => tbody.appendChild(r));
+        filterTable();
+    });
+});
+</script>
+{% endblock %}
