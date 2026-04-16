@@ -1,0 +1,35 @@
+{% if is_granted('ROLE_ADMIN') %}
+    {% set layout = 'base_admin.html.twig' %}
+    {% set cancel_route = 'app_tache_index' %}
+{% elseif is_granted('ROLE_AGRICULTEUR') %}
+    {% set layout = 'base_agriculteur.html.twig' %}
+    {% set cancel_route = 'app_tache_front' %}
+
+{% endif %}
+{% extends layout %} 
+{% block title %}Nouvelle Tâche - AgroFlow{% endblock %}
+
+{% block body %}
+<div style="padding:30px; font-family:Arial,sans-serif; max-width:700px; margin:0 auto;">
+    <div style="margin-bottom:25px;">
+        <a href="{{ path(cancel_route) }}" style="color:#888; text-decoration:none; font-size:14px;">
+            <i class="fa fa-arrow-left"></i> Retour
+        </a>
+        <h2 style="margin:10px 0 0; color:#2C3E50;">Nouvelle tâche</h2>
+    </div>
+
+    <div style="background:white; border-radius:12px; padding:30px; box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+        {{ form_start(form) }}
+            {% include 'User/formTache.html.twig' %}
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <a href="{{ path(cancel_route) }}" style="flex:1; text-align:center; background:#e0e0e0; color:#333; padding:14px; border-radius:8px; font-size:15px; font-weight:600; text-decoration:none;">
+                    <i class="fa fa-times"></i> Annuler
+                </a>
+                <button type="submit" style="flex:2; background:#2D5A27; color:white; padding:14px; border:none; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer;">
+                    <i class="fa fa-save"></i> Créer la tâche
+                </button>
+            </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}

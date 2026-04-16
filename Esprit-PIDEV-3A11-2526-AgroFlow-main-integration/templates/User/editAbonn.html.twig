@@ -1,0 +1,42 @@
+{% extends 'base_admin.html.twig' %}
+
+{% block title %}Modifier Abonnement #{{ abonnement.idAbonn }} — AgroFlow Admin{% endblock %}
+{% block page_title %}Modifier l'Abonnement{% endblock %}
+{% block breadcrumb %}
+    <a href="{{ path('admin_abonnements_index') }}" style="color:var(--green-accent);text-decoration:none;">Abonnements</a>
+    / <a href="{{ path('admin_abonnements_show', {idAbonn: abonnement.idAbonn}) }}" style="color:var(--green-accent);text-decoration:none;">#{{ abonnement.idAbonn }}</a>
+    / Modifier
+{% endblock %}
+
+{% block body %}
+<div style="max-width:720px;">
+    <div style="background:var(--white); border:1px solid var(--cream-dark); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden;">
+
+        <div style="padding:16px 22px; border-bottom:1px solid var(--cream-dark); display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:36px;height:36px;border-radius:10px;background:#FEF3C7;display:flex;align-items:center;justify-content:center;">
+                    <i class="fa fa-pen" style="color:#B45309;"></i>
+                </div>
+                <div>
+                    <div style="font-size:15px;font-weight:600;color:var(--navy);">Abonnement <span style="font-family:'DM Mono',monospace;">#{{ abonnement.idAbonn }}</span></div>
+                    <div style="font-size:12px;color:var(--text-muted);">CIN : {{ abonnement.cin }} — Offre : {{ abonnement.idOffre }}</div>
+                </div>
+            </div>
+            <span class="badge badge-{{ abonnement.situation }}" style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;">
+                {{ abonnement.situation|capitalize }}
+            </span>
+        </div>
+
+        <div style="padding:24px 22px;">
+            {{ include('User/formAbonn.html.twig') }}
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .badge-actif   { background:#D1FAE5; color:#065F46; }
+    .badge-inactif { background:#FEF3C7; color:#B45309; }
+    .badge-expire  { background:#FEE2E2; color:#DC2626; }
+</style>
+{% endblock %}

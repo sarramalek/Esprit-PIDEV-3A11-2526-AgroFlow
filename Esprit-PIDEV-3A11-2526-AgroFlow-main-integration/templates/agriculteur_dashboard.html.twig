@@ -1,0 +1,473 @@
+{% extends 'base_agriculteur.html.twig' %}
+
+{% block title %}Mon Espace — AgroFlow{% endblock %}
+
+{% block page_title %}Mon Espace{% endblock %}
+{% block breadcrumb %}AgroFlow / Agriculteur / Accueil{% endblock %}
+
+{% block stylesheets %}
+<style>
+    :root {
+        --g1: #1B3A20;
+        --g2: #2D5A27;
+        --g3: #4A8C3F;
+        --gp: #C8E6C0;
+        --gm: #EAF3E6;
+        --earth: #8B6914;
+        --ep:    #F5EDD8;
+        --cream: #FDFAF2;
+        --cb:    #EDE8D5;
+        --navy:  #1C2B3A;
+        --muted: #7A9080;
+        --white: #FFFFFF;
+        --r: 14px;
+        --rs: 10px;
+    }
+
+    .page { display: flex; flex-direction: column; gap: 28px; }
+
+    /* ── Welcome Banner ── */
+    .welcome {
+        background: var(--g1);
+        border-radius: 18px;
+        padding: 32px 36px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        overflow: hidden;
+        position: relative;
+    }
+    .welcome::before {
+        content: '';
+        position: absolute;
+        top: -60px; right: -60px;
+        width: 260px; height: 260px;
+        border-radius: 50%;
+        background: rgba(74,140,63,0.18);
+        pointer-events: none;
+    }
+    .welcome::after {
+        content: '';
+        position: absolute;
+        bottom: -80px; right: 100px;
+        width: 180px; height: 180px;
+        border-radius: 50%;
+        background: rgba(200,230,192,0.08);
+        pointer-events: none;
+    }
+    .welcome-text { position: relative; z-index: 1; }
+    .welcome-greeting {
+        font-size: 13px; font-weight: 500;
+        color: var(--gp);
+        letter-spacing: 0.06em; text-transform: uppercase;
+        margin-bottom: 6px;
+    }
+    .welcome-name {
+        font-family: 'Playfair Display', serif;
+        font-size: 28px; font-weight: 700;
+        color: #fff;
+        line-height: 1.2;
+        margin-bottom: 10px;
+    }
+    .welcome-sub { font-size: 14px; color: rgba(255,255,255,0.55); }
+
+    .welcome-stats {
+        display: flex; gap: 20px;
+        position: relative; z-index: 1;
+    }
+    .wstat {
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 14px;
+        padding: 16px 22px;
+        text-align: center;
+        min-width: 90px;
+    }
+    .wstat-val {
+        font-size: 26px; font-weight: 700;
+        color: var(--gp); line-height: 1;
+    }
+    .wstat-label { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 5px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* ── Section title ── */
+    .section-head {
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: 16px;
+    }
+    .section-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 17px; color: var(--g1);
+        display: flex; align-items: center; gap: 10px;
+    }
+    .section-title i { font-size: 14px; color: var(--g3); }
+    .section-link {
+        font-size: 12px; font-weight: 600;
+        color: var(--g3); text-decoration: none;
+        display: flex; align-items: center; gap: 5px;
+        border: 1px solid var(--gm);
+        padding: 5px 12px; border-radius: 20px;
+        transition: all 0.2s;
+    }
+    .section-link:hover { background: var(--gm); color: var(--g1); }
+
+    /* ── Modules Grid (5 icons) ── */
+    .modules-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 14px;
+    }
+    .module-card {
+        background: var(--white);
+        border: 1px solid var(--cb);
+        border-radius: var(--r);
+        padding: 22px 16px 18px;
+        text-align: center;
+        text-decoration: none;
+        transition: all 0.25s;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+    .module-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 3px;
+        background: var(--accent, var(--g3));
+        border-radius: 3px 3px 0 0;
+        transform: scaleX(0);
+        transition: transform 0.25s;
+    }
+    .module-card:hover { transform: translateY(-3px); border-color: var(--accent, var(--g3)); box-shadow: 0 8px 24px rgba(0,0,0,0.07); }
+    .module-card:hover::before { transform: scaleX(1); }
+
+    .module-icon-wrap {
+        width: 56px; height: 56px;
+        border-radius: 16px;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto 14px;
+        font-size: 22px;
+    }
+    .module-name {
+        font-size: 13px; font-weight: 600;
+        color: var(--navy); line-height: 1.3;
+    }
+    .module-count {
+        font-size: 11px; color: var(--muted);
+        margin-top: 4px;
+    }
+
+    /* ── Two-col layout ── */
+    .two-col {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 20px;
+    }
+
+    /* ── Abonnement Card ── */
+    .abo-card {
+        background: var(--white);
+        border: 1px solid var(--cb);
+        border-radius: var(--r);
+        overflow: hidden;
+    }
+    .abo-header {
+        padding: 18px 22px 14px;
+        border-bottom: 1px solid var(--cb);
+    }
+    .abo-body { padding: 18px 22px; }
+
+    .abo-plan {
+        background: linear-gradient(135deg, var(--g1) 0%, var(--g2) 100%);
+        border-radius: 12px;
+        padding: 18px 20px;
+        display: flex; align-items: center; gap: 16px;
+        margin-bottom: 16px;
+        position: relative; overflow: hidden;
+    }
+    .abo-plan::after {
+        content: '';
+        position: absolute; top: -20px; right: -20px;
+        width: 80px; height: 80px; border-radius: 50%;
+        background: rgba(200,230,192,0.12);
+    }
+    .abo-plan-icon {
+        width: 46px; height: 46px; border-radius: 12px;
+        background: rgba(255,255,255,0.15);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 20px; color: var(--gp); flex-shrink: 0;
+    }
+    .abo-plan-info { flex: 1; }
+    .abo-plan-name { font-size: 16px; font-weight: 700; color: #fff; }
+    .abo-plan-price {
+        font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 2px;
+    }
+    .abo-plan-badge {
+    background: rgba(111,224,101,0.2);
+    border: 1px solid rgba(111,224,101,0.35);
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+    .abo-plan-badge::before {
+        content: ''; width: 6px; height: 6px;
+        border-radius: 50%; background: #6FE065;
+    }
+
+    .abo-perks {
+        display: grid; grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+    .abo-perk {
+        display: flex; align-items: center; gap: 9px;
+        background: var(--gm);
+        border-radius: var(--rs); padding: 10px 12px;
+    }
+    .abo-perk-icon {
+        width: 30px; height: 30px; border-radius: 8px;
+        background: var(--white);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 14px; flex-shrink: 0;
+    }
+    .abo-perk-label { font-size: 12px; font-weight: 500; color: var(--g1); }
+
+    .abo-progress { margin-top: 16px; }
+    .abo-progress-label {
+        display: flex; justify-content: space-between;
+        font-size: 12px; color: var(--muted); margin-bottom: 7px;
+    }
+    .progress-bar {
+        height: 6px; background: var(--cb);
+        border-radius: 6px; overflow: hidden;
+    }
+    .progress-fill {
+        height: 100%; background: var(--g3);
+        border-radius: 6px;
+        transition: width 1s ease;
+    }
+
+    /* ── Événements List ── */
+    .events-card {
+        background: var(--white);
+        border: 1px solid var(--cb);
+        border-radius: var(--r);
+        overflow: hidden;
+    }
+    .events-header {
+        padding: 18px 20px 14px;
+        border-bottom: 1px solid var(--cb);
+    }
+    .event-item {
+        display: flex; align-items: flex-start; gap: 13px;
+        padding: 14px 20px;
+        border-bottom: 1px solid var(--cb);
+        transition: background 0.15s;
+    }
+    .event-item:last-child { border-bottom: none; }
+    .event-item:hover { background: var(--cream); }
+
+    .event-date-box {
+        min-width: 44px;
+        background: var(--gm);
+        border: 1px solid var(--cb);
+        border-radius: 10px;
+        text-align: center;
+        padding: 6px 8px;
+        flex-shrink: 0;
+    }
+    .event-day { font-size: 18px; font-weight: 700; color: var(--g1); line-height: 1; }
+    .event-mon { font-size: 10px; font-weight: 600; color: var(--g3); text-transform: uppercase; letter-spacing: 0.05em; }
+
+    .event-info { flex: 1; min-width: 0; }
+    .event-name { font-size: 14px; font-weight: 600; color: var(--navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .event-meta { font-size: 12px; color: var(--muted); margin-top: 3px; display: flex; gap: 10px; align-items: center; }
+    .event-meta i { font-size: 11px; }
+
+    .event-badge {
+        font-size: 10px; font-weight: 600;
+        padding: 3px 9px; border-radius: 20px;
+        flex-shrink: 0;
+    }
+    .badge-confirmed { background: #E8F5E2; color: #2D5A27; }
+    .badge-pending   { background: var(--ep); color: var(--earth); }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="page">
+
+    {# ── Bannière ── #}
+    <div class="welcome">
+        <div class="welcome-text">
+            <div class="welcome-greeting">Bonjour</div>
+            <div class="welcome-name">{{ app.user.prenom }} {{ app.user.nom }} 👋</div>
+            <div class="welcome-sub">Voici un aperçu de votre exploitation aujourd'hui</div>
+        </div>
+        <div class="welcome-stats">
+            <div class="wstat">
+                <div class="wstat-val">{{ animaux|default(0) }}</div>
+                <div class="wstat-label">Animaux</div>
+            </div>
+            <div class="wstat">
+                <div class="wstat-val">{{ terrains|default(0) }}</div>
+                <div class="wstat-label">Terrains</div>
+            </div>
+            
+            <div class="wstat">
+                <div class="wstat-val">{{ machines|default(0) }}</div>
+                <div class="wstat-label">Machines</div>
+            </div>
+        </div>
+    </div>
+
+    {# ── 5 Modules ── #}
+    <div>
+        <div class="section-head">
+            <div class="section-title"><i class="fa fa-grip"></i> Mes modules</div>
+        </div>
+        <div class="modules-grid">
+
+            <a href="{{ path('agri_animaux') }}" class="module-card" style="--accent:#2D5A27;">
+                <div class="module-icon-wrap" style="background:#EAF3E6;">
+                    <i class="fa fa-paw" style="color:#2D5A27; font-size:22px;"></i>
+                </div>
+                <div class="module-name">Mes Animaux</div>
+                <div class="module-count">Animaux & examens</div>
+            </a>
+
+            <a href="{{ path('agri_categories') }}" class="module-card" style="--accent:#185FA5;">
+                <div class="module-icon-wrap" style="background:#E6F1FB;">
+                    <i class="fa fa-boxes-stacked" style="color:#185FA5; font-size:22px;"></i>
+                </div>
+                <div class="module-name">Mes Stocks</div>
+                <div class="module-count">Produits & catégories</div>
+            </a>
+
+            <a href="{{ path('agri_terrains') }}" class="module-card" style="--accent:#8B6914;">
+                <div class="module-icon-wrap" style="background:#F5EDD8;">
+                    <i class="fa fa-map" style="color:#8B6914; font-size:22px;"></i>
+                </div>
+                <div class="module-name">Mes Terrains</div>
+                <div class="module-count">Terrains & rotations</div>
+            </a>
+
+            <a href="{{ path('agriculteur_evenement_index') }}" class="module-card" style="--accent:#7F77DD;">
+                <div class="module-icon-wrap" style="background:#EEEDFE;">
+                    <i class="fa fa-calendar-days" style="color:#7F77DD; font-size:22px;"></i>
+                </div>
+                <div class="module-name">Événements</div>
+                <div class="module-count">Événements & particip.</div>
+            </a>
+
+             <a href="{{ path('agri_machines') }}" class="module-card" style="--accent:#D85A30;">
+                <div class="module-icon-wrap" style="background:#FAECE7;">
+                    <i class="fa fa-tractor" style="color:#D85A30; font-size:22px;"></i>
+                </div>
+                <div class="module-name">Matériels</div>
+                <div class="module-count">Machines & maintenances.</div>
+            </a>
+
+        </div>
+    </div>
+
+    {# ── Abonnement + Événements ── #}
+    <div class="two-col">
+
+        {# Abonnement #}
+        {# Abonnement #}
+<div class="abo-card">
+    <div class="abo-header">
+        <div class="section-head" style="margin-bottom:0;">
+            <div class="section-title"><i class="fa fa-crown"></i> Mes abonnements actifs</div>
+            <a href="{{ path('app_abonnement_front') }}" class="section-link">Gérer <i class="fa fa-arrow-right" style="font-size:10px;"></i></a>
+        </div>
+    </div>
+    <div class="abo-body">
+
+       {% if abonnementsActifs is defined and abonnementsActifs|length > 0 %}
+    {% set gradients = [
+        'linear-gradient(135deg, #3a7d44 0%, #57a55a 100%)',
+        'linear-gradient(135deg, #4a8c3f 0%, #6db56b 100%)',
+        'linear-gradient(135deg, #2d7a4f 0%, #4aad7a 100%)',
+    ] %}
+    {% for a in abonnementsActifs %}
+    <div class="abo-plan" style="background: {{ gradients[loop.index0 % 3] }}; margin-bottom: {{ not loop.last ? '12px' : '0' }};">
+        <div class="abo-plan-icon">
+            <i class="fa fa-crown"></i>
+        </div>
+        <div class="abo-plan-info">
+            <div class="abo-plan-name">{{ a.nomOffre }}</div>
+            <div class="abo-plan-price">{{ a.duree }} jours</div>
+        </div>
+        <div class="abo-plan-badge">Actif</div>
+    </div>
+    {% endfor %}
+
+        {% else %}
+            <div style="text-align:center; padding: 30px 20px;">
+                <div style="width:64px;height:64px;border-radius:18px;background:var(--gm);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                    <i class="fa fa-crown" style="font-size:26px;color:var(--g3);"></i>
+                </div>
+                <div style="font-size:15px;font-weight:600;color:var(--navy);margin-bottom:6px;">Aucun abonnement actif</div>
+                <div style="font-size:13px;color:var(--muted);margin-bottom:18px;">Souscrivez à une offre pour accéder à toutes les fonctionnalités</div>
+                <a href="{{ path('app_offre_front') }}"
+                   style="display:inline-flex;align-items:center;gap:8px;background:var(--g2);color:white;padding:10px 22px;border-radius:10px;text-decoration:none;font-size:13px;font-weight:600;">
+                    <i class="fa fa-star"></i> Voir les offres
+                </a>
+            </div>
+        {% endif %}
+
+    </div>
+</div>
+
+        {# Événements #}
+        <div class="events-card">
+            <div class="events-header">
+                <div class="section-head" style="margin-bottom:0;">
+                    <div class="section-title"><i class="fa fa-calendar-days"></i> Mes événements</div>
+                    <a href="{{ path('agri_participations') }}" class="section-link">Voir tout <i class="fa fa-arrow-right" style="font-size:10px;"></i></a>
+                </div>
+            </div>
+
+            {% if participations is defined and participations|length > 0 %}
+                {% for participation in participations|slice(0, 4) %}
+                <div class="event-item">
+                    <div class="event-date-box">
+                        <div class="event-day">{{ participation.evenement.date|date('d') }}</div>
+                        <div class="event-mon">{{ participation.evenement.date|date('M') }}</div>
+                    </div>
+                    <div class="event-info">
+                        <div class="event-name">{{ participation.evenement.nom }}</div>
+                        <div class="event-meta">
+                            <span><i class="fa fa-location-dot"></i> {{ participation.evenement.lieu ?? 'Tunisie' }}</span>
+                        </div>
+                    </div>
+                    <span class="event-badge {{ participation.statut == 'confirmé' ? 'badge-confirmed' : 'badge-pending' }}">
+                        {{ participation.statut ?? 'En attente' }}
+                    </span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div style="text-align:center; padding:36px 20px;">
+                    <div style="width:56px;height:56px;border-radius:16px;background:#EEEDFE;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
+                        <i class="fa fa-calendar-xmark" style="font-size:22px;color:#7F77DD;"></i>
+                    </div>
+                    <div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:6px;">Aucune participation</div>
+                    <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">Inscrivez-vous à des événements agricoles</div>
+                    <a href="{{ path('agriculteur_evenement_index') }}"
+                       style="display:inline-flex;align-items:center;gap:7px;background:#EEEDFE;color:#534AB7;padding:9px 18px;border-radius:10px;text-decoration:none;font-size:12px;font-weight:600;">
+                        <i class="fa fa-search"></i> Explorer les événements
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

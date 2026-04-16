@@ -1,0 +1,296 @@
+{% extends 'base_agriculteur.html.twig' %}
+
+{% block title %}Événements disponibles - AgroFlow{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .evt-page { max-width: 1100px; margin: 0 auto; }
+
+    /* ── Header ── */
+    .evt-header {
+        display: flex; align-items: flex-end;
+        justify-content: space-between;
+        margin-bottom: 28px; flex-wrap: wrap; gap: 14px;
+    }
+    .evt-header h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 28px; color: #1B3A20; margin: 0 0 4px;
+    }
+    .evt-header p { color: #7a9070; font-size: 14px; margin: 0; }
+
+    .btn-participations {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 10px 18px; border-radius: 10px;
+        border: 1.5px solid #2D5A27; background: transparent;
+        color: #2D5A27; font-size: 13px; font-weight: 600;
+        text-decoration: none; transition: all 0.2s;
+    }
+    .btn-participations:hover { background: #2D5A27; color: white; }
+
+    /* ── Filtres ── */
+    .evt-filters {
+        background: white; border-radius: 14px;
+        padding: 20px 24px; margin-bottom: 28px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .evt-filters .filter-title {
+        font-size: 12px; font-weight: 600; color: #aaa;
+        text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 14px;
+    }
+    .filter-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;
+        gap: 12px; align-items: end;
+    }
+    .filter-field label { display: block; font-size: 11px; color: #999; margin-bottom: 5px; font-weight: 500; }
+    .filter-field input,
+    .filter-field select {
+        width: 100%; border: 1.5px solid #e8e8e8; border-radius: 9px;
+        padding: 9px 12px; font-size: 13px; color: #2C3E50;
+        background: #fafafa; outline: none; transition: border 0.2s;
+        font-family: 'DM Sans', sans-serif;
+    }
+    .filter-field input:focus,
+    .filter-field select:focus { border-color: #4A8C3F; background: white; }
+
+    .btn-filter {
+        display: inline-flex; align-items: center; gap: 7px;
+        padding: 10px 18px; border-radius: 9px;
+        background: #2D5A27; color: white; border: none;
+        font-size: 13px; font-weight: 600; cursor: pointer;
+        transition: background 0.2s; font-family: 'DM Sans', sans-serif;
+        white-space: nowrap;
+    }
+    .btn-filter:hover { background: #1B3A20; }
+    .btn-reset {
+        font-size: 12px; color: #aaa; text-decoration: none;
+        display: inline-flex; align-items: center; gap: 5px;
+        margin-top: 10px; transition: color 0.2s;
+    }
+    .btn-reset:hover { color: #555; }
+
+    /* ── Résultats ── */
+    .evt-results-bar {
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: 18px;
+    }
+    .evt-results-bar span { font-size: 13px; color: #999; }
+    .evt-results-bar strong { color: #2D5A27; }
+
+    /* ── Cards grille ── */
+    .evt-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+
+    .evt-card {
+        background: white; border-radius: 14px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        overflow: hidden; display: flex; flex-direction: column;
+        transition: box-shadow 0.2s, transform 0.2s;
+        border: 1.5px solid #f0f0f0;
+    }
+    .evt-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.1); transform: translateY(-2px); }
+
+    /* Bandeau coloré haut */
+    .evt-card-top {
+        height: 6px;
+        background: linear-gradient(90deg, #4A8C3F, #2D5A27);
+    }
+    .evt-card-top.termine  { background: linear-gradient(90deg, #1976D2, #0d47a1); }
+    .evt-card-top.annule   { background: linear-gradient(90deg, #e74c3c, #c0392b); }
+
+    .evt-card-body { padding: 18px 20px; flex: 1; display: flex; flex-direction: column; }
+
+    .evt-card-type {
+        font-size: 10px; font-weight: 700; text-transform: uppercase;
+        letter-spacing: 0.08em; color: #4A8C3F; margin-bottom: 8px;
+    }
+    .evt-card h5 {
+        font-family: 'Playfair Display', serif;
+        font-size: 16px; color: #1B3A20; margin: 0 0 12px;
+        line-height: 1.35;
+    }
+
+    .evt-meta { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+    .evt-meta-item {
+        display: flex; align-items: center; gap: 8px;
+        font-size: 12px; color: #666;
+    }
+    .evt-meta-item i { width: 14px; text-align: center; color: #4A8C3F; font-size: 11px; }
+
+    .evt-desc {
+        font-size: 12px; color: #999; line-height: 1.55;
+        flex: 1; margin-bottom: 16px;
+    }
+
+    /* Badges statut */
+    .evt-badge {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 3px 10px; border-radius: 20px;
+        font-size: 11px; font-weight: 700; margin-bottom: 14px;
+    }
+    .evt-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.6; }
+    .evt-badge-planifie  { background: #E8F5E9; color: #2E7D32; }
+    .evt-badge-termine   { background: #E3F2FD; color: #1976D2; }
+    .evt-badge-annule    { background: #FFEBEE; color: #C62828; }
+
+    /* Boutons action */
+    .btn-inscrire {
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        padding: 11px; border-radius: 10px;
+        background: #2D5A27; color: white;
+        text-decoration: none; font-size: 13px; font-weight: 600;
+        transition: background 0.2s; border: none; cursor: pointer;
+        font-family: 'DM Sans', sans-serif;
+    }
+    .btn-inscrire:hover { background: #1B3A20; color: white; }
+
+    .btn-indisponible {
+        display: flex; align-items: center; justify-content: center;
+        padding: 11px; border-radius: 10px;
+        background: #f5f5f5; color: #bbb;
+        font-size: 13px; font-weight: 600;
+        border: 1.5px solid #eee; cursor: not-allowed;
+    }
+
+    /* ── Empty state ── */
+    .evt-empty {
+        grid-column: 1 / -1;
+        text-align: center; padding: 60px 24px;
+        background: white; border-radius: 14px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .evt-empty i { font-size: 40px; color: #ddd; margin-bottom: 14px; display: block; }
+    .evt-empty p { font-size: 14px; color: #bbb; }
+
+    @media (max-width: 900px) { .evt-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) {
+        .evt-grid { grid-template-columns: 1fr; }
+        .filter-grid { grid-template-columns: 1fr 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="evt-page">
+
+    {# ── En-tête ── #}
+    <div class="evt-header">
+        <div>
+            <h1><i class="fa fa-calendar-days" style="font-size:22px;margin-right:10px;color:#4A8C3F;"></i>Événements disponibles</h1>
+            <p>Découvrez et inscrivez-vous aux événements agricoles</p>
+        </div>
+        <a href="{{ path('agriculteur_participation_index') }}" class="btn-participations">
+            <i class="fa fa-ticket"></i> Mes participations
+        </a>
+    </div>
+
+    {# ── Filtres ── #}
+    <div class="evt-filters">
+        <div class="filter-title"><i class="fa fa-sliders" style="margin-right:6px;"></i>Filtres</div>
+        <form method="GET" action="{{ path('agriculteur_evenement_index') }}">
+            <div class="filter-grid">
+                <div class="filter-field">
+                    <label>Recherche</label>
+                    <input type="text" name="search" value="{{ search }}" placeholder="Titre de l'événement…">
+                </div>
+                <div class="filter-field">
+                    <label>Date début</label>
+                    <input type="date" name="dateDebut" value="{{ dateDebutFiltre }}">
+                </div>
+                <div class="filter-field">
+                    <label>Date fin</label>
+                    <input type="date" name="dateFin" value="{{ dateFinFiltre }}">
+                </div>
+                <div class="filter-field">
+                    <label>Lieu</label>
+                    <input type="text" name="lieu" value="{{ lieuFiltre }}" placeholder="Ville, région…">
+                </div>
+                <div class="filter-field">
+                    <label>Statut</label>
+                    <select name="statut">
+                        <option value="">Tous</option>
+                        <option value="Planifié" {% if statutFiltre == 'Planifié' %}selected{% endif %}>Planifié</option>
+                        <option value="Terminé"  {% if statutFiltre == 'Terminé'  %}selected{% endif %}>Terminé</option>
+                        <option value="Annulé"   {% if statutFiltre == 'Annulé'   %}selected{% endif %}>Annulé</option>
+                    </select>
+                </div>
+                <div>
+                    <button type="submit" class="btn-filter">
+                        <i class="fa fa-magnifying-glass"></i> Filtrer
+                    </button>
+                </div>
+            </div>
+            {% if search or dateDebutFiltre or dateFinFiltre or lieuFiltre or statutFiltre %}
+            <div>
+                <a href="{{ path('agriculteur_evenement_index') }}" class="btn-reset">
+                    <i class="fa fa-xmark"></i> Réinitialiser les filtres
+                </a>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+
+    {# ── Barre résultats ── #}
+    <div class="evt-results-bar">
+        <span><strong>{{ total }}</strong> événement{{ total > 1 ? 's' : '' }} trouvé{{ total > 1 ? 's' : '' }}</span>
+    </div>
+
+    {# ── Grille événements ── #}
+    <div class="evt-grid">
+        {% for evenement in evenements %}
+            {% set statut_lower = evenement.statut|lower|replace({'é':'e','è':'e'}) %}
+            <div class="evt-card">
+                <div class="evt-card-top {{ statut_lower == 'termine' ? 'termine' : (statut_lower == 'annule' ? 'annule' : '') }}"></div>
+                <div class="evt-card-body">
+
+                    {% if evenement.typeEvenement %}
+                        <div class="evt-card-type">{{ evenement.typeEvenement }}</div>
+                    {% endif %}
+
+                    <h5>{{ evenement.titre }}</h5>
+
+                    <div class="evt-meta">
+                        <div class="evt-meta-item">
+                            <i class="fa fa-calendar"></i>
+                            Du {{ evenement.dateDebut|date('d/m/Y') }} au {{ evenement.dateFin|date('d/m/Y') }}
+                        </div>
+                        {% if evenement.lieu %}
+                        <div class="evt-meta-item">
+                            <i class="fa fa-location-dot"></i>
+                            {{ evenement.lieu }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    {% if evenement.description %}
+                        <p class="evt-desc">{{ evenement.description|slice(0, 110) }}…</p>
+                    {% endif %}
+
+                    <span class="evt-badge evt-badge-{{ statut_lower }}">{{ evenement.statut }}</span>
+
+                    {% if evenement.statut in ['Planifié', 'planifie', 'Planifie'] %}
+                        <a href="{{ path('agriculteur_evenement_inscription', {id: evenement.idEvenement}) }}"
+                           class="btn-inscrire">
+                            <i class="fa fa-pen-to-square"></i> S'inscrire
+                        </a>
+                    {% else %}
+                        <div class="btn-indisponible">
+                            <i class="fa fa-ban" style="margin-right:6px;"></i> Inscription non disponible
+                        </div>
+                    {% endif %}
+
+                </div>
+            </div>
+        {% else %}
+            <div class="evt-empty">
+                <i class="fa fa-calendar-xmark"></i>
+                <p>Aucun événement trouvé pour ces critères.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

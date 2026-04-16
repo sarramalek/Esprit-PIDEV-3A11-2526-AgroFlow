@@ -1,0 +1,29 @@
+{% extends 'base_agriculteur.html.twig' %}
+
+{% block title %}AgroFlow - Modifier {{ animaux.nom }}{% endblock %}
+
+{% block body %}
+    <div style="padding: 10px;">
+        <!-- Header : Breadcrumb -->
+        <div style="margin-bottom: 25px; color: #666; font-size: 14px;">
+            <span>Gestion</span> <i class="fa fa-chevron-right" style="font-size: 10px; margin: 0 5px;"></i> 
+            <span>Animaux</span> <i class="fa fa-chevron-right" style="font-size: 10px; margin: 0 5px;"></i> 
+            <strong style="color: #2C3E50;">Modifier</strong>
+        </div>
+
+        <div style="background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); max-width: 800px; margin: 0 auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <h2 style="color: #2C3E50; margin: 0; font-size: 24px; border-bottom: 3px solid #3498db; display: inline-block; padding-bottom: 8px;">Modifier : {{ animaux.nom }}</h2>
+                {{ include('Animals/animaux/_delete_form.html.twig') }}
+            </div>
+            
+            {{ include('Animals/animaux/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
+            
+            <div style="margin-top: 25px; border-top: 1px solid #EEE; padding-top: 20px;">
+                <a href="{{ path('app_animaux_index') }}" style="color: #7f8c8d; text-decoration: none; font-size: 14px; font-weight: 600;">
+                    <i class="fa fa-arrow-left"></i> Retour à la liste
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
