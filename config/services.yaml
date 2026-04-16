@@ -20,6 +20,11 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 # config/services.yaml
+    App\Service\TacheIAService:
+        arguments:
+            $groqApiKey: '%env(GROQ_API_KEY)%'
+
+
 
     App\EventListener\LogoutListener:
         tags:

@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Service\TacheIAService ; 
 
 #[Route('/agriculteur/ouvriers')]
 class Ouvrier_agriController extends AbstractController
@@ -283,5 +284,31 @@ public function assignationAuto(
     ));
 
     return $this->redirectToRoute('app_ouvrier_index');
+}
+#[Route('/tache/suggestion-ia', name: 'app_ouvrier_tache_ia_suggest', methods: ['GET'])]
+public function suggestionIA(\App\Service\TacheIAService $iaService): Response
+{
+    $agriculteur = $this->getUser();
+    try {
+        $suggestion = $iaService->genererSuggestion($agriculteur->getCin());
+        return $this->json($suggestion); // ex: { nom_tache, description, priorite, etat }
+    } catch (\Exception $e) {
+        return $this->json(['error' => $e->getMessage()], 500);
+    }
+}
+    #[Route('/debug-ia', name: 'app_test_ia', methods: ['GET'])]
+public function testIA(\App\Service\TacheIAService $iaService): Response
+{
+    try {
+        $result = $iaService->genererSuggestion($this->getUser()->getCin());
+        return $this->json(['ok' => true, 'result' => $result]);
+    } catch (\Throwable $e) {
+        return $this->json([
+            'error' => $e->getMessage(),
+            'class' => get_class($e),
+            'file'  => $e->getFile(),
+            'line'  => $e->getLine(),
+        ]);
+    }
 }
 }

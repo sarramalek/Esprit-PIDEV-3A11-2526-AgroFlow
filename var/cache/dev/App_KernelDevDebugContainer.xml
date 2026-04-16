@@ -817,6 +817,15 @@
     <service id="App\Service\PdfService" class="App\Service\PdfService" autowire="true" autoconfigure="true">
       <argument type="service" id="twig"/>
     </service>
+    <service id="App\Service\TacheIAService" class="App\Service\TacheIAService" autowire="true" autoconfigure="true">
+      <argument type="service" id=".debug.http_client"/>
+      <argument type="service" id="App\Repository\User\UserRepository"/>
+      <argument type="service" id="App\Repository\User\TacheRepository"/>
+      <argument type="service" id="App\Repository\Terrain\TerrainRepository"/>
+      <argument type="service" id="App\Repository\Materiels\MachineRepository"/>
+      <argument type="service" id="App\Repository\Animals\AnimauxRepository"/>
+      <argument>%env(GROQ_API_KEY)%</argument>
+    </service>
     <service id="argument_metadata_factory" class="Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory"/>
     <service id="argument_resolver.backed_enum_resolver" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueResolver">
       <tag priority="100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueResolver">controller.argument_value_resolver</tag>
@@ -844,7 +853,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.DSefLuM"/>
+      <argument type="service" id=".service_locator.dYM0LI2"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -3833,7 +3842,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.DSefLuM"/>
+      <argument type="service" id=".service_locator.dYM0LI2"/>
     </service>
     <service id="debug.log_processor" class="Symfony\Bridge\Monolog\Processor\DebugProcessor">
       <tag name="kernel.reset" method="reset"/>
@@ -9077,6 +9086,12 @@
         <argument key="terrainRepo" type="service_closure" id="App\Repository\Terrain\TerrainRepository"/>
       </argument>
     </service>
+    <service id=".service_locator.KlmpK5B" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="iaService" type="service_closure" id="App\Service\TacheIAService"/>
+      </argument>
+    </service>
     <service id=".service_locator.PhEk7tx" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -9165,7 +9180,7 @@
         <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
       </argument>
     </service>
-    <service id=".service_locator.DSefLuM" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.dYM0LI2" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Controller\AdminDashboardController::index" type="service_closure" id=".service_locator.qni5W9T"/>
@@ -9321,8 +9336,10 @@
         <argument key="App\Controller\User\Ouvrier_agriController::edit" type="service_closure" id=".service_locator.X8q_9sW"/>
         <argument key="App\Controller\User\Ouvrier_agriController::index" type="service_closure" id=".service_locator.sYplRBf"/>
         <argument key="App\Controller\User\Ouvrier_agriController::new" type="service_closure" id=".service_locator.ymeeUut"/>
+        <argument key="App\Controller\User\Ouvrier_agriController::suggestionIA" type="service_closure" id=".service_locator.KlmpK5B"/>
         <argument key="App\Controller\User\Ouvrier_agriController::supprimerTache" type="service_closure" id=".service_locator.xRuLM4F"/>
         <argument key="App\Controller\User\Ouvrier_agriController::taches" type="service_closure" id=".service_locator.DkDVX4k"/>
+        <argument key="App\Controller\User\Ouvrier_agriController::testIA" type="service_closure" id=".service_locator.KlmpK5B"/>
         <argument key="App\Controller\User\Ouvrier_agriController::updateEtatTache" type="service_closure" id=".service_locator.xRuLM4F"/>
         <argument key="App\Controller\User\TacheController::delete" type="service_closure" id=".service_locator.Mzhqy3N"/>
         <argument key="App\Controller\User\TacheController::edit" type="service_closure" id=".service_locator.z7LPJKP"/>
@@ -9509,8 +9526,10 @@
         <argument key="App\Controller\User\Ouvrier_agriController:edit" type="service_closure" id=".service_locator.X8q_9sW"/>
         <argument key="App\Controller\User\Ouvrier_agriController:index" type="service_closure" id=".service_locator.sYplRBf"/>
         <argument key="App\Controller\User\Ouvrier_agriController:new" type="service_closure" id=".service_locator.ymeeUut"/>
+        <argument key="App\Controller\User\Ouvrier_agriController:suggestionIA" type="service_closure" id=".service_locator.KlmpK5B"/>
         <argument key="App\Controller\User\Ouvrier_agriController:supprimerTache" type="service_closure" id=".service_locator.xRuLM4F"/>
         <argument key="App\Controller\User\Ouvrier_agriController:taches" type="service_closure" id=".service_locator.DkDVX4k"/>
+        <argument key="App\Controller\User\Ouvrier_agriController:testIA" type="service_closure" id=".service_locator.KlmpK5B"/>
         <argument key="App\Controller\User\Ouvrier_agriController:updateEtatTache" type="service_closure" id=".service_locator.xRuLM4F"/>
         <argument key="App\Controller\User\TacheController:delete" type="service_closure" id=".service_locator.Mzhqy3N"/>
         <argument key="App\Controller\User\TacheController:edit" type="service_closure" id=".service_locator.z7LPJKP"/>
@@ -12200,7 +12219,7 @@
     <service id="scheb_two_factor.provider_decider" alias="scheb_two_factor.default_provider_decider"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.w7.f4fT" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.DSefLuM"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.dYM0LI2"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id=".Psr\Log\LoggerInterface $request.logger" alias="monolog.logger.request"/>
@@ -12269,7 +12288,7 @@
     <service id=".service_locator.5pebkNV" alias=".service_locator.xxq2prQ"/>
     <service id=".service_locator.whdse4m" alias=".service_locator.yd.AI8F"/>
     <service id=".service_locator.8J1nalj" alias=".service_locator.SsD9eLO"/>
-    <service id=".service_locator.4oCgmNM" alias=".service_locator.DSefLuM"/>
+    <service id=".service_locator.bxmK4LC" alias=".service_locator.dYM0LI2"/>
     <service id=".service_locator.BFrsqsn" alias=".service_locator.F9PKc.7"/>
     <service id=".service_locator.oIHygA7" alias=".service_locator.xOkKGYY"/>
     <service id=".service_locator.XtmiKbi" alias=".service_locator.MfxSDRP"/>
@@ -12366,6 +12385,7 @@
     <service id=".service_locator.d1dNbYT" alias=".service_locator.DkDVX4k"/>
     <service id=".service_locator.txngRqi" alias=".service_locator.xRuLM4F"/>
     <service id=".service_locator.Wm.ypLj" alias=".service_locator.IQrhfKn"/>
+    <service id=".service_locator.u6x3X2z" alias=".service_locator.KlmpK5B"/>
     <service id=".service_locator.bGJjvaT" alias=".service_locator.PhEk7tx"/>
     <service id=".service_locator.vO.9397" alias=".service_locator.WVGOjkY"/>
     <service id=".service_locator.U0KjzJw" alias=".service_locator.z7LPJKP"/>
