@@ -3,6 +3,11 @@
 namespace App\Controller\User;
 
 use App\Repository\User\TacheRepository;
+use App\Repository\Animals\AnimauxRepository;
+use App\Repository\Materiels\MachineRepository;
+use App\Repository\Terrain\TerrainRepository;
+use App\Repository\User\UserRepository;
+use App\Entity\Terrain\Terrain;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,6 +18,29 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_OUVRIER')]
 class OuvrierController extends AbstractController
 {
+    // ── Mots-clés par catégorie ───────────────────────────────────────────────
+    private const KEYWORDS_ANIMAL  = [
+        'vaccination', 'vaccin', 'alimentation', 'bétail', 'animal', 'animaux',
+        'vétérinaire', 'veto', 'traite', 'vermifugation', 'enclos', 'pesée',
+        'troupeau', 'volaille', 'ovin', 'bovin', 'caprin', 'soin animal',
+        'nourrissage', 'abreuvement', 'désinfection enclos', 'brebis', 'vache',
+        'mouton', 'chèvre', 'poulet', 'dinde', 'lapin',
+    ];
+
+    private const KEYWORDS_MACHINE = [
+        'vidange', 'révision', 'machine', 'tracteur', 'équipement', 'moteur',
+        'maintenance', 'réparation', 'graissage', 'filtre', 'pneu', 'huile',
+        'pompe', 'nettoyage machine', 'contrôle machine', 'vérification machine',
+        'moissonneuse', 'charrue', 'semoir', 'pulvérisateur',
+    ];
+
+    private const KEYWORDS_TERRAIN = [
+        'labour', 'irrigation', 'désherbage', 'fertilisation', 'semis', 'récolte',
+        'taille', 'plantation', 'traitement phytosanitaire', 'terrain', 'culture',
+        'plante', 'sol', 'engrais', 'herbicide', 'pesticide', 'arrosage',
+        'serre', 'champ', 'parcelle', 'compost', 'buttage', 'binage',
+    ];
+
     // ── Home ─────────────────────────────────────────────────────────────────
     #[Route('/', name: 'home')]
     public function home(TacheRepository $tacheRepo): Response
@@ -32,6 +60,8 @@ class OuvrierController extends AbstractController
             'priorite'    => $t->getPriorite(),
             'dateDebut'   => null,
             'dateFin'     => $t->getDateEcheancee(),
+            'categorie'   => null,
+            'detail_url'  => null,
         ], $recentes);
 
         return $this->render('home_ouvrier.html.twig', [
@@ -45,21 +75,49 @@ class OuvrierController extends AbstractController
 
     // ── Tâches ───────────────────────────────────────────────────────────────
     #[Route('/taches', name: 'taches')]
-    public function taches(TacheRepository $tacheRepo): Response
-    {
+    public function taches(
+        TacheRepository   $tacheRepo,
+        AnimauxRepository $animauxRepo,
+        MachineRepository $machineRepo,
+        TerrainRepository $terrainRepo,
+        UserRepository    $userRepo
+    ): Response {
         /** @var \App\Entity\User\User $user */
         $user   = $this->getUser();
         $taches = $tacheRepo->findByAssignee($user);
 
-        $tachesData = array_map(fn($t) => [
-            'id'          => $t->getIdTache(),
-            'titre'       => $t->getNomTache(),
-            'description' => $t->getDescription(),
-            'statut'      => $this->mapStatut($t->getEtat()),
-            'priorite'    => $t->getPriorite(),
-            'dateDebut'   => null,
-            'dateFin'     => $t->getDateEcheancee(),
-        ], $taches);
+        // Pré-charger les ressources de l'agriculteur lié à l'ouvrier
+$agriculteurCin = $user->getTerrain()->getCin();
+        $animaux  = [];
+        $machines = [];
+        $terrains = [];
+
+        if ($agriculteurCin) {
+            $agriculteur = $userRepo->findByCin($agriculteurCin);
+            $animaux     = $agriculteur
+                ? $animauxRepo->searchDashboard(null, 'id', 'DESC', $agriculteur)
+                : [];
+            $machines    = $machineRepo->findByCin($agriculteurCin);
+            $terrains    = $terrainRepo->findByAgriculteur($agriculteurCin);
+        }
+
+        $tachesData = array_map(function ($t) use ($animaux, $machines, $terrains) {
+            $nom       = strtolower($t->getNomTache() . ' ' . $t->getDescription());
+            $categorie = $this->detectCategorie($nom);
+            $detailUrl = $this->resolveDetailUrl($categorie, $nom, $animaux, $machines, $terrains);
+
+            return [
+                'id'          => $t->getIdTache(),
+                'titre'       => $t->getNomTache(),
+                'description' => $t->getDescription(),
+                'statut'      => $this->mapStatut($t->getEtat()),
+                'priorite'    => $t->getPriorite(),
+                'dateDebut'   => null,
+                'dateFin'     => $t->getDateEcheancee(),
+                'categorie'   => $categorie,
+                'detail_url'  => $detailUrl,
+            ];
+        }, $taches);
 
         return $this->render('User/ouvrier_tache.html.twig', [
             'taches' => $tachesData,
@@ -80,17 +138,14 @@ class OuvrierController extends AbstractController
             return $this->json(['success' => false, 'message' => 'Tâche non trouvée'], 404);
         }
 
-        // Vérifier que la tâche appartient bien à l'ouvrier connecté
         /** @var \App\Entity\User\User $user */
         $user = $this->getUser();
         if ($tache->getAssignee()?->getCin() !== $user->getCin()) {
             return $this->json(['success' => false, 'message' => 'Accès refusé'], 403);
         }
 
-        // Normaliser l'état actuel depuis la DB
         $statutActuel = $this->mapStatut($tache->getEtat());
 
-        // Transitions autorisées uniquement dans un sens (valeurs normalisées)
         $transitionsAutorisees = [
             'a_faire'  => ['en_cours'],
             'en_cours' => ['terminee'],
@@ -100,7 +155,6 @@ class OuvrierController extends AbstractController
             return $this->json(['success' => false, 'message' => 'Transition non autorisée'], 400);
         }
 
-        // Convertir le statut normalisé vers la valeur DB
         $etat = match($statut) {
             'en_cours' => 'en cours',
             'terminee' => 'terminée',
@@ -126,6 +180,72 @@ class OuvrierController extends AbstractController
             'evenements' => [],
         ]);
     }
+
+    // ── Détection catégorie par mots-clés ────────────────────────────────────
+    private function detectCategorie(string $texte): ?string
+    {
+        foreach (self::KEYWORDS_ANIMAL as $kw) {
+            if (str_contains($texte, $kw)) return 'animal';
+        }
+        foreach (self::KEYWORDS_MACHINE as $kw) {
+            if (str_contains($texte, $kw)) return 'machine';
+        }
+        foreach (self::KEYWORDS_TERRAIN as $kw) {
+            if (str_contains($texte, $kw)) return 'terrain';
+        }
+        return null;
+    }
+
+    // ── Résolution de l'URL de détail ────────────────────────────────────────
+    private function resolveDetailUrl(
+    ?string $categorie,
+    string  $texte,
+    array   $animaux,
+    array   $machines,
+    array   $terrains
+): ?string {
+    if (!$categorie) return null;
+
+    switch ($categorie) {
+        case 'animal':
+            foreach ($animaux as $animal) {
+                $nomAnimal = strtolower($animal->getNom() ?? '');
+                if ($nomAnimal && str_contains($texte, $nomAnimal)) {
+                    return '#';
+                }
+            }
+            if (!empty($animaux)) {
+                return '#';
+            }
+            return null;
+
+        case 'machine':
+            foreach ($machines as $machine) {
+                $nomMachine = strtolower($machine->getNom() ?? '');
+                if ($nomMachine && str_contains($texte, $nomMachine)) {
+                    return '#';
+                }
+            }
+            if (!empty($machines)) {
+                return '#';
+            }
+            return null;
+
+        case 'terrain':
+            foreach ($terrains as $terrain) {
+                $nomTerrain = strtolower($terrain->getNomTerrain() ?? '');
+                if ($nomTerrain && str_contains($texte, $nomTerrain)) {
+                    return '#';
+                }
+            }
+            if (!empty($terrains)) {
+                return '#';
+            }
+            return null;
+    }
+
+    return null;
+}
 
     // ── Helper : map etat DB → statut normalisé ───────────────────────────────
     private function mapStatut(string $etat): string
