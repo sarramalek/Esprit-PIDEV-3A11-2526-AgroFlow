@@ -61,7 +61,6 @@
     @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 {% endblock %}
-
 {% block body %}
 <section style="min-height:100vh;display:flex;align-items:center;justify-content:center;background-color:#FCF8E6;padding:40px 0;">
     <div style="background:white;padding:50px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.1);width:100%;max-width:560px;">
@@ -72,65 +71,13 @@
             <p style="color:#666;margin-top:6px;">Rejoignez AgroFlow</p>
         </div>
 
-
-        <form method="post" action="{{ path('app_register') }}" novalidate >
+        <form method="post" action="{{ path('app_register') }}" novalidate>
             {{ form_widget(registrationForm._token) }}
-
-            {# ── Rôle ── #}
-            <div class="field-group">
-                <label class="form-label">Je suis...</label>
-                <div class="role-selector">
-                    {% for child in registrationForm.role %}
-                        <div class="role-card">
-                            {{ form_widget(child) }}
-                            <label for="{{ child.vars.id }}">
-                                {% if child.vars.value == 1 %}
-                                    <i class="fas fa-hard-hat"></i> Ouvrier
-                                {% else %}
-                                    <i class="fas fa-tractor"></i> Agriculteur
-                                {% endif %}
-                            </label>
-                        </div>
-                    {% endfor %}
-                </div>
-                {{ form_errors(registrationForm.role) }}
-            </div>
-
-           {# ── Employeur (visible si Ouvrier) ── #}
-<div class="field-group dynamic-group" id="employeur-group">
-    <div class="field-icon-label">
-        <i class="fas fa-tractor"></i>
-        <span>Employeur (Agriculteur)</span>
-    </div>
-    {{ form_widget(registrationForm.employeur, {'attr': {'class': 'form-input', 'id': 'employeur-select'}}) }}
-    {{ form_errors(registrationForm.employeur) }}
-</div>
-
-            {# ── Terrain (visible après choix agriculteur) ── #}
-            <div class="field-group dynamic-group" id="terrain-group">
-                <div class="field-icon-label">
-                    <i class="fas fa-map-marked-alt"></i>
-                    <span>Terrain assigné</span>
-                </div>
-
-                {# Champ caché Symfony — reçoit la valeur via JS #}
-                {{ form_widget(registrationForm.terrain, {'attr': {'style': 'display:none', 'id': 'terrain-hidden-value'}}) }}
-
-                {# Select visuel uniquement pour l'UX #}
-                <select id="terrain-select-visual" class="form-input" disabled>
-                    <option value="">-- Choisissez d'abord un agriculteur --</option>
-                </select>
-
-                <div class="loading-text" id="terrain-loading">
-                    <div class="spinner"></div> Chargement des terrains…
-                </div>
-                {{ form_errors(registrationForm.terrain) }}
-            </div>
 
             {# ── CIN ── #}
             <div class="field-group">
                 <label class="form-label" for="{{ registrationForm.cin.vars.id }}">Numéro CIN</label>
-{{ form_widget(registrationForm.cin, {'attr': {'class': 'form-input'}}) }}
+                {{ form_widget(registrationForm.cin, {'attr': {'class': 'form-input'}}) }}
                 {{ form_errors(registrationForm.cin) }}
             </div>
 
@@ -162,7 +109,7 @@
                 {{ form_errors(registrationForm.email) }}
             </div>
 
-            {# ── Ville & Adresse ── #}
+            {# ── Ville & Quartier ── #}
             <div class="field-row field-group">
                 <div>
                     <label class="form-label" for="{{ registrationForm.ville.vars.id }}">Ville</label>
@@ -196,8 +143,48 @@
     </div>
 </section>
 {% endblock %}
+
 {% block javascripts %}
 <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const villesAdresses = {
+        "Tunis":    ["Centre-ville","La Marsa","Le Bardo","Carthage","Ariana","La Goulette","Sidi Bou Saïd","Menzah"],
+        "Sfax":     ["Centre-ville","Sakiet Ezzit","Sakiet Eddaier","Thyna","El Ain","Chihia"],
+        "Sousse":   ["Centre-ville","Hammam Sousse","Akouda","Kalaa Kebira","Msaken","Kantaoui"],
+        "Nabeul":   ["Centre-ville","Hammamet","Kelibia","Korba","Menzel Temime","Dar Chaabane"],
+        "Bizerte":  ["Centre-ville","Menzel Bourguiba","Mateur","Ras Jebel","Zarzouna","Utique"],
+        "Gabès":    ["Centre-ville","Mareth","El Hamma","Matmata","Chenini","Ghannouch"],
+        "Kairouan": ["Centre-ville","Sbikha","Haffouz","El Alaa","Nasrallah","Oueslatia"],
+        "Monastir": ["Centre-ville","Ksar Hellal","Moknine","Jemmal","Sahline","Bembla"],
+        "Gafsa":    ["Centre-ville","Metlaoui","El Ksar","Redeyef","Moulares","Sened"],
+        "Médenine": ["Centre-ville","Djerba","Zarzis","Ben Gardane","Beni Khedache","Sidi Makhlouf"],
+    };
+
+    const villeSelect   = document.getElementById('registration_form_ville');
+    const adresseSelect = document.getElementById('adresse-select');
+    const adresseHidden = document.getElementById('adresse-hidden');
+
+    function updateAdresses(ville) {
+        adresseSelect.innerHTML = '<option value="">-- Choisissez un quartier --</option>';
+        if (ville && villesAdresses[ville]) {
+            villesAdresses[ville].forEach(quartier => {
+                const opt = new Option(quartier, quartier);
+                adresseSelect.appendChild(opt);
+            });
+            adresseSelect.disabled = false;
+        } else {
+            adresseSelect.disabled = true;
+        }
+    }
+
+    adresseSelect.addEventListener('change', () => adresseHidden.value = adresseSelect.value);
+    villeSelect.addEventListener('change', () => {
+        updateAdresses(villeSelect.value);
+        adresseHidden.value = '';
+    });
+    updateAdresses(villeSelect.value);
+});
+
 document.addEventListener('DOMContentLoaded', function () {
 
     // ==================== Villes / Quartiers ====================
