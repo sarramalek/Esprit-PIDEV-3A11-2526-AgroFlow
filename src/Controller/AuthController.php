@@ -44,12 +44,11 @@ class AuthController extends AbstractController
     }
 
     // ==================== REGISTER ====================
-    #[Route('/register', name: 'app_register')]
+   #[Route('/register', name: 'app_register')]
 public function register(
     Request $request,
     UserPasswordHasherInterface $passwordHasher,
     EntityManagerInterface $em,
-    \App\Repository\Terrain\TerrainRepository $terrainRepo  // ✅ Ajouter
 ): Response {
     $user = new User();
     $form = $this->createForm(RegistrationFormType::class, $user);
@@ -57,23 +56,12 @@ public function register(
 
     if ($form->isSubmitted() && $form->isValid()) {
 
-        // Hash du mot de passe
+        $user->setRole(2); // Agriculteur par défaut
+
         $user->setMdp(
             $passwordHasher->hashPassword($user, $form->get('plainPassword')->getData())
         );
 
-        // ✅ Assigner le terrain si l'utilisateur est un ouvrier
-        if ((int)$user->getRole() === 1) {
-            $terrainId = $form->get('terrain')->getData(); // récupère la valeur du champ hidden
-            if ($terrainId) {
-                $terrain = $terrainRepo->find((int)$terrainId);
-                if ($terrain) {
-                    $user->setTerrain($terrain);
-                }
-            }
-        }
-
-        // Date de création
         $user->setDateCreationcpt(new \DateTime());
         $user->setDateDernierchg(new \DateTime());
 
