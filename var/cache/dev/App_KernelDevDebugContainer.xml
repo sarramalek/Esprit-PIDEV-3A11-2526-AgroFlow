@@ -814,6 +814,9 @@
       <argument type="service" id="App\Repository\User\TacheRepository"/>
       <argument type="service" id="App\Repository\Terrain\TerrainRepository"/>
     </service>
+    <service id="App\Service\MailerService" class="App\Service\MailerService" autowire="true" autoconfigure="true">
+      <argument type="service" id="mailer.mailer"/>
+    </service>
     <service id="App\Service\PdfService" class="App\Service\PdfService" autowire="true" autoconfigure="true">
       <argument type="service" id="twig"/>
     </service>
@@ -853,7 +856,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.qC9Aoqa"/>
+      <argument type="service" id=".service_locator.SORtraR"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -1478,6 +1481,7 @@
       <argument type="collection">
         <argument>async</argument>
         <argument>failed</argument>
+        <argument>sync</argument>
       </argument>
       <call method="setName">
         <argument>messenger:setup-transports</argument>
@@ -1610,6 +1614,7 @@
       <argument type="collection">
         <argument>async</argument>
         <argument>failed</argument>
+        <argument>sync</argument>
       </argument>
       <call method="setName">
         <argument>messenger:stats</argument>
@@ -3842,7 +3847,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.qC9Aoqa"/>
+      <argument type="service" id=".service_locator.SORtraR"/>
     </service>
     <service id="debug.log_processor" class="Symfony\Bridge\Monolog\Processor\DebugProcessor">
       <tag name="kernel.reset" method="reset"/>
@@ -4772,7 +4777,7 @@
     <service id="messenger.senders_locator" class="Symfony\Component\Messenger\Transport\Sender\SendersLocator">
       <argument type="collection">
         <argument key="Symfony\Component\Mailer\Messenger\SendEmailMessage" type="collection">
-          <argument>async</argument>
+          <argument>sync</argument>
         </argument>
         <argument key="Symfony\Component\Notifier\Message\ChatMessage" type="collection">
           <argument>async</argument>
@@ -4781,7 +4786,7 @@
           <argument>async</argument>
         </argument>
       </argument>
-      <argument type="service" id=".service_locator.c7f47p7"/>
+      <argument type="service" id=".service_locator.NZdAz3P"/>
     </service>
     <service id="messenger.middleware.send_message" class="Symfony\Component\Messenger\Middleware\SendMessageMiddleware" abstract="true">
       <tag name="monolog.logger" channel="messenger"/>
@@ -4827,6 +4832,8 @@
         <argument key="failed" type="service_closure" id="messenger.transport.failed"/>
         <argument key="messenger.transport.async" type="service_closure" id="messenger.transport.async"/>
         <argument key="messenger.transport.failed" type="service_closure" id="messenger.transport.failed"/>
+        <argument key="messenger.transport.sync" type="service_closure" id="messenger.transport.sync"/>
+        <argument key="sync" type="service_closure" id="messenger.transport.sync"/>
       </argument>
     </service>
     <service id="messenger.transport_factory" class="Symfony\Component\Messenger\Transport\TransportFactory">
@@ -4853,6 +4860,7 @@
       <argument type="collection">
         <argument key="async" type="service_closure" id="messenger.retry.multiplier_retry_strategy.async"/>
         <argument key="failed" type="service_closure" id="messenger.retry.multiplier_retry_strategy.failed"/>
+        <argument key="sync" type="service_closure" id="messenger.retry.multiplier_retry_strategy.sync"/>
       </argument>
     </service>
     <service id="messenger.retry.abstract_multiplier_retry_strategy" class="Symfony\Component\Messenger\Retry\MultiplierRetryStrategy" abstract="true">
@@ -4864,7 +4872,7 @@
     <service id="messenger.retry.send_failed_message_for_retry_listener" class="Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener">
       <tag name="monolog.logger" channel="messenger"/>
       <tag name="kernel.event_subscriber"/>
-      <argument type="service" id=".service_locator.c7f47p7"/>
+      <argument type="service" id=".service_locator.NZdAz3P"/>
       <argument type="service" id="messenger.retry_strategy_locator"/>
       <argument type="service" id="monolog.logger.messenger" on-invalid="ignore"/>
       <argument type="service" id="debug.event_dispatcher"/>
@@ -4875,11 +4883,12 @@
     <service id="messenger.failure.send_failed_message_to_failure_transport_listener" class="Symfony\Component\Messenger\EventListener\SendFailedMessageToFailureTransportListener">
       <tag name="monolog.logger" channel="messenger"/>
       <tag name="kernel.event_subscriber"/>
-      <argument type="service" id=".service_locator._wyX1Dp"/>
+      <argument type="service" id=".service_locator.v4buNEb"/>
       <argument type="service" id="monolog.logger.messenger" on-invalid="ignore"/>
       <argument type="collection">
         <argument key="async">failed</argument>
         <argument key="failed">failed</argument>
+        <argument key="sync">failed</argument>
       </argument>
     </service>
     <service id="messenger.listener.dispatch_pcntl_signal_listener" class="Symfony\Component\Messenger\EventListener\DispatchPcntlSignalListener">
@@ -4941,20 +4950,38 @@
       <argument>2</argument>
       <argument>0</argument>
     </service>
-    <service id=".service_locator.c7f47p7" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id="messenger.transport.sync" class="Symfony\Component\Messenger\Transport\TransportInterface">
+      <tag name="messenger.receiver" alias="sync" is_failure_transport="" is_consumable=""/>
+      <argument>sync://</argument>
+      <argument type="collection">
+        <argument key="transport_name">sync</argument>
+      </argument>
+      <argument type="service" id="messenger.transport.native_php_serializer"/>
+      <factory service="messenger.transport_factory" method="createTransport"/>
+    </service>
+    <service id="messenger.retry.multiplier_retry_strategy.sync" class="Symfony\Component\Messenger\Retry\MultiplierRetryStrategy">
+      <argument>3</argument>
+      <argument>1000</argument>
+      <argument>2</argument>
+      <argument>0</argument>
+    </service>
+    <service id=".service_locator.NZdAz3P" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="async" type="service_closure" id="messenger.transport.async"/>
         <argument key="failed" type="service_closure" id="messenger.transport.failed"/>
         <argument key="messenger.transport.async" type="service_closure" id="messenger.transport.async"/>
         <argument key="messenger.transport.failed" type="service_closure" id="messenger.transport.failed"/>
+        <argument key="messenger.transport.sync" type="service_closure" id="messenger.transport.sync"/>
+        <argument key="sync" type="service_closure" id="messenger.transport.sync"/>
       </argument>
     </service>
-    <service id=".service_locator._wyX1Dp" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.v4buNEb" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="async" type="service_closure" id="messenger.transport.failed"/>
         <argument key="failed" type="service_closure" id="messenger.transport.failed"/>
+        <argument key="sync" type="service_closure" id="messenger.transport.failed"/>
       </argument>
     </service>
     <service id="notifier" class="Symfony\Component\Notifier\Notifier">
@@ -9056,12 +9083,19 @@
         <argument key="userRepo" type="service_closure" id="App\Repository\User\UserRepository"/>
       </argument>
     </service>
-    <service id=".service_locator.ymeeUut" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.yRx.v7d" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
         <argument key="hasher" type="service_closure" id="security.user_password_hasher"/>
+        <argument key="mailer" type="service_closure" id="App\Service\MailerService"/>
         <argument key="terrainRepo" type="service_closure" id="App\Repository\Terrain\TerrainRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.7w5TO6o" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="mailer" type="service_closure" id="App\Service\MailerService"/>
       </argument>
     </service>
     <service id=".service_locator.X8q_9sW" class="Symfony\Component\DependencyInjection\ServiceLocator">
@@ -9190,7 +9224,7 @@
         <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
       </argument>
     </service>
-    <service id=".service_locator.qC9Aoqa" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.SORtraR" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Controller\AdminDashboardController::index" type="service_closure" id=".service_locator.qni5W9T"/>
@@ -9345,11 +9379,12 @@
         <argument key="App\Controller\User\Ouvrier_agriController::deleteOuvrier" type="service_closure" id=".service_locator.X8q_9sW"/>
         <argument key="App\Controller\User\Ouvrier_agriController::edit" type="service_closure" id=".service_locator.X8q_9sW"/>
         <argument key="App\Controller\User\Ouvrier_agriController::index" type="service_closure" id=".service_locator.sYplRBf"/>
-        <argument key="App\Controller\User\Ouvrier_agriController::new" type="service_closure" id=".service_locator.ymeeUut"/>
+        <argument key="App\Controller\User\Ouvrier_agriController::new" type="service_closure" id=".service_locator.yRx.v7d"/>
         <argument key="App\Controller\User\Ouvrier_agriController::suggestionIA" type="service_closure" id=".service_locator.KlmpK5B"/>
         <argument key="App\Controller\User\Ouvrier_agriController::supprimerTache" type="service_closure" id=".service_locator.xRuLM4F"/>
         <argument key="App\Controller\User\Ouvrier_agriController::taches" type="service_closure" id=".service_locator.DkDVX4k"/>
         <argument key="App\Controller\User\Ouvrier_agriController::testIA" type="service_closure" id=".service_locator.KlmpK5B"/>
+        <argument key="App\Controller\User\Ouvrier_agriController::testMail" type="service_closure" id=".service_locator.7w5TO6o"/>
         <argument key="App\Controller\User\Ouvrier_agriController::updateEtatTache" type="service_closure" id=".service_locator.xRuLM4F"/>
         <argument key="App\Controller\User\TacheController::delete" type="service_closure" id=".service_locator.Mzhqy3N"/>
         <argument key="App\Controller\User\TacheController::edit" type="service_closure" id=".service_locator.z7LPJKP"/>
@@ -9535,11 +9570,12 @@
         <argument key="App\Controller\User\Ouvrier_agriController:deleteOuvrier" type="service_closure" id=".service_locator.X8q_9sW"/>
         <argument key="App\Controller\User\Ouvrier_agriController:edit" type="service_closure" id=".service_locator.X8q_9sW"/>
         <argument key="App\Controller\User\Ouvrier_agriController:index" type="service_closure" id=".service_locator.sYplRBf"/>
-        <argument key="App\Controller\User\Ouvrier_agriController:new" type="service_closure" id=".service_locator.ymeeUut"/>
+        <argument key="App\Controller\User\Ouvrier_agriController:new" type="service_closure" id=".service_locator.yRx.v7d"/>
         <argument key="App\Controller\User\Ouvrier_agriController:suggestionIA" type="service_closure" id=".service_locator.KlmpK5B"/>
         <argument key="App\Controller\User\Ouvrier_agriController:supprimerTache" type="service_closure" id=".service_locator.xRuLM4F"/>
         <argument key="App\Controller\User\Ouvrier_agriController:taches" type="service_closure" id=".service_locator.DkDVX4k"/>
         <argument key="App\Controller\User\Ouvrier_agriController:testIA" type="service_closure" id=".service_locator.KlmpK5B"/>
+        <argument key="App\Controller\User\Ouvrier_agriController:testMail" type="service_closure" id=".service_locator.7w5TO6o"/>
         <argument key="App\Controller\User\Ouvrier_agriController:updateEtatTache" type="service_closure" id=".service_locator.xRuLM4F"/>
         <argument key="App\Controller\User\TacheController:delete" type="service_closure" id=".service_locator.Mzhqy3N"/>
         <argument key="App\Controller\User\TacheController:edit" type="service_closure" id=".service_locator.z7LPJKP"/>
@@ -12229,7 +12265,7 @@
     <service id="scheb_two_factor.provider_decider" alias="scheb_two_factor.default_provider_decider"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.w7.f4fT" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.qC9Aoqa"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.SORtraR"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id=".Psr\Log\LoggerInterface $request.logger" alias="monolog.logger.request"/>
@@ -12264,8 +12300,9 @@
     <service id="Psr\Log\LoggerInterface $securityLogger" alias="monolog.logger.security"/>
     <service id=".Psr\Log\LoggerInterface $deprecation.logger" alias="monolog.logger.deprecation"/>
     <service id="Psr\Log\LoggerInterface $deprecationLogger" alias="monolog.logger.deprecation"/>
-    <service id=".service_locator.80edgLI" alias="messenger.receiver_locator"/>
-    <service id=".service_locator.h8Jkkd2" alias="messenger.retry_strategy_locator"/>
+    <service id=".service_locator.GsIjbjK" alias="messenger.receiver_locator"/>
+    <service id=".service_locator.Q7if2wv" alias="messenger.retry_strategy_locator"/>
+    <service id=".service_locator.ZBZXtOS" alias=".service_locator.NZdAz3P"/>
     <service id=".service_locator.bJ.4HC5" alias=".service_locator.w7.f4fT"/>
     <service id=".service_locator._vhpmx6" alias=".service_locator.pt54IVS"/>
     <service id=".service_locator.gobRZbS" alias=".service_locator.pgExxvC"/>
@@ -12290,6 +12327,7 @@
     <service id=".service_locator.ZjajG2R" alias=".service_locator.at8Yq7y"/>
     <service id=".service_locator.pwqUmIQ" alias=".service_locator.pl5XVUK"/>
     <service id=".service_locator.Pc55owN" alias=".service_locator.sYplRBf"/>
+    <service id=".service_locator.1Xi3sbE" alias=".service_locator.yRx.v7d"/>
     <service id=".service_locator.F7aKy3I" alias=".service_locator.X8q_9sW"/>
     <service id=".service_locator.aNnJEK6" alias=".service_locator.DkDVX4k"/>
     <service id=".service_locator.tDbLDno" alias=".service_locator.xRuLM4F"/>
@@ -12299,7 +12337,7 @@
     <service id=".service_locator.5pebkNV" alias=".service_locator.xxq2prQ"/>
     <service id=".service_locator.whdse4m" alias=".service_locator.yd.AI8F"/>
     <service id=".service_locator.8J1nalj" alias=".service_locator.SsD9eLO"/>
-    <service id=".service_locator.jKbMwCa" alias=".service_locator.qC9Aoqa"/>
+    <service id=".service_locator.WVFSLI6" alias=".service_locator.SORtraR"/>
     <service id=".service_locator.BFrsqsn" alias=".service_locator.F9PKc.7"/>
     <service id=".service_locator.oIHygA7" alias=".service_locator.xOkKGYY"/>
     <service id=".service_locator.XtmiKbi" alias=".service_locator.MfxSDRP"/>
@@ -12392,7 +12430,8 @@
     <service id=".service_locator.KaeMUCe" alias=".service_locator.at8Yq7y"/>
     <service id=".service_locator.vv0pyJg" alias=".service_locator.pl5XVUK"/>
     <service id=".service_locator.HAVR4ss" alias=".service_locator.sYplRBf"/>
-    <service id=".service_locator..LLQpeq" alias=".service_locator.ymeeUut"/>
+    <service id=".service_locator.0D4RXPd" alias=".service_locator.yRx.v7d"/>
+    <service id=".service_locator.m7fAE_z" alias=".service_locator.7w5TO6o"/>
     <service id=".service_locator.fWXEh1S" alias=".service_locator.X8q_9sW"/>
     <service id=".service_locator.d1dNbYT" alias=".service_locator.DkDVX4k"/>
     <service id=".service_locator.txngRqi" alias=".service_locator.xRuLM4F"/>

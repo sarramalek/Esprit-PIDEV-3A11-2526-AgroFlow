@@ -63,42 +63,81 @@ public function index(
     ]);
 }
 
-    #[Route('/nouveau', name: 'app_ouvrier_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $em, UserPasswordHasherInterface $hasher, TerrainRepository $terrainRepo): Response
-    {
-        $agriculteur = $this->getUser();
-        $terrains = $terrainRepo->findByAgriculteur($agriculteur->getCin());
+   #[Route('/nouveau', name: 'app_ouvrier_new', methods: ['GET', 'POST'])]
+public function new(
+    Request $request,
+    EntityManagerInterface $em,
+    UserPasswordHasherInterface $hasher,
+    TerrainRepository $terrainRepo,
+    \App\Service\MailerService $mailer
+): Response {
+    $agriculteur = $this->getUser();
+    $terrains    = $terrainRepo->findByAgriculteur($agriculteur->getCin());
 
-        if ($request->isMethod('POST')) {
-            $ouvrier = new User();
-            $ouvrier->setCin((int) $request->request->get('cin'));
-            $ouvrier->setNom($request->request->get('nom'));
-            $ouvrier->setPrenom($request->request->get('prenom'));
-            $ouvrier->setEmail($request->request->get('email'));
-            $ouvrier->setTel($request->request->get('tel'));
-            $ouvrier->setAdresse($request->request->get('adresse'));
-            $ouvrier->setVille($request->request->get('ville'));
-            $ouvrier->setRole(1);
-            $ouvrier->setDateCreationcpt(new \DateTime());
-            $ouvrier->setMdp($hasher->hashPassword($ouvrier, $request->request->get('mdp')));
+    if ($request->isMethod('POST')) {
+        $tel   = $request->request->get('tel');
+        $email = $request->request->get('email');
 
-            $idTerrain = $request->request->get('id_terrain');
-            if ($idTerrain) {
-                $terrain = $terrainRepo->find((int) $idTerrain);
-                if ($terrain && $terrain->getCin() === $agriculteur->getCin()) {
-                    $ouvrier->setTerrain($terrain);
-                }
+        $ouvrier = new User();
+        $ouvrier->setCin((int) $request->request->get('cin'));
+        $ouvrier->setNom($request->request->get('nom'));
+        $ouvrier->setPrenom($request->request->get('prenom'));
+        $ouvrier->setEmail($email);
+        $ouvrier->setTel($tel);
+        $ouvrier->setAdresse($request->request->get('adresse'));
+        $ouvrier->setVille($request->request->get('ville'));
+        $ouvrier->setRole(1);
+        $ouvrier->setDateCreationcpt(new \DateTime());
+
+        // ── Mot de passe = numéro de téléphone ──────────────────────────
+        $ouvrier->setMdp($hasher->hashPassword($ouvrier, $tel));
+
+        $idTerrain = $request->request->get('id_terrain');
+        if ($idTerrain) {
+            $terrain = $terrainRepo->find((int) $idTerrain);
+            if ($terrain && $terrain->getCin() === $agriculteur->getCin()) {
+                $ouvrier->setTerrain($terrain);
             }
+        }
 
-            $em->persist($ouvrier);
-            $em->flush();
-            $this->addFlash('success', 'Ouvrier créé avec succès.');
+        $em->persist($ouvrier);
+        $em->flush();
+
+        // ── Envoi du mail avec les credentials ──────────────────────────
+        try {
+            $mailer->envoyerCredentialsOuvrier(
+                $email,
+                $ouvrier->getNom(),
+                $ouvrier->getPrenom(),
+                $tel
+            );
+        } catch (\Exception $e) {
+            // L'ouvrier est créé même si le mail échoue
+            $this->addFlash('warning', 'Ouvrier créé mais l\'envoi du mail a échoué : ' . $e->getMessage());
             return $this->redirectToRoute('app_ouvrier_index');
         }
 
-        return $this->render('User/ouvriers_new.html.twig', ['terrains' => $terrains]);
+        $this->addFlash('success', 'Ouvrier créé avec succès. Un email avec ses identifiants lui a été envoyé.');
+        return $this->redirectToRoute('app_ouvrier_index');
     }
 
+    return $this->render('User/ouvriers_new.html.twig', ['terrains' => $terrains]);
+}
+#[Route('/test-mail', name: 'app_test_mail', methods: ['GET'])]
+public function testMail(\App\Service\MailerService $mailer): Response
+{
+    try {
+        $mailer->envoyerCredentialsOuvrier(
+            'sarra.malek@esprit.tn', // mettez votre propre email pour tester
+            'Test',
+            'Ouvrier',
+            '55123456'
+        );
+        return new Response('✅ Mail envoyé avec succès !');
+    } catch (\Exception $e) {
+        return new Response('❌ Erreur : ' . $e->getMessage() . '<br>Classe : ' . get_class($e));
+    }
+}
     #[Route('/{cin}/modifier', name: 'app_ouvrier_edit', methods: ['GET', 'POST'])]
     public function edit(int $cin, Request $request, UserRepository $userRepo, TerrainRepository $terrainRepo, EntityManagerInterface $em): Response
     {
@@ -311,4 +350,5 @@ public function testIA(\App\Service\TacheIAService $iaService): Response
         ]);
     }
 }
+
 }
