@@ -32,16 +32,30 @@ class TacheIAService
         ], $terrains);
 
         // ── 2. Ouvriers ──────────────────────────────────────────────────────
-        $ouvriers     = $this->userRepo->findOuvriersByAgriculteur($cinAgriculteur);
-        $ouvriersData = array_map(function ($o) {
-            $taches        = $this->tacheRepo->findByAssignee($o);
-            $tachesEnCours = array_filter($taches, fn($t) => $t->getEtat() !== 'terminée');
-            return [
-                'nom'            => $o->getNom() . ' ' . $o->getPrenom(),
-                'terrain'        => $o->getTerrain()?->getNomTerrain() ?? 'non assigné',
-                'taches_actives' => count($tachesEnCours),
-            ];
-        }, $ouvriers);
+       // ── 2. Ouvriers ──────────────────────────────────────────────────────
+$ouvriers = $this->userRepo->findOuvriersByAgriculteur($cinAgriculteur);
+
+// Collecte des tâches actives par terrain (pour éviter les doublons inter-ouvriers)
+$tachesParTerrain = []; // ['NomTerrain' => ['tache1', 'tache2', ...]]
+foreach ($ouvriers as $o) {
+    $nomTerrain = $o->getTerrain()?->getNomTerrain() ?? 'non assigné';
+    foreach ($this->tacheRepo->findByAssignee($o) as $t) {
+        if ($t->getEtat() !== 'terminée') {
+            $tachesParTerrain[$nomTerrain][] = strtolower(trim($t->getNomTache()));
+        }
+    }
+}
+
+$ouvriersData = array_map(function ($o) use ($tachesParTerrain) {
+    $nomTerrain    = $o->getTerrain()?->getNomTerrain() ?? 'non assigné';
+    $taches        = $this->tacheRepo->findByAssignee($o);
+    $tachesEnCours = array_filter($taches, fn($t) => $t->getEtat() !== 'terminée');
+    return [
+        'nom'            => $o->getNom() . ' ' . $o->getPrenom(),
+        'terrain'        => $nomTerrain,
+        'taches_actives' => count($tachesEnCours),
+    ];
+}, $ouvriers);
 
         // ── 3. Machines ──────────────────────────────────────────────────────
         $machines     = $this->machineRepo->findByCin($cinAgriculteur);
@@ -91,7 +105,15 @@ class TacheIAService
         if (!empty($machinesData)) $categories[] = 'MACHINES';
         $categories[] = 'TERRAINS';
         $categorieForcee = $categories[$rand % count($categories)];
-
+// ── Injection des tâches déjà existantes par terrain ─────────────────
+if (!empty($tachesParTerrain)) {
+    $prompt .= "TÂCHES DÉJÀ ASSIGNÉES PAR TERRAIN (à ne PAS reproduire) :\n";
+    foreach ($tachesParTerrain as $terrain => $noms) {
+        $unique = array_unique($noms);
+        $prompt .= "- {$terrain} : " . implode(', ', $unique) . "\n";
+    }
+    $prompt .= "\n";
+}
         $prompt .= "⚠️ CONSIGNE STRICTE : Tu DOIS proposer une tâche concernant UNIQUEMENT la catégorie « {$categorieForcee} ». ";
         $prompt .= "Ignore les autres catégories pour le choix de la tâche.\n\n";
 
