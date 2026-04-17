@@ -13,6 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\HttpFoundation\Request;
 
 #[Route('/ouvrier', name: 'ouvrier_')]
 #[IsGranted('ROLE_OUVRIER')]
@@ -256,4 +257,17 @@ $agriculteurCin = $user->getTerrain()->getCin();
             default    => 'a_faire',
         };
     }
+    #[Route('/langue/{locale}', name: 'changer_langue')]
+public function changerLangue(string $locale, Request $request): Response
+{
+    // Valider la locale
+    if (!in_array($locale, ['fr', 'en', 'ar'])) {
+        $locale = 'fr';
+    }
+
+    $request->getSession()->set('_locale', $locale);
+
+    $referer = $request->headers->get('referer', $this->generateUrl('ouvrier_taches'));
+    return $this->redirect($referer);
+}
 }
