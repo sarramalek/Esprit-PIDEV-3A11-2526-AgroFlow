@@ -190,9 +190,14 @@ input.invalid, select.invalid, textarea.invalid {
 
         {# ---- Formulaire ajout tâche ---- #}
         {# ---- Formulaire ajout tâche ---- #}
+        
 <div class="form-card">
-    <h3>➕ Assigner une nouvelle tâche</h3>
 
+    <h3>➕ Assigner une nouvelle tâche</h3>
+<button type="button" id="btn-generate" class="btn-add" style="margin-bottom:10px; background:#6A1B9A;">
+    ✨ Générer automatiquement
+</button>
+<div id="ai-reason" style="font-size:12px;color:#666;margin-top:5px;"></div>
     {# Messages d'erreur JS #}
     <div id="form-errors" style="display:none; background:#f8d7da; color:#842029; border:1px solid #f5c2c7; border-radius:.5rem; padding:.75rem 1rem; margin-bottom:1rem; font-size:.85rem;"></div>
 
@@ -242,112 +247,76 @@ input.invalid, select.invalid, textarea.invalid {
 {% block javascripts %}
 {{ parent() }}
 <script>
-function () {
-    const form       = document.getElementById('tache-form');
-    const nomInput   = document.getElementById('nom_tache');
-    const descInput  = document.getElementById('description');
-    const dateInput  = document.getElementById('date_echeancee');
-    const errBox     = document.getElementById('form-errors');
-    const counter    = document.getElementById('desc-counter');
+document.addEventListener('DOMContentLoaded', function () {
 
-    /* Compteur description */
-    descInput.addEventListener('input', () => {
-        counter.textContent = descInput.value.length + ' / 1000';
+    const btn = document.getElementById('btn-generate');
+
+    if (!btn) {
+        console.error("Bouton non trouvé");
+        return;
+    }
+
+    btn.addEventListener('click', function () {
+        btn.disabled = true;
+        btn.textContent = "⏳ Génération...";
+
+        fetch('{{ path('app_ouvrier_tache_ia_suggest') }}')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Erreur HTTP : " + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Réponse IA :", data);
+
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                // Remplissage du formulaire
+                document.getElementById('nom_tache').value = data.nom_tache || '';
+                document.getElementById('description').value = data.description || '';
+                document.getElementById('date_echeancee').value = data.date_echeancee || '';
+
+                document.getElementById('priorite').value = data.priorite || 'normale';
+                document.getElementById('etat').value = data.etat || 'à faire';
+
+                // compteur description
+                const counter = document.getElementById('desc-counter');
+                if (counter) {
+                    counter.textContent = (data.description ? data.description.length : 0) + " / 1000";
+                }
+
+                // raison IA
+                const reason = document.getElementById('ai-reason');
+                if (reason) {
+                    reason.textContent = data.raison || '';
+                }
+
+                btn.textContent = "✅ Généré !";
+
+                setTimeout(() => {
+                    btn.textContent = "✨ Générer automatiquement";
+                    btn.disabled = false;
+                }, 1500);
+            })
+            .catch(error => {
+                console.error("Erreur IA :", error);
+
+                const reason = document.getElementById('ai-reason');
+                if (reason) {
+                    reason.textContent = "❌ Erreur lors de la génération IA";
+                }
+
+                alert("Erreur : " + error.message);
+
+                btn.textContent = "❌ Erreur";
+                btn.disabled = false;
+            });
     });
 
-    /* Helpers */
-    function showFieldError(id, msg) {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.textContent = msg;
-        el.style.display = 'block';
-    }
-    function clearFieldError(id, inputEl) {
-        const el = document.getElementById(id);
-        if (el) { el.textContent = ''; el.style.display = 'none'; }
-        if (inputEl) inputEl.classList.remove('invalid');
-    }
-    function markInvalid(inputEl, errId, msg) {
-        inputEl.classList.add('invalid');
-        showFieldError(errId, msg);
-    }
-
-    /* Validation live sur blur */
-    nomInput.addEventListener('blur', () => validateNom());
-    descInput.addEventListener('blur', () => validateDesc());
-    dateInput.addEventListener('blur', () => validateDate());
-
-    function validateNom() {
-        clearFieldError('err-nom', nomInput);
-        const val = nomInput.value.trim();
-        const regex = /^[\p{L}0-9 \-_.,!?'"()]+$/u;
-
-        if (!val) {
-            markInvalid(nomInput, 'err-nom', 'Le nom de la tâche est obligatoire.');
-            return false;
-        }
-        if (val.length < 3) {
-            markInvalid(nomInput, 'err-nom', 'Le nom doit contenir au moins 3 caractères.');
-            return false;
-        }
-        if (val.length > 100) {
-            markInvalid(nomInput, 'err-nom', 'Le nom ne peut pas dépasser 100 caractères.');
-            return false;
-        }
-        if (!regex.test(val)) {
-            markInvalid(nomInput, 'err-nom', 'Le nom contient des caractères non autorisés.');
-            return false;
-        }
-        return true;
-    }
-
-    function validateDesc() {
-        clearFieldError('err-desc', descInput);
-        if (descInput.value.length > 1000) {
-            markInvalid(descInput, 'err-desc', 'La description ne peut pas dépasser 1000 caractères.');
-            return false;
-        }
-        return true;
-    }
-
-    function validateDate() {
-        clearFieldError('err-date', dateInput);
-        const val = dateInput.value;
-        if (!val) return true; /* facultatif */
-
-        const chosen = new Date(val);
-        chosen.setHours(0, 0, 0, 0);
-        const today  = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        if (chosen < today) {
-            markInvalid(dateInput, 'err-date', "La date d'échéance doit être aujourd'hui ou dans le futur.");
-            return false;
-        }
-        return true;
-    }
-
-    /* Validation globale à la soumission */
-    form.addEventListener('submit', function (e) {
-        errBox.style.display = 'none';
-        errBox.innerHTML     = '';
-
-        const okNom  = validateNom();
-        const okDesc = validateDesc();
-        const okDate = validateDate();
-
-        if (!okNom || !okDesc || !okDate) {
-            e.preventDefault();
-            const errors = [];
-            if (!okNom)  errors.push(document.getElementById('err-nom').textContent);
-            if (!okDesc) errors.push(document.getElementById('err-desc').textContent);
-            if (!okDate) errors.push(document.getElementById('err-date').textContent);
-            errBox.innerHTML     = '<strong>Veuillez corriger les erreurs suivantes :</strong><ul style="margin:.4rem 0 0; padding-left:1.2rem;">' +
-                errors.map(m => '<li>' + m + '</li>').join('') + '</ul>';
-            errBox.style.display = 'block';
-            errBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-    });
-})();
+});
 </script>
+
 {% endblock %}

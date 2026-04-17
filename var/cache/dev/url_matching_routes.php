@@ -105,6 +105,7 @@ return [
         '/ouvrier/taches' => [[['_route' => 'ouvrier_taches', '_controller' => 'App\\Controller\\User\\OuvrierController::taches'], null, null, null, false, false, null]],
         '/agriculteur/ouvriers' => [[['_route' => 'app_ouvrier_index', '_controller' => 'App\\Controller\\User\\Ouvrier_agriController::index'], null, ['GET' => 0], null, false, false, null]],
         '/agriculteur/ouvriers/nouveau' => [[['_route' => 'app_ouvrier_new', '_controller' => 'App\\Controller\\User\\Ouvrier_agriController::new'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        '/agriculteur/ouvriers/test-mail' => [[['_route' => 'app_test_mail', '_controller' => 'App\\Controller\\User\\Ouvrier_agriController::testMail'], null, ['GET' => 0], null, false, false, null]],
         '/agriculteur/ouvriers/tache/assignation-auto' => [[['_route' => 'app_ouvrier_tache_auto', '_controller' => 'App\\Controller\\User\\Ouvrier_agriController::assignationAuto'], null, ['POST' => 0], null, false, false, null]],
         '/agriculteur/ouvriers/tache/suggestion-ia' => [[['_route' => 'app_ouvrier_tache_ia_suggest', '_controller' => 'App\\Controller\\User\\Ouvrier_agriController::suggestionIA'], null, ['GET' => 0], null, false, false, null]],
         '/agriculteur/ouvriers/debug-ia' => [[['_route' => 'app_test_ia', '_controller' => 'App\\Controller\\User\\Ouvrier_agriController::testIA'], null, ['GET' => 0], null, false, false, null]],
