@@ -23,6 +23,16 @@ services:
     App\Service\TacheIAService:
         arguments:
             $groqApiKey: '%env(GROQ_API_KEY)%'
+    
+    App\Service\SmsService:
+        arguments:
+            $twilioSid:       '%env(TWILIO_SID)%'
+            $twilioToken:     '%env(TWILIO_TOKEN)%'
+            $twilioFrom:      '%env(TWILIO_FROM)%'
+            $vonageApiKey:    '%env(VONAGE_API_KEY)%'
+            $vonageApiSecret: '%env(VONAGE_API_SECRET)%'
+            $vonageFrom:      '%env(VONAGE_FROM)%'
+    
 
 
 

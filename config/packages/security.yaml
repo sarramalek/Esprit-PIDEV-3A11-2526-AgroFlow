@@ -19,6 +19,9 @@ security:
         main:
             lazy: true
             provider: app_user_provider
+            custom_authenticators: 
+                - App\Security\LoginFormAuthenticator  # ← votre classe
+            entry_point: App\Security\LoginFormAuthenticator
 
             form_login:
                 login_path: app_login

@@ -51,8 +51,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , TwoFac
     #[ORM\Column(type: 'date', nullable: true)]
     private ?\DateTimeInterface $dateDernierchg = null;
 
-    #[ORM\Column(type: 'boolean', options: ['default' => 0])]
-    private bool $twoFactorEnabled = false;
+    // src/Entity/User/User.php
+#[ORM\Column(type: 'integer', options: ['default' => 0])]
+private int $twoFactorEnabled = 0;
+
 
     #[ORM\Column(type: 'string', length: 32, nullable: true)]
     private ?string $twoFactorSecret = null;
@@ -139,15 +141,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , TwoFac
     public function getDateDernierchg(): ?\DateTimeInterface { return $this->dateDernierchg; }
     public function setDateDernierchg(?\DateTimeInterface $dateDernierchg): self { $this->dateDernierchg = $dateDernierchg; return $this; }
 
-    public function isTwoFactorEnabled(): bool { return $this->twoFactorEnabled; }
-    public function setTwoFactorEnabled(bool $twoFactorEnabled): self { $this->twoFactorEnabled = $twoFactorEnabled; return $this; }
-
-    public function getTwoFactorSecret(): ?string { return $this->twoFactorSecret; }
-    public function setTwoFactorSecret(?string $twoFactorSecret): self { $this->twoFactorSecret = $twoFactorSecret; return $this; }
-
-    public function getTwoFactorBackupCodes(): ?string { return $this->twoFactorBackupCodes; }
-    public function setTwoFactorBackupCodes(?string $twoFactorBackupCodes): self { $this->twoFactorBackupCodes = $twoFactorBackupCodes; return $this; }
-
+    public function getTwoFactorEnabled(): int { return $this->twoFactorEnabled; }
+public function setTwoFactorEnabled(int $v): self { $this->twoFactorEnabled = $v; return $this; }
+public function isTwoFactorEnabled(): bool { return $this->twoFactorEnabled === 1; }
     public function getImg(): ?string { return $this->img; }
     public function setImg(?string $img): self { $this->img = $img; return $this; }
 
