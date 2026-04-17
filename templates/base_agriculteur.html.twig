@@ -597,7 +597,23 @@ checkAndRedirect();
                             </div>
                         </div>
                         {% endif %}
-
+<!-- Toggle 2FA -->
+<div style="padding:10px 16px;border-top:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;">
+    <div>
+        <div style="font-size:12px;font-weight:600;color:#2C3E50;">Authentification à 2 facteurs</div>
+        <div style="font-size:11px;color:#aaa;" id="twofa-status">
+            {{ app.user.twoFactorEnabled ? 'Activée' : 'Désactivée' }}
+        </div>
+    </div>
+    <label style="position:relative;display:inline-block;width:40px;height:22px;cursor:pointer;">
+        <input type="checkbox" id="twofa-toggle"
+               {{ app.user.twoFactorEnabled ? 'checked' : '' }}
+               onchange="toggle2FA(this.checked)"
+               style="opacity:0;width:0;height:0;">
+        <span id="twofa-track" style="position:absolute;inset:0;background:{{ app.user.twoFactorEnabled ? '#2D5A27' : '#ccc' }};border-radius:11px;transition:background 0.2s;"></span>
+        <span id="twofa-thumb" style="position:absolute;top:3px;left:{{ app.user.twoFactorEnabled ? '21px' : '3px' }};width:16px;height:16px;background:white;border-radius:50%;transition:left 0.2s;"></span>
+    </label>
+</div>
                         {# Nouveau mot de passe — visible uniquement en mode édition #}
                         <div id="agriPwdRow" style="display:none;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid #f8f8f8;">
                             <div style="width:28px;height:28px;border-radius:8px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
@@ -909,6 +925,31 @@ checkAndRedirect();
         setTimeout(function() { t.style.opacity = '0'; }, 2800);
         setTimeout(function() { if (t.parentNode) t.remove(); }, 3300);
     }
+
+    // Dans le bloc <script> du base_agriculteur.html.twig
+function toggle2FA(enabled) {
+    var track = document.getElementById('twofa-track');
+    var thumb = document.getElementById('twofa-thumb');
+    var status = document.getElementById('twofa-status');
+
+    var fd = new FormData();
+    fd.append('enabled', enabled ? '1' : '0');
+
+    fetch('{{ path("app_2fa_toggle") }}', {
+        method: 'POST',
+        body: fd,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => r.json())
+    .then(json => {
+        if (json.success) {
+            track.style.background = enabled ? '#2D5A27' : '#ccc';
+            thumb.style.left       = enabled ? '21px' : '3px';
+            status.textContent     = enabled ? 'Activée' : 'Désactivée';
+            agriShowToast(enabled ? '2FA activée ✓' : '2FA désactivée');
+        }
+    });
+}
 </script>
 {% endblock %}
 
