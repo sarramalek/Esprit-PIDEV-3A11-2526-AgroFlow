@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+use App\Service\TwoFactorCodeSender;
 
 
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -24,25 +25,165 @@ class AuthController extends AbstractController
 {
     // ==================== LOGIN ====================
     #[Route('/login', name: 'app_login')]
-    public function login(AuthenticationUtils $authenticationUtils): Response
-    {
-        if ($this->getUser()) {
-            return $this->redirectByRole($this->getUser());
-        }
-
-        $error        = $authenticationUtils->getLastAuthenticationError();
-        $lastUsername = $authenticationUtils->getLastUsername();
-
-        $loginForm = $this->createForm(LoginFormType::class, [
-            '_username' => $lastUsername,
-        ]);
-
-        return $this->render('auth/login.html.twig', [
-            'loginForm' => $loginForm->createView(),
-            'error'     => $error,
-        ]);
+public function login(
+    AuthenticationUtils $authenticationUtils,
+    Request $request,
+    SessionInterface $session,
+    UserRepository $userRepo,
+    UserPasswordHasherInterface $hasher
+): Response {
+    // Si déjà connecté normalement → rediriger
+    if ($this->getUser() && !$session->get('2fa_pending_user_id')) {
+        return $this->redirectByRole($this->getUser());
     }
 
+    $error        = $authenticationUtils->getLastAuthenticationError();
+    $lastUsername = $authenticationUtils->getLastUsername();
+
+    // Symfony a authentifié l'utilisateur → on intercepte avant la session finale
+    // On passe par un CustomAuthenticator (voir étape 3) qui positionne '2fa_pending_user_id'
+    // Si 2FA en attente → rediriger vers la page de vérification
+    if ($session->get('2fa_pending_user_id')) {
+        return $this->redirectToRoute('app_2fa_verify');
+    }
+
+    $loginForm = $this->createForm(LoginFormType::class, ['_username' => $lastUsername]);
+
+    return $this->render('auth/login.html.twig', [
+        'loginForm' => $loginForm->createView(),
+        'error'     => $error,
+    ]);
+}
+
+
+ #[Route('/send-code', name: 'send_code', methods: ['POST'])]
+    public function sendCode(
+        Request $request,
+        SmsService $smsService,
+        SessionInterface $session
+    ): JsonResponse {
+        $phone = $request->request->get('phone');
+
+        try {
+            $result = $smsService->sendVerificationCode($phone);
+
+            // 💾 Stocker le code en session pour vérification
+            $session->set('verification_code', $result['code']);
+            $session->set('verification_expires', time() + 600); // 10 min
+
+            return $this->json([
+                'success' => true,
+                'channel' => $result['channel'], // 'twilio' ou 'vonage'
+                'message' => 'Code envoyé par SMS.',
+            ]);
+
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Impossible d\'envoyer le SMS.',
+            ], 500);
+        }
+    }
+
+    #[Route('/verify-code', name: 'verify_code', methods: ['POST'])]
+    public function verifyCode(
+        Request $request,
+        SessionInterface $session
+    ): JsonResponse {
+        $inputCode = $request->request->get('code');
+        $savedCode = $session->get('verification_code');
+        $expires   = $session->get('verification_expires');
+
+        if (!$savedCode || time() > $expires) {
+            return $this->json(['success' => false, 'message' => 'Code expiré.'], 400);
+        }
+
+        if ($inputCode !== $savedCode) {
+            return $this->json(['success' => false, 'message' => 'Code incorrect.'], 400);
+        }
+
+        // ✅ Code valide → nettoyer la session
+        $session->remove('verification_code');
+        $session->remove('verification_expires');
+
+        return $this->json(['success' => true, 'message' => 'Code vérifié avec succès.']);
+    }
+// Dans AuthController.php — ajouter ces routes :
+
+#[Route('/2fa/verify', name: 'app_2fa_verify')]
+public function twoFactorVerify(
+    Request $request,
+    SessionInterface $session,
+    UserRepository $userRepo,
+    EntityManagerInterface $em
+): Response {
+    $userId = $session->get('2fa_pending_user_id');
+    if (!$userId) {
+        return $this->redirectToRoute('app_login');
+    }
+
+    $error = null;
+
+    if ($request->isMethod('POST')) {
+        $entered   = trim($request->request->get('code', ''));
+        $stored    = $session->get('2fa_code');
+        $expiresAt = $session->get('2fa_expires_at');
+
+        if (time() > $expiresAt) {
+            $session->remove('2fa_pending_user_id');
+            $session->remove('2fa_code');
+            $error = 'Le code a expiré. Veuillez vous reconnecter.';
+        } elseif ($entered !== $stored) {
+            $error = 'Code incorrect. Vérifiez votre email ou SMS.';
+        } else {
+            // Code valide → connecter l'utilisateur manuellement
+            $user = $userRepo->find($userId);
+            $session->remove('2fa_pending_user_id');
+            $session->remove('2fa_code');
+            $session->remove('2fa_expires_at');
+
+            // Authentification manuelle via le token
+            $token = new \Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken(
+                $user, 'main', $user->getRoles()
+            );
+            $this->container->get('security.token_storage')->setToken($token);
+
+            return $this->redirectByRole($user);
+        }
+    }
+
+    return $this->render('auth/2fa_verify.html.twig', ['error' => $error]);
+}
+
+#[Route('/2fa/resend', name: 'app_2fa_resend')]
+public function twoFactorResend(
+    SessionInterface $session,
+    UserRepository $userRepo,
+    TwoFactorCodeSender $sender
+): Response {
+    $userId = $session->get('2fa_pending_user_id');
+    if (!$userId) return $this->redirectToRoute('app_login');
+
+    $user = $userRepo->find($userId);
+    $sender->send($user, $session);
+    $this->addFlash('success', 'Nouveau code envoyé.');
+    return $this->redirectToRoute('app_2fa_verify');
+}
+
+#[Route('/profil/2fa/toggle', name: 'app_2fa_toggle', methods: ['POST'])]
+public function toggle2fa(
+    Request $request,
+    EntityManagerInterface $em
+): Response {
+    $user = $this->getUser();
+    if (!$user) return $this->json(['success' => false], 401);
+
+    $enabled = (int) $request->request->get('enabled', 0);
+    $user->setTwoFactorEnabled($enabled ? 1 : 0);
+    $em->flush();
+
+    return $this->json(['success' => true, 'enabled' => $user->getTwoFactorEnabled()]);
+}
     // ==================== REGISTER ====================
    #[Route('/register', name: 'app_register')]
 public function register(
@@ -169,24 +310,64 @@ public function request(
             $session->set('reset_canal',      $canal);
             $session->set('reset_expires_at', time() + 600);
 
-            if ($canal === 'sms') {
-                try {
-                    $twilio = new TwilioClient(
-                        $_ENV['TWILIO_ACCOUNT_SID'],
-                        $_ENV['TWILIO_AUTH_TOKEN']
-                    );
-                    $tel = $user->getTel();
-                    if (!str_starts_with($tel, '+')) {
-                        $tel = '+216' . ltrim($tel, '0');
-                    }
-                    $twilio->messages->create($tel, [
-                        'from' => $_ENV['TWILIO_FROM'],
-                        'body' => "AgroFlow – Votre code : $code (valable 10 min)"
-                    ]);
-                } catch (\Exception $e) {
-                    $error = 'Impossible d\'envoyer le SMS : ' . $e->getMessage();
-                    goto renderForm;
+           if ($canal === 'sms') {
+    $sent = false;
+
+    // ── Tentative 1 : Twilio ──
+    try {
+        $twilio = new TwilioClient(
+            $_ENV['TWILIO_ACCOUNT_SID'],
+            $_ENV['TWILIO_AUTH_TOKEN']
+        );
+        $tel = $user->getTel();
+        if (!str_starts_with($tel, '+')) {
+            $tel = '+216' . ltrim($tel, '0');
+        }
+        $twilio->messages->create($tel, [
+            'from' => $_ENV['TWILIO_FROM'],
+            'body' => "AgroFlow – Votre code : $code (valable 10 min)"
+        ]);
+        $sent = true;
+
+    } catch (\Twilio\Exceptions\RestException $e) {
+
+        // ── Fallback : Vonage si Twilio dépasse la limite (429) ──
+        if ($e->getStatusCode() === 429) {
+            try {
+                $vonage = new \Vonage\Client(
+                    new \Vonage\Client\Credentials\Basic(
+                        $_ENV['VONAGE_API_KEY'],
+                        $_ENV['VONAGE_API_SECRET']
+                    )
+                );
+                $tel = $user->getTel();
+                if (!str_starts_with($tel, '+')) {
+                    $tel = '+216' . ltrim($tel, '0');
                 }
+                $message  = new \Vonage\SMS\Message\SMS(
+                    $tel,
+                    $_ENV['VONAGE_FROM'],
+                    "AgroFlow – Votre code : $code (valable 10 min)"
+                );
+                $response = $vonage->sms()->send($message);
+
+                if ($response->current()->getStatus() === 0) {
+                    $sent = true;
+                }
+            } catch (\Exception $vonageEx) {
+                $error = 'SMS indisponible. Veuillez choisir l\'envoi par email.';
+                goto renderForm;
+            }
+        } else {
+            $error = 'Impossible d\'envoyer le SMS : ' . $e->getMessage();
+            goto renderForm;
+        }
+    }
+
+    if (!$sent) {
+        $error = 'L\'envoi du SMS a échoué. Veuillez réessayer.';
+        goto renderForm;
+    }
             } else {
                 // ── PHPMailer ──
                 try {
@@ -348,22 +529,47 @@ public function request(
         $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
         $session->set('reset_code',       $code);
         $session->set('reset_expires_at', time() + 600);
+if ($canal === 'sms') {
+    $tel = $user->getTel();
+    if (!str_starts_with($tel, '+')) {
+        $tel = '+216' . ltrim($tel, '0');
+    }
 
-        if ($canal === 'sms') {
-            try {
-                $twilio = new TwilioClient($_ENV['TWILIO_ACCOUNT_SID'], $_ENV['TWILIO_AUTH_TOKEN']);
-                $tel = $user->getTel();
-                if (!str_starts_with($tel, '+')) {
-                    $tel = '+216' . ltrim($tel, '0');
-                }
-                $twilio->messages->create($tel, [
-                    'from' => $_ENV['TWILIO_FROM'],
-                    'body' => "AgroFlow – Nouveau code : $code (valable 10 min)"
-                ]);
-            } catch (\Exception $e) {
-                // silencieux
+    $smsSent = false;
+
+    // ── Tentative 1 : Twilio ──
+    
+    // ── Tentative 2 : Vonage (fallback) ──
+    if (!$smsSent) {
+        try {
+            $vonage = new \Vonage\Client(
+                new \Vonage\Client\Credentials\Basic(
+                    $_ENV['VONAGE_API_KEY'],
+                    $_ENV['VONAGE_API_SECRET']
+                )
+            );
+            $response = $vonage->sms()->send(
+                new \Vonage\SMS\Message\SMS(
+                    $tel,
+                    $_ENV['VONAGE_FROM'],
+                    "AgroFlow – Votre code : $code (valable 10 min)"
+                )
+            );
+            if ($response->current()->getStatus() === 0) {
+                $smsSent = true;
             }
-        } else {
+        } catch (\Exception $vonageEx) {
+            $smsSent = false;
+        }
+    }
+
+    if (!$smsSent) {
+        $error = 'Impossible d\'envoyer le SMS. Veuillez choisir l\'envoi par email.';
+        return $this->render('Auth/reset_password_request.html.twig', [
+        'error' => $error,
+    ]);
+    }
+    } else {
     try {
         $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
         $mail->isSMTP();

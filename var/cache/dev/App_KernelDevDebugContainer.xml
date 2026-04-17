@@ -658,6 +658,12 @@
     <service id="App\EventListener\LogoutListener" class="App\EventListener\LogoutListener" autowire="true" autoconfigure="true">
       <tag name="kernel.event_subscriber"/>
     </service>
+    <service id="App\EventListener\SmsService" class="App\EventListener\SmsService" autowire="true" autoconfigure="true">
+      <tag name="container.error" message="The autoloader expected class &quot;App\EventListener\SmsService&quot; to be defined in file &quot;C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\EventListener\SmsService.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
+    </service>
+    <service id="App\EventListener\TwoFactorLListener" class="App\EventListener\TwoFactorLListener" autowire="true" autoconfigure="true">
+      <tag name="container.error" message="The autoloader expected class &quot;App\EventListener\TwoFactorLListener&quot; to be defined in file &quot;C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\EventListener\TwoFactorLListener.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
+    </service>
     <service id="App\Form\Animals\Admin\AdminAnimauxType" class="App\Form\Animals\Admin\AdminAnimauxType" autowire="true" autoconfigure="true">
       <tag name="form.type"/>
     </service>
@@ -811,6 +817,11 @@
       <tag name="doctrine.repository_service"/>
       <argument type="service" id="doctrine"/>
     </service>
+    <service id="App\Security\LoginFormAuthenticator" class="App\Security\LoginFormAuthenticator" autowire="true" autoconfigure="true">
+      <argument type="service" id="router.default"/>
+      <argument type="service" id="App\Repository\User\UserRepository"/>
+      <argument type="service" id="security.token_storage"/>
+    </service>
     <service id="App\Security\TerrainVoter" class="App\Security\TerrainVoter" autowire="true" autoconfigure="true">
       <tag name="security.voter"/>
     </service>
@@ -832,6 +843,16 @@
       <argument type="service" id="App\Repository\Materiels\MachineRepository"/>
       <argument type="service" id="App\Repository\Animals\AnimauxRepository"/>
       <argument>%env(GROQ_API_KEY)%</argument>
+    </service>
+    <service id="App\Service\TwoFactorCodeSender" class="App\Service\TwoFactorCodeSender" autowire="true" autoconfigure="true"/>
+    <service id="App\Service\SmsService" class="App\Service\SmsService" autowire="true" autoconfigure="true">
+      <argument>%env(TWILIO_SID)%</argument>
+      <argument>%env(TWILIO_TOKEN)%</argument>
+      <argument>%env(TWILIO_FROM)%</argument>
+      <argument>%env(VONAGE_API_KEY)%</argument>
+      <argument>%env(VONAGE_API_SECRET)%</argument>
+      <argument>%env(VONAGE_FROM)%</argument>
+      <argument type="service" id="monolog.logger"/>
     </service>
     <service id="argument_metadata_factory" class="Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory"/>
     <service id="argument_resolver.backed_enum_resolver" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueResolver">
@@ -860,7 +881,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.SORtraR"/>
+      <argument type="service" id=".service_locator.vGdBZFg"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -2381,6 +2402,11 @@
       </call>
       <factory class="Symfony\Component\HttpClient\HttpClient" method="create"/>
     </service>
+    <service id="psr18.http_client" class="Symfony\Component\HttpClient\Psr18Client">
+      <argument type="service" id=".debug.http_client"/>
+      <argument>null</argument>
+      <argument>null</argument>
+    </service>
     <service id="http_client.abstract_retry_strategy" class="Symfony\Component\HttpClient\Retry\GenericRetryStrategy" abstract="true">
       <argument type="abstract">http codes</argument>
       <argument type="abstract">delay ms</argument>
@@ -3877,7 +3903,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.SORtraR"/>
+      <argument type="service" id=".service_locator.vGdBZFg"/>
     </service>
     <service id="debug.log_processor" class="Symfony\Bridge\Monolog\Processor\DebugProcessor">
       <tag name="kernel.reset" method="reset"/>
@@ -6787,7 +6813,7 @@
       <argument type="service" id=".service_locator.e_.xxAP"/>
       <argument type="collection">
         <argument key="dev">null</argument>
-        <argument key="main" type="service" id=".service_locator.SfGnQiG"/>
+        <argument key="main" type="service" id=".service_locator.0X5EsyL"/>
       </argument>
     </service>
     <service id="security.user_value_resolver" class="Symfony\Component\Security\Http\Controller\UserValueResolver">
@@ -7331,6 +7357,7 @@
       <argument type="service" id=".service_locator._1SGciK"/>
       <argument type="collection">
         <argument key="main" type="collection">
+          <argument type="service" id="App\Security\LoginFormAuthenticator"/>
           <argument type="service" id="security.authenticator.form_login.main"/>
         </argument>
       </argument>
@@ -7385,11 +7412,12 @@
       <argument>false</argument>
       <argument>security.user.provider.concrete.app_user_provider</argument>
       <argument>main</argument>
-      <argument>security.authenticator.form_login.main</argument>
+      <argument>App\Security\LoginFormAuthenticator</argument>
       <argument>null</argument>
       <argument>null</argument>
       <argument type="collection">
         <argument>form_login</argument>
+        <argument>App\Security\LoginFormAuthenticator</argument>
       </argument>
       <argument>null</argument>
       <argument type="collection">
@@ -7501,6 +7529,7 @@
     <service id="security.authenticator.manager.main" class="Symfony\Component\Security\Http\Authentication\AuthenticatorManager">
       <tag name="monolog.logger" channel="security"/>
       <argument type="collection">
+        <argument type="service" id="App\Security\LoginFormAuthenticator"/>
         <argument type="service" id="security.authenticator.form_login.main"/>
       </argument>
       <argument type="service" id="security.token_storage"/>
@@ -7525,15 +7554,16 @@
       <argument type="service" id="scheb_two_factor.security.authentication.trust_resolver"/>
       <argument type="service" id="security.http_utils"/>
       <argument>main</argument>
-      <argument type="service" id="security.authenticator.form_login.main"/>
+      <argument type="service" id="App\Security\LoginFormAuthenticator"/>
       <argument>null</argument>
       <argument>null</argument>
       <argument type="service" id="monolog.logger.security" on-invalid="null"/>
       <argument>false</argument>
     </service>
-    <service id=".service_locator.SfGnQiG" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.0X5EsyL" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
+        <argument key="App\Security\LoginFormAuthenticator" type="service_closure" id="App\Security\LoginFormAuthenticator"/>
         <argument key="security.authenticator.form_login.main" type="service_closure" id="security.authenticator.form_login.main"/>
       </argument>
     </service>
@@ -8823,10 +8853,35 @@
         <argument key="examen" type="service_closure" id=".errored..service_locator.wH4nX8g.App\Entity\Animals\Examen"/>
       </argument>
     </service>
-    <service id=".service_locator.rSTd.nA" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.cK.9e7Y" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="authenticationUtils" type="service_closure" id="security.authentication_utils"/>
+        <argument key="hasher" type="service_closure" id="security.user_password_hasher"/>
+        <argument key="userRepo" type="service_closure" id="App\Repository\User\UserRepository"/>
+      </argument>
+    </service>
+    <service id=".errored.XQjLQ.F" class="App\Controller\SmsService">
+      <tag name="container.error" message="Cannot determine controller argument for &quot;App\Controller\AuthController::sendCode()&quot;: the $smsService argument is type-hinted with the non-existent class or interface: &quot;App\Controller\SmsService&quot;. Did you forget to add a use statement?"/>
+    </service>
+    <service id=".service_locator.u2cqaFU" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="smsService" type="service_closure" id=".errored.XQjLQ.F"/>
+      </argument>
+    </service>
+    <service id=".service_locator.2oEUwKR" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="userRepo" type="service_closure" id="App\Repository\User\UserRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.ZrybK.J" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="sender" type="service_closure" id="App\Service\TwoFactorCodeSender"/>
+        <argument key="userRepo" type="service_closure" id="App\Repository\User\UserRepository"/>
       </argument>
     </service>
     <service id=".service_locator.t8346QO" class="Symfony\Component\DependencyInjection\ServiceLocator">
@@ -8937,13 +8992,6 @@
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="repo" type="service_closure" id="App\Repository\Materiels\MachineRepository"/>
-        <argument key="userRepo" type="service_closure" id="App\Repository\User\UserRepository"/>
-      </argument>
-    </service>
-    <service id=".service_locator.IOi49kI" class="Symfony\Component\DependencyInjection\ServiceLocator">
-      <tag name="container.service_locator"/>
-      <argument type="collection">
-        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
         <argument key="userRepo" type="service_closure" id="App\Repository\User\UserRepository"/>
       </argument>
     </service>
@@ -9256,7 +9304,7 @@
         <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
       </argument>
     </service>
-    <service id=".service_locator.SORtraR" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.vGdBZFg" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Controller\AdminDashboardController::index" type="service_closure" id=".service_locator.qni5W9T"/>
@@ -9304,12 +9352,16 @@
         <argument key="App\Controller\Animals\ExamensController::show" type="service_closure" id=".service_locator.Uyi5bSJ"/>
         <argument key="App\Controller\Animals\ExamensController::stats" type="service_closure" id=".service_locator.tl.X0ws"/>
         <argument key="App\Controller\AuthController::banni" type="service_closure" id=".service_locator.5K79pQ6"/>
-        <argument key="App\Controller\AuthController::login" type="service_closure" id=".service_locator.rSTd.nA"/>
+        <argument key="App\Controller\AuthController::login" type="service_closure" id=".service_locator.cK.9e7Y"/>
         <argument key="App\Controller\AuthController::newPassword" type="service_closure" id=".service_locator.P9wQXFg"/>
         <argument key="App\Controller\AuthController::register" type="service_closure" id=".service_locator.t8346QO"/>
         <argument key="App\Controller\AuthController::request" type="service_closure" id=".service_locator.qni5W9T"/>
         <argument key="App\Controller\AuthController::resend" type="service_closure" id=".service_locator.TvXqsTL"/>
+        <argument key="App\Controller\AuthController::sendCode" type="service_closure" id=".service_locator.u2cqaFU"/>
         <argument key="App\Controller\AuthController::terrainsByAgriculteur" type="service_closure" id=".service_locator.S6We5vz"/>
+        <argument key="App\Controller\AuthController::toggle2fa" type="service_closure" id=".service_locator.9kKwU2t"/>
+        <argument key="App\Controller\AuthController::twoFactorResend" type="service_closure" id=".service_locator.ZrybK.J"/>
+        <argument key="App\Controller\AuthController::twoFactorVerify" type="service_closure" id=".service_locator.2oEUwKR"/>
         <argument key="App\Controller\Evenements\Agriculteur\EvenementController::index" type="service_closure" id=".service_locator.bTRClTF"/>
         <argument key="App\Controller\Evenements\Agriculteur\EvenementController::inscrire" type="service_closure" id=".service_locator.VGXccJ4"/>
         <argument key="App\Controller\Evenements\Agriculteur\ParticipationController::annuler" type="service_closure" id=".service_locator.csIWZan"/>
@@ -9335,7 +9387,7 @@
         <argument key="App\Controller\Materiels\MachineController::machineDelete" type="service_closure" id=".service_locator.pt54IVS"/>
         <argument key="App\Controller\Materiels\MachineController::machineEdit" type="service_closure" id=".service_locator.pt54IVS"/>
         <argument key="App\Controller\Materiels\MachineController::machineIndex" type="service_closure" id=".service_locator._.8m7iI"/>
-        <argument key="App\Controller\Materiels\MachineController::machineNew" type="service_closure" id=".service_locator.IOi49kI"/>
+        <argument key="App\Controller\Materiels\MachineController::machineNew" type="service_closure" id=".service_locator.2oEUwKR"/>
         <argument key="App\Controller\Materiels\MachineController::machineShow" type="service_closure" id=".service_locator.6xRxq88"/>
         <argument key="App\Controller\Materiels\MachineController::machineStatistiques" type="service_closure" id=".service_locator.2E5fScC"/>
         <argument key="App\Controller\Materiels\MaintenancesController::delete" type="service_closure" id=".service_locator.kLp2YUI"/>
@@ -9495,12 +9547,16 @@
         <argument key="App\Controller\Animals\ExamensController:show" type="service_closure" id=".service_locator.Uyi5bSJ"/>
         <argument key="App\Controller\Animals\ExamensController:stats" type="service_closure" id=".service_locator.tl.X0ws"/>
         <argument key="App\Controller\AuthController:banni" type="service_closure" id=".service_locator.5K79pQ6"/>
-        <argument key="App\Controller\AuthController:login" type="service_closure" id=".service_locator.rSTd.nA"/>
+        <argument key="App\Controller\AuthController:login" type="service_closure" id=".service_locator.cK.9e7Y"/>
         <argument key="App\Controller\AuthController:newPassword" type="service_closure" id=".service_locator.P9wQXFg"/>
         <argument key="App\Controller\AuthController:register" type="service_closure" id=".service_locator.t8346QO"/>
         <argument key="App\Controller\AuthController:request" type="service_closure" id=".service_locator.qni5W9T"/>
         <argument key="App\Controller\AuthController:resend" type="service_closure" id=".service_locator.TvXqsTL"/>
+        <argument key="App\Controller\AuthController:sendCode" type="service_closure" id=".service_locator.u2cqaFU"/>
         <argument key="App\Controller\AuthController:terrainsByAgriculteur" type="service_closure" id=".service_locator.S6We5vz"/>
+        <argument key="App\Controller\AuthController:toggle2fa" type="service_closure" id=".service_locator.9kKwU2t"/>
+        <argument key="App\Controller\AuthController:twoFactorResend" type="service_closure" id=".service_locator.ZrybK.J"/>
+        <argument key="App\Controller\AuthController:twoFactorVerify" type="service_closure" id=".service_locator.2oEUwKR"/>
         <argument key="App\Controller\Evenements\Agriculteur\EvenementController:index" type="service_closure" id=".service_locator.bTRClTF"/>
         <argument key="App\Controller\Evenements\Agriculteur\EvenementController:inscrire" type="service_closure" id=".service_locator.VGXccJ4"/>
         <argument key="App\Controller\Evenements\Agriculteur\ParticipationController:annuler" type="service_closure" id=".service_locator.csIWZan"/>
@@ -9526,7 +9582,7 @@
         <argument key="App\Controller\Materiels\MachineController:machineDelete" type="service_closure" id=".service_locator.pt54IVS"/>
         <argument key="App\Controller\Materiels\MachineController:machineEdit" type="service_closure" id=".service_locator.pt54IVS"/>
         <argument key="App\Controller\Materiels\MachineController:machineIndex" type="service_closure" id=".service_locator._.8m7iI"/>
-        <argument key="App\Controller\Materiels\MachineController:machineNew" type="service_closure" id=".service_locator.IOi49kI"/>
+        <argument key="App\Controller\Materiels\MachineController:machineNew" type="service_closure" id=".service_locator.2oEUwKR"/>
         <argument key="App\Controller\Materiels\MachineController:machineShow" type="service_closure" id=".service_locator.6xRxq88"/>
         <argument key="App\Controller\Materiels\MachineController:machineStatistiques" type="service_closure" id=".service_locator.2E5fScC"/>
         <argument key="App\Controller\Materiels\MaintenancesController:delete" type="service_closure" id=".service_locator.kLp2YUI"/>
@@ -12156,6 +12212,7 @@
     <service id="asset_mapper.http_client" alias=".debug.http_client"/>
     <service id="Symfony\Component\AssetMapper\ImportMap\ImportMapManager" alias="asset_mapper.importmap.manager"/>
     <service id="Symfony\Contracts\HttpClient\HttpClientInterface" alias=".debug.http_client"/>
+    <service id="Psr\Http\Client\ClientInterface" alias="psr18.http_client"/>
     <service id="mailer" alias="mailer.mailer"/>
     <service id="Symfony\Component\Mailer\MailerInterface" alias="mailer.mailer"/>
     <service id="mailer.default_transport" alias="mailer.transports"/>
@@ -12297,7 +12354,7 @@
     <service id="scheb_two_factor.provider_decider" alias="scheb_two_factor.default_provider_decider"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.w7.f4fT" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.SORtraR"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.vGdBZFg"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id=".Psr\Log\LoggerInterface $request.logger" alias="monolog.logger.request"/>
@@ -12342,6 +12399,9 @@
     <service id=".service_locator.Ye5OOWs" alias=".service_locator.cZxzGoz"/>
     <service id=".service_locator.s4yyZIP" alias=".service_locator.ST3E3fc"/>
     <service id=".service_locator.ontUAUs" alias=".service_locator.wH4nX8g"/>
+    <service id=".service_locator.6RkzpeU" alias=".service_locator.cK.9e7Y"/>
+    <service id=".service_locator.IOi49kI" alias=".service_locator.2oEUwKR"/>
+    <service id=".service_locator.JJEdj.e" alias=".service_locator.ZrybK.J"/>
     <service id=".service_locator.81LTOQ7" alias=".service_locator.t8346QO"/>
     <service id=".service_locator.DREuDkf" alias=".service_locator.5K79pQ6"/>
     <service id=".service_locator.GnAFEbN" alias=".service_locator.P9wQXFg"/>
@@ -12369,7 +12429,7 @@
     <service id=".service_locator.5pebkNV" alias=".service_locator.xxq2prQ"/>
     <service id=".service_locator.whdse4m" alias=".service_locator.yd.AI8F"/>
     <service id=".service_locator.8J1nalj" alias=".service_locator.SsD9eLO"/>
-    <service id=".service_locator.WVFSLI6" alias=".service_locator.SORtraR"/>
+    <service id=".service_locator.XU9rtn0" alias=".service_locator.vGdBZFg"/>
     <service id=".service_locator.BFrsqsn" alias=".service_locator.F9PKc.7"/>
     <service id=".service_locator.oIHygA7" alias=".service_locator.xOkKGYY"/>
     <service id=".service_locator.XtmiKbi" alias=".service_locator.MfxSDRP"/>
@@ -12419,7 +12479,9 @@
     <service id=".service_locator.Z1ddSQN" alias=".service_locator.I4pKEWT"/>
     <service id=".service_locator._D8eTcZ" alias=".service_locator.Uyi5bSJ"/>
     <service id=".service_locator.JTtEETS" alias=".service_locator.wH4nX8g"/>
-    <service id=".service_locator.7NIAq8D" alias=".service_locator.rSTd.nA"/>
+    <service id=".service_locator.W8CreQw" alias=".service_locator.cK.9e7Y"/>
+    <service id=".service_locator.VIwhQZf" alias=".service_locator.2oEUwKR"/>
+    <service id=".service_locator.JMj.UAi" alias=".service_locator.ZrybK.J"/>
     <service id=".service_locator.PgYGRUQ" alias=".service_locator.t8346QO"/>
     <service id=".service_locator.uMYGWnB" alias=".service_locator.5K79pQ6"/>
     <service id=".service_locator.NY0XfPp" alias=".service_locator.S6We5vz"/>
@@ -12436,7 +12498,6 @@
     <service id=".service_locator.pKyWZ4m" alias=".service_locator.md0EV5q"/>
     <service id=".service_locator.b9UTYfn" alias=".service_locator.VGXccJ4"/>
     <service id=".service_locator.b3SM2he" alias=".service_locator._.8m7iI"/>
-    <service id=".service_locator.VIwhQZf" alias=".service_locator.IOi49kI"/>
     <service id=".service_locator.JG4uyKr" alias=".service_locator.kLp2YUI"/>
     <service id=".service_locator.biu0rfU" alias=".service_locator.ZUN3WII"/>
     <service id=".service_locator..wevcEs" alias=".service_locator.yjHtSb5"/>
