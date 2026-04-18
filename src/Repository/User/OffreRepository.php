@@ -99,4 +99,38 @@ class OffreRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+    // Compte les offres filtrées (pour la pagination)
+public function countSearched(string $search = ''): int
+{
+    $qb = $this->createQueryBuilder('o')
+        ->select('COUNT(o.idOffres)');
+
+    if ($search) {
+        $qb->where('o.nomOffre LIKE :q OR o.description LIKE :q')
+           ->setParameter('q', "%$search%");
+    }
+
+    return (int) $qb->getQuery()->getSingleScalarResult();
+}
+
+// Version paginée de searchAndSort
+public function searchAndSortPaginated(
+    string $search,
+    string $sort,
+    string $direction,
+    int $page,
+    int $limit
+): array {
+    $qb = $this->createQueryBuilder('o')
+        ->orderBy("o.$sort", $direction)
+        ->setFirstResult(($page - 1) * $limit)
+        ->setMaxResults($limit);
+
+    if ($search) {
+        $qb->where('o.nomOffre LIKE :q OR o.description LIKE :q')
+           ->setParameter('q', "%$search%");
+    }
+
+    return $qb->getQuery()->getResult();
+}
 }
