@@ -1,0 +1,298 @@
+{% extends 'agriculteur_dashboard.html.twig' %}
+{% block title %}Plan de maintenance IA — #{{ maintenance.idMain }}{% endblock %}
+{% block body %}
+<style>
+.api-page { max-width:960px; margin:0 auto; padding:2rem 1.75rem; font-family:'Segoe UI',system-ui,sans-serif; }
+.api-bc { display:flex; align-items:center; gap:.4rem; font-size:.82rem; color:#5f7a5f; margin-bottom:1.5rem; }
+.api-bc a { color:#2d6a2d; text-decoration:none; font-weight:500; }
+.api-bc a:hover { text-decoration:underline; }
+.api-bc__sep { color:#aac2aa; }
+.api-header { margin-bottom:1.75rem; }
+.api-header h1 { margin:0 0 .3rem; font-size:1.75rem; font-weight:700; color:#1a2e1a; }
+.api-header p  { margin:0; font-size:.875rem; color:#6b8c6b; }
+
+.plan-options-card { background:#fff; border-radius:16px; box-shadow:0 2px 18px rgba(0,0,0,.07); padding:1.4rem 1.5rem; margin-bottom:1.25rem; border-left:4px solid #534AB7; }
+.plan-options-card h2 { margin:0 0 1rem; font-size:1rem; font-weight:700; color:#3C3489; }
+.options-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:.75rem; }
+.opt-chip { background:#f9f7ff; border:1.5px solid #AFA9EC; border-radius:12px; padding:.75rem 1rem; cursor:pointer; transition:all .15s; display:flex; flex-direction:column; gap:.25rem; }
+.opt-chip:hover,.opt-chip.selected { background:#EEEDFE; border-color:#534AB7; box-shadow:0 0 0 3px rgba(83,74,183,.1); }
+.opt-chip__icon { font-size:1.3rem; }
+.opt-chip__name { font-size:.85rem; font-weight:700; color:#1a2e1a; }
+.opt-chip__desc { font-size:.73rem; color:#7a7aaa; }
+
+.api-context-card { background:#fff; border-radius:16px; box-shadow:0 2px 18px rgba(0,0,0,.07); padding:1.5rem; margin-bottom:1.5rem; border-left:4px solid #534AB7; }
+.api-context-card h2 { margin:0 0 1rem; font-size:1rem; font-weight:700; color:#3C3489; }
+.api-context-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:.75rem; }
+.api-citem { background:#f9f7ff; border-radius:10px; padding:.85rem 1rem; }
+.api-clabel { font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#7a9a7a; margin-bottom:.25rem; }
+.api-cvalue { font-size:.95rem; font-weight:600; color:#1a2e1a; }
+
+.timeline-card { background:#fff; border-radius:16px; box-shadow:0 2px 18px rgba(0,0,0,.07); padding:1.4rem 1.5rem; margin-bottom:1.25rem; }
+.timeline-card h2 { margin:0 0 1rem; font-size:1rem; font-weight:700; color:#1a2e1a; }
+.timeline { display:flex; flex-direction:column; gap:.6rem; }
+.tl-item { display:flex; align-items:flex-start; gap:.9rem; }
+.tl-dot  { width:12px; height:12px; border-radius:50%; flex-shrink:0; margin-top:4px; }
+.tl-dot--done   { background:#2d6a2d; }
+.tl-dot--active { background:#7b5200; }
+.tl-dot--future { background:#AFA9EC; }
+.tl-text { font-size:.85rem; color:#3a5a3a; line-height:1.4; }
+.tl-text strong { color:#1a2e1a; }
+
+.btn-generate { display:inline-flex; align-items:center; gap:.6rem; padding:.85rem 2rem; border-radius:12px; background:linear-gradient(135deg,#534AB7,#3C3489); color:#fff; font-size:1rem; font-weight:700; border:none; cursor:pointer; transition:opacity .15s; box-shadow:0 4px 16px rgba(83,74,183,.3); }
+.btn-generate:hover { opacity:.9; }
+.btn-generate:disabled { opacity:.55; cursor:not-allowed; }
+.spinner { display:none; width:18px; height:18px; border:2.5px solid rgba(255,255,255,.3); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+.result-card { display:none; background:#fff; border-radius:16px; box-shadow:0 2px 18px rgba(0,0,0,.07); overflow:hidden; margin-top:1.5rem; }
+.result-header { background:linear-gradient(135deg,#534AB7,#3C3489); padding:1.2rem 1.5rem; color:#fff; display:flex; align-items:center; gap:.75rem; }
+.result-header h2 { margin:0; font-size:1rem; font-weight:700; }
+.result-body { padding:1.5rem; }
+.result-body .plan-content { line-height:1.8; color:#2a3a2a; font-size:.95rem; }
+.result-body .plan-content h3 { color:#3C3489; margin:1.25rem 0 .5rem; font-size:1rem; }
+.result-body .plan-content ul { padding-left:1.4rem; margin:.5rem 0; }
+.result-body .plan-content li { margin-bottom:.4rem; }
+.result-body .plan-content strong { color:#1a2e1a; }
+.result-actions { display:flex; gap:.75rem; padding:1rem 1.5rem; border-top:1px solid #f0f4ef; background:#fafcf8; flex-wrap:wrap; }
+
+.error-card { display:none; background:#fcebeb; border-radius:12px; border:1.5px solid #f7c1c1; padding:1.2rem 1.5rem; color:#a32d2d; margin-top:1.25rem; font-size:.9rem; }
+
+.actions-row { display:flex; gap:.75rem; flex-wrap:wrap; align-items:center; margin-bottom:1.5rem; }
+.btn-back { display:inline-flex; align-items:center; gap:.4rem; padding:.62rem 1.2rem; border-radius:10px; border:1.5px solid #d0e4cc; color:#5f7a5f; font-size:.88rem; font-weight:600; text-decoration:none; background:transparent; transition:background .14s; }
+.btn-back:hover { background:#f2f8ee; }
+.btn-copy { display:inline-flex; align-items:center; gap:.4rem; padding:.55rem 1.1rem; border-radius:10px; border:1.5px solid #AFA9EC; color:#534AB7; font-size:.85rem; font-weight:600; background:#fff; cursor:pointer; transition:background .14s; }
+.btn-copy:hover { background:#EEEDFE; }
+</style>
+
+<div class="api-page">
+
+  <nav class="api-bc">
+    <a href="{{ path('agri_maintenances_index') }}">Maintenances</a>
+    <span class="api-bc__sep">›</span>
+    <a href="{{ path('agri_maintenances_show', {id: maintenance.idMain}) }}">#{{ maintenance.idMain }}</a>
+    <span class="api-bc__sep">›</span>
+    <span>Plan IA</span>
+  </nav>
+
+  <div class="api-header">
+    <h1>🤖 Plan de maintenance intelligent</h1>
+    <p>Générez un plan d'intervention optimisé, groupé et préventif grâce à l'IA</p>
+  </div>
+
+  <div class="actions-row">
+    <a href="{{ path('agri_maintenances_show', {id: maintenance.idMain}) }}" class="btn-back">← Retour à la fiche</a>
+    <a href="{{ path('agri_maintenances_api_diagnostics', {id: maintenance.idMain}) }}" class="btn-back" style="border-color:#a8d5c8; color:#0F6E56;">🔍 Diagnostics IA</a>
+  </div>
+
+  {# Options du plan #}
+  <div class="plan-options-card">
+    <h2>⚙️ Personnaliser le plan</h2>
+    <div class="options-grid" id="planOptionsGrid">
+      <div class="opt-chip selected" data-key="intervention"><span class="opt-chip__icon">🔧</span><span class="opt-chip__name">Étapes détaillées</span><span class="opt-chip__desc">Séquence précise d'intervention</span></div>
+      <div class="opt-chip selected" data-key="prevention"><span class="opt-chip__icon">📅</span><span class="opt-chip__name">Préventif</span><span class="opt-chip__desc">Planning des futures maintenances</span></div>
+      <div class="opt-chip selected" data-key="pieces"><span class="opt-chip__icon">🔩</span><span class="opt-chip__name">Pièces détachées</span><span class="opt-chip__desc">Disponibilité et coûts estimés</span></div>
+      <div class="opt-chip selected" data-key="optimisation"><span class="opt-chip__icon">⚡</span><span class="opt-chip__name">Optimisation</span><span class="opt-chip__desc">Regroupement des interventions</span></div>
+      <div class="opt-chip selected" data-key="securite"><span class="opt-chip__icon">⚠️</span><span class="opt-chip__name">Sécurité</span><span class="opt-chip__desc">Précautions et EPI</span></div>
+      <div class="opt-chip selected" data-key="controle"><span class="opt-chip__icon">✅</span><span class="opt-chip__name">Points de contrôle</span><span class="opt-chip__desc">Vérifications post-intervention</span></div>
+    </div>
+  </div>
+
+  {# Timeline prévisionnelle #}
+  <div class="timeline-card" id="timelineCard">
+    <h2>📅 Timeline prévisionnelle</h2>
+    <div class="timeline" id="timelineList"></div>
+  </div>
+
+  {# Contexte #}
+  <div class="api-context-card">
+    <h2>📋 Contexte de la maintenance</h2>
+    <div class="api-context-grid">
+      <div class="api-citem"><div class="api-clabel">Type de panne</div><div class="api-cvalue">{{ maintenance.typePanne }}</div></div>
+      <div class="api-citem"><div class="api-clabel">Coût</div><div class="api-cvalue">{{ maintenance.cout|number_format(2,',',' ') }} DT</div></div>
+      <div class="api-citem"><div class="api-clabel">Date</div><div class="api-cvalue">{{ maintenance.dateMain ? maintenance.dateMain|date('d/m/Y') : '—' }}</div></div>
+      <div class="api-citem"><div class="api-clabel">Statut</div><div class="api-cvalue">{{ maintenance.statut|capitalize }}</div></div>
+      <div class="api-citem"><div class="api-clabel">Priorité</div><div class="api-cvalue">{{ maintenance.priorite|capitalize }}</div></div>
+      {% if maintenance.kilometrage is not null %}<div class="api-citem"><div class="api-clabel">Kilométrage</div><div class="api-cvalue">{{ maintenance.kilometrage|number_format(0,' ',' ') }} km</div></div>{% endif %}
+      {% if maintenance.nom %}<div class="api-citem"><div class="api-clabel">Machine</div><div class="api-cvalue">{{ maintenance.nom }}</div></div>{% endif %}
+    </div>
+    {% if maintenance.description %}<div style="margin-top:.9rem; background:#f9f7ff; border-radius:10px; padding:.85rem 1rem;"><div class="api-clabel" style="margin-bottom:.35rem;">Description</div><div style="font-size:.9rem; color:#2a3a2a; line-height:1.6;">{{ maintenance.description }}</div></div>{% endif %}
+    {% if maintenance.recommandation %}<div style="margin-top:.6rem; background:#f9f7ff; border-radius:10px; padding:.85rem 1rem;"><div class="api-clabel" style="margin-bottom:.35rem;">Recommandations existantes</div><div style="font-size:.9rem; color:#2a3a2a; line-height:1.6;">{{ maintenance.recommandation }}</div></div>{% endif %}
+  </div>
+
+  <button class="btn-generate" id="generateBtn">
+    <span id="btnIcon">✨</span>
+    <span class="spinner" id="spinner"></span>
+    <span id="btnText">Générer le plan de maintenance</span>
+  </button>
+
+  <div class="error-card" id="errorCard"></div>
+
+  <div class="result-card" id="resultCard">
+    <div class="result-header">
+      <span style="font-size:1.5rem;">🤖</span>
+      <h2>Plan de maintenance généré par IA</h2>
+    </div>
+    <div class="result-body">
+      <div class="plan-content" id="planContent"></div>
+    </div>
+    <div class="result-actions">
+      <button class="btn-copy" onclick="copyResult()">📋 Copier le plan</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const maintenanceData = {
+    idMain: {{ maintenance.idMain }},
+    typePanne: {{ maintenance.typePanne|json_encode|raw }},
+    cout: {{ maintenance.cout }},
+    dateMain: {{ (maintenance.dateMain ? maintenance.dateMain|date('Y-m-d') : null)|json_encode|raw }},
+    statut: {{ maintenance.statut|json_encode|raw }},
+    priorite: {{ maintenance.priorite|json_encode|raw }},
+    kilometrage: {{ maintenance.kilometrage|json_encode|raw }},
+    nom: {{ maintenance.nom|json_encode|raw }},
+    description: {{ maintenance.description|json_encode|raw }},
+    recommandation: {{ maintenance.recommandation|json_encode|raw }},
+};
+
+// Options du plan
+document.querySelectorAll('.opt-chip').forEach(chip => {
+    chip.addEventListener('click', () => chip.classList.toggle('selected'));
+});
+
+function getSelectedOptions() {
+    return Array.from(document.querySelectorAll('.opt-chip.selected')).map(c => c.dataset.key);
+}
+
+// Timeline
+function buildTimeline() {
+    const today = new Date();
+    const events = [];
+    const list = document.getElementById('timelineList');
+    list.innerHTML = '';
+
+    if (maintenanceData.dateMain) {
+        const dm = new Date(maintenanceData.dateMain);
+        const done = dm <= today;
+        events.push({ dot: done ? 'done' : 'active', text: `<strong>Maintenance actuelle</strong> — ${dm.toLocaleDateString('fr-FR')} (${maintenanceData.typePanne})` });
+    } else {
+        events.push({ dot: 'active', text: `<strong>Maintenance actuelle</strong> — Date non renseignée (${maintenanceData.typePanne})` });
+    }
+
+    const intervals = { urgente: 30, haute: 60, moyenne: 90, faible: 180 };
+    const days = intervals[maintenanceData.priorite] || 90;
+    const next = new Date(today.getTime() + days * 86400000);
+    events.push({ dot: 'future', text: `<strong>Prochaine maintenance estimée</strong> — ${next.toLocaleDateString('fr-FR')} (dans ~${days} jours)` });
+
+    if (maintenanceData.kilometrage && maintenanceData.kilometrage > 8000) {
+        const rev = new Date(today.getTime() + 120 * 86400000);
+        events.push({ dot: 'future', text: `<strong>Révision générale recommandée</strong> — ${rev.toLocaleDateString('fr-FR')} (kilométrage élevé)` });
+    }
+
+    events.forEach(ev => {
+        list.innerHTML += `<div class="tl-item"><div class="tl-dot tl-dot--${ev.dot}"></div><div class="tl-text">${ev.text}</div></div>`;
+    });
+}
+buildTimeline();
+
+// Génération du plan
+document.getElementById('generateBtn').addEventListener('click', generatePlan);
+
+async function generatePlan() {
+    const btn = document.getElementById('generateBtn');
+    const spinner = document.getElementById('spinner');
+    const btnText = document.getElementById('btnText');
+    const btnIcon = document.getElementById('btnIcon');
+    const result = document.getElementById('resultCard');
+    const content = document.getElementById('planContent');
+    const errorCard = document.getElementById('errorCard');
+
+    btn.disabled = true;
+    spinner.style.display = 'block';
+    btnIcon.style.display = 'none';
+    btnText.textContent = 'Génération en cours…';
+    result.style.display = 'none';
+    errorCard.style.display = 'none';
+
+    const opts = getSelectedOptions();
+
+    const prompt = `Tu es un expert en maintenance de machines agricoles.
+
+=== CONTEXTE ===
+Machine : ${maintenanceData.nom || 'Non spécifiée'}
+Type de panne/intervention : ${maintenanceData.typePanne}
+Priorité : ${maintenanceData.priorite}
+Statut actuel : ${maintenanceData.statut}
+Kilométrage : ${maintenanceData.kilometrage ? maintenanceData.kilometrage + ' km' : 'Non renseigné'}
+Date de la maintenance : ${maintenanceData.dateMain || 'Non renseignée'}
+Coût estimé : ${maintenanceData.cout} DT
+Description : ${maintenanceData.description || 'Aucune'}
+Recommandations existantes : ${maintenanceData.recommandation || 'Aucune'}
+
+=== SECTIONS DEMANDÉES ===
+${opts.includes('intervention') ? '✅ 1. 🔍 Diagnostic préliminaire + étapes détaillées d\'intervention' : ''}
+${opts.includes('prevention') ? '✅ 2. 📅 Planning préventif : intervalles selon km et type de panne' : ''}
+${opts.includes('pieces') ? '✅ 3. 🔩 Pièces détachées : liste, disponibilité estimée et coûts (DT)' : ''}
+${opts.includes('optimisation') ? '✅ 4. ⚡ Optimisation : regroupement des interventions' : ''}
+${opts.includes('securite') ? '✅ 5. ⚠️ Précautions de sécurité et EPI requis' : ''}
+${opts.includes('controle') ? '✅ 6. ✅ Points de contrôle post-intervention' : ''}
+
+En fin de réponse, ajoute :
+## 📊 Score de santé estimé
+Note de 0 à 100 représentant l'état de la machine après cette intervention.
+
+## 💡 Recommandations intelligentes
+3 recommandations clés pour éviter la récurrence de cette panne.
+
+Sois précis, structuré et adapté au contexte agricole tunisien.`;
+
+    try {
+        const resp = await fetch("{{ path('agri_maintenances_api_gemini_generate') }}", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt })
+        });
+
+        if (!resp.ok) {
+            const err = await resp.json();
+            throw new Error(err.error || `Erreur API: ${resp.status}`);
+        }
+
+        const data = await resp.json();
+        if (!data.text) throw new Error('Réponse vide de l\'API.');
+
+        content.innerHTML = markdownToHtml(data.text);
+        result.style.display = 'block';
+        result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    } catch (err) {
+        errorCard.textContent = '❌ ' + err.message;
+        errorCard.style.display = 'block';
+    } finally {
+        btn.disabled = false;
+        spinner.style.display = 'none';
+        btnIcon.style.display = 'inline';
+        btnText.textContent = 'Régénérer le plan';
+    }
+}
+
+function copyResult() {
+    const text = document.getElementById('planContent').innerText;
+    navigator.clipboard.writeText(text).then(() => alert('📋 Plan copié dans le presse-papiers !'));
+}
+
+function markdownToHtml(md) {
+    return md
+        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+        .replace(/^## (.+)$/gm, '<h3>$1</h3>')
+        .replace(/^# (.+)$/gm, '<h3>$1</h3>')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        .replace(/^[-*] (.+)$/gm, '<li>$1</li>')
+        .replace(/(<li>.*<\/li>\n?)+/g, s => '<ul>' + s + '</ul>')
+        .replace(/\n\n/g, '</p><p>')
+        .replace(/\n/g, '<br>');
+}
+</script>
+{% endblock %}

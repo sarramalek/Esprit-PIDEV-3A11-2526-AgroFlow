@@ -5,7 +5,7 @@
 {% block breadcrumb %}Matériels / Machines / {{ machine.nom }}{% endblock %}
 
 {% block body %}
-<div style="max-width: 700px; margin: 0 auto;">
+<div style="max-width: 800px; margin: 0 auto;">
 
     <!-- Bouton Retour -->
     <a href="{{ path('admin_machines_index') }}" 
@@ -36,7 +36,7 @@
             {{ machine.nom }}
         </h2>
 
-        <div style="display: grid; grid-template-columns: 180px 1fr; gap: 18px 25px; font-size: 15px;">
+        <div style="display: grid; grid-template-columns: 200px 1fr; gap: 18px 25px; font-size: 15px;">
 
             <div style="color:#666; font-weight:500;">Marque</div>
             <div style="color:#2C3E50; font-weight:600;">{{ machine.marque }}</div>
@@ -45,15 +45,15 @@
             <div style="color:#2C3E50;">{{ machine.modele }}</div>
 
             <div style="color:#666; font-weight:500;">Numéro de série</div>
-            <div style="color:#2C3E50; font-family:monospace; font-size:14.5px;">{{ machine.numeroSerie }}</div>
+            <div style="color:#2C3E50; font-family:monospace; font-size:14.5px;">{{ machine.numeroSerie ?: '—' }}</div>
 
             <div style="color:#666; font-weight:500;">État</div>
             <div>
-                {% if machine.etatM in ['Neuf', 'Bon', 'Actif'] %}
+                {% if machine.etatM in ['Neuf', 'Bon'] %}
                     <span style="background:#EAF3DE; color:#3B6D11; padding:6px 14px; border-radius:20px; font-size:13px; font-weight:500;">
                         <i class="fa fa-check-circle" style="margin-right:5px;"></i> {{ machine.etatM }}
                     </span>
-                {% elseif machine.etatM in ['En panne', 'Hors service'] %}
+                {% elseif machine.etatM == 'En panne' %}
                     <span style="background:#FCEBEB; color:#A32D2D; padding:6px 14px; border-radius:20px; font-size:13px; font-weight:500;">
                         <i class="fa fa-exclamation-triangle" style="margin-right:5px;"></i> {{ machine.etatM }}
                     </span>
@@ -62,6 +62,12 @@
                         <i class="fa fa-info-circle" style="margin-right:5px;"></i> {{ machine.etatM }}
                     </span>
                 {% endif %}
+            </div>
+
+            <div style="color:#666; font-weight:500;">Kilométrage</div>
+            <div style="color:#2C3E50;">
+                <i class="fa fa-tachometer" style="color:#888; margin-right:6px;"></i> 
+                {{ machine.kilometrage }} km/h
             </div>
 
             <div style="color:#666; font-weight:500;">Date d'achat</div>
@@ -73,11 +79,32 @@
                 {% endif %}
             </div>
 
+            <div style="color:#666; font-weight:500;">Dernière visite</div>
+            <div style="color:#2C3E50;">
+                {% if machine.dateLastVisite %}
+                    <i class="fa fa-calendar-check" style="color:#888; margin-right:6px;"></i> 
+                    {{ machine.dateLastVisite|date('d/m/Y') }}
+                    <span style="color:#888; font-size:13px;">({{ machine.kmLastVisite }} km/h)</span>
+                {% else %}
+                    <span style="color:#999; font-style:italic;">Aucune visite enregistrée</span>
+                {% endif %}
+            </div>
+
+            <div style="color:#666; font-weight:500;">Prochaine maintenance</div>
+            <div style="color:#2C3E50;">
+                {% if machine.prochaineMaintenance %}
+                    <i class="fa fa-clock" style="color:#888; margin-right:6px;"></i> 
+                    {{ machine.prochaineMaintenance|date('d/m/Y') }}
+                {% else %}
+                    <span style="color:#999; font-style:italic;">Non planifiée</span>
+                {% endif %}
+            </div>
+
             <!-- Propriétaire -->
-            <div style="color:#666; font-weight:500;">
+            <div style="color:#666; font-weight:500; border-top:1px solid #f0f0f0; padding-top:15px;">
                 <i class="fa fa-user" style="margin-right:5px;"></i> Propriétaire
             </div>
-            <div style="color:#2C3E50;">
+            <div style="color:#2C3E50; border-top:1px solid #f0f0f0; padding-top:15px;">
                 {% if machine.agriculteur %}
                     <div style="display:flex; flex-direction:column; gap:4px;">
                         <strong style="color:#2D5A27;">
@@ -103,14 +130,10 @@
                 <i class="fa fa-pen"></i> Modifier
             </a>
 
-            <form method="post" action="{{ path('admin_machines_delete', {id: machine.id}) }}" 
-                  onsubmit="return confirm('⚠️ Voulez-vous vraiment supprimer cette machine ? Cette action est irréversible.')">
-                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ machine.id) }}">
-                <button type="submit" 
-                        style="background:#FCEBEB; color:#A32D2D; padding:12px 24px; border:none; border-radius:8px; cursor:pointer; font-weight:500; display:flex; align-items:center; gap:8px; transition:all .2s;">
-                    <i class="fa fa-trash"></i> Supprimer
-                </button>
-            </form>
+            <a href="{{ path('admin_machines_delete_confirm', {id: machine.id}) }}" 
+               style="background:#FCEBEB; color:#A32D2D; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:500; display:flex; align-items:center; gap:8px; transition:all .2s;">
+                <i class="fa fa-trash"></i> Supprimer
+            </a>
         </div>
 
     </div>

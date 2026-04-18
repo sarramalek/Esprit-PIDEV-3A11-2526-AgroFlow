@@ -109,6 +109,10 @@ class MaintenanceAdminController extends AbstractController
         $machines = $machineRepo->findAll();
         $errors = [];
 
+        // Définir les valeurs par défaut
+        $maintenance->setStatut('planifie');
+        $maintenance->setPriorite('moyenne');
+
         if ($request->isMethod('POST')) {
             // =============================================================
             // CONTROLE DE SAISIE PHP - Validation des champs
@@ -155,21 +159,60 @@ class MaintenanceAdminController extends AbstractController
                 }
             }
 
-            // 4. Validation de la description
+            // 4. Validation de la description (optionnelle)
             $description = trim($request->request->get('description', ''));
-            if (empty($description)) {
-                $errors['description'] = 'La description est obligatoire.';
-            } elseif (strlen($description) < 5) {
-                $errors['description'] = 'La description doit contenir au moins 5 caractères.';
-            } elseif (strlen($description) > 1000) {
-                $errors['description'] = 'La description ne peut pas dépasser 1000 caractères.';
-            } elseif (preg_match('/[<>{}]/', $description)) {
-                $errors['description'] = 'La description ne doit pas contenir les caractères < > { }.';
-            } else {
-                $maintenance->setDescription($description);
+            if (!empty($description)) {
+                if (strlen($description) > 1000) {
+                    $errors['description'] = 'La description ne peut pas dépasser 1000 caractères.';
+                } elseif (preg_match('/[<>{}]/', $description)) {
+                    $errors['description'] = 'La description ne doit pas contenir les caractères < > { }.';
+                } else {
+                    $maintenance->setDescription($description);
+                }
             }
 
-            // 5. Validation de la machine (optionnelle)
+            // 5. Validation de la recommandation (optionnelle)
+            $recommandation = trim($request->request->get('recommandation', ''));
+            if (!empty($recommandation)) {
+                if (strlen($recommandation) > 2000) {
+                    $errors['recommandation'] = 'La recommandation ne peut pas dépasser 2000 caractères.';
+                } else {
+                    $maintenance->setRecommandation($recommandation);
+                }
+            }
+
+            // 6. Validation du statut
+            $statut = $request->request->get('statut', 'planifie');
+            $allowedStatuts = ['planifie', 'en_cours', 'termine'];
+            if (!in_array($statut, $allowedStatuts)) {
+                $errors['statut'] = 'Statut invalide.';
+            } else {
+                $maintenance->setStatut($statut);
+            }
+
+            // 7. Validation de la priorité
+            $priorite = $request->request->get('priorite', 'moyenne');
+            $allowedPriorites = ['faible', 'moyenne', 'haute', 'urgente'];
+            if (!in_array($priorite, $allowedPriorites)) {
+                $errors['priorite'] = 'Priorité invalide.';
+            } else {
+                $maintenance->setPriorite($priorite);
+            }
+
+            // 8. Validation du kilométrage (optionnel)
+            $kilometrage = $request->request->get('kilometrage');
+            if (!empty($kilometrage)) {
+                $kmInt = (int) $kilometrage;
+                if ($kmInt < 0) {
+                    $errors['kilometrage'] = 'Le kilométrage doit être positif ou nul.';
+                } elseif ($kmInt > 9999999) {
+                    $errors['kilometrage'] = 'Kilométrage trop élevé.';
+                } else {
+                    $maintenance->setKilometrage($kmInt);
+                }
+            }
+
+            // 9. Validation de la machine (optionnelle)
             $idM = $request->request->get('idM');
             if (!empty($idM)) {
                 $idMInt = (int) $idM;
@@ -291,21 +334,66 @@ class MaintenanceAdminController extends AbstractController
                 }
             }
 
-            // 4. Validation de la description
+            // 4. Validation de la description (optionnelle)
             $description = trim($request->request->get('description', ''));
-            if (empty($description)) {
-                $errors['description'] = 'La description est obligatoire.';
-            } elseif (strlen($description) < 5) {
-                $errors['description'] = 'La description doit contenir au moins 5 caractères.';
-            } elseif (strlen($description) > 1000) {
-                $errors['description'] = 'La description ne peut pas dépasser 1000 caractères.';
-            } elseif (preg_match('/[<>{}]/', $description)) {
-                $errors['description'] = 'La description ne doit pas contenir les caractères < > { }.';
+            if (!empty($description)) {
+                if (strlen($description) > 1000) {
+                    $errors['description'] = 'La description ne peut pas dépasser 1000 caractères.';
+                } elseif (preg_match('/[<>{}]/', $description)) {
+                    $errors['description'] = 'La description ne doit pas contenir les caractères < > { }.';
+                } else {
+                    $maintenance->setDescription($description);
+                }
             } else {
-                $maintenance->setDescription($description);
+                $maintenance->setDescription(null);
             }
 
-            // 5. Validation de la machine (optionnelle)
+            // 5. Validation de la recommandation (optionnelle)
+            $recommandation = trim($request->request->get('recommandation', ''));
+            if (!empty($recommandation)) {
+                if (strlen($recommandation) > 2000) {
+                    $errors['recommandation'] = 'La recommandation ne peut pas dépasser 2000 caractères.';
+                } else {
+                    $maintenance->setRecommandation($recommandation);
+                }
+            } else {
+                $maintenance->setRecommandation(null);
+            }
+
+            // 6. Validation du statut
+            $statut = $request->request->get('statut', 'planifie');
+            $allowedStatuts = ['planifie', 'en_cours', 'termine'];
+            if (!in_array($statut, $allowedStatuts)) {
+                $errors['statut'] = 'Statut invalide.';
+            } else {
+                $maintenance->setStatut($statut);
+            }
+
+            // 7. Validation de la priorité
+            $priorite = $request->request->get('priorite', 'moyenne');
+            $allowedPriorites = ['faible', 'moyenne', 'haute', 'urgente'];
+            if (!in_array($priorite, $allowedPriorites)) {
+                $errors['priorite'] = 'Priorité invalide.';
+            } else {
+                $maintenance->setPriorite($priorite);
+            }
+
+            // 8. Validation du kilométrage (optionnel)
+            $kilometrage = $request->request->get('kilometrage');
+            if (!empty($kilometrage)) {
+                $kmInt = (int) $kilometrage;
+                if ($kmInt < 0) {
+                    $errors['kilometrage'] = 'Le kilométrage doit être positif ou nul.';
+                } elseif ($kmInt > 9999999) {
+                    $errors['kilometrage'] = 'Kilométrage trop élevé.';
+                } else {
+                    $maintenance->setKilometrage($kmInt);
+                }
+            } else {
+                $maintenance->setKilometrage(null);
+            }
+
+            // 9. Validation de la machine (optionnelle)
             $idM = $request->request->get('idM');
             if (!empty($idM)) {
                 $idMInt = (int) $idM;
