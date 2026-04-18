@@ -6,14 +6,13 @@
 {{ parent() }}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
+    /* ===== STYLES COMPLETS (garder tous les styles existants) ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'DM Sans', sans-serif; background: #f5f2ec; color: #1a1a18; }
 
     .main-container { max-width: 1600px; margin: 0 auto; padding: 32px 28px; }
 
-    /* Header avec tous les boutons */
     .page-header {
         display: flex;
         justify-content: space-between;
@@ -37,7 +36,6 @@
         flex-wrap: wrap;
     }
 
-    /* Boutons */
     .btn-primary {
         display: inline-flex;
         align-items: center;
@@ -92,7 +90,6 @@
     }
     .btn-outline:hover { background: #ece7dd; color: #1a1a18; transform: translateY(-1px); }
 
-    /* KPI Cards */
     .kpi-grid {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
@@ -123,7 +120,6 @@
     .kpi-value.green { color: #2d5a1b; }
     .kpi-sub { font-size: 11px; color: #9e9d95; margin-top: 6px; }
 
-    /* Filter Bar */
     .filter-bar {
         background: white;
         border: 1px solid #ece7dd;
@@ -199,7 +195,6 @@
     }
     .btn-reset:hover { background: #ece7dd; color: #1a1a18; }
 
-    /* Result Summary */
     .result-summary { margin-bottom: 16px; }
     .result-badge {
         background: white;
@@ -218,7 +213,6 @@
         border-radius: 50%;
     }
 
-    /* Table */
     .table-wrapper {
         background: white;
         border: 1px solid #ece7dd;
@@ -254,7 +248,6 @@
     .data-table tr:last-child td { border-bottom: none; }
     .data-table tr:hover { background: #fafaf7; }
 
-    /* Type Badges */
     .type-badge {
         display: inline-flex;
         align-items: center;
@@ -264,17 +257,16 @@
         font-size: 11px;
         font-weight: 500;
     }
-    .type-moteur { background: #e8f5e9; color: #1b5e20; }
-    .type-hydraulique { background: #e3f2fd; color: #0d47a1; }
-    .type-electrique { background: #fff8e1; color: #e65100; }
-    .type-mecanique { background: #fce4ec; color: #880e4f; }
-    .type-pneumatique { background: #f3e5f5; color: #4a148c; }
+    .type-moteur       { background: #e8f5e9; color: #1b5e20; }
+    .type-hydraulique  { background: #e3f2fd; color: #0d47a1; }
+    .type-electrique   { background: #fff8e1; color: #e65100; }
+    .type-mecanique    { background: #fce4ec; color: #880e4f; }
+    .type-pneumatique  { background: #f3e5f5; color: #4a148c; }
     .type-transmission { background: #fff3e0; color: #bf360c; }
-    .type-vidange { background: #e0f7fa; color: #004d40; }
-    .type-logicielle { background: #eceff1; color: #263238; }
-    .type-autre { background: #f5f5f5; color: #424242; }
+    .type-vidange      { background: #e0f7fa; color: #004d40; }
+    .type-logicielle   { background: #eceff1; color: #263238; }
+    .type-autre        { background: #f5f5f5; color: #424242; }
 
-    /* Statut badges */
     .statut-badge {
         display: inline-flex;
         align-items: center;
@@ -286,9 +278,8 @@
     }
     .statut-planifie { background: #e3f2fd; color: #1565c0; }
     .statut-en_cours { background: #fff3e0; color: #e65100; }
-    .statut-termine { background: #e8f5e9; color: #2e7d32; }
+    .statut-termine  { background: #e8f5e9; color: #2e7d32; }
 
-    /* Priorité badges */
     .priorite-badge {
         display: inline-flex;
         align-items: center;
@@ -298,9 +289,9 @@
         font-size: 10px;
         font-weight: 500;
     }
-    .priorite-faible { background: #f5f5f5; color: #616161; }
+    .priorite-faible  { background: #f5f5f5; color: #616161; }
     .priorite-moyenne { background: #e3f2fd; color: #1565c0; }
-    .priorite-haute { background: #fff3e0; color: #e65100; }
+    .priorite-haute   { background: #fff3e0; color: #e65100; }
     .priorite-urgente { background: #ffebee; color: #c62828; }
 
     .machine-link {
@@ -339,7 +330,6 @@
         font-size: 12px;
     }
 
-    /* Action Buttons */
     .action-buttons {
         display: flex;
         gap: 6px;
@@ -356,20 +346,15 @@
         transition: all 0.15s;
         border: none;
         cursor: pointer;
+        font-size: 14px;
     }
-    .btn-view { background: #e8f5e9; color: #1b5e20; }
+    .btn-view   { background: #e8f5e9; color: #1b5e20; }
     .btn-view:hover { background: #c8e6c9; }
-    .btn-edit { background: #fff8e1; color: #e65100; }
+    .btn-edit   { background: #fff8e1; color: #e65100; }
     .btn-edit:hover { background: #ffecb3; }
-    .btn-delete {
-        background: #ffebee;
-        color: #c62828;
-        border: none;
-        cursor: pointer;
-    }
+    .btn-delete { background: #ffebee; color: #c62828; border: none; cursor: pointer; }
     .btn-delete:hover { background: #ffcdd2; }
 
-    /* Table Footer */
     .table-footer {
         background: #f5f2ec;
         border-top: 1px solid #ece7dd;
@@ -387,7 +372,6 @@
         font-size: 15px;
     }
 
-    /* Empty State */
     .empty-state {
         text-align: center;
         padding: 64px 20px;
@@ -416,7 +400,6 @@
         margin-bottom: 20px;
     }
 
-    /* Flash Messages */
     .flash-message {
         border-radius: 12px;
         padding: 12px 18px;
@@ -427,9 +410,8 @@
         gap: 10px;
     }
     .flash-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
-    .flash-error { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
+    .flash-error   { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; }
 
-    /* Responsive */
     @media (max-width: 1024px) {
         .main-container { padding: 20px 16px; }
         .kpi-grid { grid-template-columns: repeat(2, 1fr); }
@@ -450,27 +432,30 @@
     {% for type, messages in app.flashes %}
         {% for msg in messages %}
             <div class="flash-message flash-{{ type == 'error' ? 'error' : 'success' }}">
-                <i class="bi bi-{{ type == 'error' ? 'x-circle-fill' : 'check-circle-fill' }}"></i>
+                <span>{{ type == 'error' ? '❌' : '✅' }}</span>
                 {{ msg }}
             </div>
         {% endfor %}
     {% endfor %}
 
-    {# Header avec tous les boutons #}
+    {# Header avec tous les boutons (avec emojis) #}
     <div class="page-header">
         <div class="header-left">
-            <h1>Liste des maintenances</h1>
-            <p>Interventions, types de panne, coûts, statuts et matériel associé</p>
+            <h1>📋 Liste des maintenances</h1>
+            <p>🔧 Interventions, types de panne, coûts, statuts et matériel associé</p>
         </div>
         <div class="header-buttons">
+            <a href="{{ path('admin_maintenances_history') }}" class="btn-outline">
+                📜 Historique
+            </a>
             <a href="{{ path('admin_maintenances_stats_bar') }}" class="btn-secondary" target="_blank">
-                <i class="bi bi-bar-chart-steps"></i> Statistiques
+                📊 Statistiques
             </a>
             <a href="{{ path('admin_maintenances_export_pdf') }}" class="btn-secondary" target="_blank">
-                <i class="bi bi-file-earmark-pdf"></i> Export PDF
+                📄 Export PDF
             </a>
             <a href="{{ path('admin_maintenances_new') }}" class="btn-primary">
-                <i class="bi bi-plus-lg"></i> Nouvelle maintenance
+                ➕ Nouvelle maintenance
             </a>
         </div>
     </div>
@@ -478,22 +463,22 @@
     {# Cartes KPI #}
     <div class="kpi-grid">
         <div class="kpi-card">
-            <div class="kpi-label">Interventions</div>
+            <div class="kpi-label">📊 Interventions</div>
             <div class="kpi-value">{{ maintenances|length }}</div>
             <div class="kpi-sub">enregistrées</div>
         </div>
         <div class="kpi-card">
-            <div class="kpi-label">Coût total</div>
+            <div class="kpi-label">💰 Coût total</div>
             <div class="kpi-value green">{{ totalCout|number_format(2, ',', ' ') }} DT</div>
             <div class="kpi-sub">Dinars tunisiens</div>
         </div>
         <div class="kpi-card">
-            <div class="kpi-label">En cours</div>
+            <div class="kpi-label">⚙️ En cours</div>
             <div class="kpi-value">{{ maintenances|filter(m => m.statut == 'en_cours')|length }}</div>
             <div class="kpi-sub">interventions actives</div>
         </div>
         <div class="kpi-card">
-            <div class="kpi-label">Urgentes</div>
+            <div class="kpi-label">⚠️ Urgentes</div>
             <div class="kpi-value">{{ maintenances|filter(m => m.priorite == 'urgente')|length }}</div>
             <div class="kpi-sub">haute priorité</div>
         </div>
@@ -503,11 +488,11 @@
     <div class="filter-bar">
         <form method="get" action="{{ path('admin_maintenances_index') }}" class="filter-form">
             <div class="filter-group">
-                <div class="filter-label">Recherche</div>
+                <div class="filter-label">🔍 Recherche</div>
                 <input type="text" name="search" class="filter-input" value="{{ search }}" placeholder="Type, description, matériel…">
             </div>
             <div class="filter-group">
-                <div class="filter-label">Type de panne</div>
+                <div class="filter-label">🏷️ Type de panne</div>
                 <select name="type" class="filter-select">
                     <option value="">— Tous les types —</option>
                     {% for type in types %}
@@ -516,26 +501,26 @@
                 </select>
             </div>
             <div class="filter-group">
-                <div class="filter-label">Statut</div>
+                <div class="filter-label">📌 Statut</div>
                 <select name="statut" class="filter-select">
                     <option value="">— Tous —</option>
                     <option value="planifie" {{ app.request.query.get('statut') == 'planifie' ? 'selected' : '' }}>📋 Planifié</option>
                     <option value="en_cours" {{ app.request.query.get('statut') == 'en_cours' ? 'selected' : '' }}>⚙️ En cours</option>
-                    <option value="termine" {{ app.request.query.get('statut') == 'termine' ? 'selected' : '' }}>✅ Terminé</option>
+                    <option value="termine"  {{ app.request.query.get('statut') == 'termine'  ? 'selected' : '' }}>✅ Terminé</option>
                 </select>
             </div>
             <div class="filter-group">
-                <div class="filter-label">Priorité</div>
+                <div class="filter-label">🚨 Priorité</div>
                 <select name="priorite" class="filter-select">
                     <option value="">— Toutes —</option>
-                    <option value="faible" {{ app.request.query.get('priorite') == 'faible' ? 'selected' : '' }}>⬇️ Faible</option>
+                    <option value="faible"  {{ app.request.query.get('priorite') == 'faible'  ? 'selected' : '' }}>⬇️ Faible</option>
                     <option value="moyenne" {{ app.request.query.get('priorite') == 'moyenne' ? 'selected' : '' }}>➡️ Moyenne</option>
-                    <option value="haute" {{ app.request.query.get('priorite') == 'haute' ? 'selected' : '' }}>⬆️ Haute</option>
+                    <option value="haute"   {{ app.request.query.get('priorite') == 'haute'   ? 'selected' : '' }}>⬆️ Haute</option>
                     <option value="urgente" {{ app.request.query.get('priorite') == 'urgente' ? 'selected' : '' }}>⚠️ Urgente</option>
                 </select>
             </div>
             <div class="filter-group">
-                <div class="filter-label">Matériel</div>
+                <div class="filter-label">🚜 Matériel</div>
                 <select name="idM" class="filter-select">
                     <option value="">— Tous —</option>
                     {% for machine in machines %}
@@ -544,16 +529,16 @@
                 </select>
             </div>
             <div class="filter-group">
-                <div class="filter-label">Tri par coût</div>
+                <div class="filter-label">💰 Tri par coût</div>
                 <select name="coutFilter" class="filter-select">
                     <option value="">— Par défaut —</option>
-                    <option value="asc" {{ coutFilter == 'asc' ? 'selected' : '' }}>Croissant</option>
-                    <option value="desc" {{ coutFilter == 'desc' ? 'selected' : '' }}>Décroissant</option>
+                    <option value="asc"  {{ coutFilter == 'asc'  ? 'selected' : '' }}>📈 Croissant</option>
+                    <option value="desc" {{ coutFilter == 'desc' ? 'selected' : '' }}>📉 Décroissant</option>
                 </select>
             </div>
             <div class="filter-actions">
-                <button type="submit" class="btn-filter"><i class="bi bi-funnel"></i> Filtrer</button>
-                <a href="{{ path('admin_maintenances_index') }}" class="btn-reset"><i class="bi bi-arrow-counterclockwise"></i> Réinitialiser</a>
+                <button type="submit" class="btn-filter">🔍 Filtrer</button>
+                <a href="{{ path('admin_maintenances_index') }}" class="btn-reset">🔄 Réinitialiser</a>
             </div>
         </form>
     </div>
@@ -562,7 +547,7 @@
     <div class="result-summary">
         <div class="result-badge">
             <span class="result-dot"></span>
-            {{ maintenances|length }} maintenance{{ maintenances|length != 1 ? 's' : '' }} trouvée{{ maintenances|length != 1 ? 's' : '' }}
+            📋 {{ maintenances|length }} maintenance{{ maintenances|length != 1 ? 's' : '' }} trouvée{{ maintenances|length != 1 ? 's' : '' }}
         </div>
     </div>
 
@@ -571,22 +556,22 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Type</th>
-                    <th>Matériel</th>
-                    <th>Statut</th>
-                    <th>Priorité</th>
-                    <th>Coût (DT)</th>
-                    <th>Date</th>
-                    <th>Km</th>
-                    <th>Description</th>
-                    <th style="text-align: center;">Actions</th>
+                    <th>🏷️ Type</th>
+                    <th>🚜 Matériel</th>
+                    <th>📌 Statut</th>
+                    <th>🚨 Priorité</th>
+                    <th>💰 Coût (DT)</th>
+                    <th>📅 Date</th>
+                    <th>📏 Km</th>
+                    <th>📝 Description</th>
+                    <th style="text-align: center;">⚡ Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for m in maintenances %}
                 <tr>
                     <td>
-                        <span class="type-badge 
+                        <span class="type-badge
                             {% if m.typePanne == 'Moteur' %}type-moteur
                             {% elseif m.typePanne == 'Hydraulique' %}type-hydraulique
                             {% elseif m.typePanne in ['Électrique','Electricité'] %}type-electrique
@@ -596,11 +581,11 @@
                             {% elseif m.typePanne == 'Vidange & filtres' %}type-vidange
                             {% elseif m.typePanne == 'Logicielle' %}type-logicielle
                             {% else %}type-autre{% endif %}">
-                            {% if m.typePanne == 'Moteur' %}<i class="bi bi-gear-fill"></i>
-                            {% elseif m.typePanne == 'Hydraulique' %}<i class="bi bi-droplet-fill"></i>
-                            {% elseif m.typePanne in ['Électrique','Electricité'] %}<i class="bi bi-lightning-charge-fill"></i>
-                            {% elseif m.typePanne == 'Transmission' %}<i class="bi bi-arrow-repeat"></i>
-                            {% else %}<i class="bi bi-tools"></i>{% endif %}
+                            {% if m.typePanne == 'Moteur' %}🔧
+                            {% elseif m.typePanne == 'Hydraulique' %}💧
+                            {% elseif m.typePanne in ['Électrique','Electricité'] %}⚡
+                            {% elseif m.typePanne == 'Transmission' %}🔄
+                            {% else %}🔨{% endif %}
                             {{ m.typePanne }}
                         </span>
                     </td>
@@ -613,23 +598,28 @@
                         {% endif %}
                     </td>
                     <td>
-                        <span class="statut-badge 
+                        <span class="statut-badge
                             {% if m.statut == 'planifie' %}statut-planifie
                             {% elseif m.statut == 'en_cours' %}statut-en_cours
                             {% else %}statut-termine{% endif %}">
-                            <i class="bi bi-{% if m.statut == 'planifie' %}calendar-check{% elseif m.statut == 'en_cours' %}hourglass-split{% else %}check2-circle{% endif %}"></i>
+                            {% if m.statut == 'planifie' %}📋
+                            {% elseif m.statut == 'en_cours' %}⚙️
+                            {% else %}✅{% endif %}
                             {% if m.statut == 'planifie' %}Planifié
                             {% elseif m.statut == 'en_cours' %}En cours
                             {% else %}Terminé{% endif %}
                         </span>
                     </td>
                     <td>
-                        <span class="priorite-badge 
+                        <span class="priorite-badge
                             {% if m.priorite == 'faible' %}priorite-faible
                             {% elseif m.priorite == 'moyenne' %}priorite-moyenne
                             {% elseif m.priorite == 'haute' %}priorite-haute
                             {% else %}priorite-urgente{% endif %}">
-                            <i class="bi bi-{% if m.priorite == 'faible' %}arrow-down-circle{% elseif m.priorite == 'moyenne' %}dash-circle{% elseif m.priorite == 'haute' %}arrow-up-circle{% else %}exclamation-circle{% endif %}"></i>
+                            {% if m.priorite == 'faible' %}⬇️
+                            {% elseif m.priorite == 'moyenne' %}➡️
+                            {% elseif m.priorite == 'haute' %}⬆️
+                            {% else %}⚠️{% endif %}
                             {% if m.priorite == 'faible' %}Faible
                             {% elseif m.priorite == 'moyenne' %}Moyenne
                             {% elseif m.priorite == 'haute' %}Haute
@@ -645,14 +635,25 @@
                             <span style="color: #9e9d95;">—</span>
                         {% endif %}
                     </td>
-                    <td><span class="desc-cell" title="{{ m.description }}">{{ m.description|default('—')|slice(0, 55) }}{{ m.description|length > 55 ? '…' : '' }}</span></td>
+                    <td>
+                        <span class="desc-cell" title="{{ m.description }}">
+                            {{ m.description|default('—')|slice(0, 55) }}{{ m.description|length > 55 ? '…' : '' }}
+                        </span>
+                    </td>
                     <td style="text-align: center;">
                         <div class="action-buttons">
-                            <a href="{{ path('admin_maintenances_show', {id: m.idMain}) }}" class="btn-icon btn-view" title="Voir"><i class="bi bi-eye"></i></a>
-                            <a href="{{ path('admin_maintenances_edit', {id: m.idMain}) }}" class="btn-icon btn-edit" title="Modifier"><i class="bi bi-pencil"></i></a>
-                            <form method="post" action="{{ path('admin_maintenances_delete', {id: m.idMain}) }}" style="display: inline;" onsubmit="return confirm('Supprimer définitivement cette maintenance ? Cette action est irréversible.')">
+                            <a href="{{ path('admin_maintenances_show', {id: m.idMain}) }}" class="btn-icon btn-view" title="Voir">
+                                👁️
+                            </a>
+                            <a href="{{ path('admin_maintenances_edit', {id: m.idMain}) }}" class="btn-icon btn-edit" title="Modifier">
+                                ✏️
+                            </a>
+                            <form method="post" action="{{ path('admin_maintenances_delete', {id: m.idMain}) }}" style="display: inline;"
+                                  onsubmit="return confirm('Supprimer définitivement cette maintenance ? Cette action est irréversible.')">
                                 <input type="hidden" name="_token" value="{{ csrf_token('delete_maintenance_' ~ m.idMain) }}">
-                                <button type="submit" class="btn-icon btn-delete" title="Supprimer"><i class="bi bi-trash"></i></button>
+                                <button type="submit" class="btn-icon btn-delete" title="Supprimer">
+                                    🗑️
+                                </button>
                             </form>
                         </div>
                     </td>
@@ -661,10 +662,12 @@
                 <tr>
                     <td colspan="9">
                         <div class="empty-state">
-                            <div class="empty-icon"><i class="bi bi-inbox"></i></div>
+                            <div class="empty-icon">📭</div>
                             <h3>Aucune maintenance trouvée</h3>
                             <p>Aucun résultat ne correspond à vos critères.</p>
-                            <a href="{{ path('admin_maintenances_new') }}" class="btn-primary" style="display: inline-flex;">Nouvelle maintenance</a>
+                            <a href="{{ path('admin_maintenances_new') }}" class="btn-primary" style="display: inline-flex;">
+                                ➕ Nouvelle maintenance
+                            </a>
                         </div>
                     </td>
                 </tr>
@@ -674,15 +677,18 @@
 
         {% if maintenances|length > 0 %}
         <div class="table-footer">
-            <div>{{ maintenances|length }} intervention{{ maintenances|length != 1 ? 's' : '' }} affichée{{ maintenances|length != 1 ? 's' : '' }}</div>
-            <div><span style="font-size: 11px; color: #9e9d95;">Total</span> <span class="total-cost">{{ totalCout|number_format(2, ',', ' ') }} DT</span></div>
+            <div>📋 {{ maintenances|length }} intervention{{ maintenances|length != 1 ? 's' : '' }} affichée{{ maintenances|length != 1 ? 's' : '' }}</div>
+            <div>
+                <span style="font-size: 11px; color: #9e9d95;">💰 Total</span>
+                <span class="total-cost">{{ totalCout|number_format(2, ',', ' ') }} DT</span>
+            </div>
         </div>
         {% endif %}
     </div>
+
 </div>
 {% endblock %}
 
 {% block javascripts %}
 {{ parent() }}
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 {% endblock %}

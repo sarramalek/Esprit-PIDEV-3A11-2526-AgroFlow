@@ -1,7 +1,17 @@
+# config/services.yaml
+parameters:
+    upload_dir: '%kernel.project_dir%/public/uploads/materiels'
+    gemini.api_key: '%env(GEMINI_API_KEY)%'
+    gemini.model: '%env(GEMINI_MODEL)%'
+
 services:
     _defaults:
         autowire: true
         autoconfigure: true
+        bind:
+            string $uploadDir: '%upload_dir%'
+            string $apiKey: '%gemini.api_key%'
+            string $model: '%gemini.model%'
 
     App\:
         resource: '../src/'
@@ -13,3 +23,13 @@ services:
     App\Controller\:
         resource: '../src/Controller/'
         tags: ['controller.service_arguments']
+
+    App\Controller\AdminMateriels\:
+        resource: '../src/Controller/AdminMateriels/'
+        tags: ['controller.service_arguments']
+
+    App\Service\GeminiRecommendationService:
+        arguments:
+            $apiKey: '%gemini.api_key%'
+            $model: '%gemini.model%'
+        public: true
