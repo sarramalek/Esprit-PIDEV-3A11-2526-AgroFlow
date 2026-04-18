@@ -60,6 +60,41 @@ class MaintenanceType extends AbstractType
                     ]),
                 ],
             ])
+            ->add('statut', ChoiceType::class, [
+                'label'   => false,
+                'choices' => [
+                    'Planifié'   => 'planifie',
+                    'En cours'   => 'en_cours',
+                    'Terminé'    => 'termine',
+                ],
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'Veuillez sélectionner un statut.']),
+                ],
+            ])
+            ->add('priorite', ChoiceType::class, [
+                'label'   => false,
+                'choices' => [
+                    'Faible'   => 'faible',
+                    'Moyenne'  => 'moyenne',
+                    'Haute'    => 'haute',
+                    'Urgente'  => 'urgente',
+                ],
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'Veuillez sélectionner une priorité.']),
+                ],
+            ])
+            ->add('kilometrage', IntegerType::class, [
+                'label'    => false,
+                'required' => false,
+                'attr'     => ['min' => 0, 'placeholder' => 'Ex: 12500'],
+                'constraints' => [
+                    new Assert\PositiveOrZero(['message' => 'Le kilométrage doit être positif ou zéro.']),
+                    new Assert\LessThanOrEqual([
+                        'value'   => 9999999,
+                        'message' => 'Kilométrage trop élevé.',
+                    ]),
+                ],
+            ])
             ->add('description', TextareaType::class, [
                 'label'    => false,
                 'required' => false,
@@ -73,6 +108,16 @@ class MaintenanceType extends AbstractType
                     new Assert\Regex([
                         'pattern' => '/^[^<>{}]*$/',
                         'message' => 'La description ne doit pas contenir les caractères < > { }.',
+                    ]),
+                ],
+            ])
+            ->add('recommandation', TextareaType::class, [
+                'label'    => false,
+                'required' => false,
+                'constraints' => [
+                    new Assert\Length([
+                        'max'        => 2000,
+                        'maxMessage' => 'La recommandation ne peut pas dépasser {{ limit }} caractères.',
                     ]),
                 ],
             ])

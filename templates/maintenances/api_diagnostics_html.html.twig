@@ -1,0 +1,394 @@
+{% extends 'agriculteur_dashboard.html.twig' %}
+{% block title %}Diagnostics IA — #{{ maintenance.idMain }}{% endblock %}
+{% block body %}
+<style>
+.api-page { max-width:960px; margin:0 auto; padding:2rem 1.75rem; font-family:'Segoe UI',system-ui,sans-serif; }
+.api-bc { display:flex; align-items:center; gap:.4rem; font-size:.82rem; color:#5f7a5f; margin-bottom:1.5rem; }
+.api-bc a { color:#2d6a2d; text-decoration:none; font-weight:500; }
+.api-bc a:hover { text-decoration:underline; }
+.api-bc__sep { color:#aac2aa; }
+.api-header { margin-bottom:1.75rem; }
+.api-header h1 { margin:0 0 .3rem; font-size:1.75rem; font-weight:700; color:#1a2e1a; }
+.api-header p  { margin:0; font-size:.875rem; color:#6b8c6b; }
+
+.health-card {
+    background:#fff; border-radius:16px; box-shadow:0 2px 18px rgba(0,0,0,.07);
+    padding:1.2rem 1.5rem; margin-bottom:1.25rem;
+    display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap;
+    border-left:4px solid #2d6a2d;
+}
+.health-score-circle {
+    width:72px; height:72px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column; font-weight:800; flex-shrink:0;
+    font-size:1.3rem; border:3px solid;
+}
+.health-score-circle.bon      { border-color:#2d6a2d; color:#2d6a2d; background:#eaf3de; }
+.health-score-circle.moyen    { border-color:#7b5200; color:#7b5200; background:#fff8e1; }
+.health-score-circle.degrade  { border-color:#854F0B; color:#854F0B; background:#faeeda; }
+.health-score-circle.critique { border-color:#a32d2d; color:#a32d2d; background:#fde8e8; }
+.health-info h3 { margin:0 0 .25rem; font-size:1rem; font-weight:700; color:#1a2e1a; }
+.health-info p  { margin:0; font-size:.83rem; color:#6b8c6b; }
+.health-pills   { display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.4rem; }
+.health-pill    { padding:.2rem .7rem; border-radius:20px; font-size:.75rem; font-weight:700; }
+.hp--red    { background:#fde8e8; color:#a32d2d; }
+.hp--orange { background:#faeeda; color:#854F0B; }
+.hp--green  { background:#eaf3de; color:#2d6a2d; }
+
+.api-context-card { background:#fff; border-radius:16px; box-shadow:0 2px 18px rgba(0,0,0,.07); padding:1.5rem; margin-bottom:1.5rem; border-left:4px solid #0F6E56; }
+.api-context-card h2 { margin:0 0 1rem; font-size:1rem; font-weight:700; color:#0F6E56; }
+.api-context-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:.75rem; }
+.api-citem { background:#f0faf7; border-radius:10px; padding:.85rem 1rem; }
+.api-clabel { font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#7a9a7a; margin-bottom:.25rem; }
+.api-cvalue { font-size:.95rem; font-weight:600; color:#1a2e1a; }
+
+.section-title { font-size:.8rem; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#0F6E56; margin:1.25rem 0 .75rem; }
+.diag-types-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:.75rem; margin-bottom:1.5rem; }
+.diag-type-chip { background:#fff; border:1.5px solid #a8d5c8; border-radius:12px; padding:.85rem 1rem; cursor:pointer; transition:all .15s; display:flex; flex-direction:column; gap:.3rem; }
+.diag-type-chip:hover,.diag-type-chip.selected { background:#E1F5EE; border-color:#0F6E56; }
+.diag-type-chip.selected { box-shadow:0 0 0 3px rgba(15,110,86,.12); }
+.dtc-icon { font-size:1.4rem; }
+.dtc-name { font-size:.88rem; font-weight:700; color:#1a2e1a; }
+.dtc-desc { font-size:.76rem; color:#5f7a5f; }
+
+.alerts-section { margin-bottom:1.5rem; }
+.alert-item { display:flex; align-items:center; gap:.75rem; padding:.7rem 1rem; border-radius:10px; margin-bottom:.5rem; font-size:.88rem; font-weight:500; }
+.alert-item--urgent  { background:#fde8e8; border-left:3px solid #a32d2d; color:#a32d2d; }
+.alert-item--overdue { background:#fff8e1; border-left:3px solid #f5a623; color:#7b4f00; }
+.alert-item--ok      { background:#eaf3de; border-left:3px solid #2d6a2d; color:#27500a; }
+
+.btn-generate { display:inline-flex; align-items:center; gap:.6rem; padding:.85rem 2rem; border-radius:12px; background:linear-gradient(135deg,#0F6E56,#085041); color:#fff; font-size:1rem; font-weight:700; border:none; cursor:pointer; transition:opacity .15s; box-shadow:0 4px 16px rgba(15,110,86,.3); }
+.btn-generate:hover { opacity:.9; }
+.btn-generate:disabled { opacity:.55; cursor:not-allowed; }
+.spinner { display:none; width:18px; height:18px; border:2.5px solid rgba(255,255,255,.3); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+.result-card { display:none; background:#fff; border-radius:16px; box-shadow:0 2px 18px rgba(0,0,0,.07); overflow:hidden; margin-top:1.5rem; }
+.result-header { background:linear-gradient(135deg,#0F6E56,#085041); padding:1.2rem 1.5rem; color:#fff; display:flex; align-items:center; gap:.75rem; }
+.result-header h2 { margin:0; font-size:1rem; font-weight:700; }
+.result-body { padding:1.5rem; }
+.result-body .diag-content { line-height:1.8; color:#2a3a2a; font-size:.95rem; }
+.result-body .diag-content h3 { color:#0F6E56; margin:1.25rem 0 .5rem; font-size:1rem; }
+.result-body .diag-content ul { padding-left:1.4rem; margin:.5rem 0; }
+.result-body .diag-content li { margin-bottom:.4rem; }
+.result-body .diag-content strong { color:#1a2e1a; }
+.result-actions { display:flex; gap:.75rem; padding:1rem 1.5rem; border-top:1px solid #f0f4ef; background:#fafcf8; flex-wrap:wrap; }
+
+.error-card { display:none; background:#fcebeb; border-radius:12px; border:1.5px solid #f7c1c1; padding:1.2rem 1.5rem; color:#a32d2d; margin-top:1.25rem; font-size:.9rem; }
+
+.actions-row { display:flex; gap:.75rem; flex-wrap:wrap; align-items:center; margin-bottom:1.5rem; }
+.btn-back { display:inline-flex; align-items:center; gap:.4rem; padding:.62rem 1.2rem; border-radius:10px; border:1.5px solid #d0e4cc; color:#5f7a5f; font-size:.88rem; font-weight:600; text-decoration:none; background:transparent; transition:background .14s; }
+.btn-back:hover { background:#f2f8ee; }
+.btn-copy { display:inline-flex; align-items:center; gap:.4rem; padding:.55rem 1.1rem; border-radius:10px; border:1.5px solid #a8d5c8; color:#0F6E56; font-size:.85rem; font-weight:600; background:#fff; cursor:pointer; transition:background .14s; }
+.btn-copy:hover { background:#E1F5EE; }
+</style>
+
+<div class="api-page">
+
+  <nav class="api-bc">
+    <a href="{{ path('agri_maintenances_index') }}">Maintenances</a>
+    <span class="api-bc__sep">›</span>
+    <a href="{{ path('agri_maintenances_show', {id: maintenance.idMain}) }}">#{{ maintenance.idMain }}</a>
+    <span class="api-bc__sep">›</span>
+    <span>Diagnostics IA</span>
+  </nav>
+
+  <div class="api-header">
+    <h1>🔍 Diagnostics intelligents</h1>
+    <p>Diagnostics adaptatifs, alertes intelligentes et score de santé pour votre machine</p>
+  </div>
+
+  <div class="actions-row">
+    <a href="{{ path('agri_maintenances_show', {id: maintenance.idMain}) }}" class="btn-back">← Retour à la fiche</a>
+    <a href="{{ path('agri_maintenances_api_schedule', {id: maintenance.idMain}) }}" class="btn-back" style="border-color:#AFA9EC; color:#534AB7;">🤖 Plan de maintenance</a>
+  </div>
+
+  <div class="health-card" id="healthCard">
+    <div class="health-score-circle" id="healthCircle">…</div>
+    <div class="health-info">
+      <h3 id="healthTitle">Calcul du score…</h3>
+      <p id="healthDesc">Analyse en cours</p>
+      <div class="health-pills" id="healthPills"></div>
+    </div>
+  </div>
+
+  <div class="alerts-section" id="alertsSection" style="display:none;">
+    <div class="section-title">🔔 Alertes intelligentes</div>
+    <div id="alertsList"></div>
+  </div>
+
+  <div class="api-context-card">
+    <h2>📋 Contexte de la panne</h2>
+    <div class="api-context-grid">
+      <div class="api-citem"><div class="api-clabel">Type de panne</div><div class="api-cvalue">{{ maintenance.typePanne }}</div></div>
+      <div class="api-citem"><div class="api-clabel">Priorité</div><div class="api-cvalue">{{ maintenance.priorite|capitalize }}</div></div>
+      <div class="api-citem"><div class="api-clabel">Statut</div><div class="api-cvalue">{{ maintenance.statut|capitalize }}</div></div>
+      {% if maintenance.nom %}<div class="api-citem"><div class="api-clabel">Machine</div><div class="api-cvalue">{{ maintenance.nom }}</div></div>{% endif %}
+      {% if maintenance.kilometrage is not null %}<div class="api-citem"><div class="api-clabel">Kilométrage</div><div class="api-cvalue">{{ maintenance.kilometrage|number_format(0,' ',' ') }} km</div></div>{% endif %}
+      <div class="api-citem"><div class="api-clabel">Coût</div><div class="api-cvalue">{{ maintenance.cout|number_format(2,',',' ') }} DT</div></div>
+    </div>
+  </div>
+
+  <div class="section-title">🎯 Sélectionnez les types de diagnostics</div>
+  <div class="diag-types-grid" id="diagTypesGrid"></div>
+
+  <button class="btn-generate" id="generateBtn">
+    <span id="btnIcon">🔍</span>
+    <span class="spinner" id="spinner"></span>
+    <span id="btnText">Obtenir les diagnostics</span>
+  </button>
+
+  <div class="error-card" id="errorCard"></div>
+
+  <div class="result-card" id="resultCard">
+    <div class="result-header">
+      <span style="font-size:1.5rem;">🔍</span>
+      <h2>Diagnostics générés par IA</h2>
+    </div>
+    <div class="result-body">
+      <div class="diag-content" id="diagContent"></div>
+    </div>
+    <div class="result-actions">
+      <button class="btn-copy" onclick="copyResult()">📋 Copier le diagnostic</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const maintenanceData = {
+    idMain:      {{ maintenance.idMain }},
+    idM:         {{ maintenance.idM|json_encode|raw }},
+    typePanne:   {{ maintenance.typePanne|json_encode|raw }},
+    priorite:    {{ maintenance.priorite|json_encode|raw }},
+    statut:      {{ maintenance.statut|json_encode|raw }},
+    kilometrage: {{ maintenance.kilometrage|json_encode|raw }},
+    nom:         {{ maintenance.nom|json_encode|raw }},
+    description: {{ maintenance.description|json_encode|raw }},
+    cout:        {{ maintenance.cout }},
+    dateMain:    {{ (maintenance.dateMain ? maintenance.dateMain|date('Y-m-d') : null)|json_encode|raw }},
+};
+
+function computeLocalHealth() {
+    let score = 100;
+    if (maintenanceData.statut !== 'termine') {
+        const pen = {urgente:20, haute:10, moyenne:5, faible:2};
+        score -= (pen[maintenanceData.priorite] || 2);
+        if (maintenanceData.statut === 'en_cours') score -= 3;
+        if (maintenanceData.dateMain && maintenanceData.statut === 'planifie') {
+            const today = new Date(); today.setHours(0,0,0,0);
+            const dm = new Date(maintenanceData.dateMain);
+            if (dm < today) score -= 10;
+        }
+    }
+    return Math.max(0, Math.min(100, score));
+}
+
+function healthLabel(s) {
+    if (s >= 80) return {label:'Bon', cls:'bon'};
+    if (s >= 60) return {label:'Moyen', cls:'moyen'};
+    if (s >= 40) return {label:'Dégradé', cls:'degrade'};
+    return {label:'Critique', cls:'critique'};
+}
+
+function renderHealthScore() {
+    const score = computeLocalHealth();
+    const { label, cls } = healthLabel(score);
+    const circle = document.getElementById('healthCircle');
+    circle.textContent = score + '%';
+    circle.className = 'health-score-circle ' + cls;
+    document.getElementById('healthTitle').textContent = 'Score de santé : ' + label;
+    document.getElementById('healthDesc').textContent = score >= 80 ? 'Machine en bon état de fonctionnement.' : (score >= 60 ? 'Surveillance recommandée.' : (score >= 40 ? 'Intervention à planifier rapidement.' : 'Intervention urgente requise !'));
+    const pills = document.getElementById('healthPills');
+    pills.innerHTML = '';
+    if (maintenanceData.priorite === 'urgente') pills.innerHTML += '<span class="health-pill hp--red">🔴 Panne urgente</span>';
+    if (maintenanceData.statut !== 'termine') pills.innerHTML += '<span class="health-pill hp--orange">⚙️ Non résolue</span>';
+    else pills.innerHTML += '<span class="health-pill hp--green">✅ Terminée</span>';
+}
+renderHealthScore();
+
+function renderAlerts() {
+    const alerts = [];
+    const today = new Date(); today.setHours(0,0,0,0);
+    if (maintenanceData.priorite === 'urgente' && maintenanceData.statut !== 'termine')
+        alerts.push({ type:'urgent', msg:'⚠️ Maintenance urgente non résolue — intervenir immédiatement' });
+    if (maintenanceData.priorite === 'haute' && maintenanceData.statut !== 'termine')
+        alerts.push({ type:'overdue', msg:'🟠 Maintenance haute priorité en attente' });
+    if (maintenanceData.dateMain && maintenanceData.statut === 'planifie') {
+        const dm = new Date(maintenanceData.dateMain);
+        if (dm < today) {
+            const diff = Math.floor((today - dm) / 86400000);
+            alerts.push({ type:'overdue', msg:'📅 Maintenance planifiée en retard de ' + diff + ' jour(s)' });
+        }
+    }
+    if (maintenanceData.kilometrage && maintenanceData.kilometrage > 10000)
+        alerts.push({ type:'overdue', msg:'🔩 Kilométrage élevé — révision générale recommandée' });
+    if (alerts.length === 0)
+        alerts.push({ type:'ok', msg:'✅ Aucune alerte critique détectée pour cette maintenance' });
+
+    const section = document.getElementById('alertsSection');
+    const list = document.getElementById('alertsList');
+    list.innerHTML = '';
+    alerts.forEach(a => {
+        const div = document.createElement('div');
+        div.className = 'alert-item alert-item--' + a.type;
+        div.textContent = a.msg;
+        list.appendChild(div);
+    });
+    section.style.display = 'block';
+}
+renderAlerts();
+
+const diagTypesByPanne = {
+    'Mécanique': [{icon:'⚙️',name:'Analyse vibratoire',desc:'Vibrations anormales'},{icon:'🔩',name:'Inspection des pièces',desc:'Usure, fissures, jeu'},{icon:'🌡️',name:'Contrôle thermique',desc:'Surchauffe composants'},{icon:'📊',name:'Test de performances',desc:'Puissance et rendement'}],
+    'Électricité': [{icon:'⚡',name:'Test des circuits',desc:'Continuité, isolement'},{icon:'🔋',name:'Contrôle batterie',desc:'Tension et capacité'},{icon:'💡',name:'Diagnostic capteurs',desc:'Capteurs et sondes'},{icon:'🔌',name:'Connexions',desc:'Connecteurs et câblage'}],
+    'Hydraulique': [{icon:'💧',name:'Analyse du fluide',desc:'Viscosité, contamination'},{icon:'📈',name:'Test de pression',desc:'Circuit hydraulique'},{icon:'🔍',name:'Détection de fuites',desc:'Joints, tuyaux, raccords'},{icon:'⚙️',name:'Pompe hydraulique',desc:'Débit et rendement'}],
+    'Moteur': [{icon:'🔧',name:'Compression moteur',desc:'Cylindres et pistons'},{icon:'🌡️',name:'Température refroid.',desc:'Circuit de refroid.'},{icon:'⛽',name:'Injection carburant',desc:'Injecteurs et pompe'},{icon:'💨',name:"Gaz d'échappement",desc:'Émissions anormales'}],
+    'Vidange & filtres': [{icon:'🛢️',name:'Analyse huile moteur',desc:'Viscosité et usure'},{icon:'🌬️',name:'Filtre à air',desc:'Colmatage, efficacité'},{icon:'⛽',name:'Filtre carburant',desc:'Restrictions'},{icon:'💧',name:'Filtre hydraulique',desc:'Particules, contamination'}],
+    'Transmission': [{icon:'⚙️',name:'Boîte de vitesses',desc:'Engrenages, synchron.'},{icon:'🔗',name:'Arbres de transmission',desc:'Joints homo., usure'},{icon:'🔧',name:'Embrayage',desc:'Usure garnitures'},{icon:'📊',name:'Test de glissement',desc:'Efficacité transmission'}],
+    'Pneumatique': [{icon:'🔵',name:'Pression pneus',desc:'Pression et uniformité'},{icon:'👁️',name:'Inspection visuelle',desc:'Usure, coupures'},{icon:'⚖️',name:'Équilibrage',desc:'Vibrations, équilibre'},{icon:'📐',name:'Géométrie',desc:'Parallélisme'}],
+    'Logicielle': [{icon:'💻',name:'Diagnostic ECU',desc:'Codes défauts'},{icon:'📡',name:'Capteurs électroniques',desc:'Calibration, signaux'},{icon:'🔄',name:'Mise à jour firmware',desc:'Version logicielle'},{icon:'📊',name:'Données de fonct.',desc:'Historique, anomalies'}],
+    'Révision générale': [{icon:'📋',name:'Inspection complète',desc:'Tous les systèmes'},{icon:'📏',name:"Mesures d'usure",desc:'Jeux et tolérances'},{icon:'🔧',name:'Serrage et couples',desc:'Boulonnerie'},{icon:'📅',name:'Suivi préventif',desc:'Planning entretien'}],
+    'Autre': [{icon:'🔍',name:'Diagnostic général',desc:'Inspection complète'},{icon:'📊',name:'Analyse des symptômes',desc:'Identification causes'},{icon:'🛠️',name:'Test fonctionnel',desc:'Vérification fonct.'},{icon:'📝',name:'Bilan technique',desc:"Rapport d'état"}],
+};
+
+function getTypes() {
+    return diagTypesByPanne[maintenanceData.typePanne] || diagTypesByPanne['Autre'];
+}
+
+let selectedDiagTypes = [];
+
+function renderDiagChips() {
+    const grid = document.getElementById('diagTypesGrid');
+    const types = getTypes();
+    grid.innerHTML = '';
+    types.forEach((dt, i) => {
+        const chip = document.createElement('div');
+        chip.className = 'diag-type-chip selected';
+        chip.dataset.idx = i;
+        chip.innerHTML = `<span class="dtc-icon">${dt.icon}</span><span class="dtc-name">${dt.name}</span><span class="dtc-desc">${dt.desc}</span>`;
+        chip.onclick = () => {
+            chip.classList.toggle('selected');
+            selectedDiagTypes = chip.classList.contains('selected') ? [...selectedDiagTypes, i] : selectedDiagTypes.filter(x => x !== i);
+        };
+        grid.appendChild(chip);
+    });
+    selectedDiagTypes = types.map((_, i) => i);
+}
+renderDiagChips();
+
+document.getElementById('generateBtn').addEventListener('click', generateDiagnostics);
+
+async function generateDiagnostics() {
+    const btn = document.getElementById('generateBtn');
+    const spinner = document.getElementById('spinner');
+    const btnText = document.getElementById('btnText');
+    const btnIcon = document.getElementById('btnIcon');
+    const result = document.getElementById('resultCard');
+    const content = document.getElementById('diagContent');
+    const errorCard = document.getElementById('errorCard');
+
+    const allTypes = getTypes();
+    const chosen = selectedDiagTypes.map(i => allTypes[i]).filter(Boolean);
+
+    if (chosen.length === 0) {
+        errorCard.textContent = '⚠️ Sélectionnez au moins un type de diagnostic.';
+        errorCard.style.display = 'block';
+        return;
+    }
+
+    btn.disabled = true;
+    spinner.style.display = 'block';
+    btnIcon.style.display = 'none';
+    btnText.textContent = 'Analyse en cours…';
+    result.style.display = 'none';
+    errorCard.style.display = 'none';
+
+    const chosenList = chosen.map(d => `- ${d.icon} ${d.name} : ${d.desc}`).join('\n');
+
+    const prompt = `Tu es un expert en diagnostic de machines agricoles.
+
+=== CONTEXTE DE LA MACHINE ===
+Machine : ${maintenanceData.nom || 'Non spécifiée'}
+Type de panne : ${maintenanceData.typePanne}
+Priorité : ${maintenanceData.priorite}
+Statut actuel : ${maintenanceData.statut}
+Kilométrage : ${maintenanceData.kilometrage ? maintenanceData.kilometrage + ' km' : 'Non renseigné'}
+Coût estimé : ${maintenanceData.cout} DT
+Date : ${maintenanceData.dateMain || 'Non renseignée'}
+Description : ${maintenanceData.description || 'Aucune'}
+
+=== TYPES DE DIAGNOSTICS DEMANDÉS ===
+${chosenList}
+
+=== CONSIGNES ===
+Pour CHAQUE type de diagnostic, fournis :
+1. **Description** : Explication du diagnostic dans ce contexte précis
+2. **Procédure étape par étape** : Comment effectuer ce diagnostic
+3. **Outils nécessaires** : Équipements et matériel requis
+4. **Valeurs normales** : Seuils et plages acceptables
+5. **Signes d'anomalie** : Ce qui indique un problème
+6. **Actions correctives** : Mesures à prendre si anomalie
+7. **Fréquence recommandée** : Intervalles basés sur le kilométrage/usage
+
+En fin de réponse, ajoute une section :
+## 🎯 Score de criticité
+Évalue la criticité (1-10) de la panne "${maintenanceData.typePanne}" sur ce type de machine et justifie.
+
+## 📅 Prochaine maintenance recommandée
+Basé sur le kilométrage et le type de panne, indique la prochaine échéance.
+
+## 🔩 Pièces détachées potentielles
+Liste les pièces susceptibles d'être remplacées avec estimation de coût.
+
+Sois précis, pratique et adapté au contexte agricole tunisien.`;
+
+    try {
+        const resp = await fetch("{{ path('agri_maintenances_api_gemini_generate') }}", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt })
+        });
+
+        if (!resp.ok) {
+            const err = await resp.json();
+            throw new Error(err.error || `Erreur API: ${resp.status}`);
+        }
+
+        const data = await resp.json();
+        if (!data.text) throw new Error('Réponse vide de l\'API.');
+
+        content.innerHTML = markdownToHtml(data.text);
+        result.style.display = 'block';
+        result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    } catch (err) {
+        errorCard.textContent = '❌ ' + err.message;
+        errorCard.style.display = 'block';
+    } finally {
+        btn.disabled = false;
+        spinner.style.display = 'none';
+        btnIcon.style.display = 'inline';
+        btnText.textContent = 'Relancer les diagnostics';
+    }
+}
+
+function copyResult() {
+    const text = document.getElementById('diagContent').innerText;
+    navigator.clipboard.writeText(text).then(() => alert('📋 Diagnostic copié dans le presse-papiers !'));
+}
+
+function markdownToHtml(md) {
+    return md
+        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+        .replace(/^## (.+)$/gm, '<h3>$1</h3>')
+        .replace(/^# (.+)$/gm, '<h3>$1</h3>')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        .replace(/^[-*] (.+)$/gm, '<li>$1</li>')
+        .replace(/(<li>.*<\/li>\n?)+/g, s => '<ul>' + s + '</ul>')
+        .replace(/\n\n/g, '</p><p>')
+        .replace(/\n/g, '<br>');
+}
+</script>
+{% endblock %}
