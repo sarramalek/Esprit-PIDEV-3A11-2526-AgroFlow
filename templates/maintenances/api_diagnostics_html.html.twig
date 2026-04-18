@@ -1,5 +1,7 @@
 {% extends 'agriculteur_dashboard.html.twig' %}
+
 {% block title %}Diagnostics IA — #{{ maintenance.idMain }}{% endblock %}
+
 {% block body %}
 <style>
 .api-page { max-width:960px; margin:0 auto; padding:2rem 1.75rem; font-family:'Segoe UI',system-ui,sans-serif; }
@@ -69,9 +71,11 @@
 .result-body { padding:1.5rem; }
 .result-body .diag-content { line-height:1.8; color:#2a3a2a; font-size:.95rem; }
 .result-body .diag-content h3 { color:#0F6E56; margin:1.25rem 0 .5rem; font-size:1rem; }
+.result-body .diag-content h4 { color:#534AB7; margin:1rem 0 .4rem; font-size:.9rem; }
 .result-body .diag-content ul { padding-left:1.4rem; margin:.5rem 0; }
 .result-body .diag-content li { margin-bottom:.4rem; }
 .result-body .diag-content strong { color:#1a2e1a; }
+.result-body .diag-content p { margin:.5rem 0; }
 .result-actions { display:flex; gap:.75rem; padding:1rem 1.5rem; border-top:1px solid #f0f4ef; background:#fafcf8; flex-wrap:wrap; }
 
 .error-card { display:none; background:#fcebeb; border-radius:12px; border:1.5px solid #f7c1c1; padding:1.2rem 1.5rem; color:#a32d2d; margin-top:1.25rem; font-size:.9rem; }
@@ -81,6 +85,10 @@
 .btn-back:hover { background:#f2f8ee; }
 .btn-copy { display:inline-flex; align-items:center; gap:.4rem; padding:.55rem 1.1rem; border-radius:10px; border:1.5px solid #a8d5c8; color:#0F6E56; font-size:.85rem; font-weight:600; background:#fff; cursor:pointer; transition:background .14s; }
 .btn-copy:hover { background:#E1F5EE; }
+
+.loading-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:1000; display:none; }
+.loading-spinner { background:#fff; padding:1.5rem 2rem; border-radius:16px; display:flex; align-items:center; gap:1rem; font-weight:600; color:#0F6E56; }
+.loading-spinner .spinner-large { width:24px; height:24px; border:3px solid #e0e0e0; border-top-color:#0F6E56; border-radius:50%; animation:spin .7s linear infinite; }
 </style>
 
 <div class="api-page">
@@ -103,6 +111,7 @@
     <a href="{{ path('agri_maintenances_api_schedule', {id: maintenance.idMain}) }}" class="btn-back" style="border-color:#AFA9EC; color:#534AB7;">🤖 Plan de maintenance</a>
   </div>
 
+  <!-- Carte de santé -->
   <div class="health-card" id="healthCard">
     <div class="health-score-circle" id="healthCircle">…</div>
     <div class="health-info">
@@ -112,11 +121,13 @@
     </div>
   </div>
 
+  <!-- Alertes intelligentes -->
   <div class="alerts-section" id="alertsSection" style="display:none;">
     <div class="section-title">🔔 Alertes intelligentes</div>
     <div id="alertsList"></div>
   </div>
 
+  <!-- Contexte de la panne -->
   <div class="api-context-card">
     <h2>📋 Contexte de la panne</h2>
     <div class="api-context-grid">
@@ -126,20 +137,31 @@
       {% if maintenance.nom %}<div class="api-citem"><div class="api-clabel">Machine</div><div class="api-cvalue">{{ maintenance.nom }}</div></div>{% endif %}
       {% if maintenance.kilometrage is not null %}<div class="api-citem"><div class="api-clabel">Kilométrage</div><div class="api-cvalue">{{ maintenance.kilometrage|number_format(0,' ',' ') }} km</div></div>{% endif %}
       <div class="api-citem"><div class="api-clabel">Coût</div><div class="api-cvalue">{{ maintenance.cout|number_format(2,',',' ') }} DT</div></div>
+      {% if maintenance.dateMain %}<div class="api-citem"><div class="api-clabel">Date prévue</div><div class="api-cvalue">{{ maintenance.dateMain|date('d/m/Y') }}</div></div>{% endif %}
     </div>
+    {% if maintenance.description %}
+    <div style="margin-top:.9rem; background:#f0faf7; border-radius:10px; padding:.85rem 1rem;">
+      <div class="api-clabel" style="margin-bottom:.35rem;">Description</div>
+      <div style="font-size:.9rem; color:#2a3a2a; line-height:1.6;">{{ maintenance.description }}</div>
+    </div>
+    {% endif %}
   </div>
 
+  <!-- Sélection des types de diagnostics -->
   <div class="section-title">🎯 Sélectionnez les types de diagnostics</div>
   <div class="diag-types-grid" id="diagTypesGrid"></div>
 
+  <!-- Bouton de génération -->
   <button class="btn-generate" id="generateBtn">
     <span id="btnIcon">🔍</span>
     <span class="spinner" id="spinner"></span>
     <span id="btnText">Obtenir les diagnostics</span>
   </button>
 
+  <!-- Message d'erreur -->
   <div class="error-card" id="errorCard"></div>
 
+  <!-- Résultat -->
   <div class="result-card" id="resultCard">
     <div class="result-header">
       <span style="font-size:1.5rem;">🔍</span>
@@ -155,7 +177,18 @@
 
 </div>
 
+<!-- Loading overlay global -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner">
+    <div class="spinner-large"></div>
+    <span>Génération des diagnostics en cours...</span>
+  </div>
+</div>
+
 <script>
+// ─────────────────────────────────────────────────────────────────
+// Données de la maintenance
+// ─────────────────────────────────────────────────────────────────
 const maintenanceData = {
     idMain:      {{ maintenance.idMain }},
     idM:         {{ maintenance.idM|json_encode|raw }},
@@ -169,114 +202,249 @@ const maintenanceData = {
     dateMain:    {{ (maintenance.dateMain ? maintenance.dateMain|date('Y-m-d') : null)|json_encode|raw }},
 };
 
-function computeLocalHealth() {
-    let score = 100;
-    if (maintenanceData.statut !== 'termine') {
-        const pen = {urgente:20, haute:10, moyenne:5, faible:2};
-        score -= (pen[maintenanceData.priorite] || 2);
-        if (maintenanceData.statut === 'en_cours') score -= 3;
-        if (maintenanceData.dateMain && maintenanceData.statut === 'planifie') {
-            const today = new Date(); today.setHours(0,0,0,0);
-            const dm = new Date(maintenanceData.dateMain);
-            if (dm < today) score -= 10;
-        }
-    }
-    return Math.max(0, Math.min(100, score));
-}
-
-function healthLabel(s) {
-    if (s >= 80) return {label:'Bon', cls:'bon'};
-    if (s >= 60) return {label:'Moyen', cls:'moyen'};
-    if (s >= 40) return {label:'Dégradé', cls:'degrade'};
-    return {label:'Critique', cls:'critique'};
-}
-
-function renderHealthScore() {
-    const score = computeLocalHealth();
-    const { label, cls } = healthLabel(score);
-    const circle = document.getElementById('healthCircle');
-    circle.textContent = score + '%';
-    circle.className = 'health-score-circle ' + cls;
-    document.getElementById('healthTitle').textContent = 'Score de santé : ' + label;
-    document.getElementById('healthDesc').textContent = score >= 80 ? 'Machine en bon état de fonctionnement.' : (score >= 60 ? 'Surveillance recommandée.' : (score >= 40 ? 'Intervention à planifier rapidement.' : 'Intervention urgente requise !'));
-    const pills = document.getElementById('healthPills');
-    pills.innerHTML = '';
-    if (maintenanceData.priorite === 'urgente') pills.innerHTML += '<span class="health-pill hp--red">🔴 Panne urgente</span>';
-    if (maintenanceData.statut !== 'termine') pills.innerHTML += '<span class="health-pill hp--orange">⚙️ Non résolue</span>';
-    else pills.innerHTML += '<span class="health-pill hp--green">✅ Terminée</span>';
-}
-renderHealthScore();
-
-function renderAlerts() {
-    const alerts = [];
-    const today = new Date(); today.setHours(0,0,0,0);
-    if (maintenanceData.priorite === 'urgente' && maintenanceData.statut !== 'termine')
-        alerts.push({ type:'urgent', msg:'⚠️ Maintenance urgente non résolue — intervenir immédiatement' });
-    if (maintenanceData.priorite === 'haute' && maintenanceData.statut !== 'termine')
-        alerts.push({ type:'overdue', msg:'🟠 Maintenance haute priorité en attente' });
-    if (maintenanceData.dateMain && maintenanceData.statut === 'planifie') {
-        const dm = new Date(maintenanceData.dateMain);
-        if (dm < today) {
-            const diff = Math.floor((today - dm) / 86400000);
-            alerts.push({ type:'overdue', msg:'📅 Maintenance planifiée en retard de ' + diff + ' jour(s)' });
-        }
-    }
-    if (maintenanceData.kilometrage && maintenanceData.kilometrage > 10000)
-        alerts.push({ type:'overdue', msg:'🔩 Kilométrage élevé — révision générale recommandée' });
-    if (alerts.length === 0)
-        alerts.push({ type:'ok', msg:'✅ Aucune alerte critique détectée pour cette maintenance' });
-
-    const section = document.getElementById('alertsSection');
-    const list = document.getElementById('alertsList');
-    list.innerHTML = '';
-    alerts.forEach(a => {
-        const div = document.createElement('div');
-        div.className = 'alert-item alert-item--' + a.type;
-        div.textContent = a.msg;
-        list.appendChild(div);
-    });
-    section.style.display = 'block';
-}
-renderAlerts();
-
+// ─────────────────────────────────────────────────────────────────
+// Types de diagnostics par catégorie de panne
+// ─────────────────────────────────────────────────────────────────
 const diagTypesByPanne = {
-    'Mécanique': [{icon:'⚙️',name:'Analyse vibratoire',desc:'Vibrations anormales'},{icon:'🔩',name:'Inspection des pièces',desc:'Usure, fissures, jeu'},{icon:'🌡️',name:'Contrôle thermique',desc:'Surchauffe composants'},{icon:'📊',name:'Test de performances',desc:'Puissance et rendement'}],
-    'Électricité': [{icon:'⚡',name:'Test des circuits',desc:'Continuité, isolement'},{icon:'🔋',name:'Contrôle batterie',desc:'Tension et capacité'},{icon:'💡',name:'Diagnostic capteurs',desc:'Capteurs et sondes'},{icon:'🔌',name:'Connexions',desc:'Connecteurs et câblage'}],
-    'Hydraulique': [{icon:'💧',name:'Analyse du fluide',desc:'Viscosité, contamination'},{icon:'📈',name:'Test de pression',desc:'Circuit hydraulique'},{icon:'🔍',name:'Détection de fuites',desc:'Joints, tuyaux, raccords'},{icon:'⚙️',name:'Pompe hydraulique',desc:'Débit et rendement'}],
-    'Moteur': [{icon:'🔧',name:'Compression moteur',desc:'Cylindres et pistons'},{icon:'🌡️',name:'Température refroid.',desc:'Circuit de refroid.'},{icon:'⛽',name:'Injection carburant',desc:'Injecteurs et pompe'},{icon:'💨',name:"Gaz d'échappement",desc:'Émissions anormales'}],
-    'Vidange & filtres': [{icon:'🛢️',name:'Analyse huile moteur',desc:'Viscosité et usure'},{icon:'🌬️',name:'Filtre à air',desc:'Colmatage, efficacité'},{icon:'⛽',name:'Filtre carburant',desc:'Restrictions'},{icon:'💧',name:'Filtre hydraulique',desc:'Particules, contamination'}],
-    'Transmission': [{icon:'⚙️',name:'Boîte de vitesses',desc:'Engrenages, synchron.'},{icon:'🔗',name:'Arbres de transmission',desc:'Joints homo., usure'},{icon:'🔧',name:'Embrayage',desc:'Usure garnitures'},{icon:'📊',name:'Test de glissement',desc:'Efficacité transmission'}],
-    'Pneumatique': [{icon:'🔵',name:'Pression pneus',desc:'Pression et uniformité'},{icon:'👁️',name:'Inspection visuelle',desc:'Usure, coupures'},{icon:'⚖️',name:'Équilibrage',desc:'Vibrations, équilibre'},{icon:'📐',name:'Géométrie',desc:'Parallélisme'}],
-    'Logicielle': [{icon:'💻',name:'Diagnostic ECU',desc:'Codes défauts'},{icon:'📡',name:'Capteurs électroniques',desc:'Calibration, signaux'},{icon:'🔄',name:'Mise à jour firmware',desc:'Version logicielle'},{icon:'📊',name:'Données de fonct.',desc:'Historique, anomalies'}],
-    'Révision générale': [{icon:'📋',name:'Inspection complète',desc:'Tous les systèmes'},{icon:'📏',name:"Mesures d'usure",desc:'Jeux et tolérances'},{icon:'🔧',name:'Serrage et couples',desc:'Boulonnerie'},{icon:'📅',name:'Suivi préventif',desc:'Planning entretien'}],
-    'Autre': [{icon:'🔍',name:'Diagnostic général',desc:'Inspection complète'},{icon:'📊',name:'Analyse des symptômes',desc:'Identification causes'},{icon:'🛠️',name:'Test fonctionnel',desc:'Vérification fonct.'},{icon:'📝',name:'Bilan technique',desc:"Rapport d'état"}],
+    'Mécanique': [
+        {id: 'vibratoire', icon:'⚙️', name:'Analyse vibratoire', desc:'Détection des vibrations anormales'},
+        {id: 'inspection_pieces', icon:'🔩', name:'Inspection des pièces', desc:'Usure, fissures, jeu mécanique'},
+        {id: 'thermique', icon:'🌡️', name:'Contrôle thermique', desc:'Surchauffe des composants'},
+        {id: 'performances', icon:'📊', name:'Test de performances', desc:'Puissance et rendement moteur'}
+    ],
+    'Électricité': [
+        {id: 'circuits', icon:'⚡', name:'Test des circuits', desc:'Continuité, isolement électrique'},
+        {id: 'batterie', icon:'🔋', name:'Contrôle batterie', desc:'Tension, capacité et état'},
+        {id: 'capteurs', icon:'💡', name:'Diagnostic capteurs', desc:'Vérification des capteurs et sondes'},
+        {id: 'connexions', icon:'🔌', name:'Connexions', desc:'État des connecteurs et câblage'}
+    ],
+    'Hydraulique': [
+        {id: 'analyse_fluide', icon:'💧', name:'Analyse du fluide', desc:'Viscosité, contamination, niveau'},
+        {id: 'test_pression', icon:'📈', name:'Test de pression', desc:'Pression du circuit hydraulique'},
+        {id: 'detection_fuites', icon:'🔍', name:'Détection de fuites', desc:'Joints, tuyaux, raccords'},
+        {id: 'pompe', icon:'⚙️', name:'Pompe hydraulique', desc:'Débit et rendement de la pompe'}
+    ],
+    'Moteur': [
+        {id: 'compression', icon:'🔧', name:'Compression moteur', desc:'Vérification des cylindres et pistons'},
+        {id: 'refroidissement', icon:'🌡️', name:'Circuit refroidissement', desc:'État du liquide et du radiateur'},
+        {id: 'injection', icon:'⛽', name:'Injection carburant', desc:'État des injecteurs et pompe'},
+        {id: 'echappement', icon:'💨', name:"Gaz d'échappement", desc:'Analyse des émissions anormales'}
+    ],
+    'Vidange & filtres': [
+        {id: 'analyse_huile', icon:'🛢️', name:'Analyse huile moteur', desc:'Viscosité et particules d\'usure'},
+        {id: 'filtre_air', icon:'🌬️', name:'Filtre à air', desc:'Colmatage et efficacité'},
+        {id: 'filtre_carburant', icon:'⛽', name:'Filtre carburant', desc:'Restrictions et colmatage'},
+        {id: 'filtre_hydraulique', icon:'💧', name:'Filtre hydraulique', desc:'Particules et contamination'}
+    ],
+    'Transmission': [
+        {id: 'boite_vitesses', icon:'⚙️', name:'Boîte de vitesses', desc:'État des engrenages et synchronisation'},
+        {id: 'arbres_transmission', icon:'🔗', name:'Arbres de transmission', desc:'Joints homocinétiques, usure'},
+        {id: 'embrayage', icon:'🔧', name:'Embrayage', desc:'Usure des garnitures et butée'},
+        {id: 'test_glissement', icon:'📊', name:'Test de glissement', desc:'Efficacité de la transmission'}
+    ],
+    'Pneumatique': [
+        {id: 'pression', icon:'🔵', name:'Pression pneus', desc:'Vérification pression et uniformité'},
+        {id: 'inspection_visuelle', icon:'👁️', name:'Inspection visuelle', desc:'Usure, coupures, déformations'},
+        {id: 'equilibrage', icon:'⚖️', name:'Équilibrage', desc:'Vibrations et équilibrage des roues'},
+        {id: 'geometrie', icon:'📐', name:'Géométrie', desc:'Contrôle du parallélisme et carrossage'}
+    ],
+    'Logicielle': [
+        {id: 'diagnostic_ecu', icon:'💻', name:'Diagnostic ECU', desc:'Lecture des codes défauts'},
+        {id: 'capteurs_elec', icon:'📡', name:'Capteurs électroniques', desc:'Calibration et signaux'},
+        {id: 'firmware', icon:'🔄', name:'Mise à jour firmware', desc:'Version logicielle et correctifs'},
+        {id: 'donnees_fonct', icon:'📊', name:'Données fonctionnement', desc:'Historique et anomalies logicielles'}
+    ],
+    'Révision générale': [
+        {id: 'inspection_complete', icon:'📋', name:'Inspection complète', desc:'Vérification de tous les systèmes'},
+        {id: 'mesures_usure', icon:'📏', name:'Mesures d\'usure', desc:'Jeux et tolérances mécaniques'},
+        {id: 'serrage', icon:'🔧', name:'Contrôle serrage', desc:'Vérification des couples de serrage'},
+        {id: 'suivi_preventif', icon:'📅', name:'Suivi préventif', desc:'Planning et historique entretien'}
+    ]
 };
 
+const defaultDiagTypes = [
+    {id: 'general', icon:'🔍', name:'Diagnostic général', desc:'Inspection complète de la machine'},
+    {id: 'symptomes', icon:'📊', name:'Analyse des symptômes', desc:'Identification des causes racines'},
+    {id: 'fonctionnel', icon:'🛠️', name:'Test fonctionnel', desc:'Vérification du fonctionnement global'},
+    {id: 'bilan', icon:'📝', name:'Bilan technique', desc:'Rapport d\'état détaillé'}
+];
+
 function getTypes() {
-    return diagTypesByPanne[maintenanceData.typePanne] || diagTypesByPanne['Autre'];
+    return diagTypesByPanne[maintenanceData.typePanne] || defaultDiagTypes;
 }
 
+// ─────────────────────────────────────────────────────────────────
+// État des diagnostics sélectionnés
+// ─────────────────────────────────────────────────────────────────
 let selectedDiagTypes = [];
 
 function renderDiagChips() {
     const grid = document.getElementById('diagTypesGrid');
     const types = getTypes();
     grid.innerHTML = '';
+    
     types.forEach((dt, i) => {
         const chip = document.createElement('div');
         chip.className = 'diag-type-chip selected';
-        chip.dataset.idx = i;
-        chip.innerHTML = `<span class="dtc-icon">${dt.icon}</span><span class="dtc-name">${dt.name}</span><span class="dtc-desc">${dt.desc}</span>`;
+        chip.dataset.id = dt.id;
+        chip.dataset.index = i;
+        chip.innerHTML = `
+            <span class="dtc-icon">${dt.icon}</span>
+            <span class="dtc-name">${dt.name}</span>
+            <span class="dtc-desc">${dt.desc}</span>
+        `;
         chip.onclick = () => {
             chip.classList.toggle('selected');
-            selectedDiagTypes = chip.classList.contains('selected') ? [...selectedDiagTypes, i] : selectedDiagTypes.filter(x => x !== i);
+            updateSelectedTypes();
         };
         grid.appendChild(chip);
     });
+    
     selectedDiagTypes = types.map((_, i) => i);
 }
+
+function updateSelectedTypes() {
+    const chips = document.querySelectorAll('.diag-type-chip');
+    selectedDiagTypes = [];
+    chips.forEach((chip, idx) => {
+        if (chip.classList.contains('selected')) {
+            selectedDiagTypes.push(idx);
+        }
+    });
+}
+
 renderDiagChips();
 
+// ─────────────────────────────────────────────────────────────────
+// Calcul du score de santé
+// ─────────────────────────────────────────────────────────────────
+function computeLocalHealth() {
+    let score = 100;
+    
+    if (maintenanceData.statut !== 'termine') {
+        const penalties = {urgente: 25, haute: 15, moyenne: 8, faible: 3};
+        score -= (penalties[maintenanceData.priorite] || 3);
+        
+        if (maintenanceData.statut === 'en_cours') score -= 5;
+        
+        if (maintenanceData.dateMain && maintenanceData.statut === 'planifie') {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const dm = new Date(maintenanceData.dateMain);
+            if (dm < today) {
+                const daysLate = Math.floor((today - dm) / 86400000);
+                score -= Math.min(20, daysLate * 2);
+            }
+        }
+    }
+    
+    // Pénalité kilométrage élevé
+    if (maintenanceData.kilometrage && maintenanceData.kilometrage > 8000) {
+        score -= 5;
+    }
+    if (maintenanceData.kilometrage && maintenanceData.kilometrage > 12000) {
+        score -= 10;
+    }
+    
+    return Math.max(0, Math.min(100, score));
+}
+
+function healthLabel(score) {
+    if (score >= 80) return {label: 'Bon', cls: 'bon', desc: 'Machine en bon état de fonctionnement.'};
+    if (score >= 60) return {label: 'Moyen', cls: 'moyen', desc: 'Surveillance recommandée.'};
+    if (score >= 40) return {label: 'Dégradé', cls: 'degrade', desc: 'Intervention à planifier rapidement.'};
+    return {label: 'Critique', cls: 'critique', desc: 'Intervention urgente requise !'};
+}
+
+function renderHealthScore() {
+    const score = computeLocalHealth();
+    const { label, cls, desc } = healthLabel(score);
+    
+    const circle = document.getElementById('healthCircle');
+    circle.textContent = score + '%';
+    circle.className = 'health-score-circle ' + cls;
+    
+    document.getElementById('healthTitle').textContent = 'Score de santé : ' + label;
+    document.getElementById('healthDesc').textContent = desc;
+    
+    const pills = document.getElementById('healthPills');
+    pills.innerHTML = '';
+    
+    if (maintenanceData.priorite === 'urgente') {
+        pills.innerHTML += '<span class="health-pill hp--red">🔴 Panne urgente</span>';
+    }
+    if (maintenanceData.priorite === 'haute') {
+        pills.innerHTML += '<span class="health-pill hp--orange">🟠 Haute priorité</span>';
+    }
+    if (maintenanceData.statut !== 'termine') {
+        pills.innerHTML += '<span class="health-pill hp--orange">⚙️ Non résolue</span>';
+    } else {
+        pills.innerHTML += '<span class="health-pill hp--green">✅ Terminée</span>';
+    }
+}
+
+renderHealthScore();
+
+// ─────────────────────────────────────────────────────────────────
+// Génération des alertes intelligentes
+// ─────────────────────────────────────────────────────────────────
+function renderAlerts() {
+    const alerts = [];
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Alerte priorité urgente
+    if (maintenanceData.priorite === 'urgente' && maintenanceData.statut !== 'termine') {
+        alerts.push({ type: 'urgent', msg: '⚠️ Maintenance urgente non résolue — intervenir immédiatement' });
+    }
+    
+    // Alerte haute priorité
+    if (maintenanceData.priorite === 'haute' && maintenanceData.statut !== 'termine') {
+        alerts.push({ type: 'overdue', msg: '🟠 Maintenance haute priorité en attente' });
+    }
+    
+    // Alerte retard
+    if (maintenanceData.dateMain && maintenanceData.statut === 'planifie') {
+        const dm = new Date(maintenanceData.dateMain);
+        if (dm < today) {
+            const diff = Math.floor((today - dm) / 86400000);
+            alerts.push({ type: 'overdue', msg: `📅 Maintenance planifiée en retard de ${diff} jour(s)` });
+        }
+    }
+    
+    // Alerte kilométrage élevé
+    if (maintenanceData.kilometrage) {
+        if (maintenanceData.kilometrage > 10000) {
+            alerts.push({ type: 'overdue', msg: '🔩 Kilométrage très élevé — révision générale urgente' });
+        } else if (maintenanceData.kilometrage > 5000) {
+            alerts.push({ type: 'overdue', msg: '🔧 Kilométrage élevé — vidange recommandée' });
+        }
+    }
+    
+    // Message par défaut
+    if (alerts.length === 0) {
+        alerts.push({ type: 'ok', msg: '✅ Aucune alerte critique détectée pour cette maintenance' });
+    }
+    
+    const section = document.getElementById('alertsSection');
+    const list = document.getElementById('alertsList');
+    list.innerHTML = '';
+    
+    alerts.forEach(a => {
+        const div = document.createElement('div');
+        div.className = 'alert-item alert-item--' + a.type;
+        div.textContent = a.msg;
+        list.appendChild(div);
+    });
+    
+    section.style.display = 'block';
+}
+
+renderAlerts();
+
+// ─────────────────────────────────────────────────────────────────
+// Génération des diagnostics via API
+// ─────────────────────────────────────────────────────────────────
 document.getElementById('generateBtn').addEventListener('click', generateDiagnostics);
 
 async function generateDiagnostics() {
@@ -287,6 +455,7 @@ async function generateDiagnostics() {
     const result = document.getElementById('resultCard');
     const content = document.getElementById('diagContent');
     const errorCard = document.getElementById('errorCard');
+    const loadingOverlay = document.getElementById('loadingOverlay');
 
     const allTypes = getTypes();
     const chosen = selectedDiagTypes.map(i => allTypes[i]).filter(Boolean);
@@ -294,15 +463,20 @@ async function generateDiagnostics() {
     if (chosen.length === 0) {
         errorCard.textContent = '⚠️ Sélectionnez au moins un type de diagnostic.';
         errorCard.style.display = 'block';
+        setTimeout(() => {
+            errorCard.style.display = 'none';
+        }, 5000);
         return;
     }
 
+    // Désactiver le bouton
     btn.disabled = true;
     spinner.style.display = 'block';
     btnIcon.style.display = 'none';
     btnText.textContent = 'Analyse en cours…';
     result.style.display = 'none';
     errorCard.style.display = 'none';
+    loadingOverlay.style.display = 'flex';
 
     const chosenList = chosen.map(d => `- ${d.icon} ${d.name} : ${d.desc}`).join('\n');
 
@@ -347,7 +521,7 @@ Sois précis, pratique et adapté au contexte agricole tunisien.`;
         const resp = await fetch("{{ path('agri_maintenances_api_gemini_generate') }}", {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt })
+            body: JSON.stringify({ prompt: prompt })
         });
 
         if (!resp.ok) {
@@ -363,32 +537,96 @@ Sois précis, pratique et adapté au contexte agricole tunisien.`;
         result.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
     } catch (err) {
+        console.error('Erreur:', err);
         errorCard.textContent = '❌ ' + err.message;
         errorCard.style.display = 'block';
+        setTimeout(() => {
+            errorCard.style.display = 'none';
+        }, 8000);
     } finally {
         btn.disabled = false;
         spinner.style.display = 'none';
         btnIcon.style.display = 'inline';
         btnText.textContent = 'Relancer les diagnostics';
+        loadingOverlay.style.display = 'none';
     }
 }
 
+// ─────────────────────────────────────────────────────────────────
+// Copier le résultat
+// ─────────────────────────────────────────────────────────────────
 function copyResult() {
     const text = document.getElementById('diagContent').innerText;
-    navigator.clipboard.writeText(text).then(() => alert('📋 Diagnostic copié dans le presse-papiers !'));
+    navigator.clipboard.writeText(text).then(() => {
+        alert('📋 Diagnostic copié dans le presse-papiers !');
+    }).catch(() => {
+        alert('❌ Impossible de copier le texte.');
+    });
 }
 
+// ─────────────────────────────────────────────────────────────────
+// Conversion Markdown vers HTML
+// ─────────────────────────────────────────────────────────────────
 function markdownToHtml(md) {
-    return md
-        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-        .replace(/^## (.+)$/gm, '<h3>$1</h3>')
-        .replace(/^# (.+)$/gm, '<h3>$1</h3>')
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.+?)\*/g, '<em>$1</em>')
-        .replace(/^[-*] (.+)$/gm, '<li>$1</li>')
-        .replace(/(<li>.*<\/li>\n?)+/g, s => '<ul>' + s + '</ul>')
-        .replace(/\n\n/g, '</p><p>')
-        .replace(/\n/g, '<br>');
+    if (!md) return '';
+    
+    let html = md;
+    
+    // Échapper les caractères HTML (sauf les balises qu'on va créer)
+    html = html.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+    
+    // Titres
+    html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+    html = html.replace(/^## (.+)$/gm, '<h3>$1</h3>');
+    html = html.replace(/^# (.+)$/gm, '<h3>$1</h3>');
+    
+    // Titres de niveau 4 pour les sous-sections
+    html = html.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
+    
+    // Gras
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    
+    // Italique
+    html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    
+    // Listes non ordonnées
+    html = html.replace(/^[-*] (.+)$/gm, '<li>$1</li>');
+    html = html.replace(/(<li>.*<\/li>\n?)+/g, function(s) {
+        return '<ul>' + s + '</ul>';
+    });
+    
+    // Listes ordonnées
+    html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
+    html = html.replace(/(<li>.*<\/li>\n?)+(?=<li>|$)/g, function(s) {
+        if (s.indexOf('</li>') > 0) {
+            return '<ol>' + s + '</ol>';
+        }
+        return s;
+    });
+    
+    // Paragraphes
+    html = html.replace(/\n\n/g, '</p><p>');
+    
+    // Sauts de ligne simples
+    html = html.replace(/\n/g, '<br>');
+    
+    // Encapsuler dans un paragraphe si nécessaire
+    if (!html.startsWith('<')) {
+        html = '<p>' + html + '</p>';
+    }
+    
+    return html;
 }
+
+// Rafraîchir le score de santé périodiquement (optionnel)
+setInterval(() => {
+    renderHealthScore();
+    renderAlerts();
+}, 30000); // toutes les 30 secondes
 </script>
 {% endblock %}
