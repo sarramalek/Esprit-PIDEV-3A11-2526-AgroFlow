@@ -1,5 +1,7 @@
 {% extends 'agriculteur_dashboard.html.twig' %}
+
 {% block title %}Plan de maintenance IA — #{{ maintenance.idMain }}{% endblock %}
+
 {% block body %}
 <style>
 .api-page { max-width:960px; margin:0 auto; padding:2rem 1.75rem; font-family:'Segoe UI',system-ui,sans-serif; }
@@ -115,8 +117,18 @@
       {% if maintenance.kilometrage is not null %}<div class="api-citem"><div class="api-clabel">Kilométrage</div><div class="api-cvalue">{{ maintenance.kilometrage|number_format(0,' ',' ') }} km</div></div>{% endif %}
       {% if maintenance.nom %}<div class="api-citem"><div class="api-clabel">Machine</div><div class="api-cvalue">{{ maintenance.nom }}</div></div>{% endif %}
     </div>
-    {% if maintenance.description %}<div style="margin-top:.9rem; background:#f9f7ff; border-radius:10px; padding:.85rem 1rem;"><div class="api-clabel" style="margin-bottom:.35rem;">Description</div><div style="font-size:.9rem; color:#2a3a2a; line-height:1.6;">{{ maintenance.description }}</div></div>{% endif %}
-    {% if maintenance.recommandation %}<div style="margin-top:.6rem; background:#f9f7ff; border-radius:10px; padding:.85rem 1rem;"><div class="api-clabel" style="margin-bottom:.35rem;">Recommandations existantes</div><div style="font-size:.9rem; color:#2a3a2a; line-height:1.6;">{{ maintenance.recommandation }}</div></div>{% endif %}
+    {% if maintenance.description %}
+    <div style="margin-top:.9rem; background:#f9f7ff; border-radius:10px; padding:.85rem 1rem;">
+      <div class="api-clabel" style="margin-bottom:.35rem;">Description</div>
+      <div style="font-size:.9rem; color:#2a3a2a; line-height:1.6;">{{ maintenance.description }}</div>
+    </div>
+    {% endif %}
+    {% if maintenance.recommandation %}
+    <div style="margin-top:.6rem; background:#f9f7ff; border-radius:10px; padding:.85rem 1rem;">
+      <div class="api-clabel" style="margin-bottom:.35rem;">Recommandations existantes</div>
+      <div style="font-size:.9rem; color:#2a3a2a; line-height:1.6;">{{ maintenance.recommandation }}</div>
+    </div>
+    {% endif %}
   </div>
 
   <button class="btn-generate" id="generateBtn">
@@ -143,6 +155,7 @@
 </div>
 
 <script>
+// Données de la maintenance passées du backend au JavaScript
 const maintenanceData = {
     idMain: {{ maintenance.idMain }},
     typePanne: {{ maintenance.typePanne|json_encode|raw }},
@@ -156,7 +169,9 @@ const maintenanceData = {
     recommandation: {{ maintenance.recommandation|json_encode|raw }},
 };
 
-// Options du plan
+// ─────────────────────────────────────────────────────────────────
+// Gestion des options du plan
+// ─────────────────────────────────────────────────────────────────
 document.querySelectorAll('.opt-chip').forEach(chip => {
     chip.addEventListener('click', () => chip.classList.toggle('selected'));
 });
@@ -165,38 +180,69 @@ function getSelectedOptions() {
     return Array.from(document.querySelectorAll('.opt-chip.selected')).map(c => c.dataset.key);
 }
 
-// Timeline
+// ─────────────────────────────────────────────────────────────────
+// Construction de la timeline prévisionnelle
+// ─────────────────────────────────────────────────────────────────
 function buildTimeline() {
     const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
     const events = [];
     const list = document.getElementById('timelineList');
     list.innerHTML = '';
 
+    // Événement 1 : Maintenance actuelle
     if (maintenanceData.dateMain) {
         const dm = new Date(maintenanceData.dateMain);
         const done = dm <= today;
-        events.push({ dot: done ? 'done' : 'active', text: `<strong>Maintenance actuelle</strong> — ${dm.toLocaleDateString('fr-FR')} (${maintenanceData.typePanne})` });
+        events.push({ 
+            dot: done ? 'done' : 'active', 
+            text: `<strong>Maintenance actuelle</strong> — ${dm.toLocaleDateString('fr-FR')} (${maintenanceData.typePanne})` 
+        });
     } else {
-        events.push({ dot: 'active', text: `<strong>Maintenance actuelle</strong> — Date non renseignée (${maintenanceData.typePanne})` });
+        events.push({ 
+            dot: 'active', 
+            text: `<strong>Maintenance actuelle</strong> — Date non renseignée (${maintenanceData.typePanne})` 
+        });
     }
 
+    // Événement 2 : Prochaine maintenance estimée
     const intervals = { urgente: 30, haute: 60, moyenne: 90, faible: 180 };
     const days = intervals[maintenanceData.priorite] || 90;
     const next = new Date(today.getTime() + days * 86400000);
-    events.push({ dot: 'future', text: `<strong>Prochaine maintenance estimée</strong> — ${next.toLocaleDateString('fr-FR')} (dans ~${days} jours)` });
+    events.push({ 
+        dot: 'future', 
+        text: `<strong>Prochaine maintenance estimée</strong> — ${next.toLocaleDateString('fr-FR')} (dans ~${days} jours)` 
+    });
 
+    // Événement 3 : Révision générale (si kilométrage élevé)
     if (maintenanceData.kilometrage && maintenanceData.kilometrage > 8000) {
         const rev = new Date(today.getTime() + 120 * 86400000);
-        events.push({ dot: 'future', text: `<strong>Révision générale recommandée</strong> — ${rev.toLocaleDateString('fr-FR')} (kilométrage élevé)` });
+        events.push({ 
+            dot: 'future', 
+            text: `<strong>Révision générale recommandée</strong> — ${rev.toLocaleDateString('fr-FR')} (kilométrage élevé)` 
+        });
     }
 
+    // Événement 4 : Vidange (si kilométrage > 5000)
+    if (maintenanceData.kilometrage && maintenanceData.kilometrage > 5000 && maintenanceData.kilometrage <= 10000) {
+        const vidange = new Date(today.getTime() + 45 * 86400000);
+        events.push({ 
+            dot: 'future', 
+            text: `<strong>Vidange recommandée</strong> — ${vidange.toLocaleDateString('fr-FR')} (tous les 5000 km)` 
+        });
+    }
+
+    // Affichage des événements
     events.forEach(ev => {
         list.innerHTML += `<div class="tl-item"><div class="tl-dot tl-dot--${ev.dot}"></div><div class="tl-text">${ev.text}</div></div>`;
     });
 }
 buildTimeline();
 
-// Génération du plan
+// ─────────────────────────────────────────────────────────────────
+// Génération du plan via l'API Gemini
+// ─────────────────────────────────────────────────────────────────
 document.getElementById('generateBtn').addEventListener('click', generatePlan);
 
 async function generatePlan() {
@@ -208,6 +254,7 @@ async function generatePlan() {
     const content = document.getElementById('planContent');
     const errorCard = document.getElementById('errorCard');
 
+    // Désactiver le bouton pendant la génération
     btn.disabled = true;
     spinner.style.display = 'block';
     btnIcon.style.display = 'none';
@@ -217,6 +264,17 @@ async function generatePlan() {
 
     const opts = getSelectedOptions();
 
+    if (opts.length === 0) {
+        errorCard.textContent = '⚠️ Veuillez sélectionner au moins une option pour le plan.';
+        errorCard.style.display = 'block';
+        btn.disabled = false;
+        spinner.style.display = 'none';
+        btnIcon.style.display = 'inline';
+        btnText.textContent = 'Générer le plan de maintenance';
+        return;
+    }
+
+    // Construction du prompt pour l'API Gemini
     const prompt = `Tu es un expert en maintenance de machines agricoles.
 
 === CONTEXTE ===
@@ -251,7 +309,7 @@ Sois précis, structuré et adapté au contexte agricole tunisien.`;
         const resp = await fetch("{{ path('agri_maintenances_api_gemini_generate') }}", {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt })
+            body: JSON.stringify({ prompt: prompt })
         });
 
         if (!resp.ok) {
@@ -262,11 +320,13 @@ Sois précis, structuré et adapté au contexte agricole tunisien.`;
         const data = await resp.json();
         if (!data.text) throw new Error('Réponse vide de l\'API.');
 
+        // Convertir le markdown en HTML et afficher
         content.innerHTML = markdownToHtml(data.text);
         result.style.display = 'block';
         result.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
     } catch (err) {
+        console.error('Erreur:', err);
         errorCard.textContent = '❌ ' + err.message;
         errorCard.style.display = 'block';
     } finally {
@@ -277,22 +337,62 @@ Sois précis, structuré et adapté au contexte agricole tunisien.`;
     }
 }
 
+// ─────────────────────────────────────────────────────────────────
+// Copier le résultat dans le presse-papiers
+// ─────────────────────────────────────────────────────────────────
 function copyResult() {
     const text = document.getElementById('planContent').innerText;
-    navigator.clipboard.writeText(text).then(() => alert('📋 Plan copié dans le presse-papiers !'));
+    navigator.clipboard.writeText(text).then(() => {
+        alert('📋 Plan copié dans le presse-papiers !');
+    }).catch(() => {
+        alert('❌ Impossible de copier le texte.');
+    });
 }
 
+// ─────────────────────────────────────────────────────────────────
+// Conversion basique de Markdown vers HTML
+// ─────────────────────────────────────────────────────────────────
 function markdownToHtml(md) {
-    return md
-        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-        .replace(/^## (.+)$/gm, '<h3>$1</h3>')
-        .replace(/^# (.+)$/gm, '<h3>$1</h3>')
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.+?)\*/g, '<em>$1</em>')
-        .replace(/^[-*] (.+)$/gm, '<li>$1</li>')
-        .replace(/(<li>.*<\/li>\n?)+/g, s => '<ul>' + s + '</ul>')
-        .replace(/\n\n/g, '</p><p>')
-        .replace(/\n/g, '<br>');
+    if (!md) return '';
+    
+    // Échapper les caractères HTML spéciaux (sécurité de base)
+    let html = md.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+    
+    // Titres
+    html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+    html = html.replace(/^## (.+)$/gm, '<h3>$1</h3>');
+    html = html.replace(/^# (.+)$/gm, '<h3>$1</h3>');
+    
+    // Gras et italique
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    
+    // Listes
+    html = html.replace(/^[-*] (.+)$/gm, '<li>$1</li>');
+    html = html.replace(/(<li>.*<\/li>\n?)+/g, function(s) {
+        return '<ul>' + s + '</ul>';
+    });
+    
+    // Paragraphes et sauts de ligne
+    html = html.replace(/\n\n/g, '</p><p>');
+    html = html.replace(/\n/g, '<br>');
+    
+    // Encapsuler dans un paragraphe si nécessaire
+    if (!html.startsWith('<')) {
+        html = '<p>' + html + '</p>';
+    }
+    
+    return html;
+}
+
+// Rafraîchir la timeline si nécessaire (optionnel)
+function refreshTimeline() {
+    buildTimeline();
 }
 </script>
 {% endblock %}
