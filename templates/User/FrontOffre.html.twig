@@ -55,6 +55,67 @@
 {% endblock %}
 
 {% block body %}
+{# ── Alerte code promo du jour ── #}
+<div id="promoAlert" style="
+    display: flex; align-items: center; gap: 18px;
+    background: linear-gradient(135deg, #fffbe6, #fff3cc);
+    border: 2px solid #f5c518;
+    border-radius: 14px;
+    padding: 20px 28px;
+    margin-bottom: 28px;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(245,197,24,0.15);
+">
+    <div style="font-size: 36px;">🎁</div>
+    <div style="flex: 1;">
+        <div style="font-size: 12px; font-weight: 700; color: #b8860b;
+                    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">
+            🌟 Offre du jour — valable uniquement aujourd'hui !
+        </div>
+        <div style="font-size: 18px; font-weight: 700; color: #2C3E50; margin-bottom: 6px;">
+            Bénéficiez de <span style="color: #e67e22; font-size: 22px;">{{ reduction }}% de réduction</span>
+            sur votre prochaine inscription
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <div style="
+                background: white;
+                border: 2px dashed #f5c518;
+                border-radius: 10px;
+                padding: 8px 18px;
+                font-family: monospace;
+                font-size: 20px;
+                font-weight: 700;
+                color: #2D5A27;
+                letter-spacing: 3px;
+                cursor: pointer;
+                user-select: all;
+            " onclick="copyPromo(this)" title="Cliquez pour copier">
+                {{ codePromo }}
+            </div>
+            <button onclick="copyPromo(document.querySelector('[onclick^=copyPromo]'))"
+                    style="background: #f5c518; border: none; border-radius: 8px;
+                           padding: 9px 18px; font-size: 13px; font-weight: 700;
+                           cursor: pointer; display: flex; align-items: center; gap: 7px;
+                           color: #2C3E50; transition: background 0.2s;"
+                    onmouseover="this.style.background='#e6b800'"
+                    onmouseout="this.style.background='#f5c518'">
+                <i class="fa fa-copy"></i> Copier
+            </button>
+            <span style="font-size: 12px; color: #aaa;" id="promoCopyMsg"></span>
+        </div>
+        <div style="font-size: 12px; color: #aaa; margin-top: 8px;">
+            <i class="fa fa-clock"></i>
+            Expire à minuit — un nouveau code sera généré demain
+        </div>
+    </div>
+
+    {# Bouton fermer #}
+    <button onclick="document.getElementById('promoAlert').style.display='none'"
+            style="position: absolute; top: 12px; right: 14px;
+                   background: none; border: none; font-size: 18px;
+                   color: #aaa; cursor: pointer; line-height: 1;"
+            title="Fermer">✕</button>
+</div>
 <div class="front-wrapper">
 
     {# ── Header ── #}
@@ -102,12 +163,14 @@
                 </span>
             </div>
         </div>
-        <form method="post" action="{{ path('app_offre_souscrire', {id: offreSuggereee.idOffres}) }}"
-              onsubmit="return confirm('Confirmer l\'inscription à l\'offre {{ offreSuggereee.nomOffre }} ?')">
-            <button type="submit" class="btn-souscrire" style="width:auto;padding:12px 22px;">
-                <i class="fa fa-crown"></i> S'inscrire
-            </button>
-        </form>
+       <form method="post" action="{{ path('app_offre_souscrire', {id: offreSuggereee.idOffres}) }}"
+      onsubmit="return confirm('Confirmer l\'inscription ?')">
+    <input type="hidden" name="code_promo" id="promoInputSuggestion" value="">
+    <button type="submit" class="btn-souscrire" style="width:auto;padding:12px 22px;"
+            onclick="document.getElementById('promoInputSuggestion').value = document.getElementById('promoGlobalInput').value">
+        <i class="fa fa-crown"></i> S'inscrire
+    </button>
+</form>
     </div>
     {% endif %}
 
@@ -118,6 +181,42 @@
             <p>Aucune offre disponible pour le moment.</p>
         </div>
     {% else %}
+    {# ── Saisie code promo ── #}
+<div style="
+    background: white; border-radius: 12px;
+    padding: 16px 22px; margin-bottom: 22px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+">
+    <i class="fa fa-ticket" style="color: #f5c518; font-size: 18px;"></i>
+    <div style="font-size: 13px; font-weight: 600; color: #2C3E50;">
+        Code promo :
+    </div>
+    <input type="text" id="promoGlobalInput"
+           placeholder="ex: {{ codePromo }}"
+           maxlength="11"
+           style="
+               flex: 1; min-width: 160px; max-width: 220px;
+               border: 2px solid #e8e8e8; border-radius: 8px;
+               padding: 9px 14px; font-size: 14px; font-weight: 600;
+               font-family: monospace; letter-spacing: 2px;
+               text-transform: uppercase; outline: none;
+               transition: border 0.2s;
+           "
+           oninput="this.value = this.value.toUpperCase()"
+           onfocus="this.style.borderColor='#f5c518'"
+           onblur="this.style.borderColor='#e8e8e8'">
+    <button onclick="applyPromo()"
+            style="background: #2D5A27; color: white; border: none;
+                   border-radius: 8px; padding: 9px 18px;
+                   font-size: 13px; font-weight: 600; cursor: pointer;
+                   transition: background 0.2s;"
+            onmouseover="this.style.background='#1e3d1a'"
+            onmouseout="this.style.background='#2D5A27'">
+        <i class="fa fa-check"></i> Appliquer
+    </button>
+    <span id="promoStatus" style="font-size: 13px; font-weight: 600;"></span>
+</div>
         <div class="cards-grid">
             {% for offre in offres %}
                 {% set souscrite = offre.idOffres in offresSouscrites %}
@@ -164,11 +263,13 @@
                             </div>
                         {% else %}
                             <form method="post" action="{{ path('app_offre_souscrire', {id: offre.idOffres}) }}"
-                                  onsubmit="return confirm('Confirmer l\'inscription à l\'offre {{ offre.nomOffre }} ?')">
-                                <button type="submit" class="btn-souscrire">
-                                    <i class="fa fa-crown"></i> S'inscrire
-                                </button>
-                            </form>
+      onsubmit="return confirm('Confirmer l\'inscription à l\'offre {{ offre.nomOffre }} ?')">
+    <input type="hidden" name="code_promo" class="promo-hidden-input" value="">
+    <button type="submit" class="btn-souscrire"
+            onclick="this.form.querySelector('.promo-hidden-input').value = document.getElementById('promoGlobalInput').value">
+        <i class="fa fa-crown"></i> S'inscrire
+    </button>
+</form>
                         {% endif %}
                     </div>
 
@@ -222,4 +323,86 @@
 </div>
 {% endif %}
 
+{% endblock %}
+{% block javascripts %}
+<script>
+// ── Copier le code promo ──
+function copyPromo(el) {
+    const text = el.textContent.trim();
+    navigator.clipboard.writeText(text).then(() => {
+        document.getElementById('promoCopyMsg').textContent = '✓ Copié !';
+        // Auto-remplit le champ de saisie
+        const input = document.getElementById('promoGlobalInput');
+        if (input) {
+            input.value = text;
+            applyPromo();
+        }
+        setTimeout(() => {
+            document.getElementById('promoCopyMsg').textContent = '';
+        }, 2000);
+    });
+}
+
+// ── Vérifier le code saisi ──
+const PROMO_CODE      = '{{ codePromo }}';
+const PROMO_REDUCTION = {{ reduction }};
+
+function applyPromo() {
+    const input  = document.getElementById('promoGlobalInput');
+    const status = document.getElementById('promoStatus');
+    const val    = input.value.trim().toUpperCase();
+
+    if (val === '') {
+        status.textContent = '';
+        return;
+    }
+
+    if (val === PROMO_CODE) {
+        status.innerHTML = `<span style="color:#2D5A27;">
+            <i class="fa fa-check-circle"></i>
+            Code valide — ${PROMO_REDUCTION}% de réduction appliquée !
+        </span>`;
+        input.style.borderColor = '#2D5A27';
+
+        // Mettre à jour les prix affichés sur les cards
+        document.querySelectorAll('.prix-highlight').forEach(el => {
+            const original = parseFloat(el.dataset.original || el.textContent);
+            el.dataset.original = original;
+            const reduit = (original * (1 - PROMO_REDUCTION / 100)).toFixed(2);
+            el.innerHTML = `
+                <span style="text-decoration:line-through;color:#aaa;font-size:14px;">
+                    ${original.toFixed(2)} TND
+                </span>
+                <span style="color:#e67e22;"> ${reduit} TND</span>
+            `;
+        });
+    } else {
+        status.innerHTML = `<span style="color:#e74c3c;">
+            <i class="fa fa-times-circle"></i> Code invalide ou expiré
+        </span>`;
+        input.style.borderColor = '#e74c3c';
+
+        // Remettre les prix originaux
+        document.querySelectorAll('.prix-highlight').forEach(el => {
+            if (el.dataset.original) {
+                el.textContent = parseFloat(el.dataset.original).toFixed(2) + ' TND';
+            }
+        });
+    }
+}
+
+// ── Auto-remplir si code déjà copié (localStorage) ──
+document.addEventListener('DOMContentLoaded', () => {
+    // Optionnel : mémoriser le code entre les pages
+    const saved = sessionStorage.getItem('promoCode');
+    if (saved) {
+        const input = document.getElementById('promoGlobalInput');
+        if (input) { input.value = saved; applyPromo(); }
+    }
+
+    document.getElementById('promoGlobalInput')?.addEventListener('input', () => {
+        sessionStorage.setItem('promoCode', document.getElementById('promoGlobalInput').value);
+    });
+});
+</script>
 {% endblock %}
