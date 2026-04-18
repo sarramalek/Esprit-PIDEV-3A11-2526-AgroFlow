@@ -28,7 +28,7 @@ final class ExamensController extends AbstractController
         $direction = $request->query->get('direction', 'DESC');
         $typeFilter = $request->query->get('type');
         $page = $request->query->getInt('page', 1);
-        $limit = 15; // Nombre d'examens par page
+        $limit = 5; // Nombre d'examens par page
 
         // Admin voit tout, Agriculteur voit les siens
         $filterUser = $this->isGranted('ROLE_ADMIN') ? null : $user;

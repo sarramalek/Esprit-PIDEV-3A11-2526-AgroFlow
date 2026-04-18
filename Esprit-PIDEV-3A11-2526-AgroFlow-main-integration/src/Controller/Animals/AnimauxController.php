@@ -28,7 +28,7 @@ final class AnimauxController extends AbstractController
         $sortBy = $request->query->get('sortBy', 'id');
         $direction = $request->query->get('sortDirection', 'DESC');
         $page = $request->query->getInt('page', 1);
-        $limit = 10; // Nombre d'animaux par page
+        $limit = 5; // Nombre d'animaux par page
 
         // Admin voit tout, Agriculteur voit les siens
         $filterUser = $this->isGranted('ROLE_ADMIN') ? null : $user;
