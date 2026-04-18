@@ -164,3 +164,11 @@ bbfd9e,127.0.0.1,POST,http://127.0.0.1:8000/agriculteur/offre/souscrire/2,177653
 b70a7d,127.0.0.1,GET,http://127.0.0.1:8000/agriculteur/offre/front,1776533285,,200,request
 d4c0b2,127.0.0.1,GET,http://127.0.0.1:8000/check-session,1776533285,,200,request
 34c390,127.0.0.1,GET,http://127.0.0.1:8000/check-session,1776533312,,200,request
+c56865,127.0.0.1,GET,http://127.0.0.1:8000/check-session,1776533380,,200,request
+747ded,127.0.0.1,GET,http://127.0.0.1:8000/agriculteur/abonnement/front,1776533413,,200,request
+8641dd,127.0.0.1,GET,http://127.0.0.1:8000/check-session,1776533414,,200,request
+883043,127.0.0.1,GET,http://127.0.0.1:8000/agriculteur/ouvriers,1776533417,,200,request
+8907a6,127.0.0.1,GET,http://127.0.0.1:8000/check-session,1776533418,,200,request
+236bda,127.0.0.1,GET,http://127.0.0.1:8000/check-session,1776533491,,200,request
+48841a,127.0.0.1,GET,http://127.0.0.1:8000/agriculteur/offre/front,1776533493,,200,request
+dc4032,127.0.0.1,GET,http://127.0.0.1:8000/check-session,1776533494,,200,request
