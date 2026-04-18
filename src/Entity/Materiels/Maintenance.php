@@ -29,6 +29,18 @@ class Maintenance
     #[ORM\Column(name: 'idM', type: 'integer', nullable: true)]
     private ?int $idM = null;
 
+    #[ORM\Column(name: 'statut', type: 'string', columnDefinition: "ENUM('en_cours','termine','planifie')", options: ['default' => 'planifie'])]
+    private ?string $statut = 'planifie';
+
+    #[ORM\Column(name: 'recommandation', type: 'text', nullable: true)]
+    private ?string $recommandation = null;
+
+    #[ORM\Column(name: 'priorite', type: 'string', columnDefinition: "ENUM('faible','moyenne','haute','urgente')", options: ['default' => 'moyenne'])]
+    private ?string $priorite = 'moyenne';
+
+    #[ORM\Column(name: 'kilometrage', type: 'integer', nullable: true)]
+    private ?int $kilometrage = null;
+
     // Propriété non persistée pour le nom de la machine
     private ?string $nom = null;
 
@@ -38,11 +50,13 @@ class Maintenance
     {
         return $this->idMain;
     }
-        public function setIdMain(int $idMain): static
-        {
-            $this->idMain = $idMain;
-            return $this;
-        }
+
+    public function setIdMain(int $idMain): static
+    {
+        $this->idMain = $idMain;
+        return $this;
+    }
+
     public function getId(): ?int
     {
         return $this->idMain;
@@ -103,6 +117,50 @@ class Maintenance
         return $this;
     }
 
+    public function getStatut(): ?string
+    {
+        return $this->statut;
+    }
+
+    public function setStatut(string $statut): static
+    {
+        $this->statut = $statut;
+        return $this;
+    }
+
+    public function getRecommandation(): ?string
+    {
+        return $this->recommandation;
+    }
+
+    public function setRecommandation(?string $recommandation): static
+    {
+        $this->recommandation = $recommandation;
+        return $this;
+    }
+
+    public function getPriorite(): ?string
+    {
+        return $this->priorite;
+    }
+
+    public function setPriorite(string $priorite): static
+    {
+        $this->priorite = $priorite;
+        return $this;
+    }
+
+    public function getKilometrage(): ?int
+    {
+        return $this->kilometrage;
+    }
+
+    public function setKilometrage(?int $kilometrage): static
+    {
+        $this->kilometrage = $kilometrage;
+        return $this;
+    }
+
     public function getNom(): ?string
     {
         return $this->nom;
@@ -112,5 +170,11 @@ class Maintenance
     {
         $this->nom = $nom;
         return $this;
+    }
+
+    // Alias for repository compatibility
+    public function getNomMateriel(): ?string
+    {
+        return $this->nom;
     }
 }

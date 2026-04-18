@@ -5,7 +5,6 @@ namespace App\Controller\AdminMateriels;
 use App\Entity\Materiels\Machine;
 use App\Entity\User\User;
 use App\Repository\Materiels\MachineRepository;
-use App\Repository\User\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -161,6 +160,17 @@ class MachineAdminController extends AbstractController
     }
 
     /* ════════════════════════════════════════════
+       DELETE CONFIRMATION
+    ════════════════════════════════════════════ */
+    #[Route('/{id}/delete-confirm', name: 'delete_confirm', methods: ['GET'])]
+    public function deleteConfirm(Machine $machine): Response
+    {
+        return $this->render('admin/machines/delete.html.twig', [
+            'machine' => $machine,
+        ]);
+    }
+
+    /* ════════════════════════════════════════════
        VALIDATION CÔTÉ SERVEUR
     ════════════════════════════════════════════ */
     private function validateMachine(Machine $machine, Request $request): array
@@ -176,10 +186,10 @@ class MachineAdminController extends AbstractController
         $nom = trim($machine->getNom());
         if ($nom === '') {
             $errors[] = 'Le nom de la machine est obligatoire.';
-        } elseif (mb_strlen($nom) < 3) {
-            $errors[] = 'Le nom doit contenir au moins 3 caractères.';
-        } elseif (mb_strlen($nom) > 100) {
-            $errors[] = 'Le nom ne peut pas dépasser 100 caractères.';
+        } elseif (mb_strlen($nom) < 2) {
+            $errors[] = 'Le nom doit contenir au moins 2 caractères.';
+        } elseif (mb_strlen($nom) > 255) {
+            $errors[] = 'Le nom ne peut pas dépasser 255 caractères.';
         }
 
         // Marque
@@ -188,50 +198,89 @@ class MachineAdminController extends AbstractController
             $errors[] = 'La marque est obligatoire.';
         } elseif (mb_strlen($marque) < 2) {
             $errors[] = 'La marque doit contenir au moins 2 caractères.';
-        } elseif (mb_strlen($marque) > 80) {
-            $errors[] = 'La marque ne peut pas dépasser 80 caractères.';
+        } elseif (mb_strlen($marque) > 255) {
+            $errors[] = 'La marque ne peut pas dépasser 255 caractères.';
         }
 
         // Modèle
         $modele = trim($machine->getModele());
         if ($modele === '') {
             $errors[] = 'Le modèle est obligatoire.';
-        } elseif (mb_strlen($modele) > 80) {
-            $errors[] = 'Le modèle ne peut pas dépasser 80 caractères.';
+        } elseif (mb_strlen($modele) > 255) {
+            $errors[] = 'Le modèle ne peut pas dépasser 255 caractères.';
         }
 
-        // N° de série
+        // N° de série (optionnel)
         $serie = trim($machine->getNumeroSerie());
-        if ($serie === '') {
-            $errors[] = 'Le numéro de série est obligatoire.';
-        } elseif (mb_strlen($serie) < 3) {
-            $errors[] = 'Le numéro de série doit contenir au moins 3 caractères.';
-        } elseif (mb_strlen($serie) > 60) {
-            $errors[] = 'Le numéro de série ne peut pas dépasser 60 caractères.';
-        } elseif (!preg_match('/^[A-Za-z0-9\-_]+$/', $serie)) {
-            $errors[] = 'Le numéro de série ne doit contenir que des lettres, chiffres et tirets.';
+        if ($serie !== '' && mb_strlen($serie) > 255) {
+            $errors[] = 'Le numéro de série ne peut pas dépasser 255 caractères.';
         }
 
-        // État
-        $etatsAutorises = ['Neuf', 'Bon', 'Actif', 'Occasion', 'En panne', 'Hors service'];
+        // État (selon les choices de l'entité)
+        $etatsAutorises = ['Neuf', 'Bon', 'Occasion', 'En panne'];
         $etat = trim($machine->getEtatM());
         if ($etat === '') {
             $errors[] = "L'état de la machine est obligatoire.";
         } elseif (!in_array($etat, $etatsAutorises, true)) {
-            $errors[] = "L'état sélectionné est invalide.";
+            $errors[] = "L'état sélectionné est invalide. Valeurs acceptées : " . implode(', ', $etatsAutorises);
+        }
+
+        // Kilométrage
+        $kilometrage = $machine->getKilometrage();
+        if ($kilometrage === null) {
+            $errors[] = 'Le kilométrage est obligatoire.';
+        } elseif ($kilometrage < 0) {
+            $errors[] = 'Le kilométrage ne peut pas être négatif.';
+        }
+
+        // Kilométrage dernière visite
+        $kmLastVisite = $machine->getKmLastVisite();
+        if ($kmLastVisite === null) {
+            $errors[] = 'Le kilométrage de dernière visite est obligatoire.';
+        } elseif ($kmLastVisite < 0) {
+            $errors[] = 'Le kilométrage de dernière visite ne peut pas être négatif.';
+        }
+
+        // Vérification cohérence des kilométrages
+        if ($kilometrage !== null && $kmLastVisite !== null && $kmLastVisite > $kilometrage) {
+            $errors[] = 'Le kilométrage de dernière visite ne peut pas être supérieur au kilométrage actuel.';
         }
 
         // Date d'achat (optionnel)
         $dateStr = $request->request->get('dateAchat');
         if ($dateStr !== null && $dateStr !== '') {
             try {
-                $date  = new \DateTime($dateStr);
+                $date = new \DateTime($dateStr);
                 $today = new \DateTime('today');
                 if ($date > $today) {
                     $errors[] = "La date d'achat ne peut pas être dans le futur.";
                 }
             } catch (\Exception) {
                 $errors[] = "Le format de la date d'achat est invalide.";
+            }
+        }
+
+        // Date dernière visite (optionnel)
+        $dateLastVisiteStr = $request->request->get('dateLastVisite');
+        if ($dateLastVisiteStr !== null && $dateLastVisiteStr !== '') {
+            try {
+                $dateLastVisite = new \DateTime($dateLastVisiteStr);
+                $today = new \DateTime('today');
+                if ($dateLastVisite > $today) {
+                    $errors[] = "La date de dernière visite ne peut pas être dans le futur.";
+                }
+            } catch (\Exception) {
+                $errors[] = "Le format de la date de dernière visite est invalide.";
+            }
+        }
+
+        // Prochaine maintenance (optionnel)
+        $prochaineMaintenanceStr = $request->request->get('prochaineMaintenance');
+        if ($prochaineMaintenanceStr !== null && $prochaineMaintenanceStr !== '') {
+            try {
+                new \DateTime($prochaineMaintenanceStr);
+            } catch (\Exception) {
+                $errors[] = "Le format de la date de prochaine maintenance est invalide.";
             }
         }
 
@@ -250,26 +299,63 @@ class MachineAdminController extends AbstractController
         return $em->getRepository(User::class)->findBy(['role' => 2]);
     }
     
+    /**
+     * Hydrate toutes les propriétés de la machine
+     */
     private function hydrateMachine(Machine $machine, Request $request): void
     {
+        // Champs texte
         $machine->setNom(trim($request->request->get('nom', '')));
         $machine->setMarque(trim($request->request->get('marque', '')));
         $machine->setModele(trim($request->request->get('modele', '')));
-        $machine->setNumeroSerie(trim($request->request->get('numeroSerie', '')));
+        $machine->setNumeroSerie(trim($request->request->get('numeroSerie', '')) ?: null);
         $machine->setEtatM(trim($request->request->get('etatM', '')));
-
-        $dateStr = $request->request->get('dateAchat');
-        if ($dateStr && $dateStr !== '') {
+        
+        // Kilométrages
+        $kilometrage = $request->request->get('kilometrage');
+        $machine->setKilometrage($kilometrage !== '' && $kilometrage !== null ? (int)$kilometrage : 0);
+        
+        $kmLastVisite = $request->request->get('kmLastVisite');
+        $machine->setKmLastVisite($kmLastVisite !== '' && $kmLastVisite !== null ? (int)$kmLastVisite : 0);
+        
+        // Dates
+        $dateAchatStr = $request->request->get('dateAchat');
+        if ($dateAchatStr && $dateAchatStr !== '') {
             try {
-                $machine->setDateAchat(new \DateTime($dateStr));
+                $machine->setDateAchat(new \DateTime($dateAchatStr));
             } catch (\Exception) {
                 $machine->setDateAchat(null);
             }
         } else {
             $machine->setDateAchat(null);
         }
+        
+        $dateLastVisiteStr = $request->request->get('dateLastVisite');
+        if ($dateLastVisiteStr && $dateLastVisiteStr !== '') {
+            try {
+                $machine->setDateLastVisite(new \DateTime($dateLastVisiteStr));
+            } catch (\Exception) {
+                $machine->setDateLastVisite(null);
+            }
+        } else {
+            $machine->setDateLastVisite(null);
+        }
+        
+        $prochaineMaintenanceStr = $request->request->get('prochaineMaintenance');
+        if ($prochaineMaintenanceStr && $prochaineMaintenanceStr !== '') {
+            try {
+                $machine->setProchaineMaintenance(new \DateTime($prochaineMaintenanceStr));
+            } catch (\Exception) {
+                $machine->setProchaineMaintenance(null);
+            }
+        } else {
+            $machine->setProchaineMaintenance(null);
+        }
     }
 
+    /**
+     * Sérialise les machines pour le DataTable
+     */
     private function serializeMachines(array $machines): string
     {
         $data = array_map(function (Machine $m) {
@@ -280,9 +366,12 @@ class MachineAdminController extends AbstractController
                 'modele' => $m->getModele(),
                 'serie'  => $m->getNumeroSerie(),
                 'etat'   => $m->getEtatM(),
-                'date'   => $m->getDateAchat()
-                            ? $m->getDateAchat()->format('Y-m-d')
-                            : null,
+                'date'   => $m->getDateAchat() ? $m->getDateAchat()->format('Y-m-d') : null, // Changé ici : 'date' au lieu de 'dateAchat'
+                'kilometrage' => $m->getKilometrage(),
+                'kmLastVisite' => $m->getKmLastVisite(),
+                'dateAchat' => $m->getDateAchat() ? $m->getDateAchat()->format('Y-m-d') : null,
+                'dateLastVisite' => $m->getDateLastVisite() ? $m->getDateLastVisite()->format('Y-m-d') : null,
+                'prochaineMaintenance' => $m->getProchaineMaintenance() ? $m->getProchaineMaintenance()->format('Y-m-d') : null,
                 // Infos propriétaire
                 'cinAgriculteur' => $m->getCinAgriculteur(),
                 'nomAgriculteur' => $m->getNomAgriculteur(),
@@ -292,11 +381,4 @@ class MachineAdminController extends AbstractController
 
         return json_encode($data, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG);
     }
-    #[Route('/{id}/delete-confirm', name: 'delete_confirm', methods: ['GET'])]
-public function deleteConfirm(Machine $machine): Response
-{
-    return $this->render('admin/machines/delete.html.twig', [
-        'machine' => $machine,
-    ]);
-}
 }

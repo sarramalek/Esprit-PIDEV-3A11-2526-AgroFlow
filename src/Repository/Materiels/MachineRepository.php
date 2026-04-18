@@ -1,4 +1,5 @@
 <?php
+// src/Repository/Materiels/MachineRepository.php
 
 namespace App\Repository\Materiels;
 
@@ -13,50 +14,48 @@ class MachineRepository extends ServiceEntityRepository
         parent::__construct($registry, Machine::class);
     }
 
+    // =========================================================================
+    // Recherche filtrée pour l'index
+    // =========================================================================
     public function search(array $filters = []): array
     {
-        $qb = $this->createQueryBuilder('m')
-            ->leftJoin('m.agriculteur', 'u')
-            ->addSelect('u');
-
-        // ── Filtre par CIN ──────────────────────────────────────────────────
-        // ✅ CORRIGÉ : on vérifie que cin est un entier valide > 0
-        // Si cin est null/0/vide → on ne retourne RIEN (sécurité : jamais afficher
-        // toutes les machines de tous les agriculteurs)
         $cin = isset($filters['cin']) ? (int) $filters['cin'] : 0;
 
-        if ($cin > 0) {
-            $qb->andWhere('u.cin = :cin')
-               ->setParameter('cin', $cin);
-        } else {
-            // ✅ Sécurité : si pas de CIN valide, retourner tableau vide
+        // Sans CIN valide on ne retourne rien (sécurité)
+        if ($cin <= 0) {
             return [];
         }
 
-        // ── Recherche textuelle (insensible à la casse) ─────────────────────
+        $qb = $this->createQueryBuilder('m')
+            ->leftJoin('m.agriculteur', 'u')
+            ->addSelect('u')
+            ->andWhere('u.cin = :cin')
+            ->setParameter('cin', $cin);
+
+        // Recherche textuelle (nom, marque, modèle, numéro de série)
         if (!empty($filters['search'])) {
             $search = '%' . mb_strtolower(trim($filters['search'])) . '%';
             $qb->andWhere(
                 $qb->expr()->orX(
-                    $qb->expr()->like('LOWER(m.nom)',         ':search'),
-                    $qb->expr()->like('LOWER(m.marque)',      ':search'),
-                    $qb->expr()->like('LOWER(m.modele)',      ':search'),
+                    $qb->expr()->like('LOWER(m.nom)', ':search'),
+                    $qb->expr()->like('LOWER(m.marque)', ':search'),
+                    $qb->expr()->like('LOWER(m.modele)', ':search'),
                     $qb->expr()->like('LOWER(m.numeroSerie)', ':search')
                 )
             )->setParameter('search', $search);
         }
 
-        // ── Filtre par état ─────────────────────────────────────────────────
+        // Filtre par état
         if (!empty($filters['etat'])) {
             $qb->andWhere('m.etatM = :etat')
                ->setParameter('etat', $filters['etat']);
         }
 
-        // ── Tri ─────────────────────────────────────────────────────────────
-        $allowedSortFields = ['nom', 'marque', 'modele', 'etatM', 'dateAchat', 'id'];
-        $sortBy  = in_array($filters['sortBy'] ?? 'dateAchat', $allowedSortFields, true)
-                   ? ($filters['sortBy'] ?? 'dateAchat')
-                   : 'dateAchat';
+        // Tri
+        $allowedSortFields = ['nom', 'marque', 'modele', 'etatM', 'dateAchat', 'kilometrage', 'id'];
+        $sortBy  = in_array($filters['sortBy'] ?? '', $allowedSortFields, true)
+                     ? $filters['sortBy']
+                     : 'dateAchat';
         $sortDir = strtoupper($filters['sortDir'] ?? 'DESC') === 'ASC' ? 'ASC' : 'DESC';
 
         $qb->orderBy('m.' . $sortBy, $sortDir);
@@ -67,6 +66,9 @@ class MachineRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    // =========================================================================
+    // Statistiques globales (admin)
+    // =========================================================================
     public function getStatistiques(): array
     {
         $total = (int) $this->createQueryBuilder('m')
@@ -98,16 +100,47 @@ class MachineRepository extends ServiceEntityRepository
             $parMarque[$row['marque']] = (int) $row['nb'];
         }
 
-        return compact('total', 'parEtat', 'parMarque');
+        // Statistiques kilométrage
+        $statsKm = $this->createQueryBuilder('m')
+            ->select(
+                'AVG(m.kilometrage) AS avgKm',
+                'MAX(m.kilometrage) AS maxKm',
+                'MIN(m.kilometrage) AS minKm'
+            )
+            ->getQuery()
+            ->getSingleResult();
+
+        return compact('total', 'parEtat', 'parMarque', 'statsKm');
     }
 
+    // =========================================================================
+    // Machines d'un agriculteur par CIN
+    // =========================================================================
     public function findByCin(int $cin): array
     {
         return $this->createQueryBuilder('m')
             ->leftJoin('m.agriculteur', 'u')
+            ->addSelect('u')
             ->andWhere('u.cin = :cin')
             ->setParameter('cin', $cin)
             ->orderBy('m.dateAchat', 'DESC')
+            ->addOrderBy('m.id', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    // =========================================================================
+    // Machines dont la prochaine maintenance arrive bientôt
+    // =========================================================================
+    public function findMachinesWithMaintenanceSoon(\DateTimeInterface $dateLimit): array
+    {
+        return $this->createQueryBuilder('m')
+            ->leftJoin('m.agriculteur', 'u')
+            ->addSelect('u')
+            ->where('m.prochaineMaintenance IS NOT NULL')
+            ->andWhere('m.prochaineMaintenance <= :dateLimit')
+            ->setParameter('dateLimit', $dateLimit)
+            ->orderBy('m.prochaineMaintenance', 'ASC')
             ->getQuery()
             ->getResult();
     }
