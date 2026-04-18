@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="{{ app.request.locale ?: 'fr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -154,6 +154,31 @@
         }
         .btn-logout:hover { background-color: #1B3A20; color: white; }
 
+        .language-switcher {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .language-switcher .lang-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: 1px solid #E9ECEF;
+            color: #2C3E50;
+            font-size: 13px;
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+        }
+        .language-switcher .lang-link:hover,
+        .language-switcher .lang-link.active {
+            background: #2D5A27;
+            color: white;
+            border-color: #2D5A27;
+        }
+
         /* ── Contenu ── */
         .main-content {
             flex: 1;
@@ -179,7 +204,7 @@
             <div class="nav-item">
                 <a href="{{ path('agri_home') }}"
                    class="nav-link {% if app.request.get('_route') == 'agri_home' %}active{% endif %}">
-                    <i class="fa fa-house"></i> Accueil
+                    <i class="fa fa-house"></i> {{ 'menu.home'|trans }}
                 </a>
             </div>
 
@@ -187,12 +212,12 @@
             <div class="nav-item">
                 <a href="{{ path('app_animaux_index') }}"
                    class="nav-link {% if app.request.get('_route') in ['app_animaux_index','app_examens_index'] %}active{% endif %}">
-                    <i class="fa fa-paw"></i> Animaux
+                    <i class="fa fa-paw"></i> {{ 'menu.animaux'|trans }}
                     <i class="fa fa-chevron-down chevron"></i>
                 </a>
                 <div class="dropdown">
-                    <a href="{{ path('app_animaux_index') }}"><i class="fa fa-paw"></i> Mes animaux</a>
-                    <a href="{{ path('app_examens_index') }}"><i class="fa fa-stethoscope"></i> Examens vétérinaires</a>
+                    <a href="{{ path('app_animaux_index') }}"><i class="fa fa-paw"></i> {{ 'menu.my_animals'|trans }}</a>
+                    <a href="{{ path('app_examens_index') }}"><i class="fa fa-stethoscope"></i> {{ 'menu.veterinary_exams'|trans }}</a>
                 </div>
             </div>
 
@@ -200,12 +225,12 @@
             <div class="nav-item">
                 <a href="{{ path('agri_categories') }}"
                    class="nav-link {% if app.request.get('_route') in ['agri_categories','agri_produits'] %}active{% endif %}">
-                    <i class="fa fa-boxes-stacked"></i> Stocks
+                    <i class="fa fa-boxes-stacked"></i> {{ 'menu.stocks'|trans }}
                     <i class="fa fa-chevron-down chevron"></i>
                 </a>
                 <div class="dropdown">
-                    <a href="{{ path('agri_categories') }}"><i class="fa fa-tags"></i> Catégories</a>
-                    <a href="{{ path('agri_produits') }}"><i class="fa fa-box"></i> Produits</a>
+                    <a href="{{ path('agri_categories') }}"><i class="fa fa-tags"></i> {{ 'menu.categories'|trans }}</a>
+                    <a href="{{ path('agri_produits') }}"><i class="fa fa-box"></i> {{ 'menu.products'|trans }}</a>
                 </div>
             </div>
 
@@ -213,12 +238,12 @@
             <div class="nav-item">
                 <a href="{{ path('agri_terrains') }}"
                    class="nav-link {% if app.request.get('_route') in ['agri_terrains','agri_rotations'] %}active{% endif %}">
-                    <i class="fa fa-map"></i> Terrains
+                    <i class="fa fa-map"></i> {{ 'menu.terrains'|trans }}
                     <i class="fa fa-chevron-down chevron"></i>
                 </a>
                 <div class="dropdown">
-                    <a href="{{ path('agri_terrains') }}"><i class="fa fa-map"></i> Mes terrains</a>
-                    <a href="{{ path('agri_rotations') }}"><i class="fa fa-rotate"></i> Rotations de culture</a>
+                    <a href="{{ path('agri_terrains') }}"><i class="fa fa-map"></i> {{ 'menu.my_fields'|trans }}</a>
+                    <a href="{{ path('agri_rotations') }}"><i class="fa fa-rotate"></i> {{ 'menu.crop_rotations'|trans }}</a>
                 </div>
             </div>
 
@@ -226,12 +251,12 @@
             <div class="nav-item">
                 <a href="{{ path('agri_machines') }}"
                    class="nav-link {% if app.request.get('_route') in ['agri_machines','agri_maintenances'] %}active{% endif %}">
-                    <i class="fa fa-tractor"></i> Matériels
+                    <i class="fa fa-tractor"></i> {{ 'menu.materiels'|trans }}
                     <i class="fa fa-chevron-down chevron"></i>
                 </a>
                 <div class="dropdown">
-                    <a href="{{ path('agri_machines') }}"><i class="fa fa-tractor"></i> Machines</a>
-                    <a href="{{ path('agri_maintenances') }}"><i class="fa fa-wrench"></i> Maintenances</a>
+                    <a href="{{ path('agri_machines') }}"><i class="fa fa-tractor"></i> {{ 'menu.machines'|trans }}</a>
+                    <a href="{{ path('agri_maintenances') }}"><i class="fa fa-wrench"></i> {{ 'menu.maintenances'|trans }}</a>
                 </div>
             </div>
 
@@ -239,12 +264,12 @@
             <div class="nav-item">
                 <a href="{{ path('agri_evenements') }}"
                    class="nav-link {% if app.request.get('_route') in ['agri_evenements','agri_participations'] %}active{% endif %}">
-                    <i class="fa fa-calendar-days"></i> Événements
+                    <i class="fa fa-calendar-days"></i> {{ 'menu.evenements'|trans }}
                     <i class="fa fa-chevron-down chevron"></i>
                 </a>
                 <div class="dropdown">
-                    <a href="{{ path('agri_evenements') }}"><i class="fa fa-calendar-days"></i> Événements</a>
-                    <a href="{{ path('agri_participations') }}"><i class="fa fa-ticket"></i> Mes participations</a>
+                    <a href="{{ path('agri_evenements') }}"><i class="fa fa-calendar-days"></i> {{ 'menu.events'|trans }}</a>
+                    <a href="{{ path('agri_participations') }}"><i class="fa fa-ticket"></i> {{ 'menu.participations'|trans }}</a>
                 </div>
             </div>
 
@@ -252,12 +277,12 @@
             <div class="nav-item">
                 <a href="{{ path('agri_abonnements') }}"
                    class="nav-link {% if app.request.get('_route') in ['agri_offres','agri_abonnements'] %}active{% endif %}">
-                    <i class="fa fa-crown"></i> Abonnement
+                    <i class="fa fa-crown"></i> {{ 'menu.abonnement'|trans }}
                     <i class="fa fa-chevron-down chevron"></i>
                 </a>
                 <div class="dropdown">
-                    <a href="{{ path('agri_offres') }}"><i class="fa fa-star"></i> Offres disponibles</a>
-                    <a href="{{ path('agri_abonnements') }}"><i class="fa fa-crown"></i> Mon abonnement</a>
+                    <a href="{{ path('agri_offres') }}"><i class="fa fa-star"></i> {{ 'menu.offers'|trans }}</a>
+                    <a href="{{ path('agri_abonnements') }}"><i class="fa fa-crown"></i> {{ 'menu.my_subscription'|trans }}</a>
                 </div>
             </div>
 
@@ -265,7 +290,7 @@
             <div class="nav-item">
                 <a href="{{ path('agri_taches') }}"
                    class="nav-link {% if app.request.get('_route') == 'agri_taches' %}active{% endif %}">
-                    <i class="fa fa-list-check"></i> Tâches
+                    <i class="fa fa-list-check"></i> {{ 'menu.taches'|trans }}
                 </a>
             </div>
 
@@ -273,6 +298,11 @@
 
         {# Actions droite #}
         <div class="header-actions">
+            <div class="language-switcher">
+                <a href="{{ path('app_set_locale', {'locale': 'fr'}) }}" class="lang-link {{ app.request.locale == 'fr' ? 'active' : '' }}">FR</a>
+                <a href="{{ path('app_set_locale', {'locale': 'en'}) }}" class="lang-link {{ app.request.locale == 'en' ? 'active' : '' }}">EN</a>
+                <a href="{{ path('app_set_locale', {'locale': 'es'}) }}" class="lang-link {{ app.request.locale == 'es' ? 'active' : '' }}">ES</a>
+            </div>
             {% if app.user %}
                 <div class="user-greeting">
                     <div class="user-avatar-sm">
@@ -283,7 +313,7 @@
             {% endif %}
             <a href="{{ path('app_logout') }}" class="btn-logout">
                 <i class="fa fa-arrow-right-from-bracket"></i>
-                Déconnexion
+                {{ 'menu.logout'|trans }}
             </a>
         </div>
 
