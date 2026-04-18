@@ -1,14 +1,30 @@
 {% extends 'base_agriculteur.html.twig' %}
 
-{% block title %}AgroFlow - Détails de {{ animaux.nom }}{% endblock %}
+{% block title %}AgroFlow - {{ 'animal.details_title'|trans({'%name%': animaux.nom}) }}{% endblock %}
 
 {% block body %}
+<!-- Sélecteur de langue - EN HAUT -->
+<div style="width: 100%; padding: 15px 30px; background: transparent; display: flex; justify-content: flex-end; gap: 10px; border-bottom: none;">
+    <a href="{{ path('app_set_locale', {'locale': 'fr'}) }}" 
+       style="display: inline-flex; align-items: center; justify-content: center; padding: 8px 14px; border-radius: 6px; background: {{ app.request.locale == 'fr' ? '#2D5A27' : '#f0f0f0' }}; color: {{ app.request.locale == 'fr' ? 'white' : '#2C3E50' }}; border: 1px solid {{ app.request.locale == 'fr' ? '#2D5A27' : '#ddd' }}; font-size: 13px; text-decoration: none; font-weight: 600; cursor: pointer;">
+        🇫🇷 FR
+    </a>
+    <a href="{{ path('app_set_locale', {'locale': 'en'}) }}" 
+       style="display: inline-flex; align-items: center; justify-content: center; padding: 8px 14px; border-radius: 6px; background: {{ app.request.locale == 'en' ? '#2D5A27' : '#f0f0f0' }}; color: {{ app.request.locale == 'en' ? 'white' : '#2C3E50' }}; border: 1px solid {{ app.request.locale == 'en' ? '#2D5A27' : '#ddd' }}; font-size: 13px; text-decoration: none; font-weight: 600; cursor: pointer;">
+        🇬🇧 EN
+    </a>
+    <a href="{{ path('app_set_locale', {'locale': 'es'}) }}" 
+       style="display: inline-flex; align-items: center; justify-content: center; padding: 8px 14px; border-radius: 6px; background: {{ app.request.locale == 'es' ? '#2D5A27' : '#f0f0f0' }}; color: {{ app.request.locale == 'es' ? 'white' : '#2C3E50' }}; border: 1px solid {{ app.request.locale == 'es' ? '#2D5A27' : '#ddd' }}; font-size: 13px; text-decoration: none; font-weight: 600; cursor: pointer;">
+        🇪🇸 ES
+    </a>
+</div>
+
 <div style="padding: 10px;">
     <!-- Header : Breadcrumb -->
     <div style="margin-bottom: 25px; color: #666; font-size: 14px;">
-        <span>Gestion</span> <i class="fa fa-chevron-right" style="font-size: 10px; margin: 0 5px;"></i> 
-        <span>Animaux</span> <i class="fa fa-chevron-right" style="font-size: 10px; margin: 0 5px;"></i> 
-        <strong style="color: #2C3E50;">Fiche Profil</strong>
+        <span>{{ 'breadcrumb.management'|trans }}</span> <i class="fa fa-chevron-right" style="font-size: 10px; margin: 0 5px;"></i> 
+        <span>{{ 'breadcrumb.animals'|trans }}</span> <i class="fa fa-chevron-right" style="font-size: 10px; margin: 0 5px;"></i> 
+        <strong style="color: #2C3E50;">{{ 'breadcrumb.profile'|trans }}</strong>
     </div>
 
     <div style="display: grid; grid-template-columns: 350px 1fr; gap: 30px;">
@@ -28,11 +44,11 @@
                     
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
                         <div style="background: #F8F9FA; padding: 15px; border-radius: 12px;">
-                            <span style="display: block; font-size: 11px; color: #999; text-transform: uppercase;">Poids</span>
+                            <span style="display: block; font-size: 11px; color: #999; text-transform: uppercase;">{{ 'animal.weight'|trans }}</span>
                             <strong style="font-size: 18px; color: #2D5A27;">{{ animaux.poids }} <small>kg</small></strong>
                         </div>
                         <div style="background: #F8F9FA; padding: 15px; border-radius: 12px;">
-                            <span style="display: block; font-size: 11px; color: #999; text-transform: uppercase;">Âge</span>
+                            <span style="display: block; font-size: 11px; color: #999; text-transform: uppercase;">{{ 'animal.age'|trans }}</span>
                             <strong style="font-size: 18px; color: #2C3E50;">
                                 {{ animaux.dateNaissance ? date().diff(animaux.dateNaissance).y : '?' }} <small>ans</small>
                             </strong>
@@ -41,20 +57,20 @@
 
                     <div style="display: flex; flex-direction: column; gap: 10px;">
                         <a href="{{ path('app_animaux_edit', {'id': animaux.id}) }}" style="background: #2D5A27; color: white; padding: 12px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 14px; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                            <i class="fa fa-edit"></i> Modifier le profil
+                            <i class="fa fa-edit"></i> {{ 'animal.edit_profile'|trans }}
                         </a>
                         
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                             <a href="{{ path('app_animaux_export_card', {'id': animaux.id}) }}" target="_blank" style="background: #EEEDFE; color: #534AB7; padding: 10px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 5px;">
-                                <i class="fa fa-id-card"></i> Export ID
+                                <i class="fa fa-id-card"></i> {{ 'animal.export_id'|trans }}
                             </a>
                             <a href="{{ path('app_animaux_export_medical', {'id': animaux.id}) }}" target="_blank" style="background: #FFF5F5; color: #E74C3C; padding: 10px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 5px;">
-                                <i class="fa fa-file-medical"></i> Dossier PDF
+                                <i class="fa fa-file-medical"></i> {{ 'animal.medical_file'|trans }}
                             </a>
                         </div>
 
                         <a href="{{ path('app_animaux_index') }}" style="background: white; color: #7f8c8d; padding: 10px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 13px; border: 1px solid #E9ECEF; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                            <i class="fa fa-arrow-left"></i> Retour
+                            <i class="fa fa-arrow-left"></i> {{ 'animal.back'|trans }}
                         </a>
                     </div>
                 </div>
@@ -65,13 +81,13 @@
                     <i class="fa fa-handshake" style="font-size: 60px; color: #2D5A27;"></i>
                 </div>
                 <h4 style="margin: 0 0 10px 0; color: #1B3A20; font-size: 16px; font-weight: 800;">
-                    <i class="fa fa-users-viewfinder" style="color: #2D5A27;"></i> AgroFlow Connect
+                    <i class="fa fa-users-viewfinder" style="color: #2D5A27;"></i> {{ 'animal.agroflow_connect'|trans }}
                 </h4>
                 <p style="margin: 0; font-size: 13px; color: #555; line-height: 1.5;">
-                    Besoin d'un vétérinaire expert ou d'un acheteur certifié ? 
+                    {{ 'animal.agroflow_connect_desc'|trans }}
                 </p>
                 <div style="display: inline-block; margin-top: 15px; background: #2D5A27; color: white; padding: 10px 20px; border-radius: 12px; font-weight: 700; font-size: 13px; box-shadow: 0 4px 10px rgba(45, 90, 39, 0.2);">
-                    🔍 Trouver un Partenaire
+                    🔍 {{ 'animal.find_partner'|trans }}
                 </div>
             </div>
         </div>
@@ -81,10 +97,10 @@
             <div style="background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 35px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
                     <h3 style="margin: 0; color: #2C3E50; font-size: 20px; display: flex; align-items: center; gap: 12px;">
-                        <i class="fa fa-notes-medical" style="color: #e74c3c;"></i> Timeline Médicale
+                        <i class="fa fa-notes-medical" style="color: #e74c3c;"></i> {{ 'animal.medical_timeline'|trans }}
                     </h3>
                     <a href="{{ path('app_examens_new', {'animal': animaux.id}) }}" style="background: #2D5A27; color: white; padding: 10px 18px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 13px; transition: 0.3s; box-shadow: 0 4px 10px rgba(45, 90, 39, 0.2);">
-                        <i class="fa fa-plus-circle"></i> Nouveau Rapport
+                        <i class="fa fa-plus-circle"></i> {{ 'animal.new_report'|trans }}
                     </a>
                 </div>
 
@@ -109,7 +125,7 @@
                                             </span>
                                         </div>
                                         <div style="background: #F8F9FA; padding: 12px 15px; border-radius: 12px; border-left: 4px solid #2D5A27;">
-                                            <span style="display: block; font-size: 10px; color: #999; text-transform: uppercase; margin-bottom: 3px;">Traitement prescrit</span>
+                                            <span style="display: block; font-size: 10px; color: #999; text-transform: uppercase; margin-bottom: 3px;">{{ 'animal.treatment_prescribed'|trans }}</span>
                                             <p style="margin: 0; color: #1B3A20; font-size: 14px; font-weight: 600;">{{ examen.traitement }}</p>
                                         </div>
                                     </div>
@@ -120,8 +136,8 @@
                 {% else %}
                     <div style="text-align: center; padding: 60px 40px; color: #999; background: #F8F9FA; border-radius: 20px; border: 2px dashed #E9ECEF;">
                         <i class="fa fa-folder-open" style="font-size: 50px; margin-bottom: 15px; opacity: 0.2;"></i>
-                        <p style="margin: 0; font-weight: 600;">Aucun dossier médical trouvé.</p>
-                        <p style="font-size: 14px; margin-top: 5px;">Commencez par ajouter un premier examen clinique.</p>
+                        <p style="margin: 0; font-weight: 600;">{{ 'animal.no_medical_record_title'|trans }}</p>
+                        <p style="font-size: 14px; margin-top: 5px;">{{ 'animal.no_medical_record_desc'|trans }}</p>
                     </div>
                 {% endif %}
 
@@ -129,10 +145,10 @@
                 <div style="margin-top: 35px; background: linear-gradient(135deg, #FFFBF0, #FEF9F3); border: 2px solid #F4D8A8; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(244, 216, 168, 0.15);">
                     <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
                         <h4 style="margin: 0; color: #2C3E50; font-size: 18px; font-weight: 700;">
-                            🍽️ Suggestions alimentaires
+                            🍽️ {{ 'animal.food_suggestions'|trans }}
                         </h4>
                         <span style="background: #F0C674; color: white; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase;">
-                            {{ animaux.espece|lower }}
+                            {{ ('animal.species.' ~ animaux.espece|lower)|trans }}
                         </span>
                     </div>
 
@@ -165,7 +181,7 @@
                                         
                                         <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #E9ECEF;">
                                             <a href="https://world.openfoodfacts.org/search?q={{ product.name|url_encode }}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 5px; background: #2D5A27; color: white; padding: 6px 10px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 11px; transition: 0.3s;" onmouseover="this.style.background='#1B3A20';" onmouseout="this.style.background='#2D5A27';">
-                                                <i class="fa fa-external-link"></i> Plus
+                                                <i class="fa fa-external-link"></i> {{ 'animal.more'|trans }}
                                             </a>
                                         </div>
                                     </div>
@@ -175,8 +191,8 @@
                     {% else %}
                         <div style="text-align: center; padding: 25px 20px; background: white; border-radius: 14px; border: 1px dashed #E9ECEF;">
                             <i class="fa fa-search" style="font-size: 32px; margin-bottom: 10px; opacity: 0.3; display: block;"></i>
-                            <p style="margin: 0 0 5px 0; font-weight: 600; color: #2C3E50; font-size: 14px;">Aucune suggestion</p>
-                            <p style="margin: 0; color: #7f8c8d; font-size: 12px;">Non disponible</p>
+                            <p style="margin: 0 0 5px 0; font-weight: 600; color: #2C3E50; font-size: 14px;">{{ 'animal.no_suggestions'|trans }}</p>
+                            <p style="margin: 0; color: #7f8c8d; font-size: 12px;">{{ 'animal.no_suggestions_subtitle'|trans }}</p>
                         </div>
                     {% endif %}
                 </div>

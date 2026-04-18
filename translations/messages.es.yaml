@@ -1,0 +1,100 @@
+menu:
+  home: Inicio
+  animaux: Animales
+  stocks: Inventario
+  terrains: Terrenos
+  materiels: Equipos
+  evenements: Eventos
+  abonnement: Suscripción
+  taches: Tareas
+  logout: Cerrar sesión
+  my_animals: Mis animales
+  veterinary_exams: Exámenes veterinarios
+  categories: Categorías
+  products: Productos
+  my_fields: Mis terrenos
+  crop_rotations: Rotaciones de cultivo
+  machines: Máquinas
+  maintenances: Mantenimientos
+  events: Eventos
+  participations: Mis participaciones
+  offers: Ofertas disponibles
+  my_subscription: Mi suscripción
+
+breadcrumb:
+  management: Gestión
+  animals: Animales
+  profile: Perfil
+  exams: Exámenes
+  report_details: Detalles del Informe
+
+animal:
+  weight: Peso
+  age: Edad
+  details_title: Detalles de %name%
+  edit_profile: Editar perfil
+  export_id: Exportar ID
+  medical_file: Expediente PDF
+  back: Volver
+  medical_timeline: Línea de tiempo médica
+  new_report: Nuevo informe
+  no_medical_record_title: No se encontró ningún expediente médico.
+  no_medical_record_desc: Comience agregando un primer examen clínico.
+  food_suggestions: Sugerencias de alimentación
+  species_label: %species%
+  species:
+    Chien: Perro
+    Chat: Gato
+    Vache: Vaca
+    Chèvre: Cabra
+    Mouton: Oveja
+    Cheval: Caballo
+    Autre: Otro
+  sex:
+    MALE: Macho
+    FEMELLE: Hembra
+  age_unit: años
+  weight_unit: kg
+  treatment_prescribed: Tratamiento prescrito
+  no_suggestions: Sin sugerencias
+  no_suggestions_subtitle: No disponible
+  more: Más
+  agroflow_connect: AgroFlow Connect
+  agroflow_connect_desc: ¿Necesita un veterinario experto o un comprador certificado?
+  find_partner: Encontrar un socio
+  assistant_title: Asistente IA:
+  assistant_greeting: ¡Hola! Estoy aquí para ayudarte a encontrar el mejor veterinario o socio comercial para tu animal.
+  chat_placeholder: Haz tu pregunta...
+  send: Enviar
+
+report:
+  reference: Referencia #%id%
+  report_title: Informe: %type%
+  exam_date: Fecha del examen
+  patient_animal: Paciente Animal
+  prescription_action: Prescripción / Acción
+  treatment_assigned: Tratamiento asignado
+  exam_type:
+    Vaccin: Vacunación
+    Radio: Radiografía
+    Scanner: Escáner
+    Consultation: Consulta
+  diagnostic:
+    "En bonne salud": Saludable
+    "En bonne santé": Saludable
+    Infection: Infección
+    Fracture: Fractura
+    Urgence: Urgencia
+  treatment:
+    Repos: Reposo
+    Antibiotiques: Antibióticos
+    Observation: Observación
+    Chirurgie: Cirugía
+  diagnostic_result: Resultado del diagnóstico
+  edit_report: Editar informe
+  back_to_list: Volver a la lista
+
+language:
+  fr: Français
+  en: English
+  es: Español
