@@ -1,0 +1,80 @@
+menu:
+  home: Accueil
+  animaux: Animaux
+  stocks: Stocks
+  terrains: Terrains
+  materiels: Matériels
+  evenements: Événements
+  abonnement: Abonnement
+  taches: Tâches
+  logout: Déconnexion
+  my_animals: Mes animaux
+  veterinary_exams: Examens vétérinaires
+  categories: Catégories
+  products: Produits
+  my_fields: Mes terrains
+  crop_rotations: Rotations de culture
+  machines: Machines
+  maintenances: Maintenances
+  events: Événements
+  participations: Mes participations
+  offers: Offres disponibles
+  my_subscription: Mon abonnement
+
+breadcrumb:
+  management: Gestion
+  animals: Animaux
+  profile: Fiche Profil
+  exams: Examens
+  report_details: Détails du Rapport
+
+animal:
+  weight: Poids
+  age: Âge
+  details_title: Détails de %name%
+  edit_profile: Modifier le profil
+  export_id: Export ID
+  medical_file: Dossier PDF
+  back: Retour
+  medical_timeline: Timeline Médicale
+  new_report: Nouveau Rapport
+  no_medical_record_title: Aucun dossier médical trouvé.
+  no_medical_record_desc: Commencez par ajouter un premier examen clinique.
+  food_suggestions: Suggestions alimentaires
+  species_label: "%species%"
+  treatment_prescribed: Traitement prescrit
+  no_suggestions: Aucune suggestion
+  no_suggestions_subtitle: Non disponible
+  more: Plus
+  species:
+    vache: Vache
+    mouton: Mouton
+  agroflow_connect: AgroFlow Connect
+  agroflow_connect_desc: Besoin d'un vétérinaire expert ou d'un acheteur certifié ?
+  find_partner: Trouver un Partenaire
+  sex:
+    male: Mâle
+    female: Femelle
+report:
+  reference: "Référence #%id%"
+  report_title: "Rapport : %type%"
+  exam_date: Date de l'examen
+  patient_animal: Patient Animal
+  prescription_action: Prescription / Action
+  treatment_assigned: Traitement assigné
+  treatment:
+    rest: Repos
+    surgery: Chirurgie
+  diagnostic_result: Résultat du Diagnostic
+  diagnostic:
+    good_health: En bonne santé
+  exam_type:
+    vaccin: Vaccin
+    radio: Radio
+  edit_report: Modifier le rapport
+  back_to_list: Retour à la liste
+
+language:
+  fr: Français
+  en: English
+  es: Español
