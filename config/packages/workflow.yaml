@@ -1,0 +1,51 @@
+# config/packages/workflow.yaml
+
+framework:
+    workflows:
+
+        machine_lifecycle:
+            type: state_machine
+            audit_trail:
+                enabled: true
+
+            marking_store:
+                type: method
+                property: statut
+
+            supports:
+                - App\Entity\Materiels\Machine
+
+            places:
+                - en_service
+                - alerte_maintenance
+                - au_garage
+                - en_test
+                - operationnel
+
+            initial_marking: en_service
+
+            transitions:
+
+                signaler_alerte:
+                    from: en_service
+                    to:   alerte_maintenance
+
+                envoyer_garage:
+                    from: alerte_maintenance
+                    to:   au_garage
+
+                commencer_test:
+                    from: au_garage
+                    to:   en_test
+
+                valider_operation:
+                    from: en_test
+                    to:   operationnel
+
+                remettre_en_service:
+                    from: operationnel
+                    to:   en_service
+
+                retrait_urgent:
+                    from: [en_service, alerte_maintenance, en_test, operationnel]
+                    to:   au_garage
