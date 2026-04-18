@@ -33,6 +33,29 @@
     .price-tag { font-weight: 700; color: #2D5A27; font-size: 15px; }
     .duration-tag { display: inline-flex; align-items: center; gap: 5px; background: #E6F1FB; color: #185FA5; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
     .flash-success { background: #EAF3DE; color: #3B6D11; padding: 14px 20px; border-radius: 10px; margin-bottom: 25px; border-left: 4px solid #3B6D11; display: flex; align-items: center; gap: 10px; }
+    /* ── Pagination ── */
+.pagination-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 24px 20px;
+    flex-wrap: wrap;
+}
+.page-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 36px; height: 36px; padding: 0 10px;
+    border-radius: 8px;
+    font-size: 13px; font-weight: 600;
+    border: 1px solid #e8e8e8;
+    background: white; color: #2C3E50;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+.page-btn:hover    { background: #f0f0f0; color: #2D5A27; }
+.page-btn.active   { background: #2D5A27; color: white; border-color: #2D5A27; pointer-events: none; }
+.page-btn.disabled { opacity: 0.3; pointer-events: none; cursor: default; }
+.page-dots         { color: #bbb; font-size: 13px; line-height: 36px; padding: 0 4px; }
 </style>
 {% endblock %}
 
@@ -118,7 +141,7 @@
                 <i class="fa fa-list" style="color:#2D5A27; margin-right:8px;"></i> Offres
             </h3>
             <span id="resultCount" style="font-size:13px; color:#999; background:#f5f5f5; padding:4px 12px; border-radius:20px;">
-                {{ offres|length }} offre(s)
+    {{ total }} offre(s) — page {{ page }}/{{ totalPages }}
             </span>
         </div>
 
@@ -213,10 +236,49 @@
                         Aucune offre trouvée.
                     </td>
                 </tr>
+                
                 {% endfor %}
             </tbody>
         </table>
         </div>
+        {# ── Pagination ── #}
+{% if totalPages > 1 %}
+<div class="pagination-wrap">
+
+    {# Précédent #}
+    {% if page > 1 %}
+        <a href="{{ path('app_offre_list', {page: page - 1, q: searchTerm, sort: currentSort, direction: currentDir}) }}"
+           class="page-btn">
+            <i class="fa fa-chevron-left"></i>
+        </a>
+    {% else %}
+        <span class="page-btn disabled"><i class="fa fa-chevron-left"></i></span>
+    {% endif %}
+
+    {# Pages numérotées #}
+    {% for p in 1..totalPages %}
+        {% if p == 1 or p == totalPages or (p >= page - 2 and p <= page + 2) %}
+            <a href="{{ path('app_offre_list', {page: p, q: searchTerm, sort: currentSort, direction: currentDir}) }}"
+               class="page-btn {{ p == page ? 'active' : '' }}">
+                {{ p }}
+            </a>
+        {% elseif p == page - 3 or p == page + 3 %}
+            <span class="page-dots">…</span>
+        {% endif %}
+    {% endfor %}
+
+    {# Suivant #}
+    {% if page < totalPages %}
+        <a href="{{ path('app_offre_list', {page: page + 1, q: searchTerm, sort: currentSort, direction: currentDir}) }}"
+           class="page-btn">
+            <i class="fa fa-chevron-right"></i>
+        </a>
+    {% else %}
+        <span class="page-btn disabled"><i class="fa fa-chevron-right"></i></span>
+    {% endif %}
+
+</div>
+{% endif %}
     </div>
 </div>
 {% endblock %}

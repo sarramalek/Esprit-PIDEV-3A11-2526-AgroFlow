@@ -18,52 +18,56 @@ use Dompdf\Options;
 class OffreController extends AbstractController
 {
     // ==================== LIST ====================
-    #[Route('/', name: 'app_offre_list', methods: ['GET'])]
-    public function list(
-        Request $request,
-        OffreRepository $offreRepo,
-        AbonnementRepository $abonnRepo  // ← ajouté
-    ): Response {
-        $search    = $request->query->get('q', '');
-        $sort      = $request->query->get('sort', 'idOffres');
-        $direction = $request->query->get('direction', 'ASC');
+   #[Route('/', name: 'app_offre_list', methods: ['GET'])]
+public function list(
+    Request $request,
+    OffreRepository $offreRepo,
+    AbonnementRepository $abonnRepo
+): Response {
+    $search    = $request->query->get('q', '');
+    $sort      = $request->query->get('sort', 'idOffres');
+    $direction = $request->query->get('direction', 'ASC');
+    $page      = max(1, $request->query->getInt('page', 1));
+    $limit     = 5;
 
-        $allowedSorts = ['idOffres', 'nomOffre', 'prix', 'dureeOffre'];
-        if (!in_array($sort, $allowedSorts)) $sort = 'idOffres';
-        if (!in_array($direction, ['ASC', 'DESC'])) $direction = 'ASC';
+    $allowedSorts = ['idOffres', 'nomOffre', 'prix', 'dureeOffre'];
+    if (!in_array($sort, $allowedSorts)) $sort = 'idOffres';
+    if (!in_array($direction, ['ASC', 'DESC'])) $direction = 'ASC';
 
-        $offres = $offreRepo->searchAndSort($search, $sort, $direction);
+    // ── Total pour la pagination ──────────────────────────────
+    $total      = $offreRepo->countSearched($search);
+    $totalPages = max(1, (int) ceil($total / $limit));
+    $page       = min($page, $totalPages);
 
-        // ── Suggestion d'offre pour l'agriculteur connecté ──
-        $suggestion = null;
-        $raisonSuggestion = null;
+    // ── Résultats paginés ─────────────────────────────────────
+    $offres = $offreRepo->searchAndSortPaginated($search, $sort, $direction, $page, $limit);
 
-        /** @var \App\Entity\User\User|null $user */
-        $user = $this->getUser();
+    // ── Suggestion IA (inchangée) ─────────────────────────────
+    $suggestion       = null;
+    $raisonSuggestion = null;
+    $user = $this->getUser();
 
-        if ($user && (int)$user->getRole() === 2 && count($offres) > 0) {
-            // Récupère l'historique des abonnements de l'agriculteur
-            $abonnements = $abonnRepo->findByCin($user->getCin());
+    if ($user && (int)$user->getRole() === 2 && count($offres) > 0) {
+        $allOffres   = $offreRepo->searchAndSort($search, $sort, $direction); // toutes pour l'IA
+        $abonnements = $abonnRepo->findByCin($user->getCin());
 
-            // Construit le contexte pour la suggestion
-            $offresData = array_map(fn($o) => [
-                'id'          => $o->getIdOffres(),
-                'nom'         => $o->getNomOffre(),
-                'prix'        => $o->getPrix(),
-                'duree'       => $o->getDureeOffre(),
-                'description' => $o->getDescription(),
-            ], $offres);
+        $offresData = array_map(fn($o) => [
+            'id'          => $o->getIdOffres(),
+            'nom'         => $o->getNomOffre(),
+            'prix'        => $o->getPrix(),
+            'duree'       => $o->getDureeOffre(),
+            'description' => $o->getDescription(),
+        ], $allOffres);
 
-            $abonnementsData = array_map(fn($a) => [
-                'offre_id'   => $a->getIdOffre(),
-                'situation'  => $a->getSituation(),
-                'expiration' => $a->getDateExpiration()->format('Y-m-d'),
-            ], $abonnements);
+        $abonnementsData = array_map(fn($a) => [
+            'offre_id'   => $a->getIdOffre(),
+            'situation'  => $a->getSituation(),
+            'expiration' => $a->getDateExpiration()->format('Y-m-d'),
+        ], $abonnements);
 
-            // Appel API Claude pour la suggestion
-            try {
-                $prompt = "Tu es un conseiller agricole pour AgroFlow.
-                
+        try {
+            $prompt = "Tu es un conseiller agricole pour AgroFlow.
+            
 Voici les offres disponibles :
 " . json_encode($offresData, JSON_UNESCAPED_UNICODE) . "
 
@@ -77,62 +81,59 @@ Réponds UNIQUEMENT en JSON avec ce format exact :
   \"raison\": \"<explication courte en français, max 2 phrases>\"
 }";
 
-                $response = \Symfony\Component\HttpClient\HttpClient::create()->request('POST',
-                    'https://api.anthropic.com/v1/messages',
-                    [
-                        'headers' => [
-                            'x-api-key'         => $_ENV['ANTHROPIC_API_KEY'],
-                            'anthropic-version' => '2023-06-01',
-                            'content-type'      => 'application/json',
-                        ],
-                        'json' => [
-                            'model'      => 'claude-sonnet-4-20250514',
-                            'max_tokens' => 200,
-                            'messages'   => [
-                                ['role' => 'user', 'content' => $prompt]
-                            ],
-                        ],
-                    ]
-                );
+            $response = \Symfony\Component\HttpClient\HttpClient::create()->request('POST',
+                'https://api.anthropic.com/v1/messages',
+                [
+                    'headers' => [
+                        'x-api-key'         => $_ENV['ANTHROPIC_API_KEY'],
+                        'anthropic-version' => '2023-06-01',
+                        'content-type'      => 'application/json',
+                    ],
+                    'json' => [
+                        'model'      => 'claude-sonnet-4-20250514',
+                        'max_tokens' => 200,
+                        'messages'   => [['role' => 'user', 'content' => $prompt]],
+                    ],
+                ]
+            );
 
-                $data = $response->toArray();
-                $text = $data['content'][0]['text'] ?? '';
+            $data = $response->toArray();
+            $text = $data['content'][0]['text'] ?? '';
+            $text = preg_replace('/```json|```/', '', $text);
+            $json = json_decode(trim($text), true);
 
-                // Nettoie le JSON
-                $text = preg_replace('/```json|```/', '', $text);
-                $json = json_decode(trim($text), true);
-
-                if ($json && isset($json['offre_id'])) {
-                    // Trouve l'offre suggérée dans la liste
-                    foreach ($offres as $o) {
-                        if ($o->getIdOffres() === (int)$json['offre_id']) {
-                            $suggestion       = $o;
-                            $raisonSuggestion = $json['raison'];
-                            break;
-                        }
+            if ($json && isset($json['offre_id'])) {
+                foreach ($allOffres as $o) {
+                    if ($o->getIdOffres() === (int)$json['offre_id']) {
+                        $suggestion       = $o;
+                        $raisonSuggestion = $json['raison'];
+                        break;
                     }
                 }
-            } catch (\Exception $e) {
-                // Silencieux — pas de suggestion si l'API échoue
             }
+        } catch (\Exception $e) {
+            // Silencieux
         }
-        // ─────────────────────────────────────────────────────
-
-        return $this->render('User/listOffre.html.twig', [
-            'offres'           => $offres,
-            'searchTerm'       => $search,
-            'currentSort'      => $sort,
-            'currentDir'       => $direction,
-            'suggestion'       => $suggestion,        // ← ajouté
-            'raisonSuggestion' => $raisonSuggestion,  // ← ajouté
-            'stats' => [
-                'total'   => $offreRepo->countAll(),
-                'avgPrix' => round($offreRepo->avgPrix(), 2),
-                'minCher' => $offreRepo->findMoinsCher(1)[0] ?? null,
-                'maxLong' => $offreRepo->findPlusLong(1)[0] ?? null,
-            ],
-        ]);
     }
+
+    return $this->render('User/listOffre.html.twig', [
+        'offres'           => $offres,
+        'searchTerm'       => $search,
+        'currentSort'      => $sort,
+        'currentDir'       => $direction,
+        'suggestion'       => $suggestion,
+        'raisonSuggestion' => $raisonSuggestion,
+        'page'             => $page,
+        'totalPages'       => $totalPages,
+        'total'            => $total,
+        'stats' => [
+            'total'   => $offreRepo->countAll(),
+            'avgPrix' => round($offreRepo->avgPrix(), 2),
+            'minCher' => $offreRepo->findMoinsCher(1)[0] ?? null,
+            'maxLong' => $offreRepo->findPlusLong(1)[0] ?? null,
+        ],
+    ]);
+}
 
     // ==================== EXPORT PDF LISTE ====================
     #[Route('/export/pdf', name: 'app_offre_export_pdf', methods: ['GET'])]

@@ -26,6 +26,7 @@
       <parameter key="MonologBundle">Symfony\Bundle\MonologBundle\MonologBundle</parameter>
       <parameter key="MakerBundle">Symfony\Bundle\MakerBundle\MakerBundle</parameter>
       <parameter key="SchebTwoFactorBundle">Scheb\TwoFactorBundle\SchebTwoFactorBundle</parameter>
+      <parameter key="KnpPaginatorBundle">Knp\Bundle\PaginatorBundle\KnpPaginatorBundle</parameter>
     </parameter>
     <parameter key="kernel.bundles_metadata" type="collection">
       <parameter key="FrameworkBundle" type="collection">
@@ -79,6 +80,10 @@
       <parameter key="SchebTwoFactorBundle" type="collection">
         <parameter key="path">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle</parameter>
         <parameter key="namespace">Scheb\TwoFactorBundle</parameter>
+      </parameter>
+      <parameter key="KnpPaginatorBundle" type="collection">
+        <parameter key="path">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle</parameter>
+        <parameter key="namespace">Knp\Bundle\PaginatorBundle</parameter>
       </parameter>
     </parameter>
     <parameter key="kernel.charset">UTF-8</parameter>
@@ -261,6 +266,14 @@
     <parameter key="scheb_two_factor.ip_whitelist" type="collection"/>
     <parameter key="scheb_two_factor.code_reuse_cache_duration">60</parameter>
     <parameter key="scheb_two_factor.trusted_device.enabled">false</parameter>
+    <parameter key="knp_paginator.template.pagination">@KnpPaginator/Pagination/sliding.html.twig</parameter>
+    <parameter key="knp_paginator.template.rel_links">@KnpPaginator/Pagination/rel_links.html.twig</parameter>
+    <parameter key="knp_paginator.template.filtration">@KnpPaginator/Pagination/filtration.html.twig</parameter>
+    <parameter key="knp_paginator.template.sortable">@KnpPaginator/Pagination/sortable_link.html.twig</parameter>
+    <parameter key="knp_paginator.page_range">5</parameter>
+    <parameter key="knp_paginator.page_limit">null</parameter>
+    <parameter key="knp_paginator.page_name">page</parameter>
+    <parameter key="knp_paginator.remove_first_page_param">false</parameter>
     <parameter key="data_collector.templates" type="collection">
       <parameter key="data_collector.request" type="collection">
         <parameter>request</parameter>
@@ -658,9 +671,6 @@
     <service id="App\EventListener\LogoutListener" class="App\EventListener\LogoutListener" autowire="true" autoconfigure="true">
       <tag name="kernel.event_subscriber"/>
     </service>
-    <service id="App\EventListener\SmsService" class="App\EventListener\SmsService" autowire="true" autoconfigure="true">
-      <tag name="container.error" message="The autoloader expected class &quot;App\EventListener\SmsService&quot; to be defined in file &quot;C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\EventListener\SmsService.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
-    </service>
     <service id="App\EventListener\TwoFactorLListener" class="App\EventListener\TwoFactorLListener" autowire="true" autoconfigure="true">
       <tag name="container.error" message="The autoloader expected class &quot;App\EventListener\TwoFactorLListener&quot; to be defined in file &quot;C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\EventListener\TwoFactorLListener.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
     </service>
@@ -835,6 +845,15 @@
     <service id="App\Service\PdfService" class="App\Service\PdfService" autowire="true" autoconfigure="true">
       <argument type="service" id="twig"/>
     </service>
+    <service id="App\Service\SmsService" class="App\Service\SmsService" autowire="true" autoconfigure="true">
+      <argument>%env(TWILIO_SID)%</argument>
+      <argument>%env(TWILIO_TOKEN)%</argument>
+      <argument>%env(TWILIO_FROM)%</argument>
+      <argument>%env(VONAGE_API_KEY)%</argument>
+      <argument>%env(VONAGE_API_SECRET)%</argument>
+      <argument>%env(VONAGE_FROM)%</argument>
+      <argument type="service" id="monolog.logger"/>
+    </service>
     <service id="App\Service\TacheIAService" class="App\Service\TacheIAService" autowire="true" autoconfigure="true">
       <argument type="service" id=".debug.http_client"/>
       <argument type="service" id="App\Repository\User\UserRepository"/>
@@ -845,15 +864,6 @@
       <argument>%env(GROQ_API_KEY)%</argument>
     </service>
     <service id="App\Service\TwoFactorCodeSender" class="App\Service\TwoFactorCodeSender" autowire="true" autoconfigure="true"/>
-    <service id="App\Service\SmsService" class="App\Service\SmsService" autowire="true" autoconfigure="true">
-      <argument>%env(TWILIO_SID)%</argument>
-      <argument>%env(TWILIO_TOKEN)%</argument>
-      <argument>%env(TWILIO_FROM)%</argument>
-      <argument>%env(VONAGE_API_KEY)%</argument>
-      <argument>%env(VONAGE_API_SECRET)%</argument>
-      <argument>%env(VONAGE_FROM)%</argument>
-      <argument type="service" id="monolog.logger"/>
-    </service>
     <service id="argument_metadata_factory" class="Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory"/>
     <service id="argument_resolver.backed_enum_resolver" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueResolver">
       <tag priority="100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueResolver">controller.argument_value_resolver</tag>
@@ -881,7 +891,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.vGdBZFg"/>
+      <argument type="service" id=".service_locator.xFEXRPe"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -1696,6 +1706,7 @@
         <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations</argument>
         <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations</argument>
         <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations</argument>
+        <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations</argument>
         <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/translations</argument>
       </argument>
       <argument type="collection">
@@ -1724,6 +1735,7 @@
         <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations</argument>
         <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations</argument>
         <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations</argument>
+        <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations</argument>
         <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/translations</argument>
       </argument>
       <argument type="collection">
@@ -2571,6 +2583,7 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.ar.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.ar.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.ar.xlf</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.ar.xliff</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/translations\messages.ar.yaml</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/translations\messages.ar.yaml</argument>
           </argument>
@@ -2588,6 +2601,7 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.bg.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.bg.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.bg.xlf</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.bg.xliff</argument>
           </argument>
           <argument key="bs" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.bs.xlf</argument>
@@ -2598,12 +2612,14 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.ca.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.ca.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.ca.xlf</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.ca.xliff</argument>
           </argument>
           <argument key="cs" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.cs.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.cs.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.cs.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.cs.yml</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.cs.xliff</argument>
           </argument>
           <argument key="cy" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.cy.xlf</argument>
@@ -2614,12 +2630,14 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.da.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.da.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.da.xlf</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.da.xliff</argument>
           </argument>
           <argument key="de" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.de.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.de.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.de.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.de.yml</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.de.xliff</argument>
           </argument>
           <argument key="el" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.el.xlf</argument>
@@ -2631,6 +2649,7 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.en.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.en.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.en.yml</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.en.xliff</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/translations\messages.en.yaml</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/translations\messages.en.yaml</argument>
           </argument>
@@ -2639,6 +2658,7 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.es.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.es.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.es.yml</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.es.xliff</argument>
           </argument>
           <argument key="et" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.et.xlf</argument>
@@ -2649,22 +2669,26 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.eu.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.eu.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.eu.xlf</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.eu.xliff</argument>
           </argument>
           <argument key="fa" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.fa.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.fa.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.fa.xlf</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.fa.xliff</argument>
           </argument>
           <argument key="fi" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.fi.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.fi.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.fi.xlf</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.fi.xliff</argument>
           </argument>
           <argument key="fr" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.fr.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.fr.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.fr.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.fr.yml</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.fr.xliff</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/translations\SchebTwoFactorBundle.fr.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/translations\messages.fr.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/translations\messages.fr.yaml</argument>
@@ -2691,12 +2715,14 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.hr.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.hr.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.hr.yml</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.hr.xliff</argument>
           </argument>
           <argument key="hu" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.hu.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.hu.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.hu.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.hu.yml</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.hu.xliff</argument>
           </argument>
           <argument key="hy" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.hy.xlf</argument>
@@ -2708,16 +2734,19 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.id.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.id.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.id.yml</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.id.xliff</argument>
           </argument>
           <argument key="it" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.it.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.it.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.it.xlf</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.it.xliff</argument>
           </argument>
           <argument key="ja" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.ja.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.ja.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.ja.xlf</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.ja.xliff</argument>
           </argument>
           <argument key="lb" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.lb.xlf</argument>
@@ -2728,6 +2757,7 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.lt.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.lt.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.lt.xlf</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.lt.xliff</argument>
           </argument>
           <argument key="lv" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.lv.xlf</argument>
@@ -2759,6 +2789,7 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.nl.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.nl.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.nl.yml</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.nl.xliff</argument>
           </argument>
           <argument key="nn" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.nn.xlf</argument>
@@ -2769,12 +2800,14 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.no.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.no.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.no.xlf</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.no.xliff</argument>
           </argument>
           <argument key="pl" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.pl.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.pl.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.pl.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.pl.yml</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.pl.xliff</argument>
           </argument>
           <argument key="pt" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.pt.xlf</argument>
@@ -2785,18 +2818,21 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.pt_BR.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.pt_BR.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.pt_BR.xlf</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.pt_BR.xliff</argument>
           </argument>
           <argument key="ro" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.ro.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.ro.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.ro.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.ro.yml</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.ro.xliff</argument>
           </argument>
           <argument key="ru" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.ru.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.ru.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.ru.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.ru.yml</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.ru.xliff</argument>
           </argument>
           <argument key="sk" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.sk.xlf</argument>
@@ -2829,6 +2865,7 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.sv.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.sv.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.sv.yml</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.sv.xliff</argument>
           </argument>
           <argument key="th" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.th.xlf</argument>
@@ -2845,12 +2882,14 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.tr.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.tr.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.tr.yml</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.tr.xliff</argument>
           </argument>
           <argument key="uk" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.uk.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.uk.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.uk.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.uk.yml</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.uk.xliff</argument>
           </argument>
           <argument key="ur" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.ur.xlf</argument>
@@ -2871,11 +2910,18 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.zh_CN.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.zh_CN.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.zh_CN.xlf</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.zh_CN.xliff</argument>
           </argument>
           <argument key="zh_TW" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.zh_TW.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.zh_TW.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.zh_TW.xlf</argument>
+          </argument>
+          <argument key="ky" type="collection">
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.ky.xliff</argument>
+          </argument>
+          <argument key="sw" type="collection">
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.sw.xliff</argument>
           </argument>
         </argument>
         <argument key="scanned_directories" type="collection">
@@ -2883,6 +2929,7 @@
           <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations</argument>
           <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations</argument>
           <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations</argument>
+          <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations</argument>
           <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/translations</argument>
           <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/translations</argument>
           <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\framework-bundle/translations</argument>
@@ -2904,6 +2951,7 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations</argument>
             <argument>translations</argument>
             <argument>translations</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\framework-bundle/translations</argument>
@@ -3310,6 +3358,14 @@
         <argument type="collection">
           <argument type="service_closure" id="security.context_listener.0"/>
           <argument>onKernelResponse</argument>
+        </argument>
+        <argument>0</argument>
+      </call>
+      <call method="addListener">
+        <argument>kernel.request</argument>
+        <argument type="collection">
+          <argument type="service_closure" id="knp_paginator.subscriber.sliding_pagination"/>
+          <argument>onKernelRequest</argument>
         </argument>
         <argument>0</argument>
       </call>
@@ -3874,6 +3930,46 @@
         <argument>9223372036854775806</argument>
       </call>
       <call method="addListener">
+        <argument>knp_pager.before</argument>
+        <argument type="collection">
+          <argument type="service_closure" id="knp_paginator.subscriber.paginate"/>
+          <argument>before</argument>
+        </argument>
+        <argument>0</argument>
+      </call>
+      <call method="addListener">
+        <argument>knp_pager.pagination</argument>
+        <argument type="collection">
+          <argument type="service_closure" id="knp_paginator.subscriber.paginate"/>
+          <argument>pagination</argument>
+        </argument>
+        <argument>0</argument>
+      </call>
+      <call method="addListener">
+        <argument>knp_pager.before</argument>
+        <argument type="collection">
+          <argument type="service_closure" id="knp_paginator.subscriber.sortable"/>
+          <argument>before</argument>
+        </argument>
+        <argument>1</argument>
+      </call>
+      <call method="addListener">
+        <argument>knp_pager.before</argument>
+        <argument type="collection">
+          <argument type="service_closure" id="knp_paginator.subscriber.filtration"/>
+          <argument>before</argument>
+        </argument>
+        <argument>1</argument>
+      </call>
+      <call method="addListener">
+        <argument>knp_pager.pagination</argument>
+        <argument type="collection">
+          <argument type="service_closure" id="knp_paginator.subscriber.sliding_pagination"/>
+          <argument>pagination</argument>
+        </argument>
+        <argument>1</argument>
+      </call>
+      <call method="addListener">
         <argument>Symfony\Component\Security\Http\Event\CheckPassportEvent</argument>
         <argument type="collection">
           <argument type="service_closure" id="security.listener.csrf_protection"/>
@@ -3903,7 +3999,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.vGdBZFg"/>
+      <argument type="service" id=".service_locator.xFEXRPe"/>
     </service>
     <service id="debug.log_processor" class="Symfony\Bridge\Monolog\Processor\DebugProcessor">
       <tag name="kernel.reset" method="reset"/>
@@ -6363,6 +6459,9 @@
         <argument type="service" id="turbo.twig.extension"/>
       </call>
       <call method="addExtension">
+        <argument type="service" id="knp_paginator.twig.extension.pagination"/>
+      </call>
+      <call method="addExtension">
         <argument type="service" id="stimulus.twig_extension"/>
       </call>
       <call method="addGlobal">
@@ -6498,6 +6597,14 @@
         <argument>!SchebTwoFactor</argument>
       </call>
       <call method="addPath">
+        <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/templates</argument>
+        <argument>KnpPaginator</argument>
+      </call>
+      <call method="addPath">
+        <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/templates</argument>
+        <argument>!KnpPaginator</argument>
+      </call>
+      <call method="addPath">
         <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/templates</argument>
       </call>
       <call method="addPath">
@@ -6586,7 +6693,7 @@
       <argument>,</argument>
     </service>
     <service id="twig.runtime_loader" class="Twig\RuntimeLoader\ContainerRuntimeLoader">
-      <argument type="service" id=".service_locator.i0..Ry2"/>
+      <argument type="service" id=".service_locator.PqIxmzX"/>
     </service>
     <service id="twig.error_renderer.html" class="Symfony\Bridge\Twig\ErrorRenderer\TwigErrorRenderer">
       <argument type="service" id="twig"/>
@@ -8079,6 +8186,62 @@
       <argument type="service" id="twig"/>
       <argument>@SchebTwoFactor/Authentication/form.html.twig</argument>
     </service>
+    <service id="knp_paginator" class="Knp\Component\Pager\Paginator" public="true" lazy="true">
+      <tag name="proxy" interface="Knp\Component\Pager\PaginatorInterface"/>
+      <argument type="service" id="debug.event_dispatcher"/>
+      <argument type="service" id="Knp\Component\Pager\ArgumentAccess\RequestArgumentAccess"/>
+      <argument type="service" id="doctrine.dbal.default_connection" on-invalid="null"/>
+      <call method="setDefaultPaginatorOptions">
+        <argument type="collection">
+          <argument key="pageParameterName">page</argument>
+          <argument key="sortFieldParameterName">sort</argument>
+          <argument key="sortDirectionParameterName">direction</argument>
+          <argument key="filterFieldParameterName">filterField</argument>
+          <argument key="filterValueParameterName">filterValue</argument>
+          <argument key="distinct">true</argument>
+          <argument key="pageOutOfRange">ignore</argument>
+          <argument key="defaultLimit">10</argument>
+        </argument>
+      </call>
+    </service>
+    <service id="Knp\Component\Pager\ArgumentAccess\RequestArgumentAccess" class="Knp\Component\Pager\ArgumentAccess\RequestArgumentAccess">
+      <argument type="service" id="request_stack"/>
+    </service>
+    <service id="knp_paginator.subscriber.paginate" class="Knp\Component\Pager\Event\Subscriber\Paginate\PaginationSubscriber">
+      <tag name="kernel.event_subscriber"/>
+    </service>
+    <service id="knp_paginator.subscriber.sortable" class="Knp\Component\Pager\Event\Subscriber\Sortable\SortableSubscriber">
+      <tag name="kernel.event_subscriber"/>
+    </service>
+    <service id="knp_paginator.subscriber.filtration" class="Knp\Component\Pager\Event\Subscriber\Filtration\FiltrationSubscriber">
+      <tag name="kernel.event_subscriber"/>
+    </service>
+    <service id="knp_paginator.subscriber.sliding_pagination" class="Knp\Bundle\PaginatorBundle\Subscriber\SlidingPaginationSubscriber">
+      <tag name="kernel.event_subscriber"/>
+      <tag name="kernel.event_listener" event="kernel.request" method="onKernelRequest"/>
+      <tag name="container.hot_path"/>
+      <argument type="collection">
+        <argument key="defaultPaginationTemplate">@KnpPaginator/Pagination/sliding.html.twig</argument>
+        <argument key="defaultRelLinksTemplate">@KnpPaginator/Pagination/rel_links.html.twig</argument>
+        <argument key="defaultSortableTemplate">@KnpPaginator/Pagination/sortable_link.html.twig</argument>
+        <argument key="defaultFiltrationTemplate">@KnpPaginator/Pagination/filtration.html.twig</argument>
+        <argument key="defaultPageRange">5</argument>
+        <argument key="defaultPageLimit">null</argument>
+      </argument>
+    </service>
+    <service id="knp_paginator.helper.processor" class="Knp\Bundle\PaginatorBundle\Helper\Processor">
+      <argument type="service" id="router.default"/>
+      <argument type="service" id="translator.data_collector" on-invalid="null"/>
+    </service>
+    <service id="knp_paginator.twig.extension.pagination" class="Knp\Bundle\PaginatorBundle\Twig\Extension\PaginationExtension">
+      <tag name="twig.extension"/>
+    </service>
+    <service id="Knp\Bundle\PaginatorBundle\Twig\Extension\PaginationRuntime" class="Knp\Bundle\PaginatorBundle\Twig\Extension\PaginationRuntime">
+      <tag name="twig.runtime"/>
+      <argument type="service" id="knp_paginator.helper.processor"/>
+      <argument>page</argument>
+      <argument>false</argument>
+    </service>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\AboutController" class="App\Controller\AboutController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\AboutController" class="App\Controller\AboutController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\AboutController" class="App\Controller\AboutController" autowire="true" autoconfigure="true" abstract="true"/>
@@ -9100,6 +9263,13 @@
         <argument key="offreRepo" type="service_closure" id="App\Repository\User\OffreRepository"/>
       </argument>
     </service>
+    <service id=".service_locator.PDW3bOQ" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="terrainRepo" type="service_closure" id="App\Repository\Terrain\TerrainRepository"/>
+        <argument key="user" type="service_closure" id=".errored..service_locator.PDW3bOQ.App\Entity\User\User"/>
+      </argument>
+    </service>
     <service id=".service_locator.S18McA7" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -9304,7 +9474,7 @@
         <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
       </argument>
     </service>
-    <service id=".service_locator.vGdBZFg" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.xFEXRPe" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Controller\AdminDashboardController::index" type="service_closure" id=".service_locator.qni5W9T"/>
@@ -9444,7 +9614,7 @@
         <argument key="App\Controller\User\AdminUserController::delete" type="service_closure" id=".service_locator.S18McA7"/>
         <argument key="App\Controller\User\AdminUserController::edit" type="service_closure" id=".service_locator.S18McA7"/>
         <argument key="App\Controller\User\AdminUserController::pdf" type="service_closure" id=".service_locator.S18McA7"/>
-        <argument key="App\Controller\User\AdminUserController::show" type="service_closure" id=".service_locator.S18McA7"/>
+        <argument key="App\Controller\User\AdminUserController::show" type="service_closure" id=".service_locator.PDW3bOQ"/>
         <argument key="App\Controller\User\AdminUserController::unban" type="service_closure" id=".service_locator.S18McA7"/>
         <argument key="App\Controller\User\OffreController::delete" type="service_closure" id=".service_locator.jDXJRjC"/>
         <argument key="App\Controller\User\OffreController::edit" type="service_closure" id=".service_locator.jDXJRjC"/>
@@ -9639,7 +9809,7 @@
         <argument key="App\Controller\User\AdminUserController:delete" type="service_closure" id=".service_locator.S18McA7"/>
         <argument key="App\Controller\User\AdminUserController:edit" type="service_closure" id=".service_locator.S18McA7"/>
         <argument key="App\Controller\User\AdminUserController:pdf" type="service_closure" id=".service_locator.S18McA7"/>
-        <argument key="App\Controller\User\AdminUserController:show" type="service_closure" id=".service_locator.S18McA7"/>
+        <argument key="App\Controller\User\AdminUserController:show" type="service_closure" id=".service_locator.PDW3bOQ"/>
         <argument key="App\Controller\User\AdminUserController:unban" type="service_closure" id=".service_locator.S18McA7"/>
         <argument key="App\Controller\User\OffreController:delete" type="service_closure" id=".service_locator.jDXJRjC"/>
         <argument key="App\Controller\User\OffreController:edit" type="service_closure" id=".service_locator.jDXJRjC"/>
@@ -11128,6 +11298,9 @@
     <service id=".errored..service_locator.JTVGD1n.App\Entity\User\Abonnement" class="App\Entity\User\Abonnement">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.JTVGD1n&quot;: it needs an instance of &quot;App\Entity\User\Abonnement&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
     </service>
+    <service id=".errored..service_locator.PDW3bOQ.App\Entity\User\User" class="App\Entity\User\User">
+      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.PDW3bOQ&quot;: it needs an instance of &quot;App\Entity\User\User&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
+    </service>
     <service id=".errored..service_locator.S18McA7.App\Entity\User\User" class="App\Entity\User\User">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.S18McA7&quot;: it needs an instance of &quot;App\Entity\User\User&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
     </service>
@@ -12164,7 +12337,7 @@
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
-    <service id=".service_locator.i0..Ry2" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.PqIxmzX" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="Symfony\Bridge\Twig\Extension\CsrfRuntime" type="service_closure" id="twig.runtime.security_csrf"/>
@@ -12174,6 +12347,7 @@
         <argument key="Symfony\Bridge\Twig\Extension\ImportMapRuntime" type="service_closure" id="twig.runtime.importmap"/>
         <argument key="Symfony\UX\StimulusBundle\Twig\UxControllersTwigRuntime" type="service_closure" id="stimulus.ux_controllers_twig_runtime"/>
         <argument key="Symfony\UX\Turbo\Twig\TurboRuntime" type="service_closure" id="turbo.twig.runtime"/>
+        <argument key="Knp\Bundle\PaginatorBundle\Twig\Extension\PaginationRuntime" type="service_closure" id="Knp\Bundle\PaginatorBundle\Twig\Extension\PaginationRuntime"/>
       </argument>
     </service>
     <service id="App\Kernel" alias="kernel" public="true"/>
@@ -12352,9 +12526,11 @@
     <service id="scheb_two_factor.ip_whitelist_provider" alias="scheb_two_factor.default_ip_whitelist_provider"/>
     <service id="scheb_two_factor.token_factory" alias="scheb_two_factor.default_token_factory"/>
     <service id="scheb_two_factor.provider_decider" alias="scheb_two_factor.default_provider_decider"/>
+    <service id="Knp\Component\Pager\PaginatorInterface" alias="knp_paginator"/>
+    <service id="Knp\Component\Pager\ArgumentAccess\ArgumentAccessInterface" alias="Knp\Component\Pager\ArgumentAccess\RequestArgumentAccess"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.w7.f4fT" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.vGdBZFg"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.xFEXRPe"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id=".Psr\Log\LoggerInterface $request.logger" alias="monolog.logger.request"/>
@@ -12413,6 +12589,7 @@
     <service id=".service_locator.TSrp4XK" alias=".service_locator.QoKtgh5"/>
     <service id=".service_locator.EN_uOgD" alias=".service_locator.4mmheGO"/>
     <service id=".service_locator.96S3CMX" alias=".service_locator._KaSS0M"/>
+    <service id=".service_locator.xRtMrOW" alias=".service_locator.PDW3bOQ"/>
     <service id=".service_locator.ahE6ilb" alias=".service_locator.CLxInnv"/>
     <service id=".service_locator.d0U0rWZ" alias=".service_locator.jDXJRjC"/>
     <service id=".service_locator.oaRQYyJ" alias=".service_locator.10ih3yF"/>
@@ -12429,7 +12606,7 @@
     <service id=".service_locator.5pebkNV" alias=".service_locator.xxq2prQ"/>
     <service id=".service_locator.whdse4m" alias=".service_locator.yd.AI8F"/>
     <service id=".service_locator.8J1nalj" alias=".service_locator.SsD9eLO"/>
-    <service id=".service_locator.XU9rtn0" alias=".service_locator.vGdBZFg"/>
+    <service id=".service_locator.T66Q_EJ" alias=".service_locator.xFEXRPe"/>
     <service id=".service_locator.BFrsqsn" alias=".service_locator.F9PKc.7"/>
     <service id=".service_locator.oIHygA7" alias=".service_locator.xOkKGYY"/>
     <service id=".service_locator.XtmiKbi" alias=".service_locator.MfxSDRP"/>
@@ -12514,6 +12691,7 @@
     <service id=".service_locator.WYubhsw" alias=".service_locator.wzz8Y5M"/>
     <service id=".service_locator.gbqVxpP" alias=".service_locator.JTVGD1n"/>
     <service id=".service_locator.CvimYjo" alias=".service_locator._KaSS0M"/>
+    <service id=".service_locator.skJ.QHW" alias=".service_locator.PDW3bOQ"/>
     <service id=".service_locator.CGdbDXd" alias=".service_locator.S18McA7"/>
     <service id=".service_locator.nA7ETfe" alias=".service_locator.CLxInnv"/>
     <service id=".service_locator.0d5GrSc" alias=".service_locator.9hPlMik"/>
