@@ -5,6 +5,7 @@ namespace App\Controller\User;
 use App\Entity\User\User;
 use App\Form\User\UserFormType;
 use App\Repository\User\UserRepository;
+use App\Repository\Terrain\TerrainRepository;  // ← ajouter en haut
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,50 +28,75 @@ class AdminUserController extends AbstractController
     ) {}
 
     // ── LIST ──────────────────────────────────────────────────────────────────
-    #[Route('', name: '_list')]
-    public function list(Request $request): Response
-    {
-        $search = $request->query->get('q', '');
+   #[Route('', name: '_list')]
+public function list(Request $request): Response
+{
+    $search  = $request->query->get('q', '');
+    $page    = max(1, $request->query->getInt('page', 1));
+    $limit   = 5;
 
-        // On filtre uniquement les agriculteurs (role=2) ET les bannis (role=0)
-        $qb = $this->userRepository->createQueryBuilder('u')
-            ->where('u.role IN (:roles)')
-            ->setParameter('roles', [0, 2])
-            ->orderBy('u.dateCreationcpt', 'DESC');
+    $qb = $this->userRepository->createQueryBuilder('u')
+        ->where('u.role IN (:roles)')
+        ->setParameter('roles', [0, 2])
+        ->orderBy('u.dateCreationcpt', 'DESC');
 
-        if ($search) {
-            $qb->andWhere('u.nom LIKE :q OR u.prenom LIKE :q OR u.email LIKE :q')
-               ->setParameter('q', "%$search%");
-        }
-
-        $users = $qb->getQuery()->getResult();
-
-        $stats = [
-            'total'        => $this->userRepository->count(['role' => 2]),
-            'bannis'       => $this->userRepository->count(['role' => 0]),
-            'agriculteurs' => $this->userRepository->count(['role' => 2]),
-        ];
-
-        return $this->render('User/list.html.twig', [
-            'users'  => $users,
-            'stats'  => $stats,
-            'search' => $search,
-        ]);
+    if ($search) {
+        $qb->andWhere('u.nom LIKE :q OR u.prenom LIKE :q OR u.email LIKE :q')
+           ->setParameter('q', "%$search%");
     }
+
+    // ── Total pour calculer les pages ──
+    $totalQb = clone $qb;
+    $total   = (int) $totalQb
+        ->select('COUNT(u.cin)')
+        ->getQuery()
+        ->getSingleScalarResult();
+
+    $totalPages = max(1, (int) ceil($total / $limit));
+    $page       = min($page, $totalPages); // sécurité : page ne dépasse pas le max
+
+    // ── Résultats paginés ──
+    $users = $qb
+        ->select('u')
+        ->setFirstResult(($page - 1) * $limit)
+        ->setMaxResults($limit)
+        ->getQuery()
+        ->getResult();
+
+    $stats = [
+        'total'        => $this->userRepository->count(['role' => 2]),
+        'bannis'       => $this->userRepository->count(['role' => 0]),
+        'agriculteurs' => $this->userRepository->count(['role' => 2]),
+    ];
+
+    return $this->render('User/list.html.twig', [
+        'users'       => $users,
+        'stats'       => $stats,
+        'search'      => $search,
+        'page'        => $page,
+        'totalPages'  => $totalPages,
+        'total'       => $total,
+        'limit'       => $limit,
+    ]);
+}
 
     // ── SHOW ──────────────────────────────────────────────────────────────────
-    #[Route('/{cin}', name: '_show', requirements: ['cin' => '\d+'], methods: ['GET'])]
-    public function show(User $user): Response
-    {
-        // Sécurité : on interdit l'accès aux profils non-agriculteurs et non-bannis
-        if (!in_array((int)$user->getRole(), [0, 2])) {
-            throw $this->createAccessDeniedException('Accès interdit à ce profil.');
-        }
-
-        return $this->render('User/show.html.twig', [
-            'user' => $user,
-        ]);
+    
+#[Route('/{cin}', name: '_show', requirements: ['cin' => '\d+'], methods: ['GET'])]
+public function show(User $user, TerrainRepository $terrainRepo): Response
+{
+    if (!in_array((int)$user->getRole(), [0, 2])) {
+        throw $this->createAccessDeniedException('Accès interdit à ce profil.');
     }
+
+    // Terrains de l'agriculteur avec leurs ouvriers
+    $terrains = $terrainRepo->findByAgriculteurWithOuvriers($user->getCin());
+
+    return $this->render('User/show.html.twig', [
+        'user'     => $user,
+        'terrains' => $terrains,
+    ]);
+}
      // ── DELETE ────────────────────────────────────────────────────────────────
     #[Route('/{cin}/delete', name: '_delete', requirements: ['cin' => '\d+'], methods: ['POST'])]
     public function delete(Request $request, User $user): Response
