@@ -845,3 +845,12 @@ fee420,127.0.0.1,GET,http://127.0.0.1:8000/agri/rotations,1776598909,,200,reques
 40750a,127.0.0.1,GET,http://127.0.0.1:8000/agri/rotations/new,1776598957,,200,request
 cb6964,127.0.0.1,POST,http://127.0.0.1:8000/api/ai-suggestion,1776598960,,200,request
 7129de,127.0.0.1,GET,http://127.0.0.1:8000/agri/rotations,1776599001,,200,request
+8f632c,127.0.0.1,GET,http://127.0.0.1:8000/agri/terrains,1776599302,,200,request
+9c1a5d,127.0.0.1,GET,http://127.0.0.1:8000/agri/plantes,1776599308,,200,request
+53b741,127.0.0.1,GET,http://127.0.0.1:8000/agri/plantes/2,1776599310,,200,request
+6e677a,127.0.0.1,GET,http://127.0.0.1:8000/agri/plantes/2,1776600299,,200,request
+461996,127.0.0.1,GET,http://127.0.0.1:8000/agri/plantes/2,1776600299,,200,request
+4c846c,127.0.0.1,POST,http://127.0.0.1:8000/api/workflow-plante,1776600304,,200,request
+db3d2d,127.0.0.1,GET,http://127.0.0.1:8000/agri/plantes,1776600489,,200,request
+648c7d,127.0.0.1,GET,http://127.0.0.1:8000/agri/plantes/2,1776600491,,200,request
+c0c8c9,127.0.0.1,POST,http://127.0.0.1:8000/api/workflow-plante,1776600503,,200,request
