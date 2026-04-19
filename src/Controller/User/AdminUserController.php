@@ -97,18 +97,7 @@ public function show(User $user, TerrainRepository $terrainRepo): Response
         'terrains' => $terrains,
     ]);
 }
-     // ── DELETE ────────────────────────────────────────────────────────────────
-    #[Route('/{cin}/delete', name: '_delete', requirements: ['cin' => '\d+'], methods: ['POST'])]
-    public function delete(Request $request, User $user): Response
-    {
-        if ($this->isCsrfTokenValid('delete_user_' . $user->getCin(), $request->request->get('_token'))) {
-            $this->em->remove($user);
-            $this->em->flush();
-            $this->addFlash('success', 'Utilisateur supprimé.');
-        }
-
-        return $this->redirectToRoute('admin_users_list');
-    }
+    
 
  // ── CREATE ────────────────────────────────────────────────────────────────
     #[Route('/new', name: '_new', methods: ['GET', 'POST'])]
@@ -173,6 +162,18 @@ public function show(User $user, TerrainRepository $terrainRepo): Response
             $user->setDateDernierchg(new \DateTime());
             $this->em->flush();
             $this->addFlash('success', 'Le compte de ' . $user->getPrenom() . ' ' . $user->getNom() . ' a été réactivé.');
+        }
+
+        return $this->redirectToRoute('admin_users_list');
+    }
+    // ── DELETE ────────────────────────────────────────────────────────────────
+    #[Route('/{cin}/delete', name: '_delete', requirements: ['cin' => '\d+'], methods: ['POST'])]
+    public function delete(Request $request, User $user): Response
+    {
+        if ($this->isCsrfTokenValid('delete_user_' . $user->getCin(), $request->request->get('_token'))) {
+            $this->em->remove($user);
+            $this->em->flush();
+            $this->addFlash('success', 'Utilisateur supprimé.');
         }
 
         return $this->redirectToRoute('admin_users_list');
