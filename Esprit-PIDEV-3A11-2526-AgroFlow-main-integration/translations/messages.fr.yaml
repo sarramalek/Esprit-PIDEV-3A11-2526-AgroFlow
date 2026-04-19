@@ -73,6 +73,10 @@ report:
     radio: Radio
   edit_report: Modifier le rapport
   back_to_list: Retour à la liste
+  reminder_system: Système de Rappels
+  next_reminder: Prochain rappel
+  reminder_soon: Bientôt
+  reminder_planned: Planifié
 
 language:
   fr: Français

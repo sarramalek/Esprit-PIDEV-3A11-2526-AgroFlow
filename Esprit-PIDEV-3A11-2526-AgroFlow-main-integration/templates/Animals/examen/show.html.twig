@@ -89,6 +89,46 @@
                 </div>
             </div>
 
+            <!-- Section Rappels -->
+            {% if examen.isFutureVaccineAlert() %}
+            <div style="margin-bottom: 30px; background: #fff9e6; border: 1px solid #ffecb5; padding: 20px; border-radius: 15px; color: #7f6000;">
+                <strong style="display: block; margin-bottom: 10px;"><i class="fa fa-bell" style="margin-right: 8px;"></i>Vaccin programmé</strong>
+                L'examen vaccinal est prévu le {{ examen.dateExamen|date('d/m/Y') }}. Une alerte est générée pour ce rendez-vous futur.
+            </div>
+            {% endif %}
+            {% if examen.shouldHaveReminder() %}
+            <div style="margin-bottom: 40px;">
+                <h4 style="color: #2C3E50; font-size: 16px; margin-bottom: 15px; border-bottom: 2px solid #F1F3F5; padding-bottom: 10px;">
+                    <i class="fa fa-calendar-check" style="color: #3498db; margin-right: 10px;"></i>
+                    {{ 'report.reminder_system'|trans }}
+                </h4>
+                <div style="background: {{ examen.isReminderSoon() ? 'rgba(231, 76, 60, 0.05)' : 'rgba(39, 174, 96, 0.05)' }}; border: 2px solid {{ examen.isReminderSoon() ? '#e74c3c' : '#27ae60' }}; padding: 25px; border-radius: 15px;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="width: 50px; height: 50px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; color: {{ examen.isReminderSoon() ? '#e74c3c' : '#27ae60' }}; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                            <i class="fa fa-bell"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <strong style="display: block; font-size: 18px; color: #2C3E50; margin-bottom: 5px;">{{ examen.getReminderType() }}</strong>
+                            <div style="font-size: 14px; color: #666; margin-bottom: 10px;">
+                                {{ 'report.next_reminder'|trans }}: <strong>{{ examen.calculateNextReminderDate()|date('d/m/Y') }}</strong>
+                            </div>
+                            {% if examen.isReminderSoon() %}
+                                <span style="background: #e74c3c; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase;">
+                                    <i class="fa fa-exclamation-triangle" style="margin-right: 5px;"></i>
+                                    {{ 'report.reminder_soon'|trans }}
+                                </span>
+                            {% else %}
+                                <span style="background: #27ae60; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase;">
+                                    <i class="fa fa-check-circle" style="margin-right: 5px;"></i>
+                                    {{ 'report.reminder_planned'|trans }}
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
             <!-- Actions -->
             <div style="display: flex; gap: 15px; border-top: 1px solid #EEE; padding-top: 30px;">
                 <a href="{{ path('app_examens_edit', {'id': examen.id}) }}" style="background: #3498db; color: white; padding: 12px 25px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px;">

@@ -210,6 +210,7 @@
                             <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">Type</th>
                             <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">Diagnostic</th>
                             <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">Traitement</th>
+                            <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">Rappel</th>
                             <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600; text-align: center;">Actions</th>
                         </tr>
                     </thead>
@@ -235,6 +236,11 @@
                                         <i class="fa fa-stethoscope" style="color: #e74c3c; font-size: 14px;"></i>
                                     {% endif %}
                                     <span style="font-weight: 600; color: #2C3E50; font-size: 14px;">{{ e.typeExamen }}</span>
+                                    {% if e.isFutureVaccineAlert() %}
+                                        <span style="background: #f1c40f; color: #2c3e50; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; text-transform: uppercase; margin-left: 8px;">Vaccin programmé</span>
+                                    {% elseif e.shouldHaveReminder() and e.isReminderSoon() %}
+                                        <span style="background: #e74c3c; color: white; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; text-transform: uppercase;">Bientôt</span>
+                                    {% endif %}
                                 </div>
                             </td>
                             <td style="padding: 15px 10px;">
@@ -245,6 +251,25 @@
                             <td style="padding: 15px 10px; color: #555; font-size: 14px;">
                                 <i class="fa fa-capsules" style="color: #999; font-size: 12px; margin-right: 5px;"></i> {{ e.traitement }}
                             </td>
+                            <td style="padding: 15px 10px;">
+                                {% if e.shouldHaveReminder() %}
+                                    <div style="font-size: 12px; color: #666;">
+                                        <i class="fa fa-calendar-check" style="color: #3498db; margin-right: 5px;"></i>
+                                        <strong>{{ e.getReminderType() }}</strong><br>
+                                        <span style="color: {{ e.isReminderSoon() ? '#e74c3c' : '#27ae60' }};">
+                                            {{ e.calculateNextReminderDate()|date('d/m/Y') }}
+                                        </span>
+                                        {% if e.isFutureVaccineAlert() %}
+                                            <div style="margin-top: 6px; color: #d35400; font-size: 11px; font-weight: 700;">
+                                                <i class="fa fa-bell" style="margin-right: 4px;"></i>
+                                                Vaccin programmé le {{ e.dateExamen|date('d/m/Y') }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <span style="color: #999; font-size: 12px;">-</span>
+                                {% endif %}
+                            </td>
                             <td style="padding: 15px 10px; text-align: center;">
                                 <a href="{{ path('app_examens_show', {'id': e.id}) }}" style="color: #7f8c8d; margin: 0 8px;"><i class="fa fa-eye"></i></a>
                                 <a href="{{ path('app_examens_edit', {'id': e.id}) }}" style="color: #3498db; margin: 0 8px;"><i class="fa fa-edit"></i></a>
@@ -253,7 +278,7 @@
                         </tr>
                         {% else %}
                         <tr>
-                            <td colspan="6" style="padding: 30px; text-align: center; color: #999;">Aucun rapport médical trouvé.</td>
+                            <td colspan="7" style="padding: 30px; text-align: center; color: #999;">Aucun rapport médical trouvé.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
