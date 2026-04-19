@@ -78,6 +78,11 @@
     </parameter>
     <parameter key="kernel.charset">UTF-8</parameter>
     <parameter key="kernel.container_class">App_KernelDevDebugContainer</parameter>
+    <parameter key="app.locales" type="collection">
+      <parameter>fr</parameter>
+      <parameter>en</parameter>
+      <parameter>ar</parameter>
+    </parameter>
     <parameter key="event_dispatcher.event_aliases" type="collection">
       <parameter key="Symfony\Component\Console\Event\ConsoleCommandEvent">console.command</parameter>
       <parameter key="Symfony\Component\Console\Event\ConsoleErrorEvent">console.error</parameter>
@@ -106,7 +111,7 @@
     <parameter key="kernel.http_method_override">false</parameter>
     <parameter key="kernel.trust_x_sendfile_type_header">false</parameter>
     <parameter key="kernel.trusted_hosts" type="collection"/>
-    <parameter key="kernel.default_locale">en</parameter>
+    <parameter key="kernel.default_locale">fr</parameter>
     <parameter key="kernel.enabled_locales" type="collection"/>
     <parameter key="kernel.error_controller">error_controller</parameter>
     <parameter key="debug.file_link_format">%env(default::SYMFONY_IDE)%</parameter>
@@ -663,6 +668,10 @@
         <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\stocks\MouvementController"/>
       </call>
     </service>
+    <service id="App\EventListener\LocaleListener" class="App\EventListener\LocaleListener" autowire="true" autoconfigure="true">
+      <tag name="kernel.event_listener" event="kernel.request" priority="20"/>
+      <tag name="container.hot_path"/>
+    </service>
     <service id="App\EventListener\LogoutListener" class="App\EventListener\LogoutListener" autowire="true" autoconfigure="true">
       <tag name="kernel.event_subscriber"/>
     </service>
@@ -872,7 +881,7 @@
       <tag name="container.hot_path"/>
       <tag name="container.hot_path"/>
       <argument type="service" id="request_stack"/>
-      <argument>en</argument>
+      <argument>fr</argument>
       <argument type="service" id="router.default" on-invalid="ignore"/>
       <argument>false</argument>
       <argument type="collection"/>
@@ -1133,7 +1142,7 @@
     </service>
     <service id="slugger" class="Symfony\Component\String\Slugger\AsciiSlugger">
       <tag name="kernel.locale_aware"/>
-      <argument>en</argument>
+      <argument>fr</argument>
     </service>
     <service id="container.getenv" class="Closure">
       <tag name="routing.expression_language_function" function="env"/>
@@ -1680,7 +1689,7 @@
       <argument type="service" id="translation.writer"/>
       <argument type="service" id="translation.reader"/>
       <argument type="service" id="translation.extractor"/>
-      <argument>en</argument>
+      <argument>fr</argument>
       <argument>C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow/translations</argument>
       <argument>C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow/templates</argument>
       <argument type="collection">
@@ -1717,7 +1726,7 @@
       <argument type="service" id="translation.provider_collection"/>
       <argument type="service" id="translation.writer"/>
       <argument type="service" id="translation.reader"/>
-      <argument>en</argument>
+      <argument>fr</argument>
       <argument type="collection"/>
       <argument type="collection"/>
       <call method="setName">
@@ -2471,7 +2480,7 @@
       <tag name="kernel.locale_aware"/>
       <argument type="service" id=".service_locator.yY.p4P7"/>
       <argument type="service" id="translator.formatter.default"/>
-      <argument>en</argument>
+      <argument>fr</argument>
       <argument type="collection">
         <argument key="translation.loader.php" type="collection">
           <argument>php</argument>
@@ -2522,6 +2531,7 @@
             <argument>C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.ar.xlf</argument>
             <argument>C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.ar.xlf</argument>
             <argument>C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.ar.xlf</argument>
+            <argument>C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow/translations\messages.ar.yaml</argument>
           </argument>
           <argument key="az" type="collection">
             <argument>C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.az.xlf</argument>
@@ -2577,6 +2587,7 @@
             <argument>C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.en.xlf</argument>
             <argument>C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.en.xlf</argument>
             <argument>C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.en.xlf</argument>
+            <argument>C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow/translations\messages.en.yaml</argument>
           </argument>
           <argument key="es" type="collection">
             <argument>C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.es.xlf</argument>
@@ -2607,6 +2618,11 @@
             <argument>C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.fr.xlf</argument>
             <argument>C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\form/Resources/translations\validators.fr.xlf</argument>
             <argument>C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.fr.xlf</argument>
+            <argument>C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow/translations\messages.fr.xlf</argument>
+            <argument>C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow/translations\messages.fr.yaml</argument>
+            <argument>C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow/translations\plantes.fr.xlf</argument>
+            <argument>C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow/translations\security.fr.xlf</argument>
+            <argument>C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow/translations\validators.fr.xlf</argument>
           </argument>
           <argument key="gl" type="collection">
             <argument>C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.gl.xlf</argument>
@@ -2844,7 +2860,7 @@
       </call>
       <call method="setFallbackLocales">
         <argument type="collection">
-          <argument>en</argument>
+          <argument>fr</argument>
         </argument>
       </call>
     </service>
@@ -3132,7 +3148,7 @@
     <service id="translation.locale_switcher" class="Symfony\Component\Translation\LocaleSwitcher">
       <tag name="kernel.reset" method="reset"/>
       <tag name="kernel.locale_aware"/>
-      <argument>en</argument>
+      <argument>fr</argument>
       <argument type="tagged_iterator" tag="kernel.locale_aware" exclude="translation.locale_switcher"/>
       <argument type="service" id="router.request_context" on-invalid="ignore"/>
     </service>
@@ -3182,6 +3198,14 @@
       <argument type="service" id="debug.stopwatch"/>
       <argument type="service" id="monolog.logger.event" on-invalid="null"/>
       <argument type="service" id=".virtual_request_stack" on-invalid="null"/>
+      <call method="addListener">
+        <argument>kernel.request</argument>
+        <argument type="collection">
+          <argument type="service_closure" id="App\EventListener\LocaleListener"/>
+          <argument>onKernelRequest</argument>
+        </argument>
+        <argument>20</argument>
+      </call>
       <call method="addListener">
         <argument>kernel.controller</argument>
         <argument type="collection">
@@ -3887,7 +3911,7 @@
       <argument type="service" id="router.request_context" on-invalid="ignore"/>
       <argument type="service" id="parameter_bag" on-invalid="ignore"/>
       <argument type="service" id="monolog.logger.router" on-invalid="ignore"/>
-      <argument>en</argument>
+      <argument>fr</argument>
       <call method="setConfigCacheFactory">
         <argument type="service" id="config_cache_factory"/>
       </call>

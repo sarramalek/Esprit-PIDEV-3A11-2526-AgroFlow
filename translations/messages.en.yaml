@@ -1,0 +1,43 @@
+plante:
+    retour: "Back"
+    modifier: "Edit"
+    arrosage: "Watering"
+    workflow: "Workflow"
+    variete_vide: "Unspecified variety"
+
+    champ:
+        nom: "Name"
+        variete: "Variety"
+        besoin_eau: "Water needs"
+        cycle: "Growth cycle"
+
+    unite:
+        litres_jour: "L/d"
+        jours: "days"
+
+    modal:
+        arrosage_titre: "Watering — %nom%"
+        arrosage_sous_titre: "Personalized recommendation based on weather"
+        calcul_en_cours: "Calculating…"
+        humidite_sol: "Estimated soil moisture"
+        meilleure_heure: "Best time"
+        besoin_net: "Adjusted net need"
+        erreur_meteo: "Weather loading error. Check your connection."
+        pas_arrosage: "No watering needed today — rain is sufficient."
+        arrosage_urgent: "Urgent watering recommended — water stress conditions."
+        arrosage_reduit: "Reduced watering advised."
+        arrosage_normal: "Watering recommended."
+        statut_pas_arrosage: "No watering"
+        statut_urgent: "Urgent watering"
+        statut_reduit: "Reduced watering"
+        statut_normal: "Normal watering"
+        temperature: "Temperature"
+        humidite_air: "Air humidity"
+        precipitations: "Precipitation"
+        vent: "Wind"
+
+        workflow_titre: "Workflow — %nom%"
+        workflow_sous_titre: "AI-generated growing steps"
+        generation_en_cours: "Generating…"
+        aucune_etape: "No steps received."
+        erreur_serveur: "Server error"

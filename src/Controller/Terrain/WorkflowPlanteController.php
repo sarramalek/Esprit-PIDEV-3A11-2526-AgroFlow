@@ -20,9 +20,18 @@ class WorkflowPlanteController extends AbstractController
             return $this->json(['error' => 'Clé API Groq manquante.'], 500);
         }
 
-        $data      = json_decode($request->getContent(), true);
-        $nomPlante = $data['nomPlante'] ?? 'plante inconnue';
+        $data       = json_decode($request->getContent(), true);
+        $nomPlante  = $data['nomPlante']  ?? 'plante inconnue';
         $cycleJours = $data['cycleJours'] ?? 0;
+        $locale     = $data['locale']     ?? 'fr'; // ← récupérer la locale
+
+        // Mapper la locale vers la langue du prompt
+        $langMap = [
+            'fr' => 'français',
+            'en' => 'English',
+            'ar' => 'Arabic',
+        ];
+        $langue = $langMap[$locale] ?? 'français';
 
         try {
             $response = $this->httpClient->request('POST', 'https://api.groq.com/openai/v1/chat/completions', [
@@ -37,36 +46,34 @@ class WorkflowPlanteController extends AbstractController
                     'messages'    => [
                         [
                             'role'    => 'system',
-                            'content' => 'Tu es un expert agronome. Réponds UNIQUEMENT en JSON valide, sans texte autour, sans backticks.',
+                            'content' => sprintf(
+                                'You are an expert agronomist. Respond ONLY in valid JSON, no surrounding text, no backticks. ALL text values (titre, description, duree) MUST be written in %s.',
+                                $langue
+                            ),
                         ],
                         [
                             'role'    => 'user',
                             'content' => sprintf(
-                                'Génère le workflow complet des étapes de culture pour la plante "%s"%s.
+                                'Generate the complete cultivation workflow for the plant "%s"%s.
 
-Chaque étape doit avoir un type parmi : prep, semis, croissance, entretien, recolte.
+Each step must have a type from: prep, semis, croissance, entretien, recolte.
 
-Réponds UNIQUEMENT en JSON valide avec exactement ce format :
+Respond ONLY in valid JSON with exactly this format:
 {
   "steps": [
     {
-      "titre": "Préparation du sol",
-      "description": "Labourer et ameublir le sol en profondeur. Ajouter du compost si nécessaire.",
-      "duree": "1-2 semaines",
+      "titre": "...",
+      "description": "...",
+      "duree": "...",
       "type": "prep"
-    },
-    {
-      "titre": "Semis",
-      "description": "Semer les graines à 2-3 cm de profondeur, espacées de 30 cm.",
-      "duree": "Jour J",
-      "type": "semis"
     }
   ]
 }
 
-Génère entre 5 et 7 étapes réalistes et détaillées pour cette plante.',
+ALL text must be in %s. Generate between 5 and 7 realistic and detailed steps.',
                                 $nomPlante,
-                                $cycleJours > 0 ? " (cycle de {$cycleJours} jours)" : ''
+                                $cycleJours > 0 ? " (cycle of {$cycleJours} days)" : '',
+                                $langue
                             ),
                         ],
                     ],
