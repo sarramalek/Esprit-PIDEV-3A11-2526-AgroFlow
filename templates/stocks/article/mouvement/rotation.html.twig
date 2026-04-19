@@ -35,7 +35,7 @@
                 </div>
             </div>
             <div style="height: 300px; position: relative;">
-                <canvas id="rotationChart"></canvas>
+                {{ render_chart(chart) }}
             </div>
         </div>
 
@@ -103,56 +103,13 @@
 </div>
 
 <script>
-// Empêche le conflit si Chart.js est déjà chargé
-if (typeof Chart === 'undefined') {
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
-    document.head.appendChild(script);
-}
-
-function initChart() {
-    const canvas = document.getElementById('rotationChart');
-    if(!canvas) return;
-    const ctx = canvas.getContext('2d');
-    
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: [{% for s in stats %}'{{ s.categorie.nom|e('js') }}',{% endfor %}],
-            datasets: [
-                {
-                    label: 'Entrées',
-                    data: [{% for s in stats %}{{ s.entrees }},{% endfor %}],
-                    backgroundColor: '#A8D5BA',
-                    borderRadius: 6,
-                    barThickness: 20
-                },
-                {
-                    label: 'Sorties',
-                    data: [{% for s in stats %}{{ s.sorties }},{% endfor %}],
-                    backgroundColor: '#2D5A27',
-                    borderRadius: 6,
-                    barThickness: 20
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                y: { grid: { display: false }, beginAtZero: true },
-                x: { grid: { display: false }, ticks: { font: { size: 10, weight: '700' } } }
-            }
-        }
-    });
-
-    // Conseil Agro-dynamique
+// Conseil Agro-dynamique
+function renderAdvice() {
     const adviceBox = document.getElementById('agro-advice');
     const badge = document.getElementById('global-status-badge');
     const criticals = [{% for s in stats %}{% if s.indice > 0.7 %}'{{ s.categorie.nom|e('js') }}',{% endif %}{% endfor %}];
 
-    if(criticals.length > 0) {
+    if (criticals.length > 0) {
         adviceBox.innerHTML = "Alerte : La rotation pour <strong>" + criticals[0] + "</strong> est trop rapide. Risque de rupture de stock imminent.";
         badge.innerHTML = "Rupture Possible";
         badge.style.background = "#fff";
@@ -171,6 +128,5 @@ function updateStats(e) {
     openStatsModal('{{ path("app_mouvement_rotation") }}?' + params.toString());
 }
 
-// Lancement
-setTimeout(initChart, 300);
+renderAdvice();
 </script>

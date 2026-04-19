@@ -293,6 +293,8 @@
         {% block body %}{% endblock %}
     </main>
 
-    {% block javascripts %}{% endblock %}
+    {% block javascripts %}
+        {{ importmap() }}
+    {% endblock %}
 </body>
 </html>

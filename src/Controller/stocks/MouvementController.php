@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
+use Symfony\UX\Chartjs\Model\Chart;
 
 class MouvementController extends AbstractController
 {
@@ -95,7 +97,7 @@ class MouvementController extends AbstractController
         return $this->redirectToRoute('agri_produits');
     }
     #[Route('/agriculteur/mouvements/rotation', name: 'app_mouvement_rotation')]
-    public function rotation(Request $request, CategorieRepository $catRepo, EntityManagerInterface $em): Response
+    public function rotation(Request $request, CategorieRepository $catRepo, EntityManagerInterface $em, ChartBuilderInterface $chartBuilder): Response
     {
         $user = $this->getUser();
 
@@ -152,10 +154,54 @@ class MouvementController extends AbstractController
             ];
         }
 
+        $labels = array_map(fn(array $stat) => $stat['categorie']->getNom(), $stats);
+        $entreesData = array_map(fn(array $stat) => $stat['entrees'], $stats);
+        $sortiesData = array_map(fn(array $stat) => $stat['sorties'], $stats);
+
+        $rotationChart = $chartBuilder->createChart(Chart::TYPE_BAR);
+        $rotationChart->setData([
+            'labels' => $labels,
+            'datasets' => [
+                [
+                    'label' => 'Entrées',
+                    'data' => $entreesData,
+                    'backgroundColor' => '#A8D5BA',
+                    'borderRadius' => 6,
+                    'barThickness' => 20,
+                ],
+                [
+                    'label' => 'Sorties',
+                    'data' => $sortiesData,
+                    'backgroundColor' => '#2D5A27',
+                    'borderRadius' => 6,
+                    'barThickness' => 20,
+                ],
+            ],
+        ]);
+        $rotationChart->setOptions([
+            'responsive' => true,
+            'maintainAspectRatio' => false,
+            'plugins' => [
+                'legend' => ['display' => false],
+            ],
+            'scales' => [
+                'y' => [
+                    'grid' => ['display' => false],
+                    'beginAtZero' => true,
+                ],
+                'x' => [
+                    'grid' => ['display' => false],
+                    'ticks' => ['font' => ['size' => 10, 'weight' => '700']],
+                ],
+            ],
+        ]);
+        $rotationChart->setAttributes(['style' => 'max-width:100%; height:300px;']);
+
         return $this->render('stocks/article/mouvement/rotation.html.twig', [
             'stats' => $stats,
             'dateDebut' => $dateDebutStr,
-            'dateFin' => $dateFinStr
+            'dateFin' => $dateFinStr,
+            'chart' => $rotationChart,
         ]);
     }
 

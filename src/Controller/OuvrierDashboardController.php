@@ -126,7 +126,8 @@ class OuvrierDashboardController extends AbstractController
             return $this->redirectToRoute('ouvrier_produits');
         }
 
-        $article->setQuantiteEnStock($stockActuel - $quantite);
+        $nouveauStock = $stockActuel - $quantite;
+        $article->setQuantiteEnStock($nouveauStock);
 
         $mouvement = new MouvementStock();
         $mouvement->setArticle($article);
