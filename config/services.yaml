@@ -1,7 +1,8 @@
 parameters:
     upload_dir: '%kernel.project_dir%/public/uploads/materiels'
-    gemini_api_key: '%env(default::GEMINI_API_KEY)%'  # Valeur par défaut vide
-    gemini_model: '%env(default:gemini-2.0-flash-exp::GEMINI_MODEL)%'  # Valeur par défaut
+    gemini_model_default: 'gemini-2.0-flash-exp'   # ← paramètre séparé
+    gemini_api_key: '%env(default::GEMINI_API_KEY)%'
+    gemini_model: '%env(default:gemini_model_default:GEMINI_MODEL)%'  # ← référence le paramètre
 
 services:
     _defaults:
@@ -32,7 +33,7 @@ services:
             $apiKey: '%gemini_api_key%'
             $model: '%gemini_model%'
         public: true
-      
+
     App\Service\MaintenanceAlertService:
         arguments:
             $httpClient: '@http_client'
