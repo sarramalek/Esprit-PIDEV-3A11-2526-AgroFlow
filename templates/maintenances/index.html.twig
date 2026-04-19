@@ -192,90 +192,6 @@
 .empty { text-align:center; padding:4rem 2rem; background:#fff; border-radius:16px; border:1.5px dashed #c8dac8; }
 .loading-spinner { display:inline-block; width:13px; height:13px; border:2px solid rgba(255,255,255,.3); border-radius:50%; border-top-color:#fff; animation:spin .6s linear infinite; }
 @keyframes spin { to { transform:rotate(360deg); } }
-
-/* ══════════════════════════════════════════
-   PAGINATION
-══════════════════════════════════════════ */
-.pagination-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 1.5rem;
-    flex-wrap: wrap;
-    gap: .75rem;
-}
-.pagination-info {
-    font-size: .82rem;
-    color: #6b8c6b;
-    font-weight: 500;
-}
-.pagination-info strong { color: #1a2e1a; }
-.pagination-controls {
-    display: flex;
-    align-items: center;
-    gap: .35rem;
-}
-.pg-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 36px;
-    height: 36px;
-    padding: 0 .5rem;
-    border-radius: 9px;
-    border: 1.5px solid #d4e8d4;
-    background: #fff;
-    color: #2d6a2d;
-    font-size: .82rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all .13s;
-    line-height: 1;
-    text-decoration: none;
-    user-select: none;
-}
-.pg-btn:hover:not(:disabled):not(.active) {
-    background: #eaf3de;
-    border-color: #97C459;
-}
-.pg-btn.active {
-    background: #2d6a2d;
-    color: #fff;
-    border-color: #2d6a2d;
-    cursor: default;
-}
-.pg-btn:disabled {
-    opacity: .38;
-    cursor: not-allowed;
-}
-.pg-btn--prev, .pg-btn--next {
-    font-size: .95rem;
-    padding: 0 .75rem;
-}
-.pg-ellipsis {
-    font-size: .82rem;
-    color: #aac2aa;
-    padding: 0 .2rem;
-    user-select: none;
-}
-.pg-per-page {
-    display: flex;
-    align-items: center;
-    gap: .5rem;
-    font-size: .82rem;
-    color: #6b8c6b;
-}
-.pg-per-page select {
-    padding: .3rem .6rem;
-    border: 1.5px solid #d4e8d4;
-    border-radius: 8px;
-    font-size: .82rem;
-    color: #1a2e1a;
-    background: #f9fcf7;
-    outline: none;
-    cursor: pointer;
-}
-.pg-per-page select:focus { border-color: #2d6a2d; }
 </style>
 
 <div class="mp">
@@ -467,22 +383,6 @@
       {% endfor %}
     </div>
     <div id="noResultsCards" style="display:none;text-align:center;padding:3rem;color:#7a9a7a;">🔍 Aucun résultat.</div>
-
-    {# ── Pagination cartes ── #}
-    <div class="pagination-bar" id="paginationCards">
-      <div class="pagination-info" id="pgInfoCards">— — —</div>
-      <div class="pagination-controls" id="pgControlsCards"></div>
-      <div class="pg-per-page">
-        <span>Par page :</span>
-        <select id="perPageCards" onchange="setPerPage('cards', this.value)">
-          <option value="6">6</option>
-          <option value="9" selected>9</option>
-          <option value="12">12</option>
-          <option value="24">24</option>
-          <option value="0">Tout</option>
-        </select>
-      </div>
-    </div>
   </div>
 
   {# ══ TABLE VIEW ══ #}
@@ -539,21 +439,6 @@
         </tbody>
       </table>
       <div id="noResultsTable" style="display:none;text-align:center;padding:3rem;color:#7a9a7a;">🔍 Aucun résultat.</div>
-    </div>
-
-    {# ── Pagination tableau ── #}
-    <div class="pagination-bar" id="paginationTable">
-      <div class="pagination-info" id="pgInfoTable">— — —</div>
-      <div class="pagination-controls" id="pgControlsTable"></div>
-      <div class="pg-per-page">
-        <span>Par page :</span>
-        <select id="perPageTable" onchange="setPerPage('table', this.value)">
-          <option value="10" selected>10</option>
-          <option value="20">20</option>
-          <option value="50">50</option>
-          <option value="0">Tout</option>
-        </select>
-      </div>
     </div>
   </div>
   {% endif %}
@@ -670,128 +555,6 @@ setView(currentView);
 function toggleStats() {
     document.getElementById('chartsPanel').classList.toggle('is-open');
     document.getElementById('statsToggle').classList.toggle('active');
-}
-
-// ══ PAGINATION ══
-const pgState = {
-    cards: { page: 1, perPage: 9,  filteredItems: [] },
-    table: { page: 1, perPage: 10, filteredItems: [] },
-};
-
-/**
- * Applique la pagination sur un ensemble d'éléments déjà filtrés/triés.
- * @param {string} view   - 'cards' ou 'table'
- * @param {Array}  items  - éléments DOM visibles après filtrage
- */
-function applyPagination(view, items) {
-    const state   = pgState[view];
-    state.filteredItems = items;
-
-    // Recalage de la page si nécessaire (ex. : filtre réduit le total)
-    const perPage  = parseInt(state.perPage) || 0;
-    const total    = items.length;
-    const totalPgs = perPage === 0 ? 1 : Math.max(1, Math.ceil(total / perPage));
-    if (state.page > totalPgs) state.page = totalPgs;
-    if (state.page < 1)        state.page = 1;
-
-    const startIdx = perPage === 0 ? 0          : (state.page - 1) * perPage;
-    const endIdx   = perPage === 0 ? total       : Math.min(startIdx + perPage, total);
-
-    // Masquer / afficher selon la page courante
-    items.forEach((el, idx) => {
-        el.style.display = (idx >= startIdx && idx < endIdx) ? '' : 'none';
-    });
-
-    // Affichage "0 résultat" géré ici uniquement si total > 0
-    const noResId = view === 'cards' ? 'noResultsCards' : 'noResultsTable';
-    document.getElementById(noResId).style.display = total === 0 ? 'block' : 'none';
-
-    renderPaginationBar(view, state.page, totalPgs, startIdx + 1, Math.min(endIdx, total), total);
-}
-
-/**
- * Génère les boutons de pagination.
- */
-function renderPaginationBar(view, page, totalPgs, from, to, total) {
-    const infoEl     = document.getElementById('pgInfo'     + (view === 'cards' ? 'Cards' : 'Table'));
-    const controlsEl = document.getElementById('pgControls' + (view === 'cards' ? 'Cards' : 'Table'));
-
-    // Info textuelle
-    if (total === 0) {
-        infoEl.innerHTML = 'Aucun résultat';
-    } else {
-        infoEl.innerHTML = `Affichage <strong>${from}–${to}</strong> sur <strong>${total}</strong>`;
-    }
-
-    // Boutons
-    controlsEl.innerHTML = '';
-    if (total === 0 || totalPgs <= 1) return;
-
-    // Précédent
-    const prev = document.createElement('button');
-    prev.className = 'pg-btn pg-btn--prev';
-    prev.textContent = '‹';
-    prev.disabled    = page <= 1;
-    prev.addEventListener('click', () => goToPage(view, page - 1));
-    controlsEl.appendChild(prev);
-
-    // Pages numérotées avec ellipses
-    const pages = buildPageRange(page, totalPgs);
-    pages.forEach(p => {
-        if (p === '…') {
-            const el = document.createElement('span');
-            el.className   = 'pg-ellipsis';
-            el.textContent = '…';
-            controlsEl.appendChild(el);
-        } else {
-            const btn = document.createElement('button');
-            btn.className   = 'pg-btn' + (p === page ? ' active' : '');
-            btn.textContent = p;
-            if (p !== page) btn.addEventListener('click', () => goToPage(view, p));
-            controlsEl.appendChild(btn);
-        }
-    });
-
-    // Suivant
-    const next = document.createElement('button');
-    next.className = 'pg-btn pg-btn--next';
-    next.textContent = '›';
-    next.disabled    = page >= totalPgs;
-    next.addEventListener('click', () => goToPage(view, page + 1));
-    controlsEl.appendChild(next);
-}
-
-/**
- * Construit le tableau de pages à afficher (avec ellipses).
- * Fenêtre glissante : toujours afficher 1, dernière, +/-2 autour de la page active.
- */
-function buildPageRange(current, total) {
-    if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
-    const delta = 2;
-    const range = [];
-    const left  = Math.max(2, current - delta);
-    const right = Math.min(total - 1, current + delta);
-
-    range.push(1);
-    if (left > 2)       range.push('…');
-    for (let i = left; i <= right; i++) range.push(i);
-    if (right < total - 1) range.push('…');
-    range.push(total);
-    return range;
-}
-
-function goToPage(view, page) {
-    pgState[view].page = page;
-    applyPagination(view, pgState[view].filteredItems);
-    // Scroll en haut de la liste
-    const container = view === 'cards' ? document.getElementById('cardsGrid') : document.getElementById('maintBody');
-    if (container) container.closest('.mp').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-function setPerPage(view, val) {
-    pgState[view].perPage = parseInt(val) || 0;
-    pgState[view].page    = 1; // retour à la page 1
-    applyPagination(view, pgState[view].filteredItems);
 }
 
 // ══ MODAL IA ══
@@ -1043,7 +806,7 @@ document.getElementById('aiModal').addEventListener('click', function(e) {
     if (e.target === this) closeAIModal();
 });
 
-// ══ FILTRES + TRI (avec pagination) ══
+// ══ FILTRES ══
 function filterItems() {
     const search = (document.getElementById('searchInput').value || '').toLowerCase();
     const type   = (document.getElementById('typeFilter').value   || '').toLowerCase();
@@ -1060,39 +823,26 @@ function filterItems() {
             && (!prio   || (el.dataset.priorite||'').toLowerCase() === prio);
     }
 
-    // ── Vue cartes ──
     const cardsGrid = document.getElementById('cardsGrid');
     if (cardsGrid) {
-        const allCards = Array.from(cardsGrid.children).filter(el => el.classList.contains('maint-card-item'));
-        // Rendre tout visible d'abord (pour le filtrage)
-        allCards.forEach(c => c.style.display = '');
-        const matched = allCards.filter(c => matches(c));
-        const sorted  = sortItemsArr(matched, sort, dir);
-        // Remettre dans le DOM dans l'ordre trié
-        sorted.forEach(el => cardsGrid.appendChild(el));
-        // Masquer les non-correspondants
-        allCards.filter(c => !matches(c)).forEach(c => c.style.display = 'none');
-        // Réinitialiser la page 1 à chaque filtre/tri
-        pgState.cards.page = 1;
-        applyPagination('cards', sorted);
+        const cards = Array.from(cardsGrid.children);
+        cards.forEach(c => { c.style.display = matches(c) ? '' : 'none'; });
+        const vis = cards.filter(c => c.style.display !== 'none');
+        sortItems(vis, sort, dir, cardsGrid);
+        document.getElementById('noResultsCards').style.display = vis.length === 0 ? 'block' : 'none';
     }
-
-    // ── Vue tableau ──
     const tbody = document.getElementById('maintBody');
     if (tbody) {
-        const allRows = Array.from(tbody.querySelectorAll('tr'));
-        allRows.forEach(tr => tr.style.display = '');
-        const matched = allRows.filter(tr => matches(tr));
-        const sorted  = sortItemsArr(matched, sort, dir);
-        sorted.forEach(el => tbody.appendChild(el));
-        allRows.filter(tr => !matches(tr)).forEach(tr => tr.style.display = 'none');
-        pgState.table.page = 1;
-        applyPagination('table', sorted);
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        rows.forEach(tr => { tr.style.display = matches(tr) ? '' : 'none'; });
+        const vis = rows.filter(r => r.style.display !== 'none');
+        sortItems(vis, sort, dir, tbody);
+        document.getElementById('noResultsTable').style.display = vis.length === 0 ? 'block' : 'none';
     }
 }
 
-function sortItemsArr(items, sort, dir) {
-    return [...items].sort((a, b) => {
+function sortItems(items, sort, dir, container) {
+    items.sort((a, b) => {
         let va, vb;
         switch (sort) {
             case 'cout':     va = parseFloat(a.dataset.cout||0);    vb = parseFloat(b.dataset.cout||0);    break;
@@ -1106,6 +856,7 @@ function sortItemsArr(items, sort, dir) {
         if (va > vb) return dir === 'asc' ?  1 : -1;
         return 0;
     });
+    items.forEach(el => container.appendChild(el));
 }
 
 function onSearchInput(input) {
@@ -1154,9 +905,6 @@ document.addEventListener('DOMContentLoaded', function() {
             options: { responsive:true, plugins:{ legend:{display:false} }, scales:{ y:{ beginAtZero:true } } }
         });
     }
-
-    // ── Initialisation de la pagination au chargement ──
-    filterItems();
 });
 </script>
 {% endblock %}
