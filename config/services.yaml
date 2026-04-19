@@ -22,7 +22,7 @@ services:
 # config/services.yaml
     App\Service\TacheIAService:
         arguments:
-            $groqApiKey: '%env(GROQ_API_KEY)%'
+            $groqApiKey: '%env(GROQ_API_KEY_TACHES)%'
     
     App\Service\SmsService:
         arguments:
@@ -33,6 +33,11 @@ services:
             $vonageApiSecret: '%env(VONAGE_API_SECRET)%'
             $vonageFrom:      '%env(VONAGE_FROM)%'
     
+    App\Service\GrokService:
+        arguments:
+            $grokApiKey: '%env(GROQ_API_KEY_ASSISTANT)%'
+
+ 
 
 
 
