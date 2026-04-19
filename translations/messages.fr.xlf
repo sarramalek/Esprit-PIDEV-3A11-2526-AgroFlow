@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="fr" target-language="fr" datatype="plaintext" original="file.ext">
+    <header>
+      <tool tool-id="symfony" tool-name="Symfony"/>
+    </header>
+    <body>
+      <trans-unit id="SS.OayZ" resname="plante.retour">
+        <source>plante.retour</source>
+        <target>__plante.retour</target>
+      </trans-unit>
+      <trans-unit id="Ql.CGL7" resname="plante.modifier">
+        <source>plante.modifier</source>
+        <target>__plante.modifier</target>
+      </trans-unit>
+      <trans-unit id="hnT2YlV" resname="plante.arrosage">
+        <source>plante.arrosage</source>
+        <target>__plante.arrosage</target>
+      </trans-unit>
+      <trans-unit id="vHdonY7" resname="plante.modal.arrosage_sous_titre">
+        <source>plante.modal.arrosage_sous_titre</source>
+        <target>__plante.modal.arrosage_sous_titre</target>
+      </trans-unit>
+      <trans-unit id="1MRSaQW" resname="plante.modal.calcul_en_cours">
+        <source>plante.modal.calcul_en_cours</source>
+        <target>__plante.modal.calcul_en_cours</target>
+      </trans-unit>
+      <trans-unit id="BMK0xSB" resname="plante.modal.humidite_sol">
+        <source>plante.modal.humidite_sol</source>
+        <target>__plante.modal.humidite_sol</target>
+      </trans-unit>
+      <trans-unit id="oBO5qTy" resname="plante.modal.meilleure_heure">
+        <source>plante.modal.meilleure_heure</source>
+        <target>__plante.modal.meilleure_heure</target>
+      </trans-unit>
+      <trans-unit id="XRc1z4p" resname="plante.modal.besoin_net">
+        <source>plante.modal.besoin_net</source>
+        <target>__plante.modal.besoin_net</target>
+      </trans-unit>
+      <trans-unit id="v6wQjYm" resname="plante.modal.erreur_meteo">
+        <source>plante.modal.erreur_meteo</source>
+        <target>__plante.modal.erreur_meteo</target>
+      </trans-unit>
+      <trans-unit id="wffHo3p" resname="plante.modal.pas_arrosage">
+        <source>plante.modal.pas_arrosage</source>
+        <target>__plante.modal.pas_arrosage</target>
+      </trans-unit>
+      <trans-unit id="O.VDsGK" resname="plante.modal.arrosage_urgent">
+        <source>plante.modal.arrosage_urgent</source>
+        <target>__plante.modal.arrosage_urgent</target>
+      </trans-unit>
+      <trans-unit id="rJQSbrS" resname="plante.modal.arrosage_reduit">
+        <source>plante.modal.arrosage_reduit</source>
+        <target>__plante.modal.arrosage_reduit</target>
+      </trans-unit>
+      <trans-unit id="tA7878v" resname="plante.modal.arrosage_normal">
+        <source>plante.modal.arrosage_normal</source>
+        <target>__plante.modal.arrosage_normal</target>
+      </trans-unit>
+      <trans-unit id="VNztBtr" resname="plante.modal.statut_pas_arrosage">
+        <source>plante.modal.statut_pas_arrosage</source>
+        <target>__plante.modal.statut_pas_arrosage</target>
+      </trans-unit>
+      <trans-unit id=".huO2AD" resname="plante.modal.statut_urgent">
+        <source>plante.modal.statut_urgent</source>
+        <target>__plante.modal.statut_urgent</target>
+      </trans-unit>
+      <trans-unit id="Q9K05NM" resname="plante.modal.statut_reduit">
+        <source>plante.modal.statut_reduit</source>
+        <target>__plante.modal.statut_reduit</target>
+      </trans-unit>
+      <trans-unit id="V3iSzA2" resname="plante.modal.statut_normal">
+        <source>plante.modal.statut_normal</source>
+        <target>__plante.modal.statut_normal</target>
+      </trans-unit>
+      <trans-unit id="xq.XHMT" resname="plante.modal.temperature">
+        <source>plante.modal.temperature</source>
+        <target>__plante.modal.temperature</target>
+      </trans-unit>
+      <trans-unit id="5dj.Kmg" resname="plante.modal.humidite_air">
+        <source>plante.modal.humidite_air</source>
+        <target>__plante.modal.humidite_air</target>
+      </trans-unit>
+      <trans-unit id="1rBVnuo" resname="plante.modal.precipitations">
+        <source>plante.modal.precipitations</source>
+        <target>__plante.modal.precipitations</target>
+      </trans-unit>
+      <trans-unit id="e7555Ar" resname="plante.modal.vent">
+        <source>plante.modal.vent</source>
+        <target>__plante.modal.vent</target>
+      </trans-unit>
+      <trans-unit id="n7DGdQu" resname="plante.workflow">
+        <source>plante.workflow</source>
+        <target>__plante.workflow</target>
+      </trans-unit>
+      <trans-unit id="XBjPfND" resname="plante.modal.workflow_sous_titre">
+        <source>plante.modal.workflow_sous_titre</source>
+        <target>__plante.modal.workflow_sous_titre</target>
+      </trans-unit>
+      <trans-unit id="0LasLHm" resname="plante.modal.generation_en_cours">
+        <source>plante.modal.generation_en_cours</source>
+        <target>__plante.modal.generation_en_cours</target>
+      </trans-unit>
+      <trans-unit id="uaUucEf" resname="plante.modal.aucune_etape">
+        <source>plante.modal.aucune_etape</source>
+        <target>__plante.modal.aucune_etape</target>
+      </trans-unit>
+      <trans-unit id="V1akvrZ" resname="plante.modal.erreur_serveur">
+        <source>plante.modal.erreur_serveur</source>
+        <target>__plante.modal.erreur_serveur</target>
+      </trans-unit>
+      <trans-unit id="wQ.aIuz" resname="plante.variete_vide">
+        <source>plante.variete_vide</source>
+        <target>__plante.variete_vide</target>
+      </trans-unit>
+      <trans-unit id="juzkrd2" resname="plante.champ.nom">
+        <source>plante.champ.nom</source>
+        <target>__plante.champ.nom</target>
+      </trans-unit>
+      <trans-unit id="kdzaMY." resname="plante.champ.variete">
+        <source>plante.champ.variete</source>
+        <target>__plante.champ.variete</target>
+      </trans-unit>
+      <trans-unit id="c662vZY" resname="plante.champ.besoin_eau">
+        <source>plante.champ.besoin_eau</source>
+        <target>__plante.champ.besoin_eau</target>
+      </trans-unit>
+      <trans-unit id="a.1AlxI" resname="plante.unite.litres_jour">
+        <source>plante.unite.litres_jour</source>
+        <target>__plante.unite.litres_jour</target>
+      </trans-unit>
+      <trans-unit id="4ZGETDy" resname="plante.champ.cycle">
+        <source>plante.champ.cycle</source>
+        <target>__plante.champ.cycle</target>
+      </trans-unit>
+      <trans-unit id="XllCI0W" resname="plante.unite.jours">
+        <source>plante.unite.jours</source>
+        <target>__plante.unite.jours</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>
