@@ -19,31 +19,38 @@ class PlanteType extends AbstractType
     {
         $builder
             ->add('nomP', TextType::class, [
-                'label' => 'Nom de la plante',
-                'attr'  => ['class' => 'form-input', 'placeholder' => 'ex: Blé dur'],
+                'label'      => 'Nom de la plante',
+                'required'   => true,
+                'empty_data' => '',  // ✅ évite null → TypeError
+                'attr'       => ['class' => 'form-input', 'placeholder' => 'ex: Blé dur'],
                 'constraints' => [
                     new NotBlank(message: 'Le nom de la plante est obligatoire.'),
                     new Length(
-                        min: 2, max: 100,
+                        min: 2,          // ✅ min manquait
+                        max: 100,
                         minMessage: 'Minimum 2 caractères.',
                         maxMessage: 'Maximum 100 caractères.'
                     ),
                 ],
             ])
             ->add('variete', TextType::class, [
-                'label'    => 'Variété',
-                'required' => false,
-                'attr'     => ['class' => 'form-input', 'placeholder' => 'ex: cerise'],
+                'label'      => 'Variété',
+                'required'   => true,   // ✅ was false mais NotBlank présent = contradiction
+                'empty_data' => '',     // ✅ même fix
+                'attr'       => ['class' => 'form-input', 'placeholder' => 'ex: cerise'],
                 'constraints' => [
-                    new Length(max: 100, maxMessage: 'Maximum 100 caractères.'),
-                    new NotBlank(message: 'variete est obligatoire.'),
-                
+                    new NotBlank(message: 'La variété est obligatoire.'),
+                    new Length(
+                        max: 100,
+                        maxMessage: 'Maximum 100 caractères.'
+                    ),
                 ],
             ])
             ->add('besoinEau', NumberType::class, [
-                'label'    => 'Besoin en eau (L/j)',
-                'required' => true,
-                'attr'     => ['class' => 'form-input', 'step' => '0.1', 'placeholder' => 'ex: 5.5'],
+                'label'      => 'Besoin en eau (L/j)',
+                'required'   => true,
+                'empty_data' => '',     // ✅ même fix
+                'attr'       => ['class' => 'form-input', 'step' => '0.1', 'placeholder' => 'ex: 5.5'],
                 'constraints' => [
                     new NotBlank(message: 'Le besoin en eau est obligatoire.'),
                     new Range(
@@ -53,9 +60,10 @@ class PlanteType extends AbstractType
                 ],
             ])
             ->add('cycleJours', IntegerType::class, [
-                'label'    => 'Cycle (jours)',
-                'required' => true,
-                'attr'     => ['class' => 'form-input', 'placeholder' => 'ex: 150'],
+                'label'      => 'Cycle (jours)',
+                'required'   => true,
+                'empty_data' => '',     // ✅ même fix
+                'attr'       => ['class' => 'form-input', 'placeholder' => 'ex: 150'],
                 'constraints' => [
                     new NotBlank(message: 'Le cycle en jours est obligatoire.'),
                     new Positive(message: 'Le cycle doit être un nombre positif.'),

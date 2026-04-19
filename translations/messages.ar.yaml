@@ -19,3 +19,46 @@ taches:
     statut_afaire: "للتنفيذ"
     statut_encours: "قيد التنفيذ"
     statut_terminee: "منجزة"
+plante:
+    retour: "رجوع"
+    modifier: "تعديل"
+    arrosage: "الري"
+    workflow: "سير العمل"
+    variete_vide: "صنف غير محدد"
+
+    champ:
+        nom: "الاسم"
+        variete: "الصنف"
+        besoin_eau: "احتياج الماء"
+        cycle: "دورة الزراعة"
+
+    unite:
+        litres_jour: "ل/ي"
+        jours: "أيام"
+
+    modal:
+        arrosage_titre: "الري — %nom%"
+        arrosage_sous_titre: "توصية مخصصة بناءً على الطقس"
+        calcul_en_cours: "جارٍ الحساب…"
+        humidite_sol: "رطوبة التربة المقدرة"
+        meilleure_heure: "أفضل وقت"
+        besoin_net: "الاحتياج الصافي المعدّل"
+        erreur_meteo: "خطأ في تحميل بيانات الطقس. تحقق من اتصالك."
+        pas_arrosage: "لا حاجة للري اليوم — المطر كافٍ."
+        arrosage_urgent: "يُنصح بالري العاجل — ظروف إجهاد مائي."
+        arrosage_reduit: "يُنصح بري مخفف."
+        arrosage_normal: "الري موصى به."
+        statut_pas_arrosage: "لا ري"
+        statut_urgent: "ري عاجل"
+        statut_reduit: "ري مخفف"
+        statut_normal: "ري عادي"
+        temperature: "درجة الحرارة"
+        humidite_air: "رطوبة الهواء"
+        precipitations: "هطول الأمطار"
+        vent: "الرياح"
+
+        workflow_titre: "سير العمل — %nom%"
+        workflow_sous_titre: "مراحل الزراعة المولّدة بالذكاء الاصطناعي"
+        generation_en_cours: "جارٍ التوليد…"
+        aucune_etape: "لم يتم استلام أي مراحل."
+        erreur_serveur: "خطأ في الخادم"

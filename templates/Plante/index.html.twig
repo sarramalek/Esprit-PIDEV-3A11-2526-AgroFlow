@@ -4,6 +4,8 @@
 {% block breadcrumb %}Plantes{% endblock %}
 
 {% block stylesheets %}
+<style>
+/* ── Stats ── */
 .stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:28px; }
 .stat-card { background:var(--white); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px 24px; display:flex; align-items:center; gap:16px; }
 .stat-icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
@@ -12,14 +14,20 @@
 .stat-icon.yellow { background:#FEF3C7; color:#92400E; }
 .stat-value { font-size:24px; font-weight:700; color:var(--navy); line-height:1; }
 .stat-label { font-size:12px; color:var(--text-muted); margin-top:4px; }
+
+/* ── Toolbar ── */
 .toolbar { display:flex; align-items:center; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
 .search-box { position:relative; flex:1; min-width:220px; }
-.search-box input { width:100%; padding:10px 14px 10px 38px; border:1.5px solid var(--cream-dark); border-radius:8px; font-size:14px; font-family:'DM Sans',sans-serif; background:var(--white); color:var(--navy); }
+.search-box input { width:100%; padding:10px 14px 10px 38px; border:1.5px solid var(--cream-dark); border-radius:8px; font-size:14px; font-family:'DM Sans',sans-serif; background:var(--white); color:var(--navy); transition:border-color 0.2s; }
 .search-box input:focus { outline:none; border-color:var(--green-accent); }
 .search-box i { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:13px; }
 .btn-primary { display:inline-flex; align-items:center; gap:8px; background:var(--green-accent); color:white; padding:10px 20px; border-radius:var(--radius); font-size:14px; font-weight:600; text-decoration:none; border:none; cursor:pointer; white-space:nowrap; }
 .btn-primary:hover { background:var(--green-mid); }
+.btn-pdf { display:inline-flex; align-items:center; gap:8px; background:#1D4ED8; color:white; padding:10px 20px; border-radius:var(--radius); font-size:14px; font-weight:600; border:none; cursor:pointer; white-space:nowrap; }
+.btn-pdf:hover { background:#1E40AF; }
 .result-count { font-size:13px; color:var(--text-muted); }
+
+/* ── Table ── */
 .card { background:var(--white); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
 .flash-success { background:#D1FAE5; color:#065F46; padding:12px 18px; border-radius:var(--radius); margin-bottom:20px; font-size:14px; font-weight:500; display:flex; align-items:center; gap:8px; }
 .data-table { width:100%; border-collapse:collapse; }
@@ -33,13 +41,60 @@
 .data-table tbody tr:hover { background:#FAFDF8; }
 .data-table tbody tr.hidden-row { display:none; }
 .badge-plant { background:#DCFCE7; color:#166534; display:inline-block; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; }
-.actions { display:flex; gap:8px; align-items:center; }
-.btn-danger { background:#FEE2E2; color:#DC2626; border:none; padding:6px 12px; border-radius:7px; font-size:13px; cursor:pointer; }
+.actions { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+.btn-danger { background:#FEE2E2; color:#DC2626; border:none; padding:6px 10px; border-radius:7px; font-size:12px; cursor:pointer; display:inline-flex; align-items:center; gap:4px; }
 .btn-danger:hover { background:#FECACA; }
-.btn-edit { display:inline-flex; align-items:center; gap:5px; background:var(--cream-dark); color:var(--navy); border:1px solid #ddd; padding:6px 12px; border-radius:7px; font-size:13px; text-decoration:none; }
-.btn-show { display:inline-flex; align-items:center; gap:5px; background:#EFF6FF; color:#2563EB; border:1px solid #BFDBFE; padding:6px 12px; border-radius:7px; font-size:13px; text-decoration:none; }
+.btn-edit { display:inline-flex; align-items:center; gap:4px; background:var(--cream-dark); color:var(--navy); border:1px solid #ddd; padding:6px 10px; border-radius:7px; font-size:12px; text-decoration:none; }
+.btn-show { display:inline-flex; align-items:center; gap:4px; background:#EFF6FF; color:#2563EB; border:1px solid #BFDBFE; padding:6px 10px; border-radius:7px; font-size:12px; text-decoration:none; }
+.btn-arrosage { display:inline-flex; align-items:center; gap:4px; background:#F0FDF4; color:#166534; border:1px solid #86EFAC; padding:6px 10px; border-radius:7px; font-size:12px; cursor:pointer; }
+.btn-arrosage:hover { background:#DCFCE7; }
 .empty-state { text-align:center; padding:60px 20px; color:var(--text-muted); }
 .no-results { text-align:center; padding:40px; color:var(--text-muted); display:none; }
+
+/* ── Pagination ── */
+.pagination-wrap { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-top:1px solid var(--cream-dark); font-size:13px; flex-wrap:wrap; gap:10px; }
+.pagination-info { color:var(--text-muted); }
+.pagination-btns { display:flex; gap:4px; }
+.page-btn { min-width:34px; height:34px; border-radius:7px; border:1.5px solid var(--cream-dark); background:var(--white); color:var(--navy); font-size:13px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition:all 0.15s; }
+.page-btn:hover { border-color:var(--green-accent); color:var(--green-accent); }
+.page-btn.active { background:var(--green-accent); color:white; border-color:var(--green-accent); }
+.page-btn:disabled { opacity:0.35; cursor:not-allowed; }
+.per-page-select { padding:6px 10px; border:1.5px solid var(--cream-dark); border-radius:7px; font-size:13px; font-family:'DM Sans',sans-serif; background:var(--white); color:var(--navy); cursor:pointer; }
+
+/* ── Modal ── */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center; }
+.modal-overlay.active { display:flex; }
+.modal-box { background:#FFFDF5; border-radius:16px; padding:32px; width:90%; max-width:500px; box-shadow:0 20px 60px rgba(0,0,0,0.2); position:relative; animation:modalIn 0.25s ease; max-height:90vh; overflow-y:auto; }
+@keyframes modalIn { from{transform:translateY(20px);opacity:0} to{transform:none;opacity:1} }
+.modal-close { position:absolute; top:14px; right:16px; background:none; border:none; font-size:20px; cursor:pointer; color:#999; }
+.modal-close:hover { color:#333; }
+.modal-title { font-size:18px; font-weight:700; color:#1B3A20; margin-bottom:4px; display:flex; align-items:center; gap:10px; }
+.modal-subtitle { font-size:13px; color:#6B7280; margin-bottom:20px; }
+.modal-loading { text-align:center; padding:30px 0; color:#6B7280; font-size:14px; }
+.modal-loading i { font-size:28px; display:block; margin-bottom:10px; animation:spin 1s linear infinite; }
+@keyframes spin { to{transform:rotate(360deg)} }
+
+/* ── Arrosage modal content ── */
+.arrosage-header { display:flex; align-items:center; gap:16px; background:#F0FDF4; border-radius:12px; padding:16px; margin-bottom:16px; }
+.arrosage-icon { font-size:36px; }
+.arrosage-temp { font-size:28px; font-weight:700; color:#1B3A20; }
+.arrosage-desc { font-size:13px; color:#6B7280; }
+.arrosage-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+.arrosage-item { background:#F9FAFB; border-radius:10px; padding:12px 14px; }
+.arrosage-item-label { font-size:11px; color:#6B7280; font-weight:600; text-transform:uppercase; margin-bottom:4px; }
+.arrosage-item-val { font-size:16px; font-weight:700; color:#1B3A20; }
+.reco-card { border-radius:12px; padding:16px; margin-bottom:10px; }
+.reco-card.urgent   { background:#FEE2E2; border-left:4px solid #DC2626; color:#991B1B; }
+.reco-card.normal   { background:#D1FAE5; border-left:4px solid #16A34A; color:#065F46; }
+.reco-card.skip     { background:#DBEAFE; border-left:4px solid #2563EB; color:#1D4ED8; }
+.reco-card.warning  { background:#FEF3C7; border-left:4px solid #D97706; color:#92400E; }
+.reco-title { font-size:15px; font-weight:700; margin-bottom:6px; }
+.reco-detail { font-size:13px; line-height:1.6; }
+.dose-badge { display:inline-block; background:white; border-radius:8px; padding:6px 14px; font-size:18px; font-weight:700; margin:8px 0; }
+.horaire-list { list-style:none; padding:0; margin:8px 0 0; }
+.horaire-list li { font-size:13px; padding:3px 0; }
+.horaire-list li::before { content:'⏰ '; }
+</style>
 {% endblock %}
 
 {% block body %}
@@ -71,6 +126,9 @@
         <input type="text" id="searchInput" placeholder="Rechercher par nom, variété…">
     </div>
     <span class="result-count" id="resultCount"></span>
+    <button class="btn-pdf" onclick="exportPDF()">
+        <i class="fa fa-file-pdf"></i> Exporter PDF
+    </button>
     <a href="{{ path('admin_plantes_new') }}" class="btn-primary">
         <i class="fa fa-plus"></i> Nouvelle plante
     </a>
@@ -87,19 +145,23 @@
     <table class="data-table" id="planteTable">
         <thead>
             <tr>
-                <th data-col="0">ID <i class="fa fa-sort sort-icon"></i></th>
-                <th data-col="1">Nom <i class="fa fa-sort sort-icon"></i></th>
-                <th data-col="2">Variété <i class="fa fa-sort sort-icon"></i></th>
-                <th data-col="3">Besoin eau (L/j) <i class="fa fa-sort sort-icon"></i></th>
-                <th data-col="4">Cycle (jours) <i class="fa fa-sort sort-icon"></i></th>
+                <th data-col="0">Nom <i class="fa fa-sort sort-icon"></i></th>
+                <th data-col="1">Variété <i class="fa fa-sort sort-icon"></i></th>
+                <th data-col="2">Besoin eau (L/j) <i class="fa fa-sort sort-icon"></i></th>
+                <th data-col="3">Cycle (jours) <i class="fa fa-sort sort-icon"></i></th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody id="planteBody">
         {% for plante in plantes %}
             <tr data-nom="{{ plante.nomP|lower }}"
-                data-variete="{{ plante.variete ? plante.variete|lower : '' }}">
-                <td style="color:var(--text-muted);font-family:'DM Mono',monospace;font-size:13px">{{ plante.id }}</td>
+                data-variete="{{ plante.variete ? plante.variete|lower : '' }}"
+                data-besoin="{{ plante.besoinEau ?? 0 }}"
+                data-cycle="{{ plante.cycleJours ?? 0 }}"
+                data-nom-raw="{{ plante.nomP }}"
+                data-variete-raw="{{ plante.variete ?? '—' }}"
+                data-besoin-raw="{{ plante.besoinEau ?? '—' }}"
+                data-cycle-raw="{{ plante.cycleJours ?? '—' }}">
                 <td><strong>{{ plante.nomP }}</strong></td>
                 <td><span class="badge-plant">{{ plante.variete ?? '—' }}</span></td>
                 <td>{{ plante.besoinEau ?? '—' }}</td>
@@ -112,6 +174,10 @@
                         <a href="{{ path('admin_plantes_edit', {id: plante.id}) }}" class="btn-edit">
                             <i class="fa fa-pen"></i>
                         </a>
+                        <button class="btn-arrosage"
+                            onclick="openArrosage('{{ plante.nomP }}', '{{ plante.variete ?? '' }}', {{ plante.besoinEau ?? 0 }}, {{ plante.cycleJours ?? 0 }})">
+                            <i class="fa fa-droplet"></i> Arrosage
+                        </button>
                         <form method="post" action="{{ path('admin_plantes_delete', {id: plante.id}) }}"
                               onsubmit="return confirm('Supprimer cette plante ?')">
                             <input type="hidden" name="_token" value="{{ csrf_token('delete'~plante.id) }}">
@@ -123,84 +189,381 @@
         {% endfor %}
         </tbody>
     </table>
+
     <div class="no-results" id="noResults">
         <i class="fa fa-magnifying-glass" style="font-size:32px;opacity:0.3;display:block;margin-bottom:12px"></i>
         Aucun résultat trouvé.
     </div>
+
+    {# ══ PAGINATION ══ #}
+    <div class="pagination-wrap">
+        <div class="pagination-info" id="paginationInfo"></div>
+        <div style="display:flex;align-items:center;gap:10px;">
+            <select class="per-page-select" id="perPageSelect">
+                <option value="5">5 / page</option>
+                <option value="10" selected>10 / page</option>
+                <option value="25">25 / page</option>
+                <option value="50">50 / page</option>
+            </select>
+            <div class="pagination-btns" id="paginationBtns"></div>
+        </div>
+    </div>
     {% endif %}
 </div>
+
+{# ══ MODAL ARROSAGE ══ #}
+<div class="modal-overlay" id="arrosageModal">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal()">×</button>
+        <div class="modal-title">
+            <i class="fa fa-droplet" style="color:#2563EB"></i>
+            <span id="arrosageTitle">Recommandation d'arrosage</span>
+        </div>
+        <div class="modal-subtitle" id="arrosageSubtitle"></div>
+        <div id="arrosageContent">
+            <div class="modal-loading"><i class="fa fa-spinner"></i> Analyse en cours…</div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block javascripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script>
+// ══════════════════════════════════════════════════════
+// ÉTAT GLOBAL PAGINATION
+// ══════════════════════════════════════════════════════
+let allRows      = [];
+let filteredRows = [];
+let currentPage  = 1;
+let perPage      = 10;
+
 const searchInput = document.getElementById('searchInput');
 const resultCount = document.getElementById('resultCount');
 const noResults   = document.getElementById('noResults');
 const tbody       = document.getElementById('planteBody');
+const perPageSel  = document.getElementById('perPageSelect');
 
-function filterTable() {
+window.addEventListener('DOMContentLoaded', () => {
     if (!tbody) return;
-    const q     = searchInput ? searchInput.value.toLowerCase().trim() : '';
-    const rows  = Array.from(tbody.getElementsByTagName('tr'));
-    let visible = 0;
+    allRows = Array.from(tbody.querySelectorAll('tr'));
+    applyFilterAndPaginate();
+});
 
-    rows.forEach(row => {
-        const nom     = row.dataset.nom     || '';
-        const variete = row.dataset.variete || '';
-        const match   = !q || nom.includes(q) || variete.includes(q);
-        row.style.display = match ? '' : 'none';
-        if (match) visible++;
+// ══════════════════════════════════════════════════════
+// FILTRE + PAGINATION
+// ══════════════════════════════════════════════════════
+function applyFilterAndPaginate() {
+    const q = searchInput ? searchInput.value.toLowerCase().trim() : '';
+    filteredRows = allRows.filter(row => {
+        return !q
+            || (row.dataset.nom    || '').includes(q)
+            || (row.dataset.variete|| '').includes(q);
     });
-
-    if (resultCount) resultCount.textContent = visible + ' résultat' + (visible > 1 ? 's' : '');
-    if (noResults)   noResults.style.display  = visible === 0 ? 'block' : 'none';
+    currentPage = 1;
+    renderPage();
 }
 
-if (searchInput) searchInput.addEventListener('input', filterTable);
-window.addEventListener('DOMContentLoaded', filterTable);
+if (searchInput) searchInput.addEventListener('input', applyFilterAndPaginate);
+if (perPageSel)  perPageSel.addEventListener('change', () => {
+    perPage = parseInt(perPageSel.value);
+    currentPage = 1;
+    renderPage();
+});
 
-// ── Tri par colonne ──────────────────────────────────────
+function renderPage() {
+    if (!tbody) return;
+    const total      = filteredRows.length;
+    const totalPages = Math.max(1, Math.ceil(total / perPage));
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    const start = (currentPage - 1) * perPage;
+    const end   = Math.min(start + perPage, total);
+
+    allRows.forEach(r => r.classList.add('hidden-row'));
+    filteredRows.slice(start, end).forEach(r => r.classList.remove('hidden-row'));
+
+    if (resultCount) resultCount.textContent = total + ' résultat' + (total > 1 ? 's' : '');
+    if (noResults)   noResults.style.display  = total === 0 ? 'block' : 'none';
+
+    const info = document.getElementById('paginationInfo');
+    if (info) info.textContent = total === 0
+        ? 'Aucun résultat'
+        : `${start + 1}–${end} sur ${total} plante${total > 1 ? 's' : ''}`;
+
+    renderPaginationBtns(totalPages);
+}
+
+function renderPaginationBtns(totalPages) {
+    const wrap = document.getElementById('paginationBtns');
+    if (!wrap) return;
+    wrap.innerHTML = '';
+
+    const mkBtn = (label, page, disabled, active) => {
+        const b = document.createElement('button');
+        b.className = 'page-btn' + (active ? ' active' : '');
+        b.innerHTML = label;
+        b.disabled  = disabled;
+        if (!disabled) b.addEventListener('click', () => { currentPage = page; renderPage(); });
+        return b;
+    };
+
+    wrap.appendChild(mkBtn('<i class="fa fa-chevron-left"></i>', currentPage - 1, currentPage === 1, false));
+
+    let pages = [];
+    if (totalPages <= 7) {
+        for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+        pages = [1];
+        if (currentPage > 3) pages.push('…');
+        for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) pages.push(i);
+        if (currentPage < totalPages - 2) pages.push('…');
+        pages.push(totalPages);
+    }
+
+    pages.forEach(p => {
+        if (p === '…') {
+            const sp = document.createElement('span');
+            sp.textContent = '…';
+            sp.style.cssText = 'padding:0 6px;color:var(--text-muted);line-height:34px';
+            wrap.appendChild(sp);
+        } else {
+            wrap.appendChild(mkBtn(p, p, false, p === currentPage));
+        }
+    });
+
+    wrap.appendChild(mkBtn('<i class="fa fa-chevron-right"></i>', currentPage + 1, currentPage === totalPages, false));
+}
+
+// ══════════════════════════════════════════════════════
+// TRI PAR COLONNE
+// ══════════════════════════════════════════════════════
 let sortCol = -1, sortAsc = true;
 
 document.querySelectorAll('th[data-col]').forEach(th => {
     th.addEventListener('click', () => {
         if (!tbody) return;
         const col = parseInt(th.dataset.col);
-
         document.querySelectorAll('th[data-col]').forEach(t => {
             t.classList.remove('sort-asc', 'sort-desc');
-            const icon = t.querySelector('.sort-icon');
-            if (icon) icon.className = 'fa fa-sort sort-icon';
+            const ic = t.querySelector('.sort-icon');
+            if (ic) ic.className = 'fa fa-sort sort-icon';
         });
-
         sortAsc = (sortCol === col) ? !sortAsc : true;
         sortCol = col;
-
         th.classList.add(sortAsc ? 'sort-asc' : 'sort-desc');
         const thIcon = th.querySelector('.sort-icon');
         if (thIcon) thIcon.className = 'fa fa-sort-' + (sortAsc ? 'up' : 'down') + ' sort-icon';
 
-        const rows = Array.from(tbody.getElementsByTagName('tr'));
-
-        rows.sort((a, b) => {
-            const aCell = a.cells[col];
-            const bCell = b.cells[col];
-            const aVal  = aCell ? aCell.textContent.trim() : '';
-            const bVal  = bCell ? bCell.textContent.trim() : '';
-            const aNum  = parseFloat(aVal.replace(/[^\d.]/g, ''));
-            const bNum  = parseFloat(bVal.replace(/[^\d.]/g, ''));
-
-            if (!isNaN(aNum) && !isNaN(bNum)) {
-                return sortAsc ? aNum - bNum : bNum - aNum;
-            }
-            return sortAsc
-                ? aVal.localeCompare(bVal, 'fr')
-                : bVal.localeCompare(aVal, 'fr');
+        filteredRows.sort((a, b) => {
+            const aVal = a.cells[col]?.textContent.trim() || '';
+            const bVal = b.cells[col]?.textContent.trim() || '';
+            const aNum = parseFloat(aVal.replace(/[^\d.]/g, ''));
+            const bNum = parseFloat(bVal.replace(/[^\d.]/g, ''));
+            if (!isNaN(aNum) && !isNaN(bNum)) return sortAsc ? aNum - bNum : bNum - aNum;
+            return sortAsc ? aVal.localeCompare(bVal, 'fr') : bVal.localeCompare(aVal, 'fr');
         });
-
-        rows.forEach(r => tbody.appendChild(r));
-        filterTable();
+        filteredRows.forEach(r => tbody.appendChild(r));
+        currentPage = 1;
+        renderPage();
     });
 });
+
+// ══════════════════════════════════════════════════════
+// EXPORT PDF — jsPDF + autoTable (CDN, sans clé API)
+// Exporte toutes les lignes filtrées (pas seulement la page courante)
+// ══════════════════════════════════════════════════════
+function exportPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+    // En-tête vert
+    doc.setFillColor(45, 90, 39);
+    doc.rect(0, 0, 210, 22, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(14); doc.setFont('helvetica', 'bold');
+    doc.text('AgroFlow — Liste des Plantes', 14, 14);
+    doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+    doc.text(
+        'Exporté le ' + new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }),
+        130, 14
+    );
+
+    // Données des lignes filtrées
+    const rows = filteredRows.map(tr => [
+        tr.dataset.nomRaw     || '—',
+        tr.dataset.varieteRaw || '—',
+        tr.dataset.besoinRaw !== '—' ? tr.dataset.besoinRaw + ' L/j' : '—',
+        tr.dataset.cycleRaw  !== '—' ? tr.dataset.cycleRaw  + ' j'   : '—',
+    ]);
+
+    doc.autoTable({
+        head: [['Nom', 'Variété', 'Besoin en eau', 'Cycle de culture']],
+        body: rows,
+        startY: 28,
+        theme: 'striped',
+        headStyles: {
+            fillColor: [74, 140, 63],
+            textColor: 255,
+            fontStyle: 'bold',
+            fontSize: 10,
+        },
+        bodyStyles: { fontSize: 9, textColor: [30, 30, 30] },
+        alternateRowStyles: { fillColor: [240, 255, 240] },
+        columnStyles: {
+            0: { fontStyle: 'bold', cellWidth: 55 },
+            1: { cellWidth: 55 },
+            2: { cellWidth: 40, halign: 'center' },
+            3: { cellWidth: 40, halign: 'center' },
+        },
+        margin: { left: 14, right: 14 },
+    });
+
+    // Pied de page
+    const pc = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pc; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8); doc.setTextColor(150);
+        doc.text('AgroFlow — Confidentiel', 14, 290);
+        doc.text(`Page ${i} / ${pc}`, 185, 290);
+    }
+
+    doc.save('plantes_agroflow_' + new Date().toISOString().slice(0, 10) + '.pdf');
+}
+
+// ══════════════════════════════════════════════════════
+// MODAL
+// ══════════════════════════════════════════════════════
+function closeModal() {
+    document.getElementById('arrosageModal').classList.remove('active');
+}
+document.getElementById('arrosageModal').addEventListener('click', e => {
+    if (e.target === document.getElementById('arrosageModal')) closeModal();
+});
+
+// ══════════════════════════════════════════════════════
+// RECOMMANDATION D'ARROSAGE — Open-Meteo, sans clé API
+// ══════════════════════════════════════════════════════
+async function openArrosage(nom, variete, besoinEau, cycleJours) {
+    document.getElementById('arrosageTitle').textContent    = 'Arrosage — ' + nom;
+    document.getElementById('arrosageSubtitle').textContent = variete
+        ? `Variété : ${variete}  •  Besoin : ${besoinEau} L/j  •  Cycle : ${cycleJours} j`
+        : `Besoin : ${besoinEau} L/j  •  Cycle : ${cycleJours} j`;
+    document.getElementById('arrosageContent').innerHTML    = '<div class="modal-loading"><i class="fa fa-spinner"></i> Récupération météo en cours…</div>';
+    document.getElementById('arrosageModal').classList.add('active');
+
+    try {
+        const lat = 36.8065, lon = 10.1815;
+        const wResp = await fetch(
+            `https://api.open-meteo.com/v1/forecast` +
+            `?latitude=${lat}&longitude=${lon}` +
+            `&current_weather=true` +
+            `&hourly=relative_humidity_2m,precipitation,evapotranspiration,soil_moisture_0_to_1cm` +
+            `&forecast_days=1&timezone=Africa/Tunis`
+        );
+        const wData = await wResp.json();
+        const cw  = wData.current_weather;
+        const h   = new Date().getHours();
+
+        const humidity  = wData.hourly?.relative_humidity_2m?.[h]   ?? 50;
+        const precip    = wData.hourly?.precipitation?.[h]           ?? 0;
+        const evapo     = wData.hourly?.evapotranspiration?.[h]      ?? 0;
+        const soilMoist = wData.hourly?.soil_moisture_0_to_1cm?.[h]  ?? null;
+        const temp      = cw.temperature;
+        const windspeed = cw.windspeed;
+
+        const besoin = parseFloat(besoinEau) || 5;
+        let facteurTemp = 1.0;
+        if (temp >= 35)      facteurTemp = 1.5;
+        else if (temp >= 30) facteurTemp = 1.25;
+        else if (temp >= 25) facteurTemp = 1.1;
+        else if (temp < 15)  facteurTemp = 0.7;
+
+        let facteurHum = 1.0;
+        if (humidity < 30)      facteurHum = 1.2;
+        else if (humidity > 70) facteurHum = 0.85;
+
+        const precipDeduction = Math.min(precip * 2, besoin);
+        let dose = Math.max(0, (besoin * facteurTemp * facteurHum) - precipDeduction + evapo);
+        dose = Math.round(dose * 10) / 10;
+
+        let recoClass, recoTitle, recoDetail, doserAffiche;
+        if (precip >= 10) {
+            recoClass = 'skip'; recoTitle = "💧 Arrosage inutile aujourd'hui";
+            recoDetail = `Il pleut (${precip} mm). Reprenez demain.`;
+            doserAffiche = '0 L/j';
+        } else if (temp >= 38) {
+            recoClass = 'urgent'; recoTitle = '🔥 Arrosage URGENT — Canicule';
+            recoDetail = `Température extrême (${temp}°C). Arrosez immédiatement.`;
+            doserAffiche = dose + ' L/j';
+        } else if (temp >= 30 || humidity < 35) {
+            recoClass = 'warning'; recoTitle = '⚠️ Arrosage renforcé recommandé';
+            recoDetail = `Conditions chaudes (${temp}°C, humidité ${humidity}%). Arrosez aux heures fraîches.`;
+            doserAffiche = dose + ' L/j';
+        } else {
+            recoClass = 'normal'; recoTitle = '✅ Arrosage normal';
+            recoDetail = `Conditions favorables (${temp}°C, humidité ${humidity}%).`;
+            doserAffiche = dose + ' L/j';
+        }
+
+        let horaires = [];
+        if (temp >= 30)     horaires = ['6h00 – 8h00 (matin)', '19h00 – 21h00 (soir)'];
+        else if (temp < 15) horaires = ['10h00 – 12h00 (milieu de matinée)'];
+        else                horaires = ['7h00 – 9h00 (matin)', '17h00 – 19h00 (soir)'];
+
+        let conseilCycle = '';
+        if (cycleJours > 0) {
+            if (cycleJours <= 60)       conseilCycle = '🌱 Cycle court — arrosages fréquents (tous les 1–2 jours).';
+            else if (cycleJours <= 150) conseilCycle = '🌿 Cycle moyen — tous les 2–3 jours selon le sol.';
+            else                         conseilCycle = '🌳 Cycle long — arrosage profond tous les 3–5 jours.';
+        }
+
+        const wcode = cw.weathercode;
+        let icon = '☀️';
+        if (wcode >= 1  && wcode <= 3)  icon = '⛅';
+        if (wcode >= 45 && wcode <= 48) icon = '🌫️';
+        if (wcode >= 51 && wcode <= 67) icon = '🌧️';
+        if (wcode >= 71 && wcode <= 77) icon = '❄️';
+        if (wcode >= 80 && wcode <= 82) icon = '🌦️';
+        if (wcode >= 95)                icon = '⛈️';
+
+        const soilInfo = soilMoist !== null
+            ? `<div class="arrosage-item"><div class="arrosage-item-label">🌍 Humidité sol</div><div class="arrosage-item-val">${(soilMoist * 100).toFixed(1)} %</div></div>`
+            : '';
+
+        document.getElementById('arrosageContent').innerHTML = `
+            <div class="arrosage-header">
+                <div class="arrosage-icon">${icon}</div>
+                <div>
+                    <div class="arrosage-temp">${temp} °C</div>
+                    <div class="arrosage-desc">Tunis, Tunisie — Météo en direct</div>
+                </div>
+            </div>
+            <div class="arrosage-grid">
+                <div class="arrosage-item"><div class="arrosage-item-label">💧 Humidité air</div><div class="arrosage-item-val">${humidity} %</div></div>
+                <div class="arrosage-item"><div class="arrosage-item-label">🌧️ Précipitations</div><div class="arrosage-item-val">${precip} mm</div></div>
+                <div class="arrosage-item"><div class="arrosage-item-label">💨 Vent</div><div class="arrosage-item-val">${windspeed} km/h</div></div>
+                <div class="arrosage-item"><div class="arrosage-item-label">🌡️ Évapotranspiration</div><div class="arrosage-item-val">${evapo.toFixed(2)} mm</div></div>
+                ${soilInfo}
+            </div>
+            <div class="reco-card ${recoClass}">
+                <div class="reco-title">${recoTitle}</div>
+                <div class="reco-detail">${recoDetail}</div>
+                <div class="dose-badge">💧 Dose recommandée : <strong>${doserAffiche}</strong></div>
+                <p style="font-size:12px;margin:6px 0 4px;font-weight:600">Meilleurs horaires :</p>
+                <ul class="horaire-list">${horaires.map(h => `<li>${h}</li>`).join('')}</ul>
+            </div>
+            ${conseilCycle ? `<div class="reco-card normal"><div class="reco-detail">${conseilCycle}</div></div>` : ''}
+            <p style="font-size:11px;color:#9CA3AF;margin-top:12px;text-align:center">
+                Données météo : Open-Meteo API — Mis à jour en temps réel
+            </p>`;
+
+    } catch (e) {
+        document.getElementById('arrosageContent').innerHTML =
+            '<p style="color:#DC2626;text-align:center;padding:20px">Erreur météo. Vérifiez votre connexion.</p>';
+    }
+}
 </script>
 {% endblock %}

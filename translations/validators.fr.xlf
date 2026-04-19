@@ -475,11 +475,11 @@
       </trans-unit>
       <trans-unit id="nkWt_7E" resname="This file is not a valid video.">
         <source>This file is not a valid video.</source>
-        <target>Ce fichier n’est pas une vidéo valide.</target>
+        <target>Ce fichier n'est pas une vidéo valide.</target>
       </trans-unit>
       <trans-unit id="pi554ed" resname="The size of the video could not be detected.">
         <source>The size of the video could not be detected.</source>
-        <target>La taille de la vidéo n’a pas pu être détectée.</target>
+        <target>La taille de la vidéo n'a pas pu être détectée.</target>
       </trans-unit>
       <trans-unit id="vpXeOI1" resname="The video width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.">
         <source>The video width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
@@ -547,11 +547,11 @@
       </trans-unit>
       <trans-unit id=".4PEOjp" resname="The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.">
         <source>The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-        <target>L’image comporte trop peu de pixels ({{ pixels }}). La quantité minimale attendue est de {{ min_pixels }} pixels.</target>
+        <target>L'image comporte trop peu de pixels ({{ pixels }}). La quantité minimale attendue est de {{ min_pixels }} pixels.</target>
       </trans-unit>
       <trans-unit id="EJE2_B5" resname="The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.">
         <source>The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-        <target>L’image contient trop de pixels ({{ pixels }}). La quantité maximale attendue est de {{ max_pixels }} pixels.</target>
+        <target>L'image contient trop de pixels ({{ pixels }}). La quantité maximale attendue est de {{ max_pixels }} pixels.</target>
       </trans-unit>
       <trans-unit id="eRZIN0." resname="This filename does not match the expected charset.">
         <source>This filename does not match the expected charset.</source>
@@ -689,601 +689,621 @@
         <source>Please enter a valid week.</source>
         <target>Veuillez entrer une semaine valide.</target>
       </trans-unit>
+
+      <!-- ===== Validations métier ===== -->
       <trans-unit id="_f44BwH" resname="Le nom de l'animal est obligatoire.">
         <source>Le nom de l'animal est obligatoire.</source>
-        <target>__Le nom de l'animal est obligatoire.</target>
+        <target>Le nom de l'animal est obligatoire.</target>
       </trans-unit>
       <trans-unit id="jUFBaJ8" resname="Le nom ne doit contenir que des lettres.">
         <source>Le nom ne doit contenir que des lettres.</source>
-        <target>__Le nom ne doit contenir que des lettres.</target>
+        <target>Le nom ne doit contenir que des lettres.</target>
       </trans-unit>
       <trans-unit id="OnxtwBS" resname="Veuillez sélectionner une espèce.">
         <source>Veuillez sélectionner une espèce.</source>
-        <target>__Veuillez sélectionner une espèce.</target>
+        <target>Veuillez sélectionner une espèce.</target>
       </trans-unit>
       <trans-unit id="chJXztp" resname="L'espèce sélectionnée n'est pas valide.">
         <source>L'espèce sélectionnée n'est pas valide.</source>
-        <target>__L'espèce sélectionnée n'est pas valide.</target>
+        <target>L'espèce sélectionnée n'est pas valide.</target>
       </trans-unit>
       <trans-unit id="jcrAhd6" resname="La date de naissance est requise.">
         <source>La date de naissance est requise.</source>
-        <target>__La date de naissance est requise.</target>
+        <target>La date de naissance est requise.</target>
       </trans-unit>
       <trans-unit id="H5e0mFr" resname="Format de date invalide.">
         <source>Format de date invalide.</source>
-        <target>__Format de date invalide.</target>
+        <target>Format de date invalide.</target>
       </trans-unit>
       <trans-unit id="sirmTfu" resname="La date de naissance ne peut pas être dans le futur.">
         <source>La date de naissance ne peut pas être dans le futur.</source>
-        <target>__La date de naissance ne peut pas être dans le futur.</target>
+        <target>La date de naissance ne peut pas être dans le futur.</target>
       </trans-unit>
       <trans-unit id="8PMl7Ab" resname="Le sexe est obligatoire.">
         <source>Le sexe est obligatoire.</source>
-        <target>__Le sexe est obligatoire.</target>
+        <target>Le sexe est obligatoire.</target>
       </trans-unit>
       <trans-unit id="HIFGUSM" resname="Le sexe doit être MALE ou FEMELLE.">
         <source>Le sexe doit être MALE ou FEMELLE.</source>
-        <target>__Le sexe doit être MALE ou FEMELLE.</target>
+        <target>Le sexe doit être MALE ou FEMELLE.</target>
       </trans-unit>
       <trans-unit id="nqTG2Zt" resname="Le poids doit être un nombre valide.">
         <source>Le poids doit être un nombre valide.</source>
-        <target>__Le poids doit être un nombre valide.</target>
+        <target>Le poids doit être un nombre valide.</target>
       </trans-unit>
       <trans-unit id="qJcPFkE" resname="La date de l'examen est obligatoire.">
         <source>La date de l'examen est obligatoire.</source>
-        <target>__La date de l'examen est obligatoire.</target>
+        <target>La date de l'examen est obligatoire.</target>
       </trans-unit>
       <trans-unit id="Ku3CdG_" resname="La date ne peut pas être dans le futur.">
         <source>La date ne peut pas être dans le futur.</source>
-        <target>__La date ne peut pas être dans le futur.</target>
+        <target>La date ne peut pas être dans le futur.</target>
       </trans-unit>
       <trans-unit id="SUN7uzK" resname="Le type d'examen est obligatoire.">
         <source>Le type d'examen est obligatoire.</source>
-        <target>__Le type d'examen est obligatoire.</target>
+        <target>Le type d'examen est obligatoire.</target>
       </trans-unit>
       <trans-unit id="6Y_bARh" resname="Veuillez sélectionner un type d'examen valide.">
         <source>Veuillez sélectionner un type d'examen valide.</source>
-        <target>__Veuillez sélectionner un type d'examen valide.</target>
+        <target>Veuillez sélectionner un type d'examen valide.</target>
       </trans-unit>
       <trans-unit id="xv_usjW" resname="Le diagnostic est obligatoire.">
         <source>Le diagnostic est obligatoire.</source>
-        <target>__Le diagnostic est obligatoire.</target>
+        <target>Le diagnostic est obligatoire.</target>
       </trans-unit>
       <trans-unit id="M8IL8LR" resname="Le diagnostic sélectionné n'est pas valide.">
         <source>Le diagnostic sélectionné n'est pas valide.</source>
-        <target>__Le diagnostic sélectionné n'est pas valide.</target>
+        <target>Le diagnostic sélectionné n'est pas valide.</target>
       </trans-unit>
       <trans-unit id="1f7wnav" resname="Le traitement est obligatoire.">
         <source>Le traitement est obligatoire.</source>
-        <target>__Le traitement est obligatoire.</target>
+        <target>Le traitement est obligatoire.</target>
       </trans-unit>
       <trans-unit id="wKUTNI7" resname="Le traitement sélectionné n'est pas valide.">
         <source>Le traitement sélectionné n'est pas valide.</source>
-        <target>__Le traitement sélectionné n'est pas valide.</target>
+        <target>Le traitement sélectionné n'est pas valide.</target>
       </trans-unit>
       <trans-unit id="dnA2BRA" resname="L'examen doit être relié à un animal.">
         <source>L'examen doit être relié à un animal.</source>
-        <target>__L'examen doit être relié à un animal.</target>
+        <target>L'examen doit être relié à un animal.</target>
       </trans-unit>
       <trans-unit id="TdF02qR" resname="Le nom de la catégorie ne peut pas être vide !">
         <source>Le nom de la catégorie ne peut pas être vide !</source>
-        <target>__Le nom de la catégorie ne peut pas être vide !</target>
+        <target>Le nom de la catégorie ne peut pas être vide !</target>
       </trans-unit>
       <trans-unit id="Sw4IGpJ" resname="Le nom doit contenir au moins {{ limit }} caractères !">
         <source>Le nom doit contenir au moins {{ limit }} caractères !</source>
-        <target>__Le nom doit contenir au moins {{ limit }} caractères !</target>
+        <target>Le nom doit contenir au moins {{ limit }} caractères !</target>
       </trans-unit>
       <trans-unit id="Txpi423" resname="Le nom ne doit pas dépasser {{ limit }} caractères !">
         <source>Le nom ne doit pas dépasser {{ limit }} caractères !</source>
-        <target>__Le nom ne doit pas dépasser {{ limit }} caractères !</target>
+        <target>Le nom ne doit pas dépasser {{ limit }} caractères !</target>
       </trans-unit>
       <trans-unit id="Q3yGHh7" resname="La description ne peut pas être vide !">
         <source>La description ne peut pas être vide !</source>
-        <target>__La description ne peut pas être vide !</target>
+        <target>La description ne peut pas être vide !</target>
       </trans-unit>
       <trans-unit id=".FWR0t3" resname="La description doit contenir au moins {{ limit }} caractères !">
         <source>La description doit contenir au moins {{ limit }} caractères !</source>
-        <target>__La description doit contenir au moins {{ limit }} caractères !</target>
+        <target>La description doit contenir au moins {{ limit }} caractères !</target>
       </trans-unit>
       <trans-unit id="YJDxCj9" resname="La description ne doit pas dépasser {{ limit }} caractères !">
         <source>La description ne doit pas dépasser {{ limit }} caractères !</source>
-        <target>__La description ne doit pas dépasser {{ limit }} caractères !</target>
+        <target>La description ne doit pas dépasser {{ limit }} caractères !</target>
       </trans-unit>
       <trans-unit id="WNrzNT1" resname="Le titre ne peut pas être vide !">
         <source>Le titre ne peut pas être vide !</source>
-        <target>__Le titre ne peut pas être vide !</target>
+        <target>Le titre ne peut pas être vide !</target>
       </trans-unit>
       <trans-unit id="MR12cuR" resname="Le titre doit contenir au moins {{ limit }} caractères !">
         <source>Le titre doit contenir au moins {{ limit }} caractères !</source>
-        <target>__Le titre doit contenir au moins {{ limit }} caractères !</target>
+        <target>Le titre doit contenir au moins {{ limit }} caractères !</target>
       </trans-unit>
       <trans-unit id="zVhTyDF" resname="Le titre ne doit pas dépasser {{ limit }} caractères !">
         <source>Le titre ne doit pas dépasser {{ limit }} caractères !</source>
-        <target>__Le titre ne doit pas dépasser {{ limit }} caractères !</target>
+        <target>Le titre ne doit pas dépasser {{ limit }} caractères !</target>
       </trans-unit>
       <trans-unit id="V8A67re" resname="Veuillez sélectionner un type d'événement !">
         <source>Veuillez sélectionner un type d'événement !</source>
-        <target>__Veuillez sélectionner un type d'événement !</target>
+        <target>Veuillez sélectionner un type d'événement !</target>
       </trans-unit>
       <trans-unit id="XduFDay" resname="La date de début est obligatoire !">
         <source>La date de début est obligatoire !</source>
-        <target>__La date de début est obligatoire !</target>
+        <target>La date de début est obligatoire !</target>
       </trans-unit>
       <trans-unit id="6FB0GFx" resname="La date de fin est obligatoire !">
         <source>La date de fin est obligatoire !</source>
-        <target>__La date de fin est obligatoire !</target>
+        <target>La date de fin est obligatoire !</target>
       </trans-unit>
       <trans-unit id="s_qNt4_" resname="La date de fin ne peut pas être antérieure à la date de début.">
         <source>La date de fin ne peut pas être antérieure à la date de début.</source>
-        <target>__La date de fin ne peut pas être antérieure à la date de début.</target>
+        <target>La date de fin ne peut pas être antérieure à la date de début.</target>
       </trans-unit>
       <trans-unit id="JtFCrUh" resname="Le lieu ne peut pas être vide !">
         <source>Le lieu ne peut pas être vide !</source>
-        <target>__Le lieu ne peut pas être vide !</target>
+        <target>Le lieu ne peut pas être vide !</target>
       </trans-unit>
       <trans-unit id="70J_45k" resname="Veuillez sélectionner un statut !">
         <source>Veuillez sélectionner un statut !</source>
-        <target>__Veuillez sélectionner un statut !</target>
+        <target>Veuillez sélectionner un statut !</target>
       </trans-unit>
       <trans-unit id="u3254Eh" resname="Veuillez sélectionner une catégorie !">
         <source>Veuillez sélectionner une catégorie !</source>
-        <target>__Veuillez sélectionner une catégorie !</target>
+        <target>Veuillez sélectionner une catégorie !</target>
       </trans-unit>
       <trans-unit id="6M3LUgY" resname="Le statut ne peut pas être vide !">
         <source>Le statut ne peut pas être vide !</source>
-        <target>__Le statut ne peut pas être vide !</target>
+        <target>Le statut ne peut pas être vide !</target>
       </trans-unit>
       <trans-unit id="g_blkl7" resname="La date d'inscription est obligatoire.">
         <source>La date d'inscription est obligatoire.</source>
-        <target>__La date d'inscription est obligatoire.</target>
+        <target>La date d'inscription est obligatoire.</target>
       </trans-unit>
       <trans-unit id="nHGw4X3" resname="La date d'inscription ne peut pas être dans le futur.">
         <source>La date d'inscription ne peut pas être dans le futur.</source>
-        <target>__La date d'inscription ne peut pas être dans le futur.</target>
+        <target>La date d'inscription ne peut pas être dans le futur.</target>
       </trans-unit>
       <trans-unit id="DmnBwxJ" resname="Veuillez sélectionner un événement.">
         <source>Veuillez sélectionner un événement.</source>
-        <target>__Veuillez sélectionner un événement.</target>
+        <target>Veuillez sélectionner un événement.</target>
       </trans-unit>
       <trans-unit id="ofUnQ5Z" resname="Veuillez sélectionner un utilisateur.">
         <source>Veuillez sélectionner un utilisateur.</source>
-        <target>__Veuillez sélectionner un utilisateur.</target>
+        <target>Veuillez sélectionner un utilisateur.</target>
       </trans-unit>
       <trans-unit id="7uShdvy" resname="Le nom du produit ne peut pas être vide.">
         <source>Le nom du produit ne peut pas être vide.</source>
-        <target>__Le nom du produit ne peut pas être vide.</target>
+        <target>Le nom du produit ne peut pas être vide.</target>
       </trans-unit>
       <trans-unit id="lBve_V3" resname="Le nom doit contenir au moins {{ limit }} caractères.">
         <source>Le nom doit contenir au moins {{ limit }} caractères.</source>
-        <target>__Le nom doit contenir au moins {{ limit }} caractères.</target>
+        <target>Le nom doit contenir au moins {{ limit }} caractères.</target>
       </trans-unit>
       <trans-unit id="FTTYdH2" resname="La quantité est obligatoire.">
         <source>La quantité est obligatoire.</source>
-        <target>__La quantité est obligatoire.</target>
+        <target>La quantité est obligatoire.</target>
       </trans-unit>
       <trans-unit id="bLyRdr0" resname="Le seuil d'alerte est obligatoire.">
         <source>Le seuil d'alerte est obligatoire.</source>
-        <target>__Le seuil d'alerte est obligatoire.</target>
+        <target>Le seuil d'alerte est obligatoire.</target>
       </trans-unit>
       <trans-unit id="1gIbMTa" resname="Veuillez préciser l'unité (Kg, Litre, etc.).">
         <source>Veuillez préciser l'unité (Kg, Litre, etc.).</source>
-        <target>__Veuillez préciser l'unité (Kg, Litre, etc.).</target>
+        <target>Veuillez préciser l'unité (Kg, Litre, etc.).</target>
       </trans-unit>
       <trans-unit id="ZxCZJfk" resname="Le prix unitaire est requis.">
         <source>Le prix unitaire est requis.</source>
-        <target>__Le prix unitaire est requis.</target>
+        <target>Le prix unitaire est requis.</target>
       </trans-unit>
       <trans-unit id="mc3OF7D" resname="Le nom de la catégorie est obligatoire.">
         <source>Le nom de la catégorie est obligatoire.</source>
-        <target>__Le nom de la catégorie est obligatoire.</target>
+        <target>Le nom de la catégorie est obligatoire.</target>
       </trans-unit>
       <trans-unit id="w_gWcFw" resname="Veuillez entrer un nom.">
         <source>Veuillez entrer un nom.</source>
-        <target>__Veuillez entrer un nom.</target>
+        <target>Veuillez entrer un nom.</target>
       </trans-unit>
       <trans-unit id="bb5aWij" resname="Veuillez entrer votre email.">
         <source>Veuillez entrer votre email.</source>
-        <target>__Veuillez entrer votre email.</target>
+        <target>Veuillez entrer votre email.</target>
       </trans-unit>
       <trans-unit id="yEo2BST" resname="Email invalide.">
         <source>Email invalide.</source>
-        <target>__Email invalide.</target>
+        <target>Email invalide.</target>
       </trans-unit>
       <trans-unit id="tqdHfjE" resname="Veuillez entrer votre mot de passe.">
         <source>Veuillez entrer votre mot de passe.</source>
-        <target>__Veuillez entrer votre mot de passe.</target>
+        <target>Veuillez entrer votre mot de passe.</target>
       </trans-unit>
-      <trans-unit id="b7sPxck" resname="Veuillez entrer votre CIN.">
-        <source>Veuillez entrer votre CIN.</source>
-        <target>__Veuillez entrer votre CIN.</target>
-      </trans-unit>
+      <!-- HEAD: champs rôle, CIN (8 chiffres fixes), date naissance (100 ans), nom/prénom complets, email max, mot de passe complexe, tâches, abonnements -->
       <trans-unit id="Rs30pSp" resname="Le CIN doit être un nombre entier.">
         <source>Le CIN doit être un nombre entier.</source>
-        <target>__Le CIN doit être un nombre entier.</target>
+        <target>Le CIN doit être un nombre entier.</target>
       </trans-unit>
       <trans-unit id="uwbsRjr" resname="Le CIN doit contenir exactement 8 chiffres.">
         <source>Le CIN doit contenir exactement 8 chiffres.</source>
-        <target>__Le CIN doit contenir exactement 8 chiffres.</target>
+        <target>Le CIN doit contenir exactement 8 chiffres.</target>
+      </trans-unit>
+      <!-- Terrain: CIN dynamique avec {{ limit }} -->
+      <trans-unit id="HFfNthv" resname="Le CIN doit contenir exactement {{ limit }} chiffres.">
+        <source>Le CIN doit contenir exactement {{ limit }} chiffres.</source>
+        <target>Le CIN doit contenir exactement {{ limit }} chiffres.</target>
+      </trans-unit>
+      <trans-unit id="t0JJeei" resname="Veuillez choisir un rôle.">
+        <source>Veuillez choisir un rôle.</source>
+        <target>Veuillez choisir un rôle.</target>
+      </trans-unit>
+      <trans-unit id="b7sPxck" resname="Veuillez entrer votre CIN.">
+        <source>Veuillez entrer votre CIN.</source>
+        <target>Veuillez entrer votre CIN.</target>
       </trans-unit>
       <trans-unit id=".6trB9M" resname="Veuillez entrer votre date de naissance.">
         <source>Veuillez entrer votre date de naissance.</source>
-        <target>__Veuillez entrer votre date de naissance.</target>
+        <target>Veuillez entrer votre date de naissance.</target>
       </trans-unit>
       <trans-unit id="dNZDvZd" resname="Vous devez avoir au moins 18 ans.">
         <source>Vous devez avoir au moins 18 ans.</source>
-        <target>__Vous devez avoir au moins 18 ans.</target>
+        <target>Vous devez avoir au moins 18 ans.</target>
       </trans-unit>
       <trans-unit id="_x7yLgS" resname="Date de naissance invalide (plus de 100 ans).">
         <source>Date de naissance invalide (plus de 100 ans).</source>
-        <target>__Date de naissance invalide (plus de 100 ans).</target>
+        <target>Date de naissance invalide (plus de 100 ans).</target>
+      </trans-unit>
+      <trans-unit id="JI5z8AX" resname="Date de naissance invalide.">
+        <source>Date de naissance invalide.</source>
+        <target>Date de naissance invalide.</target>
       </trans-unit>
       <trans-unit id="2pfbEIm" resname="Veuillez entrer votre nom.">
         <source>Veuillez entrer votre nom.</source>
-        <target>__Veuillez entrer votre nom.</target>
+        <target>Veuillez entrer votre nom.</target>
       </trans-unit>
       <trans-unit id="HI0XIid" resname="Le nom ne peut contenir que des lettres, espaces, tirets ou apostrophes.">
         <source>Le nom ne peut contenir que des lettres, espaces, tirets ou apostrophes.</source>
-        <target>__Le nom ne peut contenir que des lettres, espaces, tirets ou apostrophes.</target>
+        <target>Le nom ne peut contenir que des lettres, espaces, tirets ou apostrophes.</target>
       </trans-unit>
       <trans-unit id="CIPVqFN" resname="Veuillez entrer votre prénom.">
         <source>Veuillez entrer votre prénom.</source>
-        <target>__Veuillez entrer votre prénom.</target>
+        <target>Veuillez entrer votre prénom.</target>
       </trans-unit>
       <trans-unit id="Xr2Gk16" resname="Le prénom doit contenir au moins {{ limit }} caractères.">
         <source>Le prénom doit contenir au moins {{ limit }} caractères.</source>
-        <target>__Le prénom doit contenir au moins {{ limit }} caractères.</target>
+        <target>Le prénom doit contenir au moins {{ limit }} caractères.</target>
       </trans-unit>
       <trans-unit id="KxY08lt" resname="Le prénom ne peut contenir que des lettres, espaces, tirets ou apostrophes.">
         <source>Le prénom ne peut contenir que des lettres, espaces, tirets ou apostrophes.</source>
-        <target>__Le prénom ne peut contenir que des lettres, espaces, tirets ou apostrophes.</target>
+        <target>Le prénom ne peut contenir que des lettres, espaces, tirets ou apostrophes.</target>
       </trans-unit>
       <trans-unit id="zHdz_Oe" resname="L'email ne peut pas dépasser {{ limit }} caractères.">
         <source>L'email ne peut pas dépasser {{ limit }} caractères.</source>
-        <target>__L'email ne peut pas dépasser {{ limit }} caractères.</target>
+        <target>L'email ne peut pas dépasser {{ limit }} caractères.</target>
       </trans-unit>
       <trans-unit id="5_YRei8" resname="L'adresse email « {{ value }} » est invalide.">
         <source>L'adresse email « {{ value }} » est invalide.</source>
-        <target>__L'adresse email « {{ value }} » est invalide.</target>
+        <target>L'adresse email « {{ value }} » est invalide.</target>
       </trans-unit>
       <trans-unit id="ZPU3yPq" resname="Veuillez choisir une ville.">
         <source>Veuillez choisir une ville.</source>
-        <target>__Veuillez choisir une ville.</target>
+        <target>Veuillez choisir une ville.</target>
       </trans-unit>
       <trans-unit id="q1wuXFS" resname="Veuillez entrer un mot de passe.">
         <source>Veuillez entrer un mot de passe.</source>
-        <target>__Veuillez entrer un mot de passe.</target>
+        <target>Veuillez entrer un mot de passe.</target>
       </trans-unit>
       <trans-unit id=".HdzZ2h" resname="Le mot de passe doit contenir au moins {{ limit }} caractères.">
         <source>Le mot de passe doit contenir au moins {{ limit }} caractères.</source>
-        <target>__Le mot de passe doit contenir au moins {{ limit }} caractères.</target>
+        <target>Le mot de passe doit contenir au moins {{ limit }} caractères.</target>
       </trans-unit>
       <trans-unit id="gAlV3cq" resname="Le mot de passe doit contenir au moins une lettre majuscule.">
         <source>Le mot de passe doit contenir au moins une lettre majuscule.</source>
-        <target>__Le mot de passe doit contenir au moins une lettre majuscule.</target>
+        <target>Le mot de passe doit contenir au moins une lettre majuscule.</target>
       </trans-unit>
       <trans-unit id="Te7UpX5" resname="Le mot de passe doit contenir au moins une lettre minuscule.">
         <source>Le mot de passe doit contenir au moins une lettre minuscule.</source>
-        <target>__Le mot de passe doit contenir au moins une lettre minuscule.</target>
+        <target>Le mot de passe doit contenir au moins une lettre minuscule.</target>
       </trans-unit>
       <trans-unit id="QecNC0p" resname="Le mot de passe doit contenir au moins un chiffre.">
         <source>Le mot de passe doit contenir au moins un chiffre.</source>
-        <target>__Le mot de passe doit contenir au moins un chiffre.</target>
+        <target>Le mot de passe doit contenir au moins un chiffre.</target>
       </trans-unit>
       <trans-unit id="B6ixURo" resname="Le mot de passe doit contenir au moins un caractère spécial.">
         <source>Le mot de passe doit contenir au moins un caractère spécial.</source>
-        <target>__Le mot de passe doit contenir au moins un caractère spécial.</target>
+        <target>Le mot de passe doit contenir au moins un caractère spécial.</target>
       </trans-unit>
       <trans-unit id="0mi9rqH" resname="Veuillez choisir un quartier.">
         <source>Veuillez choisir un quartier.</source>
-        <target>__Veuillez choisir un quartier.</target>
+        <target>Veuillez choisir un quartier.</target>
       </trans-unit>
       <trans-unit id="Qn1kPAo" resname="Le nom de la machine est obligatoire">
         <source>Le nom de la machine est obligatoire</source>
-        <target>__Le nom de la machine est obligatoire</target>
+        <target>Le nom de la machine est obligatoire</target>
       </trans-unit>
       <trans-unit id="vH.7Y9T" resname="Le nom doit contenir au moins {{ limit }} caractères">
         <source>Le nom doit contenir au moins {{ limit }} caractères</source>
-        <target>__Le nom doit contenir au moins {{ limit }} caractères</target>
+        <target>Le nom doit contenir au moins {{ limit }} caractères</target>
       </trans-unit>
       <trans-unit id="nNchAxt" resname="Le nom ne peut contenir que des lettres, chiffres, espaces et tirets">
         <source>Le nom ne peut contenir que des lettres, chiffres, espaces et tirets</source>
-        <target>__Le nom ne peut contenir que des lettres, chiffres, espaces et tirets</target>
+        <target>Le nom ne peut contenir que des lettres, chiffres, espaces et tirets</target>
       </trans-unit>
       <trans-unit id="E095apd" resname="La marque est obligatoire">
         <source>La marque est obligatoire</source>
-        <target>__La marque est obligatoire</target>
+        <target>La marque est obligatoire</target>
       </trans-unit>
       <trans-unit id="58kPcxg" resname="La marque doit contenir au moins {{ limit }} caractères">
         <source>La marque doit contenir au moins {{ limit }} caractères</source>
-        <target>__La marque doit contenir au moins {{ limit }} caractères</target>
+        <target>La marque doit contenir au moins {{ limit }} caractères</target>
       </trans-unit>
       <trans-unit id="PsZQCJg" resname="La marque ne peut contenir que des lettres, espaces et tirets">
         <source>La marque ne peut contenir que des lettres, espaces et tirets</source>
-        <target>__La marque ne peut contenir que des lettres, espaces et tirets</target>
+        <target>La marque ne peut contenir que des lettres, espaces et tirets</target>
       </trans-unit>
       <trans-unit id="JQS2gbS" resname="Le modèle est obligatoire">
         <source>Le modèle est obligatoire</source>
-        <target>__Le modèle est obligatoire</target>
+        <target>Le modèle est obligatoire</target>
       </trans-unit>
       <trans-unit id="iAZBt0s" resname="Le modèle doit contenir au moins {{ limit }} caractères">
         <source>Le modèle doit contenir au moins {{ limit }} caractères</source>
-        <target>__Le modèle doit contenir au moins {{ limit }} caractères</target>
+        <target>Le modèle doit contenir au moins {{ limit }} caractères</target>
       </trans-unit>
       <trans-unit id="Np7jGjp" resname="Le modèle ne peut contenir que des lettres, chiffres, espaces et tirets">
         <source>Le modèle ne peut contenir que des lettres, chiffres, espaces et tirets</source>
-        <target>__Le modèle ne peut contenir que des lettres, chiffres, espaces et tirets</target>
+        <target>Le modèle ne peut contenir que des lettres, chiffres, espaces et tirets</target>
       </trans-unit>
       <trans-unit id="gRJzwG8" resname="Le numéro de série est obligatoire">
         <source>Le numéro de série est obligatoire</source>
-        <target>__Le numéro de série est obligatoire</target>
+        <target>Le numéro de série est obligatoire</target>
       </trans-unit>
       <trans-unit id="CGkwA4W" resname="Le numéro de série doit contenir au moins {{ limit }} caractères">
         <source>Le numéro de série doit contenir au moins {{ limit }} caractères</source>
-        <target>__Le numéro de série doit contenir au moins {{ limit }} caractères</target>
+        <target>Le numéro de série doit contenir au moins {{ limit }} caractères</target>
       </trans-unit>
       <trans-unit id="52zDdFD" resname="Le numéro de série ne peut contenir que des lettres, chiffres et tirets (sans espaces)">
         <source>Le numéro de série ne peut contenir que des lettres, chiffres et tirets (sans espaces)</source>
-        <target>__Le numéro de série ne peut contenir que des lettres, chiffres et tirets (sans espaces)</target>
+        <target>Le numéro de série ne peut contenir que des lettres, chiffres et tirets (sans espaces)</target>
       </trans-unit>
       <trans-unit id="2bQqg0E" resname="Veuillez sélectionner l'état de la machine">
         <source>Veuillez sélectionner l'état de la machine</source>
-        <target>__Veuillez sélectionner l'état de la machine</target>
+        <target>Veuillez sélectionner l'état de la machine</target>
       </trans-unit>
       <trans-unit id="B2ZIqFF" resname="Veuillez choisir un état valide">
         <source>Veuillez choisir un état valide</source>
-        <target>__Veuillez choisir un état valide</target>
+        <target>Veuillez choisir un état valide</target>
       </trans-unit>
       <trans-unit id="2t.cvR0" resname="La date d'achat est obligatoire">
         <source>La date d'achat est obligatoire</source>
-        <target>__La date d'achat est obligatoire</target>
+        <target>La date d'achat est obligatoire</target>
       </trans-unit>
       <trans-unit id="xnzbo0y" resname="Veuillez entrer une date valide">
         <source>Veuillez entrer une date valide</source>
-        <target>__Veuillez entrer une date valide</target>
+        <target>Veuillez entrer une date valide</target>
       </trans-unit>
       <trans-unit id="7xsWMYi" resname="La date d'achat ne peut pas être antérieure à 1900">
         <source>La date d'achat ne peut pas être antérieure à 1900</source>
-        <target>__La date d'achat ne peut pas être antérieure à 1900</target>
+        <target>La date d'achat ne peut pas être antérieure à 1900</target>
       </trans-unit>
       <trans-unit id="D6q83MN" resname="La date d'achat ne peut pas être dans le futur">
         <source>La date d'achat ne peut pas être dans le futur</source>
-        <target>__La date d'achat ne peut pas être dans le futur</target>
+        <target>La date d'achat ne peut pas être dans le futur</target>
       </trans-unit>
       <trans-unit id="4wDj7cF" resname="Veuillez sélectionner un type de panne.">
         <source>Veuillez sélectionner un type de panne.</source>
-        <target>__Veuillez sélectionner un type de panne.</target>
+        <target>Veuillez sélectionner un type de panne.</target>
       </trans-unit>
       <trans-unit id="3tKz0Ko" resname="Le coût est obligatoire.">
         <source>Le coût est obligatoire.</source>
-        <target>__Le coût est obligatoire.</target>
+        <target>Le coût est obligatoire.</target>
       </trans-unit>
       <trans-unit id="4z5n6aA" resname="Le coût ne peut pas dépasser 999 999,99 DT.">
         <source>Le coût ne peut pas dépasser 999 999,99 DT.</source>
-        <target>__Le coût ne peut pas dépasser 999 999,99 DT.</target>
+        <target>Le coût ne peut pas dépasser 999 999,99 DT.</target>
       </trans-unit>
       <trans-unit id="KKf6jbb" resname="La date est obligatoire.">
         <source>La date est obligatoire.</source>
-        <target>__La date est obligatoire.</target>
+        <target>La date est obligatoire.</target>
       </trans-unit>
       <trans-unit id="392YZK6" resname="La description doit contenir au moins {{ limit }} caractères.">
         <source>La description doit contenir au moins {{ limit }} caractères.</source>
-        <target>__La description doit contenir au moins {{ limit }} caractères.</target>
+        <target>La description doit contenir au moins {{ limit }} caractères.</target>
       </trans-unit>
       <trans-unit id="S9cp4oO" resname="La description ne doit pas contenir les caractères &lt; &gt; { }.">
         <source>La description ne doit pas contenir les caractères &lt; &gt; { }.</source>
-        <target><![CDATA[__La description ne doit pas contenir les caractères < > { }.]]></target>
+        <target><![CDATA[La description ne doit pas contenir les caractères < > { }.]]></target>
       </trans-unit>
       <trans-unit id="DQu3z1V" resname="Le nom est obligatoire.">
         <source>Le nom est obligatoire.</source>
-        <target>__Le nom est obligatoire.</target>
+        <target>Le nom est obligatoire.</target>
       </trans-unit>
       <trans-unit id="UNrqNIT" resname="La surface est obligatoire.">
         <source>La surface est obligatoire.</source>
-        <target>__La surface est obligatoire.</target>
+        <target>La surface est obligatoire.</target>
       </trans-unit>
       <trans-unit id="fFrKZMZ" resname="La surface ne peut pas dépasser 10 000 ha.">
         <source>La surface ne peut pas dépasser 10 000 ha.</source>
-        <target>__La surface ne peut pas dépasser 10 000 ha.</target>
+        <target>La surface ne peut pas dépasser 10 000 ha.</target>
       </trans-unit>
       <trans-unit id="18IPKjy" resname="Le type de sol est obligatoire.">
         <source>Le type de sol est obligatoire.</source>
-        <target>__Le type de sol est obligatoire.</target>
+        <target>Le type de sol est obligatoire.</target>
       </trans-unit>
       <trans-unit id="OekiMOs" resname="La localisation est obligatoire.">
         <source>La localisation est obligatoire.</source>
-        <target>__La localisation est obligatoire.</target>
+        <target>La localisation est obligatoire.</target>
       </trans-unit>
       <trans-unit id="WXZyCV8" resname="Le pH est obligatoire.">
         <source>Le pH est obligatoire.</source>
-        <target>__Le pH est obligatoire.</target>
+        <target>Le pH est obligatoire.</target>
       </trans-unit>
       <trans-unit id="1BtNhgR" resname="Le pH doit être entre {{ min }} et {{ max }}.">
         <source>Le pH doit être entre {{ min }} et {{ max }}.</source>
-        <target>__Le pH doit être entre {{ min }} et {{ max }}.</target>
+        <target>Le pH doit être entre {{ min }} et {{ max }}.</target>
       </trans-unit>
       <trans-unit id="s9qJgB9" resname="Le nom de la plante est obligatoire.">
         <source>Le nom de la plante est obligatoire.</source>
-        <target>__Le nom de la plante est obligatoire.</target>
+        <target>Le nom de la plante est obligatoire.</target>
       </trans-unit>
       <trans-unit id="EyYtTZG" resname="Minimum 2 caractères.">
         <source>Minimum 2 caractères.</source>
-        <target>__Minimum 2 caractères.</target>
+        <target>Minimum 2 caractères.</target>
       </trans-unit>
       <trans-unit id="Jso2XHV" resname="Maximum 100 caractères.">
         <source>Maximum 100 caractères.</source>
-        <target>__Maximum 100 caractères.</target>
+        <target>Maximum 100 caractères.</target>
       </trans-unit>
       <trans-unit id="KXn9WKr" resname="variete est obligatoire.">
         <source>variete est obligatoire.</source>
-        <target>__variete est obligatoire.</target>
+        <target>variete est obligatoire.</target>
+      </trans-unit>
+      <trans-unit id="sVzVl7v" resname="La variété est obligatoire.">
+        <source>La variété est obligatoire.</source>
+        <target>La variété est obligatoire.</target>
       </trans-unit>
       <trans-unit id="H.vFzZf" resname="Le besoin en eau est obligatoire.">
         <source>Le besoin en eau est obligatoire.</source>
-        <target>__Le besoin en eau est obligatoire.</target>
+        <target>Le besoin en eau est obligatoire.</target>
       </trans-unit>
       <trans-unit id="7AUMiER" resname="Le besoin en eau doit être entre {{ min }} et {{ max }} L/j.">
         <source>Le besoin en eau doit être entre {{ min }} et {{ max }} L/j.</source>
-        <target>__Le besoin en eau doit être entre {{ min }} et {{ max }} L/j.</target>
+        <target>Le besoin en eau doit être entre {{ min }} et {{ max }} L/j.</target>
       </trans-unit>
       <trans-unit id="OvqiuT3" resname="Le cycle en jours est obligatoire.">
         <source>Le cycle en jours est obligatoire.</source>
-        <target>__Le cycle en jours est obligatoire.</target>
+        <target>Le cycle en jours est obligatoire.</target>
       </trans-unit>
       <trans-unit id="RjWxWSY" resname="Le cycle doit être entre {{ min }} et {{ max }} jours.">
         <source>Le cycle doit être entre {{ min }} et {{ max }} jours.</source>
-        <target>__Le cycle doit être entre {{ min }} et {{ max }} jours.</target>
+        <target>Le cycle doit être entre {{ min }} et {{ max }} jours.</target>
       </trans-unit>
       <trans-unit id="8UeBU31" resname="Veuillez sélectionner un terrain.">
         <source>Veuillez sélectionner un terrain.</source>
-        <target>__Veuillez sélectionner un terrain.</target>
+        <target>Veuillez sélectionner un terrain.</target>
       </trans-unit>
       <trans-unit id="ALUAlBq" resname="Veuillez sélectionner une plante.">
         <source>Veuillez sélectionner une plante.</source>
-        <target>__Veuillez sélectionner une plante.</target>
+        <target>Veuillez sélectionner une plante.</target>
       </trans-unit>
       <trans-unit id="YeKYxSA" resname="La date de début est obligatoire.">
         <source>La date de début est obligatoire.</source>
-        <target>__La date de début est obligatoire.</target>
+        <target>La date de début est obligatoire.</target>
       </trans-unit>
       <trans-unit id="tFvo9zo" resname="La date de fin est obligatoire.">
         <source>La date de fin est obligatoire.</source>
-        <target>__La date de fin est obligatoire.</target>
+        <target>La date de fin est obligatoire.</target>
       </trans-unit>
       <trans-unit id="O479GsV" resname="Le nom du terrain est obligatoire.">
         <source>Le nom du terrain est obligatoire.</source>
-        <target>__Le nom du terrain est obligatoire.</target>
+        <target>Le nom du terrain est obligatoire.</target>
       </trans-unit>
       <trans-unit id="ogj8kh2" resname="Veuillez sélectionner un propriétaire.">
         <source>Veuillez sélectionner un propriétaire.</source>
-        <target>__Veuillez sélectionner un propriétaire.</target>
+        <target>Veuillez sélectionner un propriétaire.</target>
       </trans-unit>
       <trans-unit id="7bDxKUZ" resname="Utilisateur invalide.">
         <source>Utilisateur invalide.</source>
-        <target>__Utilisateur invalide.</target>
+        <target>Utilisateur invalide.</target>
       </trans-unit>
       <trans-unit id="np9J7Vf" resname="Veuillez sélectionner une offre.">
         <source>Veuillez sélectionner une offre.</source>
-        <target>__Veuillez sélectionner une offre.</target>
+        <target>Veuillez sélectionner une offre.</target>
       </trans-unit>
       <trans-unit id="OoH09JJ" resname="Offre invalide.">
         <source>Offre invalide.</source>
-        <target>__Offre invalide.</target>
+        <target>Offre invalide.</target>
       </trans-unit>
       <trans-unit id="2QHeF0w" resname="Veuillez entrer la date d'inscription.">
         <source>Veuillez entrer la date d'inscription.</source>
-        <target>__Veuillez entrer la date d'inscription.</target>
+        <target>Veuillez entrer la date d'inscription.</target>
       </trans-unit>
       <trans-unit id="zst0Aj0" resname="La date d'inscription doit être dans l'année en cours.">
         <source>La date d'inscription doit être dans l'année en cours.</source>
-        <target>__La date d'inscription doit être dans l'année en cours.</target>
+        <target>La date d'inscription doit être dans l'année en cours.</target>
       </trans-unit>
       <trans-unit id="zzkg4qG" resname="Veuillez entrer la date d'expiration.">
         <source>Veuillez entrer la date d'expiration.</source>
-        <target>__Veuillez entrer la date d'expiration.</target>
+        <target>Veuillez entrer la date d'expiration.</target>
       </trans-unit>
       <trans-unit id="epzhCZ5" resname="La date d'expiration doit être dans le futur.">
         <source>La date d'expiration doit être dans le futur.</source>
-        <target>__La date d'expiration doit être dans le futur.</target>
+        <target>La date d'expiration doit être dans le futur.</target>
       </trans-unit>
       <trans-unit id="6BHk8iA" resname="Veuillez sélectionner une situation.">
         <source>Veuillez sélectionner une situation.</source>
-        <target>__Veuillez sélectionner une situation.</target>
+        <target>Veuillez sélectionner une situation.</target>
       </trans-unit>
       <trans-unit id="PZ1Yl2R" resname="La situation sélectionnée est invalide.">
         <source>La situation sélectionnée est invalide.</source>
-        <target>__La situation sélectionnée est invalide.</target>
+        <target>La situation sélectionnée est invalide.</target>
       </trans-unit>
       <trans-unit id="8QZ3RpS" resname="Le nom ne peut pas dépasser {{ limit }} caractères.">
         <source>Le nom ne peut pas dépasser {{ limit }} caractères.</source>
-        <target>__Le nom ne peut pas dépasser {{ limit }} caractères.</target>
+        <target>Le nom ne peut pas dépasser {{ limit }} caractères.</target>
       </trans-unit>
       <trans-unit id="oAPIGWB" resname="La description ne peut pas dépasser {{ limit }} caractères.">
         <source>La description ne peut pas dépasser {{ limit }} caractères.</source>
-        <target>__La description ne peut pas dépasser {{ limit }} caractères.</target>
+        <target>La description ne peut pas dépasser {{ limit }} caractères.</target>
       </trans-unit>
       <trans-unit id="P0BLt9P" resname="Veuillez entrer un prix.">
         <source>Veuillez entrer un prix.</source>
-        <target>__Veuillez entrer un prix.</target>
+        <target>Veuillez entrer un prix.</target>
       </trans-unit>
       <trans-unit id="u3KFreG" resname="Le prix ne peut pas dépasser {{ compared_value }} TND.">
         <source>Le prix ne peut pas dépasser {{ compared_value }} TND.</source>
-        <target>__Le prix ne peut pas dépasser {{ compared_value }} TND.</target>
+        <target>Le prix ne peut pas dépasser {{ compared_value }} TND.</target>
       </trans-unit>
       <trans-unit id="1JSIn.L" resname="Veuillez entrer une durée.">
         <source>Veuillez entrer une durée.</source>
-        <target>__Veuillez entrer une durée.</target>
+        <target>Veuillez entrer une durée.</target>
       </trans-unit>
       <trans-unit id="sXjFthl" resname="La durée doit être comprise entre {{ min }} et {{ max }} jours (10 ans max).">
         <source>La durée doit être comprise entre {{ min }} et {{ max }} jours (10 ans max).</source>
-        <target>__La durée doit être comprise entre {{ min }} et {{ max }} jours (10 ans max).</target>
+        <target>La durée doit être comprise entre {{ min }} et {{ max }} jours (10 ans max).</target>
       </trans-unit>
       <trans-unit id="AwIsHgY" resname="Le nom de la tâche est obligatoire.">
         <source>Le nom de la tâche est obligatoire.</source>
-        <target>__Le nom de la tâche est obligatoire.</target>
+        <target>Le nom de la tâche est obligatoire.</target>
       </trans-unit>
       <trans-unit id="jqWWbqN" resname="Le nom contient des caractères non autorisés.">
         <source>Le nom contient des caractères non autorisés.</source>
-        <target>__Le nom contient des caractères non autorisés.</target>
+        <target>Le nom contient des caractères non autorisés.</target>
       </trans-unit>
       <trans-unit id="DdBWEuy" resname="La Description de la tâche est obligatoire.">
         <source>La Description de la tâche est obligatoire.</source>
-        <target>__La Description de la tâche est obligatoire.</target>
+        <target>La Description de la tâche est obligatoire.</target>
       </trans-unit>
       <trans-unit id="6xBHyqc" resname="L ouvrier a assignée  est obligatoire.">
         <source>L ouvrier a assignée  est obligatoire.</source>
-        <target>__L ouvrier a assignée  est obligatoire.</target>
+        <target>L ouvrier a assignée  est obligatoire.</target>
       </trans-unit>
       <trans-unit id="Hh8Zlnd" resname="Veuillez assigner la tâche à un ouvrier.">
         <source>Veuillez assigner la tâche à un ouvrier.</source>
-        <target>__Veuillez assigner la tâche à un ouvrier.</target>
+        <target>Veuillez assigner la tâche à un ouvrier.</target>
       </trans-unit>
       <trans-unit id="AaSYq0o" resname="L etat de la tâche est obligatoire.">
         <source>L etat de la tâche est obligatoire.</source>
-        <target>__L etat de la tâche est obligatoire.</target>
+        <target>L etat de la tâche est obligatoire.</target>
       </trans-unit>
       <trans-unit id="zMoMrfd" resname="Veuillez choisir un état.">
         <source>Veuillez choisir un état.</source>
-        <target>__Veuillez choisir un état.</target>
+        <target>Veuillez choisir un état.</target>
       </trans-unit>
       <trans-unit id="L4kPeiN" resname="La prioritee de la tâche est obligatoire.">
         <source>La prioritee de la tâche est obligatoire.</source>
-        <target>__La prioritee de la tâche est obligatoire.</target>
+        <target>La prioritee de la tâche est obligatoire.</target>
       </trans-unit>
       <trans-unit id="6y7IB3K" resname="Veuillez choisir une priorité.">
         <source>Veuillez choisir une priorité.</source>
-        <target>__Veuillez choisir une priorité.</target>
+        <target>Veuillez choisir une priorité.</target>
       </trans-unit>
       <trans-unit id="I0P2_nZ" resname="La date d echeance de la tâche est obligatoire.">
         <source>La date d echeance de la tâche est obligatoire.</source>
-        <target>__La date d echeance de la tâche est obligatoire.</target>
+        <target>La date d echeance de la tâche est obligatoire.</target>
       </trans-unit>
       <trans-unit id="acy5CSW" resname="La date d'échéance doit être aujourd'hui ou dans le futur.">
         <source>La date d'échéance doit être aujourd'hui ou dans le futur.</source>
-        <target>__La date d'échéance doit être aujourd'hui ou dans le futur.</target>
+        <target>La date d'échéance doit être aujourd'hui ou dans le futur.</target>
       </trans-unit>
       <trans-unit id="WK_8jUm" resname="Le CIN est obligatoire.">
         <source>Le CIN est obligatoire.</source>
-        <target>__Le CIN est obligatoire.</target>
+        <target>Le CIN est obligatoire.</target>
       </trans-unit>
       <trans-unit id="vjSy3Ww" resname="Le prénom est obligatoire.">
         <source>Le prénom est obligatoire.</source>
-        <target>__Le prénom est obligatoire.</target>
+        <target>Le prénom est obligatoire.</target>
       </trans-unit>
       <trans-unit id="uK.G48K" resname="L'email est obligatoire.">
         <source>L'email est obligatoire.</source>
-        <target>__L'email est obligatoire.</target>
+        <target>L'email est obligatoire.</target>
       </trans-unit>
       <trans-unit id="XHAl10S" resname="L'email n'est pas valide.">
         <source>L'email n'est pas valide.</source>
-        <target>__L'email n'est pas valide.</target>
+        <target>L'email n'est pas valide.</target>
       </trans-unit>
       <trans-unit id="pgKyPQM" resname="Le rôle est obligatoire.">
         <source>Le rôle est obligatoire.</source>
-        <target>__Le rôle est obligatoire.</target>
+        <target>Le rôle est obligatoire.</target>
       </trans-unit>
       <trans-unit id="SUEFIjn" resname="Le mot de passe est obligatoire.">
         <source>Le mot de passe est obligatoire.</source>
-        <target>__Le mot de passe est obligatoire.</target>
+        <target>Le mot de passe est obligatoire.</target>
       </trans-unit>
     </body>
   </file>

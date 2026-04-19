@@ -80,40 +80,51 @@ class GrokService
 
 private function buildSystemPrompt(string $schema, ?string $userCin = null): string
 {
-    // Nettoyer le schéma
     $lines = explode("\n", $schema);
     $lines = array_filter($lines, fn($l) => !preg_match(
         '/^\s*(KEY|INDEX|CONSTRAINT|UNIQUE KEY|ENGINE|CHARSET|COLLATE|AUTO_INCREMENT)/i', $l
     ));
     $schema = implode("\n", $lines);
 
-    // ── Extraire les noms de tables ──────────────────
     preg_match_all('/TABLE:\s*(\w+)/i', $schema, $matches);
     $tableNames = implode(', ', $matches[1] ?? []);
-    // ────────────────────────────────────────────────
 
     if (strlen($schema) > 10000) {
         $schema = substr($schema, 0, 10000) . "\n...(tronqué)";
     }
 
-    $filterRule = $userCin
-        ? "⚠️ FILTRE OBLIGATOIRE : CIN de l'agriculteur = '{$userCin}'. Filtre toujours par cette valeur."
-        : '';
+    // Construire la règle de filtrage avec le mapping colonne → table
+    $filterRule = '';
+    if ($userCin) {
+        $filterRule = <<<FILTER
+⚠️ FILTRE OBLIGATOIRE : L'utilisateur connecté a le CIN = '{$userCin}'.
+Tu DOIS toujours filtrer les données par cet identifiant.
+Mapping des colonnes selon la table :
+- Table "users"   → filtre sur la colonne "cin" : WHERE cin = '{$userCin}'
+- Table "terrain" → filtre sur la colonne "cin" : WHERE cin = '{$userCin}'
+- Table "animaux" → filtre sur la colonne "user_id" : WHERE user_id = '{$userCin}'
+- Table "article" → filtre sur la colonne "user_id" : WHERE user_id = '{$userCin}'
+- Toute autre table → utilise la colonne qui référence l'utilisateur (cin, user_id, id_user)
+NE JAMAIS retourner des données sans ce filtre.
+FILTER;
+    }
 
     return <<<PROMPT
-    Tu es un assistant expert en agriculture tunisienne.
-    Tables disponibles : {$tableNames}
-    Schéma : {$schema}
-    {$filterRule}
+Tu es un assistant expert en agriculture tunisienne.
+Tables disponibles : {$tableNames}
+Schéma complet :
+{$schema}
 
-    INSTRUCTION CRITIQUE : Tu dois TOUJOURS répondre avec un objet JSON valide.
-    JAMAIS de texte libre, JAMAIS de SQL seul, JAMAIS de markdown.
-    Format OBLIGATOIRE :
-    {"sql":"SELECT ...","analysis":"Réponse en français","summary":"Résumé court"}
+{$filterRule}
 
-    Si pas de SQL nécessaire :
-    {"sql":null,"analysis":"Réponse en français","summary":"Résumé court"}
-    PROMPT;
+INSTRUCTION CRITIQUE : Tu dois TOUJOURS répondre avec un objet JSON valide.
+JAMAIS de texte libre, JAMAIS de SQL seul, JAMAIS de markdown.
+Format OBLIGATOIRE :
+{"sql":"SELECT ...","analysis":"Réponse en français","summary":"Résumé court"}
+
+Si pas de SQL nécessaire :
+{"sql":null,"analysis":"Réponse en français","summary":"Résumé court"}
+PROMPT;
 }
 private function callApi(string $system, array $messages, int $maxTokens = 400): string
 {
