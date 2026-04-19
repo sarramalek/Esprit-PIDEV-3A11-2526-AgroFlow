@@ -25,6 +25,6 @@ services:
         tags:
             - { name: kernel.event_subscriber }
 
-    App\EventListener\LocaleListener:
+    App\EventListener\LocaleListener_plante:
         tags:
-            - { name: kernel.event_listener, event: kernel.request, priority: 20 }
+        - { name: kernel.event_listener, event: kernel.request, priority: 20 }

@@ -21,7 +21,7 @@ class AiSuggestionController extends AbstractController
     #[Route('/api/ai-suggestion', name: 'api_ai_suggestion', methods: ['POST'])]
     public function suggest(Request $request): JsonResponse
     {
-        $apiKey = $_ENV['GROQ_API_KEY'] ?? '';
+        $apiKey = $_ENV['GROQ_API_KEY_ROTATION'] ?? '';
         if (!$apiKey) {
             return $this->json(['error' => 'Clé API Groq manquante.'], 500);
         }
