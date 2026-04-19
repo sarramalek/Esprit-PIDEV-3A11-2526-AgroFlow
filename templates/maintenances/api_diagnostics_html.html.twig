@@ -1,578 +1,481 @@
 {% extends 'agriculteur_dashboard.html.twig' %}
 
-{% block title %}Diagnostics IA — #{{ maintenance.idMain }}{% endblock %}
+{% block title %}Diagnostics - {{ maintenance.nomMateriel ?? maintenance.nom }}{% endblock %}
 
 {% block body %}
 <style>
-.api-page { max-width:960px; margin:0 auto; padding:2rem 1.75rem; font-family:'Segoe UI',system-ui,sans-serif; }
-.api-bc { display:flex; align-items:center; gap:.4rem; font-size:.82rem; color:#5f7a5f; margin-bottom:1.5rem; }
-.api-bc a { color:#2d6a2d; text-decoration:none; font-weight:500; }
-.api-bc a:hover { text-decoration:underline; }
-.api-bc__sep { color:#aac2aa; }
-.api-header { margin-bottom:1.75rem; }
-.api-header h1 { margin:0 0 .3rem; font-size:1.75rem; font-weight:700; color:#1a2e1a; }
-.api-header p  { margin:0; font-size:.875rem; color:#6b8c6b; }
-
-.health-card {
-    background:#fff; border-radius:16px; box-shadow:0 2px 18px rgba(0,0,0,.07);
-    padding:1.2rem 1.5rem; margin-bottom:1.25rem;
-    display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap;
-    border-left:4px solid #2d6a2d;
-}
-.health-score-circle {
-    width:72px; height:72px; border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
-    flex-direction:column; font-weight:800; flex-shrink:0;
-    font-size:1.3rem; border:3px solid;
-}
-.health-score-circle.bon      { border-color:#2d6a2d; color:#2d6a2d; background:#eaf3de; }
-.health-score-circle.moyen    { border-color:#7b5200; color:#7b5200; background:#fff8e1; }
-.health-score-circle.degrade  { border-color:#854F0B; color:#854F0B; background:#faeeda; }
-.health-score-circle.critique { border-color:#a32d2d; color:#a32d2d; background:#fde8e8; }
-.health-info h3 { margin:0 0 .25rem; font-size:1rem; font-weight:700; color:#1a2e1a; }
-.health-info p  { margin:0; font-size:.83rem; color:#6b8c6b; }
-.health-pills   { display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.4rem; }
-.health-pill    { padding:.2rem .7rem; border-radius:20px; font-size:.75rem; font-weight:700; }
-.hp--red    { background:#fde8e8; color:#a32d2d; }
-.hp--orange { background:#faeeda; color:#854F0B; }
-.hp--green  { background:#eaf3de; color:#2d6a2d; }
-
-.api-context-card { background:#fff; border-radius:16px; box-shadow:0 2px 18px rgba(0,0,0,.07); padding:1.5rem; margin-bottom:1.5rem; border-left:4px solid #0F6E56; }
-.api-context-card h2 { margin:0 0 1rem; font-size:1rem; font-weight:700; color:#0F6E56; }
-.api-context-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:.75rem; }
-.api-citem { background:#f0faf7; border-radius:10px; padding:.85rem 1rem; }
-.api-clabel { font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#7a9a7a; margin-bottom:.25rem; }
-.api-cvalue { font-size:.95rem; font-weight:600; color:#1a2e1a; }
-
-.section-title { font-size:.8rem; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#0F6E56; margin:1.25rem 0 .75rem; }
-.diag-types-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:.75rem; margin-bottom:1.5rem; }
-.diag-type-chip { background:#fff; border:1.5px solid #a8d5c8; border-radius:12px; padding:.85rem 1rem; cursor:pointer; transition:all .15s; display:flex; flex-direction:column; gap:.3rem; }
-.diag-type-chip:hover,.diag-type-chip.selected { background:#E1F5EE; border-color:#0F6E56; }
-.diag-type-chip.selected { box-shadow:0 0 0 3px rgba(15,110,86,.12); }
-.dtc-icon { font-size:1.4rem; }
-.dtc-name { font-size:.88rem; font-weight:700; color:#1a2e1a; }
-.dtc-desc { font-size:.76rem; color:#5f7a5f; }
-
-.alerts-section { margin-bottom:1.5rem; }
-.alert-item { display:flex; align-items:center; gap:.75rem; padding:.7rem 1rem; border-radius:10px; margin-bottom:.5rem; font-size:.88rem; font-weight:500; }
-.alert-item--urgent  { background:#fde8e8; border-left:3px solid #a32d2d; color:#a32d2d; }
-.alert-item--overdue { background:#fff8e1; border-left:3px solid #f5a623; color:#7b4f00; }
-.alert-item--ok      { background:#eaf3de; border-left:3px solid #2d6a2d; color:#27500a; }
-
-.btn-generate { display:inline-flex; align-items:center; gap:.6rem; padding:.85rem 2rem; border-radius:12px; background:linear-gradient(135deg,#0F6E56,#085041); color:#fff; font-size:1rem; font-weight:700; border:none; cursor:pointer; transition:opacity .15s; box-shadow:0 4px 16px rgba(15,110,86,.3); }
-.btn-generate:hover { opacity:.9; }
-.btn-generate:disabled { opacity:.55; cursor:not-allowed; }
-.spinner { display:none; width:18px; height:18px; border:2.5px solid rgba(255,255,255,.3); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; }
-@keyframes spin { to { transform:rotate(360deg); } }
-
-.result-card { display:none; background:#fff; border-radius:16px; box-shadow:0 2px 18px rgba(0,0,0,.07); overflow:hidden; margin-top:1.5rem; }
-.result-header { background:linear-gradient(135deg,#0F6E56,#085041); padding:1.2rem 1.5rem; color:#fff; display:flex; align-items:center; gap:.75rem; }
-.result-header h2 { margin:0; font-size:1rem; font-weight:700; }
-.result-body { padding:1.5rem; }
-.result-body .diag-content { line-height:1.8; color:#2a3a2a; font-size:.95rem; }
-.result-body .diag-content h3 { color:#0F6E56; margin:1.25rem 0 .5rem; font-size:1rem; }
-.result-body .diag-content h4 { color:#534AB7; margin:1rem 0 .4rem; font-size:.9rem; }
-.result-body .diag-content ul { padding-left:1.4rem; margin:.5rem 0; }
-.result-body .diag-content li { margin-bottom:.4rem; }
-.result-body .diag-content strong { color:#1a2e1a; }
-.result-body .diag-content p { margin:.5rem 0; }
-.result-actions { display:flex; gap:.75rem; padding:1rem 1.5rem; border-top:1px solid #f0f4ef; background:#fafcf8; flex-wrap:wrap; }
-
-.error-card { display:none; background:#fcebeb; border-radius:12px; border:1.5px solid #f7c1c1; padding:1.2rem 1.5rem; color:#a32d2d; margin-top:1.25rem; font-size:.9rem; }
-
-.actions-row { display:flex; gap:.75rem; flex-wrap:wrap; align-items:center; margin-bottom:1.5rem; }
-.btn-back { display:inline-flex; align-items:center; gap:.4rem; padding:.62rem 1.2rem; border-radius:10px; border:1.5px solid #d0e4cc; color:#5f7a5f; font-size:.88rem; font-weight:600; text-decoration:none; background:transparent; transition:background .14s; }
-.btn-back:hover { background:#f2f8ee; }
-.btn-copy { display:inline-flex; align-items:center; gap:.4rem; padding:.55rem 1.1rem; border-radius:10px; border:1.5px solid #a8d5c8; color:#0F6E56; font-size:.85rem; font-weight:600; background:#fff; cursor:pointer; transition:background .14s; }
-.btn-copy:hover { background:#E1F5EE; }
-
-.loading-overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:1000; display:none; }
-.loading-spinner { background:#fff; padding:1.5rem 2rem; border-radius:16px; display:flex; align-items:center; gap:1rem; font-weight:600; color:#0F6E56; }
-.loading-spinner .spinner-large { width:24px; height:24px; border:3px solid #e0e0e0; border-top-color:#0F6E56; border-radius:50%; animation:spin .7s linear infinite; }
+    * { box-sizing: border-box; }
+    
+    .diag-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem 1.5rem;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+    
+    .diag-header {
+        background: linear-gradient(135deg, #0F6E56 0%, #085041 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .diag-header h1 {
+        margin: 0 0 0.5rem;
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-back {
+        background: rgba(255,255,255,0.2);
+        color: white;
+        border: none;
+        padding: 0.6rem 1.2rem;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.2s;
+    }
+    
+    .btn-back:hover {
+        background: rgba(255,255,255,0.3);
+        transform: translateX(-3px);
+    }
+    
+    .info-machine {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        border: 1px solid #e4edde;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .info-label {
+        font-weight: 700;
+        color: #7a9a7a;
+    }
+    
+    .info-value {
+        color: #1a2e1a;
+        font-weight: 600;
+    }
+    
+    .diag-types {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        border: 1px solid #e4edde;
+    }
+    
+    .diag-types h3 {
+        margin: 0 0 1rem;
+        color: #0F6E56;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .types-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 0.8rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .type-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.6rem;
+        background: #f9fcf7;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+    }
+    
+    .type-item:hover {
+        background: #eaf3de;
+        transform: translateX(3px);
+    }
+    
+    .type-item.selected {
+        background: #eaf3de;
+        border-color: #2d6a2d;
+    }
+    
+    .type-item input {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: #0F6E56;
+    }
+    
+    .type-item label {
+        cursor: pointer;
+        font-size: 0.85rem;
+        color: #1a2e1a;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+    
+    .btn-generate {
+        background: linear-gradient(135deg, #0F6E56 0%, #085041 100%);
+        color: white;
+        border: none;
+        padding: 0.8rem 2rem;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-generate:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(15,110,86,0.3);
+    }
+    
+    .btn-generate:disabled {
+        opacity: 0.6;
+        transform: none;
+        cursor: not-allowed;
+    }
+    
+    .result-panel {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        border: 1px solid #e4edde;
+        display: none;
+    }
+    
+    .result-panel.show {
+        display: block;
+        animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .result-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e4edde;
+    }
+    
+    .result-header h3 {
+        margin: 0;
+        color: #0F6E56;
+    }
+    
+    .badge-local {
+        background: #7a9a7a;
+        color: white;
+        padding: 0.2rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+    
+    .result-content {
+        line-height: 1.6;
+        color: #1a2e1a;
+        max-height: 600px;
+        overflow-y: auto;
+        padding-right: 0.5rem;
+    }
+    
+    .result-content h1, .result-content h2, .result-content h3 {
+        color: #0F6E56;
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .result-content h1 {
+        font-size: 1.5rem;
+        border-bottom: 2px solid #e4edde;
+        padding-bottom: 0.5rem;
+    }
+    
+    .result-content h2 {
+        font-size: 1.2rem;
+    }
+    
+    .result-content ul, .result-content ol {
+        margin: 0.5rem 0 1rem 1.5rem;
+    }
+    
+    .result-content li {
+        margin: 0.3rem 0;
+    }
+    
+    .result-content table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+        font-size: 0.85rem;
+    }
+    
+    .result-content th, .result-content td {
+        border: 1px solid #d4e8d4;
+        padding: 0.6rem;
+        text-align: left;
+    }
+    
+    .result-content th {
+        background: #eaf3de;
+        font-weight: 700;
+        color: #2d6a2d;
+    }
+    
+    .result-content tr:hover {
+        background: #f9fcf7;
+    }
+    
+    .loading {
+        text-align: center;
+        padding: 3rem;
+        display: none;
+    }
+    
+    .loading.show {
+        display: block;
+    }
+    
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid #e4edde;
+        border-top-color: #0F6E56;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    .toast {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #2d6a2d;
+        color: white;
+        padding: 0.8rem 1.2rem;
+        border-radius: 10px;
+        z-index: 1000;
+        animation: slideInRight 0.3s ease;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    
+    @keyframes slideInRight {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    
+    .toast.error { background: #a32d2d; }
+    .toast.warning { background: #856404; }
+    
+    .action-buttons {
+        margin-top: 1.5rem;
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        border-top: 1px solid #e4edde;
+        padding-top: 1rem;
+    }
+    
+    .btn-action {
+        background: #f0f0f0;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-action:hover {
+        background: #e0e0e0;
+        transform: translateY(-1px);
+    }
+    
+    .btn-copy {
+        background: #eaf3de;
+        color: #2d6a2d;
+    }
+    
+    .btn-export {
+        background: #0F6E56;
+        color: white;
+    }
+    
+    .btn-export:hover {
+        background: #085041;
+    }
+    
+    /* Style pour les badges de priorité dans le résultat */
+    .priority-badge {
+        display: inline-block;
+        padding: 0.2rem 0.6rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+    .priority-urgente { background: #fde8e8; color: #a32d2d; }
+    .priority-haute { background: #faeeda; color: #854F0B; }
+    .priority-moyenne { background: #eaf3de; color: #2d6a2d; }
+    .priority-faible { background: #e6f1fb; color: #0c447c; }
 </style>
 
-<div class="api-page">
-
-  <nav class="api-bc">
-    <a href="{{ path('agri_maintenances_index') }}">Maintenances</a>
-    <span class="api-bc__sep">›</span>
-    <a href="{{ path('agri_maintenances_show', {id: maintenance.idMain}) }}">#{{ maintenance.idMain }}</a>
-    <span class="api-bc__sep">›</span>
-    <span>Diagnostics IA</span>
-  </nav>
-
-  <div class="api-header">
-    <h1>🔍 Diagnostics intelligents</h1>
-    <p>Diagnostics adaptatifs, alertes intelligentes et score de santé pour votre machine</p>
-  </div>
-
-  <div class="actions-row">
-    <a href="{{ path('agri_maintenances_show', {id: maintenance.idMain}) }}" class="btn-back">← Retour à la fiche</a>
-    <a href="{{ path('agri_maintenances_api_schedule', {id: maintenance.idMain}) }}" class="btn-back" style="border-color:#AFA9EC; color:#534AB7;">🤖 Plan de maintenance</a>
-  </div>
-
-  <!-- Carte de santé -->
-  <div class="health-card" id="healthCard">
-    <div class="health-score-circle" id="healthCircle">…</div>
-    <div class="health-info">
-      <h3 id="healthTitle">Calcul du score…</h3>
-      <p id="healthDesc">Analyse en cours</p>
-      <div class="health-pills" id="healthPills"></div>
+<div class="diag-container">
+    <a href="{{ path('agri_maintenances_index') }}" class="btn-back">
+        ← Retour aux maintenances
+    </a>
+    
+    <div class="diag-header">
+        <h1>
+            🔍 Diagnostics techniques
+            <span class="badge-local">Hors ligne</span>
+        </h1>
+        <p>Analyse approfondie pour : {{ maintenance.nomMateriel ?? maintenance.nom ?? 'Machine' }}</p>
     </div>
-  </div>
-
-  <!-- Alertes intelligentes -->
-  <div class="alerts-section" id="alertsSection" style="display:none;">
-    <div class="section-title">🔔 Alertes intelligentes</div>
-    <div id="alertsList"></div>
-  </div>
-
-  <!-- Contexte de la panne -->
-  <div class="api-context-card">
-    <h2>📋 Contexte de la panne</h2>
-    <div class="api-context-grid">
-      <div class="api-citem"><div class="api-clabel">Type de panne</div><div class="api-cvalue">{{ maintenance.typePanne }}</div></div>
-      <div class="api-citem"><div class="api-clabel">Priorité</div><div class="api-cvalue">{{ maintenance.priorite|capitalize }}</div></div>
-      <div class="api-citem"><div class="api-clabel">Statut</div><div class="api-cvalue">{{ maintenance.statut|capitalize }}</div></div>
-      {% if maintenance.nom %}<div class="api-citem"><div class="api-clabel">Machine</div><div class="api-cvalue">{{ maintenance.nom }}</div></div>{% endif %}
-      {% if maintenance.kilometrage is not null %}<div class="api-citem"><div class="api-clabel">Kilométrage</div><div class="api-cvalue">{{ maintenance.kilometrage|number_format(0,' ',' ') }} km</div></div>{% endif %}
-      <div class="api-citem"><div class="api-clabel">Coût</div><div class="api-cvalue">{{ maintenance.cout|number_format(2,',',' ') }} DT</div></div>
-      {% if maintenance.dateMain %}<div class="api-citem"><div class="api-clabel">Date prévue</div><div class="api-cvalue">{{ maintenance.dateMain|date('d/m/Y') }}</div></div>{% endif %}
+    
+    <div class="info-machine">
+        <div class="info-item">
+            <span class="info-label">📌 Type de panne :</span>
+            <span class="info-value">{{ maintenance.typePanne|default('Non spécifié') }}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">⚡ Priorité :</span>
+            <span class="info-value">
+                {% if maintenance.priorite == 'urgente' %}🔴 Urgente
+                {% elseif maintenance.priorite == 'haute' %}🟠 Haute
+                {% elseif maintenance.priorite == 'moyenne' %}🟢 Moyenne
+                {% else %}🔵 Faible{% endif %}
+            </span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">📅 Statut :</span>
+            <span class="info-value">{{ maintenance.statut|default('planifié')|capitalize }}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">🔢 Kilométrage :</span>
+            <span class="info-value">{{ maintenance.kilometrage ? maintenance.kilometrage ~ ' km' : 'Non renseigné' }}</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">💰 Coût estimé :</span>
+            <span class="info-value">{{ maintenance.cout|number_format(2, ',', ' ') }} DT</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">📝 Description :</span>
+            <span class="info-value">{{ maintenance.description|default('Aucune')|slice(0,50) }}{{ maintenance.description|length > 50 ? '…' : '' }}</span>
+        </div>
     </div>
-    {% if maintenance.description %}
-    <div style="margin-top:.9rem; background:#f0faf7; border-radius:10px; padding:.85rem 1rem;">
-      <div class="api-clabel" style="margin-bottom:.35rem;">Description</div>
-      <div style="font-size:.9rem; color:#2a3a2a; line-height:1.6;">{{ maintenance.description }}</div>
+    
+    <div class="diag-types">
+        <h3>🔬 Types de diagnostics disponibles</h3>
+        <div class="types-grid" id="typesGrid">
+            <!-- Les types seront chargés dynamiquement -->
+        </div>
+        <button class="btn-generate" id="btnGenerateDiagnostics">
+            🤖 Générer le diagnostic complet
+        </button>
     </div>
-    {% endif %}
-  </div>
-
-  <!-- Sélection des types de diagnostics -->
-  <div class="section-title">🎯 Sélectionnez les types de diagnostics</div>
-  <div class="diag-types-grid" id="diagTypesGrid"></div>
-
-  <!-- Bouton de génération -->
-  <button class="btn-generate" id="generateBtn">
-    <span id="btnIcon">🔍</span>
-    <span class="spinner" id="spinner"></span>
-    <span id="btnText">Obtenir les diagnostics</span>
-  </button>
-
-  <!-- Message d'erreur -->
-  <div class="error-card" id="errorCard"></div>
-
-  <!-- Résultat -->
-  <div class="result-card" id="resultCard">
-    <div class="result-header">
-      <span style="font-size:1.5rem;">🔍</span>
-      <h2>Diagnostics générés par IA</h2>
+    
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>📊 Génération du diagnostic en cours...</p>
+        <p style="font-size: 0.8rem; color: #7a9a7a; margin-top: 0.5rem;">L'analyse peut prendre quelques secondes</p>
     </div>
-    <div class="result-body">
-      <div class="diag-content" id="diagContent"></div>
+    
+    <div class="result-panel" id="resultPanel">
+        <div class="result-header">
+            <h3>📋 Rapport de diagnostic</h3>
+            <span class="badge-local" id="generatedBadge">Généré localement</span>
+        </div>
+        <div class="result-content" id="resultContent">
+            <!-- Le contenu généré sera inséré ici -->
+        </div>
+        <div class="action-buttons">
+            <button class="btn-action btn-copy" id="btnCopyResult">
+                📋 Copier le rapport
+            </button>
+            <button class="btn-action btn-export" id="btnExportResult">
+                📥 Exporter en PDF
+            </button>
+        </div>
     </div>
-    <div class="result-actions">
-      <button class="btn-copy" onclick="copyResult()">📋 Copier le diagnostic</button>
-    </div>
-  </div>
-
-</div>
-
-<!-- Loading overlay global -->
-<div class="loading-overlay" id="loadingOverlay">
-  <div class="loading-spinner">
-    <div class="spinner-large"></div>
-    <span>Génération des diagnostics en cours...</span>
-  </div>
 </div>
 
 <script>
-// ─────────────────────────────────────────────────────────────────
-// Données de la maintenance
-// ─────────────────────────────────────────────────────────────────
-const maintenanceData = {
-    idMain:      {{ maintenance.idMain }},
-    idM:         {{ maintenance.idM|json_encode|raw }},
-    typePanne:   {{ maintenance.typePanne|json_encode|raw }},
-    priorite:    {{ maintenance.priorite|json_encode|raw }},
-    statut:      {{ maintenance.statut|json_encode|raw }},
-    kilometrage: {{ maintenance.kilometrage|json_encode|raw }},
-    nom:         {{ maintenance.nom|json_encode|raw }},
-    description: {{ maintenance.description|json_encode|raw }},
-    cout:        {{ maintenance.cout }},
-    dateMain:    {{ (maintenance.dateMain ? maintenance.dateMain|date('Y-m-d') : null)|json_encode|raw }},
-};
+let lastGeneratedContent = '';
 
-// ─────────────────────────────────────────────────────────────────
-// Types de diagnostics par catégorie de panne
-// ─────────────────────────────────────────────────────────────────
-const diagTypesByPanne = {
-    'Mécanique': [
-        {id: 'vibratoire', icon:'⚙️', name:'Analyse vibratoire', desc:'Détection des vibrations anormales'},
-        {id: 'inspection_pieces', icon:'🔩', name:'Inspection des pièces', desc:'Usure, fissures, jeu mécanique'},
-        {id: 'thermique', icon:'🌡️', name:'Contrôle thermique', desc:'Surchauffe des composants'},
-        {id: 'performances', icon:'📊', name:'Test de performances', desc:'Puissance et rendement moteur'}
-    ],
-    'Électricité': [
-        {id: 'circuits', icon:'⚡', name:'Test des circuits', desc:'Continuité, isolement électrique'},
-        {id: 'batterie', icon:'🔋', name:'Contrôle batterie', desc:'Tension, capacité et état'},
-        {id: 'capteurs', icon:'💡', name:'Diagnostic capteurs', desc:'Vérification des capteurs et sondes'},
-        {id: 'connexions', icon:'🔌', name:'Connexions', desc:'État des connecteurs et câblage'}
-    ],
-    'Hydraulique': [
-        {id: 'analyse_fluide', icon:'💧', name:'Analyse du fluide', desc:'Viscosité, contamination, niveau'},
-        {id: 'test_pression', icon:'📈', name:'Test de pression', desc:'Pression du circuit hydraulique'},
-        {id: 'detection_fuites', icon:'🔍', name:'Détection de fuites', desc:'Joints, tuyaux, raccords'},
-        {id: 'pompe', icon:'⚙️', name:'Pompe hydraulique', desc:'Débit et rendement de la pompe'}
-    ],
-    'Moteur': [
-        {id: 'compression', icon:'🔧', name:'Compression moteur', desc:'Vérification des cylindres et pistons'},
-        {id: 'refroidissement', icon:'🌡️', name:'Circuit refroidissement', desc:'État du liquide et du radiateur'},
-        {id: 'injection', icon:'⛽', name:'Injection carburant', desc:'État des injecteurs et pompe'},
-        {id: 'echappement', icon:'💨', name:"Gaz d'échappement", desc:'Analyse des émissions anormales'}
-    ],
-    'Vidange & filtres': [
-        {id: 'analyse_huile', icon:'🛢️', name:'Analyse huile moteur', desc:'Viscosité et particules d\'usure'},
-        {id: 'filtre_air', icon:'🌬️', name:'Filtre à air', desc:'Colmatage et efficacité'},
-        {id: 'filtre_carburant', icon:'⛽', name:'Filtre carburant', desc:'Restrictions et colmatage'},
-        {id: 'filtre_hydraulique', icon:'💧', name:'Filtre hydraulique', desc:'Particules et contamination'}
-    ],
-    'Transmission': [
-        {id: 'boite_vitesses', icon:'⚙️', name:'Boîte de vitesses', desc:'État des engrenages et synchronisation'},
-        {id: 'arbres_transmission', icon:'🔗', name:'Arbres de transmission', desc:'Joints homocinétiques, usure'},
-        {id: 'embrayage', icon:'🔧', name:'Embrayage', desc:'Usure des garnitures et butée'},
-        {id: 'test_glissement', icon:'📊', name:'Test de glissement', desc:'Efficacité de la transmission'}
-    ],
-    'Pneumatique': [
-        {id: 'pression', icon:'🔵', name:'Pression pneus', desc:'Vérification pression et uniformité'},
-        {id: 'inspection_visuelle', icon:'👁️', name:'Inspection visuelle', desc:'Usure, coupures, déformations'},
-        {id: 'equilibrage', icon:'⚖️', name:'Équilibrage', desc:'Vibrations et équilibrage des roues'},
-        {id: 'geometrie', icon:'📐', name:'Géométrie', desc:'Contrôle du parallélisme et carrossage'}
-    ],
-    'Logicielle': [
-        {id: 'diagnostic_ecu', icon:'💻', name:'Diagnostic ECU', desc:'Lecture des codes défauts'},
-        {id: 'capteurs_elec', icon:'📡', name:'Capteurs électroniques', desc:'Calibration et signaux'},
-        {id: 'firmware', icon:'🔄', name:'Mise à jour firmware', desc:'Version logicielle et correctifs'},
-        {id: 'donnees_fonct', icon:'📊', name:'Données fonctionnement', desc:'Historique et anomalies logicielles'}
-    ],
-    'Révision générale': [
-        {id: 'inspection_complete', icon:'📋', name:'Inspection complète', desc:'Vérification de tous les systèmes'},
-        {id: 'mesures_usure', icon:'📏', name:'Mesures d\'usure', desc:'Jeux et tolérances mécaniques'},
-        {id: 'serrage', icon:'🔧', name:'Contrôle serrage', desc:'Vérification des couples de serrage'},
-        {id: 'suivi_preventif', icon:'📅', name:'Suivi préventif', desc:'Planning et historique entretien'}
-    ]
-};
-
-const defaultDiagTypes = [
-    {id: 'general', icon:'🔍', name:'Diagnostic général', desc:'Inspection complète de la machine'},
-    {id: 'symptomes', icon:'📊', name:'Analyse des symptômes', desc:'Identification des causes racines'},
-    {id: 'fonctionnel', icon:'🛠️', name:'Test fonctionnel', desc:'Vérification du fonctionnement global'},
-    {id: 'bilan', icon:'📝', name:'Bilan technique', desc:'Rapport d\'état détaillé'}
-];
-
-function getTypes() {
-    return diagTypesByPanne[maintenanceData.typePanne] || defaultDiagTypes;
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
 }
 
-// ─────────────────────────────────────────────────────────────────
-// État des diagnostics sélectionnés
-// ─────────────────────────────────────────────────────────────────
-let selectedDiagTypes = [];
-
-function renderDiagChips() {
-    const grid = document.getElementById('diagTypesGrid');
-    const types = getTypes();
-    grid.innerHTML = '';
-    
-    types.forEach((dt, i) => {
-        const chip = document.createElement('div');
-        chip.className = 'diag-type-chip selected';
-        chip.dataset.id = dt.id;
-        chip.dataset.index = i;
-        chip.innerHTML = `
-            <span class="dtc-icon">${dt.icon}</span>
-            <span class="dtc-name">${dt.name}</span>
-            <span class="dtc-desc">${dt.desc}</span>
-        `;
-        chip.onclick = () => {
-            chip.classList.toggle('selected');
-            updateSelectedTypes();
-        };
-        grid.appendChild(chip);
-    });
-    
-    selectedDiagTypes = types.map((_, i) => i);
-}
-
-function updateSelectedTypes() {
-    const chips = document.querySelectorAll('.diag-type-chip');
-    selectedDiagTypes = [];
-    chips.forEach((chip, idx) => {
-        if (chip.classList.contains('selected')) {
-            selectedDiagTypes.push(idx);
-        }
-    });
-}
-
-renderDiagChips();
-
-// ─────────────────────────────────────────────────────────────────
-// Calcul du score de santé
-// ─────────────────────────────────────────────────────────────────
-function computeLocalHealth() {
-    let score = 100;
-    
-    if (maintenanceData.statut !== 'termine') {
-        const penalties = {urgente: 25, haute: 15, moyenne: 8, faible: 3};
-        score -= (penalties[maintenanceData.priorite] || 3);
-        
-        if (maintenanceData.statut === 'en_cours') score -= 5;
-        
-        if (maintenanceData.dateMain && maintenanceData.statut === 'planifie') {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            const dm = new Date(maintenanceData.dateMain);
-            if (dm < today) {
-                const daysLate = Math.floor((today - dm) / 86400000);
-                score -= Math.min(20, daysLate * 2);
-            }
-        }
-    }
-    
-    // Pénalité kilométrage élevé
-    if (maintenanceData.kilometrage && maintenanceData.kilometrage > 8000) {
-        score -= 5;
-    }
-    if (maintenanceData.kilometrage && maintenanceData.kilometrage > 12000) {
-        score -= 10;
-    }
-    
-    return Math.max(0, Math.min(100, score));
-}
-
-function healthLabel(score) {
-    if (score >= 80) return {label: 'Bon', cls: 'bon', desc: 'Machine en bon état de fonctionnement.'};
-    if (score >= 60) return {label: 'Moyen', cls: 'moyen', desc: 'Surveillance recommandée.'};
-    if (score >= 40) return {label: 'Dégradé', cls: 'degrade', desc: 'Intervention à planifier rapidement.'};
-    return {label: 'Critique', cls: 'critique', desc: 'Intervention urgente requise !'};
-}
-
-function renderHealthScore() {
-    const score = computeLocalHealth();
-    const { label, cls, desc } = healthLabel(score);
-    
-    const circle = document.getElementById('healthCircle');
-    circle.textContent = score + '%';
-    circle.className = 'health-score-circle ' + cls;
-    
-    document.getElementById('healthTitle').textContent = 'Score de santé : ' + label;
-    document.getElementById('healthDesc').textContent = desc;
-    
-    const pills = document.getElementById('healthPills');
-    pills.innerHTML = '';
-    
-    if (maintenanceData.priorite === 'urgente') {
-        pills.innerHTML += '<span class="health-pill hp--red">🔴 Panne urgente</span>';
-    }
-    if (maintenanceData.priorite === 'haute') {
-        pills.innerHTML += '<span class="health-pill hp--orange">🟠 Haute priorité</span>';
-    }
-    if (maintenanceData.statut !== 'termine') {
-        pills.innerHTML += '<span class="health-pill hp--orange">⚙️ Non résolue</span>';
+function showLoading(show) {
+    const loadingEl = document.getElementById('loading');
+    const resultPanel = document.getElementById('resultPanel');
+    if (show) {
+        loadingEl.classList.add('show');
+        resultPanel.classList.remove('show');
     } else {
-        pills.innerHTML += '<span class="health-pill hp--green">✅ Terminée</span>';
+        loadingEl.classList.remove('show');
     }
 }
 
-renderHealthScore();
-
-// ─────────────────────────────────────────────────────────────────
-// Génération des alertes intelligentes
-// ─────────────────────────────────────────────────────────────────
-function renderAlerts() {
-    const alerts = [];
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+function formatMarkdown(text) {
+    if (!text) return '<em>Aucun contenu généré</em>';
     
-    // Alerte priorité urgente
-    if (maintenanceData.priorite === 'urgente' && maintenanceData.statut !== 'termine') {
-        alerts.push({ type: 'urgent', msg: '⚠️ Maintenance urgente non résolue — intervenir immédiatement' });
-    }
+    let html = text;
     
-    // Alerte haute priorité
-    if (maintenanceData.priorite === 'haute' && maintenanceData.statut !== 'termine') {
-        alerts.push({ type: 'overdue', msg: '🟠 Maintenance haute priorité en attente' });
-    }
-    
-    // Alerte retard
-    if (maintenanceData.dateMain && maintenanceData.statut === 'planifie') {
-        const dm = new Date(maintenanceData.dateMain);
-        if (dm < today) {
-            const diff = Math.floor((today - dm) / 86400000);
-            alerts.push({ type: 'overdue', msg: `📅 Maintenance planifiée en retard de ${diff} jour(s)` });
-        }
-    }
-    
-    // Alerte kilométrage élevé
-    if (maintenanceData.kilometrage) {
-        if (maintenanceData.kilometrage > 10000) {
-            alerts.push({ type: 'overdue', msg: '🔩 Kilométrage très élevé — révision générale urgente' });
-        } else if (maintenanceData.kilometrage > 5000) {
-            alerts.push({ type: 'overdue', msg: '🔧 Kilométrage élevé — vidange recommandée' });
-        }
-    }
-    
-    // Message par défaut
-    if (alerts.length === 0) {
-        alerts.push({ type: 'ok', msg: '✅ Aucune alerte critique détectée pour cette maintenance' });
-    }
-    
-    const section = document.getElementById('alertsSection');
-    const list = document.getElementById('alertsList');
-    list.innerHTML = '';
-    
-    alerts.forEach(a => {
-        const div = document.createElement('div');
-        div.className = 'alert-item alert-item--' + a.type;
-        div.textContent = a.msg;
-        list.appendChild(div);
-    });
-    
-    section.style.display = 'block';
-}
-
-renderAlerts();
-
-// ─────────────────────────────────────────────────────────────────
-// Génération des diagnostics via API
-// ─────────────────────────────────────────────────────────────────
-document.getElementById('generateBtn').addEventListener('click', generateDiagnostics);
-
-async function generateDiagnostics() {
-    const btn = document.getElementById('generateBtn');
-    const spinner = document.getElementById('spinner');
-    const btnText = document.getElementById('btnText');
-    const btnIcon = document.getElementById('btnIcon');
-    const result = document.getElementById('resultCard');
-    const content = document.getElementById('diagContent');
-    const errorCard = document.getElementById('errorCard');
-    const loadingOverlay = document.getElementById('loadingOverlay');
-
-    const allTypes = getTypes();
-    const chosen = selectedDiagTypes.map(i => allTypes[i]).filter(Boolean);
-
-    if (chosen.length === 0) {
-        errorCard.textContent = '⚠️ Sélectionnez au moins un type de diagnostic.';
-        errorCard.style.display = 'block';
-        setTimeout(() => {
-            errorCard.style.display = 'none';
-        }, 5000);
-        return;
-    }
-
-    // Désactiver le bouton
-    btn.disabled = true;
-    spinner.style.display = 'block';
-    btnIcon.style.display = 'none';
-    btnText.textContent = 'Analyse en cours…';
-    result.style.display = 'none';
-    errorCard.style.display = 'none';
-    loadingOverlay.style.display = 'flex';
-
-    const chosenList = chosen.map(d => `- ${d.icon} ${d.name} : ${d.desc}`).join('\n');
-
-    const prompt = `Tu es un expert en diagnostic de machines agricoles.
-
-=== CONTEXTE DE LA MACHINE ===
-Machine : ${maintenanceData.nom || 'Non spécifiée'}
-Type de panne : ${maintenanceData.typePanne}
-Priorité : ${maintenanceData.priorite}
-Statut actuel : ${maintenanceData.statut}
-Kilométrage : ${maintenanceData.kilometrage ? maintenanceData.kilometrage + ' km' : 'Non renseigné'}
-Coût estimé : ${maintenanceData.cout} DT
-Date : ${maintenanceData.dateMain || 'Non renseignée'}
-Description : ${maintenanceData.description || 'Aucune'}
-
-=== TYPES DE DIAGNOSTICS DEMANDÉS ===
-${chosenList}
-
-=== CONSIGNES ===
-Pour CHAQUE type de diagnostic, fournis :
-1. **Description** : Explication du diagnostic dans ce contexte précis
-2. **Procédure étape par étape** : Comment effectuer ce diagnostic
-3. **Outils nécessaires** : Équipements et matériel requis
-4. **Valeurs normales** : Seuils et plages acceptables
-5. **Signes d'anomalie** : Ce qui indique un problème
-6. **Actions correctives** : Mesures à prendre si anomalie
-7. **Fréquence recommandée** : Intervalles basés sur le kilométrage/usage
-
-En fin de réponse, ajoute une section :
-## 🎯 Score de criticité
-Évalue la criticité (1-10) de la panne "${maintenanceData.typePanne}" sur ce type de machine et justifie.
-
-## 📅 Prochaine maintenance recommandée
-Basé sur le kilométrage et le type de panne, indique la prochaine échéance.
-
-## 🔩 Pièces détachées potentielles
-Liste les pièces susceptibles d'être remplacées avec estimation de coût.
-
-Sois précis, pratique et adapté au contexte agricole tunisien.`;
-
-    try {
-        const resp = await fetch("{{ path('agri_maintenances_api_gemini_generate') }}", {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt: prompt })
-        });
-
-        if (!resp.ok) {
-            const err = await resp.json();
-            throw new Error(err.error || `Erreur API: ${resp.status}`);
-        }
-
-        const data = await resp.json();
-        if (!data.text) throw new Error('Réponse vide de l\'API.');
-
-        content.innerHTML = markdownToHtml(data.text);
-        result.style.display = 'block';
-        result.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-    } catch (err) {
-        console.error('Erreur:', err);
-        errorCard.textContent = '❌ ' + err.message;
-        errorCard.style.display = 'block';
-        setTimeout(() => {
-            errorCard.style.display = 'none';
-        }, 8000);
-    } finally {
-        btn.disabled = false;
-        spinner.style.display = 'none';
-        btnIcon.style.display = 'inline';
-        btnText.textContent = 'Relancer les diagnostics';
-        loadingOverlay.style.display = 'none';
-    }
-}
-
-// ─────────────────────────────────────────────────────────────────
-// Copier le résultat
-// ─────────────────────────────────────────────────────────────────
-function copyResult() {
-    const text = document.getElementById('diagContent').innerText;
-    navigator.clipboard.writeText(text).then(() => {
-        alert('📋 Diagnostic copié dans le presse-papiers !');
-    }).catch(() => {
-        alert('❌ Impossible de copier le texte.');
-    });
-}
-
-// ─────────────────────────────────────────────────────────────────
-// Conversion Markdown vers HTML
-// ─────────────────────────────────────────────────────────────────
-function markdownToHtml(md) {
-    if (!md) return '';
-    
-    let html = md;
-    
-    // Échapper les caractères HTML (sauf les balises qu'on va créer)
+    // Échapper le HTML
     html = html.replace(/[&<>]/g, function(m) {
         if (m === '&') return '&amp;';
         if (m === '<') return '&lt;';
@@ -581,52 +484,240 @@ function markdownToHtml(md) {
     });
     
     // Titres
-    html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-    html = html.replace(/^## (.+)$/gm, '<h3>$1</h3>');
-    html = html.replace(/^# (.+)$/gm, '<h3>$1</h3>');
+    html = html.replace(/^### (.*$)/gm, '<h3>$1</h3>');
+    html = html.replace(/^## (.*$)/gm, '<h2>$1</h2>');
+    html = html.replace(/^# (.*$)/gm, '<h1>$1</h1>');
     
-    // Titres de niveau 4 pour les sous-sections
-    html = html.replace(/^#### (.+)$/gm, '<h4>$1</h4>');
+    // Formatage des badges de priorité dans le texte
+    html = html.replace(/🔴 Urgente/g, '<span class="priority-badge priority-urgente">🔴 Urgente</span>');
+    html = html.replace(/🟠 Haute/g, '<span class="priority-badge priority-haute">🟠 Haute</span>');
+    html = html.replace(/🟢 Moyenne/g, '<span class="priority-badge priority-moyenne">🟢 Moyenne</span>');
+    html = html.replace(/🔵 Faible/g, '<span class="priority-badge priority-faible">🔵 Faible</span>');
     
     // Gras
-    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     
     // Italique
-    html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
     
     // Listes non ordonnées
-    html = html.replace(/^[-*] (.+)$/gm, '<li>$1</li>');
-    html = html.replace(/(<li>.*<\/li>\n?)+/g, function(s) {
-        return '<ul>' + s + '</ul>';
-    });
+    html = html.replace(/^- (.*$)/gm, '<li>$1</li>');
+    html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
     
     // Listes ordonnées
-    html = html.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
-    html = html.replace(/(<li>.*<\/li>\n?)+(?=<li>|$)/g, function(s) {
-        if (s.indexOf('</li>') > 0) {
-            return '<ol>' + s + '</ol>';
-        }
-        return s;
+    html = html.replace(/^\d+\. (.*$)/gm, '<li>$1</li>');
+    
+    // Tableaux - format markdown vers HTML
+    html = html.replace(/\|(.+)\|/g, function(match) {
+        const cells = match.split('|').filter(c => c.trim());
+        if (cells[0] && cells[0].includes('---')) return '';
+        return '<tr>' + cells.map(c => `<td>${c.trim()}</td>`).join('') + '</tr>';
     });
     
-    // Paragraphes
+    // Retour à la ligne
     html = html.replace(/\n\n/g, '</p><p>');
-    
-    // Sauts de ligne simples
     html = html.replace(/\n/g, '<br>');
     
-    // Encapsuler dans un paragraphe si nécessaire
-    if (!html.startsWith('<')) {
-        html = '<p>' + html + '</p>';
-    }
-    
-    return html;
+    return `<div style="font-family: 'Segoe UI', system-ui, sans-serif;">${html}</div>`;
 }
 
-// Rafraîchir le score de santé périodiquement (optionnel)
-setInterval(() => {
-    renderHealthScore();
-    renderAlerts();
-}, 30000); // toutes les 30 secondes
+async function loadDiagnosticTypes() {
+    const typePanne = '{{ maintenance.typePanne }}';
+    try {
+        const response = await fetch(`{{ path("agri_maintenances_api_diagnostics_types") }}?typePanne=${encodeURIComponent(typePanne)}`);
+        const data = await response.json();
+        
+        if (data.success && data.types && data.types.length > 0) {
+            const typesGrid = document.getElementById('typesGrid');
+            typesGrid.innerHTML = data.types.map(type => `
+                <div class="type-item" onclick="this.querySelector('input').click()">
+                    <input type="checkbox" id="type_${type.id}" value="${type.id}" checked>
+                    <label for="type_${type.id}">${type.icon} ${type.name}</label>
+                    <span style="font-size:0.7rem;color:#7a9a7a;margin-left:auto;">${type.desc}</span>
+                </div>
+            `).join('');
+        } else {
+            document.getElementById('typesGrid').innerHTML = '<div style="color:#7a9a7a;">Aucun type de diagnostic disponible</div>';
+        }
+    } catch (error) {
+        console.error('Erreur chargement types:', error);
+        showToast('Erreur chargement des types', 'error');
+    }
+}
+
+async function generateDiagnostics() {
+    const selectedTypes = [...document.querySelectorAll('.type-item input:checked')].map(cb => cb.value);
+    
+    if (selectedTypes.length === 0) {
+        showToast('Veuillez sélectionner au moins un type de diagnostic', 'warning');
+        return;
+    }
+    
+    showLoading(true);
+    
+    try {
+        const response = await fetch('{{ path("agri_maintenances_api_diagnostics_generate") }}', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json', 
+                'X-Requested-With': 'XMLHttpRequest' 
+            },
+            body: JSON.stringify({ 
+                maintenanceId: {{ maintenance.idMain }}, 
+                diagnosticTypes: selectedTypes 
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success && data.diagnostics) {
+            lastGeneratedContent = data.diagnostics;
+            const formattedContent = formatMarkdown(data.diagnostics);
+            document.getElementById('resultContent').innerHTML = formattedContent;
+            document.getElementById('resultPanel').classList.add('show');
+            showToast('Diagnostic généré avec succès', 'success');
+        } else {
+            showToast(data.error || 'Erreur lors de la génération', 'error');
+        }
+    } catch (error) {
+        console.error('Erreur:', error);
+        showToast('Erreur de connexion au serveur', 'error');
+    } finally {
+        showLoading(false);
+    }
+}
+
+function copyToClipboard() {
+    if (!lastGeneratedContent) {
+        showToast('Aucun contenu à copier', 'warning');
+        return;
+    }
+    
+    // Nettoyer le texte pour la copie (enlever le markdown)
+    let plainText = lastGeneratedContent
+        .replace(/\*\*(.*?)\*\*/g, '$1')
+        .replace(/\*(.*?)\*/g, '$1')
+        .replace(/^### (.*$)/gm, '$1')
+        .replace(/^## (.*$)/gm, '$1')
+        .replace(/^# (.*$)/gm, '$1')
+        .replace(/^- (.*$)/gm, '• $1')
+        .replace(/\|/g, ' ');
+    
+    navigator.clipboard.writeText(plainText);
+    showToast('Rapport copié dans le presse-papier', 'success');
+}
+
+function exportToPDF() {
+    if (!lastGeneratedContent) {
+        showToast('Aucun contenu à exporter', 'warning');
+        return;
+    }
+    
+    const machineName = '{{ maintenance.nomMateriel ?? maintenance.nom ?? 'Machine' }}';
+    const formattedContent = formatMarkdown(lastGeneratedContent);
+    const currentDate = new Date().toLocaleDateString('fr-FR');
+    const currentTime = new Date().toLocaleTimeString('fr-FR');
+    
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Diagnostic - ${machineName}</title>
+            <meta charset="UTF-8">
+            <style>
+                body {
+                    font-family: 'Segoe UI', Arial, sans-serif;
+                    padding: 2rem;
+                    max-width: 1000px;
+                    margin: 0 auto;
+                    line-height: 1.6;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #0F6E56;
+                }
+                h1 {
+                    border-bottom: 2px solid #0F6E56;
+                    padding-bottom: 0.5rem;
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin: 1rem 0;
+                }
+                th, td {
+                    border: 1px solid #ddd;
+                    padding: 0.5rem;
+                    text-align: left;
+                }
+                th {
+                    background: #eaf3de;
+                }
+                .header {
+                    text-align: center;
+                    margin-bottom: 2rem;
+                    border-bottom: 2px solid #0F6E56;
+                    padding-bottom: 1rem;
+                }
+                .footer {
+                    margin-top: 2rem;
+                    text-align: center;
+                    font-size: 0.8rem;
+                    color: #7a9a7a;
+                    border-top: 1px solid #ddd;
+                    padding-top: 1rem;
+                }
+                .priority-badge {
+                    display: inline-block;
+                    padding: 0.2rem 0.6rem;
+                    border-radius: 20px;
+                    font-size: 0.7rem;
+                    font-weight: 600;
+                }
+                .priority-urgente { background: #fde8e8; color: #a32d2d; }
+                .priority-haute { background: #faeeda; color: #854F0B; }
+                .priority-moyenne { background: #eaf3de; color: #2d6a2d; }
+                .priority-faible { background: #e6f1fb; color: #0c447c; }
+                @media print {
+                    body {
+                        padding: 1rem;
+                    }
+                    .no-print {
+                        display: none;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>🔍 Rapport de diagnostic technique</h1>
+                <p><strong>Machine :</strong> ${machineName}</p>
+                <p><strong>Date :</strong> ${currentDate} à ${currentTime}</p>
+            </div>
+            ${formattedContent}
+            <div class="footer">
+                <p>Document généré automatiquement par AgroFlow - Système de gestion de maintenance</p>
+                <p>Ce rapport est à titre indicatif et ne remplace pas l'avis d'un technicien qualifié.</p>
+            </div>
+            <script>
+                window.onload = function() {
+                    window.print();
+                    setTimeout(() => window.close(), 500);
+                };
+            <\/script>
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+}
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', function() {
+    loadDiagnosticTypes();
+    document.getElementById('btnGenerateDiagnostics').onclick = generateDiagnostics;
+    document.getElementById('btnCopyResult').onclick = copyToClipboard;
+    document.getElementById('btnExportResult').onclick = exportToPDF;
+});
 </script>
 {% endblock %}
