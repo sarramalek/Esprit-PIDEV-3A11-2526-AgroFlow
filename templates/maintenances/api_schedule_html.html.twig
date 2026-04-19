@@ -1,362 +1,492 @@
 {% extends 'agriculteur_dashboard.html.twig' %}
 
-{% block title %}Plan de maintenance IA — #{{ maintenance.idMain }}{% endblock %}
+{% block title %}Plan de maintenance - {{ maintenance.nomMateriel ?? maintenance.nom }}{% endblock %}
 
 {% block body %}
 <style>
-.api-page { max-width:960px; margin:0 auto; padding:2rem 1.75rem; font-family:'Segoe UI',system-ui,sans-serif; }
-.api-bc { display:flex; align-items:center; gap:.4rem; font-size:.82rem; color:#5f7a5f; margin-bottom:1.5rem; }
-.api-bc a { color:#2d6a2d; text-decoration:none; font-weight:500; }
-.api-bc a:hover { text-decoration:underline; }
-.api-bc__sep { color:#aac2aa; }
-.api-header { margin-bottom:1.75rem; }
-.api-header h1 { margin:0 0 .3rem; font-size:1.75rem; font-weight:700; color:#1a2e1a; }
-.api-header p  { margin:0; font-size:.875rem; color:#6b8c6b; }
-
-.plan-options-card { background:#fff; border-radius:16px; box-shadow:0 2px 18px rgba(0,0,0,.07); padding:1.4rem 1.5rem; margin-bottom:1.25rem; border-left:4px solid #534AB7; }
-.plan-options-card h2 { margin:0 0 1rem; font-size:1rem; font-weight:700; color:#3C3489; }
-.options-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:.75rem; }
-.opt-chip { background:#f9f7ff; border:1.5px solid #AFA9EC; border-radius:12px; padding:.75rem 1rem; cursor:pointer; transition:all .15s; display:flex; flex-direction:column; gap:.25rem; }
-.opt-chip:hover,.opt-chip.selected { background:#EEEDFE; border-color:#534AB7; box-shadow:0 0 0 3px rgba(83,74,183,.1); }
-.opt-chip__icon { font-size:1.3rem; }
-.opt-chip__name { font-size:.85rem; font-weight:700; color:#1a2e1a; }
-.opt-chip__desc { font-size:.73rem; color:#7a7aaa; }
-
-.api-context-card { background:#fff; border-radius:16px; box-shadow:0 2px 18px rgba(0,0,0,.07); padding:1.5rem; margin-bottom:1.5rem; border-left:4px solid #534AB7; }
-.api-context-card h2 { margin:0 0 1rem; font-size:1rem; font-weight:700; color:#3C3489; }
-.api-context-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:.75rem; }
-.api-citem { background:#f9f7ff; border-radius:10px; padding:.85rem 1rem; }
-.api-clabel { font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:#7a9a7a; margin-bottom:.25rem; }
-.api-cvalue { font-size:.95rem; font-weight:600; color:#1a2e1a; }
-
-.timeline-card { background:#fff; border-radius:16px; box-shadow:0 2px 18px rgba(0,0,0,.07); padding:1.4rem 1.5rem; margin-bottom:1.25rem; }
-.timeline-card h2 { margin:0 0 1rem; font-size:1rem; font-weight:700; color:#1a2e1a; }
-.timeline { display:flex; flex-direction:column; gap:.6rem; }
-.tl-item { display:flex; align-items:flex-start; gap:.9rem; }
-.tl-dot  { width:12px; height:12px; border-radius:50%; flex-shrink:0; margin-top:4px; }
-.tl-dot--done   { background:#2d6a2d; }
-.tl-dot--active { background:#7b5200; }
-.tl-dot--future { background:#AFA9EC; }
-.tl-text { font-size:.85rem; color:#3a5a3a; line-height:1.4; }
-.tl-text strong { color:#1a2e1a; }
-
-.btn-generate { display:inline-flex; align-items:center; gap:.6rem; padding:.85rem 2rem; border-radius:12px; background:linear-gradient(135deg,#534AB7,#3C3489); color:#fff; font-size:1rem; font-weight:700; border:none; cursor:pointer; transition:opacity .15s; box-shadow:0 4px 16px rgba(83,74,183,.3); }
-.btn-generate:hover { opacity:.9; }
-.btn-generate:disabled { opacity:.55; cursor:not-allowed; }
-.spinner { display:none; width:18px; height:18px; border:2.5px solid rgba(255,255,255,.3); border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; }
-@keyframes spin { to { transform:rotate(360deg); } }
-
-.result-card { display:none; background:#fff; border-radius:16px; box-shadow:0 2px 18px rgba(0,0,0,.07); overflow:hidden; margin-top:1.5rem; }
-.result-header { background:linear-gradient(135deg,#534AB7,#3C3489); padding:1.2rem 1.5rem; color:#fff; display:flex; align-items:center; gap:.75rem; }
-.result-header h2 { margin:0; font-size:1rem; font-weight:700; }
-.result-body { padding:1.5rem; }
-.result-body .plan-content { line-height:1.8; color:#2a3a2a; font-size:.95rem; }
-.result-body .plan-content h3 { color:#3C3489; margin:1.25rem 0 .5rem; font-size:1rem; }
-.result-body .plan-content ul { padding-left:1.4rem; margin:.5rem 0; }
-.result-body .plan-content li { margin-bottom:.4rem; }
-.result-body .plan-content strong { color:#1a2e1a; }
-.result-actions { display:flex; gap:.75rem; padding:1rem 1.5rem; border-top:1px solid #f0f4ef; background:#fafcf8; flex-wrap:wrap; }
-
-.error-card { display:none; background:#fcebeb; border-radius:12px; border:1.5px solid #f7c1c1; padding:1.2rem 1.5rem; color:#a32d2d; margin-top:1.25rem; font-size:.9rem; }
-
-.actions-row { display:flex; gap:.75rem; flex-wrap:wrap; align-items:center; margin-bottom:1.5rem; }
-.btn-back { display:inline-flex; align-items:center; gap:.4rem; padding:.62rem 1.2rem; border-radius:10px; border:1.5px solid #d0e4cc; color:#5f7a5f; font-size:.88rem; font-weight:600; text-decoration:none; background:transparent; transition:background .14s; }
-.btn-back:hover { background:#f2f8ee; }
-.btn-copy { display:inline-flex; align-items:center; gap:.4rem; padding:.55rem 1.1rem; border-radius:10px; border:1.5px solid #AFA9EC; color:#534AB7; font-size:.85rem; font-weight:600; background:#fff; cursor:pointer; transition:background .14s; }
-.btn-copy:hover { background:#EEEDFE; }
+    .schedule-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1.5rem;
+    }
+    
+    .schedule-header {
+        background: linear-gradient(135deg, #2d6a2d 0%, #1a4a1a 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 20px;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .schedule-header h1 {
+        margin: 0 0 0.5rem;
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-back {
+        background: #eaf3de;
+        color: #2d6a2d;
+        border: none;
+        padding: 0.6rem 1.2rem;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.2s;
+    }
+    
+    .btn-back:hover {
+        background: #d4e8d4;
+        transform: translateX(-3px);
+    }
+    
+    .options-panel {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        border: 1px solid #e4edde;
+    }
+    
+    .options-panel h3 {
+        margin: 0 0 1rem;
+        color: #2d6a2d;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .options-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .option-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem;
+        background: #f9fcf7;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .option-item:hover {
+        background: #eaf3de;
+    }
+    
+    .option-item input {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        accent-color: #2d6a2d;
+    }
+    
+    .option-item label {
+        cursor: pointer;
+        font-size: 0.9rem;
+        color: #1a2e1a;
+    }
+    
+    .select-all {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        padding: 0.5rem;
+        background: #eaf3de;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+    
+    .select-all input {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+    }
+    
+    .btn-generate {
+        background: linear-gradient(135deg, #534AB7 0%, #3C3489 100%);
+        color: white;
+        border: none;
+        padding: 0.8rem 2rem;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-generate:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(83,74,183,0.3);
+    }
+    
+    .result-panel {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        border: 1px solid #e4edde;
+        display: none;
+    }
+    
+    .result-panel.show {
+        display: block;
+        animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .result-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e4edde;
+    }
+    
+    .result-header h3 {
+        margin: 0;
+        color: #2d6a2d;
+    }
+    
+    .badge-local {
+        background: #7a9a7a;
+        color: white;
+        padding: 0.2rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }
+    
+    .result-content {
+        line-height: 1.6;
+        color: #1a2e1a;
+        max-height: 600px;
+        overflow-y: auto;
+        padding-right: 0.5rem;
+    }
+    
+    .result-content h1, .result-content h2 {
+        color: #2d6a2d;
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .result-content h1 {
+        font-size: 1.5rem;
+        border-bottom: 2px solid #e4edde;
+        padding-bottom: 0.5rem;
+    }
+    
+    .result-content h2 {
+        font-size: 1.2rem;
+    }
+    
+    .result-content ul, .result-content ol {
+        margin: 0.5rem 0 1rem 1.5rem;
+    }
+    
+    .result-content li {
+        margin: 0.3rem 0;
+    }
+    
+    .result-content table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0;
+        font-size: 0.85rem;
+    }
+    
+    .result-content th, .result-content td {
+        border: 1px solid #d4e8d4;
+        padding: 0.6rem;
+        text-align: left;
+    }
+    
+    .result-content th {
+        background: #eaf3de;
+        font-weight: 700;
+        color: #2d6a2d;
+    }
+    
+    .result-content tr:hover {
+        background: #f9fcf7;
+    }
+    
+    .loading {
+        text-align: center;
+        padding: 3rem;
+        display: none;
+    }
+    
+    .loading.show {
+        display: block;
+    }
+    
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid #e4edde;
+        border-top-color: #534AB7;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    .info-machine {
+        background: #f9fcf7;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: space-between;
+    }
+    
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+    }
+    
+    .info-label {
+        font-weight: 700;
+        color: #7a9a7a;
+    }
+    
+    .info-value {
+        color: #1a2e1a;
+        font-weight: 600;
+    }
+    
+    .toast {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: #2d6a2d;
+        color: white;
+        padding: 0.8rem 1.2rem;
+        border-radius: 10px;
+        z-index: 1000;
+        animation: slideInRight 0.3s ease;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    
+    @keyframes slideInRight {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    
+    .toast.error { background: #a32d2d; }
+    .toast.warning { background: #856404; }
+    
+    .action-buttons {
+        margin-top: 1.5rem;
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        border-top: 1px solid #e4edde;
+        padding-top: 1rem;
+    }
+    
+    .btn-action {
+        background: #f0f0f0;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-action:hover {
+        background: #e0e0e0;
+        transform: translateY(-1px);
+    }
+    
+    .btn-copy {
+        background: #eaf3de;
+        color: #2d6a2d;
+    }
+    
+    .btn-export {
+        background: #0F6E56;
+        color: white;
+    }
+    
+    .btn-export:hover {
+        background: #085041;
+    }
+    
+    .checklist {
+        list-style: none;
+        padding-left: 0;
+    }
+    
+    .checklist li {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.3rem 0;
+        border-bottom: 1px solid #f0f4ef;
+    }
+    
+    .checklist li:before {
+        content: "☐";
+        font-size: 1rem;
+        color: #2d6a2d;
+    }
 </style>
 
-<div class="api-page">
-
-  <nav class="api-bc">
-    <a href="{{ path('agri_maintenances_index') }}">Maintenances</a>
-    <span class="api-bc__sep">›</span>
-    <a href="{{ path('agri_maintenances_show', {id: maintenance.idMain}) }}">#{{ maintenance.idMain }}</a>
-    <span class="api-bc__sep">›</span>
-    <span>Plan IA</span>
-  </nav>
-
-  <div class="api-header">
-    <h1>🤖 Plan de maintenance intelligent</h1>
-    <p>Générez un plan d'intervention optimisé, groupé et préventif grâce à l'IA</p>
-  </div>
-
-  <div class="actions-row">
-    <a href="{{ path('agri_maintenances_show', {id: maintenance.idMain}) }}" class="btn-back">← Retour à la fiche</a>
-    <a href="{{ path('agri_maintenances_api_diagnostics', {id: maintenance.idMain}) }}" class="btn-back" style="border-color:#a8d5c8; color:#0F6E56;">🔍 Diagnostics IA</a>
-  </div>
-
-  {# Options du plan #}
-  <div class="plan-options-card">
-    <h2>⚙️ Personnaliser le plan</h2>
-    <div class="options-grid" id="planOptionsGrid">
-      <div class="opt-chip selected" data-key="intervention"><span class="opt-chip__icon">🔧</span><span class="opt-chip__name">Étapes détaillées</span><span class="opt-chip__desc">Séquence précise d'intervention</span></div>
-      <div class="opt-chip selected" data-key="prevention"><span class="opt-chip__icon">📅</span><span class="opt-chip__name">Préventif</span><span class="opt-chip__desc">Planning des futures maintenances</span></div>
-      <div class="opt-chip selected" data-key="pieces"><span class="opt-chip__icon">🔩</span><span class="opt-chip__name">Pièces détachées</span><span class="opt-chip__desc">Disponibilité et coûts estimés</span></div>
-      <div class="opt-chip selected" data-key="optimisation"><span class="opt-chip__icon">⚡</span><span class="opt-chip__name">Optimisation</span><span class="opt-chip__desc">Regroupement des interventions</span></div>
-      <div class="opt-chip selected" data-key="securite"><span class="opt-chip__icon">⚠️</span><span class="opt-chip__name">Sécurité</span><span class="opt-chip__desc">Précautions et EPI</span></div>
-      <div class="opt-chip selected" data-key="controle"><span class="opt-chip__icon">✅</span><span class="opt-chip__name">Points de contrôle</span><span class="opt-chip__desc">Vérifications post-intervention</span></div>
+<div class="schedule-container">
+    <a href="{{ path('agri_maintenances_index') }}" class="btn-back">
+        ← Retour aux maintenances
+    </a>
+    
+    <div class="schedule-header">
+        <h1>
+            📋 Plan de maintenance
+            <span class="badge-local">Hors ligne</span>
+        </h1>
+        <p>Plan généré pour : {{ maintenance.nomMateriel ?? maintenance.nom ?? 'Machine' }}</p>
     </div>
-  </div>
 
-  {# Timeline prévisionnelle #}
-  <div class="timeline-card" id="timelineCard">
-    <h2>📅 Timeline prévisionnelle</h2>
-    <div class="timeline" id="timelineList"></div>
-  </div>
+    <div class="options-panel">
+        <h3>📋 Personnalisez votre plan</h3>
+        <div class="select-all" onclick="toggleAllOptions()">
+            <input type="checkbox" id="selectAllCheckbox" checked onchange="toggleAllOptions()">
+            <label for="selectAllCheckbox">✅ Tout sélectionner / Désélectionner</label>
+        </div>
+        <div class="options-grid">
+            <div class="option-item">
+                <input type="checkbox" id="opt_intervention" value="intervention" checked>
+                <label for="opt_intervention">🔍 Diagnostic & intervention</label>
+            </div>
+            <div class="option-item">
+                <input type="checkbox" id="opt_prevention" value="prevention" checked>
+                <label for="opt_prevention">📅 Planning préventif</label>
+            </div>
+            <div class="option-item">
+                <input type="checkbox" id="opt_pieces" value="pieces" checked>
+                <label for="opt_pieces">🔩 Pièces détachées</label>
+            </div>
+            <div class="option-item">
+                <input type="checkbox" id="opt_optimisation" value="optimisation" checked>
+                <label for="opt_optimisation">⚡ Optimisation</label>
+            </div>
+            <div class="option-item">
+                <input type="checkbox" id="opt_securite" value="securite" checked>
+                <label for="opt_securite">⚠️ Sécurité</label>
+            </div>
+            <div class="option-item">
+                <input type="checkbox" id="opt_controle" value="controle" checked>
+                <label for="opt_controle">✅ Contrôle post-intervention</label>
+            </div>
+        </div>
+        <button class="btn-generate" id="btnGenerateSchedule">
+            🤖 Générer le plan
+        </button>
+    </div>
 
-  {# Contexte #}
-  <div class="api-context-card">
-    <h2>📋 Contexte de la maintenance</h2>
-    <div class="api-context-grid">
-      <div class="api-citem"><div class="api-clabel">Type de panne</div><div class="api-cvalue">{{ maintenance.typePanne }}</div></div>
-      <div class="api-citem"><div class="api-clabel">Coût</div><div class="api-cvalue">{{ maintenance.cout|number_format(2,',',' ') }} DT</div></div>
-      <div class="api-citem"><div class="api-clabel">Date</div><div class="api-cvalue">{{ maintenance.dateMain ? maintenance.dateMain|date('d/m/Y') : '—' }}</div></div>
-      <div class="api-citem"><div class="api-clabel">Statut</div><div class="api-cvalue">{{ maintenance.statut|capitalize }}</div></div>
-      <div class="api-citem"><div class="api-clabel">Priorité</div><div class="api-cvalue">{{ maintenance.priorite|capitalize }}</div></div>
-      {% if maintenance.kilometrage is not null %}<div class="api-citem"><div class="api-clabel">Kilométrage</div><div class="api-cvalue">{{ maintenance.kilometrage|number_format(0,' ',' ') }} km</div></div>{% endif %}
-      {% if maintenance.nom %}<div class="api-citem"><div class="api-clabel">Machine</div><div class="api-cvalue">{{ maintenance.nom }}</div></div>{% endif %}
+    <div class="info-machine">
+        <div class="info-item"><span class="info-label">📌 Type :</span><span class="info-value">{{ maintenance.typePanne|default('Non spécifié') }}</span></div>
+        <div class="info-item"><span class="info-label">⚡ Priorité :</span><span class="info-value">{{ maintenance.priorite|default('moyenne')|capitalize }}</span></div>
+        <div class="info-item"><span class="info-label">📅 Statut :</span><span class="info-value">{{ maintenance.statut|default('planifié')|capitalize }}</span></div>
+        <div class="info-item"><span class="info-label">🔢 Km :</span><span class="info-value">{{ maintenance.kilometrage ? maintenance.kilometrage ~ ' km' : 'Non renseigné' }}</span></div>
+        <div class="info-item"><span class="info-label">💰 Coût :</span><span class="info-value">{{ maintenance.cout|number_format(2, ',', ' ') }} DT</span></div>
     </div>
-    {% if maintenance.description %}
-    <div style="margin-top:.9rem; background:#f9f7ff; border-radius:10px; padding:.85rem 1rem;">
-      <div class="api-clabel" style="margin-bottom:.35rem;">Description</div>
-      <div style="font-size:.9rem; color:#2a3a2a; line-height:1.6;">{{ maintenance.description }}</div>
-    </div>
-    {% endif %}
-    {% if maintenance.recommandation %}
-    <div style="margin-top:.6rem; background:#f9f7ff; border-radius:10px; padding:.85rem 1rem;">
-      <div class="api-clabel" style="margin-bottom:.35rem;">Recommandations existantes</div>
-      <div style="font-size:.9rem; color:#2a3a2a; line-height:1.6;">{{ maintenance.recommandation }}</div>
-    </div>
-    {% endif %}
-  </div>
 
-  <button class="btn-generate" id="generateBtn">
-    <span id="btnIcon">✨</span>
-    <span class="spinner" id="spinner"></span>
-    <span id="btnText">Générer le plan de maintenance</span>
-  </button>
-
-  <div class="error-card" id="errorCard"></div>
-
-  <div class="result-card" id="resultCard">
-    <div class="result-header">
-      <span style="font-size:1.5rem;">🤖</span>
-      <h2>Plan de maintenance généré par IA</h2>
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>🤖 Génération du plan en cours...</p>
+        <p style="font-size: 0.8rem; color: #7a9a7a; margin-top: 0.5rem;">L'analyse peut prendre quelques secondes</p>
     </div>
-    <div class="result-body">
-      <div class="plan-content" id="planContent"></div>
-    </div>
-    <div class="result-actions">
-      <button class="btn-copy" onclick="copyResult()">📋 Copier le plan</button>
-    </div>
-  </div>
 
+    <div class="result-panel" id="resultPanel">
+        <div class="result-header">
+            <h3>📋 Plan de maintenance généré</h3>
+            <span class="badge-local" id="generatedBadge">Généré localement</span>
+        </div>
+        <div class="result-content" id="resultContent"></div>
+        <div class="action-buttons">
+            <button class="btn-action btn-copy" id="btnCopyPlan">
+                📋 Copier le plan
+            </button>
+            <button class="btn-action btn-export" id="btnExportPlan">
+                📥 Exporter en PDF
+            </button>
+        </div>
+    </div>
 </div>
 
 <script>
-// Données de la maintenance passées du backend au JavaScript
-const maintenanceData = {
-    idMain: {{ maintenance.idMain }},
-    typePanne: {{ maintenance.typePanne|json_encode|raw }},
-    cout: {{ maintenance.cout }},
-    dateMain: {{ (maintenance.dateMain ? maintenance.dateMain|date('Y-m-d') : null)|json_encode|raw }},
-    statut: {{ maintenance.statut|json_encode|raw }},
-    priorite: {{ maintenance.priorite|json_encode|raw }},
-    kilometrage: {{ maintenance.kilometrage|json_encode|raw }},
-    nom: {{ maintenance.nom|json_encode|raw }},
-    description: {{ maintenance.description|json_encode|raw }},
-    recommandation: {{ maintenance.recommandation|json_encode|raw }},
-};
+let lastGeneratedPlan = '';
 
-// ─────────────────────────────────────────────────────────────────
-// Gestion des options du plan
-// ─────────────────────────────────────────────────────────────────
-document.querySelectorAll('.opt-chip').forEach(chip => {
-    chip.addEventListener('click', () => chip.classList.toggle('selected'));
-});
-
-function getSelectedOptions() {
-    return Array.from(document.querySelectorAll('.opt-chip.selected')).map(c => c.dataset.key);
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
 }
 
-// ─────────────────────────────────────────────────────────────────
-// Construction de la timeline prévisionnelle
-// ─────────────────────────────────────────────────────────────────
-function buildTimeline() {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    const events = [];
-    const list = document.getElementById('timelineList');
-    list.innerHTML = '';
-
-    // Événement 1 : Maintenance actuelle
-    if (maintenanceData.dateMain) {
-        const dm = new Date(maintenanceData.dateMain);
-        const done = dm <= today;
-        events.push({ 
-            dot: done ? 'done' : 'active', 
-            text: `<strong>Maintenance actuelle</strong> — ${dm.toLocaleDateString('fr-FR')} (${maintenanceData.typePanne})` 
-        });
+function showLoading(show) {
+    const loadingEl = document.getElementById('loading');
+    const resultPanel = document.getElementById('resultPanel');
+    if (show) {
+        loadingEl.classList.add('show');
+        resultPanel.classList.remove('show');
     } else {
-        events.push({ 
-            dot: 'active', 
-            text: `<strong>Maintenance actuelle</strong> — Date non renseignée (${maintenanceData.typePanne})` 
-        });
-    }
-
-    // Événement 2 : Prochaine maintenance estimée
-    const intervals = { urgente: 30, haute: 60, moyenne: 90, faible: 180 };
-    const days = intervals[maintenanceData.priorite] || 90;
-    const next = new Date(today.getTime() + days * 86400000);
-    events.push({ 
-        dot: 'future', 
-        text: `<strong>Prochaine maintenance estimée</strong> — ${next.toLocaleDateString('fr-FR')} (dans ~${days} jours)` 
-    });
-
-    // Événement 3 : Révision générale (si kilométrage élevé)
-    if (maintenanceData.kilometrage && maintenanceData.kilometrage > 8000) {
-        const rev = new Date(today.getTime() + 120 * 86400000);
-        events.push({ 
-            dot: 'future', 
-            text: `<strong>Révision générale recommandée</strong> — ${rev.toLocaleDateString('fr-FR')} (kilométrage élevé)` 
-        });
-    }
-
-    // Événement 4 : Vidange (si kilométrage > 5000)
-    if (maintenanceData.kilometrage && maintenanceData.kilometrage > 5000 && maintenanceData.kilometrage <= 10000) {
-        const vidange = new Date(today.getTime() + 45 * 86400000);
-        events.push({ 
-            dot: 'future', 
-            text: `<strong>Vidange recommandée</strong> — ${vidange.toLocaleDateString('fr-FR')} (tous les 5000 km)` 
-        });
-    }
-
-    // Affichage des événements
-    events.forEach(ev => {
-        list.innerHTML += `<div class="tl-item"><div class="tl-dot tl-dot--${ev.dot}"></div><div class="tl-text">${ev.text}</div></div>`;
-    });
-}
-buildTimeline();
-
-// ─────────────────────────────────────────────────────────────────
-// Génération du plan via l'API Gemini
-// ─────────────────────────────────────────────────────────────────
-document.getElementById('generateBtn').addEventListener('click', generatePlan);
-
-async function generatePlan() {
-    const btn = document.getElementById('generateBtn');
-    const spinner = document.getElementById('spinner');
-    const btnText = document.getElementById('btnText');
-    const btnIcon = document.getElementById('btnIcon');
-    const result = document.getElementById('resultCard');
-    const content = document.getElementById('planContent');
-    const errorCard = document.getElementById('errorCard');
-
-    // Désactiver le bouton pendant la génération
-    btn.disabled = true;
-    spinner.style.display = 'block';
-    btnIcon.style.display = 'none';
-    btnText.textContent = 'Génération en cours…';
-    result.style.display = 'none';
-    errorCard.style.display = 'none';
-
-    const opts = getSelectedOptions();
-
-    if (opts.length === 0) {
-        errorCard.textContent = '⚠️ Veuillez sélectionner au moins une option pour le plan.';
-        errorCard.style.display = 'block';
-        btn.disabled = false;
-        spinner.style.display = 'none';
-        btnIcon.style.display = 'inline';
-        btnText.textContent = 'Générer le plan de maintenance';
-        return;
-    }
-
-    // Construction du prompt pour l'API Gemini
-    const prompt = `Tu es un expert en maintenance de machines agricoles.
-
-=== CONTEXTE ===
-Machine : ${maintenanceData.nom || 'Non spécifiée'}
-Type de panne/intervention : ${maintenanceData.typePanne}
-Priorité : ${maintenanceData.priorite}
-Statut actuel : ${maintenanceData.statut}
-Kilométrage : ${maintenanceData.kilometrage ? maintenanceData.kilometrage + ' km' : 'Non renseigné'}
-Date de la maintenance : ${maintenanceData.dateMain || 'Non renseignée'}
-Coût estimé : ${maintenanceData.cout} DT
-Description : ${maintenanceData.description || 'Aucune'}
-Recommandations existantes : ${maintenanceData.recommandation || 'Aucune'}
-
-=== SECTIONS DEMANDÉES ===
-${opts.includes('intervention') ? '✅ 1. 🔍 Diagnostic préliminaire + étapes détaillées d\'intervention' : ''}
-${opts.includes('prevention') ? '✅ 2. 📅 Planning préventif : intervalles selon km et type de panne' : ''}
-${opts.includes('pieces') ? '✅ 3. 🔩 Pièces détachées : liste, disponibilité estimée et coûts (DT)' : ''}
-${opts.includes('optimisation') ? '✅ 4. ⚡ Optimisation : regroupement des interventions' : ''}
-${opts.includes('securite') ? '✅ 5. ⚠️ Précautions de sécurité et EPI requis' : ''}
-${opts.includes('controle') ? '✅ 6. ✅ Points de contrôle post-intervention' : ''}
-
-En fin de réponse, ajoute :
-## 📊 Score de santé estimé
-Note de 0 à 100 représentant l'état de la machine après cette intervention.
-
-## 💡 Recommandations intelligentes
-3 recommandations clés pour éviter la récurrence de cette panne.
-
-Sois précis, structuré et adapté au contexte agricole tunisien.`;
-
-    try {
-        const resp = await fetch("{{ path('agri_maintenances_api_gemini_generate') }}", {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prompt: prompt })
-        });
-
-        if (!resp.ok) {
-            const err = await resp.json();
-            throw new Error(err.error || `Erreur API: ${resp.status}`);
-        }
-
-        const data = await resp.json();
-        if (!data.text) throw new Error('Réponse vide de l\'API.');
-
-        // Convertir le markdown en HTML et afficher
-        content.innerHTML = markdownToHtml(data.text);
-        result.style.display = 'block';
-        result.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-    } catch (err) {
-        console.error('Erreur:', err);
-        errorCard.textContent = '❌ ' + err.message;
-        errorCard.style.display = 'block';
-    } finally {
-        btn.disabled = false;
-        spinner.style.display = 'none';
-        btnIcon.style.display = 'inline';
-        btnText.textContent = 'Régénérer le plan';
+        loadingEl.classList.remove('show');
     }
 }
 
-// ─────────────────────────────────────────────────────────────────
-// Copier le résultat dans le presse-papiers
-// ─────────────────────────────────────────────────────────────────
-function copyResult() {
-    const text = document.getElementById('planContent').innerText;
-    navigator.clipboard.writeText(text).then(() => {
-        alert('📋 Plan copié dans le presse-papiers !');
-    }).catch(() => {
-        alert('❌ Impossible de copier le texte.');
-    });
+function toggleAllOptions() {
+    const selectAll = document.getElementById('selectAllCheckbox');
+    const checkboxes = document.querySelectorAll('.option-item input[type="checkbox"]');
+    checkboxes.forEach(cb => cb.checked = selectAll.checked);
 }
 
-// ─────────────────────────────────────────────────────────────────
-// Conversion basique de Markdown vers HTML
-// ─────────────────────────────────────────────────────────────────
-function markdownToHtml(md) {
-    if (!md) return '';
+function formatMarkdown(text) {
+    if (!text) return '<em>Aucun contenu généré</em>';
     
-    // Échapper les caractères HTML spéciaux (sécurité de base)
-    let html = md.replace(/[&<>]/g, function(m) {
+    let html = text;
+    
+    // Échapper le HTML
+    html = html.replace(/[&<>]/g, function(m) {
         if (m === '&') return '&amp;';
         if (m === '<') return '&lt;';
         if (m === '>') return '&gt;';
@@ -364,35 +494,213 @@ function markdownToHtml(md) {
     });
     
     // Titres
-    html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-    html = html.replace(/^## (.+)$/gm, '<h3>$1</h3>');
-    html = html.replace(/^# (.+)$/gm, '<h3>$1</h3>');
+    html = html.replace(/^### (.*$)/gm, '<h3>$1</h3>');
+    html = html.replace(/^## (.*$)/gm, '<h2>$1</h2>');
+    html = html.replace(/^# (.*$)/gm, '<h1>$1</h1>');
     
-    // Gras et italique
-    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    // Gras
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     
-    // Listes
-    html = html.replace(/^[-*] (.+)$/gm, '<li>$1</li>');
-    html = html.replace(/(<li>.*<\/li>\n?)+/g, function(s) {
-        return '<ul>' + s + '</ul>';
+    // Italique
+    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    
+    // Listes non ordonnées
+    html = html.replace(/^- (.*$)/gm, '<li>$1</li>');
+    html = html.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+    
+    // Listes ordonnées
+    html = html.replace(/^\d+\. (.*$)/gm, '<li>$1</li>');
+    
+    // Tableaux - format markdown vers HTML (amélioré)
+    html = html.replace(/\|(.+)\|/g, function(match) {
+        const cells = match.split('|').filter(c => c.trim());
+        if (cells.length === 0) return '';
+        if (cells[0] && cells[0].includes('---')) return '';
+        return '<tr>' + cells.map(c => `<td>${c.trim()}</td>`).join('') + '</tr>';
     });
     
-    // Paragraphes et sauts de ligne
+    // Retour à la ligne
     html = html.replace(/\n\n/g, '</p><p>');
     html = html.replace(/\n/g, '<br>');
     
-    // Encapsuler dans un paragraphe si nécessaire
-    if (!html.startsWith('<')) {
-        html = '<p>' + html + '</p>';
-    }
-    
-    return html;
+    return `<div style="font-family: 'Segoe UI', system-ui, sans-serif;">${html}</div>`;
 }
 
-// Rafraîchir la timeline si nécessaire (optionnel)
-function refreshTimeline() {
-    buildTimeline();
+async function generateSchedule() {
+    const options = [];
+    if (document.getElementById('opt_intervention')?.checked) options.push('intervention');
+    if (document.getElementById('opt_prevention')?.checked) options.push('prevention');
+    if (document.getElementById('opt_pieces')?.checked) options.push('pieces');
+    if (document.getElementById('opt_optimisation')?.checked) options.push('optimisation');
+    if (document.getElementById('opt_securite')?.checked) options.push('securite');
+    if (document.getElementById('opt_controle')?.checked) options.push('controle');
+    
+    if (options.length === 0) {
+        showToast('Sélectionnez au moins une option', 'warning');
+        return;
+    }
+    
+    showLoading(true);
+    
+    try {
+        const response = await fetch('{{ path("agri_maintenances_api_schedule_generate") }}', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json', 
+                'X-Requested-With': 'XMLHttpRequest' 
+            },
+            body: JSON.stringify({ 
+                maintenanceId: {{ maintenance.idMain }}, 
+                options: options 
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success && data.plan) {
+            lastGeneratedPlan = data.plan;
+            document.getElementById('resultContent').innerHTML = formatMarkdown(data.plan);
+            document.getElementById('resultPanel').classList.add('show');
+            showToast('Plan généré avec succès', 'success');
+        } else {
+            showToast(data.error || 'Erreur lors de la génération', 'error');
+        }
+    } catch (error) {
+        console.error('Erreur:', error);
+        showToast('Erreur de connexion au serveur', 'error');
+    } finally {
+        showLoading(false);
+    }
 }
+
+function copyToClipboard() {
+    if (!lastGeneratedPlan) {
+        showToast('Aucun contenu à copier', 'warning');
+        return;
+    }
+    
+    // Nettoyer le texte pour la copie
+    let plainText = lastGeneratedPlan
+        .replace(/\*\*(.*?)\*\*/g, '$1')
+        .replace(/\*(.*?)\*/g, '$1')
+        .replace(/^### (.*$)/gm, '$1')
+        .replace(/^## (.*$)/gm, '$1')
+        .replace(/^# (.*$)/gm, '$1')
+        .replace(/^- (.*$)/gm, '• $1')
+        .replace(/\|/g, ' ');
+    
+    navigator.clipboard.writeText(plainText);
+    showToast('Plan copié dans le presse-papier', 'success');
+}
+
+function exportToPDF() {
+    if (!lastGeneratedPlan) {
+        showToast('Aucun contenu à exporter', 'warning');
+        return;
+    }
+    
+    const machineName = '{{ maintenance.nomMateriel ?? maintenance.nom ?? 'Machine' }}';
+    const formattedContent = formatMarkdown(lastGeneratedPlan);
+    const currentDate = new Date().toLocaleDateString('fr-FR');
+    const currentTime = new Date().toLocaleTimeString('fr-FR');
+    
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Plan maintenance - ${machineName}</title>
+            <meta charset="UTF-8">
+            <style>
+                body {
+                    font-family: 'Segoe UI', Arial, sans-serif;
+                    padding: 2rem;
+                    max-width: 1000px;
+                    margin: 0 auto;
+                    line-height: 1.6;
+                    color: #333;
+                }
+                h1, h2, h3 {
+                    color: #2d6a2d;
+                }
+                h1 {
+                    border-bottom: 2px solid #2d6a2d;
+                    padding-bottom: 0.5rem;
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin: 1rem 0;
+                }
+                th, td {
+                    border: 1px solid #ddd;
+                    padding: 0.5rem;
+                    text-align: left;
+                }
+                th {
+                    background: #eaf3de;
+                }
+                .header {
+                    text-align: center;
+                    margin-bottom: 2rem;
+                    border-bottom: 2px solid #2d6a2d;
+                    padding-bottom: 1rem;
+                }
+                .footer {
+                    margin-top: 2rem;
+                    text-align: center;
+                    font-size: 0.8rem;
+                    color: #7a9a7a;
+                    border-top: 1px solid #ddd;
+                    padding-top: 1rem;
+                }
+                .checklist {
+                    list-style: none;
+                    padding-left: 0;
+                }
+                .checklist li {
+                    padding: 0.3rem 0;
+                }
+                .checklist li:before {
+                    content: "☐ ";
+                    color: #2d6a2d;
+                    font-weight: bold;
+                }
+                @media print {
+                    body {
+                        padding: 1rem;
+                    }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>📋 Plan de maintenance</h1>
+                <p><strong>Machine :</strong> ${machineName}</p>
+                <p><strong>Date :</strong> ${currentDate} à ${currentTime}</p>
+            </div>
+            ${formattedContent}
+            <div class="footer">
+                <p>Document généré automatiquement par AgroFlow - Système de gestion de maintenance</p>
+                <p>Ce plan est à titre indicatif et doit être adapté selon les préconisations du constructeur.</p>
+            </div>
+            <script>
+                window.onload = function() {
+                    window.print();
+                    setTimeout(() => window.close(), 500);
+                };
+            <\/script>
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+}
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('btnGenerateSchedule').onclick = generateSchedule;
+    document.getElementById('btnCopyPlan').onclick = copyToClipboard;
+    document.getElementById('btnExportPlan').onclick = exportToPDF;
+});
 </script>
 {% endblock %}
