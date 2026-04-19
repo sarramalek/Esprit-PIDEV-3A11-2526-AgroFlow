@@ -7,160 +7,45 @@
 .show-wrap { max-width:600px; margin:0 auto; }
 .actions-top { display:flex; gap:10px; margin-bottom:24px; flex-wrap:wrap; }
 
-.btn-back { 
-    display:inline-flex; align-items:center; gap:8px; 
-    background:#f0f0f0; color:#333; 
-    padding:10px 18px; border-radius:10px; 
-    font-size:14px; font-weight:500; text-decoration:none; 
-}
+.btn-back { display:inline-flex; align-items:center; gap:8px; background:#f0f0f0; color:#333; padding:10px 18px; border-radius:10px; font-size:14px; font-weight:500; text-decoration:none; }
 .btn-back:hover { background:#e0e0e0; }
 
-.btn-edit { 
-    display:inline-flex; align-items:center; gap:8px; 
-    background:#2D5A27; color:white; 
-    padding:10px 18px; border-radius:10px; 
-    font-size:14px; font-weight:500; text-decoration:none; 
-}
+.btn-edit { display:inline-flex; align-items:center; gap:8px; background:#2D5A27; color:white; padding:10px 18px; border-radius:10px; font-size:14px; font-weight:500; text-decoration:none; }
 .btn-edit:hover { background:#1B3A20; color:white; }
 
-.btn-arrosage {
-    display:inline-flex; align-items:center; gap:8px;
-    background:#EFF6FF; color:#1D4ED8; border:1px solid #BFDBFE;
-    padding:10px 18px; border-radius:10px; font-size:14px; font-weight:500;
-    cursor:pointer;
-}
+.btn-arrosage { display:inline-flex; align-items:center; gap:8px; background:#EFF6FF; color:#1D4ED8; border:1px solid #BFDBFE; padding:10px 18px; border-radius:10px; font-size:14px; font-weight:500; cursor:pointer; }
 .btn-arrosage:hover { background:#DBEAFE; }
 
-.show-card { 
-    background:white; 
-    border-radius:16px; 
-    box-shadow:0 2px 16px rgba(0,0,0,0.08); 
-    overflow:hidden; 
-}
+.btn-workflow { display:inline-flex; align-items:center; gap:8px; background:#F5F3FF; color:#6D28D9; border:1px solid #DDD6FE; padding:10px 18px; border-radius:10px; font-size:14px; font-weight:500; cursor:pointer; }
+.btn-workflow:hover { background:#EDE9FE; }
 
-.show-card-header { 
-    background:linear-gradient(135deg,#4A8C3F,#2D5A27); 
-    padding:28px; 
-    display:flex; 
-    align-items:center; 
-    gap:18px; 
-}
-
-.show-avatar { 
-    width:64px; height:64px; 
-    border-radius:16px; 
-    background:rgba(255,255,255,0.2); 
-    display:flex; 
-    align-items:center; 
-    justify-content:center; 
-    font-size:32px; 
-}
-
+.show-card { background:white; border-radius:16px; box-shadow:0 2px 16px rgba(0,0,0,0.08); overflow:hidden; }
+.show-card-header { background:linear-gradient(135deg,#4A8C3F,#2D5A27); padding:28px; display:flex; align-items:center; gap:18px; }
+.show-avatar { width:64px; height:64px; border-radius:16px; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:32px; }
 .show-name { font-size:22px; font-weight:700; color:white; }
 .show-variete { font-size:14px; color:rgba(255,255,255,0.75); margin-top:4px; }
-
 .show-body { padding:28px; }
-
-.detail-row { 
-    display:flex; 
-    justify-content:space-between; 
-    align-items:center; 
-    padding:14px 0; 
-    border-bottom:1px solid #f5f5f5; 
-    font-size:14px; 
-}
+.detail-row { display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-bottom:1px solid #f5f5f5; font-size:14px; }
 .detail-row:last-child { border-bottom:none; }
-
-.detail-label { 
-    color:#888; 
-    font-weight:500; 
-    display:flex; 
-    align-items:center; 
-    gap:8px; 
-}
+.detail-label { color:#888; font-weight:500; display:flex; align-items:center; gap:8px; }
 .detail-label i { color:#2D5A27; width:16px; }
-
 .detail-value { font-weight:600; color:#1B3A20; }
+.badge-plant { background:#DCFCE7; color:#166534; display:inline-block; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600; }
 
-.badge-plant { 
-    background:#DCFCE7; 
-    color:#166534; 
-    display:inline-block; 
-    padding:4px 12px; 
-    border-radius:20px; 
-    font-size:12px; 
-    font-weight:600; 
-}
-
-/* Modal Arrosage */
-.modal-overlay { 
-    display:none; 
-    position:fixed; 
-    inset:0; 
-    background:rgba(0,0,0,0.5); 
-    z-index:9999; 
-    align-items:center; 
-    justify-content:center; 
-}
+/* ── Modal partagé ── */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center; }
 .modal-overlay.active { display:flex; }
-
-.modal-box { 
-    background:#FFFDF5; 
-    border-radius:16px; 
-    padding:32px; 
-    width:90%; 
-    max-width:460px; 
-    box-shadow:0 20px 60px rgba(0,0,0,0.2); 
-    position:relative; 
-    animation:modalIn 0.25s ease; 
-}
-@keyframes modalIn { 
-    from{transform:translateY(20px);opacity:0} 
-    to{transform:none;opacity:1} 
-}
-
-.modal-close { 
-    position:absolute; 
-    top:14px; 
-    right:16px; 
-    background:none; 
-    border:none; 
-    font-size:20px; 
-    cursor:pointer; 
-    color:#999; 
-}
+.modal-box { background:#FFFDF5; border-radius:16px; padding:32px; width:90%; max-width:480px; box-shadow:0 20px 60px rgba(0,0,0,0.2); position:relative; animation:modalIn 0.25s ease; max-height:85vh; overflow-y:auto; }
+@keyframes modalIn { from{transform:translateY(20px);opacity:0} to{transform:none;opacity:1} }
+.modal-close { position:absolute; top:14px; right:16px; background:none; border:none; font-size:20px; cursor:pointer; color:#999; }
 .modal-close:hover { color:#333; }
-
-.modal-title { 
-    font-size:18px; 
-    font-weight:700; 
-    color:#1B3A20; 
-    margin-bottom:4px; 
-    display:flex; 
-    align-items:center; 
-    gap:10px; 
-}
-.modal-subtitle { 
-    font-size:13px; 
-    color:#6B7280; 
-    margin-bottom:20px; 
-}
-
-.modal-loading { 
-    text-align:center; 
-    padding:30px 0; 
-    color:#6B7280; 
-    font-size:14px; 
-}
-.modal-loading i { 
-    font-size:28px; 
-    display:block; 
-    margin-bottom:10px; 
-    animation:spin 1s linear infinite; 
-}
+.modal-title { font-size:18px; font-weight:700; color:#1B3A20; margin-bottom:4px; display:flex; align-items:center; gap:10px; }
+.modal-subtitle { font-size:13px; color:#6B7280; margin-bottom:20px; }
+.modal-loading { text-align:center; padding:30px 0; color:#6B7280; font-size:14px; }
+.modal-loading i { font-size:28px; display:block; margin-bottom:10px; animation:spin 1s linear infinite; }
 @keyframes spin { to{transform:rotate(360deg)} }
 
-/* Arrosage contenu */
+/* ── Arrosage ── */
 .arro-header { text-align:center; margin-bottom:20px; }
 .arro-icon { font-size:48px; }
 .arro-status { font-size:20px; font-weight:700; margin-top:8px; }
@@ -168,12 +53,7 @@
 .arro-item { border-radius:10px; padding:12px 14px; }
 .arro-item-label { font-size:11px; color:#6B7280; font-weight:600; text-transform:uppercase; }
 .arro-item-val { font-size:18px; font-weight:700; margin-top:3px; }
-.arro-conseil { 
-    border-radius:12px; 
-    padding:14px 16px; 
-    font-size:13px; 
-    line-height:1.7; 
-}
+.arro-conseil { border-radius:12px; padding:14px 16px; font-size:13px; line-height:1.7; }
 .arro-conseil.go { background:#D1FAE5; color:#065F46; }
 .arro-conseil.wait { background:#FEF3C7; color:#92400E; }
 .arro-conseil.stop { background:#FEE2E2; color:#991B1B; }
@@ -181,6 +61,31 @@
 .arro-bar-bg { height:10px; background:#E5E7EB; border-radius:5px; overflow:hidden; }
 .arro-bar-fill { height:100%; border-radius:5px; transition:width 0.8s ease; }
 .arro-bar-label { font-size:11px; color:#9CA3AF; margin-top:3px; text-align:right; }
+
+/* ── Workflow steps ── */
+.workflow-header { display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+.workflow-header .wf-icon { width:44px; height:44px; background:linear-gradient(135deg,#7C3AED,#5B21B6); border-radius:11px; display:flex; align-items:center; justify-content:center; color:white; font-size:18px; flex-shrink:0; }
+.wf-steps { display:flex; flex-direction:column; gap:0; }
+.wf-step { display:flex; gap:14px; position:relative; }
+.wf-step:not(:last-child) .wf-line { position:absolute; left:19px; top:40px; bottom:-4px; width:2px; background:#EDE9FE; z-index:0; }
+.wf-dot-wrap { display:flex; flex-direction:column; align-items:center; flex-shrink:0; z-index:1; }
+.wf-dot { width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:700; flex-shrink:0; }
+.wf-content { padding-bottom:22px; flex:1; }
+.wf-step-title { font-size:14px; font-weight:700; color:#1B3A20; margin-bottom:3px; }
+.wf-step-desc { font-size:13px; color:#6B7280; line-height:1.6; }
+.wf-step-meta { display:inline-block; font-size:11px; font-weight:600; padding:3px 10px; border-radius:20px; margin-top:6px; }
+.wf-step.type-prep .wf-dot { background:#FEF3C7; color:#92400E; }
+.wf-step.type-prep .wf-step-meta { background:#FEF3C7; color:#92400E; }
+.wf-step.type-semis .wf-dot { background:#D1FAE5; color:#065F46; }
+.wf-step.type-semis .wf-step-meta { background:#D1FAE5; color:#065F46; }
+.wf-step.type-croissance .wf-dot { background:#DBEAFE; color:#1D4ED8; }
+.wf-step.type-croissance .wf-step-meta { background:#DBEAFE; color:#1D4ED8; }
+.wf-step.type-entretien .wf-dot { background:#EDE9FE; color:#6D28D9; }
+.wf-step.type-entretien .wf-step-meta { background:#EDE9FE; color:#6D28D9; }
+.wf-step.type-recolte .wf-dot { background:#FCE7F3; color:#9D174D; }
+.wf-step.type-recolte .wf-step-meta { background:#FCE7F3; color:#9D174D; }
+.wf-step.type-default .wf-dot { background:#F3F4F6; color:#374151; }
+.wf-step.type-default .wf-step-meta { background:#F3F4F6; color:#374151; }
 </style>
 {% endblock %}
 
@@ -197,6 +102,10 @@
             onclick="openArrosage('{{ plante.nomP }}', {{ plante.besoinEau ?? 0 }}, {{ plante.cycleJours ?? 0 }})">
             <i class="fa fa-droplet"></i> Arrosage
         </button>
+        <button class="btn-workflow"
+            onclick="openWorkflow('{{ plante.nomP }}', {{ plante.cycleJours ?? 0 }})">
+            <i class="fa fa-list-check"></i> Workflow
+        </button>
     </div>
 
     <div class="show-card">
@@ -207,15 +116,11 @@
                 <div class="show-variete">{{ plante.variete ?? 'Variété non précisée' }}</div>
             </div>
         </div>
-        
         <div class="show-body">
-            <!-- Ligne ID supprimée -->
-
             <div class="detail-row">
                 <span class="detail-label"><i class="fa fa-seedling"></i> Nom</span>
                 <span class="detail-value">{{ plante.nomP }}</span>
             </div>
-
             <div class="detail-row">
                 <span class="detail-label"><i class="fa fa-leaf"></i> Variété</span>
                 <span class="detail-value">
@@ -226,56 +131,120 @@
                     {% endif %}
                 </span>
             </div>
-
             <div class="detail-row">
                 <span class="detail-label"><i class="fa fa-droplet"></i> Besoin en eau</span>
                 <span class="detail-value">
-                    {% if plante.besoinEau %}
-                        {{ plante.besoinEau }} L/j
-                    {% else %}
-                        <span style="color:#aaa">—</span>
-                    {% endif %}
+                    {% if plante.besoinEau %}{{ plante.besoinEau }} L/j{% else %}<span style="color:#aaa">—</span>{% endif %}
                 </span>
             </div>
-
             <div class="detail-row">
                 <span class="detail-label"><i class="fa fa-calendar-days"></i> Cycle de culture</span>
                 <span class="detail-value">
-                    {% if plante.cycleJours %}
-                        {{ plante.cycleJours }} jours
-                    {% else %}
-                        <span style="color:#aaa">—</span>
-                    {% endif %}
+                    {% if plante.cycleJours %}{{ plante.cycleJours }} jours{% else %}<span style="color:#aaa">—</span>{% endif %}
                 </span>
             </div>
         </div>
     </div>
 </div>
 
-{# Modal Arrosage #}
+{# ── Modal Arrosage ── #}
 <div class="modal-overlay" id="arrosageModal">
     <div class="modal-box">
         <button class="modal-close" onclick="document.getElementById('arrosageModal').classList.remove('active')">×</button>
-        <div class="modal-title">
-            <i class="fa fa-droplet" style="color:#3B82F6"></i> 
-            <span id="arrosageTitle">Arrosage</span>
-        </div>
+        <div class="modal-title"><i class="fa fa-droplet" style="color:#3B82F6"></i> <span id="arrosageTitle">Arrosage</span></div>
         <div class="modal-subtitle" id="arrosageSubtitle"></div>
-        <div id="arrosageContent">
-            <div class="modal-loading"><i class="fa fa-spinner"></i> Calcul en cours…</div>
-        </div>
+        <div id="arrosageContent"><div class="modal-loading"><i class="fa fa-spinner"></i> Calcul en cours…</div></div>
+    </div>
+</div>
+
+{# ── Modal Workflow ── #}
+<div class="modal-overlay" id="workflowModal">
+    <div class="modal-box">
+        <button class="modal-close" onclick="document.getElementById('workflowModal').classList.remove('active')">×</button>
+        <div class="modal-title"><i class="fa fa-list-check" style="color:#7C3AED"></i> <span id="workflowTitle">Workflow</span></div>
+        <div class="modal-subtitle" id="workflowSubtitle"></div>
+        <div id="workflowContent"><div class="modal-loading"><i class="fa fa-spinner"></i> Génération en cours…</div></div>
     </div>
 </div>
 {% endblock %}
 
 {% block javascripts %}
 <script>
-// Fermer le modal en cliquant sur l'overlay
+// Fermer modals en cliquant overlay
+['arrosageModal','workflowModal'].forEach(function(id) {
+    document.getElementById(id).addEventListener('click', function(e) {
+        if (e.target === this) this.classList.remove('active');
+    });
+});
+
+// ====================== WORKFLOW IA ======================
+async function openWorkflow(nomPlante, cycleJours) {
+    document.getElementById('workflowTitle').textContent  = 'Workflow — ' + nomPlante;
+    document.getElementById('workflowSubtitle').textContent = 'Étapes de culture générées par IA';
+    document.getElementById('workflowContent').innerHTML  =
+        '<div class="modal-loading"><i class="fa fa-spinner"></i> Génération en cours…</div>';
+    document.getElementById('workflowModal').classList.add('active');
+
+    try {
+        const response = await fetch('/api/workflow-plante', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nomPlante: nomPlante, cycleJours: cycleJours })
+        });
+
+        const json = await response.json();
+        if (!response.ok || json.error) throw new Error(json.error || 'Erreur serveur');
+
+        const steps = json.steps || [];
+        if (!steps.length) throw new Error('Aucune étape reçue.');
+
+        const typeIcons = {
+            'prep':       '🌿',
+            'semis':      '🌱',
+            'croissance': '☀️',
+            'entretien':  '🔧',
+            'recolte':    '🌾',
+            'default':    '📌',
+        };
+
+        let html = '<div class="wf-steps">';
+        steps.forEach(function(step, i) {
+            const type  = step.type || 'default';
+            const icon  = typeIcons[type] || '📌';
+            const isLast = i === steps.length - 1;
+            html += `
+            <div class="wf-step type-${type}">
+                ${!isLast ? '<div class="wf-line"></div>' : ''}
+                <div class="wf-dot-wrap">
+                    <div class="wf-dot">${icon}</div>
+                </div>
+                <div class="wf-content">
+                    <div class="wf-step-title">${escapeHtml(step.titre)}</div>
+                    <div class="wf-step-desc">${escapeHtml(step.description)}</div>
+                    ${step.duree ? `<span class="wf-step-meta">⏱ ${escapeHtml(step.duree)}</span>` : ''}
+                </div>
+            </div>`;
+        });
+        html += '</div>';
+
+        document.getElementById('workflowContent').innerHTML = html;
+
+    } catch(err) {
+        document.getElementById('workflowContent').innerHTML =
+            '<p style="color:#DC2626;text-align:center;padding:20px 0">' + escapeHtml(err.message) + '</p>';
+    }
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ====================== ARROSAGE ======================
 document.getElementById('arrosageModal').addEventListener('click', function(e) {
     if (e.target === this) this.classList.remove('active');
 });
 
-// ====================== FONCTION ARROSAGE ======================
 async function openArrosage(nomPlante, besoinEau, cycleJours) {
     document.getElementById('arrosageTitle').textContent = 'Arrosage — ' + nomPlante;
     document.getElementById('arrosageSubtitle').textContent = 'Recommandation personnalisée basée sur la météo';
@@ -294,68 +263,42 @@ async function openArrosage(nomPlante, besoinEau, cycleJours) {
         const wData = await wResp.json();
         const h = new Date().getHours();
 
-        temp = wData.current_weather?.temperature ?? 25;
-        windspeed = wData.current_weather?.windspeed ?? 10;
-        humidity = wData.hourly?.relative_humidity_2m?.[h] ?? 50;
-        precip = wData.hourly?.precipitation?.[h] ?? 0;
+        temp      = wData.current_weather?.temperature ?? 25;
+        windspeed = wData.current_weather?.windspeed   ?? 10;
+        humidity  = wData.hourly?.relative_humidity_2m?.[h] ?? 50;
+        precip    = wData.hourly?.precipitation?.[h]        ?? 0;
 
         let besoinReel = besoinEau > 0 ? besoinEau : 5;
-
-        if (temp > 35) besoinReel *= 1.4;
+        if (temp > 35)      besoinReel *= 1.4;
         else if (temp > 28) besoinReel *= 1.2;
         else if (temp < 15) besoinReel *= 0.7;
-
-        if (humidity < 30) besoinReel *= 1.3;
+        if (humidity < 30)  besoinReel *= 1.3;
         else if (humidity > 70) besoinReel *= 0.8;
-
         if (windspeed > 30) besoinReel *= 1.15;
 
         const apportPluie = precip * 0.8;
-        const besoinNet = Math.max(0, besoinReel - apportPluie).toFixed(1);
+        const besoinNet   = Math.max(0, besoinReel - apportPluie).toFixed(1);
 
         let statusIcon, statusText, statusColor, conseilClass, conseil, heure;
-
         if (precip > 8) {
-            statusIcon = '🌧️'; 
-            statusText = 'Pas d\'arrosage'; 
-            statusColor = '#3B82F6';
-            conseilClass = 'stop';
-            conseil = `<strong>🚫 Arrosage inutile aujourd'hui</strong><br>
-                       La pluie apporte suffisamment d'eau (${precip} mm).<br>
-                       Reportez l'arrosage à demain.`;
-            heure = '—';
-        } 
-        else if (temp > 35 || humidity < 30) {
-            statusIcon = '🔥'; 
-            statusText = 'Arrosage urgent'; 
-            statusColor = '#DC2626';
-            conseilClass = 'go';
-            conseil = `<strong>⚠️ Arrosage urgent recommandé</strong><br>
-                       Conditions de stress hydrique.<br>
-                       Apportez <strong>${besoinNet} L/plante</strong> aujourd'hui.`;
-            heure = 'Avant 8h ou après 18h';
-        } 
-        else if (precip > 3) {
-            statusIcon = '🌦️'; 
-            statusText = 'Arrosage réduit'; 
-            statusColor = '#D97706';
-            conseilClass = 'wait';
-            conseil = `<strong>💧 Arrosage réduit conseillé</strong><br>
-                       Besoin net : <strong>${besoinNet} L/plante</strong>.`;
-            heure = 'Matin de préférence';
-        } 
-        else {
-            statusIcon = '💧'; 
-            statusText = 'Arrosage normal'; 
-            statusColor = '#16A34A';
-            conseilClass = 'go';
-            conseil = `<strong>✅ Arrosage recommandé</strong><br>
-                       Apportez <strong>${besoinNet} L/plante</strong>.<br>
-                       ${cycleJours > 0 ? `Cycle : ${cycleJours} jours` : ''}`;
-            heure = 'Matin (7h–9h) ou soir (18h–20h)';
+            statusIcon='🌧️'; statusText='Pas d\'arrosage'; statusColor='#3B82F6'; conseilClass='stop';
+            conseil=`<strong>🚫 Arrosage inutile aujourd'hui</strong><br>La pluie apporte suffisamment d'eau (${precip} mm).<br>Reportez l'arrosage à demain.`;
+            heure='—';
+        } else if (temp > 35 || humidity < 30) {
+            statusIcon='🔥'; statusText='Arrosage urgent'; statusColor='#DC2626'; conseilClass='go';
+            conseil=`<strong>⚠️ Arrosage urgent recommandé</strong><br>Conditions de stress hydrique.<br>Apportez <strong>${besoinNet} L/plante</strong> aujourd'hui.`;
+            heure='Avant 8h ou après 18h';
+        } else if (precip > 3) {
+            statusIcon='🌦️'; statusText='Arrosage réduit'; statusColor='#D97706'; conseilClass='wait';
+            conseil=`<strong>💧 Arrosage réduit conseillé</strong><br>Besoin net : <strong>${besoinNet} L/plante</strong>.`;
+            heure='Matin de préférence';
+        } else {
+            statusIcon='💧'; statusText='Arrosage normal'; statusColor='#16A34A'; conseilClass='go';
+            conseil=`<strong>✅ Arrosage recommandé</strong><br>Apportez <strong>${besoinNet} L/plante</strong>.<br>${cycleJours > 0 ? `Cycle : ${cycleJours} jours` : ''}`;
+            heure='Matin (7h–9h) ou soir (18h–20h)';
         }
 
-        const humSol = Math.min(100, Math.round(humidity * 0.6 + precip * 5));
+        const humSol   = Math.min(100, Math.round(humidity * 0.6 + precip * 5));
         const humColor = humSol > 60 ? '#16A34A' : humSol > 35 ? '#D97706' : '#DC2626';
 
         document.getElementById('arrosageContent').innerHTML = `
@@ -364,41 +307,22 @@ async function openArrosage(nomPlante, besoinEau, cycleJours) {
                 <div class="arro-status" style="color:${statusColor}">${statusText}</div>
             </div>
             <div class="arro-grid">
-                <div class="arro-item" style="background:#FFF7ED">
-                    <div class="arro-item-label">🌡️ Température</div>
-                    <div class="arro-item-val" style="color:#C2410C">${temp} °C</div>
-                </div>
-                <div class="arro-item" style="background:#EFF6FF">
-                    <div class="arro-item-label">💧 Humidité air</div>
-                    <div class="arro-item-val" style="color:#1D4ED8">${humidity} %</div>
-                </div>
-                <div class="arro-item" style="background:#F0FDF4">
-                    <div class="arro-item-label">🌧️ Précipitations</div>
-                    <div class="arro-item-val" style="color:#15803D">${precip} mm</div>
-                </div>
-                <div class="arro-item" style="background:#F5F3FF">
-                    <div class="arro-item-label">💨 Vent</div>
-                    <div class="arro-item-val" style="color:#6D28D9">${windspeed} km/h</div>
-                </div>
+                <div class="arro-item" style="background:#FFF7ED"><div class="arro-item-label">🌡️ Température</div><div class="arro-item-val" style="color:#C2410C">${temp} °C</div></div>
+                <div class="arro-item" style="background:#EFF6FF"><div class="arro-item-label">💧 Humidité air</div><div class="arro-item-val" style="color:#1D4ED8">${humidity} %</div></div>
+                <div class="arro-item" style="background:#F0FDF4"><div class="arro-item-label">🌧️ Précipitations</div><div class="arro-item-val" style="color:#15803D">${precip} mm</div></div>
+                <div class="arro-item" style="background:#F5F3FF"><div class="arro-item-label">💨 Vent</div><div class="arro-item-val" style="color:#6D28D9">${windspeed} km/h</div></div>
             </div>
             <div style="margin-bottom:16px;">
-                <div style="font-size:12px;color:#6B7280;font-weight:600;text-transform:uppercase;margin-bottom:6px;">
-                    💧 Humidité estimée du sol
-                </div>
-                <div class="arro-bar-bg">
-                    <div class="arro-bar-fill" style="width:${humSol}%;background:${humColor}"></div>
-                </div>
+                <div style="font-size:12px;color:#6B7280;font-weight:600;text-transform:uppercase;margin-bottom:6px;">💧 Humidité estimée du sol</div>
+                <div class="arro-bar-bg"><div class="arro-bar-fill" style="width:${humSol}%;background:${humColor}"></div></div>
                 <div class="arro-bar-label">${humSol}%</div>
             </div>
             <div style="margin-bottom:14px;background:#F9FAFB;border-radius:10px;padding:10px 14px;font-size:13px;">
-                <span style="color:#6B7280;">⏰ Meilleure heure :</span>
-                <strong style="color:#1B3A20;margin-left:6px;">${heure}</strong><br>
-                <span style="color:#6B7280;">💧 Besoin net ajusté :</span>
-                <strong style="color:#1D4ED8;margin-left:6px;">${besoinNet} L/plante</strong>
+                <span style="color:#6B7280;">⏰ Meilleure heure :</span><strong style="color:#1B3A20;margin-left:6px;">${heure}</strong><br>
+                <span style="color:#6B7280;">💧 Besoin net ajusté :</span><strong style="color:#1D4ED8;margin-left:6px;">${besoinNet} L/plante</strong>
             </div>
             <div class="arro-conseil ${conseilClass}">${conseil}</div>`;
-    } 
-    catch (e) {
+    } catch(e) {
         document.getElementById('arrosageContent').innerHTML =
             '<p style="color:#DC2626;text-align:center">Erreur de chargement météo.<br>Vérifiez votre connexion.</p>';
     }
