@@ -15,7 +15,7 @@ class WorkflowPlanteController extends AbstractController
     #[Route('/api/workflow-plante', name: 'api_workflow_plante', methods: ['POST'])]
     public function workflow(Request $request): JsonResponse
     {
-        $apiKey = $_ENV['GROQ_API_KEY'] ?? '';
+        $apiKey = $_ENV['GROQ_API_KEY_ROTATION'] ?? '';
         if (!$apiKey) {
             return $this->json(['error' => 'Clé API Groq manquante.'], 500);
         }

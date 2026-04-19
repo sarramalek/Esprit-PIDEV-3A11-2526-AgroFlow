@@ -3,7 +3,7 @@ namespace App\EventListener;
 
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
-class LocaleListener
+class LocaleListener_plante
 {
     public function onKernelRequest(RequestEvent $event): void
     {

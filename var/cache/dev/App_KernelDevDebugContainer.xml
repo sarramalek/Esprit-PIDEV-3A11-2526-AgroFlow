@@ -668,7 +668,7 @@
         <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\stocks\MouvementController"/>
       </call>
     </service>
-    <service id="App\EventListener\LocaleListener" class="App\EventListener\LocaleListener" autowire="true" autoconfigure="true">
+    <service id="App\EventListener\LocaleListener_plante" class="App\EventListener\LocaleListener_plante" autowire="true" autoconfigure="true">
       <tag name="kernel.event_listener" event="kernel.request" priority="20"/>
       <tag name="container.hot_path"/>
     </service>
@@ -3201,7 +3201,7 @@
       <call method="addListener">
         <argument>kernel.request</argument>
         <argument type="collection">
-          <argument type="service_closure" id="App\EventListener\LocaleListener"/>
+          <argument type="service_closure" id="App\EventListener\LocaleListener_plante"/>
           <argument>onKernelRequest</argument>
         </argument>
         <argument>20</argument>
