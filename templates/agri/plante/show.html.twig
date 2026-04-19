@@ -1,4 +1,13 @@
-{% extends 'base_agriculteur.html.twig' %}
+{% if is_granted('ROLE_OUVRIER') %}
+    {% set layout = 'base_ouvrier.html.twig' %}
+    {% set cancel_route = 'ouvrier_taches' %}
+{% elseif is_granted('ROLE_AGRICULTEUR') %}
+    {% set layout = 'base_agriculteur.html.twig' %}
+    {% set cancel_route = 'agri_plantes' %}
+
+{% endif %}
+
+{% extends layout %}
 
 {% block title %}{{ plante.nomP }} — AgroFlow{% endblock %}
 
@@ -157,12 +166,18 @@
     </div>
 
     <div class="actions-top">
-        <a href="{{ path('agri_plantes') }}" class="btn-back">
-            <i class="fa fa-arrow-left"></i> {{ 'plante.retour'|trans }}
+        {% if is_granted('ROLE_AGRICULTEUR') %}
+        <a href="{{ path(cancel_route) }}" class="btn-back">
+            <i class="fa fa-arrow-left"></i> Retour aux plantes
         </a>
-        <a href="{{ path('agri_plantes_edit', {id: plante.id}) }}" class="btn-edit">
-            <i class="fa fa-pen"></i> {{ 'plante.modifier'|trans }}
+        <a href="{{ path('admin_plantes_edit', {id: plante.id}) }}" class="btn-edit-top">
+            <i class="fa fa-pen"></i> Modifier
         </a>
+    {% else %}
+        <a href="{{ path(cancel_route) }}" class="btn-back">
+            <i class="fa fa-arrow-left"></i> Retour aux tâches
+        </a>
+    {% endif %}
         <button class="btn-arrosage"
             data-nom="{{ plante.nomP }}"
             data-besoin="{{ plante.besoinEau ?? 0 }}"

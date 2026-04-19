@@ -14,6 +14,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpFoundation\Request;
+use App\Repository\Terrain\PlanteRepository; // ← ajouter
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Component\String\UnicodeString;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 
 #[Route('/ouvrier', name: 'ouvrier_')]
 #[IsGranted('ROLE_OUVRIER')]
@@ -41,6 +47,13 @@ class OuvrierController extends AbstractController
         'plante', 'sol', 'engrais', 'herbicide', 'pesticide', 'arrosage',
         'serre', 'champ', 'parcelle', 'compost', 'buttage', 'binage',
     ];
+    private const KEYWORDS_PLANTE = [
+    'plante', 'semis', 'plantation', 'récolte', 'culture', 'graine',
+    'tomate', 'blé', 'maïs', 'carotte', 'pomme de terre', 'laitue',
+    'haricot', 'poivron', 'aubergine', 'courgette', 'salade', 'épinard',
+    'olivier', 'vigne', 'orge', 'sorgho', 'tournesol', 'fève',
+    'piment', 'melon', 'pastèque', 'fenouil', 'persil', 'coriandre',
+];
 
     // ── Home ─────────────────────────────────────────────────────────────────
     #[Route('/', name: 'home')]
@@ -72,59 +85,75 @@ class OuvrierController extends AbstractController
             'taches_recentes'      => $tachesData,
             'evenements_avenir'    => [],
         ]);
+    
     }
 
     // ── Tâches ───────────────────────────────────────────────────────────────
     #[Route('/taches', name: 'taches')]
-    public function taches(
-        TacheRepository   $tacheRepo,
-        AnimauxRepository $animauxRepo,
-        MachineRepository $machineRepo,
-        TerrainRepository $terrainRepo,
-        UserRepository    $userRepo
-    ): Response {
-        /** @var \App\Entity\User\User $user */
-        $user   = $this->getUser();
-        $taches = $tacheRepo->findByAssignee($user);
+public function taches(
+    TacheRepository    $tacheRepo,
+    AnimauxRepository  $animauxRepo,
+    MachineRepository  $machineRepo,
+    TerrainRepository  $terrainRepo,
+    UserRepository     $userRepo,
+    PlanteRepository  $plantesRepo   // ← ajouter
+): Response {
+    /** @var \App\Entity\User\User $user */
+    $user   = $this->getUser();
+    $taches = $tacheRepo->findByAssignee($user);
 
-        // Pré-charger les ressources de l'agriculteur lié à l'ouvrier
-$agriculteurCin = $user->getTerrain()->getCin();
-        $animaux  = [];
-        $machines = [];
-        $terrains = [];
+    $agriculteurCin = $user->getTerrain()->getCin();
+    $animaux  = [];
+    $machines = [];
+    $terrains = [];
+    $plantes  = [];
 
-        if ($agriculteurCin) {
-            $agriculteur = $userRepo->findByCin($agriculteurCin);
-            $animaux     = $agriculteur
-                ? $animauxRepo->searchDashboard(null, 'id', 'DESC', $agriculteur)
-                : [];
-            $machines    = $machineRepo->findByCin($agriculteurCin);
-            $terrains    = $terrainRepo->findByAgriculteur($agriculteurCin);
-        }
-
-        $tachesData = array_map(function ($t) use ($animaux, $machines, $terrains) {
-            $nom       = strtolower($t->getNomTache() . ' ' . $t->getDescription());
-            $categorie = $this->detectCategorie($nom);
-            $detailUrl = $this->resolveDetailUrl($categorie, $nom, $animaux, $machines, $terrains);
-
-            return [
-                'id'          => $t->getIdTache(),
-                'titre'       => $t->getNomTache(),
-                'description' => $t->getDescription(),
-                'statut'      => $this->mapStatut($t->getEtat()),
-                'priorite'    => $t->getPriorite(),
-                'dateDebut'   => null,
-                'dateFin'     => $t->getDateEcheancee(),
-                'categorie'   => $categorie,
-                'detail_url'  => $detailUrl,
-            ];
-        }, $taches);
-
-        return $this->render('User/ouvrier_tache.html.twig', [
-            'taches' => $tachesData,
-        ]);
+    if ($agriculteurCin) {
+        $agriculteur = $userRepo->findByCin($agriculteurCin);
+        $animaux     = $agriculteur
+            ? $animauxRepo->searchDashboard(null, 'id', 'DESC', $agriculteur)
+            : [];
+        $machines    = $machineRepo->findByCin($agriculteurCin);
+        $terrains    = $terrainRepo->findByAgriculteur($agriculteurCin);
+        $plantes     = $plantesRepo->findByAgriculteur($agriculteurCin); // adapter selon votre repo
     }
 
+    $tachesData = array_map(function ($t) use ($animaux, $machines, $terrains, $plantes) {
+        $nom       = strtolower($t->getNomTache() . ' ' . $t->getDescription());
+        $categorie = $this->detectCategorie($nom);
+        
+        // Détecter si c'est une plante (sous-catégorie de terrain)
+        $isPlante  = $this->isPlanteTask($nom);
+        
+        $detailUrl = $this->resolveDetailUrl($categorie, $nom, $animaux, $machines, $terrains, $plantes, $isPlante);
+        $detailLabel = $this->resolveDetailLabel($categorie, $isPlante);
+
+        return [
+            'id'           => $t->getIdTache(),
+            'titre'        => $t->getNomTache(),
+            'description'  => $t->getDescription(),
+            'statut'       => $this->mapStatut($t->getEtat()),
+            'priorite'     => $t->getPriorite(),
+            'dateDebut'    => null,
+            'dateFin'      => $t->getDateEcheancee(),
+            'categorie'    => $categorie,
+            'is_plante'    => $isPlante,
+            'detail_url'   => $detailUrl,
+            'detail_label' => $detailLabel,
+        ];
+    }, $taches);
+
+    return $this->render('User/ouvrier_tache.html.twig', [
+        'taches' => $tachesData,
+    ]);
+}
+private function isPlanteTask(string $texte): bool
+{
+    foreach (self::KEYWORDS_PLANTE as $kw) {
+        if (str_contains($texte, $kw)) return true;
+    }
+    return false;
+}
     // ── Changer statut (AJAX) ─────────────────────────────────────────────────
     #[Route('/tache/{id}/statut/{statut}', name: 'tache_statut')]
     public function changerStatut(
@@ -203,20 +232,25 @@ $agriculteurCin = $user->getTerrain()->getCin();
     string  $texte,
     array   $animaux,
     array   $machines,
-    array   $terrains
+    array   $terrains,
+    array   $plantes,
+    bool    $isPlante
 ): ?string {
     if (!$categorie) return null;
 
     switch ($categorie) {
         case 'animal':
+            // Chercher l'animal mentionné par nom
             foreach ($animaux as $animal) {
                 $nomAnimal = strtolower($animal->getNom() ?? '');
                 if ($nomAnimal && str_contains($texte, $nomAnimal)) {
-                    return '#';
+                    // Adapter la route selon votre routing
+                    return $this->generateUrl('app_animaux_show', ['id' => $animal->getId()]);
                 }
             }
+            // Fallback : premier animal disponible
             if (!empty($animaux)) {
-                return '#';
+                return $this->generateUrl('app_animaux_index');
             }
             return null;
 
@@ -224,30 +258,55 @@ $agriculteurCin = $user->getTerrain()->getCin();
             foreach ($machines as $machine) {
                 $nomMachine = strtolower($machine->getNom() ?? '');
                 if ($nomMachine && str_contains($texte, $nomMachine)) {
-                    return '#';
+                    return $this->generateUrl('agri_machine_show', ['id' => $machine->getId()]);
                 }
             }
             if (!empty($machines)) {
-                return '#';
+                return $this->generateUrl('agri_machines');
             }
             return null;
 
         case 'terrain':
+            // ── Cas plante : chercher la plante mentionnée ──
+            if ($isPlante) {
+                foreach ($plantes as $plante) {
+                    $nomPlante = strtolower($plante->getNomP() ?? '');
+                    if ($nomPlante && str_contains($texte, $nomPlante)) {
+                        return $this->generateUrl('agri_plantes_show', ['id' => $plante->getId()]);
+                    }
+                }
+                // Fallback : liste des plantes
+                if (!empty($plantes)) {
+                    return $this->generateUrl('agri_plantes');
+                }
+            }
+
+            // ── Cas terrain : chercher le terrain mentionné par nom ──
             foreach ($terrains as $terrain) {
                 $nomTerrain = strtolower($terrain->getNomTerrain() ?? '');
                 if ($nomTerrain && str_contains($texte, $nomTerrain)) {
-                    return '#';
+                    return $this->generateUrl('agri_terrains_show', ['id' => $terrain->getId()]);
                 }
             }
+            // Fallback : premier terrain
             if (!empty($terrains)) {
-                return '#';
+                return $this->generateUrl('agri_terrains_show', ['id' => $terrains[0]->getId()]);
             }
             return null;
     }
 
     return null;
 }
-
+private function resolveDetailLabel(?string $categorie, bool $isPlante): ?string
+{
+    return match(true) {
+        $categorie === 'animal'               => "Voir l'animal",
+        $categorie === 'machine'              => 'Voir la machine',
+        $categorie === 'terrain' && $isPlante => 'Voir la plante',
+        $categorie === 'terrain'              => 'Voir le terrain',
+        default                               => null,
+    };
+}
     // ── Helper : map etat DB → statut normalisé ───────────────────────────────
     private function mapStatut(string $etat): string
     {

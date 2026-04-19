@@ -1,6 +1,13 @@
-{% extends 'base_agriculteur.html.twig' %}
-{% block title %}{{ terrain.nomTerrain }} — AgroFlow{% endblock %}
+{% if is_granted('ROLE_OUVRIER') %}
+    {% set layout = 'base_ouvrier.html.twig' %}
+    {% set cancel_route = 'ouvrier_taches' %}
+{% elseif is_granted('ROLE_AGRICULTEUR') %}
+    {% set layout = 'base_agriculteur.html.twig' %}
+    {% set cancel_route = 'agri_terrains' %}
 
+{% endif %}
+
+{% extends layout %}
 {% block stylesheets %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
@@ -141,17 +148,26 @@
 {% block body %}
 
 <div class="back-bar">
-    <a href="{{ path('agri_terrains') }}" class="btn-back">
-        <i class="fa fa-arrow-left"></i> Mes terrains
-    </a>
-    <a href="{{ path('agri_terrains_edit', {id: terrain.id}) }}" class="btn-edit-top">
-        <i class="fa fa-pen"></i> Modifier
-    </a>
-    <a href="{{ path('agri_terrains_certificat_propriete', {id: terrain.id}) }}"
+    {% if is_granted('ROLE_AGRICULTEUR') %}
+        <a href="{{ path(cancel_route) }}" class="btn-back">
+            <i class="fa fa-arrow-left"></i> Retour aux plantes
+        </a>
+        <a href="{{ path('agri_terrains_edit', {id: terrain.id}) }}" class="btn-edit-top">
+            <i class="fa fa-pen"></i> Modifier
+        </a>
+        <a href="{{ path('agri_terrains_certificat_propriete', {id: terrain.id}) }}"
        class="btn-pdf"
        target="_blank">
         <i class="fa fa-file-pdf"></i> Certificat PDF
     </a>
+    {% else %}
+        <a href="{{ path(cancel_route) }}" class="btn-back">
+            <i class="fa fa-arrow-left"></i> Retour aux tâches
+        </a>
+    {% endif %}
+    
+
+    
     <button class="btn-meteo"
         onclick="openMeteo('{{ terrain.localisation }}', '{{ terrain.nomTerrain }}')">
         <i class="fa fa-cloud-sun"></i> Météo
