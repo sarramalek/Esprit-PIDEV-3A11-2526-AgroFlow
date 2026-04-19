@@ -449,6 +449,14 @@
         <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\AuthController"/>
       </call>
     </service>
+    <service id="App\Controller\ChatController" class="App\Controller\ChatController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <argument type="service" id="App\Service\AiAssistantService"/>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\ChatController"/>
+      </call>
+    </service>
     <service id="App\Controller\Evenements\Agriculteur\EvenementController" class="App\Controller\Evenements\Agriculteur\EvenementController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
@@ -835,9 +843,22 @@
     <service id="App\Security\TerrainVoter" class="App\Security\TerrainVoter" autowire="true" autoconfigure="true">
       <tag name="security.voter"/>
     </service>
+    <service id="App\Service\AiAssistantService" class="App\Service\AiAssistantService" autowire="true" autoconfigure="true">
+      <argument type="service" id="App\Service\GrokService"/>
+      <argument type="service" id="App\Service\DatabaseReaderService"/>
+    </service>
     <service id="App\Service\AssignationAutoService" class="App\Service\AssignationAutoService" autowire="true" autoconfigure="true">
       <argument type="service" id="App\Repository\User\TacheRepository"/>
       <argument type="service" id="App\Repository\Terrain\TerrainRepository"/>
+    </service>
+    <service id="App\Service\DatabaseReaderService" class="App\Service\DatabaseReaderService" autowire="true" autoconfigure="true">
+      <argument type="service" id="doctrine.dbal.default_connection"/>
+      <argument type="service" id="monolog.logger"/>
+    </service>
+    <service id="App\Service\GrokService" class="App\Service\GrokService" autowire="true" autoconfigure="true">
+      <argument type="service" id=".debug.http_client"/>
+      <argument type="service" id="monolog.logger"/>
+      <argument>%env(GROQ_API_KEY_ASSISTANT)%</argument>
     </service>
     <service id="App\Service\MailerService" class="App\Service\MailerService" autowire="true" autoconfigure="true">
       <argument type="service" id="mailer.mailer"/>
@@ -861,7 +882,7 @@
       <argument type="service" id="App\Repository\Terrain\TerrainRepository"/>
       <argument type="service" id="App\Repository\Materiels\MachineRepository"/>
       <argument type="service" id="App\Repository\Animals\AnimauxRepository"/>
-      <argument>%env(GROQ_API_KEY)%</argument>
+      <argument>%env(GROQ_API_KEY_TACHES)%</argument>
     </service>
     <service id="App\Service\TwoFactorCodeSender" class="App\Service\TwoFactorCodeSender" autowire="true" autoconfigure="true"/>
     <service id="argument_metadata_factory" class="Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory"/>
@@ -8272,6 +8293,9 @@
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\AuthController" class="App\Controller\AuthController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\AuthController" class="App\Controller\AuthController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\AuthController" class="App\Controller\AuthController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\ChatController" class="App\Controller\ChatController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\ChatController" class="App\Controller\ChatController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\ChatController" class="App\Controller\ChatController" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Evenements\Agriculteur\EvenementController" class="App\Controller\Evenements\Agriculteur\EvenementController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Evenements\Agriculteur\EvenementController" class="App\Controller\Evenements\Agriculteur\EvenementController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\Evenements\Agriculteur\EvenementController" class="App\Controller\Evenements\Agriculteur\EvenementController" autowire="true" autoconfigure="true" abstract="true"/>
@@ -10640,6 +10664,12 @@
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.O2p6Lk7" method="withContext"/>
     </service>
+    <service id=".service_locator.O2p6Lk7.App\Controller\ChatController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\ChatController"/>
+      <argument>App\Controller\ChatController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.O2p6Lk7" method="withContext"/>
+    </service>
     <service id=".service_locator.O2p6Lk7.App\Controller\Evenements\Agriculteur\EvenementController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\Evenements\Agriculteur\EvenementController"/>
       <argument>App\Controller\Evenements\Agriculteur\EvenementController</argument>
@@ -11004,6 +11034,7 @@
           <argument>App\Controller\Animals\AnimauxController</argument>
           <argument>App\Controller\Animals\ExamensController</argument>
           <argument>App\Controller\AuthController</argument>
+          <argument>App\Controller\ChatController</argument>
           <argument>App\Controller\Evenements\Agriculteur\EvenementController</argument>
           <argument>App\Controller\Evenements\Agriculteur\ParticipationController</argument>
           <argument>App\Controller\Evenements\CategorieEvenementController</argument>
