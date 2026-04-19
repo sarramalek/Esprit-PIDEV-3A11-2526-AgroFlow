@@ -73,4 +73,16 @@ class PlanteRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    public function findByAgriculteur(string $cin): array
+{
+    return $this->createQueryBuilder('p')
+        ->innerJoin('App\Entity\Terrain\Rotation', 'r', 'WITH', 'r.plante = p')
+        ->innerJoin('App\Entity\Terrain\Terrain', 't', 'WITH', 'r.terrain = t')
+        ->where('t.cin = :cin')
+        ->setParameter('cin', $cin)
+        ->distinct()
+        ->orderBy('p.nomP', 'ASC')
+        ->getQuery()
+        ->getResult();
+}
 }

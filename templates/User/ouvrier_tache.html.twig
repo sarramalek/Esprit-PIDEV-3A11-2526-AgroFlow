@@ -67,7 +67,16 @@
     .filter-btn.active-purple { background: #6A1B9A; color: white; }
     .filter-btn.active-teal   { background: #00695C; color: white; }
     .filter-btn.active-brown  { background: #4E342E; color: white; }
-
+.btn-detail.detail-plante {
+    border-color: #A5D6A7;
+    color: #1B5E20;
+    background: #F1F8E9;
+}
+.btn-detail.detail-plante:hover {
+    background: #1B5E20;
+    color: white;
+    border-color: #1B5E20;
+}
     /* ── Séparateur filtre catégories ── */
     .filter-separator {
         width: 1px;
@@ -475,20 +484,23 @@
                 {% endif %}
 
                 {% if tache.detail_url %}
-                    {% if tache.categorie == 'animal' %}
-                    <a href="{{ tache.detail_url }}" class="btn-detail detail-animal">
-                        <i class="fa fa-paw"></i> {{ 'taches.voir_animal'|trans }}
-                    </a>
-                    {% elseif tache.categorie == 'machine' %}
-                    <a href="{{ tache.detail_url }}" class="btn-detail detail-machine">
-                        <i class="fa fa-gear"></i> {{ 'taches.voir_machine'|trans }}
-                    </a>
-                    {% elseif tache.categorie == 'terrain' %}
-                    <a href="{{ tache.detail_url }}" class="btn-detail detail-terrain">
-                        <i class="fa fa-seedling"></i> {{ 'taches.voir_terrain'|trans }}
-                    </a>
-                    {% endif %}
-                {% endif %}
+    {% set iconMap = {
+        'animal':  'fa-paw',
+        'machine': 'fa-gear',
+        'terrain': tache.is_plante ? 'fa-seedling' : 'fa-map',
+    } %}
+    {% set styleMap = {
+        'animal':  'detail-animal',
+        'machine': 'detail-machine',
+        'terrain': tache.is_plante ? 'detail-plante' : 'detail-terrain',
+    } %}
+
+    <a href="{{ tache.detail_url }}"
+       class="btn-detail {{ styleMap[tache.categorie] ?? 'detail-terrain' }}">
+        <i class="fa {{ iconMap[tache.categorie] ?? 'fa-seedling' }}"></i>
+        {{ tache.detail_label ?? 'Voir détail' }}
+    </a>
+{% endif %}
             </div>
 
         </div>
