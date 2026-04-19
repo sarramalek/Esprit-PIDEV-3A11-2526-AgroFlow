@@ -552,6 +552,14 @@
         <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\Terrain\TerrainController"/>
       </call>
     </service>
+    <service id="App\Controller\Terrain\WorkflowPlanteController" class="App\Controller\Terrain\WorkflowPlanteController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <argument type="service" id=".debug.http_client"/>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\Terrain\WorkflowPlanteController"/>
+      </call>
+    </service>
     <service id="App\Controller\User\AbonnementController" class="App\Controller\User\AbonnementController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
@@ -7842,6 +7850,9 @@
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Terrain\TerrainController" class="App\Controller\Terrain\TerrainController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Terrain\TerrainController" class="App\Controller\Terrain\TerrainController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\Terrain\TerrainController" class="App\Controller\Terrain\TerrainController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Terrain\WorkflowPlanteController" class="App\Controller\Terrain\WorkflowPlanteController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Terrain\WorkflowPlanteController" class="App\Controller\Terrain\WorkflowPlanteController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\Terrain\WorkflowPlanteController" class="App\Controller\Terrain\WorkflowPlanteController" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\User\AbonnementController" class="App\Controller\User\AbonnementController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\User\AbonnementController" class="App\Controller\User\AbonnementController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\User\AbonnementController" class="App\Controller\User\AbonnementController" autowire="true" autoconfigure="true" abstract="true"/>
@@ -10137,6 +10148,12 @@
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.O2p6Lk7" method="withContext"/>
     </service>
+    <service id=".service_locator.O2p6Lk7.App\Controller\Terrain\WorkflowPlanteController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\Terrain\WorkflowPlanteController"/>
+      <argument>App\Controller\Terrain\WorkflowPlanteController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.O2p6Lk7" method="withContext"/>
+    </service>
     <service id=".service_locator.O2p6Lk7.App\Controller\User\AbonnementController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\User\AbonnementController"/>
       <argument>App\Controller\User\AbonnementController</argument>
@@ -10423,6 +10440,7 @@
           <argument>App\Controller\Terrain\PlanteController</argument>
           <argument>App\Controller\Terrain\RotationController</argument>
           <argument>App\Controller\Terrain\TerrainController</argument>
+          <argument>App\Controller\Terrain\WorkflowPlanteController</argument>
           <argument>App\Controller\User\AbonnementController</argument>
           <argument>App\Controller\User\AbonnementFrontController</argument>
           <argument>App\Controller\User\AdminUserController</argument>
