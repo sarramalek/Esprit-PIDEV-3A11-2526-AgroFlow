@@ -514,6 +514,16 @@
         <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\Terrain\AgriTerrainController"/>
       </call>
     </service>
+    <service id="App\Controller\Terrain\AiSuggestionController" class="App\Controller\Terrain\AiSuggestionController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <argument type="service" id=".debug.http_client"/>
+      <argument type="service" id="App\Repository\Terrain\TerrainRepository"/>
+      <argument type="service" id="App\Repository\Terrain\PlanteRepository"/>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\Terrain\AiSuggestionController"/>
+      </call>
+    </service>
     <service id="App\Controller\Terrain\OuvrierPlanteViewController" class="App\Controller\Terrain\OuvrierPlanteViewController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
@@ -7817,6 +7827,9 @@
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Terrain\AgriTerrainController" class="App\Controller\Terrain\AgriTerrainController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Terrain\AgriTerrainController" class="App\Controller\Terrain\AgriTerrainController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\Terrain\AgriTerrainController" class="App\Controller\Terrain\AgriTerrainController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Terrain\AiSuggestionController" class="App\Controller\Terrain\AiSuggestionController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Terrain\AiSuggestionController" class="App\Controller\Terrain\AiSuggestionController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\Terrain\AiSuggestionController" class="App\Controller\Terrain\AiSuggestionController" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Terrain\OuvrierPlanteViewController" class="App\Controller\Terrain\OuvrierPlanteViewController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Terrain\OuvrierPlanteViewController" class="App\Controller\Terrain\OuvrierPlanteViewController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\Terrain\OuvrierPlanteViewController" class="App\Controller\Terrain\OuvrierPlanteViewController" autowire="true" autoconfigure="true" abstract="true"/>
@@ -10094,6 +10107,12 @@
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.O2p6Lk7" method="withContext"/>
     </service>
+    <service id=".service_locator.O2p6Lk7.App\Controller\Terrain\AiSuggestionController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\Terrain\AiSuggestionController"/>
+      <argument>App\Controller\Terrain\AiSuggestionController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.O2p6Lk7" method="withContext"/>
+    </service>
     <service id=".service_locator.O2p6Lk7.App\Controller\Terrain\OuvrierPlanteViewController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\Terrain\OuvrierPlanteViewController"/>
       <argument>App\Controller\Terrain\OuvrierPlanteViewController</argument>
@@ -10399,6 +10418,7 @@
           <argument>App\Controller\Terrain\AgriPlanteController</argument>
           <argument>App\Controller\Terrain\AgriRotationController</argument>
           <argument>App\Controller\Terrain\AgriTerrainController</argument>
+          <argument>App\Controller\Terrain\AiSuggestionController</argument>
           <argument>App\Controller\Terrain\OuvrierPlanteViewController</argument>
           <argument>App\Controller\Terrain\PlanteController</argument>
           <argument>App\Controller\Terrain\RotationController</argument>
