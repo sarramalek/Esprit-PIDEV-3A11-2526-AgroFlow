@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="fr" target-language="fr" datatype="plaintext" original="file.ext">
+    <header>
+      <tool tool-id="symfony" tool-name="Symfony"/>
+    </header>
+    <body>
+      <trans-unit id="SS.OayZ" resname="plante.retour">
+        <source>plante.retour</source>
+        <target>Retour</target>
+      </trans-unit>
+      <trans-unit id="Ql.CGL7" resname="plante.modifier">
+        <source>plante.modifier</source>
+        <target>Modifier</target>
+      </trans-unit>
+      <trans-unit id="hnT2YlV" resname="plante.arrosage">
+        <source>plante.arrosage</source>
+        <target>Arrosage</target>
+      </trans-unit>
+      <trans-unit id="n7DGdQu" resname="plante.workflow">
+        <source>plante.workflow</source>
+        <target>Workflow</target>
+      </trans-unit>
+      <trans-unit id="wQ.aIuz" resname="plante.variete_vide">
+        <source>plante.variete_vide</source>
+        <target>Variété non précisée</target>
+      </trans-unit>
+      <trans-unit id="juzkrd2" resname="plante.champ.nom">
+        <source>plante.champ.nom</source>
+        <target>Nom</target>
+      </trans-unit>
+      <trans-unit id="kdzaMY." resname="plante.champ.variete">
+        <source>plante.champ.variete</source>
+        <target>Variété</target>
+      </trans-unit>
+      <trans-unit id="c662vZY" resname="plante.champ.besoin_eau">
+        <source>plante.champ.besoin_eau</source>
+        <target>Besoin en eau</target>
+      </trans-unit>
+      <trans-unit id="4ZGETDy" resname="plante.champ.cycle">
+        <source>plante.champ.cycle</source>
+        <target>Cycle de culture</target>
+      </trans-unit>
+      <trans-unit id="a.1AlxI" resname="plante.unite.litres_jour">
+        <source>plante.unite.litres_jour</source>
+        <target>L/j</target>
+      </trans-unit>
+      <trans-unit id="XllCI0W" resname="plante.unite.jours">
+        <source>plante.unite.jours</source>
+        <target>jours</target>
+      </trans-unit>
+      <trans-unit id="64SV_Db" resname="plante.modal.arrosage_titre">
+        <source>plante.modal.arrosage_titre</source>
+        <target>Arrosage — %nom%</target>
+      </trans-unit>
+      <trans-unit id="vHdonY7" resname="plante.modal.arrosage_sous_titre">
+        <source>plante.modal.arrosage_sous_titre</source>
+        <target>Recommandation personnalisée basée sur la météo</target>
+      </trans-unit>
+      <trans-unit id="1MRSaQW" resname="plante.modal.calcul_en_cours">
+        <source>plante.modal.calcul_en_cours</source>
+        <target>Calcul en cours…</target>
+      </trans-unit>
+      <trans-unit id="BMK0xSB" resname="plante.modal.humidite_sol">
+        <source>plante.modal.humidite_sol</source>
+        <target>Humidité estimée du sol</target>
+      </trans-unit>
+      <trans-unit id="oBO5qTy" resname="plante.modal.meilleure_heure">
+        <source>plante.modal.meilleure_heure</source>
+        <target>Meilleure heure</target>
+      </trans-unit>
+      <trans-unit id="XRc1z4p" resname="plante.modal.besoin_net">
+        <source>plante.modal.besoin_net</source>
+        <target>Besoin net ajusté</target>
+      </trans-unit>
+      <trans-unit id="v6wQjYm" resname="plante.modal.erreur_meteo">
+        <source>plante.modal.erreur_meteo</source>
+        <target>Erreur de chargement météo. Vérifiez votre connexion.</target>
+      </trans-unit>
+      <trans-unit id="wffHo3p" resname="plante.modal.pas_arrosage">
+        <source>plante.modal.pas_arrosage</source>
+        <target>Arrosage inutile aujourd'hui — la pluie est suffisante.</target>
+      </trans-unit>
+      <trans-unit id="O.VDsGK" resname="plante.modal.arrosage_urgent">
+        <source>plante.modal.arrosage_urgent</source>
+        <target>Arrosage urgent recommandé — conditions de stress hydrique.</target>
+      </trans-unit>
+      <trans-unit id="rJQSbrS" resname="plante.modal.arrosage_reduit">
+        <source>plante.modal.arrosage_reduit</source>
+        <target>Arrosage réduit conseillé.</target>
+      </trans-unit>
+      <trans-unit id="tA7878v" resname="plante.modal.arrosage_normal">
+        <source>plante.modal.arrosage_normal</source>
+        <target>Arrosage recommandé.</target>
+      </trans-unit>
+      <trans-unit id="VNztBtr" resname="plante.modal.statut_pas_arrosage">
+        <source>plante.modal.statut_pas_arrosage</source>
+        <target>Pas d'arrosage</target>
+      </trans-unit>
+      <trans-unit id=".huO2AD" resname="plante.modal.statut_urgent">
+        <source>plante.modal.statut_urgent</source>
+        <target>Arrosage urgent</target>
+      </trans-unit>
+      <trans-unit id="Q9K05NM" resname="plante.modal.statut_reduit">
+        <source>plante.modal.statut_reduit</source>
+        <target>Arrosage réduit</target>
+      </trans-unit>
+      <trans-unit id="V3iSzA2" resname="plante.modal.statut_normal">
+        <source>plante.modal.statut_normal</source>
+        <target>Arrosage normal</target>
+      </trans-unit>
+      <trans-unit id="xq.XHMT" resname="plante.modal.temperature">
+        <source>plante.modal.temperature</source>
+        <target>Température</target>
+      </trans-unit>
+      <trans-unit id="5dj.Kmg" resname="plante.modal.humidite_air">
+        <source>plante.modal.humidite_air</source>
+        <target>Humidité air</target>
+      </trans-unit>
+      <trans-unit id="1rBVnuo" resname="plante.modal.precipitations">
+        <source>plante.modal.precipitations</source>
+        <target>Précipitations</target>
+      </trans-unit>
+      <trans-unit id="e7555Ar" resname="plante.modal.vent">
+        <source>plante.modal.vent</source>
+        <target>Vent</target>
+      </trans-unit>
+      <trans-unit id="eezqM5T" resname="plante.modal.workflow_titre">
+        <source>plante.modal.workflow_titre</source>
+        <target>Workflow — %nom%</target>
+      </trans-unit>
+      <trans-unit id="XBjPfND" resname="plante.modal.workflow_sous_titre">
+        <source>plante.modal.workflow_sous_titre</source>
+        <target>Étapes de culture générées par IA</target>
+      </trans-unit>
+      <trans-unit id="0LasLHm" resname="plante.modal.generation_en_cours">
+        <source>plante.modal.generation_en_cours</source>
+        <target>Génération en cours…</target>
+      </trans-unit>
+      <trans-unit id="uaUucEf" resname="plante.modal.aucune_etape">
+        <source>plante.modal.aucune_etape</source>
+        <target>Aucune étape reçue.</target>
+      </trans-unit>
+      <trans-unit id="V1akvrZ" resname="plante.modal.erreur_serveur">
+        <source>plante.modal.erreur_serveur</source>
+        <target>Erreur serveur</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

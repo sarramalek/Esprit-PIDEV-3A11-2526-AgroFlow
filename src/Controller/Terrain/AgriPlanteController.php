@@ -97,4 +97,13 @@ class AgriPlanteController extends AbstractController
             'plante' => $plante,
         ]);
     }
+
+    #[Route('/langue/{locale}', name: '_changer_langue')]
+    public function changerLangue(string $locale, Request $request): Response
+    {
+        $request->getSession()->set('_locale', $locale);
+
+        $referer = $request->headers->get('referer');
+        return $this->redirect($referer ?: $this->generateUrl('agri_plantes'));
+    }
 }

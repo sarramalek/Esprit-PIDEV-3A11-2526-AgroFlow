@@ -1,14 +1,24 @@
 {% extends 'base_agriculteur.html.twig' %}
+
 {% block title %}{{ plante.nomP }} — AgroFlow{% endblock %}
 
 {% block stylesheets %}
 <style>
 .show-wrap { max-width:600px; margin:0 auto; }
-.actions-top { display:flex; gap:10px; margin-bottom:24px; }
+.actions-top { display:flex; gap:10px; margin-bottom:24px; flex-wrap:wrap; }
+
 .btn-back { display:inline-flex; align-items:center; gap:8px; background:#f0f0f0; color:#333; padding:10px 18px; border-radius:10px; font-size:14px; font-weight:500; text-decoration:none; }
 .btn-back:hover { background:#e0e0e0; }
+
 .btn-edit { display:inline-flex; align-items:center; gap:8px; background:#2D5A27; color:white; padding:10px 18px; border-radius:10px; font-size:14px; font-weight:500; text-decoration:none; }
 .btn-edit:hover { background:#1B3A20; color:white; }
+
+.btn-arrosage { display:inline-flex; align-items:center; gap:8px; background:#EFF6FF; color:#1D4ED8; border:1px solid #BFDBFE; padding:10px 18px; border-radius:10px; font-size:14px; font-weight:500; cursor:pointer; }
+.btn-arrosage:hover { background:#DBEAFE; }
+
+.btn-workflow { display:inline-flex; align-items:center; gap:8px; background:#F5F3FF; color:#6D28D9; border:1px solid #DDD6FE; padding:10px 18px; border-radius:10px; font-size:14px; font-weight:500; cursor:pointer; }
+.btn-workflow:hover { background:#EDE9FE; }
+
 .show-card { background:white; border-radius:16px; box-shadow:0 2px 16px rgba(0,0,0,0.08); overflow:hidden; }
 .show-card-header { background:linear-gradient(135deg,#4A8C3F,#2D5A27); padding:28px; display:flex; align-items:center; gap:18px; }
 .show-avatar { width:64px; height:64px; border-radius:16px; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:32px; }
@@ -21,18 +31,176 @@
 .detail-label i { color:#2D5A27; width:16px; }
 .detail-value { font-weight:600; color:#1B3A20; }
 .badge-plant { background:#DCFCE7; color:#166534; display:inline-block; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600; }
+
+/* ── Sélecteur langue ── */
+.lang-switcher {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: white;
+    padding: 5px 8px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    border: 1px solid #f0f0f0;
+    margin-bottom: 20px;
+    width: fit-content;
+}
+.lang-btn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 11px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    font-size: 12px;
+    font-weight: 600;
+    color: #888;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+.lang-btn:hover  { background: #f5f5f5; color: #2C3E50; }
+.lang-btn.active { background: #2D5A27; color: white; }
+.lang-btn .flag  { font-size: 15px; }
+
+/* ── Modal partagé ── */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center; }
+.modal-overlay.active { display:flex; }
+.modal-box { background:#FFFDF5; border-radius:16px; padding:32px; width:90%; max-width:480px; box-shadow:0 20px 60px rgba(0,0,0,0.2); position:relative; animation:modalIn 0.25s ease; max-height:85vh; overflow-y:auto; }
+@keyframes modalIn { from{transform:translateY(20px);opacity:0} to{transform:none;opacity:1} }
+.modal-close { position:absolute; top:14px; right:16px; background:none; border:none; font-size:20px; cursor:pointer; color:#999; }
+.modal-close:hover { color:#333; }
+.modal-title { font-size:18px; font-weight:700; color:#1B3A20; margin-bottom:4px; display:flex; align-items:center; gap:10px; }
+.modal-subtitle { font-size:13px; color:#6B7280; margin-bottom:20px; }
+.modal-loading { text-align:center; padding:30px 0; color:#6B7280; font-size:14px; }
+.modal-loading i { font-size:28px; display:block; margin-bottom:10px; animation:spin 1s linear infinite; }
+@keyframes spin { to{transform:rotate(360deg)} }
+
+/* ── Arrosage ── */
+.arro-header { text-align:center; margin-bottom:20px; }
+.arro-icon { font-size:48px; }
+.arro-status { font-size:20px; font-weight:700; margin-top:8px; }
+.arro-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+.arro-item { border-radius:10px; padding:12px 14px; }
+.arro-item-label { font-size:11px; color:#6B7280; font-weight:600; text-transform:uppercase; }
+.arro-item-val { font-size:18px; font-weight:700; margin-top:3px; }
+.arro-conseil { border-radius:12px; padding:14px 16px; font-size:13px; line-height:1.7; }
+.arro-conseil.go   { background:#D1FAE5; color:#065F46; }
+.arro-conseil.wait { background:#FEF3C7; color:#92400E; }
+.arro-conseil.stop { background:#FEE2E2; color:#991B1B; }
+.arro-bar-bg { height:10px; background:#E5E7EB; border-radius:5px; overflow:hidden; }
+.arro-bar-fill { height:100%; border-radius:5px; transition:width 0.8s ease; }
+.arro-bar-label { font-size:11px; color:#9CA3AF; margin-top:3px; text-align:right; }
+
+/* ── Workflow steps ── */
+.wf-steps { display:flex; flex-direction:column; gap:0; }
+.wf-step { display:flex; gap:14px; position:relative; }
+.wf-step:not(:last-child) .wf-line { position:absolute; left:19px; top:40px; bottom:-4px; width:2px; background:#EDE9FE; z-index:0; }
+.wf-dot-wrap { display:flex; flex-direction:column; align-items:center; flex-shrink:0; z-index:1; }
+.wf-dot { width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:700; flex-shrink:0; }
+.wf-content { padding-bottom:22px; flex:1; }
+.wf-step-title { font-size:14px; font-weight:700; color:#1B3A20; margin-bottom:3px; }
+.wf-step-desc { font-size:13px; color:#6B7280; line-height:1.6; }
+.wf-step-meta { display:inline-block; font-size:11px; font-weight:600; padding:3px 10px; border-radius:20px; margin-top:6px; }
+.wf-step.type-prep       .wf-dot      { background:#FEF3C7; color:#92400E; }
+.wf-step.type-prep       .wf-step-meta { background:#FEF3C7; color:#92400E; }
+.wf-step.type-semis      .wf-dot      { background:#D1FAE5; color:#065F46; }
+.wf-step.type-semis      .wf-step-meta { background:#D1FAE5; color:#065F46; }
+.wf-step.type-croissance .wf-dot      { background:#DBEAFE; color:#1D4ED8; }
+.wf-step.type-croissance .wf-step-meta { background:#DBEAFE; color:#1D4ED8; }
+.wf-step.type-entretien  .wf-dot      { background:#EDE9FE; color:#6D28D9; }
+.wf-step.type-entretien  .wf-step-meta { background:#EDE9FE; color:#6D28D9; }
+.wf-step.type-recolte    .wf-dot      { background:#FCE7F3; color:#9D174D; }
+.wf-step.type-recolte    .wf-step-meta { background:#FCE7F3; color:#9D174D; }
+.wf-step.type-default    .wf-dot      { background:#F3F4F6; color:#374151; }
+.wf-step.type-default    .wf-step-meta { background:#F3F4F6; color:#374151; }
 </style>
 {% endblock %}
 
 {% block body %}
+{% set locale = app.request.locale %}
+
+{# ── RTL pour l'arabe ── #}
+{% if locale == 'ar' %}
+<style>
+    body { direction: rtl; text-align: right; }
+    .actions-top { flex-direction: row-reverse; }
+    .show-card-header { flex-direction: row-reverse; }
+    .detail-row { flex-direction: row-reverse; }
+    .detail-label { flex-direction: row-reverse; }
+    .modal-close { right: auto; left: 16px; }
+    .modal-title { flex-direction: row-reverse; }
+    .wf-step { flex-direction: row-reverse; }
+    .wf-step:not(:last-child) .wf-line { left: auto; right: 19px; }
+    .lang-switcher { flex-direction: row-reverse; }
+    .arro-bar-label { text-align: left; }
+</style>
+{% endif %}
+
 <div class="show-wrap">
+
+    {# ── Sélecteur de langue ── #}
+    <div class="lang-switcher">
+        <a href="{{ path('agri_plantes_changer_langue', {locale: 'fr'}) }}"
+           class="lang-btn {{ locale == 'fr' ? 'active' : '' }}">
+            <span class="flag">🇫🇷</span> FR
+        </a>
+        <a href="{{ path('agri_plantes_changer_langue', {locale: 'en'}) }}"
+           class="lang-btn {{ locale == 'en' ? 'active' : '' }}">
+            <span class="flag">🇬🇧</span> EN
+        </a>
+        <a href="{{ path('agri_plantes_changer_langue', {locale: 'ar'}) }}"
+           class="lang-btn {{ locale == 'ar' ? 'active' : '' }}">
+            <span class="flag">🇹🇳</span> AR
+        </a>
+    </div>
+
     <div class="actions-top">
         <a href="{{ path('agri_plantes') }}" class="btn-back">
-            <i class="fa fa-arrow-left"></i> Retour
+            <i class="fa fa-arrow-left"></i> {{ 'plante.retour'|trans }}
         </a>
         <a href="{{ path('agri_plantes_edit', {id: plante.id}) }}" class="btn-edit">
-            <i class="fa fa-pen"></i> Modifier
+            <i class="fa fa-pen"></i> {{ 'plante.modifier'|trans }}
         </a>
+        <button class="btn-arrosage"
+            data-nom="{{ plante.nomP }}"
+            data-besoin="{{ plante.besoinEau ?? 0 }}"
+            data-cycle="{{ plante.cycleJours ?? 0 }}"
+            data-label-titre="{{ 'plante.arrosage'|trans ~ ' — ' ~ plante.nomP }}"
+            data-label-sous-titre="{{ 'plante.modal.arrosage_sous_titre'|trans }}"
+            data-label-calcul="{{ 'plante.modal.calcul_en_cours'|trans }}"
+            data-label-humidite="{{ 'plante.modal.humidite_sol'|trans }}"
+            data-label-meilleure-heure="{{ 'plante.modal.meilleure_heure'|trans }}"
+            data-label-besoin-net="{{ 'plante.modal.besoin_net'|trans }}"
+            data-label-erreur="{{ 'plante.modal.erreur_meteo'|trans }}"
+            data-label-pas-arrosage="{{ 'plante.modal.pas_arrosage'|trans }}"
+            data-label-arrosage-urgent="{{ 'plante.modal.arrosage_urgent'|trans }}"
+            data-label-arrosage-reduit="{{ 'plante.modal.arrosage_reduit'|trans }}"
+            data-label-arrosage-normal="{{ 'plante.modal.arrosage_normal'|trans }}"
+            data-label-statut-pas="{{ 'plante.modal.statut_pas_arrosage'|trans }}"
+            data-label-statut-urgent="{{ 'plante.modal.statut_urgent'|trans }}"
+            data-label-statut-reduit="{{ 'plante.modal.statut_reduit'|trans }}"
+            data-label-statut-normal="{{ 'plante.modal.statut_normal'|trans }}"
+            data-label-temperature="{{ 'plante.modal.temperature'|trans }}"
+            data-label-humidite-air="{{ 'plante.modal.humidite_air'|trans }}"
+            data-label-precipitations="{{ 'plante.modal.precipitations'|trans }}"
+            data-label-vent="{{ 'plante.modal.vent'|trans }}"
+            onclick="openArrosage(this)">
+            <i class="fa fa-droplet"></i> {{ 'plante.arrosage'|trans }}
+        </button>
+        <button class="btn-workflow"
+            data-nom="{{ plante.nomP }}"
+            data-cycle="{{ plante.cycleJours ?? 0 }}"
+            data-label-titre="{{ 'plante.workflow'|trans ~ ' — ' ~ plante.nomP }}"
+            data-label-sous-titre="{{ 'plante.modal.workflow_sous_titre'|trans }}"
+            data-label-generation="{{ 'plante.modal.generation_en_cours'|trans }}"
+            data-label-aucune-etape="{{ 'plante.modal.aucune_etape'|trans }}"
+            data-label-erreur-serveur="{{ 'plante.modal.erreur_serveur'|trans }}"
+            data-locale="{{ app.request.locale }}"
+    onclick="openWorkflow(this)">
+            <i class="fa fa-list-check"></i> {{ 'plante.workflow'|trans }}
+        </button>
     </div>
 
     <div class="show-card">
@@ -40,20 +208,16 @@
             <div class="show-avatar">🌱</div>
             <div>
                 <div class="show-name">{{ plante.nomP }}</div>
-                <div class="show-variete">{{ plante.variete ?? 'Variété non précisée' }}</div>
+                <div class="show-variete">{{ plante.variete ?? 'plante.variete_vide'|trans }}</div>
             </div>
         </div>
         <div class="show-body">
             <div class="detail-row">
-                <span class="detail-label"><i class="fa fa-hashtag"></i> ID</span>
-                <span class="detail-value" style="font-family:monospace">#{{ plante.id }}</span>
-            </div>
-            <div class="detail-row">
-                <span class="detail-label"><i class="fa fa-seedling"></i> Nom</span>
+                <span class="detail-label"><i class="fa fa-seedling"></i> {{ 'plante.champ.nom'|trans }}</span>
                 <span class="detail-value">{{ plante.nomP }}</span>
             </div>
             <div class="detail-row">
-                <span class="detail-label"><i class="fa fa-leaf"></i> Variété</span>
+                <span class="detail-label"><i class="fa fa-leaf"></i> {{ 'plante.champ.variete'|trans }}</span>
                 <span class="detail-value">
                     {% if plante.variete %}
                         <span class="badge-plant">{{ plante.variete }}</span>
@@ -63,18 +227,250 @@
                 </span>
             </div>
             <div class="detail-row">
-                <span class="detail-label"><i class="fa fa-droplet"></i> Besoin en eau</span>
+                <span class="detail-label"><i class="fa fa-droplet"></i> {{ 'plante.champ.besoin_eau'|trans }}</span>
                 <span class="detail-value">
-                    {% if plante.besoinEau %}{{ plante.besoinEau }} L/j{% else %}<span style="color:#aaa">—</span>{% endif %}
+                    {% if plante.besoinEau %}
+                        {{ plante.besoinEau }} {{ 'plante.unite.litres_jour'|trans }}
+                    {% else %}
+                        <span style="color:#aaa">—</span>
+                    {% endif %}
                 </span>
             </div>
             <div class="detail-row">
-                <span class="detail-label"><i class="fa fa-calendar-days"></i> Cycle de culture</span>
+                <span class="detail-label"><i class="fa fa-calendar-days"></i> {{ 'plante.champ.cycle'|trans }}</span>
                 <span class="detail-value">
-                    {% if plante.cycleJours %}{{ plante.cycleJours }} jours{% else %}<span style="color:#aaa">—</span>{% endif %}
+                    {% if plante.cycleJours %}
+                        {{ plante.cycleJours }} {{ 'plante.unite.jours'|trans }}
+                    {% else %}
+                        <span style="color:#aaa">—</span>
+                    {% endif %}
                 </span>
             </div>
         </div>
     </div>
 </div>
+
+{# ── Modal Arrosage ── #}
+<div class="modal-overlay" id="arrosageModal">
+    <div class="modal-box">
+        <button class="modal-close" onclick="document.getElementById('arrosageModal').classList.remove('active')">×</button>
+        <div class="modal-title"><i class="fa fa-droplet" style="color:#3B82F6"></i> <span id="arrosageTitle"></span></div>
+        <div class="modal-subtitle" id="arrosageSubtitle"></div>
+        <div id="arrosageContent"><div class="modal-loading"><i class="fa fa-spinner"></i></div></div>
+    </div>
+</div>
+
+{# ── Modal Workflow ── #}
+<div class="modal-overlay" id="workflowModal">
+    <div class="modal-box">
+        <button class="modal-close" onclick="document.getElementById('workflowModal').classList.remove('active')">×</button>
+        <div class="modal-title"><i class="fa fa-list-check" style="color:#7C3AED"></i> <span id="workflowTitle"></span></div>
+        <div class="modal-subtitle" id="workflowSubtitle"></div>
+        <div id="workflowContent"><div class="modal-loading"><i class="fa fa-spinner"></i></div></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+// ── Fermer modals en cliquant l'overlay ──
+['arrosageModal','workflowModal'].forEach(function(id) {
+    document.getElementById(id).addEventListener('click', function(e) {
+        if (e.target === this) this.classList.remove('active');
+    });
+});
+
+// ====================== WORKFLOW IA ======================
+function openWorkflow(btn) {
+    var nomPlante  = btn.dataset.nom;
+    var cycleJours = parseInt(btn.dataset.cycle) || 0;
+    var locale     = btn.dataset.locale || 'fr';  // ← ajouter
+
+    document.getElementById('workflowTitle').textContent    = btn.dataset.labelTitre;
+    document.getElementById('workflowSubtitle').textContent = btn.dataset.labelSousTitre;
+    document.getElementById('workflowContent').innerHTML    =
+        '<div class="modal-loading"><i class="fa fa-spinner"></i> ' + btn.dataset.labelGeneration + '</div>';
+    document.getElementById('workflowModal').classList.add('active');
+
+    var labelAucuneEtape   = btn.dataset.labelAucuneEtape;
+    var labelErreurServeur = btn.dataset.labelErreurServeur;
+
+    fetch('/api/workflow-plante', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nomPlante: nomPlante, cycleJours: cycleJours ,locale:     locale      // ← ajouter
+ })
+    })
+    .then(function(response) {
+        return response.json().then(function(json) {
+            if (!response.ok || json.error) throw new Error(json.error || labelErreurServeur);
+            return json;
+        });
+    })
+    .then(function(json) {
+        var steps = json.steps || [];
+        if (!steps.length) throw new Error(labelAucuneEtape);
+
+        var typeIcons = {
+            'prep':       '🌿',
+            'semis':      '🌱',
+            'croissance': '☀️',
+            'entretien':  '🔧',
+            'recolte':    '🌾',
+            'default':    '📌',
+        };
+
+        var html = '<div class="wf-steps">';
+        steps.forEach(function(step, i) {
+            var type   = step.type || 'default';
+            var icon   = typeIcons[type] || '📌';
+            var isLast = i === steps.length - 1;
+            html += '<div class="wf-step type-' + type + '">'
+                + (!isLast ? '<div class="wf-line"></div>' : '')
+                + '<div class="wf-dot-wrap"><div class="wf-dot">' + icon + '</div></div>'
+                + '<div class="wf-content">'
+                + '<div class="wf-step-title">' + escapeHtml(step.titre) + '</div>'
+                + '<div class="wf-step-desc">'  + escapeHtml(step.description) + '</div>'
+                + (step.duree ? '<span class="wf-step-meta">⏱ ' + escapeHtml(step.duree) + '</span>' : '')
+                + '</div></div>';
+        });
+        html += '</div>';
+
+        document.getElementById('workflowContent').innerHTML = html;
+    })
+    .catch(function(err) {
+        document.getElementById('workflowContent').innerHTML =
+            '<p style="color:#DC2626;text-align:center;padding:20px 0">' + escapeHtml(err.message) + '</p>';
+    });
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ====================== ARROSAGE ======================
+function openArrosage(btn) {
+    var nomPlante  = btn.dataset.nom;
+    var besoinEau  = parseFloat(btn.dataset.besoin) || 0;
+    var cycleJours = parseInt(btn.dataset.cycle)    || 0;
+
+    var labels = {
+        titre:          btn.dataset.labelTitre,
+        sousTitre:      btn.dataset.labelSousTitre,
+        calcul:         btn.dataset.labelCalcul,
+        humidite:       btn.dataset.labelHumidite,
+        meilleureHeure: btn.dataset.labelMeilleureHeure,
+        besoinNet:      btn.dataset.labelBesoinNet,
+        erreur:         btn.dataset.labelErreur,
+        pasArrosage:    btn.dataset.labelPasArrosage,
+        arrosageUrgent: btn.dataset.labelArrosageUrgent,
+        arrosageReduit: btn.dataset.labelArrosageReduit,
+        arrosageNormal: btn.dataset.labelArrosageNormal,
+        statutPas:      btn.dataset.labelStatutPas,
+        statutUrgent:   btn.dataset.labelStatutUrgent,
+        statutReduit:   btn.dataset.labelStatutReduit,
+        statutNormal:   btn.dataset.labelStatutNormal,
+        temperature:    btn.dataset.labelTemperature,
+        humiditeAir:    btn.dataset.labelHumiditeAir,
+        precipitations: btn.dataset.labelPrecipitations,
+        vent:           btn.dataset.labelVent,
+    };
+
+    document.getElementById('arrosageTitle').textContent    = labels.titre;
+    document.getElementById('arrosageSubtitle').textContent = labels.sousTitre;
+    document.getElementById('arrosageContent').innerHTML    =
+        '<div class="modal-loading"><i class="fa fa-spinner"></i> ' + labels.calcul + '</div>';
+    document.getElementById('arrosageModal').classList.add('active');
+
+    var lat = 33.8869, lon = 9.5375;
+
+    fetch(
+        'https://api.open-meteo.com/v1/forecast?latitude=' + lat + '&longitude=' + lon
+        + '&current_weather=true&hourly=relative_humidity_2m,precipitation,evapotranspiration&forecast_days=1&timezone=Africa/Tunis'
+    )
+    .then(function(r) { return r.json(); })
+    .then(function(wData) {
+        var h = new Date().getHours();
+
+        var temp      = (wData.current_weather && wData.current_weather.temperature != null)  ? wData.current_weather.temperature  : 25;
+        var windspeed = (wData.current_weather && wData.current_weather.windspeed   != null)  ? wData.current_weather.windspeed    : 10;
+        var humidity  = (wData.hourly && wData.hourly.relative_humidity_2m && wData.hourly.relative_humidity_2m[h] != null) ? wData.hourly.relative_humidity_2m[h] : 50;
+        var precip    = (wData.hourly && wData.hourly.precipitation        && wData.hourly.precipitation[h]        != null) ? wData.hourly.precipitation[h]        : 0;
+
+        var besoinReel = besoinEau > 0 ? besoinEau : 5;
+        if (temp > 35)          besoinReel *= 1.4;
+        else if (temp > 28)     besoinReel *= 1.2;
+        else if (temp < 15)     besoinReel *= 0.7;
+        if (humidity < 30)      besoinReel *= 1.3;
+        else if (humidity > 70) besoinReel *= 0.8;
+        if (windspeed > 30)     besoinReel *= 1.15;
+
+        var apportPluie = precip * 0.8;
+        var besoinNet   = Math.max(0, besoinReel - apportPluie).toFixed(1);
+
+        var statusIcon, statusText, statusColor, conseilClass, conseil, heure;
+
+        if (precip > 8) {
+            statusIcon   = '🌧️';
+            statusText   = labels.statutPas;
+            statusColor  = '#3B82F6';
+            conseilClass = 'stop';
+            conseil      = '<strong>' + labels.pasArrosage + '</strong><br>' + precip + ' mm';
+            heure        = '—';
+        } else if (temp > 35 || humidity < 30) {
+            statusIcon   = '🔥';
+            statusText   = labels.statutUrgent;
+            statusColor  = '#DC2626';
+            conseilClass = 'go';
+            conseil      = '<strong>' + labels.arrosageUrgent + '</strong><br><strong>' + besoinNet + ' L</strong>';
+            heure        = '< 8h / > 18h';
+        } else if (precip > 3) {
+            statusIcon   = '🌦️';
+            statusText   = labels.statutReduit;
+            statusColor  = '#D97706';
+            conseilClass = 'wait';
+            conseil      = '<strong>' + labels.arrosageReduit + '</strong><br><strong>' + besoinNet + ' L</strong>';
+            heure        = 'AM';
+        } else {
+            statusIcon   = '💧';
+            statusText   = labels.statutNormal;
+            statusColor  = '#16A34A';
+            conseilClass = 'go';
+            conseil      = '<strong>' + labels.arrosageNormal + '</strong><br><strong>' + besoinNet + ' L</strong>'
+                         + (cycleJours > 0 ? '<br>' + cycleJours + ' j' : '');
+            heure        = '7h–9h / 18h–20h';
+        }
+
+        var humSol   = Math.min(100, Math.round(humidity * 0.6 + precip * 5));
+        var humColor = humSol > 60 ? '#16A34A' : humSol > 35 ? '#D97706' : '#DC2626';
+
+        document.getElementById('arrosageContent').innerHTML =
+            '<div class="arro-header">'
+            + '<div class="arro-icon">' + statusIcon + '</div>'
+            + '<div class="arro-status" style="color:' + statusColor + '">' + statusText + '</div>'
+            + '</div>'
+            + '<div class="arro-grid">'
+            + '<div class="arro-item" style="background:#FFF7ED"><div class="arro-item-label">🌡️ ' + labels.temperature   + '</div><div class="arro-item-val" style="color:#C2410C">' + temp      + ' °C</div></div>'
+            + '<div class="arro-item" style="background:#EFF6FF"><div class="arro-item-label">💧 ' + labels.humiditeAir   + '</div><div class="arro-item-val" style="color:#1D4ED8">' + humidity  + ' %</div></div>'
+            + '<div class="arro-item" style="background:#F0FDF4"><div class="arro-item-label">🌧️ ' + labels.precipitations + '</div><div class="arro-item-val" style="color:#15803D">' + precip    + ' mm</div></div>'
+            + '<div class="arro-item" style="background:#F5F3FF"><div class="arro-item-label">💨 ' + labels.vent          + '</div><div class="arro-item-val" style="color:#6D28D9">' + windspeed + ' km/h</div></div>'
+            + '</div>'
+            + '<div style="margin-bottom:16px;">'
+            + '<div style="font-size:12px;color:#6B7280;font-weight:600;text-transform:uppercase;margin-bottom:6px;">💧 ' + labels.humidite + '</div>'
+            + '<div class="arro-bar-bg"><div class="arro-bar-fill" style="width:' + humSol + '%;background:' + humColor + '"></div></div>'
+            + '<div class="arro-bar-label">' + humSol + '%</div>'
+            + '</div>'
+            + '<div style="margin-bottom:14px;background:#F9FAFB;border-radius:10px;padding:10px 14px;font-size:13px;">'
+            + '<span style="color:#6B7280;">⏰ ' + labels.meilleureHeure + ' :</span> <strong style="color:#1B3A20;">' + heure     + '</strong><br>'
+            + '<span style="color:#6B7280;">💧 ' + labels.besoinNet      + ' :</span> <strong style="color:#1D4ED8;">' + besoinNet + ' L</strong>'
+            + '</div>'
+            + '<div class="arro-conseil ' + conseilClass + '">' + conseil + '</div>';
+    })
+    .catch(function() {
+        document.getElementById('arrosageContent').innerHTML =
+            '<p style="color:#DC2626;text-align:center">' + labels.erreur + '</p>';
+    });
+}
+</script>
 {% endblock %}

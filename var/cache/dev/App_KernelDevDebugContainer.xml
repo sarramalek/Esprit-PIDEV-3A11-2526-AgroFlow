@@ -548,6 +548,23 @@
         <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\Terrain\AgriTerrainController"/>
       </call>
     </service>
+    <service id="App\Controller\Terrain\AiSuggestionController" class="App\Controller\Terrain\AiSuggestionController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <argument type="service" id=".debug.http_client"/>
+      <argument type="service" id="App\Repository\Terrain\TerrainRepository"/>
+      <argument type="service" id="App\Repository\Terrain\PlanteRepository"/>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\Terrain\AiSuggestionController"/>
+      </call>
+    </service>
+    <service id="App\Controller\Terrain\OuvrierPlanteViewController" class="App\Controller\Terrain\OuvrierPlanteViewController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\Terrain\OuvrierPlanteViewController"/>
+      </call>
+    </service>
     <service id="App\Controller\Terrain\PlanteController" class="App\Controller\Terrain\PlanteController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
@@ -567,6 +584,14 @@
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
         <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\Terrain\TerrainController"/>
+      </call>
+    </service>
+    <service id="App\Controller\Terrain\WorkflowPlanteController" class="App\Controller\Terrain\WorkflowPlanteController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <argument type="service" id=".debug.http_client"/>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.O2p6Lk7.App\Controller\Terrain\WorkflowPlanteController"/>
       </call>
     </service>
     <service id="App\Controller\User\AbonnementController" class="App\Controller\User\AbonnementController" public="true" autowire="true" autoconfigure="true">
@@ -676,6 +701,7 @@
       <tag name="kernel.event_listener" event="kernel.request" method="" priority="20" dispatcher=""/>
       <tag name="container.hot_path"/>
     </service>
+    <service id="App\EventListener\LocaleListener_plante" class="App\EventListener\LocaleListener_plante" autowire="true" autoconfigure="true"/>
     <service id="App\EventListener\LogoutListener" class="App\EventListener\LogoutListener" autowire="true" autoconfigure="true">
       <tag name="kernel.event_subscriber"/>
     </service>
@@ -912,7 +938,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.xFEXRPe"/>
+      <argument type="service" id=".service_locator.KEfuyJz"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -2713,11 +2739,13 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/translations\SchebTwoFactorBundle.fr.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/translations\messages.fr.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/translations\messages.fr.yaml</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/translations\plantes.fr.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/translations\security.fr.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/translations\validators.fr.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/translations\SchebTwoFactorBundle.fr.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/translations\messages.fr.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/translations\messages.fr.yaml</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/translations\plantes.fr.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/translations\security.fr.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/translations\validators.fr.xlf</argument>
           </argument>
@@ -4020,7 +4048,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.xFEXRPe"/>
+      <argument type="service" id=".service_locator.KEfuyJz"/>
     </service>
     <service id="debug.log_processor" class="Symfony\Bridge\Monolog\Processor\DebugProcessor">
       <tag name="kernel.reset" method="reset"/>
@@ -8335,6 +8363,12 @@
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Terrain\AgriTerrainController" class="App\Controller\Terrain\AgriTerrainController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Terrain\AgriTerrainController" class="App\Controller\Terrain\AgriTerrainController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\Terrain\AgriTerrainController" class="App\Controller\Terrain\AgriTerrainController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Terrain\AiSuggestionController" class="App\Controller\Terrain\AiSuggestionController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Terrain\AiSuggestionController" class="App\Controller\Terrain\AiSuggestionController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\Terrain\AiSuggestionController" class="App\Controller\Terrain\AiSuggestionController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Terrain\OuvrierPlanteViewController" class="App\Controller\Terrain\OuvrierPlanteViewController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Terrain\OuvrierPlanteViewController" class="App\Controller\Terrain\OuvrierPlanteViewController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\Terrain\OuvrierPlanteViewController" class="App\Controller\Terrain\OuvrierPlanteViewController" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Terrain\PlanteController" class="App\Controller\Terrain\PlanteController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Terrain\PlanteController" class="App\Controller\Terrain\PlanteController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\Terrain\PlanteController" class="App\Controller\Terrain\PlanteController" autowire="true" autoconfigure="true" abstract="true"/>
@@ -8344,6 +8378,9 @@
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Terrain\TerrainController" class="App\Controller\Terrain\TerrainController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Terrain\TerrainController" class="App\Controller\Terrain\TerrainController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\Terrain\TerrainController" class="App\Controller\Terrain\TerrainController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Terrain\WorkflowPlanteController" class="App\Controller\Terrain\WorkflowPlanteController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Terrain\WorkflowPlanteController" class="App\Controller\Terrain\WorkflowPlanteController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\Terrain\WorkflowPlanteController" class="App\Controller\Terrain\WorkflowPlanteController" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\User\AbonnementController" class="App\Controller\User\AbonnementController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\User\AbonnementController" class="App\Controller\User\AbonnementController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\User\AbonnementController" class="App\Controller\User\AbonnementController" autowire="true" autoconfigure="true" abstract="true"/>
@@ -9246,6 +9283,12 @@
         <argument key="terrain" type="service_closure" id=".errored..service_locator.fs7gKM2.App\Entity\Terrain\Terrain"/>
       </argument>
     </service>
+    <service id=".service_locator.MJtkWtK" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="http" type="service_closure" id=".debug.http_client"/>
+      </argument>
+    </service>
     <service id=".service_locator.3VhX_yV" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -9498,7 +9541,7 @@
         <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
       </argument>
     </service>
-    <service id=".service_locator.xFEXRPe" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.KEfuyJz" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Controller\AdminDashboardController::index" type="service_closure" id=".service_locator.qni5W9T"/>
@@ -9607,6 +9650,8 @@
         <argument key="App\Controller\Terrain\AgriTerrainController::index" type="service_closure" id=".service_locator.PbrJcXN"/>
         <argument key="App\Controller\Terrain\AgriTerrainController::new" type="service_closure" id=".service_locator.9kKwU2t"/>
         <argument key="App\Controller\Terrain\AgriTerrainController::show" type="service_closure" id=".service_locator.fs7gKM2"/>
+        <argument key="App\Controller\Terrain\OuvrierPlanteViewController::conseils" type="service_closure" id=".service_locator.MJtkWtK"/>
+        <argument key="App\Controller\Terrain\OuvrierPlanteViewController::index" type="service_closure" id=".service_locator.ZUN3WII"/>
         <argument key="App\Controller\Terrain\PlanteController::delete" type="service_closure" id=".service_locator.yjHtSb5"/>
         <argument key="App\Controller\Terrain\PlanteController::edit" type="service_closure" id=".service_locator.yjHtSb5"/>
         <argument key="App\Controller\Terrain\PlanteController::index" type="service_closure" id=".service_locator.ZUN3WII"/>
@@ -9802,6 +9847,8 @@
         <argument key="App\Controller\Terrain\AgriTerrainController:index" type="service_closure" id=".service_locator.PbrJcXN"/>
         <argument key="App\Controller\Terrain\AgriTerrainController:new" type="service_closure" id=".service_locator.9kKwU2t"/>
         <argument key="App\Controller\Terrain\AgriTerrainController:show" type="service_closure" id=".service_locator.fs7gKM2"/>
+        <argument key="App\Controller\Terrain\OuvrierPlanteViewController:conseils" type="service_closure" id=".service_locator.MJtkWtK"/>
+        <argument key="App\Controller\Terrain\OuvrierPlanteViewController:index" type="service_closure" id=".service_locator.ZUN3WII"/>
         <argument key="App\Controller\Terrain\PlanteController:delete" type="service_closure" id=".service_locator.yjHtSb5"/>
         <argument key="App\Controller\Terrain\PlanteController:edit" type="service_closure" id=".service_locator.yjHtSb5"/>
         <argument key="App\Controller\Terrain\PlanteController:index" type="service_closure" id=".service_locator.ZUN3WII"/>
@@ -10748,6 +10795,18 @@
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.O2p6Lk7" method="withContext"/>
     </service>
+    <service id=".service_locator.O2p6Lk7.App\Controller\Terrain\AiSuggestionController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\Terrain\AiSuggestionController"/>
+      <argument>App\Controller\Terrain\AiSuggestionController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.O2p6Lk7" method="withContext"/>
+    </service>
+    <service id=".service_locator.O2p6Lk7.App\Controller\Terrain\OuvrierPlanteViewController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\Terrain\OuvrierPlanteViewController"/>
+      <argument>App\Controller\Terrain\OuvrierPlanteViewController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.O2p6Lk7" method="withContext"/>
+    </service>
     <service id=".service_locator.O2p6Lk7.App\Controller\Terrain\PlanteController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\Terrain\PlanteController"/>
       <argument>App\Controller\Terrain\PlanteController</argument>
@@ -10763,6 +10822,12 @@
     <service id=".service_locator.O2p6Lk7.App\Controller\Terrain\TerrainController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\Terrain\TerrainController"/>
       <argument>App\Controller\Terrain\TerrainController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.O2p6Lk7" method="withContext"/>
+    </service>
+    <service id=".service_locator.O2p6Lk7.App\Controller\Terrain\WorkflowPlanteController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\Terrain\WorkflowPlanteController"/>
+      <argument>App\Controller\Terrain\WorkflowPlanteController</argument>
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.O2p6Lk7" method="withContext"/>
     </service>
@@ -11048,9 +11113,12 @@
           <argument>App\Controller\Terrain\AgriPlanteController</argument>
           <argument>App\Controller\Terrain\AgriRotationController</argument>
           <argument>App\Controller\Terrain\AgriTerrainController</argument>
+          <argument>App\Controller\Terrain\AiSuggestionController</argument>
+          <argument>App\Controller\Terrain\OuvrierPlanteViewController</argument>
           <argument>App\Controller\Terrain\PlanteController</argument>
           <argument>App\Controller\Terrain\RotationController</argument>
           <argument>App\Controller\Terrain\TerrainController</argument>
+          <argument>App\Controller\Terrain\WorkflowPlanteController</argument>
           <argument>App\Controller\User\AbonnementController</argument>
           <argument>App\Controller\User\AbonnementFrontController</argument>
           <argument>App\Controller\User\AdminUserController</argument>
@@ -12561,7 +12629,7 @@
     <service id="Knp\Component\Pager\ArgumentAccess\ArgumentAccessInterface" alias="Knp\Component\Pager\ArgumentAccess\RequestArgumentAccess"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.w7.f4fT" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.xFEXRPe"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.KEfuyJz"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id=".Psr\Log\LoggerInterface $request.logger" alias="monolog.logger.request"/>
@@ -12637,7 +12705,7 @@
     <service id=".service_locator.5pebkNV" alias=".service_locator.xxq2prQ"/>
     <service id=".service_locator.whdse4m" alias=".service_locator.yd.AI8F"/>
     <service id=".service_locator.8J1nalj" alias=".service_locator.SsD9eLO"/>
-    <service id=".service_locator.T66Q_EJ" alias=".service_locator.xFEXRPe"/>
+    <service id=".service_locator.vDrNHfy" alias=".service_locator.KEfuyJz"/>
     <service id=".service_locator.BFrsqsn" alias=".service_locator.F9PKc.7"/>
     <service id=".service_locator.oIHygA7" alias=".service_locator.xOkKGYY"/>
     <service id=".service_locator.XtmiKbi" alias=".service_locator.MfxSDRP"/>
@@ -12716,6 +12784,7 @@
     <service id=".service_locator.22U4beL" alias=".service_locator.PbrJcXN"/>
     <service id=".service_locator.iAk21e6" alias=".service_locator.4mmheGO"/>
     <service id=".service_locator.Ry.QS4P" alias=".service_locator.fs7gKM2"/>
+    <service id=".service_locator..Nls6h0" alias=".service_locator.MJtkWtK"/>
     <service id=".service_locator.aCE1lEv" alias=".service_locator.3VhX_yV"/>
     <service id=".service_locator.YcdNa9i" alias=".service_locator.yWC66pN"/>
     <service id=".service_locator.xoZBJdw" alias=".service_locator.SLbcwc9"/>

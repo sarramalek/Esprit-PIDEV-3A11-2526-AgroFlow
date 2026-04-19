@@ -19,3 +19,46 @@ taches:
     statut_afaire: "À faire"
     statut_encours: "En cours"
     statut_terminee: "Terminée"
+plante:
+    retour: "Retour"
+    modifier: "Modifier"
+    arrosage: "Arrosage"
+    workflow: "Workflow"
+    variete_vide: "Variété non précisée"
+ 
+    champ:
+        nom: "Nom"
+        variete: "Variété"
+        besoin_eau: "Besoin en eau"
+        cycle: "Cycle de culture"
+ 
+    unite:
+        litres_jour: "L/j"
+        jours: "jours"
+ 
+    modal:
+        arrosage_titre: "Arrosage — %nom%"
+        arrosage_sous_titre: "Recommandation personnalisée basée sur la météo"
+        calcul_en_cours: "Calcul en cours…"
+        humidite_sol: "Humidité estimée du sol"
+        meilleure_heure: "Meilleure heure"
+        besoin_net: "Besoin net ajusté"
+        erreur_meteo: "Erreur de chargement météo. Vérifiez votre connexion."
+        pas_arrosage: "Arrosage inutile aujourd'hui — la pluie est suffisante."
+        arrosage_urgent: "Arrosage urgent recommandé — conditions de stress hydrique."
+        arrosage_reduit: "Arrosage réduit conseillé."
+        arrosage_normal: "Arrosage recommandé."
+        statut_pas_arrosage: "Pas d'arrosage"
+        statut_urgent: "Arrosage urgent"
+        statut_reduit: "Arrosage réduit"
+        statut_normal: "Arrosage normal"
+        temperature: "Température"
+        humidite_air: "Humidité air"
+        precipitations: "Précipitations"
+        vent: "Vent"
+ 
+        workflow_titre: "Workflow — %nom%"
+        workflow_sous_titre: "Étapes de culture générées par IA"
+        generation_en_cours: "Génération en cours…"
+        aucune_etape: "Aucune étape reçue."
+        erreur_serveur: "Erreur serveur"
