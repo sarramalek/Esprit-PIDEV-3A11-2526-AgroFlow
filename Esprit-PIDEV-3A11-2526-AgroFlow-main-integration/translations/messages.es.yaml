@@ -78,6 +78,10 @@ report:
     radio: Radiografía
   edit_report: Editar informe
   back_to_list: Volver a la lista
+  reminder_system: Sistema de Recordatorios
+  next_reminder: Próximo recordatorio
+  reminder_soon: Pronto
+  reminder_planned: Planificado
 
 language:
   fr: Français

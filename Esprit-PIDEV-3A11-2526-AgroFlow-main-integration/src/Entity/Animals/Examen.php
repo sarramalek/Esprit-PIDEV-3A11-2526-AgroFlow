@@ -19,7 +19,6 @@ class Examen
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     #[Assert\NotBlank(message: "La date de l'examen est obligatoire.")]
     #[Assert\Type(type: "\DateTimeInterface", message: "Format de date invalide.")]
-    #[Assert\LessThanOrEqual("today", message: "La date ne peut pas être dans le futur.")]
     private ?\DateTimeInterface $date_examen = null;
 
     #[ORM\Column(length: 100, nullable: true)]
@@ -112,10 +111,6 @@ class Examen
         $this->animal = $animal;
         return $this;
     }
-
-    /**
-     * Calcule le score de santé de l'animal basé sur l'examen (0-100)
-     */
     public function getHealthScore(): int
     {
         $score = 50; // Base de départ
@@ -170,5 +165,115 @@ class Examen
         }
 
         return $price;
+    }
+
+    /**
+     * Vérifie si le rappel est bientôt (moins de 7 jours)
+     * Méthode virtuelle qui calcule si cet examen nécessite un rappel
+     */
+    public function isReminderSoon(): bool
+    {
+        // Pour les vaccins, considérer qu'un rappel est nécessaire 1 an après
+        if ($this->type_examen === 'Vaccin' && $this->date_examen) {
+            $nextReminderDate = $this->calculateNextReminderDate();
+            if ($nextReminderDate) {
+                $now = new \DateTime();
+                $interval = $now->diff($nextReminderDate);
+                $days = $interval->days;
+
+                // Si la date est dans le passé, ce n'est pas bientôt
+                if ($nextReminderDate < $now) {
+                    return false;
+                }
+
+                return $days <= 7;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Calcule automatiquement la date du prochain rappel basée sur le type de vaccin
+     */
+    public function calculateNextReminderDate(): ?\DateTimeInterface
+    {
+        if ($this->type_examen !== 'Vaccin' || !$this->date_examen) {
+            return null;
+        }
+
+        $nextDate = clone $this->date_examen;
+
+        if (str_contains(strtolower($this->diagnostic), 'rage')) {
+            $nextDate->modify('+1 year');
+        } elseif (str_contains(strtolower($this->diagnostic), 'tétanos')) {
+            $nextDate->modify('+10 years');
+        } elseif (str_contains(strtolower($this->diagnostic), 'grippe')) {
+            $nextDate->modify('+1 year');
+        } elseif ($this->traitement === 'Antibiotiques') {
+            $nextDate->modify('+7 days');
+        } elseif ($this->traitement === 'Chirurgie') {
+            $nextDate->modify('+7 days');
+        } elseif ($this->traitement === 'Observation') {
+            $nextDate->modify('+1 month');
+        } else {
+            $nextDate->modify('+1 year');
+        }
+
+        return $nextDate;
+    }
+
+    /**
+     * Retourne le type de rappel pour cet examen
+     */
+    public function getReminderType(): ?string
+    {
+        if ($this->type_examen !== 'Vaccin') {
+            return null;
+        }
+
+        if (str_contains(strtolower($this->diagnostic), 'rage')) {
+            return 'Rappel rage';
+        }
+
+        if (str_contains(strtolower($this->diagnostic), 'tétanos')) {
+            return 'Rappel tétanos';
+        }
+
+        if (str_contains(strtolower($this->diagnostic), 'grippe')) {
+            return 'Rappel grippe';
+        }
+
+        if ($this->traitement === 'Antibiotiques') {
+            return 'Suivi antibiotiques';
+        }
+
+        if ($this->traitement === 'Chirurgie') {
+            return 'Suivi post-opératoire';
+        }
+
+        if ($this->traitement === 'Observation') {
+            return 'Suivi observation';
+        }
+
+        return 'Rappel annuel';
+    }
+
+    /**
+     * Indique si un vaccin est programmé dans le futur et doit être alerté
+     */
+    public function isFutureVaccineAlert(): bool
+    {
+        return $this->type_examen === 'Vaccin'
+            && $this->date_examen !== null
+            && $this->date_examen > new \DateTime();
+    }
+
+    /**
+     * Vérifie si cet examen doit avoir un rappel
+     */
+    public function shouldHaveReminder(): bool
+    {
+        return $this->type_examen === 'Vaccin';
     }
 }

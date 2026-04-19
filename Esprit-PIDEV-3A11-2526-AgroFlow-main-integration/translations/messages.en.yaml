@@ -77,6 +77,10 @@ report:
     radio: X-Ray
   edit_report: Edit Report
   back_to_list: Back to list
+  reminder_system: Reminder System
+  next_reminder: Next reminder
+  reminder_soon: Soon
+  reminder_planned: Planned
 
 language:
   fr: Français
