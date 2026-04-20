@@ -390,9 +390,9 @@
                 </div>
                 <div class="info-value">
                     {% if maintenance.nom %}
-                        <a href="{{ path('admin_machines_show', {id: maintenance.idM}) }}" class="machine-link">
-<span class="machine-id">#{{ maintenance.idM }}</span>
-                        <span class="machine-id">#{{ maintenance.idM }}</span>
+                        <a href="{{ path('admin_machines_show', {id: maintenance.idM.id}) }}" class="machine-link">
+<span class="machine-id">#{{ maintenance.idM.id }}</span>
+                        <span class="machine-id">#{{ maintenance.idM.id }}</span>
                     {% else %}
                         <span style="color: #9e9d95; font-style: italic;">— Non lié à un matériel —</span>
                     {% endif %}
