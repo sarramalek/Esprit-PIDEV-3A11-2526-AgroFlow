@@ -1,0 +1,179 @@
+{# Shared form partial — included from new.html.twig and edit.html.twig #}
+{# This file is a template fragment, not a standalone page #}
+{# Expected variables: maintenance, machines, submit_label, cancel_path #}
+
+<div class="section-title">
+    <i class="bi bi-tag-fill"></i> Identification de la panne
+</div>
+
+<div class="form-group">
+    <label class="form-label" for="typePanne">Type de panne <span class="req">*</span></label>
+    <div class="select-wrap">
+        <select name="typePanne" id="typePanne" class="form-select" required>
+            <option value="">— Choisir un type —</option>
+            <option value="Électrique" {{ maintenance.typePanne == 'Électrique' ? 'selected' : '' }}>⚡ Électrique</option>
+            <option value="Mécanique" {{ maintenance.typePanne == 'Mécanique' ? 'selected' : '' }}>⚙️ Mécanique</option>
+            <option value="Hydraulique" {{ maintenance.typePanne == 'Hydraulique' ? 'selected' : '' }}>💧 Hydraulique</option>
+            <option value="Pneumatique" {{ maintenance.typePanne == 'Pneumatique' ? 'selected' : '' }}>🌬️ Pneumatique</option>
+            <option value="Moteur" {{ maintenance.typePanne == 'Moteur' ? 'selected' : '' }}>🔩 Moteur</option>
+            <option value="Transmission" {{ maintenance.typePanne == 'Transmission' ? 'selected' : '' }}>🔄 Transmission</option>
+            <option value="Vidange &amp; filtres" {{ maintenance.typePanne == 'Vidange & filtres' ? 'selected' : '' }}>🛢️ Vidange &amp; Filtres</option>
+            <option value="Logicielle" {{ maintenance.typePanne == 'Logicielle' ? 'selected' : '' }}>💻 Logicielle</option>
+            <option value="Autre" {{ maintenance.typePanne == 'Autre' ? 'selected' : '' }}>🔧 Autre</option>
+        </select>
+    </div>
+    <div class="field-error" id="typeError">
+        <i class="bi bi-exclamation-circle-fill"></i>
+        <span id="typeErrorMsg">Veuillez sélectionner un type de panne.</span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="form-label" for="description">Description <span class="req">*</span></label>
+    <textarea name="description" id="description" class="form-textarea"
+              placeholder="Ex : Remplacement du filtre à huile moteur et vidange complète…"
+              required>{{ maintenance.description }}</textarea>
+    <div class="desc-footer">
+        <div class="field-error" id="descError" style="flex:1;">
+            <i class="bi bi-exclamation-circle-fill"></i>
+            <span id="descErrorMsg">La description est obligatoire (5-1000 caractères).</span>
+        </div>
+        <span class="char-counter" id="descCount">{{ maintenance.description|length|default(0) }} / 1000</span>
+    </div>
+</div>
+
+<div class="section-title" style="margin-top:24px;">
+    <i class="bi bi-cash-coin"></i> Coût &amp; Date
+</div>
+
+<div class="row-2cols" style="margin-bottom: 20px;">
+    <div class="form-group">
+        <label class="form-label" for="cout">Coût <span class="req">*</span></label>
+        <div class="input-addon">
+            <span class="input-addon-text"><i class="bi bi-cash-coin"></i></span>
+            <input type="number" name="cout" id="cout" class="form-input" 
+                   step="0.01" min="0.01" max="999999.99" 
+                   placeholder="0,00" value="{{ maintenance.cout }}" required>
+            <span class="input-addon-text">DT</span>
+        </div>
+        <div class="field-error" id="coutError">
+            <i class="bi bi-exclamation-circle-fill"></i>
+            <span id="coutErrorMsg">Le coût est obligatoire et doit être supérieur à 0.</span>
+        </div>
+        <div class="help-text">Maximum 999 999,99 DT</div>
+    </div>
+    
+    <div class="form-group">
+        <label class="form-label" for="dateMain">Date <span class="req">*</span></label>
+        <div class="input-addon">
+            <span class="input-addon-text"><i class="bi bi-calendar3"></i></span>
+            <input type="date" name="dateMain" id="dateMain" class="form-input"
+                   value="{{ maintenance.dateMain ? maintenance.dateMain|date('Y-m-d') : 'now'|date('Y-m-d') }}"
+                   max="{{ 'now'|date('Y-m-d') }}" required>
+        </div>
+        <div class="field-error" id="dateError">
+            <i class="bi bi-exclamation-circle-fill"></i>
+            <span id="dateErrorMsg">La date ne peut pas être dans le futur.</span>
+        </div>
+        <div class="help-text">Date ≤ aujourd'hui</div>
+    </div>
+</div>
+
+<div class="section-title" style="margin-top:8px;">
+    <i class="bi bi-sliders2"></i> Suivi &amp; Priorité
+</div>
+
+<div class="row-2cols" style="margin-bottom: 20px;">
+    <div class="form-group">
+        <label class="form-label" for="statut">Statut <span class="req">*</span></label>
+        <div class="select-wrap">
+            <select name="statut" id="statut" class="form-select" required>
+                <option value="planifie" {{ maintenance.statut == 'planifie' ? 'selected' : '' }}>📋 Planifié</option>
+                <option value="en_cours" {{ maintenance.statut == 'en_cours' ? 'selected' : '' }}>⚙️ En cours</option>
+                <option value="termine" {{ maintenance.statut == 'termine' ? 'selected' : '' }}>✅ Terminé</option>
+            </select>
+        </div>
+        <div class="field-error" id="statutError">
+            <i class="bi bi-exclamation-circle-fill"></i>
+            <span id="statutErrorMsg">Veuillez sélectionner un statut.</span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="form-label" for="priorite">Priorité <span class="req">*</span></label>
+        <div class="select-wrap">
+            <select name="priorite" id="priorite" class="form-select" required>
+                <option value="faible" {{ maintenance.priorite == 'faible' ? 'selected' : '' }}>⬇️ Faible</option>
+                <option value="moyenne" {{ maintenance.priorite == 'moyenne' ? 'selected' : '' }}>➡️ Moyenne</option>
+                <option value="haute" {{ maintenance.priorite == 'haute' ? 'selected' : '' }}>⬆️ Haute</option>
+                <option value="urgente" {{ maintenance.priorite == 'urgente' ? 'selected' : '' }}>⚠️ Urgente</option>
+            </select>
+        </div>
+        <div class="field-error" id="prioriteError">
+            <i class="bi bi-exclamation-circle-fill"></i>
+            <span id="prioriteErrorMsg">Veuillez sélectionner une priorité.</span>
+        </div>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="form-label" for="kilometrage">Kilométrage</label>
+    <div class="input-addon">
+        <span class="input-addon-text"><i class="bi bi-speedometer2"></i></span>
+        <input type="number" name="kilometrage" id="kilometrage" class="form-input"
+               step="1" min="0" max="9999999" placeholder="0"
+               value="{{ maintenance.kilometrage }}">
+        <span class="input-addon-text">km</span>
+    </div>
+    <div class="field-error" id="kmError">
+        <i class="bi bi-exclamation-circle-fill"></i>
+        <span id="kmErrorMsg">Le kilométrage doit être positif ou nul.</span>
+    </div>
+    <div class="help-text">Optionnel - Kilométrage au moment de la maintenance</div>
+</div>
+
+<div class="section-title" style="margin-top:8px;">
+    <i class="bi bi-chat-dots-fill"></i> Recommandation
+</div>
+
+<div class="form-group">
+    <label class="form-label" for="recommandation">Recommandation</label>
+    <textarea name="recommandation" id="recommandation" class="form-textarea"
+              placeholder="Ex : À surveiller tous les 5000 km, remplacer le filtre à air…"
+              rows="3">{{ maintenance.recommandation }}</textarea>
+    <div class="reco-footer">
+        <div class="field-error" id="recoError" style="flex:1;">
+            <i class="bi bi-exclamation-circle-fill"></i>
+            <span id="recoErrorMsg">Maximum 2000 caractères.</span>
+        </div>
+        <span class="char-counter" id="recoCount">{{ maintenance.recommandation|length|default(0) }} / 2000</span>
+    </div>
+</div>
+
+<div class="section-title" style="margin-top:8px;">
+    <i class="bi bi-cpu-fill"></i> Matériel associé
+</div>
+
+<div class="form-group">
+    <label class="form-label" for="idM">Matériel <span style="font-weight:400;color:#9e9d95;">(optionnel)</span></label>
+    <div class="select-wrap">
+        <select name="idM" id="idM" class="form-select">
+            <option value="">— Aucun matériel —</option>
+            {% for machine in machines %}
+                <option value="{{ machine.id }}" {{ maintenance.idM == machine.id ? 'selected' : '' }}>
+                    {{ machine.nom }} (ID : {{ machine.id }})
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="help-text">Sélectionnez le matériel concerné par cette maintenance</div>
+</div>
+
+<div class="form-actions" style="margin-top:28px;">
+    <button type="submit" class="btn-submit">
+        <i class="bi bi-check-lg"></i> {{ submit_label|default('Enregistrer') }}
+    </button>
+    <a href="{{ cancel_path|default(path('admin_maintenances_index')) }}" class="btn-cancel">
+        <i class="bi bi-x-lg"></i> Annuler
+    </a>
+</div>

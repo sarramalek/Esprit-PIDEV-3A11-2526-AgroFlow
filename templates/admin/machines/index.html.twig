@@ -122,20 +122,27 @@
     .legend-pct   { font-size: 11px; color: #aaa; min-width: 36px; text-align: right; }
 
     /* ── Table ── */
+    .table-container {
+        background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.06);
+        overflow-x: auto;
+    }
     #machinesTable {
         width: 100%;
         border-collapse: collapse;
+        min-width: 1200px;
     }
     #machinesTable thead th {
-        font-size: 13px; color: #555; font-weight: 600;
-        padding: 14px 12px; cursor: pointer; user-select: none;
+        font-size: 12px; color: #555; font-weight: 600;
+        padding: 14px 10px; cursor: pointer; user-select: none;
         white-space: nowrap;
+        background: #fafafa;
+        border-bottom: 1px solid #eee;
     }
     #machinesTable thead th:last-child { cursor: default; }
     #machinesTable thead th:hover:not(:last-child) { color: #2D5A27; }
     #machinesTable thead th.sorted-asc::after  { content: ' ↑'; color: #2D5A27; }
     #machinesTable thead th.sorted-desc::after { content: ' ↓'; color: #2D5A27; }
-    #machinesTable tbody td { padding: 12px 12px; vertical-align: middle; }
+    #machinesTable tbody td { padding: 12px 10px; vertical-align: middle; border-bottom: 1px solid #f0f0f0; }
     #machinesTable tbody tr:hover { background: #f9fbf8; }
 
     /* ── Action buttons ── */
@@ -172,6 +179,17 @@
         background: #FCEBEB; color: #A32D2D; border: 1px solid #f7c1c1;
         padding: 12px 18px; border-radius: 8px; margin-bottom: 16px;
         display: flex; align-items: center; gap: 10px;
+    }
+    
+    /* Info tooltip */
+    .info-badge {
+        background: #f0f0f0;
+        color: #666;
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 10px;
+        margin-left: 5px;
+        cursor: help;
     }
 </style>
 {% endblock %}
@@ -227,7 +245,7 @@
         <div class="search-wrap">
             <i class="fa fa-magnifying-glass"></i>
             <input type="text" id="searchInput"
-                   placeholder="Nom, marque, modèle, n° série, propriétaire..."
+                   placeholder="Rechercher..."
                    oninput="applyFilters()">
         </div>
 
@@ -237,10 +255,8 @@
                 <option value="">Tous les états</option>
                 <option value="Neuf">Neuf</option>
                 <option value="Bon">Bon</option>
-                <option value="Actif">Actif</option>
                 <option value="Occasion">Occasion</option>
                 <option value="En panne">En panne</option>
-                <option value="Hors service">Hors service</option>
             </select>
         </div>
 
@@ -272,24 +288,33 @@
     </span>
 </div>
 
-{# ── Tableau ── #}
-<div style="background:white; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.06); overflow-x:auto;">
+{# ── Tableau avec tous les attributs ── #}
+<div class="table-container">
     <div id="resultCount"></div>
     <table id="machinesTable">
         <thead>
-            <tr style="background:#fafafa; border-bottom:1px solid #eee;">
+            <tr>
                 <th onclick="sortTable(0)">Nom</th>
                 <th onclick="sortTable(1)">Marque</th>
                 <th onclick="sortTable(2)">Modèle</th>
                 <th>N° Série</th>
                 <th onclick="sortTable(4)">État</th>
-                <th onclick="sortTable(5)">Date Achat</th>
-                <th onclick="sortTable(6)">Propriétaire</th>
-                <th style="text-align:center; width:120px;">Actions</th>
-              </tr>
+                <th onclick="sortTable(5)">Kilométrage</th>
+                <th onclick="sortTable(6)">Date Achat</th>
+                <th>Dernière Visite</th>
+                <th>Km Dernière Visite</th>
+                <th>Prochaine Maintenance</th>
+                <th onclick="sortTable(10)">Propriétaire</th>
+                <th style="text-align:center; width:100px;">Actions</th>
+            </tr>
+            <tr style="background:#f5f5f5; font-size:11px;">
+                <th colspan="12" style="text-align:center; font-weight:normal; color:#888; padding:8px;">
+                    <i class="fa fa-info-circle"></i> Tous les attributs de la machine sont affichés
+                </th>
+            </tr>
         </thead>
         <tbody id="tableBody"></tbody>
-      </table>
+    </table>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -311,9 +336,9 @@ let pieChartInstance = null;
    Utilitaires
 ═══════════════════════════════════════════════════ */
 function getBadge(etat) {
-    if (['Neuf','Bon','Actif'].includes(etat))
+    if (etat === 'Neuf' || etat === 'Bon')
         return `<span class="badge badge-success">${etat}</span>`;
-    if (['En panne','Hors service'].includes(etat))
+    if (etat === 'En panne')
         return `<span class="badge badge-danger">${etat}</span>`;
     return `<span class="badge badge-warning">${etat}</span>`;
 }
@@ -337,6 +362,11 @@ function escHtml(str) {
         .replace(/"/g,'&quot;');
 }
 
+function formatKm(km) {
+    if (km === null || km === undefined) return '—';
+    return km.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " km/h";
+}
+
 /* ═══════════════════════════════════════════════════
    Filtrage
 ═══════════════════════════════════════════════════ */
@@ -348,7 +378,11 @@ function getFiltered() {
         if (activeLetter && !r.nom.toUpperCase().startsWith(activeLetter)) return false;
         if (e && r.etat !== e) return false;
         if (s) {
-            const hay = [r.nom, r.marque, r.modele, r.serie, r.nomAgriculteur].join(' ').toLowerCase();
+            const hay = [
+                r.nom, r.marque, r.modele, r.serie, 
+                r.nomAgriculteur, r.kilometrage?.toString(), 
+                r.kmLastVisite?.toString()
+            ].join(' ').toLowerCase();
             if (!hay.includes(s)) return false;
         }
         return true;
@@ -362,25 +396,29 @@ function sortData(rows) {
     rows = [...rows];
     
     if (!dateSort && currentSort.col === -1) {
-        rows.sort((a,b) => parseDate(b.date) - parseDate(a.date));
+        rows.sort((a,b) => parseDate(b.dateAchat) - parseDate(a.dateAchat));
         return rows;
     }
     
     if (dateSort) {
         rows.sort((a,b) =>
             dateSort === 'asc'
-                ? parseDate(a.date) - parseDate(b.date)
-                : parseDate(b.date) - parseDate(a.date)
+                ? parseDate(a.dateAchat) - parseDate(b.dateAchat)
+                : parseDate(b.dateAchat) - parseDate(a.dateAchat)
         );
         return rows;
     }
     
     if (currentSort.col >= 0) {
-        const keys = ['nom','marque','modele','serie','etat','date','nomAgriculteur'];
+        const keys = ['nom', 'marque', 'modele', 'serie', 'etat', 'kilometrage', 'dateAchat', 'dateLastVisite', 'kmLastVisite', 'prochaineMaintenance', 'nomAgriculteur'];
         const k    = keys[currentSort.col];
         rows.sort((a,b) => {
-            if (k === 'date') {
+            if (k === 'dateAchat' || k === 'dateLastVisite' || k === 'prochaineMaintenance') {
                 const va = parseDate(a[k]), vb = parseDate(b[k]);
+                return currentSort.dir === 'asc' ? va - vb : vb - va;
+            }
+            if (k === 'kilometrage' || k === 'kmLastVisite') {
+                const va = a[k] || 0, vb = b[k] || 0;
                 return currentSort.dir === 'asc' ? va - vb : vb - va;
             }
             let va = (k === 'nomAgriculteur') ? (a.nomAgriculteur || '') : (a[k] || '');
@@ -394,7 +432,7 @@ function sortData(rows) {
 }
 
 /* ═══════════════════════════════════════════════════
-   Rendu tableau
+   Rendu tableau avec tous les attributs
 ═══════════════════════════════════════════════════ */
 function render() {
     const filtered = sortData(getFiltered());
@@ -404,10 +442,10 @@ function render() {
         `${filtered.length} machine${filtered.length !== 1 ? 's' : ''} trouvée${filtered.length !== 1 ? 's' : ''}`;
 
     if (!filtered.length) {
-        tbody.innerHTML = `<tr class="empty-row"><td colspan="8">
+        tbody.innerHTML = `<tr class="empty-row"><td colspan="12">
             <i class="fa fa-inbox" style="font-size:28px;display:block;margin-bottom:10px;"></i>
             Aucune machine trouvée
-          </tr>`;
+         </td></tr>`;
         renderStats([]);
         return;
     }
@@ -417,13 +455,17 @@ function render() {
             <td style="font-weight:600; color:#2C3E50;">${escHtml(r.nom)}</td>
             <td>${escHtml(r.marque)}</td>
             <td>${escHtml(r.modele)}</td>
-            <td style="font-family:monospace; font-size:13px; color:#555;">${escHtml(r.serie)}</td>
+            <td style="font-family:monospace; font-size:12px; color:#555;">${escHtml(r.serie) || '—'}</td>
             <td>${getBadge(r.etat)}</td>
-            <td>${fmtDate(r.date)}</td>
-            <td style="font-size:13px;">
+            <td style="font-family:monospace;">${formatKm(r.kilometrage)}</td>
+            <td>${fmtDate(r.dateAchat)}</td>
+            <td>${fmtDate(r.dateLastVisite)}</td>
+            <td style="font-family:monospace;">${formatKm(r.kmLastVisite)}</td>
+            <td>${fmtDate(r.prochaineMaintenance)}</td>
+            <td style="font-size:12px;">
                 ${r.cinAgriculteur && r.cinAgriculteur !== '—' && r.nomAgriculteur && r.nomAgriculteur !== '—'
                     ? `<span style="color:#2C3E50; font-weight:500;">${escHtml(r.nomAgriculteur)}</span>
-                       <span style="color:#888; font-size:11px; display:block; font-family:monospace;">CIN: ${r.cinAgriculteur}</span>`
+                       <span style="color:#888; font-size:10px; display:block; font-family:monospace;">CIN: ${r.cinAgriculteur}</span>`
                     : `<span style="color:#999; font-style:italic;">Non assigné</span>`
                 }
             </td>
@@ -459,8 +501,7 @@ function calculateAdvancedStats(filtered) {
         return {
             total: 0,
             avgAge: 0,
-            newest: null,
-            oldest: null,
+            avgKilometrage: 0,
             mostCommonBrand: null,
             brandCount: {},
             etatCount: {}
@@ -468,8 +509,15 @@ function calculateAdvancedStats(filtered) {
     }
     
     const brandCount = {};
+    let totalKilometrage = 0;
+    let kmCount = 0;
+    
     filtered.forEach(r => {
         brandCount[r.marque] = (brandCount[r.marque] || 0) + 1;
+        if (r.kilometrage) {
+            totalKilometrage += r.kilometrage;
+            kmCount++;
+        }
     });
     
     let mostCommonBrand = null;
@@ -483,32 +531,28 @@ function calculateAdvancedStats(filtered) {
     
     let totalAge = 0;
     let ageCount = 0;
-    let newestDate = null;
-    let oldestDate = null;
     const today = new Date();
     
     filtered.forEach(r => {
-        if (r.date) {
-            const purchaseDate = new Date(r.date);
+        if (r.dateAchat) {
+            const purchaseDate = new Date(r.dateAchat);
             if (!isNaN(purchaseDate.getTime())) {
                 const age = today.getFullYear() - purchaseDate.getFullYear();
                 totalAge += age;
                 ageCount++;
-                
-                if (!newestDate || purchaseDate > newestDate) newestDate = purchaseDate;
-                if (!oldestDate || purchaseDate < oldestDate) oldestDate = purchaseDate;
             }
         }
     });
     
     const avgAge = ageCount > 0 ? (totalAge / ageCount).toFixed(1) : 0;
+    const avgKilometrage = kmCount > 0 ? Math.round(totalKilometrage / kmCount) : 0;
     
     const etatCount = {};
     filtered.forEach(r => {
         etatCount[r.etat] = (etatCount[r.etat] || 0) + 1;
     });
     
-    return { total, avgAge, newest: newestDate, oldest: oldestDate, mostCommonBrand, brandCount, etatCount };
+    return { total, avgAge, avgKilometrage, mostCommonBrand, brandCount, etatCount };
 }
 
 function updateAdvancedStats(stats) {
@@ -517,10 +561,11 @@ function updateAdvancedStats(stats) {
     
     const total = stats.total;
     const avgAge = stats.avgAge;
+    const avgKm = stats.avgKilometrage;
     const mostCommonBrand = stats.mostCommonBrand || '—';
     const brandCount = stats.brandCount;
     const topBrand = mostCommonBrand !== '—' ? `${mostCommonBrand} (${brandCount[mostCommonBrand]})` : '—';
-    const available = (stats.etatCount['Bon'] || 0) + (stats.etatCount['Neuf'] || 0) + (stats.etatCount['Actif'] || 0);
+    const available = (stats.etatCount['Bon'] || 0) + (stats.etatCount['Neuf'] || 0);
     const occupancyRate = total > 0 ? Math.round(available / total * 100) : 0;
     
     statsGrid.innerHTML = `
@@ -533,8 +578,8 @@ function updateAdvancedStats(stats) {
             <div class="stat-number" style="color:#185FA5;">${avgAge} ans</div>
         </div>
         <div class="stat-card" style="border-top:4px solid #854F0B;">
-            <div class="stat-label"><i class="fa fa-chart-simple"></i> Marque dominante</div>
-            <div class="stat-number" style="font-size:24px; color:#854F0B;">${escHtml(topBrand)}</div>
+            <div class="stat-label"><i class="fa fa-tachometer"></i> Kilométrage moyen</div>
+            <div class="stat-number" style="font-size:24px; color:#854F0B;">${avgKm.toLocaleString()} km/h</div>
         </div>
         <div class="stat-card" style="border-top:4px solid #3B6D11;">
             <div class="stat-label"><i class="fa fa-chart-line"></i> Taux disponibilité</div>
@@ -549,10 +594,8 @@ function updateAdvancedStats(stats) {
 const ETAT_COLORS = {
     'Neuf':        { bg: '#2D5A27', light: '#EAF3DE', text: '#3B6D11' },
     'Bon':         { bg: '#3B6D11', light: '#EAF3DE', text: '#3B6D11' },
-    'Actif':       { bg: '#185FA5', light: '#E6F1FB', text: '#185FA5' },
     'Occasion':    { bg: '#854F0B', light: '#FAEEDA', text: '#854F0B' },
-    'En panne':    { bg: '#A32D2D', light: '#FCEBEB', text: '#A32D2D' },
-    'Hors service':{ bg: '#555555', light: '#f0f0f0', text: '#444444' },
+    'En panne':    { bg: '#A32D2D', light: '#FCEBEB', text: '#A32D2D' }
 };
 const DEFAULT_COLOR = { bg: '#888', light: '#f5f5f5', text: '#555' };
 
@@ -639,7 +682,7 @@ function renderStats(filtered) {
 ═══════════════════════════════════════════════════ */
 function buildAlphaBar() {
     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-    const usedLetters = new Set(MACHINES_DATA.map(r => r.nom[0].toUpperCase()));
+    const usedLetters = new Set(MACHINES_DATA.map(r => r.nom && r.nom[0] ? r.nom[0].toUpperCase() : ''));
     const wrap = document.getElementById('alphaButtons');
     if (!wrap) return;
     

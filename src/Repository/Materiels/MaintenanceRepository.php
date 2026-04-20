@@ -14,16 +14,30 @@ class MaintenanceRepository extends ServiceEntityRepository
         parent::__construct($registry, Maintenance::class);
     }
 
-    // Récupérer toutes les machines avec la bonne propriété
+    private function hydrate(array $row): Maintenance
+    {
+        $m = new Maintenance();
+        $m->setIdMain($row['idMain']);
+        $m->setTypePanne($row['typePanne']);
+        $m->setCout((float) $row['cout']);
+        $m->setDateMain($row['dateMain'] ? new \DateTime($row['dateMain']) : null);
+        $m->setDescription($row['description']);
+        $m->setIdM($row['idM'] ? (int)$row['idM'] : null);
+        $m->setStatut($row['statut'] ?? 'planifie');
+        $m->setRecommandation($row['recommandation'] ?? null);
+        $m->setPriorite($row['priorite'] ?? 'moyenne');
+        $m->setKilometrage(isset($row['kilometrage']) && $row['kilometrage'] !== null ? (int)$row['kilometrage'] : null);
+        $m->setNom($row['nom'] ?? null);
+        return $m;
+    }
+
     public function getAllMachines(): array
     {
         $conn = $this->getEntityManager()->getConnection();
-        $sql = "SELECT idM as id, nom FROM machine ORDER BY nom ASC";
-        $stmt = $conn->executeQuery($sql);
-        return $stmt->fetchAllAssociative();
+        $sql  = "SELECT idM as id, nom FROM machine ORDER BY nom ASC";
+        return $conn->executeQuery($sql)->fetchAllAssociative();
     }
 
-    // Recherche avec filtre et tri
     public function searchWithMaterielName(
         string $search = '',
         string $type   = '',
@@ -32,153 +46,93 @@ class MaintenanceRepository extends ServiceEntityRepository
         string $idM    = ''
     ): array {
         $conn = $this->getEntityManager()->getConnection();
-        
-        $allowedSorts = ['typePanne', 'cout', 'dateMain'];
+
+        $allowedSorts = ['typePanne', 'cout', 'dateMain', 'statut', 'priorite', 'kilometrage'];
         $allowedDirs  = ['ASC', 'DESC'];
-        
+
         $sort = in_array($sort, $allowedSorts, true) ? $sort : 'dateMain';
         $dir  = in_array(strtoupper($dir), $allowedDirs, true) ? strtoupper($dir) : 'DESC';
-        
+
         $sql = "
             SELECT 
-                m.idMain,
-                m.typePanne,
-                m.cout,
-                m.dateMain,
-                m.description,
-                m.idM,
+                m.idMain, m.typePanne, m.cout, m.dateMain,
+                m.description, m.idM,
+                m.statut, m.recommandation, m.priorite, m.kilometrage,
                 mac.nom
             FROM maintenance m
             LEFT JOIN machine mac ON mac.idM = m.idM
             WHERE 1=1
         ";
-        
+
         $params = [];
-        
+
         if ($search !== '') {
-            $sql .= " AND (LOWER(m.typePanne) LIKE :search OR LOWER(m.description) LIKE :search OR LOWER(mac.nom) LIKE :search)";
+            $sql .= " AND (LOWER(m.typePanne) LIKE :search OR LOWER(m.description) LIKE :search OR LOWER(mac.nom) LIKE :search OR LOWER(m.recommandation) LIKE :search)";
             $params['search'] = '%' . strtolower($search) . '%';
         }
-        
+
         if ($type !== '') {
             $sql .= " AND LOWER(m.typePanne) = :type";
             $params['type'] = strtolower($type);
         }
-        
+
         if ($idM !== '') {
             $sql .= " AND m.idM = :idM";
             $params['idM'] = (int) $idM;
         }
-        
+
         $sql .= " ORDER BY m.$sort $dir";
-        
-        $stmt = $conn->executeQuery($sql, $params);
-        $results = $stmt->fetchAllAssociative();
-        
-        $maintenances = [];
-        foreach ($results as $row) {
-            $m = new Maintenance();
-            $m->setIdMain($row['idMain']);
-            $m->setTypePanne($row['typePanne']);
-            $m->setCout((float) $row['cout']);
-            $m->setDateMain($row['dateMain'] ? new \DateTime($row['dateMain']) : null);
-            $m->setDescription($row['description']);
-            $m->setIdM($row['idM']);
-            $m->setNom($row['nom']);
-            $maintenances[] = $m;
-        }
-        
-        return $maintenances;
+
+        $results = $conn->executeQuery($sql, $params)->fetchAllAssociative();
+        return array_map(fn($row) => $this->hydrate($row), $results);
     }
 
-    // Toutes les maintenances
     public function findAllOrderedByDate(): array
     {
         $conn = $this->getEntityManager()->getConnection();
-        
+
         $sql = "
             SELECT 
-                m.idMain,
-                m.typePanne,
-                m.cout,
-                m.dateMain,
-                m.description,
-                m.idM,
+                m.idMain, m.typePanne, m.cout, m.dateMain,
+                m.description, m.idM,
+                m.statut, m.recommandation, m.priorite, m.kilometrage,
                 mac.nom
             FROM maintenance m
             LEFT JOIN machine mac ON mac.idM = m.idM
             ORDER BY m.dateMain DESC
         ";
-        
-        $stmt = $conn->executeQuery($sql);
-        $results = $stmt->fetchAllAssociative();
-        
-        $maintenances = [];
-        foreach ($results as $row) {
-            $m = new Maintenance();
-            $m->setIdMain($row['idMain']);
-            $m->setTypePanne($row['typePanne']);
-            $m->setCout((float) $row['cout']);
-            $m->setDateMain($row['dateMain'] ? new \DateTime($row['dateMain']) : null);
-            $m->setDescription($row['description']);
-            $m->setIdM($row['idM']);
-            $m->setNom($row['nom']);
-            $maintenances[] = $m;
-        }
-        
-        return $maintenances;
+
+        return array_map(fn($row) => $this->hydrate($row), $conn->executeQuery($sql)->fetchAllAssociative());
     }
 
-    // Trouver par ID
     public function findOneWithMaterielName(int $id): ?Maintenance
     {
         $conn = $this->getEntityManager()->getConnection();
-        
+
         $sql = "
             SELECT 
-                m.idMain,
-                m.typePanne,
-                m.cout,
-                m.dateMain,
-                m.description,
-                m.idM,
+                m.idMain, m.typePanne, m.cout, m.dateMain,
+                m.description, m.idM,
+                m.statut, m.recommandation, m.priorite, m.kilometrage,
                 mac.nom
             FROM maintenance m
             LEFT JOIN machine mac ON mac.idM = m.idM
             WHERE m.idMain = :id
         ";
-        
-        $stmt = $conn->executeQuery($sql, ['id' => $id]);
-        $row = $stmt->fetchAssociative();
-        
-        if (!$row) {
-            return null;
-        }
-        
-        $m = new Maintenance();
-        $m->setIdMain($row['idMain']);
-        $m->setTypePanne($row['typePanne']);
-        $m->setCout((float) $row['cout']);
-        $m->setDateMain($row['dateMain'] ? new \DateTime($row['dateMain']) : null);
-        $m->setDescription($row['description']);
-        $m->setIdM($row['idM']);
-        $m->setNom($row['nom']);
-        
-        return $m;
+
+        $row = $conn->executeQuery($sql, ['id' => $id])->fetchAssociative();
+        return $row ? $this->hydrate($row) : null;
     }
 
-    // Coût total
     public function getTotalCout(): float
     {
         $result = $this->createQueryBuilder('m')
             ->select('SUM(m.cout)')
             ->getQuery()
             ->getSingleScalarResult();
-
         return (float) ($result ?? 0.0);
     }
 
-    // Nombre par type
     public function countByTypePanne(): array
     {
         $rows = $this->createQueryBuilder('m')
@@ -194,7 +148,34 @@ class MaintenanceRepository extends ServiceEntityRepository
         ], $rows);
     }
 
-    // Coût par mois
+    public function countByStatut(): array
+    {
+        $rows = $this->createQueryBuilder('m')
+            ->select('m.statut AS statut, COUNT(m.idMain) AS total')
+            ->groupBy('m.statut')
+            ->getQuery()
+            ->getScalarResult();
+
+        return array_map(fn($row) => [
+            'statut' => $row['statut'],
+            'total'  => (int) $row['total'],
+        ], $rows);
+    }
+
+    public function countByPriorite(): array
+    {
+        $rows = $this->createQueryBuilder('m')
+            ->select('m.priorite AS priorite, COUNT(m.idMain) AS total')
+            ->groupBy('m.priorite')
+            ->getQuery()
+            ->getScalarResult();
+
+        return array_map(fn($row) => [
+            'priorite' => $row['priorite'],
+            'total'    => (int) $row['total'],
+        ], $rows);
+    }
+
     public function getCoutByMonth(): array
     {
         $conn      = $this->getEntityManager()->getConnection();
@@ -203,37 +184,26 @@ class MaintenanceRepository extends ServiceEntityRepository
         $colCout   = $this->getClassMetadata()->getColumnName('cout');
 
         $sql = sprintf(
-            "SELECT
-                DATE_FORMAT(`%s`, '%%Y-%%m') AS moisRaw,
-                SUM(`%s`)                    AS total
-             FROM `%s`
-             WHERE `%s` IS NOT NULL
-             GROUP BY moisRaw
-             ORDER BY moisRaw ASC",
+            "SELECT DATE_FORMAT(`%s`, '%%Y-%%m') AS moisRaw, SUM(`%s`) AS total
+             FROM `%s` WHERE `%s` IS NOT NULL
+             GROUP BY moisRaw ORDER BY moisRaw ASC",
             $colDate, $colCout, $tableName, $colDate
         );
 
-        $rows = $conn->executeQuery($sql)->fetchAllAssociative();
-
         $moisFr = [
-            '01' => 'Jan', '02' => 'Fév', '03' => 'Mar',
-            '04' => 'Avr', '05' => 'Mai', '06' => 'Jun',
-            '07' => 'Jul', '08' => 'Aoû', '09' => 'Sep',
-            '10' => 'Oct', '11' => 'Nov', '12' => 'Déc',
+            '01'=>'Jan','02'=>'Fév','03'=>'Mar','04'=>'Avr','05'=>'Mai','06'=>'Jun',
+            '07'=>'Jul','08'=>'Aoû','09'=>'Sep','10'=>'Oct','11'=>'Nov','12'=>'Déc',
         ];
 
         $result = [];
-        foreach ($rows as $row) {
-            if (empty($row['moisRaw'])) {
-                continue;
-            }
+        foreach ($conn->executeQuery($sql)->fetchAllAssociative() as $row) {
+            if (empty($row['moisRaw'])) continue;
             [$annee, $mois] = explode('-', $row['moisRaw']);
             $result[] = [
                 'mois'  => ($moisFr[$mois] ?? $mois) . ' ' . $annee,
                 'total' => round((float) $row['total'], 2),
             ];
         }
-
         return $result;
     }
 }
