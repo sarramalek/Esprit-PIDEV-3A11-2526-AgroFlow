@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Command;
+namespace App\Command\Animals;
 
-use App\Service\ReminderService;
+use App\Service\Animals\ReminderService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

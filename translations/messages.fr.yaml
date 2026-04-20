@@ -41,7 +41,7 @@ animal:
   no_medical_record_title: Aucun dossier médical trouvé.
   no_medical_record_desc: Commencez par ajouter un premier examen clinique.
   food_suggestions: Suggestions alimentaires
-  species_label: %species%
+  species_label: "%species%"
   species:
     Chien: Chien
     Chat: Chat
@@ -69,7 +69,7 @@ animal:
 
 report:
   reference: Référence #%id%
-  report_title: Rapport : %type%
+  report_title: "Rapport : %type%"
   exam_date: Date de l'examen
   patient_animal: Patient Animal
   prescription_action: Prescription / Action

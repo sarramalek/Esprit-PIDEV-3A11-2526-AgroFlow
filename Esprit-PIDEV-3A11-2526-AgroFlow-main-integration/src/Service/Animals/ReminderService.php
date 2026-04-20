@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Animals;
 
 use App\Entity\Animals\Examen;
 use App\Repository\Animals\ExamenRepository;

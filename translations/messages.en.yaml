@@ -41,7 +41,7 @@ animal:
   no_medical_record_title: No medical record found.
   no_medical_record_desc: Start by adding a first clinical exam.
   food_suggestions: Food Suggestions
-  species_label: %species%
+  species_label: "%species%"
   species:
     Chien: Dog
     Chat: Cat
@@ -69,7 +69,7 @@ animal:
 
 report:
   reference: Reference #%id%
-  report_title: Report: %type%
+  report_title: "Report: %type%"
   exam_date: Exam Date
   patient_animal: Patient Animal
   prescription_action: Prescription / Action
