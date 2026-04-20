@@ -12,6 +12,8 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Entity\Materiels\Machine;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 class MaintenanceType extends AbstractType
 {
@@ -121,11 +123,14 @@ class MaintenanceType extends AbstractType
                     ]),
                 ],
             ])
-            ->add('idM', IntegerType::class, [
-                'label'    => false,
-                'required' => false,
-                'attr'     => ['min' => 1],
-            ])
+            // ✅ Remplacer par
+->add('idM', EntityType::class, [
+    'class'        => Machine::class,
+    'choice_label' => 'nom',
+    'label'        => false,
+    'required'     => false,
+    'placeholder'  => '— Aucune machine —',
+])
         ;
     }
 

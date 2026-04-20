@@ -1,4 +1,12 @@
-{% extends 'agriculteur_dashboard.html.twig' %}
+{% if is_granted('ROLE_OUVRIER') %}
+    {% set layout = 'base_ouvrier.html.twig' %}
+    {% set cancel_route = 'ouvrier_taches' %}
+{% elseif is_granted('ROLE_AGRICULTEUR') %}
+    {% set layout = 'base_agriculteur.html.twig' %}
+    {% set cancel_route = 'agri_maintenances_index' %}
+{% endif %}
+
+{% extends layout %}
 
 {% block title %}Plan de maintenance - {{ maintenance.nomMateriel ?? maintenance.nom }}{% endblock %}
 
@@ -372,7 +380,7 @@
 </style>
 
 <div class="schedule-container">
-    <a href="{{ path('agri_maintenances_index') }}" class="btn-back">
+    <a href="{{ path(cancel_route) }}" class="btn-back">
         ← Retour aux maintenances
     </a>
     
