@@ -1,0 +1,277 @@
+{# templates/machines/_form.html.twig #}
+<style>
+    .f-section { margin-bottom:2rem; }
+    .f-section-title {
+        font-size:.82rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px;
+        color:#2d5a1b; border-left:3px solid #2d5a1b; padding-left:.6rem;
+        margin:0 0 1.1rem;
+    }
+    .f-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:.2rem 1.8rem; }
+
+    .fg {
+        margin-bottom:1.3rem;
+    }
+    .fg label { display:inline-block; margin-bottom:.35rem; font-weight:600; color:#4a6741; font-size:.88rem; }
+    .req { color:#e74c3c; margin-left:2px; }
+
+    .iw { position:relative; }
+    .iw .ico { position:absolute; left:11px; top:50%; transform:translateY(-50%); font-size:.9rem; pointer-events:none; z-index:1; }
+    .iw .sico { position:absolute; right:11px; top:50%; transform:translateY(-50%); font-size:.8rem; pointer-events:none; z-index:1; }
+    .sico.ok  { color:#2d5a1b; }
+    .sico.err { color:#e74c3c; }
+
+    .iw input, .iw select {
+        width:100%; padding:.65rem 2.2rem .65rem 2.4rem;
+        border:1.5px solid #c8e6b0; border-radius:9px;
+        font-size:.92rem; background:#fafffe;
+        transition:border-color .18s, box-shadow .18s;
+        font-family:inherit; outline:none; box-sizing:border-box;
+    }
+    .iw input:focus, .iw select:focus { border-color:#2d5a1b; box-shadow:0 0 0 3px rgba(45,90,27,.1); }
+
+    .fg.is-err .iw input, .fg.is-err .iw select { border-color:#e74c3c; background:#fff8f8; }
+    .fg.is-ok  .iw input, .fg.is-ok  .iw select { border-color:#2d5a1b; background:#f5fff5; }
+
+    .errs { list-style:none; margin:.3rem 0 0; padding:0; }
+    .errs li { color:#c0392b; font-size:.78rem; margin-top:2px; }
+    .errs li::before { content:"⚠ "; }
+    .hint { display:block; margin-top:.3rem; color:#8aaa8a; font-size:.76rem; }
+    .error-global { color:#e74c3c; background:#fff5f5; border-left:3px solid #e74c3c; padding:.75rem 1rem; margin-bottom:1.5rem; border-radius:6px; font-size:.85rem; }
+
+    .form-actions { display:flex; gap:.75rem; padding-top:1.4rem; border-top:1px solid #eef5e8; margin-top:.5rem; }
+    .btn { display:inline-flex; align-items:center; gap:.4rem; padding:.65rem 1.4rem; border-radius:10px; font-weight:600; font-size:.9rem; text-decoration:none; cursor:pointer; border:none; font-family:inherit; transition:all .18s; }
+    .btn-primary { background:#2d5a1b; color:#fff; }
+    .btn-primary:hover { background:#1f4012; transform:translateY(-1px); box-shadow:0 3px 10px rgba(45,90,27,.25); }
+    .btn-ghost { background:transparent; color:#4a6741; border:1.5px solid #c8e6b0; }
+    .btn-ghost:hover { background:#f0f7eb; border-color:#2d5a1b; }
+</style>
+
+{# Affichage des erreurs globales du formulaire #}
+{% if form.vars.errors|length %}
+    <div class="error-global">
+        {% for error in form.vars.errors %}
+            <div>{{ error.message }}</div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{# ── Section 1 : Infos générales ── #}
+<div class="f-section">
+    <p class="f-section-title">📋 Informations générales</p>
+    <div class="f-grid">
+
+        {# Nom - Contrôles : NotBlank, Length(2-255) #}
+        <div class="fg {% if form.nom.vars.errors|length %}is-err{% elseif form.nom.vars.value is not empty %}is-ok{% endif %}">
+            {{ form_label(form.nom) }}<span class="req">*</span>
+            <div class="iw">
+                <span class="ico">🚜</span>
+                {{ form_widget(form.nom, {attr:{placeholder:'Ex : John Deere 5075E'}}) }}
+                {% if form.nom.vars.errors|length %}<span class="sico err">✖</span>
+                {% elseif form.nom.vars.value is not empty %}<span class="sico ok">✔</span>{% endif %}
+            </div>
+            {% if form.nom.vars.errors|length %}
+                <ul class="errs">
+                    {% for error in form.nom.vars.errors %}
+                        <li style="color:#e74c3c;">{{ error.message }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <small class="hint">Ex : John Deere 5075E, Massey Ferguson 5713…</small>
+            {% endif %}
+        </div>
+
+        {# Marque - Contrôles : NotBlank, Length(2-255) #}
+        <div class="fg {% if form.marque.vars.errors|length %}is-err{% elseif form.marque.vars.value is not empty %}is-ok{% endif %}">
+            {{ form_label(form.marque) }}<span class="req">*</span>
+            <div class="iw">
+                <span class="ico">🏷️</span>
+                {{ form_widget(form.marque, {attr:{placeholder:'Ex : John Deere'}}) }}
+                {% if form.marque.vars.errors|length %}<span class="sico err">✖</span>
+                {% elseif form.marque.vars.value is not empty %}<span class="sico ok">✔</span>{% endif %}
+            </div>
+            {% if form.marque.vars.errors|length %}
+                <ul class="errs">
+                    {% for error in form.marque.vars.errors %}
+                        <li style="color:#e74c3c;">{{ error.message }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <small class="hint">Ex : John Deere, Massey Ferguson, New Holland…</small>
+            {% endif %}
+        </div>
+
+        {# Modèle - Contrôles : NotBlank, Length(1-255) #}
+        <div class="fg {% if form.modele.vars.errors|length %}is-err{% elseif form.modele.vars.value is not empty %}is-ok{% endif %}">
+            {{ form_label(form.modele) }}<span class="req">*</span>
+            <div class="iw">
+                <span class="ico">🔧</span>
+                {{ form_widget(form.modele, {attr:{placeholder:'Ex : 5075E'}}) }}
+                {% if form.modele.vars.errors|length %}<span class="sico err">✖</span>
+                {% elseif form.modele.vars.value is not empty %}<span class="sico ok">✔</span>{% endif %}
+            </div>
+            {% if form.modele.vars.errors|length %}
+                <ul class="errs">
+                    {% for error in form.modele.vars.errors %}
+                        <li style="color:#e74c3c;">{{ error.message }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <small class="hint">Ex : 5075E, 5713, T7.210…</small>
+            {% endif %}
+        </div>
+
+        {# Numéro de série - Contrôles : Length(max=255) #}
+        <div class="fg {% if form.numeroSerie.vars.errors|length %}is-err{% elseif form.numeroSerie.vars.value is not empty %}is-ok{% endif %}">
+            {{ form_label(form.numeroSerie) }}
+            <div class="iw">
+                <span class="ico">🔢</span>
+                {{ form_widget(form.numeroSerie, {attr:{placeholder:'Ex : 1M1234ABC', style:'text-transform:uppercase'}}) }}
+                {% if form.numeroSerie.vars.errors|length %}<span class="sico err">✖</span>
+                {% elseif form.numeroSerie.vars.value is not empty %}<span class="sico ok">✔</span>{% endif %}
+            </div>
+            {% if form.numeroSerie.vars.errors|length %}
+                <ul class="errs">
+                    {% for error in form.numeroSerie.vars.errors %}
+                        <li style="color:#e74c3c;">{{ error.message }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <small class="hint">Optionnel — sera mis en majuscules</small>
+            {% endif %}
+        </div>
+
+        {# État - Contrôles : NotBlank, Choice(Neuf, Bon, Occasion, En panne) #}
+        <div class="fg {% if form.etatM.vars.errors|length %}is-err{% endif %}">
+            {{ form_label(form.etatM) }}<span class="req">*</span>
+            <div class="iw">
+                <span class="ico">📋</span>
+                {{ form_widget(form.etatM) }}
+                {% if form.etatM.vars.errors|length %}<span class="sico err">✖</span>{% endif %}
+            </div>
+            {% if form.etatM.vars.errors|length %}
+                <ul class="errs">
+                    {% for error in form.etatM.vars.errors %}
+                        <li style="color:#e74c3c;">{{ error.message }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <small class="hint">État actuel de la machine (Neuf, Bon, Occasion, En panne)</small>
+            {% endif %}
+        </div>
+
+        {# Date achat - Contrôles : LessThanOrEqual(today) #}
+        <div class="fg {% if form.dateAchat.vars.errors|length %}is-err{% elseif form.dateAchat.vars.value is not empty %}is-ok{% endif %}">
+            {{ form_label(form.dateAchat) }}
+            <div class="iw">
+                <span class="ico">📅</span>
+                {{ form_widget(form.dateAchat) }}
+                {% if form.dateAchat.vars.errors|length %}<span class="sico err">✖</span>
+                {% elseif form.dateAchat.vars.value is not empty %}<span class="sico ok">✔</span>{% endif %}
+            </div>
+            {% if form.dateAchat.vars.errors|length %}
+                <ul class="errs">
+                    {% for error in form.dateAchat.vars.errors %}
+                        <li style="color:#e74c3c;">{{ error.message }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <small class="hint">Optionnelle — ne peut pas être dans le futur</small>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+
+{# ── Section 2 : Maintenance & Kilométrage ── #}
+<div class="f-section">
+    <p class="f-section-title">🔧 Maintenance & Kilométrage</p>
+    <div class="f-grid">
+
+        {# Kilométrage - Contrôles : NotBlank, PositiveOrZero, Range(0-1000000) #}
+        <div class="fg {% if form.kilometrage.vars.errors|length %}is-err{% elseif form.kilometrage.vars.value is not empty %}is-ok{% endif %}">
+            {{ form_label(form.kilometrage) }}<span class="req">*</span>
+            <div class="iw">
+                <span class="ico">📊</span>
+                {{ form_widget(form.kilometrage, {attr:{placeholder:'Ex : 15000', min:'0'}}) }}
+                {% if form.kilometrage.vars.errors|length %}<span class="sico err">✖</span>
+                {% elseif form.kilometrage.vars.value is not empty %}<span class="sico ok">✔</span>{% endif %}
+            </div>
+            {% if form.kilometrage.vars.errors|length %}
+                <ul class="errs">
+                    {% for error in form.kilometrage.vars.errors %}
+                        <li style="color:#e74c3c;">{{ error.message }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <small class="hint">Kilométrage actuel de la machine (doit être ≥ 0)</small>
+            {% endif %}
+        </div>
+
+        {# Date dernière visite - Contrôles : Callback (pas dans futur, > date achat, < prochaine maintenance) #}
+        <div class="fg {% if form.dateLastVisite.vars.errors|length %}is-err{% elseif form.dateLastVisite.vars.value is not empty %}is-ok{% endif %}">
+            {{ form_label(form.dateLastVisite) }}
+            <div class="iw">
+                <span class="ico">🔧</span>
+                {{ form_widget(form.dateLastVisite) }}
+                {% if form.dateLastVisite.vars.errors|length %}<span class="sico err">✖</span>
+                {% elseif form.dateLastVisite.vars.value is not empty %}<span class="sico ok">✔</span>{% endif %}
+            </div>
+            {% if form.dateLastVisite.vars.errors|length %}
+                <ul class="errs">
+                    {% for error in form.dateLastVisite.vars.errors %}
+                        <li style="color:#e74c3c;">{{ error.message }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <small class="hint">Date de la dernière visite d'entretien (ne peut pas être dans le futur)</small>
+            {% endif %}
+        </div>
+
+        {# Km dernière visite - Contrôles : NotBlank, PositiveOrZero, Range(0-1000000), <= kilometrage #}
+        <div class="fg {% if form.kmLastVisite.vars.errors|length %}is-err{% elseif form.kmLastVisite.vars.value is not empty %}is-ok{% endif %}">
+            {{ form_label(form.kmLastVisite) }}<span class="req">*</span>
+            <div class="iw">
+                <span class="ico">📏</span>
+                {{ form_widget(form.kmLastVisite, {attr:{placeholder:'Ex : 14500', min:'0'}}) }}
+                {% if form.kmLastVisite.vars.errors|length %}<span class="sico err">✖</span>
+                {% elseif form.kmLastVisite.vars.value is not empty %}<span class="sico ok">✔</span>{% endif %}
+            </div>
+            {% if form.kmLastVisite.vars.errors|length %}
+                <ul class="errs">
+                    {% for error in form.kmLastVisite.vars.errors %}
+                        <li style="color:#e74c3c;">{{ error.message }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <small class="hint">Kilométrage lors de la dernière visite (doit être ≤ kilométrage actuel)</small>
+            {% endif %}
+        </div>
+
+        {# Prochaine maintenance - Contrôles : Callback (pas dans passé, > date dernière visite, > date achat) #}
+        <div class="fg {% if form.prochaineMaintenance.vars.errors|length %}is-err{% elseif form.prochaineMaintenance.vars.value is not empty %}is-ok{% endif %}">
+            {{ form_label(form.prochaineMaintenance) }}
+            <div class="iw">
+                <span class="ico">📅</span>
+                {{ form_widget(form.prochaineMaintenance) }}
+                {% if form.prochaineMaintenance.vars.errors|length %}<span class="sico err">✖</span>
+                {% elseif form.prochaineMaintenance.vars.value is not empty %}<span class="sico ok">✔</span>{% endif %}
+            </div>
+            {% if form.prochaineMaintenance.vars.errors|length %}
+                <ul class="errs">
+                    {% for error in form.prochaineMaintenance.vars.errors %}
+                        <li style="color:#e74c3c;">{{ error.message }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <small class="hint">Date prévue pour la prochaine maintenance (doit être dans le futur)</small>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+
+{# ── Actions du formulaire ── #}
+<div class="form-actions">
+    <button type="submit" class="btn btn-primary">💾 Enregistrer la machine</button>
+    <a href="{{ path('agri_machines') }}" class="btn btn-ghost">❌ Annuler</a>
+</div>

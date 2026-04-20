@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitaa57762fbf7f56050082c2c4c3fd945d
+class ComposerStaticInit71a786d4ea4ce53d52f76fcb84859268
 {
     public static $files = array (
         '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
@@ -163,6 +163,7 @@ class ComposerStaticInitaa57762fbf7f56050082c2c4c3fd945d
             'Symfony\\Contracts\\EventDispatcher\\' => 34,
             'Symfony\\Contracts\\Cache\\' => 24,
             'Symfony\\Component\\Yaml\\' => 23,
+            'Symfony\\Component\\Workflow\\' => 27,
             'Symfony\\Component\\WebLink\\' => 26,
             'Symfony\\Component\\VarExporter\\' => 30,
             'Symfony\\Component\\VarDumper\\' => 28,
@@ -411,6 +412,10 @@ class ComposerStaticInitaa57762fbf7f56050082c2c4c3fd945d
         'Symfony\\Component\\Yaml\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/yaml',
+        ),
+        'Symfony\\Component\\Workflow\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/workflow',
         ),
         'Symfony\\Component\\WebLink\\' => 
         array (
@@ -1604,9 +1609,9 @@ class ComposerStaticInitaa57762fbf7f56050082c2c4c3fd945d
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitaa57762fbf7f56050082c2c4c3fd945d::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitaa57762fbf7f56050082c2c4c3fd945d::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInitaa57762fbf7f56050082c2c4c3fd945d::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit71a786d4ea4ce53d52f76fcb84859268::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit71a786d4ea4ce53d52f76fcb84859268::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit71a786d4ea4ce53d52f76fcb84859268::$classMap;
 
         }, null, ClassLoader::class);
     }
