@@ -591,8 +591,8 @@
                     </td>
                     <td>
                         {% if m.nom %}
-                            <a href="{{ path('admin_machines_show', {id: m.idM}) }}" class="machine-link">{{ m.nom }}</a>
-                            <span class="machine-id">#{{ m.idM }}</span>
+                            <a href="{{ path('admin_machines_show', {id: m.idM.id}) }}" class="machine-link">{{ m.nom }}</a>
+                            <span class="machine-id">#{{ m.idM.id }}</span>
                         {% else %}
                             <span style="color: #9e9d95; font-style: italic;">— Non lié —</span>
                         {% endif %}

@@ -60,7 +60,11 @@ services:
             $httpClient: '@http_client'
             $geminiApiKey: '%gemini_api_key%' 
 
-
+    
+    App\Service\TaskTranslator:
+        arguments:
+            $client:     '@http_client'
+            $projectDir: '%kernel.project_dir%'
 
     App\EventListener\LogoutListener:
         tags:

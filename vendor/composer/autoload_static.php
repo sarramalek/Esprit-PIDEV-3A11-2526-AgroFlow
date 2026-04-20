@@ -20,8 +20,8 @@ class ComposerStaticInit71a786d4ea4ce53d52f76fcb84859268
         'f844ccf1d25df8663951193c3fc307c8' => __DIR__ . '/..' . '/twig/twig/src/Resources/string_loader.php',
         '2203a247e6fda86070a5e4e07aed533a' => __DIR__ . '/..' . '/symfony/clock/Resources/now.php',
         'f598d06aa772fa33d905e87be6398fb1' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/bootstrap.php',
-        '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
         '9d2b9fc6db0f153a0a149fefb182415e' => __DIR__ . '/..' . '/symfony/polyfill-php84/bootstrap.php',
+        '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
         '72243e5536b63e298acb6476f01f1aff' => __DIR__ . '/..' . '/thecodingmachine/safe/lib/special_cases.php',
         '3f648889e687f31c52f949ba8a9d0873' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/apache.php',
         'eeb4581d958421a4244aaa4167c6a575' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/apcu.php',
@@ -163,7 +163,6 @@ class ComposerStaticInit71a786d4ea4ce53d52f76fcb84859268
             'Symfony\\Contracts\\EventDispatcher\\' => 34,
             'Symfony\\Contracts\\Cache\\' => 24,
             'Symfony\\Component\\Yaml\\' => 23,
-            'Symfony\\Component\\Workflow\\' => 27,
             'Symfony\\Component\\WebLink\\' => 26,
             'Symfony\\Component\\VarExporter\\' => 30,
             'Symfony\\Component\\VarDumper\\' => 28,
@@ -221,6 +220,7 @@ class ComposerStaticInit71a786d4ea4ce53d52f76fcb84859268
             'Symfony\\Bridge\\Monolog\\' => 23,
             'Symfony\\Bridge\\Doctrine\\' => 24,
             'Svg\\' => 4,
+            'Stof\\DoctrineExtensionsBundle\\' => 30,
             'StellaMaris\\Clock\\' => 18,
             'Scheb\\TwoFactorBundle\\' => 22,
             'Sabberworm\\CSS\\' => 15,
@@ -268,6 +268,7 @@ class ComposerStaticInit71a786d4ea4ce53d52f76fcb84859268
             'GuzzleHttp\\Psr7\\' => 16,
             'GuzzleHttp\\Promise\\' => 19,
             'GuzzleHttp\\' => 11,
+            'Gedmo\\' => 6,
         ),
         'F' => 
         array (
@@ -412,10 +413,6 @@ class ComposerStaticInit71a786d4ea4ce53d52f76fcb84859268
         'Symfony\\Component\\Yaml\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/yaml',
-        ),
-        'Symfony\\Component\\Workflow\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/symfony/workflow',
         ),
         'Symfony\\Component\\WebLink\\' => 
         array (
@@ -645,6 +642,10 @@ class ComposerStaticInit71a786d4ea4ce53d52f76fcb84859268
         array (
             0 => __DIR__ . '/..' . '/dompdf/php-svg-lib/src/Svg',
         ),
+        'Stof\\DoctrineExtensionsBundle\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/stof/doctrine-extensions-bundle/src',
+        ),
         'StellaMaris\\Clock\\' => 
         array (
             0 => __DIR__ . '/..' . '/stella-maris/clock/src',
@@ -763,6 +764,10 @@ class ComposerStaticInit71a786d4ea4ce53d52f76fcb84859268
         'GuzzleHttp\\' => 
         array (
             0 => __DIR__ . '/..' . '/guzzlehttp/guzzle/src',
+        ),
+        'Gedmo\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/gedmo/doctrine-extensions/src',
         ),
         'FontLib\\' => 
         array (
