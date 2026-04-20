@@ -41,7 +41,7 @@ animal:
   no_medical_record_title: No se encontró ningún expediente médico.
   no_medical_record_desc: Comience agregando un primer examen clínico.
   food_suggestions: Sugerencias de alimentación
-  species_label: %species%
+  species_label: "%species%"
   species:
     Chien: Perro
     Chat: Gato
@@ -69,7 +69,7 @@ animal:
 
 report:
   reference: Referencia #%id%
-  report_title: Informe: %type%
+  report_title: "Informe: %type%"
   exam_date: Fecha del examen
   patient_animal: Paciente Animal
   prescription_action: Prescripción / Acción

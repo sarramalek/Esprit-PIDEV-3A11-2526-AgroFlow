@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Animals;
 
-use App\Service\ReminderService;
+use App\Service\Animals\ReminderService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -32,7 +32,7 @@ final class ReminderController extends AbstractController
             return $examen->getAnimal() && $examen->getAnimal()->getUser() === $user;
         });
 
-        return $this->render('reminders/dashboard.html.twig', [
+        return $this->render('Animals/reminders/dashboard.html.twig', [
             'upcoming_reminders' => $upcomingReminders,
             'overdue_reminders' => $userOverdueReminders,
             'total_active' => count($userReminders),
