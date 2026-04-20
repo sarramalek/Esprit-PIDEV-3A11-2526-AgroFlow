@@ -167,7 +167,7 @@
             <span class="badge {% if m.typePanne == 'Moteur' %}bm{% elseif m.typePanne == 'Hydraulique' %}bh{% elseif m.typePanne in ['Électrique','Electricité'] %}be{% elseif m.typePanne == 'Mécanique' %}bme{% elseif m.typePanne == 'Pneumatique' %}bp{% elseif m.typePanne == 'Transmission' %}bt{% elseif m.typePanne == 'Vidange & filtres' %}bv{% elseif m.typePanne == 'Logicielle' %}bl{% else %}ba{% endif %}">{{ m.typePanne }}</span>
            </td>
           <td>
-            {% if m.nom %}<strong>{{ m.nom }}</strong><div style="font-size:9px;color:#9e9d95;">#{{ m.idM }}</div>{% else %}<span style="color:#9e9d95;font-style:italic;">— Non lié —</span>{% endif %}
+            {% if m.nom %}<strong>{{ m.nom }}</strong><div style="font-size:9px;color:#9e9d95;">#{{ m.idM.id }}</div>{% else %}<span style="color:#9e9d95;font-style:italic;">— Non lié —</span>{% endif %}
            </td>
           <td>
             <span class="statut-badge 

@@ -1,5 +1,12 @@
-{% extends 'agriculteur_dashboard.html.twig' %}
-{% block title %}Maintenances — AgroFlow{% endblock %}
+{% if is_granted('ROLE_OUVRIER') %}
+    {% set layout = 'base_ouvrier.html.twig' %}
+    {% set cancel_route = 'ouvrier_taches' %}
+{% elseif is_granted('ROLE_AGRICULTEUR') %}
+    {% set layout = 'base_agriculteur.html.twig' %}
+    {% set cancel_route = 'agri_maintenances_index' %}
+{% endif %}
+
+{% extends layout %}{% block title %}Maintenances — AgroFlow{% endblock %}
 {% block body %}
 <style>
 *, *::before, *::after { box-sizing: border-box; }
@@ -337,7 +344,7 @@
           <div class="mci-header {{ headerCls }}">
             <div>
               <div class="mci-title">{{ machineName }}</div>
-              <div class="mci-sub"><span>📍</span><span>{{ m.typePanne|default('—') }}</span>{% if m.idM %}&nbsp;·&nbsp;#{{ m.idM }}{% endif %}</div>
+              <div class="mci-sub"><span>📍</span><span>{{ m.typePanne|default('—') }}</span>{% if m.idM %}&nbsp;·&nbsp;#{{ m.idM.id }}{% endif %}</div>
             </div>
             <div class="mci-status-pill">
               {% if m.priorite == 'urgente' %}🔴 Urgente
@@ -417,8 +424,8 @@
                 {% else %}<span style="color:#7a9a7a;">📅 {{ alert.message }}</span>{% endif %}
               </td>
               <td>
-                {% if m.idM and machineName2 %}<div class="machine-badge">🚜 #{{ m.idM }}</div><div class="machine-name" style="margin-top:4px;">{{ machineName2 }}</div>
-                {% elseif m.idM %}<div class="machine-badge">🚜 #{{ m.idM }}</div>
+                {% if m.idM and machineName2 %}<div class="machine-badge">🚜 #{{ m.idM.id }}</div><div class="machine-name" style="margin-top:4px;">{{ machineName2 }}</div>
+{% elseif m.idM %}<div class="machine-badge">🚜 #{{ m.idM.id }}</div>
                 {% else %}<span class="machine-badge machine-badge--none">—</span>{% endif %}
               </td>
               <td class="td-desc" title="{{ m.description|default('') }}">{{ m.description|default('—')|slice(0,40) }}{{ m.description|length > 40 ? '…' : '' }}</td>

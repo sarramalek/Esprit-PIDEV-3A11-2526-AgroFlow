@@ -391,8 +391,7 @@
                 <div class="info-value">
                     {% if maintenance.nom %}
                         <a href="{{ path('admin_machines_show', {id: maintenance.idM}) }}" class="machine-link">
-                            <i class="bi bi-link-45deg"></i> {{ maintenance.nom }}
-                        </a>
+<span class="machine-id">#{{ maintenance.idM }}</span>
                         <span class="machine-id">#{{ maintenance.idM }}</span>
                     {% else %}
                         <span style="color: #9e9d95; font-style: italic;">— Non lié à un matériel —</span>

@@ -218,7 +218,7 @@
           <td style="color:#4a6a4a; font-size:.82rem; max-width:200px;">
             {{ m.description|default('—')|slice(0, 60) }}{% if m.description|length > 60 %}…{% endif %}
           </td>
-          <td class="td-mat">{{ m.idM ? '#'~m.idM : '—' }}</td>
+          <td class="td-mat">{{ m.idM.m ? '#'~m.idM.id : '—' }}</td>
         </tr>
       {% endfor %}
     </tbody>
