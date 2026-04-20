@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Animals;
 
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\Cache\CacheInterface;
@@ -67,11 +67,6 @@ class OpenFoodFactsService
 
     /**
      * Récupère les suggestions alimentaires pour une espèce donnée
-     *
-     * @param string $espece L'espèce de l'animal
-     * @param int $pageSize Le nombre de produits à retourner (par défaut 3)
-     * 
-     * @return array Un tableau de produits avec les champs : name, brand, image
      */
     public function getFoodSuggestionsForSpecies(string $espece, int $pageSize = 3): array
     {
@@ -99,21 +94,11 @@ class OpenFoodFactsService
 
             return $products;
         } catch (\Exception $e) {
-            // En cas d'erreur, retourner un tableau vide plutôt que d'interrompre l'affichage
             error_log('OpenFoodFacts Service Error: ' . $e->getMessage());
             return [];
         }
     }
 
-    /**
-     * Récupère les produits de l'API OpenFoodFacts
-     *
-     * @param string $searchTerms Les termes de recherche
-     * @param int $pageSize Le nombre de résultats à retourner
-     * @param string $espece L'espèce pour le fallback
-     * 
-     * @return array Tableau des produits filtrés
-     */
     private function fetchProductsFromApi(string $searchTerms, int $pageSize, string $espece = ''): array
     {
         try {
@@ -121,16 +106,14 @@ class OpenFoodFactsService
                 'query' => [
                     'search_terms' => $searchTerms,
                     'json' => '1',
-                    'page_size' => 10, // Récupérer plus pour augmenter les chances d'avoir des produits valides
+                    'page_size' => 10,
                 ],
-                'timeout' => 10, // Timeout de 10 secondes
+                'timeout' => 10,
             ]);
 
             $statusCode = $response->getStatusCode();
             
-            // Vérifier le code de statut
             if ($statusCode !== 200) {
-                error_log("OpenFoodFacts API returned status code: {$statusCode} - Using fallback data");
                 return $this->getFallbackProducts($espece, $pageSize);
             }
 
@@ -149,43 +132,24 @@ class OpenFoodFactsService
                 }
             }
 
-            // Si pas de résultats, utiliser le fallback
             if (count($products) === 0) {
-                error_log("OpenFoodFacts API returned no products for species: {$espece} - Using fallback data");
                 return $this->getFallbackProducts($espece, $pageSize);
             }
 
             return $products;
         } catch (\Exception $e) {
-            error_log('OpenFoodFacts API Request Error: ' . $e->getMessage() . ' - Using fallback data');
             return $this->getFallbackProducts($espece, $pageSize);
         }
     }
 
-    /**
-     * Récupère les données de fallback pour une espèce
-     *
-     * @param string $espece L'espèce de l'animal
-     * @param int $pageSize Le nombre de produits à retourner
-     * 
-     * @return array Tableau des produits fallback
-     */
     private function getFallbackProducts(string $espece, int $pageSize): array
     {
         $fallback = self::FALLBACK_PRODUCTS[$espece] ?? self::FALLBACK_PRODUCTS['Chien'];
         return array_slice($fallback, 0, $pageSize);
     }
 
-    /**
-     * Filtre les données du produit pour ne garder que les champs pertinents
-     *
-     * @param array $product Les données brutes du produit
-     * 
-     * @return array|null Les données filtrées ou null si le produit est incomplet
-     */
     private function filterProductData(array $product): ?array
     {
-        // On a besoin au minimum du nom du produit
         if (!isset($product['product_name'])) {
             return null;
         }
@@ -196,28 +160,15 @@ class OpenFoodFactsService
             'image' => null,
         ];
 
-        // Chercher l'image dans les différents formats disponibles
         if (isset($product['image_front_url']) && !empty($product['image_front_url'])) {
             $filteredProduct['image'] = $product['image_front_url'];
         } elseif (isset($product['image_url']) && !empty($product['image_url'])) {
             $filteredProduct['image'] = $product['image_url'];
-        } elseif (isset($product['images']) && is_array($product['images']) && count($product['images']) > 0) {
-            $firstImage = array_values($product['images'])[0];
-            if (isset($firstImage['sizes']['400'])) {
-                $filteredProduct['image'] = $firstImage['sizes']['400']['url'];
-            } elseif (isset($firstImage['sizes']['200'])) {
-                $filteredProduct['image'] = $firstImage['sizes']['200']['url'];
-            }
         }
 
         return $filteredProduct;
     }
 
-    /**
-     * Teste la connexion à l'API OpenFoodFacts
-     *
-     * @return bool true si l'API est accessible, false sinon
-     */
     public function testConnection(): bool
     {
         try {

@@ -5,7 +5,7 @@ namespace App\Controller\Animals;
 use App\Entity\Animals\Examen;
 use App\Form\Animals\ExamenType;
 use App\Repository\Animals\ExamenRepository;
-use App\Service\WikipediaService;
+use App\Service\Animals\WikipediaService;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

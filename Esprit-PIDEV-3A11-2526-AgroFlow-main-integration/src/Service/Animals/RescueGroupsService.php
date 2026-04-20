@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Animals;
 
 use Symfony\Contracts\Cache\CacheInterface;
 use Psr\Cache\CacheItemInterface;
