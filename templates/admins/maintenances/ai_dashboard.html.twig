@@ -1,0 +1,387 @@
+{# templates/admins/maintenances/ai_dashboard.html.twig #}
+{% extends 'base_admin.html.twig' %}
+
+{% block title %}Dashboard IA Maintenance — AgroFlow{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: #f5f2ec; color: #1a1a18; }
+    .main-container { max-width: 1400px; margin: 0 auto; padding: 32px 24px; }
+
+    /* Header */
+    .page-header { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        margin-bottom: 28px; 
+        flex-wrap: wrap; 
+        gap: 16px; 
+    }
+    .header-left h1 { 
+        font-size: 24px; 
+        font-weight: 600; 
+        color: #1d3d17; 
+        margin-bottom: 6px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .header-left p { 
+        font-size: 13px; 
+        color: #6b6b64;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    /* Boutons */
+    .header-buttons {
+        display: flex;
+        gap: 12px;
+    }
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: white;
+        color: #1d3d17;
+        border: 1.5px solid #1d3d17;
+        border-radius: 12px;
+        padding: 9px 18px;
+        font-size: 13px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.15s;
+        cursor: pointer;
+    }
+    .btn-back:hover {
+        background: #e8f5e9;
+        transform: translateY(-1px);
+    }
+    .btn-refresh {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #1d3d17;
+        color: #c8e6b0;
+        border: none;
+        border-radius: 12px;
+        padding: 9px 18px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .btn-refresh:hover {
+        background: #2d5a1b;
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    /* KPI Cards */
+    .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+    .kpi-card { background: white; border: 1px solid #ece7dd; border-radius: 16px; padding: 20px; transition: all 0.2s; }
+    .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .kpi-icon { font-size: 28px; margin-bottom: 10px; }
+    .kpi-label { font-size: 11px; font-weight: 600; text-transform: uppercase; color: #9e9d95; margin-bottom: 8px; }
+    .kpi-value { font-size: 32px; font-weight: 600; font-family: 'DM Mono', monospace; }
+    .kpi-value.red { color: #c62828; }
+    .kpi-value.orange { color: #e65100; }
+    .kpi-value.green { color: #2d5a1b; }
+    .kpi-sub { font-size: 11px; color: #9e9d95; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
+
+    /* Sections */
+    .section { background: white; border: 1px solid #ece7dd; border-radius: 16px; padding: 24px; margin-bottom: 24px; }
+    .section-title { font-size: 16px; font-weight: 600; color: #1d3d17; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+    .section-title i { font-size: 20px; }
+
+    /* Health Grid */
+    .health-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+    .health-card { background: #fafaf7; border-radius: 12px; padding: 18px; border-left: 4px solid; transition: all 0.2s; }
+    .health-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .health-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .health-score { font-size: 32px; font-weight: 600; font-family: 'DM Mono', monospace; margin: 10px 0; }
+    .health-level { font-size: 11px; padding: 3px 10px; border-radius: 20px; display: inline-block; font-weight: 500; }
+    .health-detail { font-size: 11px; color: #6b6b64; margin-top: 12px; display: flex; flex-direction: column; gap: 5px; }
+    .health-detail i { width: 18px; }
+
+    /* Alertes */
+    .alert-list { list-style: none; }
+    .alert-item { padding: 14px; border-radius: 10px; margin-bottom: 10px; display: flex; gap: 12px; align-items: flex-start; transition: all 0.15s; }
+    .alert-item:hover { transform: translateX(4px); }
+    .alert-critical { background: #ffebee; border-left: 3px solid #c62828; }
+    .alert-warning { background: #fff8e1; border-left: 3px solid #ff9800; }
+    .alert-info { background: #e3f2fd; border-left: 3px solid #2196f3; }
+    .alert-icon { font-size: 20px; }
+    .alert-content { flex: 1; }
+    .alert-message { font-size: 13px; font-weight: 500; }
+    .alert-action { font-size: 11px; color: #6b6b64; margin-top: 5px; display: flex; align-items: center; gap: 4px; }
+
+    /* Tableau priorités */
+    .priority-table { width: 100%; border-collapse: collapse; }
+    .priority-table th, .priority-table td { padding: 12px; text-align: left; border-bottom: 1px solid #ece7dd; }
+    .priority-table th { font-size: 11px; font-weight: 600; text-transform: uppercase; color: #9e9d95; }
+    .priority-table tr:hover { background: #fafaf7; }
+    .priority-critical { color: #c62828; font-weight: 600; }
+    .priority-high { color: #e65100; font-weight: 600; }
+    .priority-normal { color: #2d5a1b; }
+
+    /* Planning */
+    .schedule-grid { display: flex; flex-direction: column; gap: 12px; }
+    .schedule-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: #fafaf7; border-radius: 10px; transition: all 0.15s; }
+    .schedule-item:hover { transform: translateX(4px); background: #f5f2ec; }
+    .schedule-date { font-family: 'DM Mono', monospace; font-size: 12px; color: #1d3d17; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .schedule-machine { font-weight: 500; display: flex; align-items: center; gap: 6px; }
+    .schedule-urgency { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
+    .urgency-critical { background: #ffebee; color: #c62828; }
+    .urgency-high { background: #fff3e0; color: #e65100; }
+    .urgency-normal { background: #e8f5e9; color: #2d5a1b; }
+
+    /* Empty state */
+    .empty-state { text-align: center; padding: 60px 20px; }
+    .empty-state i { font-size: 48px; color: #9e9d95; margin-bottom: 16px; }
+    .empty-state h3 { font-size: 16px; font-weight: 500; color: #3d3d38; margin-bottom: 6px; }
+    .empty-state p { font-size: 13px; color: #9e9d95; }
+
+    @media (max-width: 768px) {
+        .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+        .health-grid { grid-template-columns: 1fr; }
+        .page-header { flex-direction: column; align-items: flex-start; }
+        .priority-table { font-size: 12px; }
+        .priority-table th, .priority-table td { padding: 8px; }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="main-container">
+    
+    {# Header avec boutons de retour #}
+    <div class="page-header">
+        <div class="header-left">
+            <h1>
+                <i class="bi bi-robot"></i> 
+                Dashboard IA Maintenance
+            </h1>
+            <p>
+                <i class="bi bi-graph-up"></i> 
+                Analyse prédictive, scores de santé et recommandations intelligentes
+            </p>
+        </div>
+        <div class="header-buttons">
+            <a href="{{ path('admin_maintenances_history') }}" class="btn-back">
+                <i class="bi bi-arrow-left-circle"></i> Historique
+            </a>
+            <a href="{{ path('admin_maintenances_index') }}" class="btn-back" style="border-color: #9e9d95; color: #6b6b64;">
+                <i class="bi bi-list-ul"></i> Liste des maintenances
+            </a>
+            <button onclick="location.reload()" class="btn-refresh">
+                <i class="bi bi-arrow-repeat"></i> Rafraîchir
+            </button>
+        </div>
+    </div>
+
+    {# KPI Cards #}
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <div class="kpi-icon"><i class="bi bi-truck"></i></div>
+            <div class="kpi-label">Machines surveillées</div>
+            <div class="kpi-value">{{ totalMachines }}</div>
+            <div class="kpi-sub"><i class="bi bi-check-circle"></i> équipements actifs</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon"><i class="bi bi-heart-pulse"></i></div>
+            <div class="kpi-label">Santé moyenne</div>
+            <div class="kpi-value {% if avgHealthScore < 50 %}red{% elseif avgHealthScore < 70 %}orange{% else %}green{% endif %}">
+                {{ avgHealthScore }}%
+            </div>
+            <div class="kpi-sub"><i class="bi bi-bar-chart"></i> score global</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
+            <div class="kpi-label">Alertes critiques</div>
+            <div class="kpi-value red">{{ criticalAlerts }}</div>
+            <div class="kpi-sub"><i class="bi bi-alarm"></i> intervention requise</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-icon"><i class="bi bi-graph-up"></i></div>
+            <div class="kpi-label">Risque élevé</div>
+            <div class="kpi-value orange">{{ highRiskMachines }}</div>
+            <div class="kpi-sub"><i class="bi bi-flag"></i> machines à risque</div>
+        </div>
+    </div>
+
+    {# Scores de santé des machines #}
+    <div class="section">
+        <div class="section-title">
+            <i class="bi bi-heart-pulse" style="color: #c62828;"></i>
+            Scores de santé des machines
+        </div>
+        <div class="health-grid">
+            {% for machine in machines %}
+                {% set score = healthScores[machine.id] ?? {score: 100, niveau: 'excellent', couleur: '#4caf50', details: {total_maintenances: 0, urgences: 0, derniere_maintenance: 'Jamais'}} %}
+                <div class="health-card" style="border-left-color: {{ score.couleur }}">
+                    <h3>
+                        <i class="bi bi-truck"></i> 
+                        {{ machine.nom }}
+                    </h3>
+                    <div class="health-score">{{ score.score }}%</div>
+                    <span class="health-level" style="background: {{ score.couleur }}20; color: {{ score.couleur }}">
+                        <i class="bi bi-star-fill"></i> {{ score.niveau|upper }}
+                    </span>
+                    <div class="health-detail">
+                        <span><i class="bi bi-tools"></i> {{ score.details.total_maintenances ?? 0 }} interventions</span>
+                        <span><i class="bi bi-exclamation-circle"></i> {{ score.details.urgences ?? 0 }} urgentes</span>
+                        <span><i class="bi bi-calendar"></i> Dernière: {{ score.details.derniere_maintenance ?? 'Jamais' }}</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    {# Alertes intelligentes #}
+    {% if alerts is not empty %}
+    <div class="section">
+        <div class="section-title">
+            <i class="bi bi-bell-fill" style="color: #ff9800;"></i>
+            Alertes intelligentes
+        </div>
+        <ul class="alert-list">
+            {% for alert in alerts %}
+                <li class="alert-item alert-{{ alert.type }}">
+                    <div class="alert-icon">
+                        {% if alert.type == 'critique' %}
+                            <i class="bi bi-x-octagon-fill" style="color: #c62828;"></i>
+                        {% elseif alert.type == 'warning' %}
+                            <i class="bi bi-exclamation-triangle-fill" style="color: #ff9800;"></i>
+                        {% else %}
+                            <i class="bi bi-info-circle-fill" style="color: #2196f3;"></i>
+                        {% endif %}
+                    </div>
+                    <div class="alert-content">
+                        <div class="alert-message">{{ alert.message }}</div>
+                        <div class="alert-action">
+                            <i class="bi bi-check2-square"></i> Actions: {{ alert.actions|join(', ') }}
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+    {# Priorités d'intervention #}
+    <div class="section">
+        <div class="section-title">
+            <i class="bi bi-sort-numeric-down"></i>
+            Priorités d'intervention
+        </div>
+        {% if priorities is not empty %}
+        <table class="priority-table">
+            <thead>
+                <tr>
+                    <th><i class="bi bi-truck"></i> Machine</th>
+                    <th><i class="bi bi-graph-up"></i> Score priorité</th>
+                    <th><i class="bi bi-flag"></i> Urgence</th>
+                    <th><i class="bi bi-exclamation-triangle"></i> Risque panne</th>
+                    <th><i class="bi bi-check2-square"></i> Actions recommandées</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for priority in priorities|slice(0, 10) %}
+                    <tr>
+                        <td><strong>{{ priority.machine_nom }}</strong></td>
+                        <td>{{ priority.priority_score }}%</td>
+                        <td class="priority-{{ priority.niveau_urgence|lower }}">
+                            {% if priority.niveau_urgence == 'CRITIQUE' %}
+                                <i class="bi bi-exclamation-octagon"></i> {{ priority.niveau_urgence }}
+                            {% elseif priority.niveau_urgence == 'HAUTE' %}
+                                <i class="bi bi-arrow-up-circle"></i> {{ priority.niveau_urgence }}
+                            {% else %}
+                                <i class="bi bi-arrow-right-circle"></i> {{ priority.niveau_urgence }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if priority.risque_panne == 'élevé' %}
+                                <i class="bi bi-arrow-up-circle" style="color: #c62828;"></i> ÉLEVÉ
+                            {% elseif priority.risque_panne == 'moyen' %}
+                                <i class="bi bi-arrow-right-circle" style="color: #ff9800;"></i> MOYEN
+                            {% else %}
+                                <i class="bi bi-arrow-down-circle" style="color: #4caf50;"></i> FAIBLE
+                            {% endif %}
+                        </td>
+                        <td style="font-size: 12px;">
+                            {% for action in priority.actions_recommandees|slice(0, 2) %}
+                                <span><i class="bi bi-dot"></i> {{ action }}</span>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-check-circle"></i>
+            <h3>Aucune priorité d'intervention</h3>
+            <p>Toutes les machines sont en bon état.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    {# Planning optimisé #}
+    <div class="section">
+        <div class="section-title">
+            <i class="bi bi-calendar-check"></i>
+            Planning optimisé (30 jours)
+        </div>
+        {% if schedule is not empty %}
+        <div class="schedule-grid">
+            {% for item in schedule %}
+                <div class="schedule-item">
+                    <div class="schedule-date">
+                        <i class="bi bi-calendar"></i> {{ item.date_planifiee }}
+                    </div>
+                    <div class="schedule-machine">
+                        <i class="bi bi-truck"></i> {{ item.machine_nom }}
+                    </div>
+                    <span class="schedule-urgency urgency-{{ item.urgence|lower }}">
+                        {% if item.urgence == 'CRITIQUE' %}
+                            <i class="bi bi-exclamation-octagon"></i> {{ item.urgence }}
+                        {% elseif item.urgence == 'HAUTE' %}
+                            <i class="bi bi-arrow-up-circle"></i> {{ item.urgence }}
+                        {% else %}
+                            <i class="bi bi-arrow-right-circle"></i> {{ item.urgence }}
+                        {% endif %}
+                    </span>
+                    <div style="font-size: 11px; color: #6b6b64;">
+                        <i class="bi bi-clock"></i> {{ item.duree_estimee_heures }}h
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-calendar-x"></i>
+            <h3>Aucune intervention planifiée</h3>
+            <p>Le planning sera généré automatiquement.</p>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    // Auto-refresh toutes les 5 minutes (optionnel)
+    setTimeout(() => {
+        location.reload();
+    }, 300000);
+</script>
+{% endblock %}

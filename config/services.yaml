@@ -4,12 +4,20 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    upload_dir: '%kernel.project_dir%/public/uploads/materiels'
+    gemini_model_default: 'gemini-2.0-flash-exp'   # ← paramètre séparé
+    gemini_api_key: '%env(default::GEMINI_API_KEY)%'
+    gemini_model: '%env(default:gemini_model_default:GEMINI_MODEL)%'  # ← référence le paramètre
 
 services:
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        bind:
+            string $uploadDir: '%upload_dir%'
+            string $geminiApiKey: '%gemini_api_key%'
+            string $geminiModel: '%gemini_model%'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -37,7 +45,20 @@ services:
         arguments:
             $grokApiKey: '%env(GROQ_API_KEY_ASSISTANT)%'
 
- 
+    App\Controller\AdminMateriels\:
+        resource: '../src/Controller/AdminMateriels/'
+        tags: ['controller.service_arguments']
+
+    App\Service\GeminiRecommendationService:
+        arguments:
+            $apiKey: '%gemini_api_key%'
+            $model: '%gemini_model%'
+        public: true
+
+    App\Service\MaintenanceAlertService:
+        arguments:
+            $httpClient: '@http_client'
+            $geminiApiKey: '%gemini_api_key%' 
 
 
 

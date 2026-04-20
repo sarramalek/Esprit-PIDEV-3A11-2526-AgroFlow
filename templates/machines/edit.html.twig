@@ -1,347 +1,87 @@
+{# templates/machines/edit.html.twig #}
 {% extends 'agriculteur_dashboard.html.twig' %}
 {% block title %}Modifier {{ machine.nom }} — AgroFlow{% endblock %}
 
 {% block body %}
-<div class="af-page">
-    <div class="af-breadcrumb">
-        <a href="{{ path('agri_machines') }}">Machines</a>
-        <span class="af-breadcrumb__sep">›</span>
-        <a href="{{ path('agri_machine_show', {id: machine.id}) }}">{{ machine.nom }}</a>
-        <span class="af-breadcrumb__sep">›</span>
-        <span>Modifier</span>
-    </div>
+<style>
+    :root { --green-dark:#2d5a1b; --green-border:#c8e6b0; --green-light:#f0f7eb; --shadow:0 4px 16px rgba(45,90,27,.10); }
+    * { box-sizing:border-box; }
+    .form-page { max-width:900px; margin:0 auto; padding:1.5rem; }
+    .breadcrumb { display:flex; align-items:center; gap:.5rem; font-size:.84rem; color:#7a9b6a; margin-bottom:1.2rem; }
+    .breadcrumb a { color:var(--green-dark); text-decoration:none; font-weight:600; }
+    .breadcrumb a:hover { text-decoration:underline; }
+    .page-title { font-size:1.6rem; font-weight:700; color:#1a2e10; margin:0 0 .3rem; }
+    .page-sub   { font-size:.88rem; color:#7a9b6a; margin:0 0 1.4rem; }
+    .req-star   { color:#e74c3c; }
 
-    <div class="af-page-header">
-        <h1 class="af-page-header__title">
-            <span class="af-page-header__icon">✏️</span>
-            Modifier la machine
-        </h1>
-        <p class="af-page-header__subtitle">Les champs marqués d'un <span class="required-star">*</span> sont obligatoires</p>
+    .flash { padding:.75rem 1.1rem; border-radius:10px; margin-bottom:1rem; font-weight:500; font-size:.92rem; display:flex; align-items:center; gap:.5rem; }
+    .flash-success { background:#e6f4e0; color:#1e5c0e; border:1px solid #b4dba0; }
+    .flash-error   { background:#fdecea; color:#8b1a1a; border:1px solid #f3b8b0; }
+
+    .form-card { background:#fff; border:1px solid var(--green-border); border-radius:16px; padding:2rem; box-shadow:var(--shadow); }
+
+    /* Machine summary badge at top */
+    .machine-summary {
+        display:flex; align-items:center; gap:.8rem;
+        background:var(--green-light); border:1px solid var(--green-border);
+        border-radius:11px; padding:.7rem 1rem; margin-bottom:1.5rem;
+    }
+    .machine-summary .ms-icon { font-size:1.5rem; }
+    .machine-summary .ms-name { font-weight:700; color:#1a2e10; font-size:1rem; }
+    .machine-summary .ms-sub  { font-size:.8rem; color:#7a9b6a; }
+    .badge { padding:.25rem .8rem; border-radius:50px; font-size:.75rem; font-weight:700; margin-left:auto; }
+    .badge-neuf { background:#d4edda; color:#155724; }
+    .badge-bon  { background:#cce5ff; color:#004085; }
+    .badge-occasion { background:#fff3cd; color:#856404; }
+    .badge-panne { background:#f8d7da; color:#721c24; }
+</style>
+
+<div class="form-page">
+
+    <nav class="breadcrumb">
+        <a href="{{ path('agri_machines') }}">⚙️ Machines</a>
+        <span>›</span>
+        <a href="{{ path('agri_machine_show', {id: machine.id}) }}">{{ machine.nom }}</a>
+        <span>›</span><span>Modifier</span>
+    </nav>
+
+    <h1 class="page-title">✏️ Modifier la machine</h1>
+    <p class="page-sub">Les champs marqués d'un <span class="req-star">*</span> sont obligatoires.</p>
+
+    {# Machine summary card #}
+    {% if machine.etatM == 'Neuf' %}     {% set bc='badge-neuf' %}
+    {% elseif machine.etatM == 'Bon' %}  {% set bc='badge-bon' %}
+    {% elseif machine.etatM == 'Occasion' %} {% set bc='badge-occasion' %}
+    {% else %} {% set bc='badge-panne' %} {% endif %}
+    <div class="machine-summary">
+        <span class="ms-icon">⚙️</span>
+        <div>
+            <div class="ms-name">{{ machine.nom }}</div>
+            <div class="ms-sub">{{ machine.marque }} · {{ machine.modele }}</div>
+        </div>
+        <span class="badge {{ bc }}">{{ machine.etatM }}</span>
     </div>
 
     {% if form.vars.submitted and not form.vars.valid %}
-    <div class="af-alert af-alert--error">
-        <span class="af-alert__icon">⚠️</span>
-        <span>Le formulaire contient des erreurs. Veuillez les corriger avant de continuer.</span>
-    </div>
+        <div class="flash flash-error">⚠️ Le formulaire contient des erreurs. Veuillez les corriger.</div>
     {% endif %}
-
     {% for label, messages in app.flashes %}
-        {% for message in messages %}
-            <div class="af-alert af-alert--{{ label == 'success' ? 'success' : 'error' }}">
-                {{ message }}
-            </div>
+        {% for msg in messages %}
+            <div class="flash flash-{{ label == 'success' ? 'success' : 'error' }}">{{ msg }}</div>
         {% endfor %}
     {% endfor %}
 
-    <div class="af-card">
-        {{ form_start(form, {'attr': {'novalidate': 'novalidate', 'class': 'af-form'}}) }}
-        <div class="af-form-grid">
-            <div class="form-group {% if form.nom.vars.errors|length > 0 %}has-error{% elseif form.nom.vars.submitted and form.nom.vars.value is not empty %}has-success{% endif %}">
-                {{ form_label(form.nom) }}<span class="required-star"> *</span>
-                <div class="input-wrapper">
-                    <span class="input-icon">🚜</span>
-                    {{ form_widget(form.nom, {'attr': {'class': 'form-control', 'placeholder': 'Ex : John Deere 5075E'}}) }}
-                    {% if form.nom.vars.errors|length > 0 %}
-                        <span class="input-status-icon error">✖</span>
-                    {% elseif form.nom.vars.submitted and form.nom.vars.value is not empty %}
-                        <span class="input-status-icon success">✔</span>
-                    {% endif %}
-                </div>
-                {% if form.nom.vars.errors|length > 0 %}
-                    <ul class="field-errors">
-                        {% for error in form.nom.vars.errors %}
-                            <li>⚠ {{ error.message }}</li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <small class="field-hint">Ex : John Deere 5075E, Massey Ferguson 5713...</small>
-                {% endif %}
+    <div class="form-card">
+        {{ form_start(form, {attr:{novalidate:'novalidate'}}) }}
+
+            {{ include('machines/_form.html.twig') }}
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">💾 Enregistrer les modifications</button>
+                <a href="{{ path('agri_machine_show', {id: machine.id}) }}" class="btn btn-ghost">✖ Annuler</a>
             </div>
 
-            <div class="form-group {% if form.marque.vars.errors|length > 0 %}has-error{% elseif form.marque.vars.submitted and form.marque.vars.value is not empty %}has-success{% endif %}">
-                {{ form_label(form.marque) }}<span class="required-star"> *</span>
-                <div class="input-wrapper">
-                    <span class="input-icon">🏷️</span>
-                    {{ form_widget(form.marque, {'attr': {'class': 'form-control', 'placeholder': 'Ex : John Deere'}}) }}
-                    {% if form.marque.vars.errors|length > 0 %}
-                        <span class="input-status-icon error">✖</span>
-                    {% elseif form.marque.vars.submitted and form.marque.vars.value is not empty %}
-                        <span class="input-status-icon success">✔</span>
-                    {% endif %}
-                </div>
-                {% if form.marque.vars.errors|length > 0 %}
-                    <ul class="field-errors">
-                        {% for error in form.marque.vars.errors %}
-                            <li>⚠ {{ error.message }}</li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <small class="field-hint">Ex : John Deere, Massey Ferguson, New Holland...</small>
-                {% endif %}
-            </div>
-
-            <div class="form-group {% if form.modele.vars.errors|length > 0 %}has-error{% elseif form.modele.vars.submitted and form.modele.vars.value is not empty %}has-success{% endif %}">
-                {{ form_label(form.modele) }}<span class="required-star"> *</span>
-                <div class="input-wrapper">
-                    <span class="input-icon">🔧</span>
-                    {{ form_widget(form.modele, {'attr': {'class': 'form-control', 'placeholder': 'Ex : 5075E'}}) }}
-                    {% if form.modele.vars.errors|length > 0 %}
-                        <span class="input-status-icon error">✖</span>
-                    {% elseif form.modele.vars.submitted and form.modele.vars.value is not empty %}
-                        <span class="input-status-icon success">✔</span>
-                    {% endif %}
-                </div>
-                {% if form.modele.vars.errors|length > 0 %}
-                    <ul class="field-errors">
-                        {% for error in form.modele.vars.errors %}
-                            <li>⚠ {{ error.message }}</li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <small class="field-hint">Ex : 5075E, 5713, T7.210...</small>
-                {% endif %}
-            </div>
-
-            <div class="form-group {% if form.numeroSerie.vars.errors|length > 0 %}has-error{% elseif form.numeroSerie.vars.submitted and form.numeroSerie.vars.value is not empty %}has-success{% endif %}">
-                {{ form_label(form.numeroSerie) }}<span class="required-star"> *</span>
-                <div class="input-wrapper">
-                    <span class="input-icon">🔢</span>
-                    {{ form_widget(form.numeroSerie, {'attr': {'class': 'form-control', 'style': 'text-transform: uppercase;', 'placeholder': 'Ex : 1M1234ABC'}}) }}
-                    {% if form.numeroSerie.vars.errors|length > 0 %}
-                        <span class="input-status-icon error">✖</span>
-                    {% elseif form.numeroSerie.vars.submitted and form.numeroSerie.vars.value is not empty %}
-                        <span class="input-status-icon success">✔</span>
-                    {% endif %}
-                </div>
-                {% if form.numeroSerie.vars.errors|length > 0 %}
-                    <ul class="field-errors">
-                        {% for error in form.numeroSerie.vars.errors %}
-                            <li>⚠ {{ error.message }}</li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <small class="field-hint">5 à 30 caractères — sans espaces (sera automatiquement mis en majuscules)</small>
-                {% endif %}
-            </div>
-
-            <div class="form-group {% if form.etatM.vars.errors|length > 0 %}has-error{% endif %}">
-                {{ form_label(form.etatM) }}<span class="required-star"> *</span>
-                <div class="input-wrapper">
-                    <span class="input-icon">📋</span>
-                    {{ form_widget(form.etatM, {'attr': {'class': 'form-control'}}) }}
-                    {% if form.etatM.vars.errors|length > 0 %}
-                        <span class="input-status-icon error">✖</span>
-                    {% endif %}
-                </div>
-                {% if form.etatM.vars.errors|length > 0 %}
-                    <ul class="field-errors">
-                        {% for error in form.etatM.vars.errors %}
-                            <li>⚠ {{ error.message }}</li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <small class="field-hint">Sélectionnez l'état actuel de la machine</small>
-                {% endif %}
-            </div>
-
-            <div class="form-group {% if form.dateAchat.vars.errors|length > 0 %}has-error{% elseif form.dateAchat.vars.submitted and form.dateAchat.vars.value is not empty %}has-success{% endif %}">
-                {{ form_label(form.dateAchat) }}<span class="required-star"> *</span>
-                <div class="input-wrapper">
-                    <span class="input-icon">📅</span>
-                    {{ form_widget(form.dateAchat, {'attr': {'class': 'form-control', 'placeholder': 'JJ/MM/AAAA'}}) }}
-                    {% if form.dateAchat.vars.errors|length > 0 %}
-                        <span class="input-status-icon error">✖</span>
-                    {% elseif form.dateAchat.vars.submitted and form.dateAchat.vars.value is not empty %}
-                        <span class="input-status-icon success">✔</span>
-                    {% endif %}
-                </div>
-                {% if form.dateAchat.vars.errors|length > 0 %}
-                    <ul class="field-errors">
-                        {% for error in form.dateAchat.vars.errors %}
-                            <li>⚠ {{ error.message }}</li>
-                        {% endfor %}
-                    </ul>
-                {% else %}
-                    <small class="field-hint">Entre 1900 et aujourd'hui (format: JJ/MM/AAAA)</small>
-                {% endif %}
-            </div>
-        </div>
-
-        <div class="af-form-actions">
-            <button type="submit" class="btn btn-primary">
-                💾 Enregistrer les modifications
-            </button>
-            <a href="{{ path('agri_machines') }}" class="btn btn-ghost">
-                ✖ Annuler
-            </a>
-        </div>
         {{ form_end(form) }}
     </div>
 </div>
-
-<style>
-.required-star { color: #e74c3c; font-weight: 700; margin-left: 2px; }
-
-.af-alert { 
-    padding: 12px 18px; 
-    border-radius: 8px; 
-    margin-bottom: 1.4rem; 
-    font-size: 0.93rem; 
-    font-weight: 500; 
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.af-alert--error { 
-    background: #fff0f0; 
-    border: 1.5px solid #f5c6c6; 
-    color: #c0392b; 
-}
-.af-alert--success { 
-    background: #d4edda; 
-    border: 1.5px solid #c3e6cb; 
-    color: #155724; 
-}
-.af-alert__icon { font-size: 1.1rem; }
-
-.af-card { 
-    background: #fff; 
-    border: 1px solid #dce8d5; 
-    border-radius: 12px; 
-    padding: 2.2rem; 
-    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-}
-
-.af-form-grid { 
-    display: grid; 
-    grid-template-columns: 1fr 1fr; 
-    gap: 0 2rem; 
-}
-@media (max-width: 640px) { 
-    .af-form-grid { 
-        grid-template-columns: 1fr; 
-    } 
-}
-
-.form-group { 
-    margin-bottom: 1.6rem; 
-}
-.form-group label { 
-    display: inline-block; 
-    margin-bottom: 7px; 
-    font-weight: 600; 
-    color: #5a7a5a; 
-    font-size: 0.92rem; 
-}
-
-.input-wrapper { 
-    position: relative; 
-    display: flex; 
-    align-items: center; 
-}
-.input-icon { 
-    position: absolute; 
-    left: 12px; 
-    font-size: 1rem; 
-    pointer-events: none; 
-    z-index: 1; 
-}
-.input-status-icon { 
-    position: absolute; 
-    right: 12px; 
-    font-size: 0.9rem; 
-    pointer-events: none;
-    z-index: 1;
-}
-.input-status-icon.error { 
-    color: #e74c3c; 
-}
-.input-status-icon.success { 
-    color: #2d6a2d; 
-}
-
-.form-control {
-    width: 100%; 
-    padding: 11px 38px 11px 38px; 
-    border: 1.5px solid #dce8d5;
-    border-radius: 8px; 
-    font-size: 0.96rem; 
-    box-sizing: border-box;
-    background: #fafffe; 
-    transition: all 0.2s ease;
-}
-.form-control:focus { 
-    outline: none; 
-    border-color: #2d6a2d; 
-    box-shadow: 0 0 0 3px rgba(45,106,45,0.1); 
-}
-
-.has-error .form-control { 
-    border-color: #e74c3c; 
-    background: #fff8f8; 
-}
-.has-success .form-control { 
-    border-color: #2d6a2d; 
-    background: #f6fff6; 
-}
-
-.field-errors { 
-    list-style: none; 
-    margin: 6px 0 0 0; 
-    padding: 0; 
-}
-.field-errors li { 
-    color: #c0392b; 
-    font-size: 0.83rem; 
-    margin-top: 4px; 
-}
-
-.field-hint { 
-    color: #8aaa8a; 
-    font-size: 0.81rem; 
-    margin-top: 5px; 
-    display: block; 
-}
-
-.af-form-actions { 
-    margin-top: 2rem; 
-    display: flex; 
-    gap: 12px; 
-    padding-top: 1.4rem; 
-    border-top: 1px solid #eef4ee; 
-}
-
-.btn { 
-    padding: 0.7rem 1.5rem; 
-    border-radius: 8px; 
-    font-weight: 600; 
-    text-decoration: none; 
-    cursor: pointer; 
-    border: none; 
-    font-size: 0.95rem; 
-    display: inline-flex; 
-    align-items: center; 
-    gap: 6px; 
-    transition: all 0.2s ease;
-}
-.btn-primary { 
-    background: #2d6a2d; 
-    color: white; 
-}
-.btn-primary:hover { 
-    background: #245524; 
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(45,106,45,0.2);
-}
-.btn-ghost { 
-    background: transparent; 
-    color: #5a7a5a; 
-    border: 1.5px solid #dce8d5; 
-}
-.btn-ghost:hover { 
-    background: #f0f7f0; 
-    border-color: #2d6a2d;
-}
-</style>
 {% endblock %}
