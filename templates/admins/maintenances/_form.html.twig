@@ -160,7 +160,7 @@
         <select name="idM" id="idM" class="form-select">
             <option value="">— Aucun matériel —</option>
             {% for machine in machines %}
-                <option value="{{ machine.id }}" {{ maintenance.idM == machine.id ? 'selected' : '' }}>
+                <option value="{{ machine.id }}" {{ maintenance.idM and maintenance.idM.id == machine.id ? 'selected' : '' }}>
                     {{ machine.nom }} (ID : {{ machine.id }})
                 </option>
             {% endfor %}

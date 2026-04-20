@@ -43,9 +43,9 @@ security:
         - { path: ^/register,           roles: PUBLIC_ACCESS }
         - { path: ^/agriculteur/tache,  roles: [ROLE_AGRICULTEUR, ROLE_ADMIN] }
         - { path: ^/admin,              roles: ROLE_ADMIN }
-        - { path: ^/agriculteur,        roles: ROLE_AGRICULTEUR }
+        - { path: ^/agriculteur,        roles: [ROLE_AGRICULTEUR , ROLE_OUVRIER ] }
         - { path: ^/ouvrier,            roles: ROLE_OUVRIER }
-        - { path: ^/tache,              roles: [ROLE_ADMIN, ROLE_AGRICULTEUR] }
+        - { path: ^/tache,              roles: [ROLE_ADMIN, ROLE_AGRICULTEUR, ROLE_OUVRIER] }
         - { path: ^/,                   roles: PUBLIC_ACCESS }
 
 when@test:

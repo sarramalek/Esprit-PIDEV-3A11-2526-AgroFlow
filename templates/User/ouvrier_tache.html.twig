@@ -61,26 +61,15 @@
     .filter-btn:hover { background: #f5f5f5; color: #2C3E50; }
     .filter-btn.active { background: #2D5A27; color: white; }
     .filter-btn.active .count-pill { background: rgba(255,255,255,0.25); color: white; }
-    .filter-btn.active-orange { background: #E65100; color: white; }
-    .filter-btn.active-blue   { background: #1565C0; color: white; }
-    .filter-btn.active-green  { background: #2E7D32; color: white; }
-    .filter-btn.active-purple { background: #6A1B9A; color: white; }
-    .filter-btn.active-teal   { background: #00695C; color: white; }
-    .filter-btn.active-brown  { background: #4E342E; color: white; }
-.btn-detail.detail-plante {
-    border-color: #A5D6A7;
-    color: #1B5E20;
-    background: #F1F8E9;
-}
-.btn-detail.detail-plante:hover {
-    background: #1B5E20;
-    color: white;
-    border-color: #1B5E20;
-}
-    /* ── Séparateur filtre catégories ── */
+    .filter-btn.active-orange  { background: #E65100; color: white; }
+    .filter-btn.active-blue    { background: #1565C0; color: white; }
+    .filter-btn.active-green   { background: #2E7D32; color: white; }
+    .filter-btn.active-purple  { background: #6A1B9A; color: white; }
+    .filter-btn.active-teal    { background: #00695C; color: white; }
+    .filter-btn.active-brown   { background: #4E342E; color: white; }
+
     .filter-separator {
-        width: 1px;
-        height: 28px;
+        width: 1px; height: 28px;
         background: #e8e8e8;
         margin: 0 4px;
         flex-shrink: 0;
@@ -128,7 +117,6 @@
         line-height: 1.35;
     }
 
-    /* ── Badge catégorie ── */
     .category-tag {
         display: inline-flex;
         align-items: center;
@@ -141,9 +129,9 @@
         letter-spacing: 0.05em;
         width: fit-content;
     }
-    .category-tag.cat-animal  { background: #F3E5F5; color: #6A1B9A; }
-    .category-tag.cat-machine { background: #E0F2F1; color: #00695C; }
-    .category-tag.cat-terrain { background: #EFEBE9; color: #4E342E; }
+    .category-tag.cat-animal      { background: #F3E5F5; color: #6A1B9A; }
+    .category-tag.cat-maintenance { background: #E0F2F1; color: #00695C; }
+    .category-tag.cat-terrain     { background: #EFEBE9; color: #4E342E; }
 
     .status-badge {
         font-size: 10px;
@@ -212,7 +200,6 @@
     .btn-statut.primary { background: #2D5A27; border-color: #2D5A27; color: white; }
     .btn-statut.primary:hover { background: #1B3A20; border-color: #1B3A20; }
 
-    /* ── Bouton détail ressource ── */
     .btn-detail {
         flex: 1;
         min-width: 120px;
@@ -230,36 +217,14 @@
         gap: 6px;
         text-decoration: none;
     }
-    .btn-detail.detail-animal {
-        border-color: #CE93D8;
-        color: #6A1B9A;
-        background: #F9F0FF;
-    }
-    .btn-detail.detail-animal:hover {
-        background: #6A1B9A;
-        color: white;
-        border-color: #6A1B9A;
-    }
-    .btn-detail.detail-machine {
-        border-color: #80CBC4;
-        color: #00695C;
-        background: #E8F8F7;
-    }
-    .btn-detail.detail-machine:hover {
-        background: #00695C;
-        color: white;
-        border-color: #00695C;
-    }
-    .btn-detail.detail-terrain {
-        border-color: #BCAAA4;
-        color: #4E342E;
-        background: #F5F0EE;
-    }
-    .btn-detail.detail-terrain:hover {
-        background: #4E342E;
-        color: white;
-        border-color: #4E342E;
-    }
+    .btn-detail.detail-animal           { border-color: #CE93D8; color: #6A1B9A; background: #F9F0FF; }
+    .btn-detail.detail-animal:hover     { background: #6A1B9A; color: white; border-color: #6A1B9A; }
+    .btn-detail.detail-maintenance      { border-color: #80CBC4; color: #00695C; background: #E8F8F7; }
+    .btn-detail.detail-maintenance:hover{ background: #00695C; color: white; border-color: #00695C; }
+    .btn-detail.detail-terrain          { border-color: #BCAAA4; color: #4E342E; background: #F5F0EE; }
+    .btn-detail.detail-terrain:hover    { background: #4E342E; color: white; border-color: #4E342E; }
+    .btn-detail.detail-plante           { border-color: #A5D6A7; color: #1B5E20; background: #F1F8E9; }
+    .btn-detail.detail-plante:hover     { background: #1B5E20; color: white; border-color: #1B5E20; }
 
     .empty-full {
         grid-column: 1 / -1;
@@ -272,7 +237,7 @@
     }
     .empty-full .empty-icon { font-size: 48px; color: #d0d0d0; margin-bottom: 16px; }
     .empty-full h3 { font-family: 'Playfair Display', serif; font-size: 20px; color: #bbb; margin-bottom: 8px; }
-    .empty-full p { font-size: 13px; color: #ccc; }
+    .empty-full p  { font-size: 13px; color: #ccc; }
 
     @keyframes fadeUp {
         from { opacity: 0; transform: translateY(14px); }
@@ -281,6 +246,7 @@
     {% for i in 1..12 %}
     .task-card:nth-child({{ i }}) { animation-delay: {{ (i - 1) * 0.05 }}s; }
     {% endfor %}
+
     .lang-switcher {
         display: flex;
         align-items: center;
@@ -307,17 +273,16 @@
         text-decoration: none;
         transition: all 0.2s;
     }
-    .lang-btn:hover   { background: #f5f5f5; color: #2C3E50; }
-    .lang-btn.active  { background: #2D5A27; color: white; }
-    .lang-btn .flag   { font-size: 15px; }
+    .lang-btn:hover  { background: #f5f5f5; color: #2C3E50; }
+    .lang-btn.active { background: #2D5A27; color: white; }
+    .lang-btn .flag  { font-size: 15px; }
 </style>
 {% endblock %}
+
 {% block body %}
 {% set filtreCourant = filtreCourant is defined ? filtreCourant : 'all' %}
-
 {% set locale = app.request.locale %}
 
-{# Direction RTL pour l'arabe #}
 {% if locale == 'ar' %}
 <style>
     body { direction: rtl; text-align: right; }
@@ -325,10 +290,11 @@
     .task-card.status-todo     { border-right-color: #FFA726; }
     .task-card.status-progress { border-right-color: #42A5F5; }
     .task-card.status-done     { border-right-color: #66BB6A; }
-    .filter-bar { flex-direction: row-reverse; }
+    .filter-bar    { flex-direction: row-reverse; }
     .task-card-top { flex-direction: row-reverse; }
-    .task-meta { flex-direction: row-reverse; }
-    .task-actions { flex-direction: row-reverse; }
+    .task-meta     { flex-direction: row-reverse; }
+    .task-actions  { flex-direction: row-reverse; }
+    .page-header   { flex-direction: row-reverse; }
 </style>
 {% endif %}
 
@@ -337,8 +303,6 @@
         <i class="fa fa-list-check"></i>
         {{ 'taches.titre'|trans }}
     </h1>
-
-    {# ── Sélecteur de langue ── #}
     <div class="lang-switcher">
         <a href="{{ path('ouvrier_changer_langue', {locale: 'fr'}) }}"
            class="lang-btn {{ locale == 'fr' ? 'active' : '' }}">
@@ -384,10 +348,10 @@
         <i class="fa fa-paw"></i> {{ 'taches.animaux'|trans }}
         <span class="count-pill" id="count-animal">0</span>
     </button>
-    <button class="filter-btn {{ filtreCourant == 'machine' ? 'active active-teal' : '' }}"
-            onclick="filterTasks('machine', this)">
+    <button class="filter-btn {{ filtreCourant == 'maintenance' ? 'active active-teal' : '' }}"
+            onclick="filterTasks('maintenance', this)">
         <i class="fa fa-gear"></i> {{ 'taches.machines'|trans }}
-        <span class="count-pill" id="count-machine">0</span>
+        <span class="count-pill" id="count-maintenance">0</span>
     </button>
     <button class="filter-btn {{ filtreCourant == 'terrain' ? 'active active-brown' : '' }}"
             onclick="filterTasks('terrain', this)">
@@ -397,7 +361,6 @@
 </div>
 
 <div class="tasks-grid" id="tasksGrid">
-
     {% if taches is defined and taches is not empty %}
         {% for tache in taches %}
         <div class="task-card status-{{ tache.statut == 'en_cours' ? 'progress' : (tache.statut == 'terminee' ? 'done' : 'todo') }}"
@@ -407,20 +370,18 @@
             <div class="task-card-top">
                 <div class="task-card-title-wrap">
                     <div class="task-card-title">{{ tache.titre }}</div>
-
                     {% if tache.categorie %}
                     <span class="category-tag cat-{{ tache.categorie }}">
                         {% if tache.categorie == 'animal' %}
                             <i class="fa fa-paw"></i> {{ 'taches.animaux'|trans }}
-                        {% elseif tache.categorie == 'machine' %}
+                        {% elseif tache.categorie == 'maintenance' %}
                             <i class="fa fa-gear"></i> {{ 'taches.machines'|trans }}
-                        {% else %}
+                        {% elseif tache.categorie == 'terrain' %}
                             <i class="fa fa-seedling"></i> {{ 'taches.terrains'|trans }}
                         {% endif %}
                     </span>
                     {% endif %}
                 </div>
-
                 <span class="status-badge {{ tache.statut == 'en_cours' ? 'badge-progress' : (tache.statut == 'terminee' ? 'badge-done' : 'badge-todo') }}">
                     {% if tache.statut == 'en_cours' %}
                         {{ 'taches.statut_encours'|trans }}
@@ -445,20 +406,23 @@
                     {{ tache.dateDebut|date('d/m/Y') }}
                 </div>
                 {% endif %}
-
                 {% if tache.dateFin %}
                 <div class="meta-item">
                     <i class="fa fa-flag-checkered"></i>
                     {{ tache.dateFin|date('d/m/Y') }}
                 </div>
                 {% endif %}
-
                 {% if tache.priorite %}
+                {# La couleur du badge est déterminée par la valeur FR originale stockée dans data-priorite #}
                 <span class="priority-badge
-                    {% if tache.priorite in ['haute', 'urgente'] %}priority-haute
-                    {% elseif tache.priorite in ['normale', 'moyenne'] %}priority-moyenne
-                    {% else %}priority-basse{% endif %}">
-                    {{ tache.priorite|capitalize }}
+                    {% if tache.priorite_raw is defined %}
+                        {% if tache.priorite_raw in ['haute', 'urgente'] %}priority-haute
+                        {% elseif tache.priorite_raw in ['normale', 'moyenne'] %}priority-moyenne
+                        {% else %}priority-basse{% endif %}
+                    {% else %}
+                        priority-moyenne
+                    {% endif %}">
+                    {{ tache.priorite }}
                 </span>
                 {% endif %}
             </div>
@@ -466,15 +430,12 @@
             <div class="task-actions">
                 {% if tache.statut == 'a_faire' %}
                 <button class="btn-statut primary btn-changer-statut"
-                        data-id="{{ tache.id }}" data-statut="en_cours"
-                        data-label-encours="{{ 'taches.terminer'|trans }}"
-                        data-label-done="{{ 'taches.completee'|trans }}">
+                        data-id="{{ tache.id }}" data-statut="en_cours">
                     <i class="fa fa-play"></i> {{ 'taches.commencer'|trans }}
                 </button>
                 {% elseif tache.statut == 'en_cours' %}
                 <button class="btn-statut primary btn-changer-statut"
-                        data-id="{{ tache.id }}" data-statut="terminee"
-                        data-label-done="{{ 'taches.completee'|trans }}">
+                        data-id="{{ tache.id }}" data-statut="terminee">
                     <i class="fa fa-check"></i> {{ 'taches.terminer'|trans }}
                 </button>
                 {% else %}
@@ -484,28 +445,31 @@
                 {% endif %}
 
                 {% if tache.detail_url %}
-    {% set iconMap = {
-        'animal':  'fa-paw',
-        'machine': 'fa-gear',
-        'terrain': tache.is_plante ? 'fa-seedling' : 'fa-map',
-    } %}
-    {% set styleMap = {
-        'animal':  'detail-animal',
-        'machine': 'detail-machine',
-        'terrain': tache.is_plante ? 'detail-plante' : 'detail-terrain',
-    } %}
-
-    <a href="{{ tache.detail_url }}"
-       class="btn-detail {{ styleMap[tache.categorie] ?? 'detail-terrain' }}">
-        <i class="fa {{ iconMap[tache.categorie] ?? 'fa-seedling' }}"></i>
-        {{ tache.detail_label ?? 'Voir détail' }}
-    </a>
-{% endif %}
+                    {% set iconMap = {
+                        'animal':      'fa-paw',
+                        'maintenance': 'fa-gear',
+                        'terrain':     tache.is_plante ? 'fa-seedling' : 'fa-map',
+                    } %}
+                    {% set styleMap = {
+                        'animal':      'detail-animal',
+                        'maintenance': 'detail-maintenance',
+                        'terrain':     tache.is_plante ? 'detail-plante' : 'detail-terrain',
+                    } %}
+                    {% set detailLabelMap = {
+                        'animal':      'taches.voir_animal'|trans,
+                        'maintenance': 'taches.voir_maintenance'|trans,
+                        'terrain':     tache.is_plante ? 'taches.voir_plante'|trans : 'taches.voir_terrain'|trans,
+                    } %}
+                    <a href="{{ tache.detail_url }}"
+                       class="btn-detail {{ styleMap[tache.categorie] ?? 'detail-terrain' }}">
+                        <i class="fa {{ iconMap[tache.categorie] ?? 'fa-seedling' }}"></i>
+                        {{ detailLabelMap[tache.categorie] ?? 'taches.voir_detail'|trans }}
+                    </a>
+                {% endif %}
             </div>
 
         </div>
         {% endfor %}
-
     {% else %}
         <div class="empty-full">
             <div class="empty-icon"><i class="fa fa-list-check"></i></div>
@@ -513,114 +477,103 @@
             <p>{{ 'taches.aucune_desc'|trans }}</p>
         </div>
     {% endif %}
-
 </div>
 {% endblock %}
 
 {% block javascripts %}
 {{ parent() }}
 <script>
+const TRANS = {
+    statut: {
+        a_faire:  "{{ 'taches.statut_afaire'|trans|e('js') }}",
+        en_cours: "{{ 'taches.statut_encours'|trans|e('js') }}",
+        terminee: "{{ 'taches.statut_terminee'|trans|e('js') }}",
+    },
+    btn: {
+        marquerTerminee: "{{ 'taches.terminer'|trans|e('js') }}",
+        completee:       "{{ 'taches.completee'|trans|e('js') }}",
+    },
+    erreur: {
+        maj:    "{{ 'taches.erreur_maj'|trans|e('js') }}",
+        reseau: "{{ 'taches.erreur_reseau'|trans|e('js') }}",
+    },
+};
+
 document.addEventListener('DOMContentLoaded', function () {
     updateCounts();
 });
 
 function filterTasks(filtre, btn) {
-    // Statuts classiques
-    const STATUTS     = ['all', 'a_faire', 'en_cours', 'terminee'];
-    // Catégories ressources
-    const CATEGORIES  = ['animal', 'machine', 'terrain'];
+    const STATUTS    = ['all', 'a_faire', 'en_cours', 'terminee'];
+    const CATEGORIES = ['animal', 'maintenance', 'terrain'];
 
-    // Reset tous les boutons
     document.querySelectorAll('.filter-btn').forEach(b => {
-        b.classList.remove('active', 'active-orange', 'active-blue', 'active-green', 'active-purple', 'active-teal', 'active-brown');
+        b.classList.remove('active','active-orange','active-blue','active-green','active-purple','active-teal','active-brown');
     });
-
-    // Activer le bouton cliqué
     btn.classList.add('active');
     const colorMap = {
-        a_faire:  'active-orange',
-        en_cours: 'active-blue',
-        terminee: 'active-green',
-        animal:   'active-purple',
-        machine:  'active-teal',
-        terrain:  'active-brown',
+        a_faire: 'active-orange', en_cours: 'active-blue', terminee: 'active-green',
+        animal: 'active-purple', maintenance: 'active-teal', terrain: 'active-brown',
     };
     if (colorMap[filtre]) btn.classList.add(colorMap[filtre]);
 
-    // Afficher/masquer les cartes
     document.querySelectorAll('.task-card').forEach(card => {
         const statut    = card.getAttribute('data-statut');
         const categorie = card.getAttribute('data-categorie');
-
         let visible = false;
-
-        if (filtre === 'all') {
-            visible = true;
-        } else if (STATUTS.includes(filtre)) {
-            visible = statut === filtre;
-        } else if (CATEGORIES.includes(filtre)) {
-            visible = categorie === filtre;
-        }
-
+        if (filtre === 'all') visible = true;
+        else if (STATUTS.includes(filtre))    visible = statut === filtre;
+        else if (CATEGORIES.includes(filtre)) visible = categorie === filtre;
         card.style.display = visible ? '' : 'none';
     });
 }
 
 function updateCounts() {
     const cards  = document.querySelectorAll('.task-card[data-statut]');
-    const counts = { all: 0, a_faire: 0, en_cours: 0, terminee: 0, animal: 0, machine: 0, terrain: 0 };
-
+    const counts = { all:0, a_faire:0, en_cours:0, terminee:0, animal:0, maintenance:0, terrain:0 };
     cards.forEach(c => {
         const s = c.getAttribute('data-statut');
         const g = c.getAttribute('data-categorie');
         counts.all++;
-        if (counts[s] !== undefined)  counts[s]++;
-        if (counts[g] !== undefined)  counts[g]++;
+        if (counts[s] !== undefined) counts[s]++;
+        if (counts[g] !== undefined) counts[g]++;
     });
-
-    document.getElementById('count-all').textContent      = counts.all;
-    document.getElementById('count-todo').textContent     = counts.a_faire;
-    document.getElementById('count-en_cours').textContent = counts.en_cours;
-    document.getElementById('count-terminee').textContent = counts.terminee;
-    document.getElementById('count-animal').textContent   = counts.animal;
-    document.getElementById('count-machine').textContent  = counts.machine;
-    document.getElementById('count-terrain').textContent  = counts.terrain;
+    document.getElementById('count-all').textContent         = counts.all;
+    document.getElementById('count-todo').textContent        = counts.a_faire;
+    document.getElementById('count-en_cours').textContent    = counts.en_cours;
+    document.getElementById('count-terminee').textContent    = counts.terminee;
+    document.getElementById('count-animal').textContent      = counts.animal;
+    document.getElementById('count-maintenance').textContent = counts.maintenance;
+    document.getElementById('count-terrain').textContent     = counts.terrain;
 }
 
-// ── AJAX changer statut ───────────────────────────────────
 document.addEventListener('click', function (e) {
     const btn = e.target.closest('.btn-changer-statut');
     if (!btn) return;
 
     const id     = btn.dataset.id;
     const statut = btn.dataset.statut;
-
     btn.disabled = true;
 
     fetch(`/ouvrier/tache/${id}/statut/${statut}`)
         .then(res => res.json())
         .then(data => {
             if (!data.success) {
-                alert(data.message || 'Erreur lors de la mise à jour.');
+                alert(data.message || TRANS.erreur.maj);
                 btn.disabled = false;
                 return;
             }
-
             const card = btn.closest('.task-card');
-
             card.setAttribute('data-statut', statut);
-
-            card.classList.remove('status-todo', 'status-progress', 'status-done');
-            const classeMap = { a_faire: 'status-todo', en_cours: 'status-progress', terminee: 'status-done' };
+            card.classList.remove('status-todo','status-progress','status-done');
+            const classeMap = { a_faire:'status-todo', en_cours:'status-progress', terminee:'status-done' };
             card.classList.add(classeMap[statut]);
 
             const badge    = card.querySelector('.status-badge');
-            const labelMap = { a_faire: 'À faire', en_cours: 'En cours', terminee: 'Terminée' };
-            const badgeMap = { a_faire: 'badge-todo', en_cours: 'badge-progress', terminee: 'badge-done' };
-            badge.className  = `status-badge ${badgeMap[statut]}`;
-            badge.textContent = labelMap[statut];
+            const badgeMap = { a_faire:'badge-todo', en_cours:'badge-progress', terminee:'badge-done' };
+            badge.className   = `status-badge ${badgeMap[statut]}`;
+            badge.textContent = TRANS.statut[statut] ?? statut;
 
-            // Conserver le bouton détail existant
             const detailBtn = card.querySelector('.btn-detail');
             const actions   = card.querySelector('.task-actions');
 
@@ -628,22 +581,20 @@ document.addEventListener('click', function (e) {
                 actions.innerHTML = `
                     <button class="btn-statut primary btn-changer-statut"
                             data-id="${id}" data-statut="terminee">
-                        <i class="fa fa-check"></i> Marquer terminée
+                        <i class="fa fa-check"></i> ${TRANS.btn.marquerTerminee}
                     </button>`;
             } else if (statut === 'terminee') {
                 actions.innerHTML = `
                     <span class="btn-statut" style="cursor:default;color:#66BB6A;border-color:#c8e6c9;">
-                        <i class="fa fa-circle-check"></i> Tâche complétée
+                        <i class="fa fa-circle-check"></i> ${TRANS.btn.completee}
                     </span>`;
             }
 
-            // Ré-injecter le bouton détail s'il existait
             if (detailBtn) actions.appendChild(detailBtn);
-
             updateCounts();
         })
         .catch(() => {
-            alert('Erreur réseau.');
+            alert(TRANS.erreur.reseau);
             btn.disabled = false;
         });
 });

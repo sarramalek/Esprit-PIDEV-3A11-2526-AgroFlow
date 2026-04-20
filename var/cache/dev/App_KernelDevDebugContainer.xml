@@ -9,8 +9,8 @@
     <parameter key="kernel.runtime_mode.cli">%env(not:default:kernel.runtime_mode.web:)%</parameter>
     <parameter key="kernel.runtime_mode.worker">%env(bool:default::key:worker:default:kernel.runtime_mode:)%</parameter>
     <parameter key="kernel.debug">true</parameter>
-    <parameter key="kernel.build_dir">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev</parameter>
-    <parameter key="kernel.cache_dir">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev</parameter>
+    <parameter key="kernel.build_dir">C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev</parameter>
+    <parameter key="kernel.cache_dir">C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev</parameter>
     <parameter key="kernel.logs_dir">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\log</parameter>
     <parameter key="kernel.bundles" type="collection">
       <parameter key="FrameworkBundle">Symfony\Bundle\FrameworkBundle\FrameworkBundle</parameter>
@@ -27,6 +27,7 @@
       <parameter key="MakerBundle">Symfony\Bundle\MakerBundle\MakerBundle</parameter>
       <parameter key="SchebTwoFactorBundle">Scheb\TwoFactorBundle\SchebTwoFactorBundle</parameter>
       <parameter key="KnpPaginatorBundle">Knp\Bundle\PaginatorBundle\KnpPaginatorBundle</parameter>
+      <parameter key="StofDoctrineExtensionsBundle">Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle</parameter>
     </parameter>
     <parameter key="kernel.bundles_metadata" type="collection">
       <parameter key="FrameworkBundle" type="collection">
@@ -85,6 +86,10 @@
         <parameter key="path">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle</parameter>
         <parameter key="namespace">Knp\Bundle\PaginatorBundle</parameter>
       </parameter>
+      <parameter key="StofDoctrineExtensionsBundle" type="collection">
+        <parameter key="path">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\stof\doctrine-extensions-bundle\src</parameter>
+        <parameter key="namespace">Stof\DoctrineExtensionsBundle</parameter>
+      </parameter>
     </parameter>
     <parameter key="kernel.charset">UTF-8</parameter>
     <parameter key="kernel.container_class">App_KernelDevDebugContainer</parameter>
@@ -110,13 +115,6 @@
       <parameter key="Symfony\Component\HttpKernel\Event\ViewEvent">kernel.view</parameter>
       <parameter key="Symfony\Component\HttpKernel\Event\ExceptionEvent">kernel.exception</parameter>
       <parameter key="Symfony\Component\HttpKernel\Event\TerminateEvent">kernel.terminate</parameter>
-      <parameter key="Symfony\Component\Workflow\Event\GuardEvent">workflow.guard</parameter>
-      <parameter key="Symfony\Component\Workflow\Event\LeaveEvent">workflow.leave</parameter>
-      <parameter key="Symfony\Component\Workflow\Event\TransitionEvent">workflow.transition</parameter>
-      <parameter key="Symfony\Component\Workflow\Event\EnterEvent">workflow.enter</parameter>
-      <parameter key="Symfony\Component\Workflow\Event\EnteredEvent">workflow.entered</parameter>
-      <parameter key="Symfony\Component\Workflow\Event\CompletedEvent">workflow.completed</parameter>
-      <parameter key="Symfony\Component\Workflow\Event\AnnounceEvent">workflow.announce</parameter>
       <parameter key="Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent">security.authentication.success</parameter>
       <parameter key="Symfony\Component\Security\Http\Event\InteractiveLoginEvent">security.interactive_login</parameter>
       <parameter key="Symfony\Component\Security\Http\Event\SwitchUserEvent">security.switch_user</parameter>
@@ -136,15 +134,15 @@
     <parameter key="translator.logging">false</parameter>
     <parameter key="translator.default_path">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/translations</parameter>
     <parameter key="debug.error_handler.throw_at">-1</parameter>
-    <parameter key="debug.container.dump">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/App_KernelDevDebugContainer.xml</parameter>
+    <parameter key="debug.container.dump">C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/App_KernelDevDebugContainer.xml</parameter>
     <parameter key="router.request_context.host">localhost</parameter>
     <parameter key="router.request_context.scheme">http</parameter>
     <parameter key="router.request_context.base_url"></parameter>
     <parameter key="router.resource">kernel::loadRoutes</parameter>
-    <parameter key="router.cache_dir">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev</parameter>
+    <parameter key="router.cache_dir">C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev</parameter>
     <parameter key="request_listener.http_port">80</parameter>
     <parameter key="request_listener.https_port">443</parameter>
-    <parameter key="serializer.mapping.cache.file">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/serialization.php</parameter>
+    <parameter key="serializer.mapping.cache.file">C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/serialization.php</parameter>
     <parameter key="cache.prefix.seed">_C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow.App_KernelDevDebugContainer</parameter>
     <parameter key="session.metadata.storage_key">_sf2_meta</parameter>
     <parameter key="session.storage.options" type="collection">
@@ -159,11 +157,11 @@
     <parameter key="session.metadata.update_threshold">0</parameter>
     <parameter key="form.type_extension.csrf.enabled">true</parameter>
     <parameter key="form.type_extension.csrf.field_name">_token</parameter>
-    <parameter key="validator.mapping.cache.file">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/validation.php</parameter>
+    <parameter key="validator.mapping.cache.file">C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/validation.php</parameter>
     <parameter key="validator.translation_domain">validators</parameter>
     <parameter key="profiler_listener.only_exceptions">false</parameter>
     <parameter key="profiler_listener.only_main_requests">false</parameter>
-    <parameter key="profiler.storage.dsn">file:C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/profiler</parameter>
+    <parameter key="profiler.storage.dsn">file:C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/profiler</parameter>
     <parameter key="doctrine.dbal.configuration.class">Doctrine\DBAL\Configuration</parameter>
     <parameter key="doctrine.data_collector.class">Doctrine\Bundle\DoctrineBundle\DataCollector\DoctrineDataCollector</parameter>
     <parameter key="doctrine.dbal.connection.event_manager.class">Symfony\Bridge\Doctrine\ContainerAwareEventManager</parameter>
@@ -230,7 +228,7 @@
     <parameter key="doctrine.orm.auto_generate_proxy_classes">true</parameter>
     <parameter key="doctrine.orm.enable_lazy_ghost_objects">true</parameter>
     <parameter key="doctrine.orm.enable_native_lazy_objects">false</parameter>
-    <parameter key="doctrine.orm.proxy_dir">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/doctrine/orm/Proxies</parameter>
+    <parameter key="doctrine.orm.proxy_dir">C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/doctrine/orm/Proxies</parameter>
     <parameter key="doctrine.orm.proxy_namespace">Proxies</parameter>
     <parameter key="doctrine.migrations.preferred_em">null</parameter>
     <parameter key="doctrine.migrations.preferred_connection">null</parameter>
@@ -285,6 +283,21 @@
     <parameter key="knp_paginator.page_limit">null</parameter>
     <parameter key="knp_paginator.page_name">page</parameter>
     <parameter key="knp_paginator.remove_first_page_param">false</parameter>
+    <parameter key="stof_doctrine_extensions.listener.translatable.class">Gedmo\Translatable\TranslatableListener</parameter>
+    <parameter key="stof_doctrine_extensions.event_listener.locale.class">Stof\DoctrineExtensionsBundle\EventListener\LocaleListener</parameter>
+    <parameter key="stof_doctrine_extensions.default_locale">en</parameter>
+    <parameter key="stof_doctrine_extensions.translation_fallback">false</parameter>
+    <parameter key="stof_doctrine_extensions.persist_default_translation">false</parameter>
+    <parameter key="stof_doctrine_extensions.skip_translation_on_load">false</parameter>
+    <parameter key="stof_doctrine_extensions.listener.timestampable.class">Gedmo\Timestampable\TimestampableListener</parameter>
+    <parameter key="stof_doctrine_extensions.listener.blameable.class">Gedmo\Blameable\BlameableListener</parameter>
+    <parameter key="stof_doctrine_extensions.listener.sluggable.class">Gedmo\Sluggable\SluggableListener</parameter>
+    <parameter key="stof_doctrine_extensions.listener.tree.class">Gedmo\Tree\TreeListener</parameter>
+    <parameter key="stof_doctrine_extensions.listener.loggable.class">Gedmo\Loggable\LoggableListener</parameter>
+    <parameter key="stof_doctrine_extensions.listener.sortable.class">Gedmo\Sortable\SortableListener</parameter>
+    <parameter key="stof_doctrine_extensions.listener.softdeleteable.class">Gedmo\SoftDeleteable\SoftDeleteableListener</parameter>
+    <parameter key="stof_doctrine_extensions.listener.uploadable.class">Gedmo\Uploadable\UploadableListener</parameter>
+    <parameter key="stof_doctrine_extensions.listener.reference_integrity.class">Gedmo\ReferenceIntegrity\ReferenceIntegrityListener</parameter>
     <parameter key="data_collector.templates" type="collection">
       <parameter key="data_collector.request" type="collection">
         <parameter>request</parameter>
@@ -365,10 +378,6 @@
       <parameter key="mailer.data_collector" type="collection">
         <parameter>mailer</parameter>
         <parameter>@WebProfiler/Collector/mailer.html.twig</parameter>
-      </parameter>
-      <parameter key="data_collector.workflow" type="collection">
-        <parameter>workflow</parameter>
-        <parameter>@WebProfiler/Collector/workflow.html.twig</parameter>
       </parameter>
       <parameter key="notifier.data_collector" type="collection">
         <parameter>notifier</parameter>
@@ -948,6 +957,10 @@
       <argument type="service" id="App\Repository\Animals\AnimauxRepository"/>
       <argument>%env(GROQ_API_KEY_TACHES)%</argument>
     </service>
+    <service id="App\Service\TaskTranslator" class="App\Service\TaskTranslator" autowire="true" autoconfigure="true">
+      <argument type="service" id=".debug.http_client"/>
+      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow</argument>
+    </service>
     <service id="App\Service\TwoFactorCodeSender" class="App\Service\TwoFactorCodeSender" autowire="true" autoconfigure="true"/>
     <service id="argument_metadata_factory" class="Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory"/>
     <service id="argument_resolver.backed_enum_resolver" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueResolver">
@@ -976,7 +989,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.2Z1q.5_"/>
+      <argument type="service" id=".service_locator.KYbQRH0"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -1059,7 +1072,7 @@
       </argument>
     </service>
     <service id="http_cache.store" class="Symfony\Component\HttpKernel\HttpCache\Store">
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/http_cache</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/http_cache</argument>
     </service>
     <service id="url_helper" class="Symfony\Component\HttpFoundation\UrlHelper">
       <argument type="service" id="request_stack"/>
@@ -1069,7 +1082,7 @@
       <tag name="container.no_preload"/>
       <argument type="tagged_iterator" tag="kernel.cache_warmer"/>
       <argument>true</argument>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/App_KernelDevDebugContainerDeprecations.log</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/App_KernelDevDebugContainerDeprecations.log</argument>
     </service>
     <service id="cache_clearer" class="Symfony\Component\HttpKernel\CacheClearer\ChainCacheClearer">
       <argument type="tagged_iterator" tag="kernel.cache_clearer"/>
@@ -1128,7 +1141,6 @@
         <argument key="monolog.handler.main" type="service" id="monolog.handler.main" on-invalid="ignore_uninitialized"/>
         <argument key="monolog.handler.console" type="service" id="monolog.handler.console" on-invalid="ignore_uninitialized"/>
         <argument key=".debug.http_client" type="service" id=".debug.http_client" on-invalid="ignore_uninitialized"/>
-        <argument key="debug.state_machine.machine_lifecycle" type="service" id="debug.state_machine.machine_lifecycle" on-invalid="ignore_uninitialized"/>
       </argument>
       <argument type="collection">
         <argument key="request_stack" type="collection">
@@ -1237,9 +1249,6 @@
         <argument key=".debug.http_client" type="collection">
           <argument>reset</argument>
         </argument>
-        <argument key="debug.state_machine.machine_lifecycle" type="collection">
-          <argument>reset</argument>
-        </argument>
       </argument>
     </service>
     <service id="reverse_container" class="Symfony\Component\DependencyInjection\ReverseContainer">
@@ -1254,6 +1263,7 @@
         <argument type="service" id="slugger"/>
         <argument type="service" id="translator.default"/>
         <argument type="service" id="translation.locale_switcher"/>
+        <argument type="service" id="stof_doctrine_extensions.tool.locale_synchronizer"/>
       </argument>
       <argument type="service" id="request_stack"/>
     </service>
@@ -1880,17 +1890,6 @@
         <argument>Push translations to a given provider.</argument>
       </call>
     </service>
-    <service id="console.command.workflow_dump" class="Symfony\Bundle\FrameworkBundle\Command\WorkflowDumpCommand">
-      <tag name="console.command"/>
-      <tag name="container.no_preload"/>
-      <argument type="service" id=".service_locator.BgCVgBJ"/>
-      <call method="setName">
-        <argument>workflow:dump</argument>
-      </call>
-      <call method="setDescription">
-        <argument>Dump a workflow</argument>
-      </call>
-    </service>
     <service id="console.command.xliff_lint" class="Symfony\Component\Translation\Command\XliffLintCommand">
       <tag name="console.command"/>
       <tag name="container.no_preload"/>
@@ -2108,7 +2107,7 @@
       <argument></argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -2127,7 +2126,7 @@
       <tag name="monolog.logger" channel="cache"/>
       <argument></argument>
       <argument>0</argument>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/app</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/app</argument>
       <argument type="service" id="cache.default_marshaller" on-invalid="ignore"/>
       <call method="setLogger">
         <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
@@ -2296,7 +2295,7 @@
     <service id="asset_mapper.cached_mapped_asset_factory" class="Symfony\Component\AssetMapper\Factory\CachedMappedAssetFactory">
       <tag name="container.decorator" id="asset_mapper.mapped_asset_factory" inner="asset_mapper.cached_mapped_asset_factory.inner"/>
       <argument type="service" id="asset_mapper.cached_mapped_asset_factory.inner"/>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/asset_mapper</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/asset_mapper</argument>
       <argument>true</argument>
     </service>
     <service id="asset_mapper.repository" class="Symfony\Component\AssetMapper\AssetMapperRepository">
@@ -2671,7 +2670,7 @@
         </argument>
       </argument>
       <argument type="collection">
-        <argument key="cache_dir">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/translations</argument>
+        <argument key="cache_dir">C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/translations</argument>
         <argument key="debug">true</argument>
         <argument key="resource_files" type="collection">
           <argument key="af" type="collection">
@@ -3046,6 +3045,7 @@
           <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-bundle/translations</argument>
           <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\monolog-bundle\src/translations</argument>
           <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\maker-bundle/translations</argument>
+          <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\stof\doctrine-extensions-bundle\src/translations</argument>
         </argument>
         <argument key="cache_vary" type="collection">
           <argument key="scanned_directories" type="collection">
@@ -3068,6 +3068,7 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-bundle/translations</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\monolog-bundle\src/translations</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\maker-bundle/translations</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\stof\doctrine-extensions-bundle\src/translations</argument>
           </argument>
         </argument>
       </argument>
@@ -3380,115 +3381,6 @@
     <service id="translation.provider_factory.null" class="Symfony\Component\Translation\Provider\NullProviderFactory">
       <tag name="translation.provider_factory"/>
     </service>
-    <service id="workflow.abstract" class="Symfony\Component\Workflow\Workflow" abstract="true">
-      <argument type="abstract">workflow definition</argument>
-      <argument type="abstract">marking store</argument>
-      <argument type="service" id="debug.event_dispatcher" on-invalid="ignore"/>
-      <argument type="abstract">workflow name</argument>
-      <argument type="abstract">events to dispatch</argument>
-    </service>
-    <service id="state_machine.abstract" class="Symfony\Component\Workflow\StateMachine" abstract="true">
-      <argument type="abstract">workflow definition</argument>
-      <argument type="abstract">marking store</argument>
-      <argument type="service" id="debug.event_dispatcher" on-invalid="ignore"/>
-      <argument type="abstract">workflow name</argument>
-      <argument type="abstract">events to dispatch</argument>
-    </service>
-    <service id="workflow.marking_store.method" class="Symfony\Component\Workflow\MarkingStore\MethodMarkingStore" abstract="true"/>
-    <service id="workflow.registry" class="Symfony\Component\Workflow\Registry">
-      <call method="addWorkflow">
-        <argument type="service" id="debug.state_machine.machine_lifecycle"/>
-        <argument type="service">
-          <service class="Symfony\Component\Workflow\SupportStrategy\InstanceOfSupportStrategy">
-            <argument>App\Entity\Materiels\Machine</argument>
-          </service>
-        </argument>
-      </call>
-    </service>
-    <service id="workflow.security.expression_language" class="Symfony\Component\Workflow\EventListener\ExpressionLanguage"/>
-    <service id=".state_machine.machine_lifecycle.transition.0" class="Symfony\Component\Workflow\Transition">
-      <argument>signaler_alerte</argument>
-      <argument>en_service</argument>
-      <argument>alerte_maintenance</argument>
-    </service>
-    <service id=".state_machine.machine_lifecycle.transition.1" class="Symfony\Component\Workflow\Transition">
-      <argument>envoyer_garage</argument>
-      <argument>alerte_maintenance</argument>
-      <argument>au_garage</argument>
-    </service>
-    <service id=".state_machine.machine_lifecycle.transition.2" class="Symfony\Component\Workflow\Transition">
-      <argument>commencer_test</argument>
-      <argument>au_garage</argument>
-      <argument>en_test</argument>
-    </service>
-    <service id=".state_machine.machine_lifecycle.transition.3" class="Symfony\Component\Workflow\Transition">
-      <argument>valider_operation</argument>
-      <argument>en_test</argument>
-      <argument>operationnel</argument>
-    </service>
-    <service id=".state_machine.machine_lifecycle.transition.4" class="Symfony\Component\Workflow\Transition">
-      <argument>remettre_en_service</argument>
-      <argument>operationnel</argument>
-      <argument>en_service</argument>
-    </service>
-    <service id=".state_machine.machine_lifecycle.transition.5" class="Symfony\Component\Workflow\Transition">
-      <argument>retrait_urgent</argument>
-      <argument>en_service</argument>
-      <argument>au_garage</argument>
-    </service>
-    <service id=".state_machine.machine_lifecycle.transition.6" class="Symfony\Component\Workflow\Transition">
-      <argument>retrait_urgent</argument>
-      <argument>alerte_maintenance</argument>
-      <argument>au_garage</argument>
-    </service>
-    <service id=".state_machine.machine_lifecycle.transition.7" class="Symfony\Component\Workflow\Transition">
-      <argument>retrait_urgent</argument>
-      <argument>en_test</argument>
-      <argument>au_garage</argument>
-    </service>
-    <service id=".state_machine.machine_lifecycle.transition.8" class="Symfony\Component\Workflow\Transition">
-      <argument>retrait_urgent</argument>
-      <argument>operationnel</argument>
-      <argument>au_garage</argument>
-    </service>
-    <service id="state_machine.machine_lifecycle.metadata_store" class="Symfony\Component\Workflow\Metadata\InMemoryMetadataStore">
-      <argument type="collection"/>
-      <argument type="collection"/>
-      <argument type="service">
-        <service class="SplObjectStorage"/>
-      </argument>
-    </service>
-    <service id="state_machine.machine_lifecycle.definition" class="Symfony\Component\Workflow\Definition">
-      <argument type="collection">
-        <argument>en_service</argument>
-        <argument>alerte_maintenance</argument>
-        <argument>au_garage</argument>
-        <argument>en_test</argument>
-        <argument>operationnel</argument>
-      </argument>
-      <argument type="collection">
-        <argument type="service" id=".state_machine.machine_lifecycle.transition.0"/>
-        <argument type="service" id=".state_machine.machine_lifecycle.transition.1"/>
-        <argument type="service" id=".state_machine.machine_lifecycle.transition.2"/>
-        <argument type="service" id=".state_machine.machine_lifecycle.transition.3"/>
-        <argument type="service" id=".state_machine.machine_lifecycle.transition.4"/>
-        <argument type="service" id=".state_machine.machine_lifecycle.transition.5"/>
-        <argument type="service" id=".state_machine.machine_lifecycle.transition.6"/>
-        <argument type="service" id=".state_machine.machine_lifecycle.transition.7"/>
-        <argument type="service" id=".state_machine.machine_lifecycle.transition.8"/>
-      </argument>
-      <argument type="collection">
-        <argument>en_service</argument>
-      </argument>
-      <argument type="service" id="state_machine.machine_lifecycle.metadata_store"/>
-    </service>
-    <service id=".state_machine.machine_lifecycle.listener.audit_trail" class="Symfony\Component\Workflow\EventListener\AuditTrailListener">
-      <tag name="monolog.logger" channel="workflow"/>
-      <tag name="kernel.event_listener" event="workflow.machine_lifecycle.leave" method="onLeave"/>
-      <tag name="kernel.event_listener" event="workflow.machine_lifecycle.transition" method="onTransition"/>
-      <tag name="kernel.event_listener" event="workflow.machine_lifecycle.enter" method="onEnter"/>
-      <argument type="service" id="monolog.logger.workflow"/>
-    </service>
     <service id="debug.error_handler_configurator" class="Symfony\Component\HttpKernel\Debug\ErrorHandlerConfigurator" public="true">
       <tag name="monolog.logger" channel="php"/>
       <argument type="service" id="monolog.logger.php"/>
@@ -3531,30 +3423,6 @@
           <argument>onKernelRequest</argument>
         </argument>
         <argument>20</argument>
-      </call>
-      <call method="addListener">
-        <argument>workflow.machine_lifecycle.leave</argument>
-        <argument type="collection">
-          <argument type="service_closure" id=".state_machine.machine_lifecycle.listener.audit_trail"/>
-          <argument>onLeave</argument>
-        </argument>
-        <argument>0</argument>
-      </call>
-      <call method="addListener">
-        <argument>workflow.machine_lifecycle.transition</argument>
-        <argument type="collection">
-          <argument type="service_closure" id=".state_machine.machine_lifecycle.listener.audit_trail"/>
-          <argument>onTransition</argument>
-        </argument>
-        <argument>0</argument>
-      </call>
-      <call method="addListener">
-        <argument>workflow.machine_lifecycle.enter</argument>
-        <argument type="collection">
-          <argument type="service_closure" id=".state_machine.machine_lifecycle.listener.audit_trail"/>
-          <argument>onEnter</argument>
-        </argument>
-        <argument>0</argument>
       </call>
       <call method="addListener">
         <argument>kernel.controller</argument>
@@ -4234,7 +4102,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.2Z1q.5_"/>
+      <argument type="service" id=".service_locator.KYbQRH0"/>
     </service>
     <service id="debug.log_processor" class="Symfony\Bridge\Monolog\Processor\DebugProcessor">
       <tag name="kernel.reset" method="reset"/>
@@ -4334,10 +4202,10 @@
     <service id="router.default" class="Symfony\Bundle\FrameworkBundle\Routing\Router">
       <tag name="monolog.logger" channel="router"/>
       <tag name="container.service_subscriber" id="routing.loader"/>
-      <argument type="service" id=".service_locator.b.mdbP7.router.default"/>
+      <argument type="service" id=".service_locator.DjrhxxF.router.default"/>
       <argument>kernel::loadRoutes</argument>
       <argument type="collection">
-        <argument key="cache_dir">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev</argument>
+        <argument key="cache_dir">C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev</argument>
         <argument key="debug">true</argument>
         <argument key="generator_class">Symfony\Component\Routing\Generator\CompiledUrlGenerator</argument>
         <argument key="generator_dumper_class">Symfony\Component\Routing\Generator\Dumper\CompiledUrlGeneratorDumper</argument>
@@ -4516,10 +4384,10 @@
           </service>
         </argument>
       </argument>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/serialization.php</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/serialization.php</argument>
     </service>
     <service id="serializer.mapping.cache.symfony" class="Psr\Cache\CacheItemPoolInterface">
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/serialization.php</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/serialization.php</argument>
       <argument type="service" id="cache.serializer"/>
       <factory class="Symfony\Component\Cache\Adapter\PhpArrayAdapter" method="create"/>
     </service>
@@ -4657,7 +4525,7 @@
       <argument>true</argument>
     </service>
     <service id="session.storage.factory.mock_file" class="Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorageFactory">
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/sessions</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/sessions</argument>
       <argument>MOCKSESSID</argument>
       <argument type="service">
         <service class="Symfony\Component\HttpFoundation\Session\Storage\MetadataBag">
@@ -4863,10 +4731,10 @@
     <service id="validator.mapping.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\ValidatorCacheWarmer">
       <tag name="kernel.cache_warmer"/>
       <argument type="service" id="validator.builder"/>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/validation.php</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/validation.php</argument>
     </service>
     <service id="validator.mapping.cache.adapter" class="Symfony\Component\Cache\Adapter\PhpArrayAdapter" constructor="create">
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/validation.php</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/validation.php</argument>
       <argument type="service" id="cache.validator"/>
     </service>
     <service id="validator.validator_factory" class="Symfony\Component\Validator\ContainerConstraintValidatorFactory">
@@ -5540,9 +5408,6 @@
         <argument type="service" id="mailer.data_collector"/>
       </call>
       <call method="add">
-        <argument type="service" id="data_collector.workflow"/>
-      </call>
-      <call method="add">
         <argument type="service" id="notifier.data_collector"/>
       </call>
       <call method="add">
@@ -5553,7 +5418,7 @@
       </call>
     </service>
     <service id="profiler.storage" class="Symfony\Component\HttpKernel\Profiler\FileProfilerStorage">
-      <argument>file:C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/profiler</argument>
+      <argument>file:C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/profiler</argument>
     </service>
     <service id="profiler_listener" class="Symfony\Component\HttpKernel\EventListener\ProfilerListener">
       <tag name="kernel.event_subscriber"/>
@@ -5618,7 +5483,7 @@
       <tag name="monolog.logger" channel="profiler"/>
       <tag name="data_collector" template="@WebProfiler/Collector/logger.html.twig" id="logger" priority="300"/>
       <argument type="service" id="monolog.logger.profiler" on-invalid="ignore"/>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/App_KernelDevDebugContainer</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/App_KernelDevDebugContainer</argument>
       <argument type="service" id=".virtual_request_stack" on-invalid="ignore"/>
     </service>
     <service id="data_collector.time" class="Symfony\Component\HttpKernel\DataCollector\TimeDataCollector">
@@ -5735,12 +5600,6 @@
     <service id="mailer.data_collector" class="Symfony\Component\Mailer\DataCollector\MessageDataCollector">
       <tag name="data_collector" template="@WebProfiler/Collector/mailer.html.twig" id="mailer"/>
       <argument type="service" id="mailer.message_logger_listener"/>
-    </service>
-    <service id="data_collector.workflow" class="Symfony\Component\Workflow\DataCollector\WorkflowDataCollector">
-      <tag name="data_collector" template="@WebProfiler/Collector/workflow.html.twig" id="workflow"/>
-      <argument type="tagged_iterator" tag="workflow" index-by="name" default-index-method="getDefaultNameName" default-priority-method="getDefaultNamePriority"/>
-      <argument type="service" id="debug.event_dispatcher"/>
-      <argument type="service" id="debug.file_link_formatter"/>
     </service>
     <service id="data_collector.http_client" class="Symfony\Component\HttpClient\DataCollector\HttpClientDataCollector">
       <tag name="data_collector" template="@WebProfiler/Collector/http_client.html.twig" id="http_client" priority="250"/>
@@ -5865,7 +5724,7 @@
       </call>
     </service>
     <service id="doctrine.dbal.default_connection.event_manager" class="Symfony\Bridge\Doctrine\ContainerAwareEventManager">
-      <argument type="service" id=".service_locator.MfxSDRP"/>
+      <argument type="service" id=".service_locator.vtjw4Bs"/>
       <argument type="collection">
         <argument type="collection">
           <argument type="collection">
@@ -5920,6 +5779,36 @@
             <argument>postFlush</argument>
           </argument>
           <argument>turbo.doctrine.event_listener</argument>
+        </argument>
+        <argument type="collection">
+          <argument type="collection">
+            <argument>postLoad</argument>
+          </argument>
+          <argument>stof_doctrine_extensions.listener.translatable</argument>
+        </argument>
+        <argument type="collection">
+          <argument type="collection">
+            <argument>postPersist</argument>
+          </argument>
+          <argument>stof_doctrine_extensions.listener.translatable</argument>
+        </argument>
+        <argument type="collection">
+          <argument type="collection">
+            <argument>preFlush</argument>
+          </argument>
+          <argument>stof_doctrine_extensions.listener.translatable</argument>
+        </argument>
+        <argument type="collection">
+          <argument type="collection">
+            <argument>onFlush</argument>
+          </argument>
+          <argument>stof_doctrine_extensions.listener.translatable</argument>
+        </argument>
+        <argument type="collection">
+          <argument type="collection">
+            <argument>loadClassMetadata</argument>
+          </argument>
+          <argument>stof_doctrine_extensions.listener.translatable</argument>
         </argument>
       </argument>
     </service>
@@ -6211,7 +6100,7 @@
         <argument type="service" id=".doctrine.orm.default_metadata_driver"/>
       </call>
       <call method="setProxyDir">
-        <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/doctrine/orm/Proxies</argument>
+        <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/doctrine/orm/Proxies</argument>
       </call>
       <call method="setProxyNamespace">
         <argument>Proxies</argument>
@@ -6631,7 +6520,7 @@
       <argument type="service" id="twig.loader.native_filesystem"/>
       <argument type="collection">
         <argument key="autoescape">name</argument>
-        <argument key="cache">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/twig</argument>
+        <argument key="cache">C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/twig</argument>
         <argument key="charset">UTF-8</argument>
         <argument key="debug">true</argument>
         <argument key="strict_variables">true</argument>
@@ -6674,9 +6563,6 @@
       </call>
       <call method="addExtension">
         <argument type="service" id="twig.extension.weblink"/>
-      </call>
-      <call method="addExtension">
-        <argument type="service" id="workflow.twig_extension"/>
       </call>
       <call method="addExtension">
         <argument type="service" id="twig.extension.serializer"/>
@@ -6930,10 +6816,6 @@
     <service id="twig.translation.extractor" class="Symfony\Bridge\Twig\Translation\TwigExtractor">
       <tag name="translation.extractor" alias="twig"/>
       <argument type="service" id="twig"/>
-    </service>
-    <service id="workflow.twig_extension" class="Symfony\Bridge\Twig\Extension\WorkflowExtension">
-      <tag name="twig.extension"/>
-      <argument type="service" id="workflow.registry"/>
     </service>
     <service id="twig.configurator.environment" class="Symfony\Bundle\TwigBundle\DependencyInjection\Configurator\EnvironmentConfigurator">
       <argument>F j, Y H:i</argument>
@@ -7402,6 +7284,7 @@
         <argument type="service" id=".security.request_matcher.kvhUQNO"/>
         <argument type="collection">
           <argument>ROLE_AGRICULTEUR</argument>
+          <argument>ROLE_OUVRIER</argument>
         </argument>
         <argument>null</argument>
       </call>
@@ -7417,6 +7300,7 @@
         <argument type="collection">
           <argument>ROLE_ADMIN</argument>
           <argument>ROLE_AGRICULTEUR</argument>
+          <argument>ROLE_OUVRIER</argument>
         </argument>
         <argument>null</argument>
       </call>
@@ -8493,6 +8377,50 @@
       <argument>page</argument>
       <argument>false</argument>
     </service>
+    <service id="stof_doctrine_extensions.tool.actor_provider" class="Stof\DoctrineExtensionsBundle\Tool\TokenStorageActorProvider">
+      <argument type="service" id="security.token_storage" on-invalid="null"/>
+      <argument type="service" id="security.authorization_checker" on-invalid="null"/>
+    </service>
+    <service id="stof_doctrine_extensions.tool.ip_address_provider" class="Stof\DoctrineExtensionsBundle\Tool\RequestStackIpAddressProvider">
+      <argument type="service" id="request_stack" on-invalid="null"/>
+    </service>
+    <service id="stof_doctrine_extensions.listener.translatable" class="Gedmo\Translatable\TranslatableListener">
+      <tag name="doctrine.event_listener" connection="default" priority="-10" event="postLoad"/>
+      <tag name="doctrine.event_listener" connection="default" priority="-10" event="postPersist"/>
+      <tag name="doctrine.event_listener" connection="default" priority="-10" event="preFlush"/>
+      <tag name="doctrine.event_listener" connection="default" priority="-10" event="onFlush"/>
+      <tag name="doctrine.event_listener" connection="default" priority="-10" event="loadClassMetadata"/>
+      <call method="setCacheItemPool">
+        <argument type="service" id="stof_doctrine_extensions.metadata_cache"/>
+      </call>
+      <call method="setAnnotationReader">
+        <argument type="service" id=".stof_doctrine_extensions.reader" on-invalid="ignore"/>
+      </call>
+      <call method="setDefaultLocale">
+        <argument>en</argument>
+      </call>
+      <call method="setTranslatableLocale">
+        <argument>en</argument>
+      </call>
+      <call method="setTranslationFallback">
+        <argument>false</argument>
+      </call>
+      <call method="setPersistDefaultLocaleTranslation">
+        <argument>false</argument>
+      </call>
+      <call method="setSkipOnLoad">
+        <argument>false</argument>
+      </call>
+    </service>
+    <service id="stof_doctrine_extensions.tool.locale_synchronizer" class="Stof\DoctrineExtensionsBundle\Tool\LocaleSynchronizer">
+      <tag name="kernel.locale_aware"/>
+      <argument type="service" id="stof_doctrine_extensions.listener.translatable"/>
+    </service>
+    <service id="stof_doctrine_extensions.event_listener.locale" class="Stof\DoctrineExtensionsBundle\EventListener\LocaleListener">
+      <argument type="service" id="stof_doctrine_extensions.listener.translatable"/>
+      <deprecated package="stof/doctrine-extensions-bundle" version="1.14">The "%service_id%" service is deprecated and will be removed in 2.0. The "stof_doctrine_extensions.tool.locale_synchronizer" service should be used to provide the locale instead.</deprecated>
+    </service>
+    <service id="stof_doctrine_extensions.metadata_cache" class="Symfony\Component\Cache\Adapter\ArrayAdapter"/>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\AboutController" class="App\Controller\AboutController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\AboutController" class="App\Controller\AboutController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\AboutController" class="App\Controller\AboutController" autowire="true" autoconfigure="true" abstract="true"/>
@@ -9601,13 +9529,15 @@
         <argument key="tacheRepo" type="service_closure" id="App\Repository\User\TacheRepository"/>
       </argument>
     </service>
-    <service id=".service_locator.r3OQCmv" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.CS4z9zf" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="animauxRepo" type="service_closure" id="App\Repository\Animals\AnimauxRepository"/>
         <argument key="machineRepo" type="service_closure" id="App\Repository\Materiels\MachineRepository"/>
+        <argument key="maintenanceRepo" type="service_closure" id="App\Repository\Materiels\MaintenanceRepository"/>
         <argument key="plantesRepo" type="service_closure" id="App\Repository\Terrain\PlanteRepository"/>
         <argument key="tacheRepo" type="service_closure" id="App\Repository\User\TacheRepository"/>
+        <argument key="taskTranslator" type="service_closure" id="App\Service\TaskTranslator"/>
         <argument key="terrainRepo" type="service_closure" id="App\Repository\Terrain\TerrainRepository"/>
         <argument key="userRepo" type="service_closure" id="App\Repository\User\UserRepository"/>
       </argument>
@@ -9767,7 +9697,7 @@
         <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
       </argument>
     </service>
-    <service id=".service_locator.2Z1q.5_" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.KYbQRH0" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Controller\AdminDashboardController::index" type="service_closure" id=".service_locator.qni5W9T"/>
@@ -9935,7 +9865,7 @@
         <argument key="App\Controller\User\OffreFrontController::souscrire" type="service_closure" id=".service_locator.10ih3yF"/>
         <argument key="App\Controller\User\OuvrierController::changerStatut" type="service_closure" id=".service_locator.pl5XVUK"/>
         <argument key="App\Controller\User\OuvrierController::home" type="service_closure" id=".service_locator.3Vzszbx"/>
-        <argument key="App\Controller\User\OuvrierController::taches" type="service_closure" id=".service_locator.r3OQCmv"/>
+        <argument key="App\Controller\User\OuvrierController::taches" type="service_closure" id=".service_locator.CS4z9zf"/>
         <argument key="App\Controller\User\Ouvrier_agriController::ajouterTache" type="service_closure" id=".service_locator.X8q_9sW"/>
         <argument key="App\Controller\User\Ouvrier_agriController::assignationAuto" type="service_closure" id=".service_locator.IQrhfKn"/>
         <argument key="App\Controller\User\Ouvrier_agriController::deleteOuvrier" type="service_closure" id=".service_locator.X8q_9sW"/>
@@ -10145,7 +10075,7 @@
         <argument key="App\Controller\User\OffreFrontController:souscrire" type="service_closure" id=".service_locator.10ih3yF"/>
         <argument key="App\Controller\User\OuvrierController:changerStatut" type="service_closure" id=".service_locator.pl5XVUK"/>
         <argument key="App\Controller\User\OuvrierController:home" type="service_closure" id=".service_locator.3Vzszbx"/>
-        <argument key="App\Controller\User\OuvrierController:taches" type="service_closure" id=".service_locator.r3OQCmv"/>
+        <argument key="App\Controller\User\OuvrierController:taches" type="service_closure" id=".service_locator.CS4z9zf"/>
         <argument key="App\Controller\User\Ouvrier_agriController:ajouterTache" type="service_closure" id=".service_locator.X8q_9sW"/>
         <argument key="App\Controller\User\Ouvrier_agriController:assignationAuto" type="service_closure" id=".service_locator.IQrhfKn"/>
         <argument key="App\Controller\User\Ouvrier_agriController:deleteOuvrier" type="service_closure" id=".service_locator.X8q_9sW"/>
@@ -10482,15 +10412,7 @@
       <argument type="service" id="http_client.uri_template"/>
       <argument type="service" id="debug.stopwatch" on-invalid="ignore"/>
     </service>
-    <service id="debug.state_machine.machine_lifecycle" class="Symfony\Component\Workflow\Debug\TraceableWorkflow">
-      <tag name="machine_lifecycle">workflow</tag>
-      <tag name="machine_lifecycle">workflow.state_machine</tag>
-      <tag name="kernel.reset" method="reset"/>
-      <tag name="container.decorator" id="state_machine.machine_lifecycle" inner="debug.state_machine.machine_lifecycle.inner"/>
-      <argument type="service" id="debug.state_machine.machine_lifecycle.inner"/>
-      <argument type="service" id="debug.stopwatch"/>
-    </service>
-    <service id=".service_locator.MfxSDRP" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.vtjw4Bs" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="doctrine.orm.default_listeners.attach_entity_listeners" type="service_closure" id="doctrine.orm.default_listeners.attach_entity_listeners"/>
@@ -10499,6 +10421,7 @@
         <argument key="doctrine.orm.listeners.lock_store_schema_listener" type="service_closure" id="doctrine.orm.listeners.lock_store_schema_listener"/>
         <argument key="doctrine.orm.listeners.pdo_session_handler_schema_listener" type="service_closure" id="doctrine.orm.listeners.pdo_session_handler_schema_listener"/>
         <argument key="doctrine.orm.messenger.doctrine_schema_listener" type="service_closure" id="doctrine.orm.messenger.doctrine_schema_listener"/>
+        <argument key="stof_doctrine_extensions.listener.translatable" type="service_closure" id="stof_doctrine_extensions.listener.translatable"/>
         <argument key="turbo.doctrine.event_listener" type="service_closure" id="turbo.doctrine.event_listener"/>
       </argument>
     </service>
@@ -10668,17 +10591,6 @@
       </call>
       <configurator service="debug.debug_logger_configurator" method="pushDebugLogger"/>
     </service>
-    <service id="monolog.logger.workflow" class="Monolog\Logger">
-      <tag name="monolog.channel_logger"/>
-      <argument>workflow</argument>
-      <call method="pushHandler">
-        <argument type="service" id="monolog.handler.console"/>
-      </call>
-      <call method="pushHandler">
-        <argument type="service" id="monolog.handler.main"/>
-      </call>
-      <configurator service="debug.debug_logger_configurator" method="pushDebugLogger"/>
-    </service>
     <service id="monolog.logger.php" class="Monolog\Logger">
       <tag name="monolog.channel_logger"/>
       <argument>php</argument>
@@ -10762,6 +10674,7 @@
       <configurator service="debug.debug_logger_configurator" method="pushDebugLogger"/>
     </service>
     <service id="monolog.handler.null_internal" class="Monolog\Handler\NullHandler"/>
+    <service id=".stof_doctrine_extensions.reader" class="Gedmo\Mapping\Driver\AttributeReader"/>
     <service id=".service_locator.yY.p4P7" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -11198,17 +11111,17 @@
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.fuYM_Z." method="withContext"/>
     </service>
-    <service id=".service_locator.b.mdbP7" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.DjrhxxF" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="routing.loader" type="service_closure" id="routing.loader"/>
       </argument>
     </service>
-    <service id=".service_locator.b.mdbP7.router.default" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.DjrhxxF.router.default" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="router.default"/>
       <argument>router.default</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.b.mdbP7" method="withContext"/>
+      <factory service=".service_locator.DjrhxxF" method="withContext"/>
     </service>
     <service id=".service_locator.cUcW89y" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
@@ -11274,12 +11187,6 @@
       <argument type="collection">
         <argument key="event_dispatcher" type="service_closure" id="debug.event_dispatcher"/>
         <argument key="security.event_dispatcher.main" type="service_closure" id="debug.security.event_dispatcher.main"/>
-      </argument>
-    </service>
-    <service id=".service_locator.BgCVgBJ" class="Symfony\Component\DependencyInjection\ServiceLocator">
-      <tag name="container.service_locator"/>
-      <argument type="collection">
-        <argument key="machine_lifecycle" type="service_closure" id="debug.state_machine.machine_lifecycle"/>
       </argument>
     </service>
     <service id=".service_locator.LD5oJC8" class="Symfony\Component\DependencyInjection\ServiceLocator">
@@ -11604,18 +11511,6 @@
         <argument type="service" id="messenger.bus.default.middleware.handle_message"/>
       </argument>
     </service>
-    <service id="debug.state_machine.machine_lifecycle.inner" class="Symfony\Component\Workflow\StateMachine">
-      <argument type="service" id="state_machine.machine_lifecycle.definition"/>
-      <argument type="service">
-        <service class="Symfony\Component\Workflow\MarkingStore\MethodMarkingStore">
-          <argument>true</argument>
-          <argument>statut</argument>
-        </service>
-      </argument>
-      <argument type="service" id="debug.event_dispatcher" on-invalid="ignore"/>
-      <argument>machine_lifecycle</argument>
-      <argument>null</argument>
-    </service>
     <service id=".doctrine.orm.default_metadata_driver.inner" class="Doctrine\Persistence\Mapping\Driver\MappingDriverChain">
       <call method="addDriver">
         <argument type="service" id="doctrine.orm.default_attribute_metadata_driver"/>
@@ -11939,13 +11834,6 @@
       <argument>Push translations to a given provider.</argument>
       <argument>false</argument>
       <argument type="service_closure" id="console.command.translation_push"/>
-    </service>
-    <service id=".console.command.workflow_dump.lazy" class="Symfony\Component\Console\Command\LazyCommand">
-      <argument>workflow:dump</argument>
-      <argument type="collection"/>
-      <argument>Dump a workflow</argument>
-      <argument>false</argument>
-      <argument type="service_closure" id="console.command.workflow_dump"/>
     </service>
     <service id=".console.command.xliff_lint.lazy" class="Symfony\Component\Console\Command\LazyCommand">
       <argument>lint:xliff</argument>
@@ -12402,7 +12290,7 @@
     </service>
     <service id="console.command_loader" class="Symfony\Component\Console\CommandLoader\ContainerCommandLoader" public="true">
       <tag name="container.no_preload"/>
-      <argument type="service" id=".service_locator.rSUYv03"/>
+      <argument type="service" id=".service_locator.hrajTIt"/>
       <argument type="collection">
         <argument key="about">console.command.about</argument>
         <argument key="assets:install">console.command.assets_install</argument>
@@ -12436,7 +12324,6 @@
         <argument key="debug:validator">console.command.validator_debug</argument>
         <argument key="translation:pull">console.command.translation_pull</argument>
         <argument key="translation:push">console.command.translation_push</argument>
-        <argument key="workflow:dump">console.command.workflow_dump</argument>
         <argument key="lint:xliff">console.command.xliff_lint</argument>
         <argument key="lint:yaml">console.command.yaml_lint</argument>
         <argument key="debug:form">console.command.form_debug</argument>
@@ -12523,7 +12410,7 @@
         <argument key="make:webhook">maker.auto_command.make_webhook</argument>
       </argument>
     </service>
-    <service id=".service_locator.rSUYv03" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.hrajTIt" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="console.command.about" type="service_closure" id=".console.command.about.lazy"/>
@@ -12558,7 +12445,6 @@
         <argument key="console.command.validator_debug" type="service_closure" id=".console.command.validator_debug.lazy"/>
         <argument key="console.command.translation_pull" type="service_closure" id=".console.command.translation_pull.lazy"/>
         <argument key="console.command.translation_push" type="service_closure" id=".console.command.translation_push.lazy"/>
-        <argument key="console.command.workflow_dump" type="service_closure" id=".console.command.workflow_dump.lazy"/>
         <argument key="console.command.xliff_lint" type="service_closure" id=".console.command.xliff_lint.lazy"/>
         <argument key="console.command.yaml_lint" type="service_closure" id=".console.command.yaml_lint.lazy"/>
         <argument key="console.command.form_debug" type="service_closure" id=".console.command.form_debug.lazy"/>
@@ -12645,7 +12531,7 @@
     <service id="cache.app.recorder_inner" class="Symfony\Component\Cache\Adapter\FilesystemAdapter">
       <argument>V3r2+IAK+b</argument>
       <argument>0</argument>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/app</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/app</argument>
       <argument type="service" id="cache.default_marshaller" on-invalid="ignore"/>
       <call method="setLogger">
         <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
@@ -12655,7 +12541,7 @@
       <argument>VDMa2z-Ns2</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -12663,7 +12549,7 @@
       <argument>4SKo0Ud+iV</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -12671,7 +12557,7 @@
       <argument>elH9ffFWAh</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -12679,7 +12565,7 @@
       <argument>tvUCEMx2lP</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -12687,7 +12573,7 @@
       <argument>mKK9yXSYB9</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -12695,14 +12581,14 @@
       <argument>eBIOPthAm5</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
     <service id="cache.messenger.restart_workers_signal.recorder_inner" class="Symfony\Component\Cache\Adapter\FilesystemAdapter">
       <argument>vkC3p+AY5E</argument>
       <argument>0</argument>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/app</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/app</argument>
       <argument type="service" id="cache.default_marshaller" on-invalid="ignore"/>
       <call method="setLogger">
         <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
@@ -12712,7 +12598,7 @@
       <argument>QFs9HgwAGB</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -12722,7 +12608,7 @@
       <argument>GcFxJ9F4EC</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -12730,7 +12616,7 @@
       <argument>W+caoUdv9h</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
+      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -12795,11 +12681,6 @@
     <service id="Symfony\Component\Translation\LocaleSwitcher" alias="translation.locale_switcher"/>
     <service id="translator" alias="translator.data_collector" public="true"/>
     <service id="translator.formatter" alias="translator.formatter.default"/>
-    <service id="Symfony\Component\Workflow\Registry" alias="workflow.registry"/>
-    <service id=".Symfony\Component\Workflow\WorkflowInterface $machine_lifecycle.state_machine" alias="debug.state_machine.machine_lifecycle"/>
-    <service id="Symfony\Component\Workflow\WorkflowInterface $machineLifecycleStateMachine" alias="debug.state_machine.machine_lifecycle"/>
-    <service id=".Symfony\Component\Workflow\WorkflowInterface $machine_lifecycle" alias="debug.state_machine.machine_lifecycle"/>
-    <service id="Symfony\Component\Workflow\WorkflowInterface $machineLifecycle" alias="debug.state_machine.machine_lifecycle"/>
     <service id="Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter" alias="debug.file_link_formatter"/>
     <service id="Symfony\Component\Stopwatch\Stopwatch" alias="debug.stopwatch"/>
     <service id="routing.loader.annotation" alias="routing.loader.attribute">
@@ -12932,7 +12813,7 @@
     <service id="Knp\Component\Pager\ArgumentAccess\ArgumentAccessInterface" alias="Knp\Component\Pager\ArgumentAccess\RequestArgumentAccess"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.w7.f4fT" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.2Z1q.5_"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.KYbQRH0"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id=".Psr\Log\LoggerInterface $request.logger" alias="monolog.logger.request"/>
@@ -12951,8 +12832,6 @@
     <service id="Psr\Log\LoggerInterface $mailerLogger" alias="monolog.logger.mailer"/>
     <service id=".Psr\Log\LoggerInterface $translation.logger" alias="monolog.logger.translation"/>
     <service id="Psr\Log\LoggerInterface $translationLogger" alias="monolog.logger.translation"/>
-    <service id=".Psr\Log\LoggerInterface $workflow.logger" alias="monolog.logger.workflow"/>
-    <service id="Psr\Log\LoggerInterface $workflowLogger" alias="monolog.logger.workflow"/>
     <service id=".Psr\Log\LoggerInterface $php.logger" alias="monolog.logger.php"/>
     <service id="Psr\Log\LoggerInterface $phpLogger" alias="monolog.logger.php"/>
     <service id=".Psr\Log\LoggerInterface $event.logger" alias="monolog.logger.event"/>
@@ -13000,7 +12879,7 @@
     <service id=".service_locator.ahE6ilb" alias=".service_locator.CLxInnv"/>
     <service id=".service_locator.d0U0rWZ" alias=".service_locator.jDXJRjC"/>
     <service id=".service_locator.oaRQYyJ" alias=".service_locator.10ih3yF"/>
-    <service id=".service_locator.0NIJ2B4" alias=".service_locator.r3OQCmv"/>
+    <service id=".service_locator.Ac5UHLf" alias=".service_locator.CS4z9zf"/>
     <service id=".service_locator.pwqUmIQ" alias=".service_locator.pl5XVUK"/>
     <service id=".service_locator.Pc55owN" alias=".service_locator.sYplRBf"/>
     <service id=".service_locator.1Xi3sbE" alias=".service_locator.yRx.v7d"/>
@@ -13013,12 +12892,12 @@
     <service id=".service_locator.5pebkNV" alias=".service_locator.xxq2prQ"/>
     <service id=".service_locator.whdse4m" alias=".service_locator.yd.AI8F"/>
     <service id=".service_locator.8J1nalj" alias=".service_locator.SsD9eLO"/>
-    <service id=".service_locator.dsn0OMO" alias=".service_locator.2Z1q.5_"/>
+    <service id=".service_locator.PgPWAMi" alias=".service_locator.KYbQRH0"/>
     <service id=".service_locator.BFrsqsn" alias=".service_locator.F9PKc.7"/>
     <service id=".service_locator.oIHygA7" alias=".service_locator.xOkKGYY"/>
-    <service id=".service_locator.XtmiKbi" alias=".service_locator.MfxSDRP"/>
+    <service id=".service_locator.3ijAwyK" alias=".service_locator.vtjw4Bs"/>
     <service id=".service_locator.O24_MAy" alias=".service_locator.yY.p4P7"/>
-    <service id=".service_locator.QXk7HJ." alias=".service_locator.NCHITyE"/>
+    <service id=".service_locator.irYFrHC" alias=".service_locator.NCHITyE"/>
     <service id="validator" alias="debug.validator"/>
     <service id="http_client" alias=".debug.http_client"/>
     <service id=".debug.http_client.inner" alias="http_client.uri_template"/>
@@ -13037,7 +12916,6 @@
     <service id="security.firewall.authenticator.main" alias="debug.security.firewall.authenticator.main"/>
     <service id="security.authentication.trust_resolver" alias="scheb_two_factor.security.authentication.trust_resolver"/>
     <service id="messenger.bus.default" alias="debug.traced.messenger.bus.default"/>
-    <service id="state_machine.machine_lifecycle" alias="debug.state_machine.machine_lifecycle"/>
     <service id="doctrine.orm.default_metadata_driver" alias=".doctrine.orm.default_metadata_driver"/>
     <service id="security.event_dispatcher.main" alias="debug.security.event_dispatcher.main"/>
     <service id=".service_locator.gFlme_s" alias=".service_locator.y4_Zrx."/>
@@ -13110,7 +12988,7 @@
     <service id=".service_locator.VwLHYWS" alias=".service_locator.jDXJRjC"/>
     <service id=".service_locator.f8hoWXX" alias=".service_locator.10ih3yF"/>
     <service id=".service_locator.bVGge6n" alias=".service_locator.3Vzszbx"/>
-    <service id=".service_locator.BG1Io5D" alias=".service_locator.r3OQCmv"/>
+    <service id=".service_locator.e2t3h0r" alias=".service_locator.CS4z9zf"/>
     <service id=".service_locator.vv0pyJg" alias=".service_locator.pl5XVUK"/>
     <service id=".service_locator.HAVR4ss" alias=".service_locator.sYplRBf"/>
     <service id=".service_locator.0D4RXPd" alias=".service_locator.yRx.v7d"/>
@@ -13132,7 +13010,7 @@
     <service id=".service_locator.XLFJUB8" alias=".service_locator.SsD9eLO"/>
     <service id=".service_locator.Z2DAUc_" alias=".service_locator.OlTlOHR"/>
     <service id=".service_locator.Odyyg4J" alias=".service_locator.zy9Sz.w"/>
-    <service id=".service_locator.TTxx.p2" alias=".service_locator.NCHITyE"/>
+    <service id=".service_locator.dMBjTU1" alias=".service_locator.NCHITyE"/>
     <service id=".service_locator.dGUCsbe" alias=".service_locator.oR77BOj"/>
     <service id=".service_locator._kIAbz1" alias=".service_locator.TpoC7U9"/>
     <service id=".service_locator.hnz5ZNh" alias=".service_locator.0TACwl3"/>

@@ -364,8 +364,8 @@
                                     {% if m.nom %}
                                         <span class="tl-machine">
                                             <i class="bi bi-truck"></i> ·
-                                            <a href="{{ path('admin_machines_show', {id: m.idM}) }}">{{ m.nom }}</a>
-                                            <span style="color:#d8d1c1">#{{ m.idM }}</span>
+                                            <a href="{{ path('admin_machines_show', {id: m.idM.id}) }}">{{ m.nom }}</a>
+                                            <span style="color:#d8d1c1">#{{ m.idM.id }}</span>
                                         </span>
                                     {% endif %}
                                 </div>

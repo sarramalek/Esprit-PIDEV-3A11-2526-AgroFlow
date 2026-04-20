@@ -4,6 +4,7 @@ namespace App\Entity\Materiels;
 
 use App\Repository\Materiels\MaintenanceRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Materiels\Machine;
 
 #[ORM\Entity(repositoryClass: MaintenanceRepository::class)]
 #[ORM\Table(name: 'maintenance')]
@@ -26,8 +27,9 @@ class Maintenance
     #[ORM\Column(name: 'description', length: 255, nullable: true)]
     private ?string $description = null;
 
-    #[ORM\Column(name: 'idM', type: 'integer', nullable: true)]
-    private ?int $idM = null;
+    #[ORM\ManyToOne(targetEntity: Machine::class)]
+#[ORM\JoinColumn(name: 'idM', referencedColumnName: 'idM', nullable: true)]
+private ?Machine $idM = null;
 
     #[ORM\Column(name: 'statut', type: 'string', columnDefinition: "ENUM('en_cours','termine','planifie')", options: ['default' => 'planifie'])]
     private ?string $statut = 'planifie';
@@ -106,12 +108,12 @@ class Maintenance
         return $this;
     }
 
-    public function getIdM(): ?int
+    public function getIdM(): ?Machine
     {
         return $this->idM;
     }
 
-    public function setIdM(?int $idM): static
+    public function setIdM(?Machine $idM): static
     {
         $this->idM = $idM;
         return $this;
