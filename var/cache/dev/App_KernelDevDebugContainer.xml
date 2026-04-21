@@ -9,8 +9,8 @@
     <parameter key="kernel.runtime_mode.cli">%env(not:default:kernel.runtime_mode.web:)%</parameter>
     <parameter key="kernel.runtime_mode.worker">%env(bool:default::key:worker:default:kernel.runtime_mode:)%</parameter>
     <parameter key="kernel.debug">true</parameter>
-    <parameter key="kernel.build_dir">C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev</parameter>
-    <parameter key="kernel.cache_dir">C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev</parameter>
+    <parameter key="kernel.build_dir">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev</parameter>
+    <parameter key="kernel.cache_dir">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev</parameter>
     <parameter key="kernel.logs_dir">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\log</parameter>
     <parameter key="kernel.bundles" type="collection">
       <parameter key="FrameworkBundle">Symfony\Bundle\FrameworkBundle\FrameworkBundle</parameter>
@@ -134,15 +134,15 @@
     <parameter key="translator.logging">false</parameter>
     <parameter key="translator.default_path">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/translations</parameter>
     <parameter key="debug.error_handler.throw_at">-1</parameter>
-    <parameter key="debug.container.dump">C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/App_KernelDevDebugContainer.xml</parameter>
+    <parameter key="debug.container.dump">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/App_KernelDevDebugContainer.xml</parameter>
     <parameter key="router.request_context.host">localhost</parameter>
     <parameter key="router.request_context.scheme">http</parameter>
     <parameter key="router.request_context.base_url"></parameter>
     <parameter key="router.resource">kernel::loadRoutes</parameter>
-    <parameter key="router.cache_dir">C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev</parameter>
+    <parameter key="router.cache_dir">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev</parameter>
     <parameter key="request_listener.http_port">80</parameter>
     <parameter key="request_listener.https_port">443</parameter>
-    <parameter key="serializer.mapping.cache.file">C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/serialization.php</parameter>
+    <parameter key="serializer.mapping.cache.file">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/serialization.php</parameter>
     <parameter key="cache.prefix.seed">_C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow.App_KernelDevDebugContainer</parameter>
     <parameter key="session.metadata.storage_key">_sf2_meta</parameter>
     <parameter key="session.storage.options" type="collection">
@@ -157,11 +157,11 @@
     <parameter key="session.metadata.update_threshold">0</parameter>
     <parameter key="form.type_extension.csrf.enabled">true</parameter>
     <parameter key="form.type_extension.csrf.field_name">_token</parameter>
-    <parameter key="validator.mapping.cache.file">C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/validation.php</parameter>
+    <parameter key="validator.mapping.cache.file">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/validation.php</parameter>
     <parameter key="validator.translation_domain">validators</parameter>
     <parameter key="profiler_listener.only_exceptions">false</parameter>
     <parameter key="profiler_listener.only_main_requests">false</parameter>
-    <parameter key="profiler.storage.dsn">file:C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/profiler</parameter>
+    <parameter key="profiler.storage.dsn">file:C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/profiler</parameter>
     <parameter key="doctrine.dbal.configuration.class">Doctrine\DBAL\Configuration</parameter>
     <parameter key="doctrine.data_collector.class">Doctrine\Bundle\DoctrineBundle\DataCollector\DoctrineDataCollector</parameter>
     <parameter key="doctrine.dbal.connection.event_manager.class">Symfony\Bridge\Doctrine\ContainerAwareEventManager</parameter>
@@ -228,7 +228,7 @@
     <parameter key="doctrine.orm.auto_generate_proxy_classes">true</parameter>
     <parameter key="doctrine.orm.enable_lazy_ghost_objects">true</parameter>
     <parameter key="doctrine.orm.enable_native_lazy_objects">false</parameter>
-    <parameter key="doctrine.orm.proxy_dir">C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/doctrine/orm/Proxies</parameter>
+    <parameter key="doctrine.orm.proxy_dir">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/doctrine/orm/Proxies</parameter>
     <parameter key="doctrine.orm.proxy_namespace">Proxies</parameter>
     <parameter key="doctrine.migrations.preferred_em">null</parameter>
     <parameter key="doctrine.migrations.preferred_connection">null</parameter>
@@ -403,6 +403,17 @@
     <service id="App\Entity" class="App\Entity" abstract="true">
       <tag name="container.excluded" source="in &quot;config/services.yaml&quot;"/>
     </service>
+    <service id="App\Command\Animals\UpdateRemindersCommand" class="App\Command\Animals\UpdateRemindersCommand" autowire="true" autoconfigure="true">
+      <tag name="console.command"/>
+      <tag name="container.no_preload"/>
+      <argument type="service" id="App\Service\Animals\ReminderService"/>
+      <call method="setName">
+        <argument>app:reminders:update</argument>
+      </call>
+      <call method="setDescription">
+        <argument>Met à jour automatiquement les rappels pour tous les examens</argument>
+      </call>
+    </service>
     <service id="App\Controller\AboutController" class="App\Controller\AboutController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
@@ -464,6 +475,13 @@
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
         <argument type="service" id=".service_locator.NCHITyE.App\Controller\Animals\ExamensController"/>
+      </call>
+    </service>
+    <service id="App\Controller\Animals\ReminderController" class="App\Controller\Animals\ReminderController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.NCHITyE.App\Controller\Animals\ReminderController"/>
       </call>
     </service>
     <service id="App\Controller\AuthController" class="App\Controller\AuthController" public="true" autowire="true" autoconfigure="true">
@@ -535,6 +553,13 @@
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
         <argument type="service" id=".service_locator.NCHITyE.App\Controller\HomeController"/>
+      </call>
+    </service>
+    <service id="App\Controller\LocaleController" class="App\Controller\LocaleController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.NCHITyE.App\Controller\LocaleController"/>
       </call>
     </service>
     <service id="App\Controller\Materiels\MachineController" class="App\Controller\Materiels\MachineController" public="true" autowire="true" autoconfigure="true">
@@ -735,6 +760,10 @@
       <tag name="container.error" message="The autoloader expected class &quot;App\EventListener\TwoFactorLListener&quot; to be defined in file &quot;C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\EventListener\TwoFactorLListener.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
       <tag name="container.error" message="Invalid service &quot;App\EventListener\TwoFactorLListener&quot;: the autoloader expected class &quot;App\EventListener\TwoFactorLListener&quot; to be defined in file &quot;C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\EventListener\TwoFactorLListener.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
     </service>
+    <service id="App\EventSubscriber\LocaleSubscriber" class="App\EventSubscriber\LocaleSubscriber" autowire="true" autoconfigure="true">
+      <tag name="kernel.event_subscriber"/>
+      <tag name="container.hot_path"/>
+    </service>
     <service id="App\Form\Animals\Admin\AdminAnimauxType" class="App\Form\Animals\Admin\AdminAnimauxType" autowire="true" autoconfigure="true">
       <tag name="form.type"/>
     </service>
@@ -908,6 +937,21 @@
       <argument type="service" id="App\Service\GrokService"/>
       <argument type="service" id="App\Service\DatabaseReaderService"/>
     </service>
+    <service id="App\Service\Animals\OpenFoodFactsService" class="App\Service\Animals\OpenFoodFactsService" autowire="true" autoconfigure="true">
+      <argument type="service" id=".debug.http_client"/>
+      <argument type="service" id="cache.app"/>
+    </service>
+    <service id="App\Service\Animals\ReminderService" class="App\Service\Animals\ReminderService" autowire="true" autoconfigure="true">
+      <argument type="service" id="doctrine.orm.default_entity_manager"/>
+      <argument type="service" id="App\Repository\Animals\ExamenRepository"/>
+    </service>
+    <service id="App\Service\Animals\RescueGroupsService" class="App\Service\Animals\RescueGroupsService" autowire="true" autoconfigure="true">
+      <argument type="service" id="cache.app"/>
+    </service>
+    <service id="App\Service\Animals\WikipediaService" class="App\Service\Animals\WikipediaService" autowire="true" autoconfigure="true">
+      <argument type="service" id=".debug.http_client"/>
+      <argument type="service" id="cache.app"/>
+    </service>
     <service id="App\Service\AssignationAutoService" class="App\Service\AssignationAutoService" autowire="true" autoconfigure="true">
       <argument type="service" id="App\Repository\User\TacheRepository"/>
       <argument type="service" id="App\Repository\Terrain\TerrainRepository"/>
@@ -989,7 +1033,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.KYbQRH0"/>
+      <argument type="service" id=".service_locator.bDMgK3V"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -1072,7 +1116,7 @@
       </argument>
     </service>
     <service id="http_cache.store" class="Symfony\Component\HttpKernel\HttpCache\Store">
-      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/http_cache</argument>
+      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/http_cache</argument>
     </service>
     <service id="url_helper" class="Symfony\Component\HttpFoundation\UrlHelper">
       <argument type="service" id="request_stack"/>
@@ -1082,7 +1126,7 @@
       <tag name="container.no_preload"/>
       <argument type="tagged_iterator" tag="kernel.cache_warmer"/>
       <argument>true</argument>
-      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/App_KernelDevDebugContainerDeprecations.log</argument>
+      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/App_KernelDevDebugContainerDeprecations.log</argument>
     </service>
     <service id="cache_clearer" class="Symfony\Component\HttpKernel\CacheClearer\ChainCacheClearer">
       <argument type="tagged_iterator" tag="kernel.cache_clearer"/>
@@ -2107,7 +2151,7 @@
       <argument></argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
+      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -2126,7 +2170,7 @@
       <tag name="monolog.logger" channel="cache"/>
       <argument></argument>
       <argument>0</argument>
-      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/app</argument>
+      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/app</argument>
       <argument type="service" id="cache.default_marshaller" on-invalid="ignore"/>
       <call method="setLogger">
         <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
@@ -2295,7 +2339,7 @@
     <service id="asset_mapper.cached_mapped_asset_factory" class="Symfony\Component\AssetMapper\Factory\CachedMappedAssetFactory">
       <tag name="container.decorator" id="asset_mapper.mapped_asset_factory" inner="asset_mapper.cached_mapped_asset_factory.inner"/>
       <argument type="service" id="asset_mapper.cached_mapped_asset_factory.inner"/>
-      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/asset_mapper</argument>
+      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/asset_mapper</argument>
       <argument>true</argument>
     </service>
     <service id="asset_mapper.repository" class="Symfony\Component\AssetMapper\AssetMapperRepository">
@@ -2670,7 +2714,7 @@
         </argument>
       </argument>
       <argument type="collection">
-        <argument key="cache_dir">C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/translations</argument>
+        <argument key="cache_dir">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/translations</argument>
         <argument key="debug">true</argument>
         <argument key="resource_files" type="collection">
           <argument key="af" type="collection">
@@ -2758,6 +2802,8 @@
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\security-core/Resources/translations\security.es.xlf</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\scheb\2fa-bundle/Resources/translations\SchebTwoFactorBundle.es.yml</argument>
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\knplabs\knp-paginator-bundle/translations\KnpPaginatorBundle.es.xliff</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/translations\messages.es.yaml</argument>
+            <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow/translations\messages.es.yaml</argument>
           </argument>
           <argument key="et" type="collection">
             <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\symfony\validator/Resources/translations\validators.et.xlf</argument>
@@ -3481,6 +3527,14 @@
         <argument>0</argument>
       </call>
       <call method="addListener">
+        <argument>kernel.request</argument>
+        <argument type="collection">
+          <argument type="service_closure" id="App\EventSubscriber\LocaleSubscriber"/>
+          <argument>onKernelRequest</argument>
+        </argument>
+        <argument>20</argument>
+      </call>
+      <call method="addListener">
         <argument>kernel.controller_arguments</argument>
         <argument type="collection">
           <argument type="service_closure" id="argument_resolver.request_payload"/>
@@ -4102,7 +4156,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.KYbQRH0"/>
+      <argument type="service" id=".service_locator.bDMgK3V"/>
     </service>
     <service id="debug.log_processor" class="Symfony\Bridge\Monolog\Processor\DebugProcessor">
       <tag name="kernel.reset" method="reset"/>
@@ -4205,7 +4259,7 @@
       <argument type="service" id=".service_locator.DjrhxxF.router.default"/>
       <argument>kernel::loadRoutes</argument>
       <argument type="collection">
-        <argument key="cache_dir">C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev</argument>
+        <argument key="cache_dir">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev</argument>
         <argument key="debug">true</argument>
         <argument key="generator_class">Symfony\Component\Routing\Generator\CompiledUrlGenerator</argument>
         <argument key="generator_dumper_class">Symfony\Component\Routing\Generator\Dumper\CompiledUrlGeneratorDumper</argument>
@@ -4384,10 +4438,10 @@
           </service>
         </argument>
       </argument>
-      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/serialization.php</argument>
+      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/serialization.php</argument>
     </service>
     <service id="serializer.mapping.cache.symfony" class="Psr\Cache\CacheItemPoolInterface">
-      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/serialization.php</argument>
+      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/serialization.php</argument>
       <argument type="service" id="cache.serializer"/>
       <factory class="Symfony\Component\Cache\Adapter\PhpArrayAdapter" method="create"/>
     </service>
@@ -4525,7 +4579,7 @@
       <argument>true</argument>
     </service>
     <service id="session.storage.factory.mock_file" class="Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorageFactory">
-      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/sessions</argument>
+      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/sessions</argument>
       <argument>MOCKSESSID</argument>
       <argument type="service">
         <service class="Symfony\Component\HttpFoundation\Session\Storage\MetadataBag">
@@ -4731,10 +4785,10 @@
     <service id="validator.mapping.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\ValidatorCacheWarmer">
       <tag name="kernel.cache_warmer"/>
       <argument type="service" id="validator.builder"/>
-      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/validation.php</argument>
+      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/validation.php</argument>
     </service>
     <service id="validator.mapping.cache.adapter" class="Symfony\Component\Cache\Adapter\PhpArrayAdapter" constructor="create">
-      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/validation.php</argument>
+      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/validation.php</argument>
       <argument type="service" id="cache.validator"/>
     </service>
     <service id="validator.validator_factory" class="Symfony\Component\Validator\ContainerConstraintValidatorFactory">
@@ -5418,7 +5472,7 @@
       </call>
     </service>
     <service id="profiler.storage" class="Symfony\Component\HttpKernel\Profiler\FileProfilerStorage">
-      <argument>file:C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/profiler</argument>
+      <argument>file:C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/profiler</argument>
     </service>
     <service id="profiler_listener" class="Symfony\Component\HttpKernel\EventListener\ProfilerListener">
       <tag name="kernel.event_subscriber"/>
@@ -5483,7 +5537,7 @@
       <tag name="monolog.logger" channel="profiler"/>
       <tag name="data_collector" template="@WebProfiler/Collector/logger.html.twig" id="logger" priority="300"/>
       <argument type="service" id="monolog.logger.profiler" on-invalid="ignore"/>
-      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/App_KernelDevDebugContainer</argument>
+      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/App_KernelDevDebugContainer</argument>
       <argument type="service" id=".virtual_request_stack" on-invalid="ignore"/>
     </service>
     <service id="data_collector.time" class="Symfony\Component\HttpKernel\DataCollector\TimeDataCollector">
@@ -6100,7 +6154,7 @@
         <argument type="service" id=".doctrine.orm.default_metadata_driver"/>
       </call>
       <call method="setProxyDir">
-        <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/doctrine/orm/Proxies</argument>
+        <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/doctrine/orm/Proxies</argument>
       </call>
       <call method="setProxyNamespace">
         <argument>Proxies</argument>
@@ -6520,7 +6574,7 @@
       <argument type="service" id="twig.loader.native_filesystem"/>
       <argument type="collection">
         <argument key="autoescape">name</argument>
-        <argument key="cache">C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/twig</argument>
+        <argument key="cache">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/twig</argument>
         <argument key="charset">UTF-8</argument>
         <argument key="debug">true</argument>
         <argument key="strict_variables">true</argument>
@@ -8421,6 +8475,8 @@
       <deprecated package="stof/doctrine-extensions-bundle" version="1.14">The "%service_id%" service is deprecated and will be removed in 2.0. The "stof_doctrine_extensions.tool.locale_synchronizer" service should be used to provide the locale instead.</deprecated>
     </service>
     <service id="stof_doctrine_extensions.metadata_cache" class="Symfony\Component\Cache\Adapter\ArrayAdapter"/>
+    <service id=".instanceof.Symfony\Component\Console\Command\Command.0.App\Command\Animals\UpdateRemindersCommand" class="App\Command\Animals\UpdateRemindersCommand" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Command\Animals\UpdateRemindersCommand" class="App\Command\Animals\UpdateRemindersCommand" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\AboutController" class="App\Controller\AboutController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\AboutController" class="App\Controller\AboutController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\AboutController" class="App\Controller\AboutController" autowire="true" autoconfigure="true" abstract="true"/>
@@ -8448,6 +8504,9 @@
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Animals\ExamensController" class="App\Controller\Animals\ExamensController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Animals\ExamensController" class="App\Controller\Animals\ExamensController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\Animals\ExamensController" class="App\Controller\Animals\ExamensController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Animals\ReminderController" class="App\Controller\Animals\ReminderController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Animals\ReminderController" class="App\Controller\Animals\ReminderController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\Animals\ReminderController" class="App\Controller\Animals\ReminderController" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\AuthController" class="App\Controller\AuthController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\AuthController" class="App\Controller\AuthController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\AuthController" class="App\Controller\AuthController" autowire="true" autoconfigure="true" abstract="true"/>
@@ -8478,6 +8537,9 @@
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\HomeController" class="App\Controller\HomeController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\HomeController" class="App\Controller\HomeController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\HomeController" class="App\Controller\HomeController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\LocaleController" class="App\Controller\LocaleController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\LocaleController" class="App\Controller\LocaleController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\LocaleController" class="App\Controller\LocaleController" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Materiels\MachineController" class="App\Controller\Materiels\MachineController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Materiels\MachineController" class="App\Controller\Materiels\MachineController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\Materiels\MachineController" class="App\Controller\Materiels\MachineController" autowire="true" autoconfigure="true" abstract="true"/>
@@ -8557,6 +8619,8 @@
     <service id=".abstract.instanceof.App\EventListener\LocaleListener" class="App\EventListener\LocaleListener" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\EventDispatcher\EventSubscriberInterface.0.App\EventListener\LogoutListener" class="App\EventListener\LogoutListener" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\EventListener\LogoutListener" class="App\EventListener\LogoutListener" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Component\EventDispatcher\EventSubscriberInterface.0.App\EventSubscriber\LocaleSubscriber" class="App\EventSubscriber\LocaleSubscriber" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\EventSubscriber\LocaleSubscriber" class="App\EventSubscriber\LocaleSubscriber" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\Animals\Admin\AdminAnimauxType" class="App\Form\Animals\Admin\AdminAnimauxType" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Form\Animals\Admin\AdminAnimauxType" class="App\Form\Animals\Admin\AdminAnimauxType" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\Animals\AnimauxType" class="App\Form\Animals\AnimauxType" autowire="true" abstract="true"/>
@@ -9184,16 +9248,25 @@
         <argument key="examen" type="service_closure" id=".errored..service_locator.ST3E3fc.App\Entity\Animals\Examen"/>
       </argument>
     </service>
+    <service id=".service_locator.LxtmzYH" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="animauxRepository" type="service_closure" id="App\Repository\Animals\AnimauxRepository"/>
+        <argument key="paginator" type="service_closure" id="knp_paginator"/>
+        <argument key="rescueGroupsService" type="service_closure" id="App\Service\Animals\RescueGroupsService"/>
+      </argument>
+    </service>
     <service id=".service_locator.CsMkqUa" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
       </argument>
     </service>
-    <service id=".service_locator.9Y9x5wR" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.dqHpXxT" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
-        <argument key="animaux" type="service_closure" id=".errored..service_locator.9Y9x5wR.App\Entity\Animals\Animaux"/>
+        <argument key="animaux" type="service_closure" id=".errored..service_locator.dqHpXxT.App\Entity\Animals\Animaux"/>
+        <argument key="openFoodFactsService" type="service_closure" id="App\Service\Animals\OpenFoodFactsService"/>
       </argument>
     </service>
     <service id=".service_locator.MvMJWd1" class="Symfony\Component\DependencyInjection\ServiceLocator">
@@ -9217,6 +9290,13 @@
         <argument key="repository" type="service_closure" id="App\Repository\Animals\AnimauxRepository"/>
       </argument>
     </service>
+    <service id=".service_locator.rc.WyiS" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="examenRepository" type="service_closure" id="App\Repository\Animals\ExamenRepository"/>
+        <argument key="paginator" type="service_closure" id="knp_paginator"/>
+      </argument>
+    </service>
     <service id=".service_locator.Uyi5bSJ" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -9228,6 +9308,18 @@
       <argument type="collection">
         <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
         <argument key="examen" type="service_closure" id=".errored..service_locator.wH4nX8g.App\Entity\Animals\Examen"/>
+      </argument>
+    </service>
+    <service id=".service_locator.pXYmsG2" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="wikipediaService" type="service_closure" id="App\Service\Animals\WikipediaService"/>
+      </argument>
+    </service>
+    <service id=".service_locator.CNnBks1" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="reminderService" type="service_closure" id="App\Service\Animals\ReminderService"/>
       </argument>
     </service>
     <service id=".service_locator.cK.9e7Y" class="Symfony\Component\DependencyInjection\ServiceLocator">
@@ -9697,7 +9789,7 @@
         <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
       </argument>
     </service>
-    <service id=".service_locator.KYbQRH0" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.bDMgK3V" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Controller\AdminDashboardController::index" type="service_closure" id=".service_locator.qni5W9T"/>
@@ -9739,17 +9831,19 @@
         <argument key="App\Controller\Animals\AnimauxController::edit" type="service_closure" id=".service_locator..4cEOa9"/>
         <argument key="App\Controller\Animals\AnimauxController::exportCard" type="service_closure" id=".service_locator.MvMJWd1"/>
         <argument key="App\Controller\Animals\AnimauxController::exportMedical" type="service_closure" id=".service_locator.MvMJWd1"/>
-        <argument key="App\Controller\Animals\AnimauxController::index" type="service_closure" id=".service_locator.qf5FuHx"/>
+        <argument key="App\Controller\Animals\AnimauxController::index" type="service_closure" id=".service_locator.LxtmzYH"/>
         <argument key="App\Controller\Animals\AnimauxController::match" type="service_closure" id=".service_locator.I4pKEWT"/>
         <argument key="App\Controller\Animals\AnimauxController::new" type="service_closure" id=".service_locator.CsMkqUa"/>
-        <argument key="App\Controller\Animals\AnimauxController::show" type="service_closure" id=".service_locator.9Y9x5wR"/>
+        <argument key="App\Controller\Animals\AnimauxController::show" type="service_closure" id=".service_locator.dqHpXxT"/>
         <argument key="App\Controller\Animals\AnimauxController::stats" type="service_closure" id=".service_locator.qf5FuHx"/>
         <argument key="App\Controller\Animals\ExamensController::delete" type="service_closure" id=".service_locator.wH4nX8g"/>
         <argument key="App\Controller\Animals\ExamensController::edit" type="service_closure" id=".service_locator.wH4nX8g"/>
-        <argument key="App\Controller\Animals\ExamensController::index" type="service_closure" id=".service_locator.tl.X0ws"/>
+        <argument key="App\Controller\Animals\ExamensController::index" type="service_closure" id=".service_locator.rc.WyiS"/>
         <argument key="App\Controller\Animals\ExamensController::new" type="service_closure" id=".service_locator.CsMkqUa"/>
+        <argument key="App\Controller\Animals\ExamensController::searchWikipedia" type="service_closure" id=".service_locator.pXYmsG2"/>
         <argument key="App\Controller\Animals\ExamensController::show" type="service_closure" id=".service_locator.Uyi5bSJ"/>
         <argument key="App\Controller\Animals\ExamensController::stats" type="service_closure" id=".service_locator.tl.X0ws"/>
+        <argument key="App\Controller\Animals\ReminderController::dashboard" type="service_closure" id=".service_locator.CNnBks1"/>
         <argument key="App\Controller\AuthController::banni" type="service_closure" id=".service_locator.5K79pQ6"/>
         <argument key="App\Controller\AuthController::login" type="service_closure" id=".service_locator.cK.9e7Y"/>
         <argument key="App\Controller\AuthController::newPassword" type="service_closure" id=".service_locator.P9wQXFg"/>
@@ -9949,17 +10043,19 @@
         <argument key="App\Controller\Animals\AnimauxController:edit" type="service_closure" id=".service_locator..4cEOa9"/>
         <argument key="App\Controller\Animals\AnimauxController:exportCard" type="service_closure" id=".service_locator.MvMJWd1"/>
         <argument key="App\Controller\Animals\AnimauxController:exportMedical" type="service_closure" id=".service_locator.MvMJWd1"/>
-        <argument key="App\Controller\Animals\AnimauxController:index" type="service_closure" id=".service_locator.qf5FuHx"/>
+        <argument key="App\Controller\Animals\AnimauxController:index" type="service_closure" id=".service_locator.LxtmzYH"/>
         <argument key="App\Controller\Animals\AnimauxController:match" type="service_closure" id=".service_locator.I4pKEWT"/>
         <argument key="App\Controller\Animals\AnimauxController:new" type="service_closure" id=".service_locator.CsMkqUa"/>
-        <argument key="App\Controller\Animals\AnimauxController:show" type="service_closure" id=".service_locator.9Y9x5wR"/>
+        <argument key="App\Controller\Animals\AnimauxController:show" type="service_closure" id=".service_locator.dqHpXxT"/>
         <argument key="App\Controller\Animals\AnimauxController:stats" type="service_closure" id=".service_locator.qf5FuHx"/>
         <argument key="App\Controller\Animals\ExamensController:delete" type="service_closure" id=".service_locator.wH4nX8g"/>
         <argument key="App\Controller\Animals\ExamensController:edit" type="service_closure" id=".service_locator.wH4nX8g"/>
-        <argument key="App\Controller\Animals\ExamensController:index" type="service_closure" id=".service_locator.tl.X0ws"/>
+        <argument key="App\Controller\Animals\ExamensController:index" type="service_closure" id=".service_locator.rc.WyiS"/>
         <argument key="App\Controller\Animals\ExamensController:new" type="service_closure" id=".service_locator.CsMkqUa"/>
+        <argument key="App\Controller\Animals\ExamensController:searchWikipedia" type="service_closure" id=".service_locator.pXYmsG2"/>
         <argument key="App\Controller\Animals\ExamensController:show" type="service_closure" id=".service_locator.Uyi5bSJ"/>
         <argument key="App\Controller\Animals\ExamensController:stats" type="service_closure" id=".service_locator.tl.X0ws"/>
+        <argument key="App\Controller\Animals\ReminderController:dashboard" type="service_closure" id=".service_locator.CNnBks1"/>
         <argument key="App\Controller\AuthController:banni" type="service_closure" id=".service_locator.5K79pQ6"/>
         <argument key="App\Controller\AuthController:login" type="service_closure" id=".service_locator.cK.9e7Y"/>
         <argument key="App\Controller\AuthController:newPassword" type="service_closure" id=".service_locator.P9wQXFg"/>
@@ -10889,6 +10985,12 @@
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.NCHITyE" method="withContext"/>
     </service>
+    <service id=".service_locator.NCHITyE.App\Controller\Animals\ReminderController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\Animals\ReminderController"/>
+      <argument>App\Controller\Animals\ReminderController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.NCHITyE" method="withContext"/>
+    </service>
     <service id=".service_locator.NCHITyE.App\Controller\AuthController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\AuthController"/>
       <argument>App\Controller\AuthController</argument>
@@ -10946,6 +11048,12 @@
     <service id=".service_locator.NCHITyE.App\Controller\HomeController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\HomeController"/>
       <argument>App\Controller\HomeController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.NCHITyE" method="withContext"/>
+    </service>
+    <service id=".service_locator.NCHITyE.App\Controller\LocaleController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\LocaleController"/>
+      <argument>App\Controller\LocaleController</argument>
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.NCHITyE" method="withContext"/>
     </service>
@@ -11282,6 +11390,7 @@
           <argument>App\Controller\Animals\Admin\AdminExamenController</argument>
           <argument>App\Controller\Animals\AnimauxController</argument>
           <argument>App\Controller\Animals\ExamensController</argument>
+          <argument>App\Controller\Animals\ReminderController</argument>
           <argument>App\Controller\AuthController</argument>
           <argument>App\Controller\ChatController</argument>
           <argument>App\Controller\Evenements\Agriculteur\EvenementController</argument>
@@ -11292,6 +11401,7 @@
           <argument>App\Controller\Evenements\Ouvrier\ParticipationController</argument>
           <argument>App\Controller\Evenements\ParticipationController</argument>
           <argument>App\Controller\HomeController</argument>
+          <argument>App\Controller\LocaleController</argument>
           <argument>App\Controller\Materiels\MachineController</argument>
           <argument>App\Controller\Materiels\MaintenancesController</argument>
           <argument>App\Controller\Terrain\AgriPlanteController</argument>
@@ -11533,8 +11643,8 @@
     <service id=".errored..service_locator.ST3E3fc.App\Entity\Animals\Examen" class="App\Entity\Animals\Examen">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.ST3E3fc&quot;: it needs an instance of &quot;App\Entity\Animals\Examen&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
     </service>
-    <service id=".errored..service_locator.9Y9x5wR.App\Entity\Animals\Animaux" class="App\Entity\Animals\Animaux">
-      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.9Y9x5wR&quot;: it needs an instance of &quot;App\Entity\Animals\Animaux&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
+    <service id=".errored..service_locator.dqHpXxT.App\Entity\Animals\Animaux" class="App\Entity\Animals\Animaux">
+      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.dqHpXxT&quot;: it needs an instance of &quot;App\Entity\Animals\Animaux&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
     </service>
     <service id=".errored..service_locator.MvMJWd1.App\Entity\Animals\Animaux" class="App\Entity\Animals\Animaux">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.MvMJWd1&quot;: it needs an instance of &quot;App\Entity\Animals\Animaux&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
@@ -11610,6 +11720,13 @@
     </service>
     <service id=".errored..service_locator.OlTlOHR.App\Entity\stocks\Categorie" class="App\Entity\stocks\Categorie">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.OlTlOHR&quot;: it needs an instance of &quot;App\Entity\stocks\Categorie&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
+    </service>
+    <service id=".App\Command\Animals\UpdateRemindersCommand.lazy" class="Symfony\Component\Console\Command\LazyCommand">
+      <argument>app:reminders:update</argument>
+      <argument type="collection"/>
+      <argument>Met à jour automatiquement les rappels pour tous les examens</argument>
+      <argument>false</argument>
+      <argument type="service_closure" id="App\Command\Animals\UpdateRemindersCommand"/>
     </service>
     <service id=".console.command.about.lazy" class="Symfony\Component\Console\Command\LazyCommand">
       <argument>about</argument>
@@ -12290,8 +12407,9 @@
     </service>
     <service id="console.command_loader" class="Symfony\Component\Console\CommandLoader\ContainerCommandLoader" public="true">
       <tag name="container.no_preload"/>
-      <argument type="service" id=".service_locator.hrajTIt"/>
+      <argument type="service" id=".service_locator.iH0rZCq"/>
       <argument type="collection">
+        <argument key="app:reminders:update">App\Command\Animals\UpdateRemindersCommand</argument>
         <argument key="about">console.command.about</argument>
         <argument key="assets:install">console.command.assets_install</argument>
         <argument key="cache:clear">console.command.cache_clear</argument>
@@ -12410,9 +12528,10 @@
         <argument key="make:webhook">maker.auto_command.make_webhook</argument>
       </argument>
     </service>
-    <service id=".service_locator.hrajTIt" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.iH0rZCq" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
+        <argument key="App\Command\Animals\UpdateRemindersCommand" type="service_closure" id=".App\Command\Animals\UpdateRemindersCommand.lazy"/>
         <argument key="console.command.about" type="service_closure" id=".console.command.about.lazy"/>
         <argument key="console.command.assets_install" type="service_closure" id=".console.command.assets_install.lazy"/>
         <argument key="console.command.cache_clear" type="service_closure" id=".console.command.cache_clear.lazy"/>
@@ -12531,7 +12650,7 @@
     <service id="cache.app.recorder_inner" class="Symfony\Component\Cache\Adapter\FilesystemAdapter">
       <argument>V3r2+IAK+b</argument>
       <argument>0</argument>
-      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/app</argument>
+      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/app</argument>
       <argument type="service" id="cache.default_marshaller" on-invalid="ignore"/>
       <call method="setLogger">
         <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
@@ -12541,7 +12660,7 @@
       <argument>VDMa2z-Ns2</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
+      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -12549,7 +12668,7 @@
       <argument>4SKo0Ud+iV</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
+      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -12557,7 +12676,7 @@
       <argument>elH9ffFWAh</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
+      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -12565,7 +12684,7 @@
       <argument>tvUCEMx2lP</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
+      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -12573,7 +12692,7 @@
       <argument>mKK9yXSYB9</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
+      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -12581,14 +12700,14 @@
       <argument>eBIOPthAm5</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
+      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
     <service id="cache.messenger.restart_workers_signal.recorder_inner" class="Symfony\Component\Cache\Adapter\FilesystemAdapter">
       <argument>vkC3p+AY5E</argument>
       <argument>0</argument>
-      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/app</argument>
+      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/app</argument>
       <argument type="service" id="cache.default_marshaller" on-invalid="ignore"/>
       <call method="setLogger">
         <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
@@ -12598,7 +12717,7 @@
       <argument>QFs9HgwAGB</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
+      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -12608,7 +12727,7 @@
       <argument>GcFxJ9F4EC</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
+      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -12616,7 +12735,7 @@
       <argument>W+caoUdv9h</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:/Users/Lenovo/Desktop/PIweb/user/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
+      <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -12813,7 +12932,7 @@
     <service id="Knp\Component\Pager\ArgumentAccess\ArgumentAccessInterface" alias="Knp\Component\Pager\ArgumentAccess\RequestArgumentAccess"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.w7.f4fT" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.KYbQRH0"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.bDMgK3V"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id=".Psr\Log\LoggerInterface $request.logger" alias="monolog.logger.request"/>
@@ -12860,6 +12979,7 @@
     <service id=".service_locator.Ye5OOWs" alias=".service_locator.cZxzGoz"/>
     <service id=".service_locator.rTC8XR9" alias=".service_locator.p6JsI.h"/>
     <service id=".service_locator.s4yyZIP" alias=".service_locator.ST3E3fc"/>
+    <service id=".service_locator.9oeEJ1g" alias=".service_locator.LxtmzYH"/>
     <service id=".service_locator.ontUAUs" alias=".service_locator.wH4nX8g"/>
     <service id=".service_locator.6RkzpeU" alias=".service_locator.cK.9e7Y"/>
     <service id=".service_locator.IOi49kI" alias=".service_locator.2oEUwKR"/>
@@ -12892,7 +13012,7 @@
     <service id=".service_locator.5pebkNV" alias=".service_locator.xxq2prQ"/>
     <service id=".service_locator.whdse4m" alias=".service_locator.yd.AI8F"/>
     <service id=".service_locator.8J1nalj" alias=".service_locator.SsD9eLO"/>
-    <service id=".service_locator.PgPWAMi" alias=".service_locator.KYbQRH0"/>
+    <service id=".service_locator.AvastKJ" alias=".service_locator.bDMgK3V"/>
     <service id=".service_locator.BFrsqsn" alias=".service_locator.F9PKc.7"/>
     <service id=".service_locator.oIHygA7" alias=".service_locator.xOkKGYY"/>
     <service id=".service_locator.3ijAwyK" alias=".service_locator.vtjw4Bs"/>
@@ -12938,13 +13058,17 @@
     <service id=".service_locator.rygYQwp" alias=".service_locator.iH9_4VJ"/>
     <service id=".service_locator.eTy.RnK" alias=".service_locator.tl.X0ws"/>
     <service id=".service_locator.knfkJj3" alias=".service_locator.ST3E3fc"/>
+    <service id=".service_locator.chF1gfE" alias=".service_locator.LxtmzYH"/>
     <service id=".service_locator.9e2t_lq" alias=".service_locator.CsMkqUa"/>
-    <service id=".service_locator.WfMZGBY" alias=".service_locator.9Y9x5wR"/>
+    <service id=".service_locator.qaBJwvb" alias=".service_locator.dqHpXxT"/>
     <service id=".service_locator.gS_DHRl" alias=".service_locator.MvMJWd1"/>
     <service id=".service_locator.iySheTy" alias=".service_locator..4cEOa9"/>
     <service id=".service_locator.Z1ddSQN" alias=".service_locator.I4pKEWT"/>
+    <service id=".service_locator.kuJJ0jt" alias=".service_locator.rc.WyiS"/>
     <service id=".service_locator._D8eTcZ" alias=".service_locator.Uyi5bSJ"/>
     <service id=".service_locator.JTtEETS" alias=".service_locator.wH4nX8g"/>
+    <service id=".service_locator.Ec0Wl9r" alias=".service_locator.pXYmsG2"/>
+    <service id=".service_locator.58p2stW" alias=".service_locator.CNnBks1"/>
     <service id=".service_locator.W8CreQw" alias=".service_locator.cK.9e7Y"/>
     <service id=".service_locator.VIwhQZf" alias=".service_locator.2oEUwKR"/>
     <service id=".service_locator.JMj.UAi" alias=".service_locator.ZrybK.J"/>

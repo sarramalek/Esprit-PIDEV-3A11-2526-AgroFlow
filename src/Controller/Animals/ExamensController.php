@@ -5,8 +5,11 @@ namespace App\Controller\Animals;
 use App\Entity\Animals\Examen;
 use App\Form\Animals\ExamenType;
 use App\Repository\Animals\ExamenRepository;
+use App\Service\Animals\WikipediaService;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -17,18 +20,32 @@ final class ExamensController extends AbstractController
 {
     #[Route(name: 'app_examens_index', methods: ['GET'])]
     #[IsGranted('ROLE_AGRICULTEUR')]
-    public function index(Request $request, ExamenRepository $examenRepository): Response
+    public function index(Request $request, ExamenRepository $examenRepository, PaginatorInterface $paginator): Response
     {
         $user = $this->getUser();
         $searchTerm = $request->query->get('q');
         $sortBy = $request->query->get('sort', 'id');
         $direction = $request->query->get('direction', 'DESC');
         $typeFilter = $request->query->get('type');
+        $page = $request->query->getInt('page', 1);
+        $limit = 5; // Nombre d'examens par page
 
         // Admin voit tout, Agriculteur voit les siens
         $filterUser = $this->isGranted('ROLE_ADMIN') ? null : $user;
 
-        $examens = $examenRepository->searchExamen($searchTerm, $sortBy, $direction, $typeFilter, $filterUser);
+        // Créer la requête pour la pagination
+        $query = $examenRepository->createQueryBuilderForSearch($searchTerm, $sortBy, $direction, $typeFilter, $filterUser);
+        
+        // Appliquer la pagination sans tri automatique (tri déjà appliqué au QueryBuilder)
+        $examens = $paginator->paginate(
+            $query,
+            $page,
+            $limit,
+            [
+                'sortFieldParameterName' => false,
+                'sortDirectionParameterName' => false,
+            ]
+        );
         
         // Données de fragilité par espèce (pour les dashboard cards)
         $fragilityStats = $user instanceof \App\Entity\User\User ? $examenRepository->getFragilityData($user) : [];
@@ -133,5 +150,30 @@ final class ExamensController extends AbstractController
         }
 
         return $this->redirectToRoute('app_examens_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/search/wikipedia', name: 'app_examens_wikipedia_search', methods: ['POST'])]
+    #[IsGranted('ROLE_AGRICULTEUR')]
+    public function searchWikipedia(Request $request, WikipediaService $wikipediaService): JsonResponse
+    {
+        $query = $request->request->get('query', '');
+        $diagnostic = $request->request->get('diagnostic', '');
+        $traitement = $request->request->get('traitement', '');
+
+        if (empty(trim($query))) {
+            return new JsonResponse(['error' => 'Requête vide'], 400);
+        }
+
+        // Recherche Wikipedia
+        $result = $wikipediaService->searchPage($query);
+
+        // Suggestions rapides basées sur le diagnostic/traitement
+        $suggestions = $wikipediaService->getQuickSuggestions($diagnostic, $traitement);
+
+        return new JsonResponse([
+            'result' => $result,
+            'suggestions' => $suggestions,
+            'query' => $query,
+        ]);
     }
 }

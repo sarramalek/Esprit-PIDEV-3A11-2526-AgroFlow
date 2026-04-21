@@ -1,14 +1,30 @@
 {% extends 'base_agriculteur.html.twig' %}
 
-{% block title %}AgroFlow - Détails de {{ animaux.nom }}{% endblock %}
+{% block title %}AgroFlow - {{ 'animal.details_title'|trans({'%name%': animaux.nom}) }}{% endblock %}
 
 {% block body %}
+<!-- Sélecteur de langue - EN HAUT -->
+<div style="width: 100%; padding: 15px 30px; background: transparent; display: flex; justify-content: flex-end; gap: 10px; border-bottom: none;">
+    <a href="{{ path('app_set_locale', {'locale': 'fr'}) }}" 
+       style="display: inline-flex; align-items: center; justify-content: center; padding: 8px 14px; border-radius: 6px; background: {{ app.request.locale == 'fr' ? '#2D5A27' : '#f0f0f0' }}; color: {{ app.request.locale == 'fr' ? 'white' : '#2C3E50' }}; border: 1px solid {{ app.request.locale == 'fr' ? '#2D5A27' : '#ddd' }}; font-size: 13px; text-decoration: none; font-weight: 600; cursor: pointer;">
+        🇫🇷 FR
+    </a>
+    <a href="{{ path('app_set_locale', {'locale': 'en'}) }}" 
+       style="display: inline-flex; align-items: center; justify-content: center; padding: 8px 14px; border-radius: 6px; background: {{ app.request.locale == 'en' ? '#2D5A27' : '#f0f0f0' }}; color: {{ app.request.locale == 'en' ? 'white' : '#2C3E50' }}; border: 1px solid {{ app.request.locale == 'en' ? '#2D5A27' : '#ddd' }}; font-size: 13px; text-decoration: none; font-weight: 600; cursor: pointer;">
+        🇬🇧 EN
+    </a>
+    <a href="{{ path('app_set_locale', {'locale': 'es'}) }}" 
+       style="display: inline-flex; align-items: center; justify-content: center; padding: 8px 14px; border-radius: 6px; background: {{ app.request.locale == 'es' ? '#2D5A27' : '#f0f0f0' }}; color: {{ app.request.locale == 'es' ? 'white' : '#2C3E50' }}; border: 1px solid {{ app.request.locale == 'es' ? '#2D5A27' : '#ddd' }}; font-size: 13px; text-decoration: none; font-weight: 600; cursor: pointer;">
+        🇪🇸 ES
+    </a>
+</div>
+
 <div style="padding: 10px;">
     <!-- Header : Breadcrumb -->
     <div style="margin-bottom: 25px; color: #666; font-size: 14px;">
-        <span>Gestion</span> <i class="fa fa-chevron-right" style="font-size: 10px; margin: 0 5px;"></i> 
-        <span>Animaux</span> <i class="fa fa-chevron-right" style="font-size: 10px; margin: 0 5px;"></i> 
-        <strong style="color: #2C3E50;">Fiche Profil</strong>
+        <span>{{ 'breadcrumb.management'|trans }}</span> <i class="fa fa-chevron-right" style="font-size: 10px; margin: 0 5px;"></i> 
+        <span>{{ 'breadcrumb.animals'|trans }}</span> <i class="fa fa-chevron-right" style="font-size: 10px; margin: 0 5px;"></i> 
+        <strong style="color: #2C3E50;">{{ 'breadcrumb.profile'|trans }}</strong>
     </div>
 
     <div style="display: grid; grid-template-columns: 350px 1fr; gap: 30px;">
@@ -28,11 +44,11 @@
                     
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
                         <div style="background: #F8F9FA; padding: 15px; border-radius: 12px;">
-                            <span style="display: block; font-size: 11px; color: #999; text-transform: uppercase;">Poids</span>
+                            <span style="display: block; font-size: 11px; color: #999; text-transform: uppercase;">{{ 'animal.weight'|trans }}</span>
                             <strong style="font-size: 18px; color: #2D5A27;">{{ animaux.poids }} <small>kg</small></strong>
                         </div>
                         <div style="background: #F8F9FA; padding: 15px; border-radius: 12px;">
-                            <span style="display: block; font-size: 11px; color: #999; text-transform: uppercase;">Âge</span>
+                            <span style="display: block; font-size: 11px; color: #999; text-transform: uppercase;">{{ 'animal.age'|trans }}</span>
                             <strong style="font-size: 18px; color: #2C3E50;">
                                 {{ animaux.dateNaissance ? date().diff(animaux.dateNaissance).y : '?' }} <small>ans</small>
                             </strong>
@@ -41,38 +57,38 @@
 
                     <div style="display: flex; flex-direction: column; gap: 10px;">
                         <a href="{{ path('app_animaux_edit', {'id': animaux.id}) }}" style="background: #2D5A27; color: white; padding: 12px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 14px; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                            <i class="fa fa-edit"></i> Modifier le profil
+                            <i class="fa fa-edit"></i> {{ 'animal.edit_profile'|trans }}
                         </a>
                         
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                             <a href="{{ path('app_animaux_export_card', {'id': animaux.id}) }}" target="_blank" style="background: #EEEDFE; color: #534AB7; padding: 10px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 5px;">
-                                <i class="fa fa-id-card"></i> Export ID
+                                <i class="fa fa-id-card"></i> {{ 'animal.export_id'|trans }}
                             </a>
                             <a href="{{ path('app_animaux_export_medical', {'id': animaux.id}) }}" target="_blank" style="background: #FFF5F5; color: #E74C3C; padding: 10px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 5px;">
-                                <i class="fa fa-file-medical"></i> Dossier PDF
+                                <i class="fa fa-file-medical"></i> {{ 'animal.medical_file'|trans }}
                             </a>
                         </div>
 
                         <a href="{{ path('app_animaux_index') }}" style="background: white; color: #7f8c8d; padding: 10px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 13px; border: 1px solid #E9ECEF; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                            <i class="fa fa-arrow-left"></i> Retour
+                            <i class="fa fa-arrow-left"></i> {{ 'animal.back'|trans }}
                         </a>
                     </div>
                 </div>
             </div>
             
-            <div style="margin-top: 25px; background: linear-gradient(135deg, #FFFDF5, #F9FDF5); border: 1px solid #A8C69F; border-radius: 20px; padding: 25px; text-align: center; box-shadow: 0 10px 20px rgba(45, 90, 39, 0.05); position: relative; overflow: hidden;">
+            <div onclick="openAgroFlowConnectModal('{{ animaux.nom }}', '{{ animaux.espece }}')" style="margin-top: 25px; background: linear-gradient(135deg, #FFFDF5, #F9FDF5); border: 1px solid #A8C69F; border-radius: 20px; padding: 25px; text-align: center; box-shadow: 0 10px 20px rgba(45, 90, 39, 0.05); position: relative; overflow: hidden; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 15px 30px rgba(45, 90, 39, 0.15)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 20px rgba(45, 90, 39, 0.05)';">
                 <div style="position: absolute; top: -10px; right: -10px; opacity: 0.1;">
                     <i class="fa fa-handshake" style="font-size: 60px; color: #2D5A27;"></i>
                 </div>
                 <h4 style="margin: 0 0 10px 0; color: #1B3A20; font-size: 16px; font-weight: 800;">
-                    <i class="fa fa-users-viewfinder" style="color: #2D5A27;"></i> AgroFlow Connect
+                    <i class="fa fa-users-viewfinder" style="color: #2D5A27;"></i> {{ 'animal.agroflow_connect'|trans }}
                 </h4>
                 <p style="margin: 0; font-size: 13px; color: #555; line-height: 1.5;">
-                    Besoin d'un vétérinaire expert ou d'un acheteur certifié ? 
+                    {{ 'animal.agroflow_connect_desc'|trans }}
                 </p>
-                <a href="{{ path('agriculteur_evenement_index') }}" style="display: inline-block; margin-top: 15px; background: #2D5A27; color: white; padding: 10px 20px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 13px; transition: 0.3s; box-shadow: 0 4px 10px rgba(45, 90, 39, 0.2);">
-                    Trouver un Partenaire
-                </a>
+                <div style="display: inline-block; margin-top: 15px; background: #2D5A27; color: white; padding: 10px 20px; border-radius: 12px; font-weight: 700; font-size: 13px; box-shadow: 0 4px 10px rgba(45, 90, 39, 0.2);">
+                    🔍 {{ 'animal.find_partner'|trans }}
+                </div>
             </div>
         </div>
 
@@ -81,10 +97,10 @@
             <div style="background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 35px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
                     <h3 style="margin: 0; color: #2C3E50; font-size: 20px; display: flex; align-items: center; gap: 12px;">
-                        <i class="fa fa-notes-medical" style="color: #e74c3c;"></i> Timeline Médicale
+                        <i class="fa fa-notes-medical" style="color: #e74c3c;"></i> {{ 'animal.medical_timeline'|trans }}
                     </h3>
                     <a href="{{ path('app_examens_new', {'animal': animaux.id}) }}" style="background: #2D5A27; color: white; padding: 10px 18px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 13px; transition: 0.3s; box-shadow: 0 4px 10px rgba(45, 90, 39, 0.2);">
-                        <i class="fa fa-plus-circle"></i> Nouveau Rapport
+                        <i class="fa fa-plus-circle"></i> {{ 'animal.new_report'|trans }}
                     </a>
                 </div>
 
@@ -109,7 +125,7 @@
                                             </span>
                                         </div>
                                         <div style="background: #F8F9FA; padding: 12px 15px; border-radius: 12px; border-left: 4px solid #2D5A27;">
-                                            <span style="display: block; font-size: 10px; color: #999; text-transform: uppercase; margin-bottom: 3px;">Traitement prescrit</span>
+                                            <span style="display: block; font-size: 10px; color: #999; text-transform: uppercase; margin-bottom: 3px;">{{ 'animal.treatment_prescribed'|trans }}</span>
                                             <p style="margin: 0; color: #1B3A20; font-size: 14px; font-weight: 600;">{{ examen.traitement }}</p>
                                         </div>
                                     </div>
@@ -120,12 +136,305 @@
                 {% else %}
                     <div style="text-align: center; padding: 60px 40px; color: #999; background: #F8F9FA; border-radius: 20px; border: 2px dashed #E9ECEF;">
                         <i class="fa fa-folder-open" style="font-size: 50px; margin-bottom: 15px; opacity: 0.2;"></i>
-                        <p style="margin: 0; font-weight: 600;">Aucun dossier médical trouvé.</p>
-                        <p style="font-size: 14px; margin-top: 5px;">Commencez par ajouter un premier examen clinique.</p>
+                        <p style="margin: 0; font-weight: 600;">{{ 'animal.no_medical_record_title'|trans }}</p>
+                        <p style="font-size: 14px; margin-top: 5px;">{{ 'animal.no_medical_record_desc'|trans }}</p>
                     </div>
                 {% endif %}
+
+                <!-- Section Suggestions de Nourriture -->
+                <div style="margin-top: 35px; background: linear-gradient(135deg, #FFFBF0, #FEF9F3); border: 2px solid #F4D8A8; border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(244, 216, 168, 0.15);">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">
+                        <h4 style="margin: 0; color: #2C3E50; font-size: 18px; font-weight: 700;">
+                            🍽️ {{ 'animal.food_suggestions'|trans }}
+                        </h4>
+                        <span style="background: #F0C674; color: white; padding: 3px 10px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase;">
+                            {{ ('animal.species.' ~ animaux.espece|lower)|trans }}
+                        </span>
+                    </div>
+
+                    {% if foodSuggestions|length > 0 %}
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                            {% for product in foodSuggestions %}
+                                <div style="background: white; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: 0.3s; display: flex; flex-direction: column; height: 100%;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 20px rgba(0,0,0,0.12)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)';">
+                                    <!-- Image du produit -->
+                                    {% if product.image %}
+                                        <div style="width: 100%; height: 140px; overflow: hidden; background: #F5F5F5; display: flex; align-items: center; justify-content: center;">
+                                            <img src="{{ product.image }}" alt="{{ product.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                        </div>
+                                    {% else %}
+                                        <div style="width: 100%; height: 140px; background: linear-gradient(135deg, #F0F0F0, #E8E8E8); display: flex; align-items: center; justify-content: center;">
+                                            <i class="fa fa-cube" style="font-size: 40px; color: #DDD;"></i>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    <!-- Informations du produit -->
+                                    <div style="padding: 14px; flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                                        <div>
+                                            <h5 style="margin: 0 0 8px 0; color: #2C3E50; font-size: 14px; font-weight: 700; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                                {{ product.name }}
+                                            </h5>
+                                            <p style="margin: 0; color: #7f8c8d; font-size: 12px; font-weight: 600; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;">
+                                                <i class="fa fa-tag" style="color: #2D5A27; margin-right: 5px;"></i> 
+                                                {{ product.brand }}
+                                            </p>
+                                        </div>
+                                        
+                                        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #E9ECEF;">
+                                            <a href="https://world.openfoodfacts.org/search?q={{ product.name|url_encode }}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 5px; background: #2D5A27; color: white; padding: 6px 10px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 11px; transition: 0.3s;" onmouseover="this.style.background='#1B3A20';" onmouseout="this.style.background='#2D5A27';">
+                                                <i class="fa fa-external-link"></i> {{ 'animal.more'|trans }}
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div style="text-align: center; padding: 25px 20px; background: white; border-radius: 14px; border: 1px dashed #E9ECEF;">
+                            <i class="fa fa-search" style="font-size: 32px; margin-bottom: 10px; opacity: 0.3; display: block;"></i>
+                            <p style="margin: 0 0 5px 0; font-weight: 600; color: #2C3E50; font-size: 14px;">{{ 'animal.no_suggestions'|trans }}</p>
+                            <p style="margin: 0; color: #7f8c8d; font-size: 12px;">{{ 'animal.no_suggestions_subtitle'|trans }}</p>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Modal AgroFlow Connect -->
+    <div id="agroflowConnectModal" style="display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); padding: 20px; box-sizing: border-box; align-items: center; justify-content: center;">
+        <div style="background: white; border-radius: 15px; width: 90%; max-width: 1000px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <!-- Header -->
+            <div style="background: linear-gradient(135deg, #2D5A27 0%, #1B3A20 100%); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="margin: 0; font-size: 20px;">🤝 AgroFlow Connect</h2>
+                <span onclick="closeAgroFlowConnectModal()" style="cursor: pointer; font-size: 28px; font-weight: bold; opacity: 0.8; hover: opacity: 1;">&times;</span>
+            </div>
+
+            <!-- Contenu : Deux colonnes (Carte + Chat) -->
+            <div style="display: flex; flex: 1; overflow: hidden;">
+                <!-- Colonne Gauche : Carte Leaflet -->
+                <div style="flex: 1; display: flex; flex-direction: column; border-right: 1px solid #E9ECEF;">
+                    <div id="agroflowMap" style="flex: 1; background: #F5F5F5;"></div>
+                </div>
+
+                <!-- Colonne Droite : Chat IA -->
+                <div style="width: 350px; display: flex; flex-direction: column; background: #F9F9F9;">
+                    <!-- Messages Chat -->
+                    <div id="chatMessages" style="flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+                        <div style="background: white; padding: 12px 15px; border-radius: 10px; border-left: 4px solid #2D5A27; font-size: 13px; color: #555; line-height: 1.5;">
+                            <strong style="color: #2D5A27;">Assistant IA:</strong><br>
+                            Bonjour! Je suis ici pour vous aider à trouver le meilleur vétérinaire ou partenaire commercial pour votre animal.
+                        </div>
+                    </div>
+
+                    <!-- Barre de Saisie -->
+                    <div style="padding: 15px; border-top: 1px solid #E9ECEF; background: white;">
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="chatInput" placeholder="Posez votre question..." style="flex: 1; padding: 10px 12px; border: 1px solid #E9ECEF; border-radius: 8px; outline: none; font-size: 13px;" onkeypress="if(event.key==='Enter') sendChatMessage();">
+                            <button type="button" onclick="sendChatMessage()" style="background: #2D5A27; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; transition: 0.3s;" onmouseover="this.style.background='#1B3A20';" onmouseout="this.style.background='#2D5A27';">
+                                📤 Envoyer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feuille de styles pour Leaflet -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <style>
+        #agroflowMap {
+            border: none !important;
+        }
+        .leaflet-container {
+            border-radius: 0;
+        }
+    </style>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script src="{{ asset('agroflow_connect.js') }}"></script>
+    <script>
+        let map = null;
+        let markers = [];
+        let userLocation = { lat: AGROFLOW_CONNECT.DEFAULT_LAT, lng: AGROFLOW_CONNECT.DEFAULT_LNG };
+        let currentAnimalNom = '';
+        let currentAnimalEspece = '';
+
+        // Ouvrir la modale
+        function openAgroFlowConnectModal(animalNom, animalEspece) {
+            currentAnimalNom = animalNom;
+            currentAnimalEspece = animalEspece;
+            
+            document.getElementById('agroflowConnectModal').style.display = 'flex';
+            
+            // Initialiser la carte après un petit délai (pour que le DOM soit visible)
+            setTimeout(() => {
+                if (!map) {
+                    initializeMap();
+                } else {
+                    map.invalidateSize();
+                }
+                loadPartners();
+            }, 100);
+
+            // Charger la géolocalisation
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        userLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        if (map) {
+                            map.setView([userLocation.lat, userLocation.lng], 12);
+                            loadPartners();
+                        }
+                    },
+                    function(error) {
+                        console.log('Géolocalisation refusée, utilisation localisation par défaut');
+                    }
+                );
+            }
+
+            // Message de bienvenue
+            addChatMessage('Assistant IA', `Bienvenue pour ${currentAnimalNom} (${currentAnimalEspece})! Dites-moi ce que vous cherchez (vétérinaire, acheteur, urgence...).`);
+        }
+
+        // Fermer la modale
+        function closeAgroFlowConnectModal() {
+            document.getElementById('agroflowConnectModal').style.display = 'none';
+            if (map) {
+                map.remove();
+                map = null;
+            }
+            markers = [];
+        }
+
+        // Initialiser la carte Leaflet
+        function initializeMap() {
+            const mapContainer = document.getElementById('agroflowMap');
+            if (!mapContainer) return;
+
+            map = L.map(mapContainer).setView([userLocation.lat, userLocation.lng], 12);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap',
+                maxZoom: 19
+            }).addTo(map);
+
+            // Marqueur utilisateur
+            const userIcon = L.divIcon({
+                html: '<i class="fa fa-map-marker" style="font-size: 32px; color: #3498db; text-shadow: 0 0 3px white;"></i>',
+                iconSize: [32, 32],
+                className: 'user-marker'
+            });
+
+            L.marker([userLocation.lat, userLocation.lng], { icon: userIcon })
+                .addTo(map)
+                .bindPopup('📍 Votre position');
+        }
+
+        // Charger les partenaires sur la carte
+        function loadPartners() {
+            // Récupérer les vétérinaires et acheteurs spécialisés
+            const vets = AGROFLOW_CONNECT.getVeterinairesForAnimal(currentAnimalEspece);
+            const buyers = AGROFLOW_CONNECT.getAcheteursForAnimal(currentAnimalEspece);
+            const allPartners = [...vets, ...buyers];
+
+            // Trier par distance
+            const sortedPartners = AGROFLOW_CONNECT.trierParDistance(allPartners, userLocation.lat, userLocation.lng);
+
+            // Supprimer les anciens marqueurs
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+
+            // Ajouter les marqueurs
+            sortedPartners.slice(0, 5).forEach(partner => {
+                const isVet = partner.specialite[0] && (partner.specialite[0].includes('Chien') || partner.specialite[0].includes('Cheval'));
+                const icon = isVet ? '🏥' : '🏪';
+                const color = partner.couleur || '#2D5A27';
+
+                const popupContent = `
+                    <div style="font-size: 12px; max-width: 200px;">
+                        <strong>${icon} ${partner.nom}</strong><br>
+                        📍 ${partner.distance} km<br>
+                        ⭐ ${partner.rating}/5<br>
+                        📞 ${partner.telephone}
+                    </div>
+                `;
+
+                const customIcon = L.divIcon({
+                    html: `<div style="background: ${color}; color: white; padding: 5px 10px; border-radius: 20px; font-weight: bold; font-size: 11px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">${icon}</div>`,
+                    iconSize: [40, 30],
+                    className: 'partner-marker'
+                });
+
+                const marker = L.marker([partner.lat, partner.lng], { icon: customIcon })
+                    .bindPopup(popupContent)
+                    .addTo(map);
+
+                markers.push(marker);
+            });
+
+            // Ajuster la vue pour montrer tous les marqueurs
+            if (markers.length > 0) {
+                const group = new L.featureGroup([...markers]);
+                map.fitBounds(group.getBounds().pad(0.1));
+            }
+        }
+
+        // Ajouter un message au chat
+        function addChatMessage(sender, message) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const msgDiv = document.createElement('div');
+            
+            if (sender === 'Assistant IA') {
+                msgDiv.style.cssText = 'background: white; padding: 12px 15px; border-radius: 10px; border-left: 4px solid #2D5A27; font-size: 13px; color: #555; line-height: 1.5;';
+            } else {
+                msgDiv.style.cssText = 'background: #2D5A27; color: white; padding: 12px 15px; border-radius: 10px; font-size: 13px; line-height: 1.5; text-align: right;';
+            }
+
+            msgDiv.innerHTML = `<strong>${sender}:</strong><br>${message}`;
+            messagesContainer.appendChild(msgDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Envoyer un message et obtenir la réponse IA
+        function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            // Afficher le message utilisateur
+            addChatMessage('Vous', message);
+            input.value = '';
+
+            // Simuler un délai de traitement
+            setTimeout(() => {
+                const aiResponse = AGROFLOW_CONNECT.generateAIResponse(
+                    message,
+                    currentAnimalNom,
+                    currentAnimalEspece,
+                    userLocation.lat,
+                    userLocation.lng
+                );
+
+                addChatMessage('Assistant IA', aiResponse.response);
+
+                // Recharger la carte avec les partenaires pertinents
+                loadPartners();
+            }, 500);
+        }
+
+        // Fermer au clic extérieur
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('agroflowConnectModal');
+            if (event.target === modal) {
+                closeAgroFlowConnectModal();
+            }
+        });
+    </script>
 </div>
 {% endblock %}

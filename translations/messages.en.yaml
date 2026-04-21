@@ -1,3 +1,4 @@
+
 taches:
     titre: "My Tasks"
     aucune: "No tasks assigned"
@@ -64,3 +65,104 @@ plante:
         generation_en_cours: "Generating…"
         aucune_etape: "No steps received."
         erreur_serveur: "Server error"
+
+menu:
+  home: Home
+  animaux: Animals
+  stocks: Stocks
+  terrains: Fields
+  materiels: Equipment
+  evenements: Events
+  abonnement: Subscription
+  taches: Tasks
+  logout: Logout
+  my_animals: My animals
+  veterinary_exams: Veterinary exams
+  categories: Categories
+  products: Products
+  my_fields: My fields
+  crop_rotations: Crop rotations
+  machines: Machines
+  maintenances: Maintenances
+  events: Events
+  participations: My participations
+  offers: Available offers
+  my_subscription: My subscription
+
+breadcrumb:
+  management: Management
+  animals: Animals
+  profile: Profile Sheet
+  exams: Exams
+  report_details: Report Details
+
+animal:
+  weight: Weight
+  age: Age
+  details_title: Details of %name%
+  edit_profile: Edit Profile
+  export_id: Export ID
+  medical_file: PDF Record
+  back: Back
+  medical_timeline: Medical Timeline
+  new_report: New Report
+  no_medical_record_title: No medical record found.
+  no_medical_record_desc: Start by adding a first clinical exam.
+  food_suggestions: Food Suggestions
+  species_label: "%species%"
+  species:
+    Chien: Dog
+    Chat: Cat
+    Vache: Cow
+    Chèvre: Goat
+    Mouton: Sheep
+    Cheval: Horse
+    Autre: Other
+  sex:
+    MALE: Male
+    FEMELLE: Female
+  age_unit: years
+  weight_unit: kg
+  treatment_prescribed: Prescribed Treatment
+  no_suggestions: No suggestions
+  no_suggestions_subtitle: Not available
+  more: More
+  agroflow_connect: AgroFlow Connect
+  agroflow_connect_desc: Need an expert veterinarian or a certified buyer?
+  find_partner: Find a Partner
+  assistant_title: AI Assistant:
+  assistant_greeting: Hello! I am here to help you find the best veterinarian or business partner for your animal.
+  chat_placeholder: Ask your question...
+  send: Send
+
+report:
+  reference: Reference #%id%
+  report_title: "Report: %type%"
+  exam_date: Exam Date
+  patient_animal: Patient Animal
+  prescription_action: Prescription / Action
+  treatment_assigned: Assigned treatment
+  exam_type:
+    Vaccin: Vaccination
+    Radio: X-ray
+    Scanner: Scan
+    Consultation: Consultation
+  diagnostic:
+    "En bonne santé": Healthy
+    Infection: Infection
+    Fracture: Fracture
+    Urgence: Emergency
+  treatment:
+    Repos: Rest
+    Antibiotiques: Antibiotics
+    Observation: Observation
+    Chirurgie: Surgery
+  diagnostic_result: Diagnostic Result
+  edit_report: Edit Report
+  back_to_list: Back to list
+
+language:
+  fr: Français
+  en: English
+  es: Español
+
