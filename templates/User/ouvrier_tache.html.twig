@@ -413,21 +413,26 @@
                 </div>
                 {% endif %}
                 {% if tache.priorite %}
-                {# La couleur du badge est déterminée par la valeur FR originale stockée dans data-priorite #}
-                <span class="priority-badge
-                    {% if tache.priorite_raw is defined %}
-                        {% if tache.priorite_raw in ['haute', 'urgente'] %}priority-haute
-                        {% elseif tache.priorite_raw in ['normale', 'moyenne'] %}priority-moyenne
-                        {% else %}priority-basse{% endif %}
+                    {#
+                        On utilise priorite_raw (valeur FR stockée en BDD) pour déterminer la couleur,
+                        et priorite (valeur traduite) pour l'affichage.
+                    #}
+                    {% set prioriteRaw = tache.priorite_raw is defined ? tache.priorite_raw|lower : '' %}
+                    {% if prioriteRaw in ['haute', 'urgente'] %}
+                        {% set prioriteClass = 'priority-haute' %}
+                    {% elseif prioriteRaw in ['normale', 'moyenne'] %}
+                        {% set prioriteClass = 'priority-moyenne' %}
                     {% else %}
-                        priority-moyenne
-                    {% endif %}">
-                    {{ tache.priorite }}
-                </span>
+                        {% set prioriteClass = 'priority-basse' %}
+                    {% endif %}
+                    <span class="priority-badge {{ prioriteClass }}">
+                        {{ tache.priorite }}
+                    </span>
                 {% endif %}
             </div>
 
             <div class="task-actions">
+                {# ── Bouton changement de statut ── #}
                 {% if tache.statut == 'a_faire' %}
                 <button class="btn-statut primary btn-changer-statut"
                         data-id="{{ tache.id }}" data-statut="en_cours">
@@ -444,27 +449,30 @@
                 </span>
                 {% endif %}
 
+                {# ── Bouton détail (animal / maintenance / terrain / plante) ── #}
                 {% if tache.detail_url %}
-                    {% set iconMap = {
-                        'animal':      'fa-paw',
-                        'maintenance': 'fa-gear',
-                        'terrain':     tache.is_plante ? 'fa-seedling' : 'fa-map',
-                    } %}
-                    {% set styleMap = {
-                        'animal':      'detail-animal',
-                        'maintenance': 'detail-maintenance',
-                        'terrain':     tache.is_plante ? 'detail-plante' : 'detail-terrain',
-                    } %}
-                    {% set detailLabelMap = {
-                        'animal':      'taches.voir_animal'|trans,
-                        'maintenance': 'taches.voir_maintenance'|trans,
-                        'terrain':     tache.is_plante ? 'taches.voir_plante'|trans : 'taches.voir_terrain'|trans,
-                    } %}
-                    <a href="{{ tache.detail_url }}"
-                       class="btn-detail {{ styleMap[tache.categorie] ?? 'detail-terrain' }}">
-                        <i class="fa {{ iconMap[tache.categorie] ?? 'fa-seedling' }}"></i>
-                        {{ detailLabelMap[tache.categorie] ?? 'taches.voir_detail'|trans }}
-                    </a>
+                    {% if tache.categorie == 'animal' %}
+                        {# Redirection vers app_animaux_show (ou index en fallback) #}
+                        <a href="{{ tache.detail_url }}" class="btn-detail detail-animal">
+                            <i class="fa fa-paw"></i> {{ 'taches.voir_animal'|trans }}
+                        </a>
+
+                    {% elseif tache.categorie == 'maintenance' %}
+                        <a href="{{ tache.detail_url }}" class="btn-detail detail-maintenance">
+                            <i class="fa fa-gear"></i> {{ 'taches.voir_maintenance'|trans }}
+                        </a>
+
+                    {% elseif tache.categorie == 'terrain' %}
+                        {% if tache.is_plante %}
+                            <a href="{{ tache.detail_url }}" class="btn-detail detail-plante">
+                                <i class="fa fa-seedling"></i> {{ 'taches.voir_plante'|trans }}
+                            </a>
+                        {% else %}
+                            <a href="{{ tache.detail_url }}" class="btn-detail detail-terrain">
+                                <i class="fa fa-map"></i> {{ 'taches.voir_terrain'|trans }}
+                            </a>
+                        {% endif %}
+                    {% endif %}
                 {% endif %}
             </div>
 
@@ -574,6 +582,7 @@ document.addEventListener('click', function (e) {
             badge.className   = `status-badge ${badgeMap[statut]}`;
             badge.textContent = TRANS.statut[statut] ?? statut;
 
+            // Conserver le bouton détail existant
             const detailBtn = card.querySelector('.btn-detail');
             const actions   = card.querySelector('.task-actions');
 
@@ -590,6 +599,7 @@ document.addEventListener('click', function (e) {
                     </span>`;
             }
 
+            // Ré-ajouter le bouton détail après le changement de statut
             if (detailBtn) actions.appendChild(detailBtn);
             updateCounts();
         })
