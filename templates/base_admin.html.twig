@@ -538,23 +538,23 @@ checkAndRedirect();
             </ul>
         </div>
 
-        <!-- Gestion Animaux -->
-        <div class="nav-item {% if app.request.get('_route') in ['admin_animaux_index','admin_animaux_new','admin_animaux_edit','admin_examens_index','admin_examens_new','admin_examens_edit'] %}open{% endif %}">
-            <div class="nav-link {% if app.request.get('_route') in ['admin_animaux_index','admin_animaux_new','admin_animaux_edit','admin_examens_index','admin_examens_new','admin_examens_edit'] %}active{% endif %}"
-                 onclick="toggleMenu(this)">
-                <span class="nav-icon"><i class="fa fa-paw"></i></span>
-                <span class="nav-label">Gestion Animaux</span>
-                <i class="fa fa-chevron-right nav-arrow"></i>
+            <!-- Gestion Animaux -->
+            <div class="nav-item {% if app.request.get('_route') in ['admin_animaux_index','admin_animaux_new','admin_animaux_edit','admin_examens_index','admin_examens_new','admin_examens_edit'] %}open{% endif %}">
+                <div class="nav-link {% if app.request.get('_route') in ['admin_animaux_index','admin_animaux_new','admin_animaux_edit','admin_examens_index','admin_examens_new','admin_examens_edit'] %}active{% endif %}"
+                     onclick="toggleMenu(this)">
+                    <span class="nav-icon"><i class="fa fa-paw"></i></span>
+                    <span class="nav-label">Gestion Animaux</span>
+                    <i class="fa fa-chevron-right nav-arrow"></i>
+                </div>
+                <ul class="nav-sub">
+                    <li><a href="{{ path('admin_animaux_index') }}" class="{% if app.request.get('_route') in ['admin_animaux_index','admin_animaux_new','admin_animaux_edit'] %}active{% endif %}">
+                        <span class="sub-dot"></span> Animaux
+                    </a></li>
+                    <li><a href="{{ path('admin_examens_index') }}" class="{% if app.request.get('_route') in ['admin_examens_index','admin_examens_new','admin_examens_edit'] %}active{% endif %}">
+                        <span class="sub-dot"></span> Examens
+                    </a></li>
+                </ul>
             </div>
-            <ul class="nav-sub">
-                <li><a href="{{ path('admin_animaux_index') }}" class="{% if app.request.get('_route') in ['admin_animaux_index','admin_animaux_new','admin_animaux_edit'] %}active{% endif %}">
-                    <span class="sub-dot"></span> Animaux
-                </a></li>
-                <li><a href="{{ path('admin_examens_index') }}" class="{% if app.request.get('_route') in ['admin_examens_index','admin_examens_new','admin_examens_edit'] %}active{% endif %}">
-                    <span class="sub-dot"></span> Examens
-                </a></li>
-            </ul>
-        </div>
 
         <!-- Gestion Stocks -->
         <div class="nav-item {% if app.request.get('_route') in ['admin_categories', 'admin_stock_new'] %}open{% endif %}">
@@ -599,48 +599,34 @@ checkAndRedirect();
             </ul>
         </div>
 
-        <!-- Gestion Terrains -->
-        <div class="nav-item {% if app.request.get('_route') in ['admin_terrains','admin_terrains_new','admin_terrains_edit','admin_terrains_show','admin_rotations','admin_rotations_new','admin_rotations_edit','admin_plantes','admin_plantes_new','admin_plantes_edit'] %}open{% endif %}">
-            <div class="nav-link {% if app.request.get('_route') in ['admin_terrains','admin_terrains_new','admin_terrains_edit','admin_terrains_show','admin_rotations','admin_rotations_new','admin_rotations_edit','admin_plantes','admin_plantes_new','admin_plantes_edit'] %}active{% endif %}"
-                 onclick="toggleMenu(this)">
-                <span class="nav-icon"><i class="fa fa-map"></i></span>
-                <span class="nav-label">Gestion Terrains</span>
-                <i class="fa fa-chevron-right nav-arrow"></i>
-            </div>
-            <ul class="nav-sub">
-                <li>
-                    <a href="{{ path('admin_terrains') }}"
-                       class="{% if app.request.get('_route') starts with 'admin_terrains' %}active{% endif %}">
+            <!-- Gestion Terrains -->
+            <div class="nav-item {% if app.request.get('_route') in ['admin_terrains','admin_rotations'] %}open{% endif %}">
+                <div class="nav-link {% if app.request.get('_route') in ['admin_terrains','admin_rotations'] %}active{% endif %}"
+                     onclick="toggleMenu(this)">
+                    <span class="nav-icon"><i class="fa fa-map"></i></span>
+                    <span class="nav-label">Gestion Terrains</span>
+                    <i class="fa fa-chevron-right nav-arrow"></i>
+                </div>
+                <ul class="nav-sub">
+                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_terrains' %}active{% endif %}">
                         <span class="sub-dot"></span> Terrains
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ path('admin_rotations') }}"
-                       class="{% if app.request.get('_route') starts with 'admin_rotations' %}active{% endif %}">
+                    </a></li>
+                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_rotations' %}active{% endif %}">
                         <span class="sub-dot"></span> Rotations
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ path('admin_plantes') }}"
-                       class="{% if app.request.get('_route') starts with 'admin_plantes' %}active{% endif %}">
-                        <span class="sub-dot"></span> Plantes
-                    </a>
-                </li>
-            </ul>
-        </div>
-
-        <!-- Gestion Matériels -->
-        <div class="nav-item {% if app.request.get('_route') starts with 'admin_machines' or app.request.get('_route') starts with 'admin_maintenances' %}open{% endif %}">
-            <div class="nav-link {% if app.request.get('_route') starts with 'admin_machines' or app.request.get('_route') starts with 'admin_maintenances' %}active{% endif %}"
-                 onclick="toggleMenu(this)">
-                <span class="nav-icon"><i class="fa fa-tractor"></i></span>
-                <span class="nav-label">Gestion Matériels</span>
-                <i class="fa fa-chevron-right nav-arrow"></i>
+                    </a></li>
+                </ul>
             </div>
-            <ul class="nav-sub">
-                <li>
-                    <a href="{{ path('admin_machines_index') }}"
-                       class="{% if app.request.get('_route') starts with 'admin_machines' %}active{% endif %}">
+
+            <!-- Gestion Matériels -->
+            <div class="nav-item {% if app.request.get('_route') in ['admin_machines','admin_maintenances'] %}open{% endif %}">
+                <div class="nav-link {% if app.request.get('_route') in ['admin_machines','admin_maintenances'] %}active{% endif %}"
+                     onclick="toggleMenu(this)">
+                    <span class="nav-icon"><i class="fa fa-tractor"></i></span>
+                    <span class="nav-label">Gestion Matériels</span>
+                    <i class="fa fa-chevron-right nav-arrow"></i>
+                </div>
+                <ul class="nav-sub">
+                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_machines' %}active{% endif %}">
                         <span class="sub-dot"></span> Machines
                     </a>
                 </li>

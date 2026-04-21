@@ -210,6 +210,7 @@
                             <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">Type</th>
                             <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">Diagnostic</th>
                             <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">Traitement</th>
+                            <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600;">Rappel</th>
                             <th style="padding: 15px 10px; color: #7f8c8d; font-weight: 600; text-align: center;">Actions</th>
                         </tr>
                     </thead>
@@ -235,6 +236,11 @@
                                         <i class="fa fa-stethoscope" style="color: #e74c3c; font-size: 14px;"></i>
                                     {% endif %}
                                     <span style="font-weight: 600; color: #2C3E50; font-size: 14px;">{{ e.typeExamen }}</span>
+                                    {% if e.isFutureVaccineAlert() %}
+                                        <span style="background: #f1c40f; color: #2c3e50; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; text-transform: uppercase; margin-left: 8px;">Vaccin programmé</span>
+                                    {% elseif e.shouldHaveReminder() and e.isReminderSoon() %}
+                                        <span style="background: #e74c3c; color: white; padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; text-transform: uppercase;">Bientôt</span>
+                                    {% endif %}
                                 </div>
                             </td>
                             <td style="padding: 15px 10px;">
@@ -245,18 +251,86 @@
                             <td style="padding: 15px 10px; color: #555; font-size: 14px;">
                                 <i class="fa fa-capsules" style="color: #999; font-size: 12px; margin-right: 5px;"></i> {{ e.traitement }}
                             </td>
+                            <td style="padding: 15px 10px;">
+                                {% if e.shouldHaveReminder() %}
+                                    <div style="font-size: 12px; color: #666;">
+                                        <i class="fa fa-calendar-check" style="color: #3498db; margin-right: 5px;"></i>
+                                        <strong>{{ e.getReminderType() }}</strong><br>
+                                        <span style="color: {{ e.isReminderSoon() ? '#e74c3c' : '#27ae60' }};">
+                                            {{ e.calculateNextReminderDate()|date('d/m/Y') }}
+                                        </span>
+                                        {% if e.isFutureVaccineAlert() %}
+                                            <div style="margin-top: 6px; color: #d35400; font-size: 11px; font-weight: 700;">
+                                                <i class="fa fa-bell" style="margin-right: 4px;"></i>
+                                                Vaccin programmé le {{ e.dateExamen|date('d/m/Y') }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% else %}
+                                    <span style="color: #999; font-size: 12px;">-</span>
+                                {% endif %}
+                            </td>
                             <td style="padding: 15px 10px; text-align: center;">
                                 <a href="{{ path('app_examens_show', {'id': e.id}) }}" style="color: #7f8c8d; margin: 0 8px;"><i class="fa fa-eye"></i></a>
                                 <a href="{{ path('app_examens_edit', {'id': e.id}) }}" style="color: #3498db; margin: 0 8px;"><i class="fa fa-edit"></i></a>
+                                <button type="button" onclick="openMedicalHelpModal('{{ e.diagnostic }}', '{{ e.traitement }}')" style="background: none; border: none; color: #27ae60; margin: 0 8px; cursor: pointer; font-size: 14px;" title="Aide médicale"><i class="fa fa-info-circle"></i></button>
                             </td>
                         </tr>
                         {% else %}
                         <tr>
-                            <td colspan="6" style="padding: 30px; text-align: center; color: #999;">Aucun rapport médical trouvé.</td>
+                            <td colspan="7" style="padding: 30px; text-align: center; color: #999;">Aucun rapport médical trouvé.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Pagination -->
+            <div style="margin-top: 25px; display: flex; justify-content: space-between; align-items: center;">
+                <div style="color: #7f8c8d; font-size: 13px;">
+                    Affichage <strong>{{ examens.getItemNumberPerPage() }} examens</strong> par page
+                </div>
+                <nav style="display: flex; gap: 5px; justify-content: center; flex: 1;">
+                    <ul style="list-style: none; padding: 0; margin: 0; display: flex; gap: 8px;">
+                        {# Page précédente #}
+                        {% if examens.getCurrentPageNumber() > 1 %}
+                            <li>
+                                <a href="{{ path(app.request.attributes.get('_route'), {page: examens.getCurrentPageNumber() - 1, q: searchTerm, sortBy: currentSort, sortDirection: currentDirection, type: currentType}) }}" style="padding: 8px 12px; border: 1px solid #E9ECEF; border-radius: 6px; text-decoration: none; color: #2D5A27; font-weight: 600; transition: 0.3s;" onmouseover="this.style.background='#E8F5E2'; this.style.borderColor='#2D5A27';" onmouseout="this.style.background='white'; this.style.borderColor='#E9ECEF';">
+                                    <i class="fa fa-chevron-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        {# Numéros de page #}
+                        {% for page_num in 1..examens.getPageCount() %}
+                            {% if page_num == examens.getCurrentPageNumber() %}
+                                <li>
+                                    <span style="padding: 8px 12px; border: 2px solid #2D5A27; border-radius: 6px; background: #2D5A27; color: white; font-weight: 600;">
+                                        {{ page_num }}
+                                    </span>
+                                </li>
+                            {% elseif page_num >= examens.getCurrentPageNumber() - 2 and page_num <= examens.getCurrentPageNumber() + 2 %}
+                                <li>
+                                    <a href="{{ path(app.request.attributes.get('_route'), {page: page_num, q: searchTerm, sortBy: currentSort, sortDirection: currentDirection, type: currentType}) }}" style="padding: 8px 12px; border: 1px solid #E9ECEF; border-radius: 6px; text-decoration: none; color: #2D5A27; font-weight: 600; transition: 0.3s;" onmouseover="this.style.background='#E8F5E2';" onmouseout="this.style.background='white';">
+                                        {{ page_num }}
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {# Page suivante #}
+                        {% if examens.getCurrentPageNumber() < examens.getPageCount() %}
+                            <li>
+                                <a href="{{ path(app.request.attributes.get('_route'), {page: examens.getCurrentPageNumber() + 1, q: searchTerm, sortBy: currentSort, sortDirection: currentDirection, type: currentType}) }}" style="padding: 8px 12px; border: 1px solid #E9ECEF; border-radius: 6px; text-decoration: none; color: #2D5A27; font-weight: 600; transition: 0.3s;" onmouseover="this.style.background='#E8F5E2'; this.style.borderColor='#2D5A27';" onmouseout="this.style.background='white'; this.style.borderColor='#E9ECEF';">
+                                    <i class="fa fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                <div style="color: #7f8c8d; font-size: 13px;">
+                    Total: <strong>{{ examens.getTotalItemCount() }}</strong> examens
+                </div>
             </div>
         </div>
     </div>
@@ -375,6 +449,276 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Aide Médicale (Wikipedia) -->
+    <div id="medicalHelpModal" class="modal">
+        <div class="modal-content" style="max-width: 750px;">
+            <div style="background: linear-gradient(135deg, #27ae60 0%, #229954 100%); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0; font-size: 18px;"><i class="fa fa-stethoscope"></i> 📚 Assistant de Savoir Médical</h3>
+                <span onclick="closeMedicalHelpModal()" style="cursor: pointer; font-size: 24px;">&times;</span>
+            </div>
+            
+            <div style="padding: 25px; max-height: 75vh; overflow-y: auto;" id="medicalHelpContent">
+                <!-- Instruction -->
+                <div style="background: #E8F8F5; border-left: 4px solid #27ae60; padding: 15px; margin-bottom: 20px; border-radius: 8px;">
+                    <p style="margin: 0; color: #16A085; font-size: 14px;">
+                        <i class="fa fa-lightbulb" style="margin-right: 8px;"></i>
+                        <strong>Posez une question sur le traitement ou le diagnostic pour mieux comprendre les soins de votre animal.</strong>
+                    </p>
+                </div>
+
+                <!-- Barre de Recherche -->
+                <div style="margin-bottom: 25px;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: #27ae60; text-transform: uppercase; margin-bottom: 10px;">
+                        <i class="fa fa-search"></i> Chercher une information
+                    </label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="medicalSearchInput" placeholder="Ex: Infection, Antibiotique, Vaccin..." style="flex: 1; padding: 12px 15px; border: 2px solid #D5F4E6; border-radius: 10px; outline: none; font-size: 14px; background: #F8F9F9;" onfocus="this.style.borderColor='#27ae60'; this.style.backgroundColor='white';" onblur="this.style.borderColor='#D5F4E6'; this.style.backgroundColor='#F8F9F9';">
+                        <button type="button" onclick="searchMedicalHelp()" style="background: #27ae60; color: white; border: none; padding: 12px 25px; border-radius: 10px; cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                            <i class="fa fa-search"></i> Chercher
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Suggestions Rapides -->
+                <div id="quickSuggestionsContainer" style="margin-bottom: 25px; display: none;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: #666; text-transform: uppercase; margin-bottom: 10px;">
+                        <i class="fa fa-fire"></i> Recherches rapides
+                    </label>
+                    <div id="quickSuggestions" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
+                        <!-- Suggestions générées en JS -->
+                    </div>
+                </div>
+
+                <!-- Zone d'affichage des résultats -->
+                <div id="medicalResultContainer" style="display: none;">
+                    <div id="medicalResultLoading" style="text-align: center; display: none; padding: 30px;">
+                        <i class="fa fa-spinner fa-spin" style="font-size: 32px; color: #27ae60; margin-bottom: 15px; display: block;"></i>
+                        <p style="color: #666;">Recherche en cours...</p>
+                    </div>
+                    
+                    <div id="medicalResultSuccess" style="display: none;">
+                        <!-- Image -->
+                        <div id="resultImageContainer" style="margin-bottom: 15px; text-align: center;"></div>
+                        
+                        <!-- Titre et contenu -->
+                        <div>
+                            <h3 id="resultTitle" style="margin: 0 0 10px 0; color: #27ae60; font-size: 18px;"></h3>
+                            <p id="resultExtract" style="margin: 0; color: #555; font-size: 14px; line-height: 1.6;"></p>
+                            <a id="resultLink" href="#" target="_blank" style="display: block; margin-top: 15px; color: #3498db; text-decoration: none; font-weight: 600; font-size: 12px;">
+                                <i class="fa fa-external-link"></i> Lire sur Wikipedia
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div id="medicalResultError" style="display: none; background: #FFF5F5; border-left: 4px solid #e74c3c; padding: 15px; border-radius: 8px;">
+                        <p style="margin: 0; color: #e74c3c; font-size: 14px;">
+                            <i class="fa fa-exclamation-circle" style="margin-right: 8px;"></i>
+                            <strong id="errorMessage"></strong>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- État initial (avant recherche) -->
+                <div id="medicalInitialState" style="text-align: center; padding: 40px 20px; color: #999;">
+                    <i class="fa fa-book" style="font-size: 48px; margin-bottom: 15px; opacity: 0.3; display: block;"></i>
+                    <p style="margin: 0; font-size: 14px;">Entrez un terme médical pour découvrir plus d'informations</p>
+                </div>
+            </div>
+
+            <div style="padding: 20px; background: #f8f9fa; border-top: 1px solid #eee; display: flex; justify-content: flex-end;">
+                <button type="button" onclick="closeMedicalHelpModal()" style="padding: 10px 25px; border: 1px solid #ddd; border-radius: 10px; background: white; cursor: pointer;">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        let currentDiagnostic = '';
+        let currentTraitement = '';
+
+        // Ouvrir la modal avec les données de la ligne
+        function openMedicalHelpModal(diagnostic, traitement) {
+            currentDiagnostic = diagnostic;
+            currentTraitement = traitement;
+            
+            document.getElementById('medicalHelpModal').style.display = 'flex';
+            loadQuickSuggestions();
+            document.getElementById('medicalSearchInput').focus();
+        }
+
+        // Fermer la modal
+        function closeMedicalHelpModal() {
+            document.getElementById('medicalHelpModal').style.display = 'none';
+            resetSearchForm();
+        }
+
+        // Charger les suggestions rapides
+        function loadQuickSuggestions() {
+            const suggestionsContainer = document.getElementById('quickSuggestions');
+            suggestionsContainer.innerHTML = '';
+            
+            // Mots clés à extraire
+            const diagnostic = currentDiagnostic.toLowerCase();
+            const traitement = currentTraitement.toLowerCase();
+            const text = diagnostic + ' ' + traitement;
+
+            const keywords = [
+                { keyword: 'infection', label: '🦠 Infection' },
+                { keyword: 'antibiotique', label: '💊 Antibiotique' },
+                { keyword: 'vaccin', label: '💉 Vaccin' },
+                { keyword: 'allergie', label: '🔴 Allergie' },
+                { keyword: 'fracture', label: '🦴 Fracture' },
+                { keyword: 'arthrite', label: '⚡ Arthrite' },
+                { keyword: 'diarrhée', label: '🤒 Diarrhée' },
+                { keyword: 'pneumonie', label: '🫁 Pneumonie' },
+                { keyword: 'parasites', label: '🐛 Parasites' },
+                { keyword: 'chirurgie', label: '✂️ Chirurgie' },
+            ];
+
+            let suggestionsFound = [];
+            keywords.forEach(item => {
+                if (text.includes(item.keyword)) {
+                    suggestionsFound.push(item);
+                }
+            });
+
+            // Si aucune suggestion, en ajouter par défaut
+            if (suggestionsFound.length === 0) {
+                suggestionsFound = [
+                    { keyword: 'santé animale', label: '🐾 Santé animale' },
+                    { keyword: 'médecine vétérinaire', label: '🏥 Médecine vétérinaire' },
+                    { keyword: 'traitement', label: '💉 Traitement' },
+                ];
+            }
+
+            // Afficher les suggestions (max 4)
+            suggestionsFound.slice(0, 4).forEach(item => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.textContent = item.label;
+                btn.style.cssText = 'padding: 10px 15px; background: white; border: 2px solid #D5F4E6; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 13px; color: #27ae60; transition: all 0.3s;';
+                btn.onmouseover = function() {
+                    this.style.background = '#E8F8F5';
+                    this.style.borderColor = '#27ae60';
+                };
+                btn.onmouseout = function() {
+                    this.style.background = 'white';
+                    this.style.borderColor = '#D5F4E6';
+                };
+                btn.onclick = function() {
+                    document.getElementById('medicalSearchInput').value = item.keyword;
+                    searchMedicalHelp();
+                };
+                suggestionsContainer.appendChild(btn);
+            });
+
+            document.getElementById('quickSuggestionsContainer').style.display = suggestionsFound.length > 0 ? 'block' : 'none';
+        }
+
+        // Effectuer la recherche
+        function searchMedicalHelp() {
+            const query = document.getElementById('medicalSearchInput').value.trim();
+            
+            if (!query) {
+                showError('Veuillez entrer un terme à rechercher');
+                return;
+            }
+
+            // Afficher le chargement
+            document.getElementById('medicalInitialState').style.display = 'none';
+            document.getElementById('medicalResultContainer').style.display = 'block';
+            document.getElementById('medicalResultLoading').style.display = 'block';
+            document.getElementById('medicalResultSuccess').style.display = 'none';
+            document.getElementById('medicalResultError').style.display = 'none';
+
+            // Requête AJAX
+            fetch('{{ path("app_examens_wikipedia_search") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: 'query=' + encodeURIComponent(query) + '&diagnostic=' + encodeURIComponent(currentDiagnostic) + '&traitement=' + encodeURIComponent(currentTraitement)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('medicalResultLoading').style.display = 'none';
+
+                if (data.error) {
+                    showError(data.error);
+                    return;
+                }
+
+                if (!data.result) {
+                    showError('Aucun résultat trouvé pour "' + query + '". Essayez un autre terme.');
+                    return;
+                }
+
+                // Afficher le résultat
+                displaySearchResult(data.result);
+            })
+            .catch(error => {
+                document.getElementById('medicalResultLoading').style.display = 'none';
+                showError('Erreur de connexion. Veuillez réessayer.');
+                console.error('Error:', error);
+            });
+        }
+
+        // Afficher le résultat
+        function displaySearchResult(result) {
+            document.getElementById('resultTitle').textContent = result.title;
+            document.getElementById('resultExtract').textContent = result.extract.substring(0, 500) + (result.extract.length > 500 ? '...' : '');
+            document.getElementById('resultLink').href = result.url;
+
+            // Image
+            const imageContainer = document.getElementById('resultImageContainer');
+            if (result.image) {
+                imageContainer.innerHTML = '<img src="' + result.image + '" alt="' + result.title + '" style="max-width: 200px; max-height: 150px; border-radius: 8px; object-fit: cover;">';
+            } else {
+                imageContainer.innerHTML = '';
+            }
+
+            document.getElementById('medicalResultSuccess').style.display = 'block';
+            document.getElementById('medicalResultError').style.display = 'none';
+        }
+
+        // Afficher erreur
+        function showError(message) {
+            document.getElementById('errorMessage').textContent = message;
+            document.getElementById('medicalResultError').style.display = 'block';
+            document.getElementById('medicalResultSuccess').style.display = 'none';
+            document.getElementById('medicalResultLoading').style.display = 'none';
+        }
+
+        // Réinitialiser le formulaire
+        function resetSearchForm() {
+            document.getElementById('medicalSearchInput').value = '';
+            document.getElementById('medicalResultContainer').style.display = 'none';
+            document.getElementById('medicalInitialState').style.display = 'block';
+            document.getElementById('quickSuggestionsContainer').style.display = 'none';
+        }
+
+        // Fermer la modal quand on clique en dehors
+        window.onclick = function(event) {
+            const modal = document.getElementById('medicalHelpModal');
+            if (event.target === modal) {
+                closeMedicalHelpModal();
+            }
+        }
+
+        // Permettre la recherche avec Entrée
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('medicalSearchInput');
+            if (input) {
+                input.addEventListener('keypress', function(event) {
+                    if (event.key === 'Enter') {
+                        searchMedicalHelp();
+                    }
+                });
+            }
+        });
+    </script>
 {% endblock %}
 
 {% block javascripts %}
