@@ -97,6 +97,7 @@
     <parameter key="gemini_model_default">gemini-2.0-flash-exp</parameter>
     <parameter key="gemini_api_key">%env(default::GEMINI_API_KEY)%</parameter>
     <parameter key="gemini_model">%env(default:gemini_model_default:GEMINI_MODEL)%</parameter>
+    <parameter key="EXCHANGERATE_API_KEY">%env(EXCHANGERATE_API_KEY)%</parameter>
     <parameter key="event_dispatcher.event_aliases" type="collection">
       <parameter key="Symfony\Component\Console\Event\ConsoleCommandEvent">console.command</parameter>
       <parameter key="Symfony\Component\Console\Event\ConsoleErrorEvent">console.error</parameter>
@@ -413,81 +414,93 @@
         <argument>Met à jour automatiquement les rappels pour tous les examens</argument>
       </call>
     </service>
+    <service id="App\Command\DailyStockSummaryCommand" class="App\Command\DailyStockSummaryCommand" autowire="true" autoconfigure="true">
+      <tag name="console.command"/>
+      <tag name="container.no_preload"/>
+      <argument type="service" id="doctrine.orm.default_entity_manager"/>
+      <argument type="service" id="App\Service\TelegramService"/>
+      <call method="setName">
+        <argument>app:daily-stock-summary</argument>
+      </call>
+      <call method="setDescription">
+        <argument>Envoie un bilan journalier des stocks via Telegram</argument>
+      </call>
+    </service>
     <service id="App\Controller\AboutController" class="App\Controller\AboutController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\AboutController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\AboutController"/>
       </call>
     </service>
     <service id="App\Controller\AdminDashboardController" class="App\Controller\AdminDashboardController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\AdminDashboardController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\AdminDashboardController"/>
       </call>
     </service>
     <service id="App\Controller\AdminMateriels\MachineAdminController" class="App\Controller\AdminMateriels\MachineAdminController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\AdminMateriels\MachineAdminController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\AdminMateriels\MachineAdminController"/>
       </call>
     </service>
     <service id="App\Controller\AdminMateriels\MaintenanceAdminController" class="App\Controller\AdminMateriels\MaintenanceAdminController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\AdminMateriels\MaintenanceAdminController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\AdminMateriels\MaintenanceAdminController"/>
       </call>
     </service>
     <service id="App\Controller\AgriculteurDashboardController" class="App\Controller\AgriculteurDashboardController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\AgriculteurDashboardController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\AgriculteurDashboardController"/>
       </call>
     </service>
     <service id="App\Controller\Animals\Admin\AdminAnimauxController" class="App\Controller\Animals\Admin\AdminAnimauxController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\Animals\Admin\AdminAnimauxController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\Animals\Admin\AdminAnimauxController"/>
       </call>
     </service>
     <service id="App\Controller\Animals\Admin\AdminExamenController" class="App\Controller\Animals\Admin\AdminExamenController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\Animals\Admin\AdminExamenController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\Animals\Admin\AdminExamenController"/>
       </call>
     </service>
     <service id="App\Controller\Animals\AnimauxController" class="App\Controller\Animals\AnimauxController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\Animals\AnimauxController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\Animals\AnimauxController"/>
       </call>
     </service>
     <service id="App\Controller\Animals\ExamensController" class="App\Controller\Animals\ExamensController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\Animals\ExamensController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\Animals\ExamensController"/>
       </call>
     </service>
     <service id="App\Controller\Animals\ReminderController" class="App\Controller\Animals\ReminderController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\Animals\ReminderController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\Animals\ReminderController"/>
       </call>
     </service>
     <service id="App\Controller\AuthController" class="App\Controller\AuthController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\AuthController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\AuthController"/>
       </call>
     </service>
     <service id="App\Controller\ChatController" class="App\Controller\ChatController" public="true" autowire="true" autoconfigure="true">
@@ -495,70 +508,70 @@
       <tag name="container.service_subscriber"/>
       <argument type="service" id="App\Service\AiAssistantService"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\ChatController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\ChatController"/>
       </call>
     </service>
     <service id="App\Controller\Evenements\Agriculteur\EvenementController" class="App\Controller\Evenements\Agriculteur\EvenementController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\Evenements\Agriculteur\EvenementController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\Evenements\Agriculteur\EvenementController"/>
       </call>
     </service>
     <service id="App\Controller\Evenements\Agriculteur\ParticipationController" class="App\Controller\Evenements\Agriculteur\ParticipationController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\Evenements\Agriculteur\ParticipationController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\Evenements\Agriculteur\ParticipationController"/>
       </call>
     </service>
     <service id="App\Controller\Evenements\CategorieEvenementController" class="App\Controller\Evenements\CategorieEvenementController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\Evenements\CategorieEvenementController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\Evenements\CategorieEvenementController"/>
       </call>
     </service>
     <service id="App\Controller\Evenements\EvenementController" class="App\Controller\Evenements\EvenementController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\Evenements\EvenementController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\Evenements\EvenementController"/>
       </call>
     </service>
     <service id="App\Controller\Evenements\Ouvrier\EvenementController" class="App\Controller\Evenements\Ouvrier\EvenementController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\Evenements\Ouvrier\EvenementController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\Evenements\Ouvrier\EvenementController"/>
       </call>
     </service>
     <service id="App\Controller\Evenements\Ouvrier\ParticipationController" class="App\Controller\Evenements\Ouvrier\ParticipationController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\Evenements\Ouvrier\ParticipationController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\Evenements\Ouvrier\ParticipationController"/>
       </call>
     </service>
     <service id="App\Controller\Evenements\ParticipationController" class="App\Controller\Evenements\ParticipationController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\Evenements\ParticipationController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\Evenements\ParticipationController"/>
       </call>
     </service>
     <service id="App\Controller\HomeController" class="App\Controller\HomeController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\HomeController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\HomeController"/>
       </call>
     </service>
     <service id="App\Controller\LocaleController" class="App\Controller\LocaleController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\LocaleController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\LocaleController"/>
       </call>
     </service>
     <service id="App\Controller\Materiels\MachineController" class="App\Controller\Materiels\MachineController" public="true" autowire="true" autoconfigure="true">
@@ -566,7 +579,7 @@
       <tag name="container.service_subscriber"/>
       <argument type="service" id=".debug.http_client"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\Materiels\MachineController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\Materiels\MachineController"/>
       </call>
     </service>
     <service id="App\Controller\Materiels\MaintenancesController" class="App\Controller\Materiels\MaintenancesController" public="true" autowire="true" autoconfigure="true">
@@ -574,28 +587,35 @@
       <tag name="container.service_subscriber"/>
       <argument type="service" id="App\Service\MaintenanceAlertService"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\Materiels\MaintenancesController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\Materiels\MaintenancesController"/>
+      </call>
+    </service>
+    <service id="App\Controller\OuvrierDashboardController" class="App\Controller\OuvrierDashboardController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\OuvrierDashboardController"/>
       </call>
     </service>
     <service id="App\Controller\Terrain\AgriPlanteController" class="App\Controller\Terrain\AgriPlanteController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\Terrain\AgriPlanteController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\Terrain\AgriPlanteController"/>
       </call>
     </service>
     <service id="App\Controller\Terrain\AgriRotationController" class="App\Controller\Terrain\AgriRotationController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\Terrain\AgriRotationController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\Terrain\AgriRotationController"/>
       </call>
     </service>
     <service id="App\Controller\Terrain\AgriTerrainController" class="App\Controller\Terrain\AgriTerrainController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\Terrain\AgriTerrainController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\Terrain\AgriTerrainController"/>
       </call>
     </service>
     <service id="App\Controller\Terrain\AiSuggestionController" class="App\Controller\Terrain\AiSuggestionController" public="true" autowire="true" autoconfigure="true">
@@ -605,35 +625,35 @@
       <argument type="service" id="App\Repository\Terrain\TerrainRepository"/>
       <argument type="service" id="App\Repository\Terrain\PlanteRepository"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\Terrain\AiSuggestionController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\Terrain\AiSuggestionController"/>
       </call>
     </service>
     <service id="App\Controller\Terrain\OuvrierPlanteViewController" class="App\Controller\Terrain\OuvrierPlanteViewController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\Terrain\OuvrierPlanteViewController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\Terrain\OuvrierPlanteViewController"/>
       </call>
     </service>
     <service id="App\Controller\Terrain\PlanteController" class="App\Controller\Terrain\PlanteController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\Terrain\PlanteController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\Terrain\PlanteController"/>
       </call>
     </service>
     <service id="App\Controller\Terrain\RotationController" class="App\Controller\Terrain\RotationController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\Terrain\RotationController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\Terrain\RotationController"/>
       </call>
     </service>
     <service id="App\Controller\Terrain\TerrainController" class="App\Controller\Terrain\TerrainController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\Terrain\TerrainController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\Terrain\TerrainController"/>
       </call>
     </service>
     <service id="App\Controller\Terrain\WorkflowPlanteController" class="App\Controller\Terrain\WorkflowPlanteController" public="true" autowire="true" autoconfigure="true">
@@ -641,7 +661,7 @@
       <tag name="container.service_subscriber"/>
       <argument type="service" id=".debug.http_client"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\Terrain\WorkflowPlanteController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\Terrain\WorkflowPlanteController"/>
       </call>
     </service>
     <service id="App\Controller\User\AbonnementController" class="App\Controller\User\AbonnementController" public="true" autowire="true" autoconfigure="true">
@@ -650,14 +670,14 @@
       <argument type="service" id="App\Repository\User\AbonnementRepository"/>
       <argument type="service" id="doctrine.orm.default_entity_manager"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\User\AbonnementController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\User\AbonnementController"/>
       </call>
     </service>
     <service id="App\Controller\User\AbonnementFrontController" class="App\Controller\User\AbonnementFrontController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\User\AbonnementFrontController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\User\AbonnementFrontController"/>
       </call>
     </service>
     <service id="App\Controller\User\AdminUserController" class="App\Controller\User\AdminUserController" public="true" autowire="true" autoconfigure="true">
@@ -667,84 +687,98 @@
       <argument type="service" id="App\Repository\User\UserRepository"/>
       <argument type="service" id="security.user_password_hasher"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\User\AdminUserController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\User\AdminUserController"/>
       </call>
     </service>
     <service id="App\Controller\User\OffreController" class="App\Controller\User\OffreController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\User\OffreController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\User\OffreController"/>
       </call>
     </service>
     <service id="App\Controller\User\OffreFrontController" class="App\Controller\User\OffreFrontController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\User\OffreFrontController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\User\OffreFrontController"/>
       </call>
     </service>
     <service id="App\Controller\User\OuvrierController" class="App\Controller\User\OuvrierController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\User\OuvrierController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\User\OuvrierController"/>
       </call>
     </service>
     <service id="App\Controller\User\Ouvrier_agriController" class="App\Controller\User\Ouvrier_agriController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\User\Ouvrier_agriController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\User\Ouvrier_agriController"/>
       </call>
     </service>
     <service id="App\Controller\User\TacheController" class="App\Controller\User\TacheController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\User\TacheController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\User\TacheController"/>
       </call>
     </service>
     <service id="App\Controller\User\TacheFrontController" class="App\Controller\User\TacheFrontController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\User\TacheFrontController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\User\TacheFrontController"/>
       </call>
     </service>
     <service id="App\Controller\stocks\AdminStockController" class="App\Controller\stocks\AdminStockController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\stocks\AdminStockController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\stocks\AdminStockController"/>
       </call>
     </service>
     <service id="App\Controller\stocks\Admin_CategorieController" class="App\Controller\stocks\Admin_CategorieController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\stocks\Admin_CategorieController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\stocks\Admin_CategorieController"/>
       </call>
     </service>
     <service id="App\Controller\stocks\ArticleController" class="App\Controller\stocks\ArticleController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\stocks\ArticleController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\stocks\ArticleController"/>
       </call>
     </service>
     <service id="App\Controller\stocks\CategorieController" class="App\Controller\stocks\CategorieController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\stocks\CategorieController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\stocks\CategorieController"/>
       </call>
     </service>
     <service id="App\Controller\stocks\MouvementController" class="App\Controller\stocks\MouvementController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <call method="setContainer">
-        <argument type="service" id=".service_locator.NCHITyE.App\Controller\stocks\MouvementController"/>
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\stocks\MouvementController"/>
+      </call>
+    </service>
+    <service id="App\Controller\stocks\QrCodeController" class="App\Controller\stocks\QrCodeController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\stocks\QrCodeController"/>
+      </call>
+    </service>
+    <service id="App\Controller\stocks\VisionController" class="App\Controller\stocks\VisionController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.MEcn9qh.App\Controller\stocks\VisionController"/>
       </call>
     </service>
     <service id="App\EventListener\LocaleListener" class="App\EventListener\LocaleListener" autowire="true" autoconfigure="true">
@@ -955,8 +989,16 @@
       <argument type="service" id="App\Repository\User\TacheRepository"/>
       <argument type="service" id="App\Repository\Terrain\TerrainRepository"/>
     </service>
+    <service id="App\Service\CurrencyService" class="App\Service\CurrencyService" autowire="true" autoconfigure="true">
+      <argument type="service" id=".debug.http_client"/>
+      <argument>%env(EXCHANGERATE_API_KEY)%</argument>
+    </service>
     <service id="App\Service\DatabaseReaderService" class="App\Service\DatabaseReaderService" autowire="true" autoconfigure="true">
       <argument type="service" id="doctrine.dbal.default_connection"/>
+      <argument type="service" id="monolog.logger"/>
+    </service>
+    <service id="App\Service\EmailService" class="App\Service\EmailService" autowire="true" autoconfigure="true">
+      <argument type="service" id="mailer.mailer"/>
       <argument type="service" id="monolog.logger"/>
     </service>
     <service id="App\Service\GeminiRecommendationService" class="App\Service\GeminiRecommendationService" public="true" autowire="true" autoconfigure="true">
@@ -982,6 +1024,13 @@
     <service id="App\Service\PdfService" class="App\Service\PdfService" autowire="true" autoconfigure="true">
       <argument type="service" id="twig"/>
     </service>
+    <service id="App\Service\QRCodeService" class="App\Service\QRCodeService" autowire="true" autoconfigure="true">
+      <argument type="service" id="router.default"/>
+    </service>
+    <service id="App\Service\SmartVisionService" class="App\Service\SmartVisionService" autowire="true" autoconfigure="true">
+      <argument type="service" id=".debug.http_client"/>
+      <argument>%env(GEMINI_API_KEY)%</argument>
+    </service>
     <service id="App\Service\SmsService" class="App\Service\SmsService" autowire="true" autoconfigure="true">
       <argument>%env(TWILIO_SID)%</argument>
       <argument>%env(TWILIO_TOKEN)%</argument>
@@ -1003,6 +1052,10 @@
     <service id="App\Service\TaskTranslator" class="App\Service\TaskTranslator" autowire="true" autoconfigure="true">
       <argument type="service" id=".debug.http_client"/>
       <argument>C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow</argument>
+    </service>
+    <service id="App\Service\TelegramService" class="App\Service\TelegramService" autowire="true" autoconfigure="true">
+      <argument type="service" id=".debug.http_client"/>
+      <argument>%env(TELEGRAM_TOKEN)%</argument>
     </service>
     <service id="App\Service\TwoFactorCodeSender" class="App\Service\TwoFactorCodeSender" autowire="true" autoconfigure="true"/>
     <service id="argument_metadata_factory" class="Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory"/>
@@ -1032,7 +1085,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.bDMgK3V"/>
+      <argument type="service" id=".service_locator.cjETtTl"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -4138,7 +4191,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.bDMgK3V"/>
+      <argument type="service" id=".service_locator.cjETtTl"/>
     </service>
     <service id="debug.log_processor" class="Symfony\Bridge\Monolog\Processor\DebugProcessor">
       <tag name="kernel.reset" method="reset"/>
@@ -4238,7 +4291,7 @@
     <service id="router.default" class="Symfony\Bundle\FrameworkBundle\Routing\Router">
       <tag name="monolog.logger" channel="router"/>
       <tag name="container.service_subscriber" id="routing.loader"/>
-      <argument type="service" id=".service_locator.DjrhxxF.router.default"/>
+      <argument type="service" id=".service_locator.b.mdbP7.router.default"/>
       <argument>kernel::loadRoutes</argument>
       <argument type="collection">
         <argument key="cache_dir">C:\Users\Lenovo\Desktop\PIweb\user\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev</argument>
@@ -8475,6 +8528,8 @@
     <service id="stof_doctrine_extensions.metadata_cache" class="Symfony\Component\Cache\Adapter\ArrayAdapter"/>
     <service id=".instanceof.Symfony\Component\Console\Command\Command.0.App\Command\Animals\UpdateRemindersCommand" class="App\Command\Animals\UpdateRemindersCommand" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Command\Animals\UpdateRemindersCommand" class="App\Command\Animals\UpdateRemindersCommand" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Component\Console\Command\Command.0.App\Command\DailyStockSummaryCommand" class="App\Command\DailyStockSummaryCommand" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Command\DailyStockSummaryCommand" class="App\Command\DailyStockSummaryCommand" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\AboutController" class="App\Controller\AboutController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\AboutController" class="App\Controller\AboutController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\AboutController" class="App\Controller\AboutController" autowire="true" autoconfigure="true" abstract="true"/>
@@ -8544,6 +8599,9 @@
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Materiels\MaintenancesController" class="App\Controller\Materiels\MaintenancesController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Materiels\MaintenancesController" class="App\Controller\Materiels\MaintenancesController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\Materiels\MaintenancesController" class="App\Controller\Materiels\MaintenancesController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\OuvrierDashboardController" class="App\Controller\OuvrierDashboardController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\OuvrierDashboardController" class="App\Controller\OuvrierDashboardController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\OuvrierDashboardController" class="App\Controller\OuvrierDashboardController" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Terrain\AgriPlanteController" class="App\Controller\Terrain\AgriPlanteController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Terrain\AgriPlanteController" class="App\Controller\Terrain\AgriPlanteController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\Terrain\AgriPlanteController" class="App\Controller\Terrain\AgriPlanteController" autowire="true" autoconfigure="true" abstract="true"/>
@@ -8613,6 +8671,12 @@
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\stocks\MouvementController" class="App\Controller\stocks\MouvementController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\stocks\MouvementController" class="App\Controller\stocks\MouvementController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\stocks\MouvementController" class="App\Controller\stocks\MouvementController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\stocks\QrCodeController" class="App\Controller\stocks\QrCodeController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\stocks\QrCodeController" class="App\Controller\stocks\QrCodeController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\stocks\QrCodeController" class="App\Controller\stocks\QrCodeController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\stocks\VisionController" class="App\Controller\stocks\VisionController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\stocks\VisionController" class="App\Controller\stocks\VisionController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\stocks\VisionController" class="App\Controller\stocks\VisionController" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.App\EventListener\LocaleListener.0.App\EventListener\LocaleListener" class="App\EventListener\LocaleListener" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\EventListener\LocaleListener" class="App\EventListener\LocaleListener" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\EventDispatcher\EventSubscriberInterface.0.App\EventListener\LogoutListener" class="App\EventListener\LogoutListener" autowire="true" abstract="true"/>
@@ -9469,6 +9533,51 @@
         <argument key="maintenance" type="service_closure" id=".errored..service_locator.kLp2YUI.App\Entity\Materiels\Maintenance"/>
       </argument>
     </service>
+    <service id=".service_locator.FL1_dBi" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="categorieRepo" type="service_closure" id="App\Repository\stocks\CategorieRepository"/>
+        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+      </argument>
+    </service>
+    <service id=".service_locator.RS.51pb" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="articleRepo" type="service_closure" id="App\Repository\stocks\ArticleRepository"/>
+        <argument key="categorieRepo" type="service_closure" id="App\Repository\stocks\CategorieRepository"/>
+        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+      </argument>
+    </service>
+    <service id=".service_locator.mvGX7gD" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="article" type="service_closure" id=".errored..service_locator.mvGX7gD.App\Entity\stocks\Article"/>
+        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+      </argument>
+    </service>
+    <service id=".service_locator.sdMA3l9" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="article" type="service_closure" id=".errored..service_locator.sdMA3l9.App\Entity\stocks\Article"/>
+        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="emailService" type="service_closure" id="App\Service\EmailService"/>
+      </argument>
+    </service>
+    <service id=".service_locator.zWKqscT" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="article" type="service_closure" id=".errored..service_locator.zWKqscT.App\Entity\stocks\Article"/>
+        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="mouvementRepo" type="service_closure" id="App\Repository\stocks\MouvementStockRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.6vfABg_" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="mouvement" type="service_closure" id=".errored..service_locator.6vfABg_.App\Entity\stocks\MouvementStock"/>
+      </argument>
+    </service>
     <service id=".service_locator.ZUN3WII" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -9744,11 +9853,76 @@
         <argument key="userRepo" type="service_closure" id="App\Repository\User\UserRepository"/>
       </argument>
     </service>
-    <service id=".service_locator.JDYIjkY" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.jJodKGc" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="articleRepository" type="service_closure" id="App\Repository\stocks\ArticleRepository"/>
+        <argument key="categorieRepo" type="service_closure" id="App\Repository\stocks\CategorieRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.jSEPOAw" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="currencyService" type="service_closure" id="App\Service\CurrencyService"/>
+        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+      </argument>
+    </service>
+    <service id=".service_locator.cSeYTD8" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="article" type="service_closure" id=".errored..service_locator.cSeYTD8.App\Entity\stocks\Article"/>
+        <argument key="currencyService" type="service_closure" id="App\Service\CurrencyService"/>
+        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+      </argument>
+    </service>
+    <service id=".service_locator.FiVJy9a" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="articleRepo" type="service_closure" id="App\Repository\stocks\ArticleRepository"/>
+        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="mouvementRepo" type="service_closure" id="App\Repository\stocks\MouvementStockRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.dS.jQeM" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="mouvementRepo" type="service_closure" id="App\Repository\stocks\MouvementStockRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.YXgn1by" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="categorieRepository" type="service_closure" id="App\Repository\stocks\CategorieRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.nqjRBI0" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="categorie" type="service_closure" id=".errored..service_locator.nqjRBI0.App\Entity\stocks\Categorie"/>
+        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+      </argument>
+    </service>
+    <service id=".service_locator.U.mi2Pz" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="articleRepository" type="service_closure" id="App\Repository\stocks\ArticleRepository"/>
         <argument key="catRepo" type="service_closure" id="App\Repository\stocks\CategorieRepository"/>
+        <argument key="currencyService" type="service_closure" id="App\Service\CurrencyService"/>
+        <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+      </argument>
+    </service>
+    <service id=".service_locator.lDjzc9y" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="currencyService" type="service_closure" id="App\Service\CurrencyService"/>
+        <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+      </argument>
+    </service>
+    <service id=".service_locator..1lCTzi" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="article" type="service_closure" id=".errored..service_locator..1lCTzi.App\Entity\stocks\Article"/>
+        <argument key="currencyService" type="service_closure" id="App\Service\CurrencyService"/>
         <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
       </argument>
     </service>
@@ -9759,11 +9933,26 @@
         <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
       </argument>
     </service>
-    <service id=".service_locator.mvGX7gD" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.QgKnEWq" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
-        <argument key="article" type="service_closure" id=".errored..service_locator.mvGX7gD.App\Entity\stocks\Article"/>
+        <argument key="article" type="service_closure" id=".errored..service_locator.QgKnEWq.App\Entity\stocks\Article"/>
         <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="emailService" type="service_closure" id="App\Service\EmailService"/>
+        <argument key="telegramService" type="service_closure" id="App\Service\TelegramService"/>
+      </argument>
+    </service>
+    <service id=".service_locator.MxUmCjx" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="article" type="service_closure" id=".errored..service_locator.MxUmCjx.App\Entity\stocks\Article"/>
+        <argument key="qrCodeService" type="service_closure" id="App\Service\QRCodeService"/>
+      </argument>
+    </service>
+    <service id=".service_locator.eR0i7Pd" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="article" type="service_closure" id=".errored..service_locator.eR0i7Pd.App\Entity\stocks\Article"/>
       </argument>
     </service>
     <service id=".service_locator.SsD9eLO" class="Symfony\Component\DependencyInjection\ServiceLocator">
@@ -9780,6 +9969,13 @@
         <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
       </argument>
     </service>
+    <service id=".service_locator.uURT18R" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="paginator" type="service_closure" id="knp_paginator"/>
+      </argument>
+    </service>
     <service id=".service_locator.zy9Sz.w" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -9787,7 +9983,14 @@
         <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
       </argument>
     </service>
-    <service id=".service_locator.bDMgK3V" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.f4l_PHz" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="visionService" type="service_closure" id="App\Service\SmartVisionService"/>
+      </argument>
+    </service>
+    <service id=".service_locator.cjETtTl" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Controller\AdminDashboardController::index" type="service_closure" id=".service_locator.qni5W9T"/>
@@ -9895,6 +10098,13 @@
         <argument key="App\Controller\Materiels\MaintenancesController::index" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\Materiels\MaintenancesController::new" type="service_closure" id=".service_locator.9kKwU2t"/>
         <argument key="App\Controller\Materiels\MaintenancesController::show" type="service_closure" id=".service_locator.b5YG.FV"/>
+        <argument key="App\Controller\OuvrierDashboardController::articleShow" type="service_closure" id=".service_locator.mvGX7gD"/>
+        <argument key="App\Controller\OuvrierDashboardController::categories" type="service_closure" id=".service_locator.FL1_dBi"/>
+        <argument key="App\Controller\OuvrierDashboardController::modifierMouvement" type="service_closure" id=".service_locator.6vfABg_"/>
+        <argument key="App\Controller\OuvrierDashboardController::mouvements" type="service_closure" id=".service_locator.zWKqscT"/>
+        <argument key="App\Controller\OuvrierDashboardController::produits" type="service_closure" id=".service_locator.RS.51pb"/>
+        <argument key="App\Controller\OuvrierDashboardController::profileUpdate" type="service_closure" id=".service_locator.t8346QO"/>
+        <argument key="App\Controller\OuvrierDashboardController::sortie" type="service_closure" id=".service_locator.sdMA3l9"/>
         <argument key="App\Controller\Terrain\AgriPlanteController::delete" type="service_closure" id=".service_locator.yjHtSb5"/>
         <argument key="App\Controller\Terrain\AgriPlanteController::edit" type="service_closure" id=".service_locator.yjHtSb5"/>
         <argument key="App\Controller\Terrain\AgriPlanteController::index" type="service_closure" id=".service_locator.ZUN3WII"/>
@@ -9983,21 +10193,36 @@
         <argument key="App\Controller\User\TacheFrontController::front" type="service_closure" id=".service_locator.sYplRBf"/>
         <argument key="App\Controller\User\TacheFrontController::ouvriersByTerrain" type="service_closure" id=".service_locator.sYplRBf"/>
         <argument key="App\Controller\User\TacheFrontController::tachesByOuvrier" type="service_closure" id=".service_locator.xxq2prQ"/>
-        <argument key="App\Controller\stocks\AdminStockController::new" type="service_closure" id=".service_locator.9kKwU2t"/>
+        <argument key="App\Controller\stocks\AdminStockController::delete" type="service_closure" id=".service_locator.mvGX7gD"/>
+        <argument key="App\Controller\stocks\AdminStockController::edit" type="service_closure" id=".service_locator.cSeYTD8"/>
+        <argument key="App\Controller\stocks\AdminStockController::exportPdf" type="service_closure" id=".service_locator.FiVJy9a"/>
+        <argument key="App\Controller\stocks\AdminStockController::gestionStock" type="service_closure" id=".service_locator.mvGX7gD"/>
+        <argument key="App\Controller\stocks\AdminStockController::index" type="service_closure" id=".service_locator.jJodKGc"/>
+        <argument key="App\Controller\stocks\AdminStockController::mouvements" type="service_closure" id=".service_locator.dS.jQeM"/>
+        <argument key="App\Controller\stocks\AdminStockController::new" type="service_closure" id=".service_locator.jSEPOAw"/>
+        <argument key="App\Controller\stocks\Admin_CategorieController::delete" type="service_closure" id=".service_locator.nqjRBI0"/>
+        <argument key="App\Controller\stocks\Admin_CategorieController::edit" type="service_closure" id=".service_locator.nqjRBI0"/>
+        <argument key="App\Controller\stocks\Admin_CategorieController::index" type="service_closure" id=".service_locator.YXgn1by"/>
         <argument key="App\Controller\stocks\Admin_CategorieController::new" type="service_closure" id=".service_locator.9kKwU2t"/>
         <argument key="App\Controller\stocks\ArticleController::delete" type="service_closure" id=".service_locator..KZLFfI"/>
-        <argument key="App\Controller\stocks\ArticleController::edit" type="service_closure" id=".service_locator..KZLFfI"/>
-        <argument key="App\Controller\stocks\ArticleController::gestionStock" type="service_closure" id=".service_locator.mvGX7gD"/>
-        <argument key="App\Controller\stocks\ArticleController::index" type="service_closure" id=".service_locator.JDYIjkY"/>
-        <argument key="App\Controller\stocks\ArticleController::new" type="service_closure" id=".service_locator.CsMkqUa"/>
+        <argument key="App\Controller\stocks\ArticleController::downloadQRCode" type="service_closure" id=".service_locator.MxUmCjx"/>
+        <argument key="App\Controller\stocks\ArticleController::edit" type="service_closure" id=".service_locator..1lCTzi"/>
+        <argument key="App\Controller\stocks\ArticleController::generateQRCode" type="service_closure" id=".service_locator.MxUmCjx"/>
+        <argument key="App\Controller\stocks\ArticleController::gestionStock" type="service_closure" id=".service_locator.QgKnEWq"/>
+        <argument key="App\Controller\stocks\ArticleController::index" type="service_closure" id=".service_locator.U.mi2Pz"/>
+        <argument key="App\Controller\stocks\ArticleController::new" type="service_closure" id=".service_locator.lDjzc9y"/>
+        <argument key="App\Controller\stocks\ArticleController::scanRedirect" type="service_closure" id=".service_locator.eR0i7Pd"/>
+        <argument key="App\Controller\stocks\ArticleController::show" type="service_closure" id=".service_locator.eR0i7Pd"/>
+        <argument key="App\Controller\stocks\ArticleController::viewQRCode" type="service_closure" id=".service_locator.eR0i7Pd"/>
         <argument key="App\Controller\stocks\CategorieController::delete" type="service_closure" id=".service_locator.OlTlOHR"/>
         <argument key="App\Controller\stocks\CategorieController::edit" type="service_closure" id=".service_locator.OlTlOHR"/>
         <argument key="App\Controller\stocks\CategorieController::index" type="service_closure" id=".service_locator.SsD9eLO"/>
         <argument key="App\Controller\stocks\CategorieController::new" type="service_closure" id=".service_locator.CsMkqUa"/>
         <argument key="App\Controller\stocks\MouvementController::exportPdf" type="service_closure" id=".service_locator.9kKwU2t"/>
-        <argument key="App\Controller\stocks\MouvementController::gestionStockAlias" type="service_closure" id=".service_locator.mvGX7gD"/>
-        <argument key="App\Controller\stocks\MouvementController::historique" type="service_closure" id=".service_locator.9kKwU2t"/>
+        <argument key="App\Controller\stocks\MouvementController::gestionStockAlias" type="service_closure" id=".service_locator.QgKnEWq"/>
+        <argument key="App\Controller\stocks\MouvementController::historique" type="service_closure" id=".service_locator.uURT18R"/>
         <argument key="App\Controller\stocks\MouvementController::rotation" type="service_closure" id=".service_locator.zy9Sz.w"/>
+        <argument key="App\Controller\stocks\VisionController::analyze" type="service_closure" id=".service_locator.f4l_PHz"/>
         <argument key="App\Kernel::loadRoutes" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="App\Kernel::registerContainerConfiguration" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="kernel::loadRoutes" type="service_closure" id=".service_locator.y4_Zrx."/>
@@ -10107,6 +10332,13 @@
         <argument key="App\Controller\Materiels\MaintenancesController:index" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\Materiels\MaintenancesController:new" type="service_closure" id=".service_locator.9kKwU2t"/>
         <argument key="App\Controller\Materiels\MaintenancesController:show" type="service_closure" id=".service_locator.b5YG.FV"/>
+        <argument key="App\Controller\OuvrierDashboardController:articleShow" type="service_closure" id=".service_locator.mvGX7gD"/>
+        <argument key="App\Controller\OuvrierDashboardController:categories" type="service_closure" id=".service_locator.FL1_dBi"/>
+        <argument key="App\Controller\OuvrierDashboardController:modifierMouvement" type="service_closure" id=".service_locator.6vfABg_"/>
+        <argument key="App\Controller\OuvrierDashboardController:mouvements" type="service_closure" id=".service_locator.zWKqscT"/>
+        <argument key="App\Controller\OuvrierDashboardController:produits" type="service_closure" id=".service_locator.RS.51pb"/>
+        <argument key="App\Controller\OuvrierDashboardController:profileUpdate" type="service_closure" id=".service_locator.t8346QO"/>
+        <argument key="App\Controller\OuvrierDashboardController:sortie" type="service_closure" id=".service_locator.sdMA3l9"/>
         <argument key="App\Controller\Terrain\AgriPlanteController:delete" type="service_closure" id=".service_locator.yjHtSb5"/>
         <argument key="App\Controller\Terrain\AgriPlanteController:edit" type="service_closure" id=".service_locator.yjHtSb5"/>
         <argument key="App\Controller\Terrain\AgriPlanteController:index" type="service_closure" id=".service_locator.ZUN3WII"/>
@@ -10195,21 +10427,36 @@
         <argument key="App\Controller\User\TacheFrontController:front" type="service_closure" id=".service_locator.sYplRBf"/>
         <argument key="App\Controller\User\TacheFrontController:ouvriersByTerrain" type="service_closure" id=".service_locator.sYplRBf"/>
         <argument key="App\Controller\User\TacheFrontController:tachesByOuvrier" type="service_closure" id=".service_locator.xxq2prQ"/>
-        <argument key="App\Controller\stocks\AdminStockController:new" type="service_closure" id=".service_locator.9kKwU2t"/>
+        <argument key="App\Controller\stocks\AdminStockController:delete" type="service_closure" id=".service_locator.mvGX7gD"/>
+        <argument key="App\Controller\stocks\AdminStockController:edit" type="service_closure" id=".service_locator.cSeYTD8"/>
+        <argument key="App\Controller\stocks\AdminStockController:exportPdf" type="service_closure" id=".service_locator.FiVJy9a"/>
+        <argument key="App\Controller\stocks\AdminStockController:gestionStock" type="service_closure" id=".service_locator.mvGX7gD"/>
+        <argument key="App\Controller\stocks\AdminStockController:index" type="service_closure" id=".service_locator.jJodKGc"/>
+        <argument key="App\Controller\stocks\AdminStockController:mouvements" type="service_closure" id=".service_locator.dS.jQeM"/>
+        <argument key="App\Controller\stocks\AdminStockController:new" type="service_closure" id=".service_locator.jSEPOAw"/>
+        <argument key="App\Controller\stocks\Admin_CategorieController:delete" type="service_closure" id=".service_locator.nqjRBI0"/>
+        <argument key="App\Controller\stocks\Admin_CategorieController:edit" type="service_closure" id=".service_locator.nqjRBI0"/>
+        <argument key="App\Controller\stocks\Admin_CategorieController:index" type="service_closure" id=".service_locator.YXgn1by"/>
         <argument key="App\Controller\stocks\Admin_CategorieController:new" type="service_closure" id=".service_locator.9kKwU2t"/>
         <argument key="App\Controller\stocks\ArticleController:delete" type="service_closure" id=".service_locator..KZLFfI"/>
-        <argument key="App\Controller\stocks\ArticleController:edit" type="service_closure" id=".service_locator..KZLFfI"/>
-        <argument key="App\Controller\stocks\ArticleController:gestionStock" type="service_closure" id=".service_locator.mvGX7gD"/>
-        <argument key="App\Controller\stocks\ArticleController:index" type="service_closure" id=".service_locator.JDYIjkY"/>
-        <argument key="App\Controller\stocks\ArticleController:new" type="service_closure" id=".service_locator.CsMkqUa"/>
+        <argument key="App\Controller\stocks\ArticleController:downloadQRCode" type="service_closure" id=".service_locator.MxUmCjx"/>
+        <argument key="App\Controller\stocks\ArticleController:edit" type="service_closure" id=".service_locator..1lCTzi"/>
+        <argument key="App\Controller\stocks\ArticleController:generateQRCode" type="service_closure" id=".service_locator.MxUmCjx"/>
+        <argument key="App\Controller\stocks\ArticleController:gestionStock" type="service_closure" id=".service_locator.QgKnEWq"/>
+        <argument key="App\Controller\stocks\ArticleController:index" type="service_closure" id=".service_locator.U.mi2Pz"/>
+        <argument key="App\Controller\stocks\ArticleController:new" type="service_closure" id=".service_locator.lDjzc9y"/>
+        <argument key="App\Controller\stocks\ArticleController:scanRedirect" type="service_closure" id=".service_locator.eR0i7Pd"/>
+        <argument key="App\Controller\stocks\ArticleController:show" type="service_closure" id=".service_locator.eR0i7Pd"/>
+        <argument key="App\Controller\stocks\ArticleController:viewQRCode" type="service_closure" id=".service_locator.eR0i7Pd"/>
         <argument key="App\Controller\stocks\CategorieController:delete" type="service_closure" id=".service_locator.OlTlOHR"/>
         <argument key="App\Controller\stocks\CategorieController:edit" type="service_closure" id=".service_locator.OlTlOHR"/>
         <argument key="App\Controller\stocks\CategorieController:index" type="service_closure" id=".service_locator.SsD9eLO"/>
         <argument key="App\Controller\stocks\CategorieController:new" type="service_closure" id=".service_locator.CsMkqUa"/>
         <argument key="App\Controller\stocks\MouvementController:exportPdf" type="service_closure" id=".service_locator.9kKwU2t"/>
-        <argument key="App\Controller\stocks\MouvementController:gestionStockAlias" type="service_closure" id=".service_locator.mvGX7gD"/>
-        <argument key="App\Controller\stocks\MouvementController:historique" type="service_closure" id=".service_locator.9kKwU2t"/>
+        <argument key="App\Controller\stocks\MouvementController:gestionStockAlias" type="service_closure" id=".service_locator.QgKnEWq"/>
+        <argument key="App\Controller\stocks\MouvementController:historique" type="service_closure" id=".service_locator.uURT18R"/>
         <argument key="App\Controller\stocks\MouvementController:rotation" type="service_closure" id=".service_locator.zy9Sz.w"/>
+        <argument key="App\Controller\stocks\VisionController:analyze" type="service_closure" id=".service_locator.f4l_PHz"/>
         <argument key="kernel:loadRoutes" type="service_closure" id=".service_locator.y4_Zrx."/>
         <argument key="kernel:registerContainerConfiguration" type="service_closure" id=".service_locator.y4_Zrx."/>
       </argument>
@@ -10913,7 +11160,7 @@
         <argument>0</argument>
       </call>
     </service>
-    <service id=".service_locator.NCHITyE" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="form.factory" type="service_closure" id="form.factory" on-invalid="ignore"/>
@@ -10929,281 +11176,299 @@
         <argument key="web_link.http_header_serializer" type="service_closure" id="web_link.http_header_serializer" on-invalid="ignore"/>
       </argument>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\AboutController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\AboutController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\AboutController"/>
       <argument>App\Controller\AboutController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\AdminDashboardController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\AdminDashboardController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\AdminDashboardController"/>
       <argument>App\Controller\AdminDashboardController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\AdminMateriels\MachineAdminController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\AdminMateriels\MachineAdminController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\AdminMateriels\MachineAdminController"/>
       <argument>App\Controller\AdminMateriels\MachineAdminController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\AdminMateriels\MaintenanceAdminController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\AdminMateriels\MaintenanceAdminController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\AdminMateriels\MaintenanceAdminController"/>
       <argument>App\Controller\AdminMateriels\MaintenanceAdminController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\AgriculteurDashboardController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\AgriculteurDashboardController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\AgriculteurDashboardController"/>
       <argument>App\Controller\AgriculteurDashboardController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\Animals\Admin\AdminAnimauxController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\Animals\Admin\AdminAnimauxController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\Animals\Admin\AdminAnimauxController"/>
       <argument>App\Controller\Animals\Admin\AdminAnimauxController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\Animals\Admin\AdminExamenController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\Animals\Admin\AdminExamenController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\Animals\Admin\AdminExamenController"/>
       <argument>App\Controller\Animals\Admin\AdminExamenController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\Animals\AnimauxController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\Animals\AnimauxController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\Animals\AnimauxController"/>
       <argument>App\Controller\Animals\AnimauxController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\Animals\ExamensController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\Animals\ExamensController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\Animals\ExamensController"/>
       <argument>App\Controller\Animals\ExamensController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\Animals\ReminderController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\Animals\ReminderController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\Animals\ReminderController"/>
       <argument>App\Controller\Animals\ReminderController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\AuthController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\AuthController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\AuthController"/>
       <argument>App\Controller\AuthController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\ChatController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\ChatController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\ChatController"/>
       <argument>App\Controller\ChatController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\Evenements\Agriculteur\EvenementController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\Evenements\Agriculteur\EvenementController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\Evenements\Agriculteur\EvenementController"/>
       <argument>App\Controller\Evenements\Agriculteur\EvenementController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\Evenements\Agriculteur\ParticipationController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\Evenements\Agriculteur\ParticipationController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\Evenements\Agriculteur\ParticipationController"/>
       <argument>App\Controller\Evenements\Agriculteur\ParticipationController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\Evenements\CategorieEvenementController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\Evenements\CategorieEvenementController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\Evenements\CategorieEvenementController"/>
       <argument>App\Controller\Evenements\CategorieEvenementController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\Evenements\EvenementController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\Evenements\EvenementController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\Evenements\EvenementController"/>
       <argument>App\Controller\Evenements\EvenementController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\Evenements\Ouvrier\EvenementController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\Evenements\Ouvrier\EvenementController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\Evenements\Ouvrier\EvenementController"/>
       <argument>App\Controller\Evenements\Ouvrier\EvenementController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\Evenements\Ouvrier\ParticipationController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\Evenements\Ouvrier\ParticipationController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\Evenements\Ouvrier\ParticipationController"/>
       <argument>App\Controller\Evenements\Ouvrier\ParticipationController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\Evenements\ParticipationController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\Evenements\ParticipationController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\Evenements\ParticipationController"/>
       <argument>App\Controller\Evenements\ParticipationController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\HomeController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\HomeController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\HomeController"/>
       <argument>App\Controller\HomeController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\LocaleController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\LocaleController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\LocaleController"/>
       <argument>App\Controller\LocaleController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\Materiels\MachineController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\Materiels\MachineController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\Materiels\MachineController"/>
       <argument>App\Controller\Materiels\MachineController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\Materiels\MaintenancesController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\Materiels\MaintenancesController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\Materiels\MaintenancesController"/>
       <argument>App\Controller\Materiels\MaintenancesController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\Terrain\AgriPlanteController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\OuvrierDashboardController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\OuvrierDashboardController"/>
+      <argument>App\Controller\OuvrierDashboardController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
+    </service>
+    <service id=".service_locator.MEcn9qh.App\Controller\Terrain\AgriPlanteController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\Terrain\AgriPlanteController"/>
       <argument>App\Controller\Terrain\AgriPlanteController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\Terrain\AgriRotationController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\Terrain\AgriRotationController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\Terrain\AgriRotationController"/>
       <argument>App\Controller\Terrain\AgriRotationController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\Terrain\AgriTerrainController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\Terrain\AgriTerrainController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\Terrain\AgriTerrainController"/>
       <argument>App\Controller\Terrain\AgriTerrainController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\Terrain\AiSuggestionController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\Terrain\AiSuggestionController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\Terrain\AiSuggestionController"/>
       <argument>App\Controller\Terrain\AiSuggestionController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\Terrain\OuvrierPlanteViewController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\Terrain\OuvrierPlanteViewController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\Terrain\OuvrierPlanteViewController"/>
       <argument>App\Controller\Terrain\OuvrierPlanteViewController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\Terrain\PlanteController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\Terrain\PlanteController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\Terrain\PlanteController"/>
       <argument>App\Controller\Terrain\PlanteController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\Terrain\RotationController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\Terrain\RotationController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\Terrain\RotationController"/>
       <argument>App\Controller\Terrain\RotationController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\Terrain\TerrainController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\Terrain\TerrainController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\Terrain\TerrainController"/>
       <argument>App\Controller\Terrain\TerrainController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\Terrain\WorkflowPlanteController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\Terrain\WorkflowPlanteController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\Terrain\WorkflowPlanteController"/>
       <argument>App\Controller\Terrain\WorkflowPlanteController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\User\AbonnementController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\User\AbonnementController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\User\AbonnementController"/>
       <argument>App\Controller\User\AbonnementController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\User\AbonnementFrontController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\User\AbonnementFrontController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\User\AbonnementFrontController"/>
       <argument>App\Controller\User\AbonnementFrontController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\User\AdminUserController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\User\AdminUserController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\User\AdminUserController"/>
       <argument>App\Controller\User\AdminUserController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\User\OffreController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\User\OffreController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\User\OffreController"/>
       <argument>App\Controller\User\OffreController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\User\OffreFrontController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\User\OffreFrontController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\User\OffreFrontController"/>
       <argument>App\Controller\User\OffreFrontController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\User\OuvrierController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\User\OuvrierController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\User\OuvrierController"/>
       <argument>App\Controller\User\OuvrierController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\User\Ouvrier_agriController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\User\Ouvrier_agriController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\User\Ouvrier_agriController"/>
       <argument>App\Controller\User\Ouvrier_agriController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\User\TacheController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\User\TacheController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\User\TacheController"/>
       <argument>App\Controller\User\TacheController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\User\TacheFrontController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\User\TacheFrontController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\User\TacheFrontController"/>
       <argument>App\Controller\User\TacheFrontController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\stocks\AdminStockController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\stocks\AdminStockController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\stocks\AdminStockController"/>
       <argument>App\Controller\stocks\AdminStockController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\stocks\Admin_CategorieController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\stocks\Admin_CategorieController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\stocks\Admin_CategorieController"/>
       <argument>App\Controller\stocks\Admin_CategorieController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\stocks\ArticleController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\stocks\ArticleController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\stocks\ArticleController"/>
       <argument>App\Controller\stocks\ArticleController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\stocks\CategorieController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\stocks\CategorieController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\stocks\CategorieController"/>
       <argument>App\Controller\stocks\CategorieController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
-    <service id=".service_locator.NCHITyE.App\Controller\stocks\MouvementController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.MEcn9qh.App\Controller\stocks\MouvementController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\stocks\MouvementController"/>
       <argument>App\Controller\stocks\MouvementController</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.NCHITyE" method="withContext"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
+    </service>
+    <service id=".service_locator.MEcn9qh.App\Controller\stocks\QrCodeController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\stocks\QrCodeController"/>
+      <argument>App\Controller\stocks\QrCodeController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
+    </service>
+    <service id=".service_locator.MEcn9qh.App\Controller\stocks\VisionController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\stocks\VisionController"/>
+      <argument>App\Controller\stocks\VisionController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.MEcn9qh" method="withContext"/>
     </service>
     <service id=".service_locator.fuYM_Z." class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
@@ -11217,17 +11482,17 @@
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.fuYM_Z." method="withContext"/>
     </service>
-    <service id=".service_locator.DjrhxxF" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.b.mdbP7" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="routing.loader" type="service_closure" id="routing.loader"/>
       </argument>
     </service>
-    <service id=".service_locator.DjrhxxF.router.default" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.b.mdbP7.router.default" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="router.default"/>
       <argument>router.default</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.DjrhxxF" method="withContext"/>
+      <factory service=".service_locator.b.mdbP7" method="withContext"/>
     </service>
     <service id=".service_locator.cUcW89y" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
@@ -11402,6 +11667,7 @@
           <argument>App\Controller\LocaleController</argument>
           <argument>App\Controller\Materiels\MachineController</argument>
           <argument>App\Controller\Materiels\MaintenancesController</argument>
+          <argument>App\Controller\OuvrierDashboardController</argument>
           <argument>App\Controller\Terrain\AgriPlanteController</argument>
           <argument>App\Controller\Terrain\AgriRotationController</argument>
           <argument>App\Controller\Terrain\AgriTerrainController</argument>
@@ -11425,6 +11691,8 @@
           <argument>App\Controller\stocks\ArticleController</argument>
           <argument>App\Controller\stocks\CategorieController</argument>
           <argument>App\Controller\stocks\MouvementController</argument>
+          <argument>App\Controller\stocks\QrCodeController</argument>
+          <argument>App\Controller\stocks\VisionController</argument>
           <argument>Doctrine\Bundle\DoctrineBundle\Controller\ProfilerController</argument>
         </argument>
       </call>
@@ -11662,6 +11930,18 @@
     <service id=".errored..service_locator.kLp2YUI.App\Entity\Materiels\Maintenance" class="App\Entity\Materiels\Maintenance">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.kLp2YUI&quot;: it needs an instance of &quot;App\Entity\Materiels\Maintenance&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
     </service>
+    <service id=".errored..service_locator.mvGX7gD.App\Entity\stocks\Article" class="App\Entity\stocks\Article">
+      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.mvGX7gD&quot;: it needs an instance of &quot;App\Entity\stocks\Article&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
+    </service>
+    <service id=".errored..service_locator.sdMA3l9.App\Entity\stocks\Article" class="App\Entity\stocks\Article">
+      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.sdMA3l9&quot;: it needs an instance of &quot;App\Entity\stocks\Article&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
+    </service>
+    <service id=".errored..service_locator.zWKqscT.App\Entity\stocks\Article" class="App\Entity\stocks\Article">
+      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.zWKqscT&quot;: it needs an instance of &quot;App\Entity\stocks\Article&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
+    </service>
+    <service id=".errored..service_locator.6vfABg_.App\Entity\stocks\MouvementStock" class="App\Entity\stocks\MouvementStock">
+      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.6vfABg_&quot;: it needs an instance of &quot;App\Entity\stocks\MouvementStock&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
+    </service>
     <service id=".errored..service_locator.yjHtSb5.App\Entity\Terrain\Plante" class="App\Entity\Terrain\Plante">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.yjHtSb5&quot;: it needs an instance of &quot;App\Entity\Terrain\Plante&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
     </service>
@@ -11710,11 +11990,26 @@
     <service id=".errored..service_locator.Mzhqy3N.App\Entity\User\Tache" class="App\Entity\User\Tache">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.Mzhqy3N&quot;: it needs an instance of &quot;App\Entity\User\Tache&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
     </service>
+    <service id=".errored..service_locator.cSeYTD8.App\Entity\stocks\Article" class="App\Entity\stocks\Article">
+      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.cSeYTD8&quot;: it needs an instance of &quot;App\Entity\stocks\Article&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
+    </service>
+    <service id=".errored..service_locator.nqjRBI0.App\Entity\stocks\Categorie" class="App\Entity\stocks\Categorie">
+      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.nqjRBI0&quot;: it needs an instance of &quot;App\Entity\stocks\Categorie&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
+    </service>
+    <service id=".errored..service_locator..1lCTzi.App\Entity\stocks\Article" class="App\Entity\stocks\Article">
+      <tag name="container.error" message="Cannot autowire service &quot;.service_locator..1lCTzi&quot;: it needs an instance of &quot;App\Entity\stocks\Article&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
+    </service>
     <service id=".errored..service_locator..KZLFfI.App\Entity\stocks\Article" class="App\Entity\stocks\Article">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator..KZLFfI&quot;: it needs an instance of &quot;App\Entity\stocks\Article&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
     </service>
-    <service id=".errored..service_locator.mvGX7gD.App\Entity\stocks\Article" class="App\Entity\stocks\Article">
-      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.mvGX7gD&quot;: it needs an instance of &quot;App\Entity\stocks\Article&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
+    <service id=".errored..service_locator.QgKnEWq.App\Entity\stocks\Article" class="App\Entity\stocks\Article">
+      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.QgKnEWq&quot;: it needs an instance of &quot;App\Entity\stocks\Article&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
+    </service>
+    <service id=".errored..service_locator.MxUmCjx.App\Entity\stocks\Article" class="App\Entity\stocks\Article">
+      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.MxUmCjx&quot;: it needs an instance of &quot;App\Entity\stocks\Article&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
+    </service>
+    <service id=".errored..service_locator.eR0i7Pd.App\Entity\stocks\Article" class="App\Entity\stocks\Article">
+      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.eR0i7Pd&quot;: it needs an instance of &quot;App\Entity\stocks\Article&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
     </service>
     <service id=".errored..service_locator.OlTlOHR.App\Entity\stocks\Categorie" class="App\Entity\stocks\Categorie">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.OlTlOHR&quot;: it needs an instance of &quot;App\Entity\stocks\Categorie&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
@@ -11725,6 +12020,13 @@
       <argument>Met à jour automatiquement les rappels pour tous les examens</argument>
       <argument>false</argument>
       <argument type="service_closure" id="App\Command\Animals\UpdateRemindersCommand"/>
+    </service>
+    <service id=".App\Command\DailyStockSummaryCommand.lazy" class="Symfony\Component\Console\Command\LazyCommand">
+      <argument>app:daily-stock-summary</argument>
+      <argument type="collection"/>
+      <argument>Envoie un bilan journalier des stocks via Telegram</argument>
+      <argument>false</argument>
+      <argument type="service_closure" id="App\Command\DailyStockSummaryCommand"/>
     </service>
     <service id=".console.command.about.lazy" class="Symfony\Component\Console\Command\LazyCommand">
       <argument>about</argument>
@@ -12405,9 +12707,10 @@
     </service>
     <service id="console.command_loader" class="Symfony\Component\Console\CommandLoader\ContainerCommandLoader" public="true">
       <tag name="container.no_preload"/>
-      <argument type="service" id=".service_locator.FsvSNuZ"/>
+      <argument type="service" id=".service_locator.QC3KBsN"/>
       <argument type="collection">
         <argument key="app:reminders:update">App\Command\Animals\UpdateRemindersCommand</argument>
+        <argument key="app:daily-stock-summary">App\Command\DailyStockSummaryCommand</argument>
         <argument key="about">console.command.about</argument>
         <argument key="assets:install">console.command.assets_install</argument>
         <argument key="cache:clear">console.command.cache_clear</argument>
@@ -12529,10 +12832,11 @@
         <argument key="make:webhook">maker.auto_command.make_webhook</argument>
       </argument>
     </service>
-    <service id=".service_locator.FsvSNuZ" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.QC3KBsN" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Command\Animals\UpdateRemindersCommand" type="service_closure" id=".App\Command\Animals\UpdateRemindersCommand.lazy"/>
+        <argument key="App\Command\DailyStockSummaryCommand" type="service_closure" id=".App\Command\DailyStockSummaryCommand.lazy"/>
         <argument key="console.command.about" type="service_closure" id=".console.command.about.lazy"/>
         <argument key="console.command.assets_install" type="service_closure" id=".console.command.assets_install.lazy"/>
         <argument key="console.command.cache_clear" type="service_closure" id=".console.command.cache_clear.lazy"/>
@@ -12935,7 +13239,7 @@
     <service id="Knp\Component\Pager\ArgumentAccess\ArgumentAccessInterface" alias="Knp\Component\Pager\ArgumentAccess\RequestArgumentAccess"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.w7.f4fT" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.bDMgK3V"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.cjETtTl"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id=".Psr\Log\LoggerInterface $request.logger" alias="monolog.logger.request"/>
@@ -12994,6 +13298,8 @@
     <service id=".service_locator.sEaJncE" alias=".service_locator.cBE01og"/>
     <service id=".service_locator.Dq589Yi" alias=".service_locator.VGXccJ4"/>
     <service id=".service_locator.XvTo7NF" alias=".service_locator.kLp2YUI"/>
+    <service id=".service_locator.LNnsniP" alias=".service_locator.zWKqscT"/>
+    <service id=".service_locator.rEJYkrL" alias=".service_locator.6vfABg_"/>
     <service id=".service_locator.9_5m.zA" alias=".service_locator.yjHtSb5"/>
     <service id=".service_locator.TSrp4XK" alias=".service_locator.QoKtgh5"/>
     <service id=".service_locator.EN_uOgD" alias=".service_locator.4mmheGO"/>
@@ -13014,13 +13320,20 @@
     <service id=".service_locator.nSvg3uO" alias=".service_locator.Mzhqy3N"/>
     <service id=".service_locator.5pebkNV" alias=".service_locator.xxq2prQ"/>
     <service id=".service_locator.whdse4m" alias=".service_locator.yd.AI8F"/>
+    <service id=".service_locator.FaBMGkz" alias=".service_locator.jSEPOAw"/>
+    <service id=".service_locator.jJCLbQl" alias=".service_locator.cSeYTD8"/>
+    <service id=".service_locator.h6.UsPW" alias=".service_locator.FiVJy9a"/>
+    <service id=".service_locator.Pn5g7r1" alias=".service_locator.U.mi2Pz"/>
+    <service id=".service_locator.L5nG.Di" alias=".service_locator.lDjzc9y"/>
+    <service id=".service_locator.wDI7hJ0" alias=".service_locator..1lCTzi"/>
     <service id=".service_locator.8J1nalj" alias=".service_locator.SsD9eLO"/>
-    <service id=".service_locator.AvastKJ" alias=".service_locator.bDMgK3V"/>
+    <service id=".service_locator.wo826zD" alias=".service_locator.f4l_PHz"/>
+    <service id=".service_locator.IFgFLDg" alias=".service_locator.cjETtTl"/>
     <service id=".service_locator.BFrsqsn" alias=".service_locator.F9PKc.7"/>
     <service id=".service_locator.oIHygA7" alias=".service_locator.xOkKGYY"/>
     <service id=".service_locator.3ijAwyK" alias=".service_locator.vtjw4Bs"/>
     <service id=".service_locator.O24_MAy" alias=".service_locator.yY.p4P7"/>
-    <service id=".service_locator.oM_gP8J" alias=".service_locator.NCHITyE"/>
+    <service id=".service_locator.FyNZ1nz" alias=".service_locator.MEcn9qh"/>
     <service id="validator" alias="debug.validator"/>
     <service id="http_client" alias=".debug.http_client"/>
     <service id=".debug.http_client.inner" alias="http_client.uri_template"/>
@@ -13092,6 +13405,12 @@
     <service id=".service_locator.b9UTYfn" alias=".service_locator.VGXccJ4"/>
     <service id=".service_locator.b3SM2he" alias=".service_locator._.8m7iI"/>
     <service id=".service_locator.JG4uyKr" alias=".service_locator.kLp2YUI"/>
+    <service id=".service_locator.LnYNlH_" alias=".service_locator.FL1_dBi"/>
+    <service id=".service_locator.yYBe_KY" alias=".service_locator.RS.51pb"/>
+    <service id=".service_locator.sUmDViS" alias=".service_locator.mvGX7gD"/>
+    <service id=".service_locator.66.mT6v" alias=".service_locator.sdMA3l9"/>
+    <service id=".service_locator.Bmkc0Bz" alias=".service_locator.zWKqscT"/>
+    <service id=".service_locator.QcvyUAZ" alias=".service_locator.6vfABg_"/>
     <service id=".service_locator.biu0rfU" alias=".service_locator.ZUN3WII"/>
     <service id=".service_locator..wevcEs" alias=".service_locator.yjHtSb5"/>
     <service id=".service_locator.zzr2p.g" alias=".service_locator.nKRs_ZO"/>
@@ -13131,13 +13450,26 @@
     <service id=".service_locator.lzFT4E_" alias=".service_locator.Mzhqy3N"/>
     <service id=".service_locator.O9U8oFw" alias=".service_locator.xxq2prQ"/>
     <service id=".service_locator.WaJnvcb" alias=".service_locator.yd.AI8F"/>
-    <service id=".service_locator.TVK9ZFB" alias=".service_locator.JDYIjkY"/>
+    <service id=".service_locator.COierp_" alias=".service_locator.jJodKGc"/>
+    <service id=".service_locator.FBxq4Ec" alias=".service_locator.jSEPOAw"/>
+    <service id=".service_locator.1jF8dhu" alias=".service_locator.cSeYTD8"/>
+    <service id=".service_locator.5ZbXddP" alias=".service_locator.FiVJy9a"/>
+    <service id=".service_locator.EaAxqq1" alias=".service_locator.dS.jQeM"/>
+    <service id=".service_locator.esXYnm3" alias=".service_locator.YXgn1by"/>
+    <service id=".service_locator.lqxEYOo" alias=".service_locator.nqjRBI0"/>
+    <service id=".service_locator.In9I6bO" alias=".service_locator.U.mi2Pz"/>
+    <service id=".service_locator.awJeXrx" alias=".service_locator.lDjzc9y"/>
+    <service id=".service_locator.wUMia86" alias=".service_locator..1lCTzi"/>
     <service id=".service_locator.V6FklPx" alias=".service_locator..KZLFfI"/>
-    <service id=".service_locator.sUmDViS" alias=".service_locator.mvGX7gD"/>
+    <service id=".service_locator.fTu1Qt4" alias=".service_locator.QgKnEWq"/>
+    <service id=".service_locator.7V1Q6Pe" alias=".service_locator.MxUmCjx"/>
+    <service id=".service_locator.tcpkw6W" alias=".service_locator.eR0i7Pd"/>
     <service id=".service_locator.XLFJUB8" alias=".service_locator.SsD9eLO"/>
     <service id=".service_locator.Z2DAUc_" alias=".service_locator.OlTlOHR"/>
+    <service id=".service_locator.SoFxSjl" alias=".service_locator.uURT18R"/>
     <service id=".service_locator.Odyyg4J" alias=".service_locator.zy9Sz.w"/>
-    <service id=".service_locator.5.pIaFV" alias=".service_locator.NCHITyE"/>
+    <service id=".service_locator.18YFTzl" alias=".service_locator.f4l_PHz"/>
+    <service id=".service_locator.F9XTCQg" alias=".service_locator.MEcn9qh"/>
     <service id=".service_locator.dGUCsbe" alias=".service_locator.oR77BOj"/>
     <service id=".service_locator._kIAbz1" alias=".service_locator.TpoC7U9"/>
     <service id=".service_locator.hnz5ZNh" alias=".service_locator.0TACwl3"/>

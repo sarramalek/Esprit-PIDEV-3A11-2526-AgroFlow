@@ -77,7 +77,11 @@ private int $twoFactorEnabled = 0;
     #[ORM\Column(type: 'string', nullable: true)]
     private ?string $googleAuthenticatorSecret = null;
 
-   
+   #[ORM\Column(type: 'string', length: 255, nullable: true)]
+private ?string $telegramChatId = null;
+
+public function getTelegramChatId(): ?string { return $this->telegramChatId; }
+public function setTelegramChatId(?string $id): self { $this->telegramChatId = $id; return $this; }
     // ==================== UserInterface ====================
 
     public function getUserIdentifier(): string

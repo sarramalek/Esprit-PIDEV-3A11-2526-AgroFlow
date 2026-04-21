@@ -557,27 +557,26 @@ checkAndRedirect();
             </div>
 
         <!-- Gestion Stocks -->
-        <div class="nav-item {% if app.request.get('_route') in ['admin_categories', 'admin_stock_new'] %}open{% endif %}">
-            <div class="nav-link {% if app.request.get('_route') in ['admin_categories', 'admin_stock_new'] %}active{% endif %}"
-                 onclick="toggleMenu(this)">
-                <span class="nav-icon"><i class="fa fa-boxes-stacked"></i></span>
-                <span class="nav-label">Gestion Stocks</span>
-                <i class="fa fa-chevron-right nav-arrow"></i>
-            </div>
-            <ul class="nav-sub">
-                <li>
-                    <a href="{{ path('admin_categorie_new') }}" class="{% if app.request.get('_route') == 'admin_categories' %}active{% endif %}">
-                        <span class="sub-dot"></span> Catégories
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ path('admin_stock_new') }}" class="{% if app.request.get('_route') == 'admin_stock_new' %}active{% endif %}">
-                        <span class="sub-dot"></span> Produits
-                    </a>
-                </li>
-            </ul>
-        </div>
-
+        <div class="nav-item {% if app.request.get('_route') in ['admin_categories_index','admin_categorie_new','admin_categorie_edit','admin_stock_index','admin_stock_new','admin_stock_edit'] %}open{% endif %}">
+    <div class="nav-link {% if app.request.get('_route') in ['admin_categories_index','admin_categorie_new','admin_categorie_edit','admin_stock_index','admin_stock_new','admin_stock_edit'] %}active{% endif %}"
+         onclick="toggleMenu(this)">
+        <span class="nav-icon"><i class="fa fa-boxes-stacked"></i></span>
+        <span class="nav-label">Gestion Stocks</span>
+        <i class="fa fa-chevron-right nav-arrow"></i>
+    </div>
+    <ul class="nav-sub">
+        <li>
+            <a href="{{ path('admin_categories_index') }}" class="{% if app.request.get('_route') in ['admin_categories_index','admin_categorie_new','admin_categorie_edit'] %}active{% endif %}">
+                <span class="sub-dot"></span> Catégories
+            </a>
+        </li>
+        <li>
+            <a href="{{ path('admin_stock_index') }}" class="{% if app.request.get('_route') in ['admin_stock_index','admin_stock_new','admin_stock_edit'] %}active{% endif %}">
+                <span class="sub-dot"></span> Produits
+            </a>
+        </li>
+    </ul>
+</div>
         <!-- Gestion Événements -->
         <div class="nav-item {% if app.request.get('_route') in ['evenement_index','participation_index'] %}open{% endif %}">
             <div class="nav-link {% if app.request.get('_route') in ['evenement_index','participation_index'] %}active{% endif %}"

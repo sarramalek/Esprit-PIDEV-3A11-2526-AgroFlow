@@ -35,7 +35,7 @@ class CategorieAdminType extends AbstractType
                     return $user->getCin() . ' - ' . $user->getNom() . ' ' . $user->getPrenom();
                 },
                 'query_builder' => function (UserRepository $er) {
-                    // Correction ici : on utilise 'role' au singulier comme dans ton exemple
+                    // Filtrer pour les agriculteurs (rôle 2)
                     return $er->createQueryBuilder('u')
                         ->where('u.role = :r')
                         ->setParameter('r', 2)

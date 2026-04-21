@@ -43,6 +43,12 @@ class Article
     #[Assert\Positive(message: "Le prix doit être supérieur à zéro.")]
     private ?float $prix_unitaire = null;
 
+    #[ORM\Column(length: 3, options: ["default" => "TND"])]
+    private ?string $devise = "TND";
+
+    #[ORM\Column(type: "float", nullable: true)]
+    private ?float $prix_achat_devise = null;
+
     #[ORM\ManyToOne(targetEntity: Categorie::class, inversedBy: "articles")]
     #[ORM\JoinColumn(name: "id_categorie", referencedColumnName: "id_categorie", nullable: true)]
     private ?Categorie $categorie = null;
@@ -56,9 +62,13 @@ class Article
     #[ORM\OneToMany(targetEntity: MouvementStock::class, mappedBy: 'article', orphanRemoval: true)]
     private Collection $mouvements;
 
+    #[ORM\Column(name: "id_admin", type: "integer", nullable: true)]
+    private ?int $idAdmin = null;
+
     public function __construct()
     {
         $this->mouvements = new ArrayCollection();
+        $this->devise = "TND";
     }
 
     public function getId(): ?int
@@ -113,6 +123,28 @@ class Article
     public function setPrixUnitaire(?float $prix_unitaire): self
     {
         $this->prix_unitaire = $prix_unitaire;
+        return $this;
+    }
+
+    public function getDevise(): ?string
+    {
+        return $this->devise;
+    }
+
+    public function setDevise(string $devise): self
+    {
+        $this->devise = $devise;
+        return $this;
+    }
+
+    public function getPrixAchatDevise(): ?float
+    {
+        return $this->prix_achat_devise;
+    }
+
+    public function setPrixAchatDevise(?float $prix_achat_devise): self
+    {
+        $this->prix_achat_devise = $prix_achat_devise;
         return $this;
     }
 
@@ -171,5 +203,16 @@ class Article
     public function isStockCritique(): bool
     {
         return $this->quantite_en_stock <= $this->seuil_alerte;
+    }
+
+    public function getIdAdmin(): ?int
+    {
+        return $this->idAdmin;
+    }
+
+    public function setIdAdmin(?int $idAdmin): self
+    {
+        $this->idAdmin = $idAdmin;
+        return $this;
     }
 }
