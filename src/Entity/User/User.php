@@ -65,6 +65,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\JoinColumn(name: 'id_agricole', referencedColumnName: 'cin', nullable: true, onDelete: 'SET NULL')]
     private ?self $agriculteur = null;
 
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $telegramChatId = null;
+
     // ==================== UserInterface ====================
 
     public function getUserIdentifier(): string
@@ -269,6 +272,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setImg(?string $img): self
     {
         $this->img = $img;
+        return $this;
+    }
+
+    public function getTelegramChatId(): ?string
+    {
+        return $this->telegramChatId;
+    }
+
+    public function setTelegramChatId(?string $telegramChatId): self
+    {
+        $this->telegramChatId = $telegramChatId;
         return $this;
     }
 }

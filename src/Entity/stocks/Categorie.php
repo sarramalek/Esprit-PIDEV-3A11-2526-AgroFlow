@@ -34,9 +34,6 @@ class Categorie
     #[ORM\JoinColumn(name: "id_user", referencedColumnName: "cin", nullable: false)]
     private ?User $agriculteur = null;
 
-    #[ORM\Column(name: "id_admin", type: "integer", nullable: true)]
-    private ?int $idAdmin = null;
-
     #[ORM\OneToMany(mappedBy: 'categorie', targetEntity: Article::class)]
     private Collection $articles;
 
@@ -88,17 +85,6 @@ class Categorie
     public function setAgriculteur(?User $agriculteur): self
     {
         $this->agriculteur = $agriculteur;
-        return $this;
-    }
-
-    public function getIdAdmin(): ?int
-    {
-        return $this->idAdmin;
-    }
-
-    public function setIdAdmin(?int $idAdmin): self
-    {
-        $this->idAdmin = $idAdmin;
         return $this;
     }
 

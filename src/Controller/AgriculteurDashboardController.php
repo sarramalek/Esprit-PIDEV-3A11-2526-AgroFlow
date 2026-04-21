@@ -68,6 +68,12 @@ class AgriculteurDashboardController extends AbstractController
         return new Response('Module Rotations de culture — à implémenter');
     }
 
+    #[Route('/terrains/plantes', name: 'plantes')]
+    public function plantes(): Response
+    {
+        return new Response('Module Plantes — à implémenter');
+    }
+
     // ── Matériels ────────────────────────────────────────────────────────────
 
     #[Route('/materiels/machines', name: 'machines')]
@@ -76,7 +82,7 @@ class AgriculteurDashboardController extends AbstractController
         return new Response('Module Machines — à implémenter');
     }
 
-    #[Route('/materiels/maintenances', name: 'maintenances')]
+    #[Route('/materiels/maintenances', name: 'maintenances_index')]
     public function maintenances(): Response
     {
         return new Response('Module Maintenances — à implémenter');
@@ -90,24 +96,36 @@ class AgriculteurDashboardController extends AbstractController
         return new Response('Module Événements — à implémenter');
     }
 
-    #[Route('/evenements/participations', name: 'participations')]
+    #[Route('/evenements/participations', name: 'participation_index')]
     public function participations(): Response
     {
         return new Response('Module Participations — à implémenter');
     }
 
+    #[Route('/evenements/index', name: 'evenement_index')]
+    public function evenementIndex(): Response
+    {
+        return new Response('Module Événements — à implémenter');
+    }
+
     // ── Abonnements ──────────────────────────────────────────────────────────
 
-    #[Route('/abonnements/offres', name: 'offres')]
+    #[Route('/abonnements/offres', name: 'offre_front')]
     public function offres(): Response
     {
         return new Response('Module Offres — à implémenter');
     }
 
-    #[Route('/abonnements', name: 'abonnements')]
+    #[Route('/abonnements', name: 'abonnement_front')]
     public function abonnements(): Response
     {
         return new Response('Module Abonnements — à implémenter');
+    }
+
+    #[Route('/abonnements/pdf', name: 'abonnement_pdf')]
+    public function abonnementPdf(): Response
+    {
+        return new Response('Génération PDF — à implémenter');
     }
 
     // ── Tâches ───────────────────────────────────────────────────────────────
@@ -116,5 +134,47 @@ class AgriculteurDashboardController extends AbstractController
     public function taches(): Response
     {
         return new Response('Module Tâches — à implémenter');
+    }
+
+    #[Route('/ouvriers', name: 'ouvriers')]
+    public function ouvriers(): Response
+    {
+        return new Response('Module Ouvriers — à implémenter');
+    }
+
+    // ── Profil ───────────────────────────────────────────────────────────────
+    #[Route('/profile/update', name: 'profile_update', methods: ['POST'])]
+    public function profileUpdate(\Symfony\Component\HttpFoundation\Request $request, \Doctrine\ORM\EntityManagerInterface $em, \Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface $passwordHasher): \Symfony\Component\HttpFoundation\JsonResponse
+    {
+        /** @var \App\Entity\User\User|null $user */
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->json(['success' => false, 'error' => 'Non connecté'], 401);
+        }
+
+        $email   = $request->request->get('email');
+        $nom     = $request->request->get('nom');
+        $prenom  = $request->request->get('prenom');
+        $tel     = $request->request->get('tel');
+        $ville   = $request->request->get('ville');
+        $pwd     = $request->request->get('password');
+
+        if ($email)  $user->setEmail($email);
+        if ($nom)    $user->setNom($nom);
+        if ($prenom) $user->setPrenom($prenom);
+        if ($tel)    $user->setTel($tel);
+        if ($ville)  $user->setVille($ville);
+        
+        if (!empty($pwd)) {
+            $user->setMdp($passwordHasher->hashPassword($user, $pwd));
+        }
+
+        $em->flush();
+
+        return $this->json([
+            'success' => true,
+            'nom'     => $user->getNom(),
+            'prenom'  => $user->getPrenom()
+        ]);
     }
 }

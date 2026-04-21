@@ -44,7 +44,6 @@
             font-weight: 600; font-size: 14px;
             border-bottom: 3px solid transparent;
             transition: all 0.2s; white-space: nowrap;
-            cursor: pointer;
         }
         .nav-link i { font-size: 13px; color: #2D5A27; }
         .nav-link:hover, .nav-link.active {
@@ -59,7 +58,7 @@
             position: absolute;
             top: 70px;
             left: 0;
-            width: 200px;
+            width: 210px;
             background: white;
             border-radius: 0 0 14px 14px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
@@ -68,7 +67,6 @@
             z-index: 1000;
         }
         .dropdown-panel.show { display: block; animation: fadeIn 0.2s ease-out; }
-        
         .dropdown-item {
             display: flex;
             align-items: center;
@@ -81,7 +79,6 @@
         }
         .dropdown-item:hover { background: #f5faf4; color: #2D5A27; }
         .dropdown-item i { width: 24px; font-size: 14px; color: #2D5A27; margin-right: 12px; }
-
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-5px); }
             to { opacity: 1; transform: translateY(0); }
@@ -109,7 +106,7 @@
             box-shadow: 0 8px 30px rgba(0,0,0,0.12);
             border: 1px solid #eee;
             overflow: hidden;
-            z-index: 9999 !important;
+            z-index: 99999 !important;
         }
 
         /* Champs édition */
@@ -165,6 +162,38 @@
 
     {% block stylesheets %}{% endblock %}
 </head>
+{# Dans base.html.twig, avant </body> #}
+
+{% set protectedPrefixes = ['/admin', '/agriculteur', '/ouvrier'] %}
+{% set isProtected = false %}
+{% for prefix in protectedPrefixes %}
+    {% if app.request.pathInfo starts with prefix %}
+        {% set isProtected = true %}
+    {% endif %}
+{% endfor %}
+
+{% if isProtected %}
+<script>
+function checkAndRedirect() {
+    fetch('{{ path("app_check_session") }}', { credentials: 'same-origin' })
+        .then(r => {
+            if (r.status === 401 || r.redirected) {
+                window.location.replace('{{ path("app_login") }}');
+            }
+        });
+}
+
+window.addEventListener('pageshow', function (e) {
+    if (e.persisted) { checkAndRedirect(); }
+});
+
+document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'visible') { checkAndRedirect(); }
+});
+
+checkAndRedirect();
+</script>
+{% endif %}
 <body>
 
 <header class="header">
@@ -185,7 +214,6 @@
             <a href="javascript:void(0)" class="nav-link" onclick="toggleDropdown('stocksMenu')">
                 <i class="fa fa-boxes-stacked"></i> Stocks <i class="fa fa-chevron-down" style="font-size: 8px; margin-left: 5px;"></i>
             </a>
-            
             <div class="dropdown-panel" id="stocksMenu">
                 <a href="{{ path('ouvrier_categories') }}" class="dropdown-item">
                     <i class="fa fa-tags"></i>
@@ -210,11 +238,18 @@
                 <i class="fa fa-calendar-days"></i> Événements
             </a>
         </div>
+        <div class="nav-item">
+            <a href="{{ path('ouvrier_participation_index') }}"
+               class="nav-link {% if app.request.get('_route') == 'ouvrier_participation_index' %}active{% endif %}">
+                <i class="fa fa-calendar-days"></i> Participations
+            </a>
+        </div>
     </nav>
 
     <div class="header-actions">
         {% if app.user %}
         <div id="profileMenu">
+
             <div onclick="toggleProfilePanel()"
                  style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:6px 12px;border-radius:10px;transition:background 0.2s;"
                  onmouseover="this.style.background='#f5faf4'"
@@ -230,6 +265,7 @@
             </div>
 
             <div id="profilePanel">
+
                 {# En-tête #}
                 <div style="padding:18px 16px 14px;text-align:center;border-bottom:1px solid #f0f0f0;background:#fafdf8;">
                     <div id="ouvAvatarBig" style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#4A8C3F,#2D5A27);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:white;margin:0 auto 10px;">
@@ -255,8 +291,11 @@
                     </button>
                 </div>
 
+                {# Formulaire — soumis via fetch uniquement #}
                 <form id="ouvProfileForm" onsubmit="return false;">
+
                     <div style="padding:4px 0;">
+
                         {# Email #}
                         {% if app.user.email is defined %}
                         <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid #f8f8f8;">
@@ -341,16 +380,20 @@
                         </div>
                         {% endif %}
 
+                        {# Nouveau mot de passe — visible uniquement en mode édition #}
                         <div id="ouvPwdRow" style="display:none;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid #f8f8f8;">
                             <div style="width:28px;height:28px;border-radius:8px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
                                 <i class="fa fa-lock" style="font-size:11px;color:#888;"></i>
                             </div>
                             <div style="flex:1;min-width:0;">
                                 <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:0.06em;">Nouveau mot de passe</div>
-                                <input class="ouv-pf-input" name="password" type="password" placeholder="Laisser vide pour ne pas changer" style="display:block;">
+                                <input class="ouv-pf-input" name="password" type="password"
+                                       placeholder="Laisser vide pour ne pas changer"
+                                       style="display:block;">
                             </div>
                         </div>
 
+                        {# Date création — lecture seule #}
                         {% if app.user.dateCreationcpt is defined %}
                         <div style="display:flex;align-items:center;gap:10px;padding:9px 16px;">
                             <div style="width:28px;height:28px;border-radius:8px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
@@ -362,16 +405,22 @@
                             </div>
                         </div>
                         {% endif %}
+
                     </div>
                 </form>
 
+                {# Déconnexion #}
                 <div style="padding:10px 12px;border-top:1px solid #f0f0f0;">
-                    <a href="{{ path('app_logout') }}" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;border-radius:8px;background:rgba(220,60,60,0.08);border:1px solid rgba(220,60,60,0.15);color:#e74c3c;text-decoration:none;font-size:13px;font-weight:600;transition:all 0.2s;" onmouseover="this.style.background='rgba(220,60,60,0.15)'" onmouseout="this.style.background='rgba(220,60,60,0.08)'">
+                    <a href="{{ path('app_logout') }}"
+                       style="display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;border-radius:8px;background:rgba(220,60,60,0.08);border:1px solid rgba(220,60,60,0.15);color:#e74c3c;text-decoration:none;font-size:13px;font-weight:600;transition:all 0.2s;"
+                       onmouseover="this.style.background='rgba(220,60,60,0.15)'"
+                       onmouseout="this.style.background='rgba(220,60,60,0.08)'">
                         <i class="fa fa-arrow-right-from-bracket"></i> Déconnexion
                     </a>
                 </div>
-            </div>
-        </div>
+
+            </div>{# fin #profilePanel #}
+        </div>{# fin #profileMenu #}
         {% endif %}
     </div>
 </header>
@@ -388,10 +437,11 @@
     /* ── Dropdown Stocks ── */
     function toggleDropdown(id) {
         const menu = document.getElementById(id);
+        if (!menu) return;
         menu.classList.toggle('show');
     }
 
-    /* ── Ouvrir / fermer le profil ── */
+    /* ── Ouvrir / fermer le panel ── */
     function toggleProfilePanel() {
         var panel   = document.getElementById('profilePanel');
         var chevron = document.getElementById('profileChevron');
@@ -400,34 +450,35 @@
         chevron.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
     }
 
-    /* Fermeture globale (clic extérieur) */
     document.addEventListener('click', function(e) {
-        // Profil
-        var profileMenu = document.getElementById('profileMenu');
-        if (profileMenu && !profileMenu.contains(e.target)) {
+        var menu = document.getElementById('profileMenu');
+        if (menu && !menu.contains(e.target)) {
             document.getElementById('profilePanel').style.display = 'none';
             document.getElementById('profileChevron').style.transform = 'rotate(0deg)';
         }
 
-        // Stocks Dropdown
         var stocksDropdown = document.getElementById('stocksDropdown');
         if (stocksDropdown && !stocksDropdown.contains(e.target)) {
-            document.getElementById('stocksMenu').classList.remove('show');
+            document.getElementById('stocksMenu')?.classList.remove('show');
         }
     });
 
     /* ── Édition profil ── */
     var _ouvOriginals = {};
+
     function ouvStartEdit() {
         document.querySelectorAll('.ouv-pf-input[name]').forEach(function(inp) {
             _ouvOriginals[inp.name] = inp.value;
         });
+
         document.querySelectorAll('.ouv-pf-view').forEach(function(el) { el.style.display = 'none'; });
         document.querySelectorAll('.ouv-pf-input').forEach(function(el) { el.style.display = 'block'; });
         document.getElementById('ouvPwdRow').style.display = 'flex';
+
         document.getElementById('ouvBtnEdit').style.display   = 'none';
         document.getElementById('ouvBtnSave').style.display   = 'inline-flex';
         document.getElementById('ouvBtnCancel').style.display = 'inline-flex';
+
         var first = document.querySelector('.ouv-pf-input[name="email"]');
         if (first) first.focus();
     }
@@ -438,9 +489,11 @@
         });
         var pwd = document.querySelector('.ouv-pf-input[name="password"]');
         if (pwd) pwd.value = '';
+
         document.querySelectorAll('.ouv-pf-view').forEach(function(el) { el.style.display = 'block'; });
         document.querySelectorAll('.ouv-pf-input').forEach(function(el) { el.style.display = 'none'; });
         document.getElementById('ouvPwdRow').style.display = 'none';
+
         document.getElementById('ouvBtnEdit').style.display   = 'inline-flex';
         document.getElementById('ouvBtnSave').style.display   = 'none';
         document.getElementById('ouvBtnCancel').style.display = 'none';
@@ -453,9 +506,11 @@
             emailInp.focus();
             return;
         }
+
         var btnSave = document.getElementById('ouvBtnSave');
         btnSave.disabled = true;
         btnSave.innerHTML = '<i class="fa fa-spinner fa-spin" style="font-size:10px;"></i> Envoi…';
+
         var data = new FormData(document.getElementById('ouvProfileForm'));
 
         fetch('{{ path('ouvrier_profile_update') }}', {
@@ -467,19 +522,30 @@
         .then(function(json) {
             btnSave.disabled = false;
             btnSave.innerHTML = '<i class="fa fa-check" style="font-size:10px;"></i> Enregistrer';
+
             if (json.success) {
+                /* Mise à jour des libellés visibles */
                 document.querySelectorAll('.ouv-pf-view').forEach(function(view) {
                     var inp = view.parentElement.querySelector('.ouv-pf-input');
                     if (inp && inp.value.trim()) view.textContent = inp.value.trim();
                 });
+
+                /* Mise à jour nom + initiales dans la navbar */
                 if (json.prenom && json.nom) {
                     var fullName = json.prenom + ' ' + json.nom;
                     var initials = json.prenom.charAt(0).toUpperCase() + json.nom.charAt(0).toUpperCase();
-                    if (document.getElementById('ouvNameSmall')) document.getElementById('ouvNameSmall').textContent = fullName;
-                    if (document.getElementById('ouvNameBig')) document.getElementById('ouvNameBig').textContent = fullName;
-                    if (document.getElementById('ouvAvatarSmall')) document.getElementById('ouvAvatarSmall').textContent = initials;
-                    if (document.getElementById('ouvAvatarBig')) document.getElementById('ouvAvatarBig').textContent = initials;
+
+                    var nameSmall   = document.getElementById('ouvNameSmall');
+                    var nameBig     = document.getElementById('ouvNameBig');
+                    var avatarSmall = document.getElementById('ouvAvatarSmall');
+                    var avatarBig   = document.getElementById('ouvAvatarBig');
+
+                    if (nameSmall)   nameSmall.textContent   = fullName;
+                    if (nameBig)     nameBig.textContent     = fullName;
+                    if (avatarSmall) avatarSmall.textContent = initials;
+                    if (avatarBig)   avatarBig.textContent   = initials;
                 }
+
                 ouvCancelEdit();
                 ouvShowToast('Profil mis à jour avec succès');
             } else {
@@ -493,17 +559,40 @@
         });
     }
 
+    /* ── Toast ── */
     function ouvShowToast(msg, isError) {
         var existing = document.getElementById('ouvToast');
         if (existing) existing.remove();
+
         var t = document.createElement('div');
         t.id = 'ouvToast';
-        t.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:99999;background:' + (isError ? 'rgba(160,30,30,0.95)' : 'rgba(30,90,35,0.95)') + ';color:#fff;font-size:13px;font-weight:600;font-family:DM Sans,sans-serif;padding:12px 20px;border-radius:10px;display:flex;align-items:center;gap:9px;box-shadow:0 4px 24px rgba(0,0,0,0.2);transition:opacity 0.4s ease;opacity:1';
+        t.style.cssText = [
+            'position:fixed',
+            'bottom:24px',
+            'right:24px',
+            'z-index:99999',
+            'background:' + (isError ? 'rgba(160,30,30,0.95)' : 'rgba(30,90,35,0.95)'),
+            'color:#fff',
+            'font-size:13px',
+            'font-weight:600',
+            'font-family:DM Sans,sans-serif',
+            'padding:12px 20px',
+            'border-radius:10px',
+            'display:flex',
+            'align-items:center',
+            'gap:9px',
+            'box-shadow:0 4px 24px rgba(0,0,0,0.2)',
+            'transition:opacity 0.4s ease',
+            'opacity:1'
+        ].join(';');
+
         var icon = document.createElement('i');
         icon.className = isError ? 'fa fa-circle-xmark' : 'fa fa-circle-check';
+        icon.style.fontSize = '14px';
         t.appendChild(icon);
         t.appendChild(document.createTextNode(msg));
         document.body.appendChild(t);
+
         setTimeout(function() { t.style.opacity = '0'; }, 2800);
         setTimeout(function() { if (t.parentNode) t.remove(); }, 3300);
     }

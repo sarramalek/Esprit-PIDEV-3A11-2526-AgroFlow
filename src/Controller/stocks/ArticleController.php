@@ -7,11 +7,15 @@ use App\Entity\stocks\MouvementStock;
 use App\Form\stocks\ArticleType;
 use App\Repository\stocks\ArticleRepository;
 use App\Repository\stocks\CategorieRepository;
+use App\Service\EmailService;
+use App\Service\QRCodeService;
+use App\Service\TelegramService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 #[Route('/agriculteur/stocks')]
 class ArticleController extends AbstractController
@@ -21,13 +25,10 @@ class ArticleController extends AbstractController
     {
         $user = $this->getUser();
 
-        // --- PARTIE AJOUTÉE : PRÉPARATION DU FORMULAIRE POUR LA MODAL ---
         $newArticle = new Article();
         $form = $this->createForm(ArticleType::class, $newArticle, ['agriculteur' => $user]);
-
         $form->handleRequest($request);
 
-        // Si le formulaire de la modal est soumis
         if ($form->isSubmitted() && $form->isValid()) {
             $newArticle->setUser($user);
             $entityManager->persist($newArticle);
@@ -36,14 +37,18 @@ class ArticleController extends AbstractController
             $this->addFlash('success', 'Le produit a été ajouté avec succès.');
             return $this->redirectToRoute('agri_produits');
         }
-        // -----------------------------------------------------------
 
+        return $this->renderIndexPage($request, $articleRepository, $catRepo, $form);
+    }
+
+    private function renderIndexPage(Request $request, ArticleRepository $articleRepository, CategorieRepository $catRepo, $form = null, array $extra = []): Response
+    {
+        $user = $this->getUser();
         $searchTerm = $request->query->get('search');
         $categoryId = $request->query->get('category');
         $sortBy = $request->query->get('sort', 'nom');
 
         $articles = $articleRepository->findBySearchCriteria($searchTerm, $categoryId, $user, $sortBy);
-
         $allArticles = $articleRepository->findBy(['user' => $user]);
         $totalArticles = count($allArticles);
         $alerteCount = 0;
@@ -58,7 +63,12 @@ class ArticleController extends AbstractController
             $valeurTotaleStock += ($quantite * $prix);
         }
 
-        return $this->render('stocks/article/index.html.twig', [
+        if (!$form) {
+            $newArticle = new Article();
+            $form = $this->createForm(ArticleType::class, $newArticle, ['agriculteur' => $user]);
+        }
+
+        return $this->render('stocks/article/index.html.twig', array_merge([
             'articles'          => $articles,
             'categories'        => $catRepo->findBy(['agriculteur' => $user]),
             'currentSearch'     => $searchTerm,
@@ -67,9 +77,8 @@ class ArticleController extends AbstractController
             'totalArticles'     => $totalArticles,
             'alerteCount'       => $alerteCount,
             'valeurTotaleStock' => $valeurTotaleStock,
-            // ON ENVOIE LE FORMULAIRE À LA VUE INDEX
             'form'              => $form->createView(),
-        ]);
+        ], $extra));
     }
 
     // Gardez la méthode new au cas où vous auriez besoin d'un accès direct par URL
@@ -138,7 +147,13 @@ class ArticleController extends AbstractController
 
     #[Route('/mouvements/new/{id}', name: 'app_mouvement_new', methods: ['GET', 'POST'])]
 
-    public function gestionStock(Article $article, Request $request, EntityManagerInterface $em): Response
+    public function gestionStock(
+        Article $article,
+        Request $request,
+        EntityManagerInterface $em,
+        EmailService $emailService,
+        TelegramService $telegramService
+    ): Response
     {
         if ($article->getUser() !== $this->getUser()) {
             throw $this->createAccessDeniedException();
@@ -167,7 +182,30 @@ class ArticleController extends AbstractController
                 $this->addFlash('danger', 'Stock insuffisant pour ' . $article->getNom());
                 return $this->redirectToRoute('agri_produits');
             }
-            $article->setQuantiteEnStock($stockActuel - $quantite);
+
+            $nouveauStock = $stockActuel - $quantite;
+            $article->setQuantiteEnStock($nouveauStock);
+
+            if ($nouveauStock <= $article->getSeuilAlerte()) {
+                $mailOk = $emailService->envoyerMailAlerte($article);
+                if (!$mailOk) {
+                    $this->addFlash('warning', 'Alerte créée, mais l\'envoi de l\'email a échoué.');
+                }
+
+                // Notification Telegram
+                $telegramChatId = ($article->getUser() ? $article->getUser()->getTelegramChatId() : null) ?? $_ENV['TELEGRAM_CHAT_ID'] ?? null;
+                if ($telegramChatId) {
+                    $message = sprintf(
+                        "Alerte de stock critique !\n\nArticle: %s\nStock actuel: %d %s\nSeuil d'alerte: %d %s",
+                        $article->getNom(),
+                        $nouveauStock,
+                        $article->getUniteMesure() ?? 'unités',
+                        $article->getSeuilAlerte(),
+                        $article->getUniteMesure() ?? 'unités'
+                    );
+                    $telegramService->notifier($message, $telegramChatId);
+                }
+            }
         }
 
         $mouvement->setType($type);
@@ -179,5 +217,28 @@ class ArticleController extends AbstractController
 
         $this->addFlash('success', 'Mouvement enregistré avec succès.');
         return $this->redirectToRoute('agri_produits');
+    }
+
+    // ── QR Code ───────────────────────────────────────────────────────────────
+    #[Route('/{id}/qr-code', name: 'article_qr_code', methods: ['GET'])]
+    public function generateQRCode(Article $article, QRCodeService $qrCodeService): Response
+    {
+        // Vérification simple de l'article
+        if (!$article) {
+            return new Response('Article non trouvé', 404);
+        }
+
+        return $qrCodeService->generateQRCodeResponseForArticle($article);
+    }
+
+    #[Route('/{id}/qr-code/download', name: 'article_qr_code_download', methods: ['GET'])]
+    public function downloadQRCode(Article $article, QRCodeService $qrCodeService): Response
+    {
+        // Vérification simple de l'article
+        if (!$article) {
+            return new Response('Article non trouvé', 404);
+        }
+
+        return $qrCodeService->generateQRCodeDownloadResponseForArticle($article);
     }
 }

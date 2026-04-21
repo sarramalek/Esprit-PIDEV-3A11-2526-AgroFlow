@@ -14,13 +14,12 @@
         {% endfor %}
     {% endfor %}
 
-    {# --- EN-TÊTE --- #}
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; flex-wrap:wrap; gap:14px;">
         <div>
             <h2 style="margin:0; color:#1a2a19; font-size:28px; font-weight: 800; letter-spacing: -0.5px;">
                 <i class="fa fa-boxes-stacked" style="color: #2D5A27; margin-right: 10px;"></i>Gestion des Produits
             </h2>
-            <p style="margin:5px 0 0; color:#6c757d; font-size:15px;">Liste des produits que vous avez créés.</p>
+            <p style="margin:5px 0 0; color:#6c757d; font-size:15px;">Liste des produits (articles) enregistrés.</p>
         </div>
 
         <div style="display: flex; gap: 10px;">
@@ -30,7 +29,6 @@
         </div>
     </div>
 
-    {# --- LISTE DES ARTICLES --- #}
     <div class="table-responsive">
         <table class="table table-striped table-hover">
             <thead style="background-color: #f8f9fa;">
@@ -67,7 +65,7 @@
                                     <i class="fa fa-pen"></i>
                                 </a>
                                 <form method="post" action="{{ path('admin_stock_delete', {'id': article.id}) }}" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?');">
-                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ article.id) }}">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ article.id) }}">
                                     <button class="btn btn-sm btn-action btn-action-delete" title="Supprimer" type="submit">
                                         <i class="fa fa-trash"></i>
                                     </button>
@@ -99,7 +97,6 @@
     gap: 8px;
     transition: all 0.3s ease;
 }
-
 .btn-primary-action:hover {
     background: linear-gradient(135deg, #4CAF50, #2D5A27);
     color: white;
@@ -107,31 +104,22 @@
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(45, 90, 39, 0.3);
 }
-
 .table-responsive {
     background: white;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.08);
     overflow: hidden;
 }
-
 .table th {
     border-top: none;
     font-weight: 600;
     color: #2D5A27;
     padding: 15px;
 }
-
 .table td {
     padding: 15px;
     vertical-align: middle;
 }
-
-.btn-sm {
-    padding: 6px 12px;
-    font-size: 0.875rem;
-}
-
 .action-buttons{
     display: inline-flex;
     align-items: center;

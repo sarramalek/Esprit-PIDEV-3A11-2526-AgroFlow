@@ -52,9 +52,6 @@ class Article
     #[ORM\JoinColumn(name: "id_user", referencedColumnName: "cin", nullable: true)]
     private ?User $user = null;
 
-    #[ORM\Column(name: "id_admin", type: "integer", nullable: true)]
-    private ?int $idAdmin = null;
-
     // Correction : Le nom de la propriété doit être 'mouvements' pour matcher ton MouvementStock
     #[ORM\OneToMany(targetEntity: MouvementStock::class, mappedBy: 'article', orphanRemoval: true)]
     private Collection $mouvements;
@@ -136,17 +133,6 @@ class Article
     public function setUser(?User $user): self
     {
         $this->user = $user;
-        return $this;
-    }
-
-    public function getIdAdmin(): ?int
-    {
-        return $this->idAdmin;
-    }
-
-    public function setIdAdmin(?int $idAdmin): self
-    {
-        $this->idAdmin = $idAdmin;
         return $this;
     }
 

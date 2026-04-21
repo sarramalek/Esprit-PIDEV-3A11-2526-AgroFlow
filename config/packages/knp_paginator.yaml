@@ -1,0 +1,4 @@
+knp_paginator:
+    template:
+        # Essaye ce chemin qui est le plus courant :
+        pagination: '@KnpPaginator/Pagination/bootstrap_v5_pagination.html.twig'

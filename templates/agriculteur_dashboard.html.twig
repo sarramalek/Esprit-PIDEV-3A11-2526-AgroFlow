@@ -354,7 +354,7 @@
                 <div class="module-count">Terrains & rotations</div>
             </a>
 
-            <a href="{{ path('agri_evenements') }}" class="module-card" style="--accent:#7F77DD;">
+            <a href="{{ path('agri_evenement_index') }}" class="module-card" style="--accent:#7F77DD;">
                 <div class="module-icon-wrap" style="background:#EEEDFE;">
                     <i class="fa fa-calendar-days" style="color:#7F77DD; font-size:22px;"></i>
                 </div>
@@ -381,7 +381,7 @@
             <div class="abo-header">
                 <div class="section-head" style="margin-bottom:0;">
                     <div class="section-title"><i class="fa fa-crown"></i> Mon abonnement</div>
-                    <a href="{{ path('agri_abonnements') }}" class="section-link">Gérer <i class="fa fa-arrow-right" style="font-size:10px;"></i></a>
+                    <a href="{{ path('agri_abonnement_front') }}" class="section-link">Gérer <i class="fa fa-arrow-right" style="font-size:10px;"></i></a>
                 </div>
             </div>
             <div class="abo-body">
@@ -438,7 +438,7 @@
                     </div>
                     <div style="font-size:15px;font-weight:600;color:var(--navy);margin-bottom:6px;">Aucun abonnement actif</div>
                     <div style="font-size:13px;color:var(--muted);margin-bottom:18px;">Souscrivez à une offre pour accéder à toutes les fonctionnalités</div>
-                    <a href="{{ path('agri_offres') }}"
+                    <a href="{{ path('agri_offre_front') }}"
                        style="display:inline-flex;align-items:center;gap:8px;background:var(--g2);color:white;padding:10px 22px;border-radius:10px;text-decoration:none;font-size:13px;font-weight:600;transition:background 0.2s;">
                         <i class="fa fa-star"></i> Voir les offres
                     </a>
@@ -453,7 +453,7 @@
             <div class="events-header">
                 <div class="section-head" style="margin-bottom:0;">
                     <div class="section-title"><i class="fa fa-calendar-days"></i> Mes événements</div>
-                    <a href="{{ path('agri_participations') }}" class="section-link">Voir tout <i class="fa fa-arrow-right" style="font-size:10px;"></i></a>
+                    <a href="{{ path('agri_participation_index') }}" class="section-link">Voir tout <i class="fa fa-arrow-right" style="font-size:10px;"></i></a>
                 </div>
             </div>
 
@@ -482,7 +482,7 @@
                     </div>
                     <div style="font-size:14px;font-weight:600;color:var(--navy);margin-bottom:6px;">Aucune participation</div>
                     <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">Inscrivez-vous à des événements agricoles</div>
-                    <a href="{{ path('agri_evenements') }}"
+                    <a href="{{ path('agri_evenement_index') }}"
                        style="display:inline-flex;align-items:center;gap:7px;background:#EEEDFE;color:#534AB7;padding:9px 18px;border-radius:10px;text-decoration:none;font-size:12px;font-weight:600;">
                         <i class="fa fa-search"></i> Explorer les événements
                     </a>

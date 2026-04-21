@@ -39,8 +39,6 @@ class MouvementStock
     #[ORM\JoinColumn(name: "id_user", referencedColumnName: "cin", nullable: false)]
     private ?User $user = null;
 
-    // ... (reste des getters et setters identiques)
-
     public function getId(): ?int
     {
         return $this->id;

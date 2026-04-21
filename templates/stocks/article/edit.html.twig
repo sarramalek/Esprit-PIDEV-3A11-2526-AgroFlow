@@ -1,5 +1,5 @@
 <div class="agro-form-container" style="max-width: 100%; background: white;">
-    {{ form_start(form, {'attr': {'id': 'edit-product-form'}}) }}
+    {{ form_start(form, {'action': path('app_article_edit', {'id': article.id}), 'method': 'POST', 'attr': {'id': 'edit-product-form'}}) }}
         <div class="agro-form-body" style="padding: 20px;">
             
             {# --- DESIGNATION --- #}

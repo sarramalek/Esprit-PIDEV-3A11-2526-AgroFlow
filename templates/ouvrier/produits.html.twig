@@ -456,6 +456,11 @@
                                 <span><i class="fa fa-tag"></i> {{ article.categorie ? article.categorie.nom : 'Sans catégorie' }}</span>
                                 <span><i class="fa fa-scale-balanced"></i> {{ article.uniteMesure ?: 'U' }}</span>
                             </div>
+                            <div style="display: flex; gap: 6px; margin-top: 10px;">
+                                <button onclick="traduireEtLire('Le produit est {{ article.nom|escape('js') }}. Catégorie : {{ article.categorie ? article.categorie.nom|escape('js') : '' }}. Description : {{ article.categorie and article.categorie.description ? article.categorie.description|escape('js') : 'Aucune description' }}', 'ar', 'ar-SA')" style="border:1px solid #eee; background:#fff; padding:4px 8px; border-radius:8px; cursor:pointer; font-size:0.95rem; display:flex; align-items:center; gap:5px; transition: all 0.2s;" title="Lire en Arabe" onmouseover="this.style.background='#f0f9ff'" onmouseout="this.style.background='#fff'">🇹🇳 <span style="font-size: 0.75rem; font-weight: 700; color: #666;">AR</span></button>
+                                <button onclick="traduireEtLire('Le produit est {{ article.nom|escape('js') }}. Catégorie : {{ article.categorie ? article.categorie.nom|escape('js') : '' }}. Description : {{ article.categorie and article.categorie.description ? article.categorie.description|escape('js') : 'Aucune description' }}', 'fr', 'fr-FR')" style="border:1px solid #eee; background:#fff; padding:4px 8px; border-radius:8px; cursor:pointer; font-size:0.95rem; display:flex; align-items:center; gap:5px; transition: all 0.2s;" title="Lire en Français" onmouseover="this.style.background='#f0f9ff'" onmouseout="this.style.background='#fff'">🇫🇷 <span style="font-size: 0.75rem; font-weight: 700; color: #666;">FR</span></button>
+                                <button onclick="traduireEtLire('Le produit est {{ article.nom|escape('js') }}. Catégorie : {{ article.categorie ? article.categorie.nom|escape('js') : '' }}. Description : {{ article.categorie and article.categorie.description ? article.categorie.description|escape('js') : 'Aucune description' }}', 'en', 'en-US')" style="border:1px solid #eee; background:#fff; padding:4px 8px; border-radius:8px; cursor:pointer; font-size:0.95rem; display:flex; align-items:center; gap:5px; transition: all 0.2s;" title="Lire en Anglais" onmouseover="this.style.background='#f0f9ff'" onmouseout="this.style.background='#fff'">🇬🇧 <span style="font-size: 0.75rem; font-weight: 700; color: #666;">EN</span></button>
+                            </div>
                         </div>
                         <div class="card-badge">{{ article.prixUnitaire ? article.prixUnitaire ~ ' DT' : 'Prix non défini' }}</div>
                     </div>
@@ -493,7 +498,12 @@
                 <span class="modal-label">Détail du produit</span>
                 <h2 id="modalTitle" class="modal-title"></h2>
             </div>
-            <span id="modalPrice" class="modal-price"></span>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <button id="modalTtsAr" style="border:1px solid #ddd; background:#fff; padding:6px 10px; border-radius:10px; cursor:pointer; font-size:1.1rem; transition: all 0.2s;" title="Lire en Arabe">🇹🇳</button>
+                <button id="modalTtsFr" style="border:1px solid #ddd; background:#fff; padding:6px 10px; border-radius:10px; cursor:pointer; font-size:1.1rem; transition: all 0.2s;" title="Lire en Français">🇫🇷</button>
+                <button id="modalTtsEn" style="border:1px solid #ddd; background:#fff; padding:6px 10px; border-radius:10px; cursor:pointer; font-size:1.1rem; transition: all 0.2s;" title="Lire en Anglais">🇬🇧</button>
+                <span id="modalPrice" class="modal-price"></span>
+            </div>
         </div>
         <button type="button" class="article-modal-close" aria-label="Fermer">×</button>
         <div class="article-modal-body">
@@ -543,6 +553,12 @@
                 unit.textContent = data.unit;
                 description.textContent = data.description;
                 modal.style.display = 'grid';
+
+                // Configurer la lecture vocale dans la modale
+                const textToRead = `Le produit est ${data.name}. Catégorie : ${data.category}. Description : ${data.description}`;
+                document.getElementById('modalTtsAr').onclick = () => traduireEtLire(textToRead, 'ar', 'ar-SA');
+                document.getElementById('modalTtsFr').onclick = () => traduireEtLire(textToRead, 'fr', 'fr-FR');
+                document.getElementById('modalTtsEn').onclick = () => traduireEtLire(textToRead, 'en', 'en-US');
             }
 
             function closeModal() {
@@ -807,5 +823,43 @@
                 }
             });
         });
+
+        async function traduireEtLire(texte, langDest, ttsLang) {
+            if (langDest === 'fr') {
+                lireDescriptionBase(texte, ttsLang);
+                return;
+            }
+            
+            try {
+                const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=fr&tl=${langDest}&dt=t&q=${encodeURIComponent(texte)}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                let translatedText = '';
+                if (data && data[0]) {
+                    data[0].forEach(chunk => {
+                        if (chunk[0]) translatedText += chunk[0];
+                    });
+                }
+                
+                lireDescriptionBase(translatedText || texte, ttsLang);
+            } catch (e) {
+                console.error("Erreur de traduction:", e);
+                lireDescriptionBase(texte, ttsLang);
+            }
+        }
+
+        function lireDescriptionBase(texte, langue) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const message = new SpeechSynthesisUtterance(texte);
+                message.lang = langue; 
+                message.pitch = 1;
+                message.rate = 0.9;
+                window.speechSynthesis.speak(message);
+            } else {
+                alert("Désolé, votre navigateur ne supporte pas la synthèse vocale.");
+            }
+        }
     </script>
 {% endblock %}

@@ -6,7 +6,14 @@
 <div class="main-content" style="max-width:900px; margin:auto;">
     <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; margin-bottom:24px;">
         <div>
-            <h1 style="margin-bottom:8px;">{{ article.nom }}</h1>
+            <h1 style="margin-bottom:8px; display: flex; align-items: center; gap: 15px;">
+                {{ article.nom }}
+                <div style="display: flex; gap: 8px;">
+                    <button onclick="traduireEtLire('Le produit est {{ article.nom|escape('js') }}. Catégorie : {{ article.categorie ? article.categorie.nom|escape('js') : '' }}. Description : {{ article.categorie ? article.categorie.description|escape('js') : '' }}', 'ar', 'ar-SA')" style="border:none; background:#f0f9ff; padding:5px 10px; border-radius:8px; cursor:pointer; font-size:1.2rem; display:flex; align-items:center; gap:5px;" title="Lire en Arabe"><i class="fa fa-volume-up" style="color:#1976d2; font-size:1rem;"></i> 🇹🇳</button>
+                    <button onclick="traduireEtLire('Le produit est {{ article.nom|escape('js') }}. Catégorie : {{ article.categorie ? article.categorie.nom|escape('js') : '' }}. Description : {{ article.categorie ? article.categorie.description|escape('js') : '' }}', 'fr', 'fr-FR')" style="border:none; background:#f0f9ff; padding:5px 10px; border-radius:8px; cursor:pointer; font-size:1.2rem; display:flex; align-items:center; gap:5px;" title="Lire en Français"><i class="fa fa-volume-up" style="color:#1976d2; font-size:1rem;"></i> 🇫🇷</button>
+                    <button onclick="traduireEtLire('Le produit est {{ article.nom|escape('js') }}. Catégorie : {{ article.categorie ? article.categorie.nom|escape('js') : '' }}. Description : {{ article.categorie ? article.categorie.description|escape('js') : '' }}', 'en', 'en-US')" style="border:none; background:#f0f9ff; padding:5px 10px; border-radius:8px; cursor:pointer; font-size:1.2rem; display:flex; align-items:center; gap:5px;" title="Lire en Anglais"><i class="fa fa-volume-up" style="color:#1976d2; font-size:1rem;"></i> 🇬🇧</button>
+                </div>
+            </h1>
             <p style="color:#56646a;">Détails du produit lié à l’agriculteur {{ agriculteur.nom }} {{ agriculteur.prenom }}.</p>
         </div>
         <a href="{{ path('ouvrier_produits') }}" class="card-button-outline" style="padding: 12px 18px;">Retour aux produits</a>
@@ -59,4 +66,44 @@
         </div>
     </div>
 </div>
+
+<script>
+async function traduireEtLire(texte, langDest, ttsLang) {
+    if (langDest === 'fr') {
+        lireDescriptionBase(texte, ttsLang);
+        return;
+    }
+    
+    try {
+        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=fr&tl=${langDest}&dt=t&q=${encodeURIComponent(texte)}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        let translatedText = '';
+        if (data && data[0]) {
+            data[0].forEach(chunk => {
+                if (chunk[0]) translatedText += chunk[0];
+            });
+        }
+        
+        lireDescriptionBase(translatedText || texte, ttsLang);
+    } catch (e) {
+        console.error("Erreur de traduction:", e);
+        lireDescriptionBase(texte, ttsLang);
+    }
+}
+
+function lireDescriptionBase(texte, langue) {
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const message = new SpeechSynthesisUtterance(texte);
+        message.lang = langue; 
+        message.pitch = 1;
+        message.rate = 0.9;
+        window.speechSynthesis.speak(message);
+    } else {
+        alert("Désolé, votre navigateur ne supporte pas la synthèse vocale.");
+    }
+}
+</script>
 {% endblock %}

@@ -70,6 +70,16 @@ public function login(AuthenticationUtils $authenticationUtils): Response
         ]);
     }
 
+    // ==================== SESSION CHECK ====================
+    #[Route('/check-session', name: 'app_check_session')]
+    public function checkSession(): Response
+    {
+        if (!$this->getUser()) {
+            return $this->json(['authenticated' => false], 401);
+        }
+        return $this->json(['authenticated' => true]);
+    }
+
     // ==================== LOGOUT ====================
     #[Route('/logout', name: 'app_logout')]
     public function logout(): void

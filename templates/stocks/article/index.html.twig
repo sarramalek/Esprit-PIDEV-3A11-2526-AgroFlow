@@ -3,7 +3,6 @@
 {% block title %}Gestion des Articles - AgroFlow{% endblock %}
 
 {% block body %}
-<div class="dash-wrapper" style="padding: 30px; font-family: 'DM Sans', sans-serif; background-color: transparent !important;">
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
@@ -17,13 +16,13 @@
         {% endfor %}
     {% endfor %}
 
-    {# --- EN-TÊTE --- #}
+    {# --- EN-TÃŠTE --- #}
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
         <div>
             <h2 style="margin:0; color:#1a2a19; font-size:28px; font-weight: 800; letter-spacing: -0.5px;">
                 <i class="fa fa-boxes-stacked" style="color: #2D5A27; margin-right: 10px;"></i>Gestion des Articles
             </h2>
-            <p style="margin:5px 0 0; color:#6c757d; font-size:15px;">Suivi en temps réel de votre inventaire agricole</p>
+            <p style="margin:5px 0 0; color:#6c757d; font-size:15px;">Suivi en temps rÃ©el de votre inventaire agricole</p>
         </div>
         
         <div style="display: flex; gap: 10px;">
@@ -33,8 +32,14 @@
             <button onclick="openAddProductModal()" class="btn-primary-action">
                 <i class="fa fa-plus"></i> Nouveau Produit
             </button>
+            <button onclick="document.getElementById('smartScanInput').click()" class="btn-primary-action" style="background: #8e44ad; color: white; border:none; box-shadow: 0 4px 15px rgba(142, 68, 173, 0.3);">
+                <i class="fa fa-camera"></i> Smart Scan IA
+            </button>
+            <input type="file" id="smartScanInput" accept="image/*" capture="environment" style="display: none;" onchange="handleSmartScan(event)">
         </div>
     </div>
+
+
 
     {# --- STATISTIQUES --- #}
     <div style="display: flex; gap: 20px; margin-bottom: 25px;">
@@ -59,7 +64,7 @@
             <input type="text" name="search" value="{{ currentSearch }}" placeholder="Rechercher par nom..." class="filter-input">
         </div>
         <select name="category" onchange="this.form.submit()" class="filter-input" style="min-width: 200px;">
-            <option value="">Toutes les catégories</option>
+            <option value="">Toutes les catÃ©gories</option>
             {% for cat in categories %}
                 <option value="{{ cat.id }}" {{ currentCategory == cat.id ? 'selected' : '' }}>{{ cat.nom }}</option>
             {% endfor %}
@@ -72,10 +77,10 @@
         <table style="width: 100%; border-collapse: separate; border-spacing: 0;">
             <thead>
                 <tr>
-                    <th class="th-style">Désignation</th>
-                    <th class="th-style">Catégorie</th>
+                    <th class="th-style">DÃ©signation</th>
+                    <th class="th-style">CatÃ©gorie</th>
                     <th class="th-style">Prix Unitaire</th>
-                    <th class="th-style">État du Stock</th>
+                    <th class="th-style">Ã‰tat du Stock</th>
                     <th class="th-style">Valeur Totale</th>
                     <th class="th-style" style="text-align: center;">Actions</th>
                 </tr>
@@ -86,10 +91,17 @@
                     <td style="padding: 15px 25px;">
                         <div style="display: flex; align-items: center; gap: 12px;">
                             <div class="article-icon"><i class="fa fa-seedling"></i></div>
-                            <span style="font-weight: 600; color: #2C3E50;">{{ article.nom }}</span>
+                            <div>
+                                <span style="font-weight: 600; color: #2C3E50; display:block;">{{ article.nom }}</span>
+                                <div style="display: flex; gap: 5px; margin-top: 4px;">
+                                    <button onclick="traduireEtLire('Le produit est {{ article.nom|escape('js') }}. Catégorie : {{ article.categorie ? article.categorie.nom|escape('js') : '' }}. Description : {{ article.categorie ? article.categorie.description|escape('js') : '' }}', 'ar', 'ar-SA')" style="border:none; background:#f0f9ff; padding:2px 5px; border-radius:4px; cursor:pointer; font-size:0.9rem;" title="Lire en Arabe">🇹🇳</button>
+                                    <button onclick="traduireEtLire('Le produit est {{ article.nom|escape('js') }}. Catégorie : {{ article.categorie ? article.categorie.nom|escape('js') : '' }}. Description : {{ article.categorie ? article.categorie.description|escape('js') : '' }}', 'fr', 'fr-FR')" style="border:none; background:#f0f9ff; padding:2px 5px; border-radius:4px; cursor:pointer; font-size:0.9rem;" title="Lire en Français">🇫🇷</button>
+                                    <button onclick="traduireEtLire('Le produit est {{ article.nom|escape('js') }}. Catégorie : {{ article.categorie ? article.categorie.nom|escape('js') : '' }}. Description : {{ article.categorie ? article.categorie.description|escape('js') : '' }}', 'en', 'en-US')" style="border:none; background:#f0f9ff; padding:2px 5px; border-radius:4px; cursor:pointer; font-size:0.9rem;" title="Lire en Anglais">🇬🇧</button>
+                                </div>
+                            </div>
                         </div>
                     </td>
-                    <td><span class="category-badge">{{ article.categorie ? article.categorie.nom : 'Non classé' }}</span></td>
+                    <td><span class="category-badge">{{ article.categorie ? article.categorie.nom : 'Non classÃ©' }}</span></td>
                     <td><span style="font-weight: 600;">{{ article.prixUnitaire|number_format(2, '.', ' ') }} DT</span></td>
                     <td>
                         <div style="min-width: 140px;">
@@ -113,8 +125,13 @@
                                 <i class="fa fa-pen"></i>
                             </button>
 
+                            {# --- BOUTONS QR CODE --- #}
+                            <button type="button" onclick="openQRCodeModal('{{ article.id }}', '{{ article.nom|escape('js') }}')" class="action-btn" style="background: #e3f2fd; color: #1976d2;" title="Voir le QR Code">
+                                <i class="fa fa-qrcode"></i>
+                            </button>
+
                             {% if article.quantiteEnStock <= 0 %}
-                                <button type="button" onclick="openEmergencyModalForArticle('{{ article.nom|escape('js') }}', '{{ article.categorie ? article.categorie.nom|escape('js') : '' }}')" class="action-btn btn-emergency" title="Où trouver cet article ?">
+                                <button type="button" onclick="openEmergencyModalForArticle('{{ article.nom|escape('js') }}', '{{ article.categorie ? article.categorie.nom|escape('js') : '' }}')" class="action-btn btn-emergency" title="OÃ¹ trouver cet article ?">
                                     <i class="fa fa-map-marker-alt"></i>
                                 </button>
                             {% endif %}
@@ -127,7 +144,6 @@
             </tbody>
         </table>
     </div>
-</div>
 
 {# --- MODAL AJOUT --- #}
 <div id="addProductModal" class="modal-overlay">
@@ -142,6 +158,25 @@
     </div>
 </div>
 
+{# --- MODAL QR CODE --- #}
+<div id="qrCodeModal" class="modal-overlay">
+    <div class="modal-backdrop" onclick="closeQRCodeModal()"></div>
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="qrCodeModalTitle">QR Code</h2>
+            <button type="button" class="modal-close" aria-label="Fermer" onclick="closeQRCodeModal()">×</button>
+        </div>
+        <div class="modal-body" style="text-align: center; padding: 20px;">
+            <img id="qrCodeImage" src="" alt="QR Code" style="max-width: 300px; max-height: 300px; border: 1px solid #ddd; border-radius: 8px;">
+            <div style="margin-top: 15px;">
+                <a href="#" id="downloadQRCodeLink" download style="display: inline-block; padding: 10px 20px; background: #1976d2; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                    <i class="fa fa-download"></i> Télécharger le QR Code
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 {# --- MODAL MODIFICATION --- #}
 <div id="editProductModal" class="modal-overlay">
     <div class="modal-card" style="max-width: 650px; border-radius: 20px; border: none;">
@@ -152,7 +187,7 @@
             <span class="close-modal" onclick="closeEditProductModal()" style="cursor:pointer; font-size: 24px;">&times;</span>
         </div>
         <div id="editModalBody" style="background: white;">
-            {# Le contenu AJAX sera injecté ici #}
+            {# Le contenu AJAX sera injectÃ© ici #}
         </div>
     </div>
 </div>
@@ -171,14 +206,14 @@
                     <span id="modalCurrentStock" style="background: #EAF3DE; color: #2D5A27; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 700;"></span>
                 </div>
                 <div style="margin-bottom: 20px;">
-                    <label class="form-label-modern">Type d'opération</label>
+                    <label class="form-label-modern">Type d'opÃ©ration</label>
                     <select name="type" required class="form-input-modern">
-                        <option value="ENTREE">📈 Entrée en stock</option>
-                        <option value="SORTIE">📉 Sortie de stock</option>
+                        <option value="ENTREE">ðŸ“ˆ EntrÃ©e en stock</option>
+                        <option value="SORTIE">ðŸ“‰ Sortie de stock</option>
                     </select>
                 </div>
                 <div style="margin-bottom: 20px;">
-                    <label class="form-label-modern">Quantité</label>
+                    <label class="form-label-modern">QuantitÃ©</label>
                     <input type="number" name="quantite" step="0.01" required class="form-input-modern" placeholder="0.00">
                 </div>
                 <textarea name="motif" class="form-input-modern" style="min-height: 80px;" placeholder="Commentaire..."></textarea>
@@ -202,7 +237,7 @@
         </div>
         <div class="modal-body" style="padding: 20px; background: white;">
             <p id="emergencyModalText" style="margin-bottom: 15px; font-size: 15px; color: #333;">
-                Recherche de fournisseurs à proximité...
+                Recherche de fournisseurs Ã  proximitÃ©...
             </p>
             <div id="emergencyMap" style="height: 400px; width: 100%; border-radius: 10px; margin-bottom: 20px; z-index: 1;"></div>
             <div id="supplierList" style="max-height: 200px; overflow-y: auto;">
@@ -212,8 +247,16 @@
     </div>
 </div>
 
+{# --- MODAL CHARGEMENT SMART SCAN --- #}
+<div id="smartScanLoadingModal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 400px; text-align: center; padding: 40px;">
+        <i class="fa fa-spinner fa-spin" style="font-size: 50px; color: #8e44ad; margin-bottom: 20px;"></i>
+        <h3 style="color: #2c3e50; margin: 0;">Analyse IA en cours...</h3>
+        <p style="color: #7f8c8d; margin-top: 10px;">Veuillez patienter pendant que Gemini identifie l'article.</p>
+    </div>
+</div>
+
 <style>
-    /* Intégration de tes styles existants */
     .btn-primary-action { background: #2D5A27; color: white; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 600; cursor: pointer; }
     .btn-secondary-action { background: #eef2f7; color: #444; padding: 12px 24px; border-radius: 10px; text-decoration: none; font-weight: 600; }
     .stat-card { background: white; padding: 15px 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 15px; flex: 1; }
@@ -221,7 +264,9 @@
     .stat-value { font-size: 22px; font-weight: 800; color: #2c3e50; }
     .stat-label { font-size: 11px; color: #95a5a6; font-weight: 600; text-transform: uppercase; }
     .filter-bar { display: flex; gap: 15px; margin-bottom: 20px; align-items: center; background: white; padding: 15px; border-radius: 12px; }
+
     .filter-input { width: 100%; padding: 10px 15px; border-radius: 10px; border: 1px solid #e1e1e1; outline: none; }
+
     .btn-filter-submit { background: #2D5A27; color: white; border-radius: 10px; padding: 10px 20px; border: none; cursor: pointer; font-weight: 600; }
     .main-card-table { background: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); overflow: hidden; }
     .th-style { padding: 15px 25px; color: #888; font-size: 11px; text-transform: uppercase; text-align: left; }
@@ -255,10 +300,12 @@ function closeAddProductModal() {
     document.getElementById('addProductModal').style.display = 'none';
 }
 
+
+
 function openMouvementModal(id, nom, stockActuel) {
     const form = document.getElementById('mouvementForm');
 
-    // Utilise directement l'URL connue pour éviter toute confusion de préfixe
+    // Utilise directement l'URL connue pour Ã©viter toute confusion de prÃ©fixe
     form.action = '/agriculteur/stocks/mouvements/new/' + id;
 
     document.getElementById('modalArticleName').textContent = nom;
@@ -310,33 +357,33 @@ function getQueriesForArticle(articleName, categoryName) {
     let name = articleName.toLowerCase();
     let cat = categoryName.toLowerCase();
 
-    // Mapping intelligent selon le nom et la catégorie
+    // Mapping intelligent selon le nom et la catÃ©gorie
     if (name.includes('viande') || name.includes('meat') || name.includes('poulet') || cat.includes('viande') || cat.includes('animal')) {
-        return ["boucherie", "supermarché", "marché"];
+        return ["boucherie", "supermarchÃ©", "marchÃ©"];
     }
-    if (name.includes('tomate') || name.includes('légume') || name.includes('fruit') || cat.includes('légume') || cat.includes('fruit')) {
-        return ["marché aux légumes", "primeur", "marché", "supermarché"];
+    if (name.includes('tomate') || name.includes('lÃ©gume') || name.includes('fruit') || cat.includes('lÃ©gume') || cat.includes('fruit')) {
+        return ["marchÃ© aux lÃ©gumes", "primeur", "marchÃ©", "supermarchÃ©"];
     }
-    if (name.includes('pain') || name.includes('blé') || name.includes('farine') || cat.includes('céréale')) {
-        return ["boulangerie", "moulin", "supermarché"];
+    if (name.includes('pain') || name.includes('blÃ©') || name.includes('farine') || cat.includes('cÃ©rÃ©ale')) {
+        return ["boulangerie", "moulin", "supermarchÃ©"];
     }
     if (name.includes('lait') || name.includes('fromage') || cat.includes('laitier')) {
-        return ["fromagerie", "laiterie", "supermarché"];
+        return ["fromagerie", "laiterie", "supermarchÃ©"];
     }
     if (name.includes('semence') || name.includes('graine') || name.includes('engrais') || name.includes('pesticide') || cat.includes('intrant') || cat.includes('semence')) {
-        return ["pépinière", "agriculture", "jardinerie"];
+        return ["pÃ©piniÃ¨re", "agriculture", "jardinerie"];
     }
-    if (name.includes('tracteur') || cat.includes('matériel') || cat.includes('machine') || cat.includes('outil')) {
-        return ["matériel agricole", "quincaillerie"];
+    if (name.includes('tracteur') || cat.includes('matÃ©riel') || cat.includes('machine') || cat.includes('outil')) {
+        return ["matÃ©riel agricole", "quincaillerie"];
     }
 
-    // Recherche par défaut
-    return [articleName, "marché", "supermarché", "agriculture"];
+    // Recherche par dÃ©faut
+    return [articleName, "marchÃ©", "supermarchÃ©", "agriculture"];
 }
 
 function openEmergencyModalForArticle(articleName, categoryName) {
     document.getElementById('emergencySupplierModal').style.display = 'flex';
-    document.getElementById('emergencyModalText').innerHTML = `Vous cherchez l'article <strong>${articleName}</strong>. Voici les endroits à proximité où vous pourriez le trouver :`;
+    document.getElementById('emergencyModalText').innerHTML = `Vous cherchez l'article <strong>${articleName}</strong>. Voici les endroits Ã  proximitÃ© oÃ¹ vous pourriez le trouver :`;
     
     window.currentArticleQueries = getQueriesForArticle(articleName, categoryName);
     
@@ -352,12 +399,12 @@ function initEmergencyMap() {
                 loadMapAndSuppliers(userLat, userLon);
             },
             (error) => {
-                console.error("Erreur de géolocalisation:", error);
-                document.getElementById('supplierLoading').innerHTML = "<span style='color:red;'>Impossible d'obtenir votre position. Veuillez activer la géolocalisation.</span>";
+                console.error("Erreur de gÃ©olocalisation:", error);
+                document.getElementById('supplierLoading').innerHTML = "<span style='color:red;'>Impossible d'obtenir votre position. Veuillez activer la gÃ©olocalisation.</span>";
             }
         );
     } else {
-        document.getElementById('supplierLoading').innerHTML = "<span style='color:red;'>La géolocalisation n'est pas supportée par votre navigateur.</span>";
+        document.getElementById('supplierLoading').innerHTML = "<span style='color:red;'>La gÃ©olocalisation n'est pas supportÃ©e par votre navigateur.</span>";
     }
 }
 
@@ -366,7 +413,7 @@ function loadMapAndSuppliers(lat, lon) {
         emergencyMap = L.map('emergencyMap').setView([lat, lon], 12);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
-            attribution: '© OpenStreetMap'
+            attribution: 'Â© OpenStreetMap'
         }).addTo(emergencyMap);
 
         // Marker for user (Farm)
@@ -397,7 +444,7 @@ function loadMapAndSuppliers(lat, lon) {
 
     function executeSearch() {
         if (queryIndex >= queries.length) {
-            listContainer.innerHTML = "<p style='padding:10px; color:#666;'>Aucun fournisseur spécifique trouvé à proximité immédiate.</p>";
+            listContainer.innerHTML = "<p style='padding:10px; color:#666;'>Aucun fournisseur spÃ©cifique trouvÃ© Ã  proximitÃ© immÃ©diate.</p>";
             return;
         }
 
@@ -467,8 +514,123 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 function closeEmergencyModal() {
     document.getElementById('emergencySupplierModal').style.display = 'none';
 }
+
+// ── MODAL QR CODE ───────────────────────────────────────────────────────
+function openQRCodeModal(articleId, articleName) {
+    const modal = document.getElementById('qrCodeModal');
+    const qrCodeImg = document.getElementById('qrCodeImage');
+    const modalTitle = document.getElementById('qrCodeModalTitle');
+    const downloadLink = document.getElementById('downloadQRCodeLink');
+    
+    modalTitle.textContent = 'QR Code - ' + articleName;
+    qrCodeImg.src = '/agriculteur/articles/qr/' + articleId;
+    downloadLink.href = '/agriculteur/articles/qr/' + articleId + '/download';
+    
+    modal.style.display = 'flex';
+}
+
+function closeQRCodeModal() {
+    document.getElementById('qrCodeModal').style.display = 'none';
+}
 </script>
 
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<script>
+async function handleSmartScan(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Afficher le chargement
+    document.getElementById('smartScanLoadingModal').style.display = 'flex';
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+        const response = await fetch("{{ path('api_vision_analyze') }}", {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+        document.getElementById('smartScanLoadingModal').style.display = 'none';
+        event.target.value = ''; // Reset input
+
+        if (response.ok) {
+            if (data.matchType === 'exact') {
+                // Redirection directe vers les mouvements
+                window.location.href = "{{ path('app_mouvement_index') }}?article=" + data.articleId;
+            } else {
+                // Saisie Augmentée : Ouvrir la modale et pré-remplir
+                openAddProductModal();
+                
+                setTimeout(() => {
+                    const form = document.querySelector('#addProductModal form');
+                    if (form) {
+                        // Pré-remplir le Nom
+                        const nomInput = form.querySelector('input[name*="[nom]"]');
+                        if (nomInput && data.suggestedName) {
+                            nomInput.value = data.suggestedName;
+                            nomInput.style.backgroundColor = '#fff9db'; // Surbrillance jaune pour montrer que c'est de l'IA
+                        }
+
+                        // Pré-remplir la Catégorie
+                        const catSelect = form.querySelector('select[name*="[categorie]"]');
+                        if (catSelect && data.categoryId) {
+                            catSelect.value = data.categoryId;
+                            catSelect.style.backgroundColor = '#fff9db';
+                        }
+                    }
+                }, 600);
+            }
+        } else {
+            alert("❌ Erreur IA : " + (data.error || "Impossible d'identifier l'image."));
+        }
+    } catch (e) {
+        console.error(e);
+        document.getElementById('smartScanLoadingModal').style.display = 'none';
+        alert("Une erreur de connexion est survenue.");
+    }
+}
+
+async function traduireEtLire(texte, langDest, ttsLang) {
+    if (langDest === 'fr') {
+        lireDescriptionBase(texte, ttsLang);
+        return;
+    }
+    
+    try {
+        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=fr&tl=${langDest}&dt=t&q=${encodeURIComponent(texte)}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        let translatedText = '';
+        if (data && data[0]) {
+            data[0].forEach(chunk => {
+                if (chunk[0]) translatedText += chunk[0];
+            });
+        }
+        
+        lireDescriptionBase(translatedText || texte, ttsLang);
+    } catch (e) {
+        console.error("Erreur de traduction:", e);
+        lireDescriptionBase(texte, ttsLang);
+    }
+}
+
+function lireDescriptionBase(texte, langue) {
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const message = new SpeechSynthesisUtterance(texte);
+        message.lang = langue; 
+        message.pitch = 1;
+        message.rate = 0.9;
+        window.speechSynthesis.speak(message);
+    } else {
+        alert("Désolé, votre navigateur ne supporte pas la synthèse vocale.");
+    }
+}
+</script>
 {% endblock %}

@@ -8,6 +8,7 @@ use App\Entity\stocks\MouvementStock;
 use App\Repository\stocks\ArticleRepository;
 use App\Repository\stocks\CategorieRepository;
 use App\Repository\stocks\MouvementStockRepository;
+use App\Service\EmailService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -104,7 +105,7 @@ class OuvrierDashboardController extends AbstractController
     }
 
     #[Route('/stocks/produits/{id}/sortie', name: 'article_sortie', methods: ['POST'], requirements: ['id' => '\\d+'])]
-    public function sortie(Article $article, Request $request, EntityManagerInterface $em): Response
+    public function sortie(Article $article, Request $request, EntityManagerInterface $em, EmailService $emailService): Response
     {
         /** @var \App\Entity\User\User|null $user */
         $user = $this->getUser();
@@ -139,6 +140,13 @@ class OuvrierDashboardController extends AbstractController
 
         $em->persist($mouvement);
         $em->flush();
+
+        if ($nouveauStock <= $article->getSeuilAlerte()) {
+            $mailOK = $emailService->envoyerMailAlerte($article);
+            if (!$mailOK) {
+                $this->addFlash('warning', 'Alerte créée, mais l’envoi de l’email a échoué.');
+            }
+        }
 
         $this->addFlash('success', 'Sortie enregistrée dans les mouvements.');
         return $this->redirectToRoute('ouvrier_produits');
@@ -284,5 +292,14 @@ class OuvrierDashboardController extends AbstractController
     public function evenements(): Response
     {
         return $this->render('ouvrier/evenements.html.twig');
+    }
+
+    #[Route('/participations', name: 'participation_index')]
+    public function participations(): Response
+    {
+        // On redirige vers les événements pour l'instant ou on affiche une vue simple
+        return $this->render('ouvrier/evenements.html.twig', [
+            'info' => 'Module de participation en cours de développement'
+        ]);
     }
 }
