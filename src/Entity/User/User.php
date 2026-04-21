@@ -65,6 +65,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\JoinColumn(name: 'id_agricole', referencedColumnName: 'cin', nullable: true, onDelete: 'SET NULL')]
     private ?self $agriculteur = null;
 
+    // CORRECTION : nullable: true et initialisation à null
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $telegramChatId = null;
 
@@ -77,16 +78,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        // On aligne les chiffres avec tes routes de sécurité
-        // 1 = Ouvrier, 2 = Agriculteur, 3 = Admin
         $roles = match ((int)$this->role) {
-            1 => ['ROLE_OUVRIER'],      // Correspond à ^/ouvrier
-            2 => ['ROLE_AGRICULTEUR'],  // Correspond à ^/agriculteur
-            3 => ['ROLE_ADMIN'],        // Correspond à ^/admin
+            1 => ['ROLE_OUVRIER'],
+            2 => ['ROLE_AGRICULTEUR'],
+            3 => ['ROLE_ADMIN'],
             default => [],
         };
 
-        // Toujours ajouter ROLE_USER par défaut
         $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
@@ -97,10 +95,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return (string) $this->mdp;
     }
 
-    public function eraseCredentials(): void
-    {
-        // Nettoyer les données sensibles temporaires si besoin
-    }
+    public function eraseCredentials(): void {}
 
     // ==================== GETTERS & SETTERS ====================
 
@@ -108,6 +103,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->cin;
     }
+
     public function setCin(int $cin): self
     {
         $this->cin = $cin;
@@ -118,6 +114,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->nom;
     }
+
     public function setNom(?string $nom): self
     {
         $this->nom = $nom;
@@ -128,6 +125,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->prenom;
     }
+
     public function setPrenom(?string $prenom): self
     {
         $this->prenom = $prenom;
@@ -138,6 +136,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->tel;
     }
+
     public function setTel(?string $tel): self
     {
         $this->tel = $tel;
@@ -148,6 +147,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->dateNaiss;
     }
+
     public function setDateNaiss(?\DateTimeInterface $dateNaiss): self
     {
         $this->dateNaiss = $dateNaiss;
@@ -158,6 +158,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->email;
     }
+
     public function setEmail(?string $email): self
     {
         $this->email = $email;
@@ -168,6 +169,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->mdp;
     }
+
     public function setMdp(?string $mdp): self
     {
         $this->mdp = $mdp;
@@ -178,6 +180,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->adresse;
     }
+
     public function setAdresse(?string $adresse): self
     {
         $this->adresse = $adresse;
@@ -188,6 +191,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->ville;
     }
+
     public function setVille(?string $ville): self
     {
         $this->ville = $ville;
@@ -198,6 +202,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->role;
     }
+
     public function setRole(?int $role): self
     {
         $this->role = $role;
@@ -208,6 +213,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->dateCreationcpt;
     }
+
     public function setDateCreationcpt(?\DateTimeInterface $dateCreationcpt): self
     {
         $this->dateCreationcpt = $dateCreationcpt;
@@ -218,6 +224,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->dateDernierchg;
     }
+
     public function setDateDernierchg(?\DateTimeInterface $dateDernierchg): self
     {
         $this->dateDernierchg = $dateDernierchg;
@@ -228,6 +235,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->twoFactorEnabled;
     }
+
     public function setTwoFactorEnabled(bool $twoFactorEnabled): self
     {
         $this->twoFactorEnabled = $twoFactorEnabled;
@@ -238,6 +246,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->twoFactorSecret;
     }
+
     public function setTwoFactorSecret(?string $twoFactorSecret): self
     {
         $this->twoFactorSecret = $twoFactorSecret;
@@ -248,6 +257,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->twoFactorBackupCodes;
     }
+
     public function setTwoFactorBackupCodes(?string $twoFactorBackupCodes): self
     {
         $this->twoFactorBackupCodes = $twoFactorBackupCodes;
@@ -269,6 +279,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->img;
     }
+
     public function setImg(?string $img): self
     {
         $this->img = $img;
