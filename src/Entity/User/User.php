@@ -77,8 +77,7 @@ private int $twoFactorEnabled = 0;
     #[ORM\Column(type: 'string', nullable: true)]
     private ?string $googleAuthenticatorSecret = null;
 
-    #[ORM\Column(type: 'json', nullable: true)]
-    private array $backupCodes = [];
+   
     // ==================== UserInterface ====================
 
     public function getUserIdentifier(): string
