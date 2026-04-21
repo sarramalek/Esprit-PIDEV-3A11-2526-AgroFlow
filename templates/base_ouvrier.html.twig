@@ -113,7 +113,55 @@
             overflow: hidden;
             z-index: 99999 !important;
         }
+        .navmenu { display: flex; align-items: stretch; height: 100%; }
+        .nav-item { position: relative; display: flex; align-items: center; }
+        .nav-link {
+            display: flex; align-items: center; gap: 7px;
+            padding: 0 16px; height: 70px;
+            color: #2C3E50; text-decoration: none;
+            font-weight: 600; font-size: 14px;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s; white-space: nowrap;
+        }
+        .nav-link i { font-size: 13px; color: #2D5A27; }
+        .nav-link:hover, .nav-link.active {
+            color: #2D5A27;
+            border-bottom-color: #2D5A27;
+            background: #f5faf4;
+        }
+ /* ── Dropdown Stocks ── */
+        .dropdown-panel {
+            display: none;
+            position: absolute;
+            top: 70px;
+            left: 0;
+            width: 200px;
+            background: white;
+            border-radius: 0 0 14px 14px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border: 1px solid #eee;
+            padding: 8px 0;
+            z-index: 1000;
+        }
+        .dropdown-panel.show { display: block; animation: fadeIn 0.2s ease-out; }
+        
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            text-decoration: none;
+            color: #2C3E50;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .dropdown-item:hover { background: #f5faf4; color: #2D5A27; }
+        .dropdown-item i { width: 24px; font-size: 14px; color: #2D5A27; margin-right: 12px; }
 
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
         /* Champs édition */
         .ouv-pf-input {
             display: none;
@@ -250,6 +298,23 @@ checkAndRedirect();
                class="nav-link {% if app.request.get('_route') == 'ouvrier_taches' %}active{% endif %}">
                 <i class="fa fa-list-check"></i> Mes Tâches
             </a>
+        </div>
+        <!-- Menu Déroulant Stocks -->
+        <div class="nav-item" id="stocksDropdown">
+            <a href="javascript:void(0)" class="nav-link" onclick="toggleDropdown('stocksMenu')">
+                <i class="fa fa-boxes-stacked"></i> Stocks <i class="fa fa-chevron-down" style="font-size: 8px; margin-left: 5px;"></i>
+            </a>
+            
+            <div class="dropdown-panel" id="stocksMenu">
+                <a href="{{ path('ouvrier_categories') }}" class="dropdown-item">
+                    <i class="fa fa-tags"></i>
+                    <span>Catégories</span>
+                </a>
+                <a href="{{ path('ouvrier_produits') }}" class="dropdown-item">
+                    <i class="fa fa-box"></i>
+                    <span>Produits</span>
+                </a>
+            </div>
         </div>
         <div class="nav-item">
             <a href="{{ path('ouvrier_evenements') }}"
@@ -499,6 +564,11 @@ checkAndRedirect();
 
 {% block javascripts %}
 <script>
+    /* ── Dropdown Stocks ── */
+    function toggleDropdown(id) {
+        const menu = document.getElementById(id);
+        menu.classList.toggle('show');
+    }
     /* ══════════════════════════════════════════════════════
        CLOUDINARY — Upload direct (unsigned preset)
     ══════════════════════════════════════════════════════ */

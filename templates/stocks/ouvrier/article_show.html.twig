@@ -1,0 +1,28 @@
+{% extends 'base_ouvrier.html.twig' %}
+
+{% block title %}Produit – Ouvrier | AgroFlow{% endblock %}
+
+{% block body %}
+<div class="main-content">
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px;">
+        <div>
+            <h1>{{ article.nom }}</h1>
+            <p style="margin-top:6px; color:#6c757d;">
+                Catégorie : <strong>{{ article.categorie ? article.categorie.nom : 'Sans catégorie' }}</strong>
+            </p>
+        </div>
+        <a href="{{ path('ouvrier_produits') }}" style="text-decoration:none; font-weight:700; color:#2D5A27;">
+            ← Retour produits
+        </a>
+    </div>
+
+    <div style="margin-top:24px; background:#fff; border:1px solid rgba(34,79,46,0.12); border-radius:18px; padding:20px; box-shadow:0 12px 28px rgba(31,61,33,0.08);">
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap:14px;">
+            <div><strong>Quantité en stock</strong><div>{{ article.quantiteEnStock }}</div></div>
+            <div><strong>Unité</strong><div>{{ article.uniteMesure ?: 'U' }}</div></div>
+            <div><strong>Seuil alerte</strong><div>{{ article.seuilAlerte }}</div></div>
+            <div><strong>Prix unitaire</strong><div>{{ article.prixUnitaire ? article.prixUnitaire ~ ' DT' : 'N/A' }}</div></div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -39,8 +39,6 @@ class MouvementStock
     #[ORM\JoinColumn(name: "id_user", referencedColumnName: "cin", nullable: false)]
     private ?User $user = null;
 
-    // ... (reste des getters et setters identiques)
-
     public function getId(): ?int
     {
         return $this->id;
@@ -103,6 +101,20 @@ class MouvementStock
     public function setUser(?User $user): self
     {
         $this->user = $user;
+        return $this;
+    }
+
+    #[ORM\Column(name: "id_admin", type: "integer", nullable: true)]
+    private ?int $idAdmin = null;
+
+    public function getIdAdmin(): ?int
+    {
+        return $this->idAdmin;
+    }
+
+    public function setIdAdmin(?int $idAdmin): self
+    {
+        $this->idAdmin = $idAdmin;
         return $this;
     }
 }
