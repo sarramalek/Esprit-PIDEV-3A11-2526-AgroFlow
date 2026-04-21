@@ -20,7 +20,6 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class AnimauxController extends AbstractController
 {
     #[Route(name: 'app_animaux_index', methods: ['GET'])]
-    #[IsGranted('ROLE_AGRICULTEUR')]
     public function index(Request $request, AnimauxRepository $animauxRepository, RescueGroupsService $rescueGroupsService, PaginatorInterface $paginator): Response
     {
         $user = $this->getUser();
@@ -103,10 +102,7 @@ final class AnimauxController extends AbstractController
     #[Route('/{id}', name: 'app_animaux_show', methods: ['GET'])]
     public function show(Animaux $animaux, OpenFoodFactsService $openFoodFactsService): Response
     {
-        // Sécurité : l'agriculteur ne peut voir que ses animaux
-        if (!$this->isGranted('ROLE_ADMIN') && $animaux->getUser() !== $this->getUser()) {
-            throw $this->createAccessDeniedException("Vous n'avez pas accès à cet animal.");
-        }
+        
 
         // Récupérer les suggestions alimentaires pour l'espèce de l'animal
         $foodSuggestions = $openFoodFactsService->getFoodSuggestionsForSpecies($animaux->getEspece());
