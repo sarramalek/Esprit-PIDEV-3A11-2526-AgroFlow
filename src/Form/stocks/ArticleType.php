@@ -11,6 +11,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use App\Repository\stocks\CategorieRepository;
 
 class ArticleType extends AbstractType
@@ -26,8 +27,25 @@ class ArticleType extends AbstractType
                 'attr' => ['placeholder' => 'Ex: Engrais Azoté']
             ])
             ->add('prix_unitaire', NumberType::class, [
-                'label' => 'Prix Unitaire (DT)',
-                'attr' => ['placeholder' => 'Ex: 45.500', 'step' => '0.001'],
+                'label' => 'Prix Unitaire (TND)',
+                'attr' => ['placeholder' => 'Prix final en Dinars', 'step' => '0.001'],
+                'required' => false,
+            ])
+            ->add('devise', ChoiceType::class, [
+                'label' => 'Devise d\'achat',
+                'choices' => [
+                    'Dinar Tunisien (TND)' => 'TND',
+                    'Euro (EUR)' => 'EUR',
+                    'Dollar US (USD)' => 'USD',
+                    'Livre Sterling (GBP)' => 'GBP',
+                    'Dinar Algérien (DZD)' => 'DZD',
+                    'Dirham Marocain (MAD)' => 'MAD',
+                ],
+                'preferred_choices' => ['TND'],
+            ])
+            ->add('prix_achat_devise', NumberType::class, [
+                'label' => 'Prix d\'achat (Devise etrangere)',
+                'attr' => ['placeholder' => 'Saisir le prix original'],
                 'required' => false,
             ])
             ->add('quantite_en_stock', NumberType::class, [
@@ -44,7 +62,7 @@ class ArticleType extends AbstractType
             ->add('categorie', EntityType::class, [
                 'class' => Categorie::class,
                 'choice_label' => 'nom',
-                'label' => 'Ma Catégorie',
+                'label' => 'Ma Categorie',
                 'placeholder' => 'Sélectionnez une catégorie',
                 'required' => true,
                 // --- FILTRE DES CATÉGORIES ICI ---

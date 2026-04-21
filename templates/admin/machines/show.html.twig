@@ -1,0 +1,118 @@
+{% extends 'base_admin.html.twig' %}
+
+{% block title %}Détail Machine - {{ machine.nom }}{% endblock %}
+{% block page_title %}Détail de la Machine{% endblock %}
+{% block breadcrumb %}Matériels / Machines / {{ machine.nom }}{% endblock %}
+
+{% block body %}
+<div style="max-width: 700px; margin: 0 auto;">
+
+    <!-- Bouton Retour -->
+    <a href="{{ path('admin_machines_index') }}" 
+       style="color:#2D5A27; text-decoration:none; font-size:14px; display:inline-flex; align-items:center; gap:6px; margin-bottom:25px;">
+        <i class="fa fa-arrow-left"></i> Retour à la liste
+    </a>
+
+    <!-- Flash messages -->
+    {% for msg in app.flashes('success') %}
+        <div style="padding:12px 18px; border-radius:8px; margin-bottom:16px;
+                    background:#EAF3DE; color:#3B6D11; border:1px solid #c0dd97;
+                    display:flex; align-items:center; gap:10px; font-size:13.5px;">
+            <i class="fa fa-check-circle"></i> {{ msg }}
+        </div>
+    {% endfor %}
+    {% for msg in app.flashes('error') %}
+        <div style="padding:12px 18px; border-radius:8px; margin-bottom:16px;
+                    background:#FCEBEB; color:#A32D2D; border:1px solid #f7c1c1;
+                    display:flex; align-items:center; gap:10px; font-size:13.5px;">
+            <i class="fa fa-exclamation-circle"></i> {{ msg }}
+        </div>
+    {% endfor %}
+
+    <!-- Carte centrée -->
+    <div style="background:white; border-radius:12px; padding:35px; box-shadow:0 4px 15px rgba(0,0,0,0.07);">
+
+        <h2 style="margin:0 0 30px 0; color:#2C3E50; text-align:center;">
+            {{ machine.nom }}
+        </h2>
+
+        <div style="display: grid; grid-template-columns: 180px 1fr; gap: 18px 25px; font-size: 15px;">
+
+            <div style="color:#666; font-weight:500;">Marque</div>
+            <div style="color:#2C3E50; font-weight:600;">{{ machine.marque }}</div>
+
+            <div style="color:#666; font-weight:500;">Modèle</div>
+            <div style="color:#2C3E50;">{{ machine.modele }}</div>
+
+            <div style="color:#666; font-weight:500;">Numéro de série</div>
+            <div style="color:#2C3E50; font-family:monospace; font-size:14.5px;">{{ machine.numeroSerie }}</div>
+
+            <div style="color:#666; font-weight:500;">État</div>
+            <div>
+                {% if machine.etatM in ['Neuf', 'Bon', 'Actif'] %}
+                    <span style="background:#EAF3DE; color:#3B6D11; padding:6px 14px; border-radius:20px; font-size:13px; font-weight:500;">
+                        <i class="fa fa-check-circle" style="margin-right:5px;"></i> {{ machine.etatM }}
+                    </span>
+                {% elseif machine.etatM in ['En panne', 'Hors service'] %}
+                    <span style="background:#FCEBEB; color:#A32D2D; padding:6px 14px; border-radius:20px; font-size:13px; font-weight:500;">
+                        <i class="fa fa-exclamation-triangle" style="margin-right:5px;"></i> {{ machine.etatM }}
+                    </span>
+                {% else %}
+                    <span style="background:#FAEEDA; color:#854F0B; padding:6px 14px; border-radius:20px; font-size:13px; font-weight:500;">
+                        <i class="fa fa-info-circle" style="margin-right:5px;"></i> {{ machine.etatM }}
+                    </span>
+                {% endif %}
+            </div>
+
+            <div style="color:#666; font-weight:500;">Date d'achat</div>
+            <div style="color:#2C3E50;">
+                {% if machine.dateAchat %}
+                    <i class="fa fa-calendar" style="color:#888; margin-right:6px;"></i> {{ machine.dateAchat|date('d/m/Y') }}
+                {% else %}
+                    <span style="color:#999; font-style:italic;">Non renseignée</span>
+                {% endif %}
+            </div>
+
+            <!-- Propriétaire -->
+            <div style="color:#666; font-weight:500;">
+                <i class="fa fa-user" style="margin-right:5px;"></i> Propriétaire
+            </div>
+            <div style="color:#2C3E50;">
+                {% if machine.agriculteur %}
+                    <div style="display:flex; flex-direction:column; gap:4px;">
+                        <strong style="color:#2D5A27;">
+                            <i class="fa fa-user-circle"></i> {{ machine.nomAgriculteur }}
+                        </strong>
+                        <span style="color:#888; font-size:13px; font-family:monospace;">
+                            <i class="fa fa-id-card"></i> CIN: {{ machine.cinAgriculteur }}
+                        </span>
+                    </div>
+                {% else %}
+                    <span style="color:#999; font-style:italic;">
+                        <i class="fa fa-question-circle"></i> Non assigné
+                    </span>
+                {% endif %}
+            </div>
+
+        </div>
+
+        <!-- Boutons d'actions -->
+        <div style="margin-top: 40px; display: flex; gap: 12px; justify-content: center;">
+            <a href="{{ path('admin_machines_edit', {id: machine.id}) }}" 
+               style="background:#FAEEDA; color:#854F0B; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:500; display:flex; align-items:center; gap:8px; transition:all .2s;">
+                <i class="fa fa-pen"></i> Modifier
+            </a>
+
+            <form method="post" action="{{ path('admin_machines_delete', {id: machine.id}) }}" 
+                  onsubmit="return confirm('⚠️ Voulez-vous vraiment supprimer cette machine ? Cette action est irréversible.')">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ machine.id) }}">
+                <button type="submit" 
+                        style="background:#FCEBEB; color:#A32D2D; padding:12px 24px; border:none; border-radius:8px; cursor:pointer; font-weight:500; display:flex; align-items:center; gap:8px; transition:all .2s;">
+                    <i class="fa fa-trash"></i> Supprimer
+                </button>
+            </form>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

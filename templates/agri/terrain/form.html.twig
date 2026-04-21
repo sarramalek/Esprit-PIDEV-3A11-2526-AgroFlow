@@ -1,0 +1,116 @@
+{% extends 'base_agriculteur.html.twig' %}
+{% block title %}{{ title }} — AgroFlow{% endblock %}
+
+{% block stylesheets %}
+<style>
+.form-card {
+    max-width:640px; margin:0 auto;
+    background:#fff; border-radius:14px; border:1px solid #e8e4d0;
+    overflow:hidden;
+}
+.form-card-header {
+    background:linear-gradient(135deg,#1A3A1F,#2D5A27);
+    padding:22px 28px; display:flex; align-items:center; gap:12px;
+}
+.form-card-header i { font-size:22px; color:#C8E6C0; }
+.form-card-header h2 { font-size:18px; font-weight:700; color:#fff; }
+
+.form-body { padding:28px; }
+
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+.form-group { display:flex; flex-direction:column; gap:6px; margin-bottom:18px; }
+.form-group.full { grid-column:1/-1; }
+
+.form-group label {
+    font-size:12px; font-weight:600; text-transform:uppercase;
+    letter-spacing:.06em; color:#7A8A95;
+}
+.form-group input,
+.form-group select {
+    padding:11px 14px; border-radius:8px; border:1px solid #e8e4d0;
+    background:#FCF8E6; font-size:13px; color:#1C2B3A; outline:none;
+    transition:border-color .2s, background .2s;
+}
+.form-group input:focus,
+.form-group select:focus { border-color:#4A8C3F; background:#fff; }
+
+.form-group .error {
+    font-size:11px; color:#e53e3e; margin-top:2px;
+    display:flex; align-items:center; gap:4px;
+}
+
+.ph-hint {
+    font-size:11px; color:#7A8A95; margin-top:4px;
+    display:flex; align-items:center; gap:5px;
+}
+
+.form-actions { display:flex; gap:12px; justify-content:flex-end; padding-top:8px; }
+.btn-cancel {
+    background:#FCF8E6; color:#1C2B3A; border:1px solid #e8e4d0;
+    padding:10px 22px; border-radius:8px; font-weight:600;
+    font-size:13px; text-decoration:none; display:inline-flex;
+    align-items:center; gap:7px;
+}
+.btn-save {
+    background:#2D5A27; color:#fff; border:none;
+    padding:10px 26px; border-radius:8px; font-weight:600;
+    font-size:13px; cursor:pointer; display:inline-flex;
+    align-items:center; gap:7px; transition:background .2s;
+}
+.btn-save:hover { background:#1B3A20; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="form-card">
+    <div class="form-card-header">
+        <i class="fa fa-{{ edit ? 'pen' : 'plus-circle' }}"></i>
+        <h2>{{ title }}</h2>
+    </div>
+
+    <div class="form-body">
+        {{ form_start(form, {attr: {novalidate: 'novalidate'}}) }}
+
+        <div class="form-row">
+            <div class="form-group full">
+                <label>{{ form_label(form.nomTerrain) }}</label>
+                {{ form_widget(form.nomTerrain) }}
+                {{ form_errors(form.nomTerrain) }}
+            </div>
+            <div class="form-group">
+                <label>{{ form_label(form.surface) }}</label>
+                {{ form_widget(form.surface) }}
+                {{ form_errors(form.surface) }}
+            </div>
+            <div class="form-group">
+                <label>{{ form_label(form.typeSol) }}</label>
+                {{ form_widget(form.typeSol) }}
+                {{ form_errors(form.typeSol) }}
+            </div>
+            <div class="form-group full">
+                <label>{{ form_label(form.localisation) }}</label>
+                {{ form_widget(form.localisation) }}
+                {{ form_errors(form.localisation) }}
+            </div>
+            <div class="form-group">
+                <label>{{ form_label(form.pH) }}</label>
+                {{ form_widget(form.pH) }}
+                <div class="ph-hint"><i class="fa fa-info-circle"></i> Valeur entre 0 (acide) et 14 (basique)</div>
+                {{ form_errors(form.pH) }}
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a href="{{ path('agri_terrains') }}" class="btn-cancel">
+                <i class="fa fa-arrow-left"></i> Annuler
+            </a>
+            <button type="submit" class="btn-save">
+                <i class="fa fa-floppy-disk"></i>
+                {{ edit ? 'Enregistrer' : 'Créer le terrain' }}
+            </button>
+        </div>
+
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}

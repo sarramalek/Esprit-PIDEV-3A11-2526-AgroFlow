@@ -81,10 +81,10 @@
                         <td style="padding: 24px 20px; text-align: right;">
                              <div style="display: flex; justify-content: flex-end; gap: 10px;">
                                 <button onclick="openCategoryModal('{{ path('agri_categories_edit', {'id': categorie.id}) }}')" class="action-btn-modern edit"><i class="fa fa-pencil-alt"></i></button>
-                                <form method="post" action="{{ path('agri_categories_delete', {'id': categorie.id}) }}" onsubmit="return confirm('Supprimer définitivement cette catégorie ?');" style="display:inline;">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ categorie.id) }}">
-                                    <button class="action-btn-modern delete"><i class="fa fa-trash-alt"></i></button>
-                                </form>
+                                <form method="post" action="{{ path('agri_categories_delete', {'id': categorie.id}) }}">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ categorie.id) }}">
+    <button type="submit">Supprimer</button>
+</form>
                             </div>
                         </td>
                     </tr>

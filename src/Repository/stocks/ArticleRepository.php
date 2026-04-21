@@ -16,24 +16,35 @@ class ArticleRepository extends ServiceEntityRepository
     /**
      * Recherche, filtre et trie les articles
      */
-    public function findBySearchCriteria(?string $search, ?string $categoryId, $user, string $sortBy = 'nom'): array
+    public function findBySearchCriteria(?string $search, ?string $categoryId, $user, string $sortBy = 'nom', ?int $idAdmin = null): array
     {
         $qb = $this->createQueryBuilder('a');
 
-        // 1. Filtrer par l'utilisateur connecté (Sécurité & Isolation des données)
-        $qb->andWhere('a.user = :user')
-            ->setParameter('user', $user);
-
-        // 2. Filtre de recherche par nom
-        if ($search) {
-            $qb->andWhere('a.nom LIKE :search')
-                ->setParameter('search', '%' . $search . '%');
+        // Filtre par Admin spécifique (Nouvelle règle)
+        if ($idAdmin) {
+            $qb->andWhere('a.idAdmin = :idAdmin')
+               ->setParameter('idAdmin', $idAdmin);
         }
 
-        // 3. Filtre par catégorie
+        // 1. Filtrer par l'utilisateur (Optionnel pour l'Admin)
+        if ($user) {
+            $qb->andWhere('a.user = :user')
+                ->setParameter('user', $user);
+        }
+
+        // 2. Filtre de recherche global (Nom, Categorie, Agriculteur)
+        if ($search) {
+            $qb->leftJoin('a.categorie', 'c')
+               ->leftJoin('a.user', 'u')
+               ->andWhere('a.nom LIKE :search OR c.nom LIKE :search OR u.nom LIKE :search OR u.prenom LIKE :search')
+               ->setParameter('search', '%' . $search . '%');
+        }
+
+        // 3. Filtre par catégorie (Dropdown)
         if ($categoryId && $categoryId !== '') {
+            if (!$search) { $qb->leftJoin('a.categorie', 'c'); } // Join si pas deja fait
             $qb->andWhere('a.categorie = :catId')
-                ->setParameter('catId', $categoryId);
+               ->setParameter('catId', $categoryId);
         }
 
         // 4. Gestion dynamique du Tri
@@ -70,11 +81,11 @@ class ArticleRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findByAdminCin(int $adminCin): array
+    public function findByAdminCin($admin): array
     {
         return $this->createQueryBuilder('a')
-            ->andWhere('a.idAdmin = :cin')
-            ->setParameter('cin', $adminCin)
+            ->andWhere('a.user = :user')
+            ->setParameter('user', $admin)
             ->orderBy('a.nom', 'ASC')
             ->getQuery()
             ->getResult();

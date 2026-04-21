@@ -22,6 +22,18 @@ use Doctrine\ORM\EntityManagerInterface;
 #[IsGranted('ROLE_OUVRIER')]
 class OuvrierDashboardController extends AbstractController
 {
+    private function resolveAgriculteur(?User $user, EntityManagerInterface $em): ?User
+    {
+        if (!$user) {
+            return null;
+        }
+        $terrain = $user->getTerrain();
+        if ($terrain && $terrain->getCin()) {
+            return $em->getRepository(User::class)->find($terrain->getCin());
+        }
+        return null;
+    }
+
     #[Route('/', name: 'home')]
     public function index(): Response
     {
@@ -29,11 +41,11 @@ class OuvrierDashboardController extends AbstractController
     }
 
     #[Route('/stocks/categories', name: 'categories')]
-    public function categories(CategorieRepository $categorieRepo): Response
+    public function categories(CategorieRepository $categorieRepo, EntityManagerInterface $em): Response
     {
         /** @var \App\Entity\User\User|null $user */
         $user = $this->getUser();
-        $agriculteur = $user?->getAgriculteur();
+        $agriculteur = $this->resolveAgriculteur($user, $em);
 
         if (!$agriculteur) {
             return $this->render('ouvrier/categories.html.twig', [
@@ -51,11 +63,11 @@ class OuvrierDashboardController extends AbstractController
     }
 
     #[Route('/stocks/produits', name: 'produits')]
-    public function produits(Request $request, ArticleRepository $articleRepo, CategorieRepository $categorieRepo): Response
+    public function produits(Request $request, ArticleRepository $articleRepo, CategorieRepository $categorieRepo, EntityManagerInterface $em): Response
     {
         /** @var \App\Entity\User\User|null $user */
         $user = $this->getUser();
-        $agriculteur = $user?->getAgriculteur();
+        $agriculteur = $this->resolveAgriculteur($user, $em);
 
         if (!$agriculteur) {
             return $this->render('ouvrier/produits.html.twig', [
@@ -88,11 +100,11 @@ class OuvrierDashboardController extends AbstractController
     }
 
     #[Route('/stocks/produits/{id}', name: 'article_show', methods: ['GET'], requirements: ['id' => '\\d+'])]
-    public function articleShow(Article $article): Response
+    public function articleShow(Article $article, EntityManagerInterface $em): Response
     {
         /** @var \App\Entity\User\User|null $user */
         $user = $this->getUser();
-        $agriculteur = $user?->getAgriculteur();
+        $agriculteur = $this->resolveAgriculteur($user, $em);
 
         if (!$agriculteur || $article->getUser()?->getCin() !== $agriculteur->getCin()) {
             throw $this->createAccessDeniedException('Accès refusé à cet article.');
@@ -109,7 +121,7 @@ class OuvrierDashboardController extends AbstractController
     {
         /** @var \App\Entity\User\User|null $user */
         $user = $this->getUser();
-        $agriculteur = $user?->getAgriculteur();
+        $agriculteur = $this->resolveAgriculteur($user, $em);
 
         if (!$agriculteur || $article->getUser()?->getCin() !== $agriculteur->getCin()) {
             throw $this->createAccessDeniedException('Accès refusé à cet article.');
@@ -136,7 +148,7 @@ class OuvrierDashboardController extends AbstractController
         $mouvement->setType('SORTIE');
         $mouvement->setQuantite($quantite);
         $mouvement->setDateMouvement(new \DateTimeImmutable());
-        $mouvement->setMotif('Sortie par l’ouvrier ' . $user->getCin());
+        $mouvement->setMotif('Sortie par l\'ouvrier ' . $user->getCin());
 
         $em->persist($mouvement);
         $em->flush();
@@ -153,11 +165,11 @@ class OuvrierDashboardController extends AbstractController
     }
 
     #[Route('/stocks/produits/{id}/mouvements', name: 'article_mouvements', methods: ['GET'], requirements: ['id' => '\\d+'])]
-    public function mouvements(Article $article, MouvementStockRepository $mouvementRepo): JsonResponse
+    public function mouvements(Article $article, MouvementStockRepository $mouvementRepo, EntityManagerInterface $em): JsonResponse
     {
         /** @var \App\Entity\User\User|null $user */
         $user = $this->getUser();
-        $agriculteur = $user?->getAgriculteur();
+        $agriculteur = $this->resolveAgriculteur($user, $em);
 
         if (!$agriculteur || $article->getUser()?->getCin() !== $agriculteur->getCin()) {
             return new JsonResponse(['success' => false, 'message' => 'Accès refusé.'], Response::HTTP_FORBIDDEN);
@@ -178,7 +190,7 @@ class OuvrierDashboardController extends AbstractController
                 'type' => $mouvement->getType(),
                 'quantite' => $mouvement->getQuantite(),
                 'date' => $mouvement->getDateMouvement()?->format('d/m/Y H:i') ?? '',
-                'motif' => $mouvement->getMotif() ?: '',
+                'motif' => (string)$mouvement->getMotif(),
             ];
         }, $mouvements);
 
@@ -190,7 +202,7 @@ class OuvrierDashboardController extends AbstractController
     {
         /** @var \App\Entity\User\User|null $user */
         $user = $this->getUser();
-        $agriculteur = $user?->getAgriculteur();
+        $agriculteur = $this->resolveAgriculteur($user, $em);
 
         if (!$agriculteur || $mouvement->getUser()?->getCin() !== $user->getCin() || $mouvement->getArticle()?->getUser()?->getCin() !== $agriculteur->getCin()) {
             return new JsonResponse(['success' => false, 'message' => 'Accès refusé.'], Response::HTTP_FORBIDDEN);
@@ -217,10 +229,9 @@ class OuvrierDashboardController extends AbstractController
         }
 
         $mouvement->setQuantite($quantite);
-        $mouvement->setMotif($motif ?: $mouvement->getMotif());
         $em->flush();
 
-        return new JsonResponse(['success' => true, 'message' => 'Mouvement mis à jour.', 'quantite' => $quantite, 'motif' => $motif]);
+        return new JsonResponse(['success' => true, 'message' => 'Mouvement mis à jour.', 'quantite' => $quantite, 'motif' => $mouvement->getMotif()]);
     }
 
     #[Route('/profile/update', name: 'profile_update', methods: ['POST'])]

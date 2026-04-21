@@ -1,98 +1,99 @@
 {# Pas d'extends ici car c'est une vue partielle chargée en AJAX #}
-<div style="padding: 40px; font-family: 'DM Sans', sans-serif;">
+<div style="padding: 25px; font-family: 'Segoe UI', Roboto, sans-serif; background: #fcfcfc;">
     
     {# --- EN-TÊTE --- #}
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 15px;">
         <div>
-            <h6 style="text-transform: uppercase; color: #2D5A27; font-weight: 800; letter-spacing: 1px; font-size: 12px; margin: 0;">Analytique Temps Réel</h6>
-            <h1 style="color: #1a1a1a; font-size: 32px; font-weight: 800; margin-top: 5px; letter-spacing: -1px;">Rotation des Flux</h1>
+            <h6 style="text-transform: uppercase; color: #2D5A27; font-weight: 800; letter-spacing: 1px; font-size: 10px; margin: 0;">Analytique Temps Réel</h6>
+            <h1 style="color: #1a1a1a; font-size: 24px; font-weight: 800; margin-top: 5px; letter-spacing: -0.5px;">Rotation des Flux</h1>
         </div>
         
-        {# Filtrage par date compact #}
-        <form onsubmit="updateStats(event)" id="dateFilterForm" style="display: flex; align-items: center; background: white; padding: 8px 15px; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee;">
-            <div style="padding: 0 15px; border-right: 1px solid #eee;">
-                <small style="color: #aaa; display: block; font-size: 9px; font-weight: 800;">DÉBUT</small>
-                <input type="date" name="debut" value="{{ dateDebut }}" style="border:0; font-size: 13px; font-weight: 600; outline:none;">
+        <form onsubmit="updateStats(event)" id="dateFilterForm" style="display: flex; align-items: center; background: white; padding: 5px 12px; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee;">
+            <div style="padding: 0 10px; border-right: 1px solid #eee;">
+                <small style="color: #aaa; display: block; font-size: 8px; font-weight: 800;">DÉBUT</small>
+                <input type="date" name="debut" value="{{ dateDebut }}" style="border:0; font-size: 12px; font-weight: 600; outline:none;">
             </div>
-            <div style="padding: 0 15px;">
-                <small style="color: #aaa; display: block; font-size: 9px; font-weight: 800;">FIN</small>
-                <input type="date" name="fin" value="{{ dateFin }}" style="border:0; font-size: 13px; font-weight: 600; outline:none;">
+            <div style="padding: 0 10px;">
+                <small style="color: #aaa; display: block; font-size: 8px; font-weight: 800;">FIN</small>
+                <input type="date" name="fin" value="{{ dateFin }}" style="border:0; font-size: 12px; font-weight: 600; outline:none;">
             </div>
-            <button type="submit" style="background: #1a1a1a; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer;">
-                <i class="fa fa-sync-alt" style="font-size: 12px;"></i>
+            <button type="submit" style="background: #1a1a1a; color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                <i class="fa fa-sync-alt" style="font-size: 10px;"></i>
             </button>
         </form>
     </div>
 
-    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 25px; margin-bottom: 30px;">
+    <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; margin-bottom: 20px;">
         {# --- GRAPHIQUE --- #}
-        <div style="background: white; border-radius: 25px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.03);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                <h5 style="margin: 0; font-weight: 800; color: #2c3e50;">Performance des Catégories</h5>
-                <div style="font-size: 11px; font-weight: 700;">
-                    <span style="margin-right: 15px;"><i class="fa fa-circle" style="color: #A8D5BA;"></i> ENTRÉES</span>
+        <div style="background: white; border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #f0f0f0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h5 style="margin: 0; font-weight: 800; color: #2c3e50; font-size: 14px;">Performance par Catégorie</h5>
+                <div style="font-size: 10px; font-weight: 700;">
+                    <span style="margin-right: 10px;"><i class="fa fa-circle" style="color: #A8D5BA;"></i> ENTRÉES</span>
                     <span><i class="fa fa-circle" style="color: #2D5A27;"></i> SORTIES</span>
                 </div>
             </div>
-            <div style="height: 300px; position: relative;">
-                {{ render_chart(chart) }}
+            <div style="height: 250px; position: relative;">
+                <canvas id="rotationChartCanvas"></canvas>
             </div>
         </div>
 
         {# --- CONSEIL AGRO --- #}
-        <div style="background: #2D5A27; border-radius: 25px; padding: 25px; color: white; display: flex; flex-direction: column; justify-content: space-between;">
+        <div style="background: #2D5A27; border-radius: 20px; padding: 20px; color: white; display: flex; flex-direction: column; justify-content: space-between;">
             <div>
-                <div style="background: rgba(255,255,255,0.2); width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
-                    <i class="fa fa-lightbulb" style="font-size: 20px;"></i>
+                <div style="background: rgba(255,255,255,0.2); width: 35px; height: 35px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                    <i class="fa fa-lightbulb" style="font-size: 18px;"></i>
                 </div>
-                <h5 style="font-weight: 800; margin-bottom: 15px;">Aide à la décision</h5>
-                <p id="agro-advice" style="font-size: 14px; line-height: 1.6; opacity: 0.9; margin: 0;">
+                <h5 style="font-weight: 800; margin-bottom: 10px; font-size: 14px;">Aide à la décision</h5>
+                <p id="agro-advice" style="font-size: 13px; line-height: 1.5; opacity: 0.9; margin: 0;">
                     Analyse des indicateurs en cours...
                 </p>
             </div>
-            <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 10px; font-weight: 800; text-transform: uppercase;">Statut Global</span>
-                <span id="global-status-badge" style="background: #fff; color: #2D5A27; padding: 5px 12px; border-radius: 8px; font-size: 11px; font-weight: 800;">Optimal</span>
+            <div style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 12px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 9px; font-weight: 800; text-transform: uppercase;">Statut Global</span>
+                <span id="global-status-badge" style="background: #fff; color: #2D5A27; padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800;">Chargement...</span>
             </div>
         </div>
     </div>
 
     {# --- TABLEAU --- #}
-    <div style="background: white; border-radius: 25px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.03);">
+    <div style="background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #f0f0f0;">
         <table style="width: 100%; border-collapse: collapse;">
             <thead>
                 <tr style="background: #fafafa; border-bottom: 1px solid #eee;">
-                    <th style="padding: 18px 25px; text-align: left; font-size: 11px; color: #aaa; letter-spacing: 1px;">CATÉGORIE</th>
-                    <th style="padding: 18px 25px; text-align: left; font-size: 11px; color: #aaa; letter-spacing: 1px;">FLUX (E/S)</th>
-                    <th style="padding: 18px 25px; text-align: left; font-size: 11px; color: #aaa; letter-spacing: 1px;">INDICE ROTATION</th>
-                    <th style="padding: 18px 25px; text-align: right; font-size: 11px; color: #aaa; letter-spacing: 1px;">ÉTAT</th>
+                    <th style="padding: 12px 20px; text-align: left; font-size: 10px; color: #aaa; letter-spacing: 0.5px; text-transform: uppercase;">Catégorie</th>
+                    <th style="padding: 12px 20px; text-align: left; font-size: 10px; color: #aaa; letter-spacing: 0.5px; text-transform: uppercase;">Flux (E/S)</th>
+                    <th style="padding: 12px 20px; text-align: left; font-size: 10px; color: #aaa; letter-spacing: 0.5px; text-transform: uppercase;">Indice</th>
+                    <th style="padding: 12px 20px; text-align: right; font-size: 10px; color: #aaa; letter-spacing: 0.5px; text-transform: uppercase;">État</th>
                 </tr>
             </thead>
             <tbody>
                 {% for s in stats %}
                 <tr style="border-bottom: 1px solid #f8f8f8;">
-                    <td style="padding: 20px 25px; font-weight: 700; color: #1a1a1a;">{{ s.categorie.nom }}</td>
-                    <td style="padding: 20px 25px;">
-                        <span style="color: #48bb78; font-weight: 700; font-size: 13px;">+{{ s.entrees }}</span>
-                        <span style="color: #cbd5e0; margin: 0 5px;">/</span>
-                        <span style="color: #f56565; font-weight: 700; font-size: 13px;">-{{ s.sorties }}</span>
+                    <td style="padding: 15px 20px; font-weight: 700; color: #1a1a1a; font-size: 13px;">{{ s.categorie.nom }}</td>
+                    <td style="padding: 15px 20px;">
+                        <span style="color: #48bb78; font-weight: 700; font-size: 12px;">+{{ s.entrees }}</span>
+                        <span style="color: #cbd5e0; margin: 0 3px;">/</span>
+                        <span style="color: #f56565; font-weight: 700; font-size: 12px;">-{{ s.sorties }}</span>
                     </td>
-                    <td style="padding: 20px 25px;">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <div style="flex-grow: 1; height: 6px; background: #eee; border-radius: 10px; width: 100px;">
+                    <td style="padding: 15px 20px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="flex-grow: 1; height: 5px; background: #eee; border-radius: 10px; width: 80px; position: relative;">
                                 {% set progress = (s.indice * 100) > 100 ? 100 : (s.indice * 100) %}
                                 <div style="width: {{ progress }}%; height: 100%; background: {{ s.indice > 0.7 ? '#f56565' : '#2D5A27' }}; border-radius: 10px;"></div>
                             </div>
-                            <span style="font-size: 12px; font-weight: 800; color: #666;">{{ s.indice }}</span>
+                            <span style="font-size: 11px; font-weight: 800; color: #666;">{{ s.indice }}</span>
                         </div>
                     </td>
-                    <td style="padding: 20px 25px; text-align: right;">
+                    <td style="padding: 15px 20px; text-align: right;">
                         {% if s.indice > 0.7 %}
-                            <span style="background: #FFF5F5; color: #E53E3E; padding: 5px 12px; border-radius: 8px; font-size: 10px; font-weight: 800; border: 1px solid #FEB2B2;">CRITIQUE</span>
+                            <span style="background: #FFF5F5; color: #E53E3E; padding: 3px 8px; border-radius: 6px; font-size: 9px; font-weight: 800; border: 1px solid #FEB2B2;">CRITIQUE</span>
+                        {% elseif s.indice < 0.1 and s.entrees == 0 and s.sorties == 0 %}
+                            <span style="background: #F8F9F9; color: #95A5A6; padding: 3px 8px; border-radius: 6px; font-size: 9px; font-weight: 800; border: 1px solid #E2E8F0;">AUCUN FLUX</span>
                         {% elseif s.indice < 0.1 %}
-                            <span style="background: #F7FAFC; color: #A0AEC0; padding: 5px 12px; border-radius: 8px; font-size: 10px; font-weight: 800; border: 1px solid #E2E8F0;">DORMANT</span>
+                            <span style="background: #F7FAFC; color: #A0AEC0; padding: 3px 8px; border-radius: 6px; font-size: 9px; font-weight: 800; border: 1px solid #E2E8F0;">DORMANT</span>
                         {% else %}
-                            <span style="background: #F0FFF4; color: #38A169; padding: 5px 12px; border-radius: 8px; font-size: 10px; font-weight: 800; border: 1px solid #C6F6D5;">SAIN</span>
+                            <span style="background: #F0FFF4; color: #38A169; padding: 3px 8px; border-radius: 6px; font-size: 9px; font-weight: 800; border: 1px solid #C6F6D5;">SAIN</span>
                         {% endif %}
                     </td>
                 </tr>
@@ -103,30 +104,95 @@
 </div>
 
 <script>
-// Conseil Agro-dynamique
-function renderAdvice() {
-    const adviceBox = document.getElementById('agro-advice');
-    const badge = document.getElementById('global-status-badge');
-    const criticals = [{% for s in stats %}{% if s.indice > 0.7 %}'{{ s.categorie.nom|e('js') }}',{% endif %}{% endfor %}];
-
-    if (criticals.length > 0) {
-        adviceBox.innerHTML = "Alerte : La rotation pour <strong>" + criticals[0] + "</strong> est trop rapide. Risque de rupture de stock imminent.";
-        badge.innerHTML = "Rupture Possible";
-        badge.style.background = "#fff";
-        badge.style.color = "#E53E3E";
+(function() {
+    // On s'assure que Chart.js est disponible
+    if (typeof Chart === 'undefined') {
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
+        script.onload = initChart;
+        document.head.appendChild(script);
     } else {
-        adviceBox.innerHTML = "Bravo ! Vos flux sont parfaitement équilibrés. Le rythme de sortie actuel permet une gestion saine sans surstockage.";
-        badge.innerHTML = "Flux Sain";
+        initChart();
     }
-}
 
-// Fonction pour filtrer sans fermer la modal
+    function initChart() {
+        const ctx = document.getElementById('rotationChartCanvas');
+        if (!ctx) return;
+
+        const data = {{ chartData|json_encode|raw }};
+        
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.labels,
+                datasets: [
+                    {
+                        label: 'Entrées',
+                        data: data.entrees,
+                        backgroundColor: '#A8D5BA',
+                        borderRadius: 5
+                    },
+                    {
+                        label: 'Sorties',
+                        data: data.sorties,
+                        backgroundColor: '#2D5A27',
+                        borderRadius: 5
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true, grid: { display: false } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    }
+
+    // Conseil Agro-dynamique
+    function renderAdvice() {
+        const adviceBox = document.getElementById('agro-advice');
+        const badge = document.getElementById('global-status-badge');
+        const stats = {{ stats|length }};
+        
+        if (stats === 0) {
+            adviceBox.innerHTML = "Aucune catégorie trouvée. Créez des catégories et enregistrez des mouvements pour voir l'analyse.";
+            badge.innerHTML = "Inactif";
+            return;
+        }
+
+        const criticals = [{% for s in stats %}{% if s.indice > 0.7 %}'{{ s.categorie.nom|e('js') }}',{% endif %}{% endfor %}];
+
+        if (criticals.length > 0) {
+            adviceBox.innerHTML = "Alerte : La rotation pour <strong>" + criticals[0] + "</strong> est trop rapide. Risque de rupture de stock imminent.";
+            badge.innerHTML = "Rupture Possible";
+            badge.style.background = "#fff";
+            badge.style.color = "#E53E3E";
+        } else {
+            adviceBox.innerHTML = "Bravo ! Vos flux sont parfaitement équilibrés. Le rythme de sortie actuel permet une gestion saine sans surstockage.";
+            badge.innerHTML = "Flux Sain";
+            badge.style.color = "#2D5A27";
+        }
+    }
+
+    renderAdvice();
+})();
+
+// Fonction globale pour le filtrage
 function updateStats(e) {
     e.preventDefault();
     const formData = new FormData(e.target);
     const params = new URLSearchParams(formData);
-    openStatsModal('{{ path("app_mouvement_rotation") }}?' + params.toString());
+    if (typeof openStatsModal === 'function') {
+        openStatsModal('{{ path("app_mouvement_rotation") }}?' + params.toString());
+    } else {
+        // Fallback si la fonction n'est pas définie (cas rare)
+        location.search = params.toString();
+    }
 }
-
-renderAdvice();
 </script>

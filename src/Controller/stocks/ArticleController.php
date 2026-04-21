@@ -10,6 +10,7 @@ use App\Repository\stocks\CategorieRepository;
 use App\Service\EmailService;
 use App\Service\QRCodeService;
 use App\Service\TelegramService;
+use App\Service\CurrencyService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,7 +22,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 class ArticleController extends AbstractController
 {
     #[Route('/', name: 'agri_produits', methods: ['GET', 'POST'])]
-    public function index(Request $request, ArticleRepository $articleRepository, CategorieRepository $catRepo, EntityManagerInterface $entityManager): Response
+    public function index(Request $request, ArticleRepository $articleRepository, CategorieRepository $catRepo, EntityManagerInterface $entityManager, CurrencyService $currencyService): Response
     {
         $user = $this->getUser();
 
@@ -30,11 +31,21 @@ class ArticleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $devise = $newArticle->getDevise();
+            $prixAchat = $newArticle->getPrixAchatDevise();
+
+            if ($devise && $devise !== 'TND' && $prixAchat > 0) {
+                $prixTnd = $currencyService->convertToTND($prixAchat, $devise);
+                $newArticle->setPrixUnitaire($prixTnd);
+                $this->addFlash('success', sprintf('Conversion effectuee : %s %s = %s TND', $prixAchat, $devise, $prixTnd));
+            } else {
+                $this->addFlash('success', 'Le produit a ete ajoute avec succes.');
+            }
+
             $newArticle->setUser($user);
             $entityManager->persist($newArticle);
             $entityManager->flush();
 
-            $this->addFlash('success', 'Le produit a été ajouté avec succès.');
             return $this->redirectToRoute('agri_produits');
         }
 
@@ -83,7 +94,7 @@ class ArticleController extends AbstractController
 
     // Gardez la méthode new au cas où vous auriez besoin d'un accès direct par URL
     #[Route('/new', name: 'app_article_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, CurrencyService $currencyService): Response
     {
         $article = new Article();
         $user = $this->getUser();
@@ -92,6 +103,12 @@ class ArticleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Conversion automatique de devise
+            if ($article->getDevise() !== 'TND' && $article->getPrixAchatDevise() > 0) {
+                $prixTnd = $currencyService->convertToTND($article->getPrixAchatDevise(), $article->getDevise());
+                $article->setPrixUnitaire($prixTnd);
+            }
+
             $article->setUser($user);
             $entityManager->persist($article);
             $entityManager->flush();
@@ -107,7 +124,7 @@ class ArticleController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_article_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Article $article, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Article $article, EntityManagerInterface $entityManager, CurrencyService $currencyService): Response
     {
         if ($article->getUser() !== $this->getUser()) {
             throw $this->createAccessDeniedException();
@@ -117,8 +134,18 @@ class ArticleController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $devise = $article->getDevise();
+            $prixAchat = $article->getPrixAchatDevise();
+
+            if ($devise && $devise !== 'TND' && $prixAchat > 0) {
+                $prixTnd = $currencyService->convertToTND($prixAchat, $devise);
+                $article->setPrixUnitaire($prixTnd);
+                $this->addFlash('success', sprintf('Mise a jour avec conversion : %s %s = %s TND', $prixAchat, $devise, $prixTnd));
+            } else {
+                $this->addFlash('success', 'Le produit a ete mis a jour.');
+            }
+
             $entityManager->flush();
-            $this->addFlash('success', 'Le produit a été mis à jour.');
             return $this->redirectToRoute('agri_produits');
         }
 
@@ -153,8 +180,7 @@ class ArticleController extends AbstractController
         EntityManagerInterface $em,
         EmailService $emailService,
         TelegramService $telegramService
-    ): Response
-    {
+    ): Response {
         if ($article->getUser() !== $this->getUser()) {
             throw $this->createAccessDeniedException();
         }
@@ -234,11 +260,47 @@ class ArticleController extends AbstractController
     #[Route('/{id}/qr-code/download', name: 'article_qr_code_download', methods: ['GET'])]
     public function downloadQRCode(Article $article, QRCodeService $qrCodeService): Response
     {
-        // Vérification simple de l'article
-        if (!$article) {
-            return new Response('Article non trouvé', 404);
+        return $qrCodeService->generateQRCodeDownloadResponseForArticle($article);
+    }
+
+    #[Route('/{id}/qr-code/view', name: 'article_qr_code_view', methods: ['GET'])]
+    public function viewQRCode(Article $article): Response
+    {
+        return $this->render('stocks/qr_code/view.html.twig', [
+            'article' => $article,
+            'qrCodeUrl' => $this->generateUrl('article_qr_code', ['id' => $article->getId()]),
+            'downloadUrl' => $this->generateUrl('article_qr_code_download', ['id' => $article->getId()]),
+        ]);
+    }
+
+    #[Route('/{id}/details', name: 'app_article_show', methods: ['GET'])]
+    public function show(Article $article): Response
+    {
+        if ($article->getUser() !== $this->getUser()) {
+            throw $this->createAccessDeniedException();
         }
 
-        return $qrCodeService->generateQRCodeDownloadResponseForArticle($article);
+        return $this->render('stocks/article/show.html.twig', [
+            'article' => $article,
+            'movements' => $article->getMouvements(), 
+        ]);
+    }
+
+    #[Route('/{id}/scan-redirect', name: 'article_scan_redirect', methods: ['GET'])]
+    public function scanRedirect(Article $article): Response
+    {
+        $user = $this->getUser();
+        
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        // Si c'est un ouvrier (ROLE_OUVRIER)
+        if (in_array('ROLE_OUVRIER', $user->getRoles())) {
+            return $this->redirectToRoute('ouvrier_article_show', ['id' => $article->getId()]);
+        }
+
+        // Par défaut pour l'agriculteur (le propriétaire de l'article)
+        return $this->redirectToRoute('app_article_show', ['id' => $article->getId()]);
     }
 }

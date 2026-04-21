@@ -756,10 +756,15 @@
                 formRow.innerHTML = `
                     <td colspan="5">
                         <form class="movement-edit-form">
+                            <label><i class="fa fa-warehouse"></i> Stock actuel (Lecture seule)</label>
+                            <input type="text" value="${escapeHtml(row.closest('.stock-card')?.querySelector('.stock-level')?.textContent.trim() || 'Non défini')}" readonly style="background: #f8f9fa; color: #6c757d; border: 1px solid #dee2e6; margin-bottom: 15px;">
+                            
                             <label>Quantité</label>
                             <input type="number" name="quantite" min="0.01" step="0.01" value="${escapeHtml(mouvement.quantite)}" required>
-                            <label>Motif</label>
-                            <textarea name="motif" rows="3">${escapeHtml(mouvement.motif)}</textarea>
+                            
+                            <label>Motif (Lecture seule)</label>
+                            <textarea name="motif" rows="3" readonly style="background: #f8f9fa; color: #6c757d; border: 1px solid #dee2e6; cursor: not-allowed;">${escapeHtml(mouvement.motif)}</textarea>
+                            
                             <div class="movement-edit-actions">
                                 <button type="button" class="card-button-outline">Annuler</button>
                                 <button type="submit" class="card-button">Enregistrer</button>
@@ -799,7 +804,7 @@
                         const quantityCell = row.querySelector('td:nth-child(3)');
                         const motifCell = row.querySelector('td:nth-child(4)');
                         quantityCell.textContent = data.quantite;
-                        motifCell.textContent = data.motif || motifCell.textContent;
+                        motifCell.textContent = data.motif;
                         formRow.remove();
                     })
                     .catch(() => showMovementError('Impossible de modifier le mouvement.'));

@@ -103,4 +103,18 @@ class MouvementStock
         $this->user = $user;
         return $this;
     }
+
+    #[ORM\Column(name: "id_admin", type: "integer", nullable: true)]
+    private ?int $idAdmin = null;
+
+    public function getIdAdmin(): ?int
+    {
+        return $this->idAdmin;
+    }
+
+    public function setIdAdmin(?int $idAdmin): self
+    {
+        $this->idAdmin = $idAdmin;
+        return $this;
+    }
 }

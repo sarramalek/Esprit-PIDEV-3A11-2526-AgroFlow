@@ -1,0 +1,191 @@
+{% extends 'base_admin.html.twig' %}
+{% block title %}Admin – Gestion des Animaux{% endblock %}
+{% block page_title %}Gestion Animaux{% endblock %}
+{% block breadcrumb %}Animaux{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .admin-table th {
+        padding: 12px 16px; text-align: left; font-size: 11px;
+        color: #999; text-transform: uppercase; border-bottom: 2px solid #eee;
+        font-weight: 600; white-space: nowrap;
+    }
+    .admin-table td {
+        padding: 14px 16px; border-bottom: 1px solid #f5f5f5;
+        color: #444; vertical-align: middle;
+    }
+    .admin-table tr:hover td { background: #FCF8E6; }
+    .admin-table tr:last-child td { border-bottom: none; }
+
+    .btn-action {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 6px 12px; border-radius: 7px; font-size: 12px;
+        font-weight: 600; text-decoration: none; cursor: pointer;
+        border: none; transition: all 0.2s;
+    }
+    .btn-edit  { background: #EBF5FB; color: #1A6FA3; }
+    .btn-edit:hover  { background: #1A6FA3; color: white; }
+    .btn-del   { background: #FCEBEB; color: #A32D2D; }
+    .btn-del:hover   { background: #A32D2D; color: white; }
+    .btn-add   { background: #2D5A27; color: white; border: none; }
+    .btn-add:hover   { background: #1e3f1b; }
+
+    .search-bar {
+        display: flex; gap: 10px; margin-bottom: 20px; align-items: center;
+    }
+    .search-bar input {
+        flex: 1; padding: 10px 16px; border: 1px solid #ddd;
+        border-radius: 8px; font-size: 14px; outline: none; transition: 0.2s;
+    }
+    .search-bar input:focus { border-color: #2D5A27; box-shadow: 0 0 0 3px rgba(45,90,39,0.1); }
+
+    .iq-badge-admin {
+        display: inline-flex; align-items: center; gap: 4px;
+        padding: 3px 9px; border-radius: 20px; font-size: 11px;
+        font-weight: 700; text-transform: uppercase;
+    }
+    .badge-elite    { background: #EBF5FB; color: #1A6FA3; border: 1px solid #bde0f5; }
+    .badge-conforme { background: #E8F5E9; color: #27ae60; border: 1px solid #b2dfdb; }
+    .badge-surveiller { background: #FEF5E7; color: #f39c12; border: 1px solid #fde68a; }
+
+    .owner-chip {
+        display: inline-flex; align-items: center; gap: 5px;
+        background: #f0f4f8; color: #445; border-radius: 20px;
+        padding: 3px 10px; font-size: 12px; font-weight: 500;
+    }
+
+    .sex-badge { display: inline-flex; align-items: center; gap: 4px; font-weight: 600; }
+    .sex-male   { color: #3498db; }
+    .sex-female { color: #e91e63; }
+
+    .flash-success {
+        background: #EAF3DE; color: #3B6D11; padding: 12px 18px;
+        border-radius: 8px; margin-bottom: 20px; font-size: 14px;
+        border-left: 4px solid #3B6D11;
+    }
+
+    .page-header {
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 24px;
+    }
+    .page-header h2 { font-size: 20px; font-weight: 700; color: #1C2B3A; margin: 0; }
+    .page-header p  { font-size: 13px; color: #888; margin: 4px 0 0; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="dash-wrapper">
+
+    {% for msg in app.flashes('success') %}
+        <div class="flash-success"><i class="fa fa-check-circle"></i> {{ msg }}</div>
+    {% endfor %}
+
+    {# ── En-tête de page ── #}
+    <div class="page-header">
+        <div>
+            <h2><i class="fa fa-paw" style="color:#2D5A27; margin-right:8px;"></i>Gestion des Animaux</h2>
+            <p>{{ animaux|length }} animaux enregistrés sur la plateforme</p>
+        </div>
+        <a href="{{ path('admin_animaux_new') }}" class="btn-action btn-add">
+            <i class="fa fa-plus"></i> Ajouter
+        </a>
+    </div>
+
+    {# ── Barre de recherche ── #}
+    <form method="GET" class="search-bar">
+        <input type="text" name="q" value="{{ searchTerm }}" placeholder="Rechercher par nom, espèce ou sexe…">
+        <button type="submit" class="btn-action btn-add">
+            <i class="fa fa-search"></i> Rechercher
+        </button>
+        {% if searchTerm %}
+            <a href="{{ path('admin_animaux_index') }}" class="btn-action" style="background:#f0f0f0;color:#555;">
+                <i class="fa fa-times"></i> Effacer
+            </a>
+        {% endif %}
+    </form>
+
+    {# ── Tableau ── #}
+    <div style="background:white; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.06); overflow:hidden;">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    {% set nd = (currentDirection == 'ASC') ? 'DESC' : 'ASC' %}
+                    <th><a href="{{ path('admin_animaux_index', {q: searchTerm, sort:'nom',      direction: currentSort=='nom'      ? nd : 'ASC'}) }}" style="color:inherit;text-decoration:none;">Nom <i class="fa fa-sort" style="opacity:.4"></i></a></th>
+                    <th><a href="{{ path('admin_animaux_index', {q: searchTerm, sort:'espece',   direction: currentSort=='espece'   ? nd : 'ASC'}) }}" style="color:inherit;text-decoration:none;">Espèce <i class="fa fa-sort" style="opacity:.4"></i></a></th>
+                    <th>Propriétaire</th>
+                    <th>Sexe</th>
+                    <th><a href="{{ path('admin_animaux_index', {q: searchTerm, sort:'poids',    direction: currentSort=='poids'    ? nd : 'DESC'}) }}" style="color:inherit;text-decoration:none;">Poids / IQ <i class="fa fa-sort" style="opacity:.4"></i></a></th>
+                    <th><a href="{{ path('admin_animaux_index', {q: searchTerm, sort:'date_naissance', direction: currentSort=='date_naissance' ? nd : 'DESC'}) }}" style="color:inherit;text-decoration:none;">Naissance <i class="fa fa-sort" style="opacity:.4"></i></a></th>
+                    <th style="text-align:right; padding-right: 20px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for a in animaux %}
+                <tr>
+                    <td style="font-weight:600; color:#2D5A27;">{{ a.nom }}</td>
+                    <td>{{ a.espece }}</td>
+                    <td>
+                        {% if a.user %}
+                            <span class="owner-chip">
+                                <i class="fa fa-user" style="color:#2D5A27;font-size:10px;"></i>
+                                {{ a.user.prenom }} {{ a.user.nom }}
+                            </span>
+                        {% else %}
+                            <span style="color:#ccc;font-size:12px;">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="sex-badge {% if a.sexe == 'MALE' %}sex-male{% else %}sex-female{% endif %}">
+                            <i class="fa fa-{% if a.sexe == 'MALE' %}mars{% else %}venus{% endif %}"></i>
+                            {{ a.sexe }}
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display:flex;flex-direction:column;gap:4px;">
+                            <span style="font-weight:700;">{{ a.poids }} kg</span>
+                            {% if a.poids > 0 %}
+                                {% set sk = a.espece|lower %}
+                                {% if averages[sk] is defined %}
+                                    {% set diff = ((a.poids - averages[sk]) / averages[sk]) * 100 %}
+                                    {% if diff > 15 %}
+                                        <span class="iq-badge-admin badge-elite"><i class="fa fa-star"></i> Élite</span>
+                                    {% elseif diff >= -5 %}
+                                        <span class="iq-badge-admin badge-conforme"><i class="fa fa-check-circle"></i> Conforme</span>
+                                    {% else %}
+                                        <span class="iq-badge-admin badge-surveiller"><i class="fa fa-exclamation-triangle"></i> À surveiller</span>
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td style="color:#888;">{{ a.dateNaissance ? a.dateNaissance|date('d/m/Y') : '-' }}</td>
+                    <td style="text-align:right; padding-right: 20px;">
+                        <div style="display:flex;gap:6px;justify-content:flex-end;">
+                            <a href="{{ path('admin_animaux_edit', {id: a.id}) }}" class="btn-action btn-edit">
+                                <i class="fa fa-pen"></i> Modifier
+                            </a>
+                            <form method="POST" action="{{ path('admin_animaux_delete', {id: a.id}) }}"
+                                  onsubmit="return confirm('Supprimer {{ a.nom }} ? Cette action est irréversible.');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete_animal_' ~ a.id) }}">
+                                <button type="submit" class="btn-action btn-del">
+                                    <i class="fa fa-trash"></i> Supprimer
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" style="text-align:center; padding:40px; color:#aaa;">
+                        <i class="fa fa-paw" style="font-size:32px; margin-bottom:10px; display:block;"></i>
+                        Aucun animal trouvé{% if searchTerm %} pour "{{ searchTerm }}"{% endif %}.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% endblock %}

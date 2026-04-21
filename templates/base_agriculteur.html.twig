@@ -314,42 +314,37 @@ checkAndRedirect();
 
             {# Événements #}
             <div class="nav-item">
-                <a href="{{ path('agri_evenement_index') }}"
-                   class="nav-link {% if app.request.get('_route') in ['agri_evenement_index','agri_participation_index'] %}active{% endif %}">
+                <a href="{{ path('agriculteur_evenement_index') }}"
+                   class="nav-link {% if app.request.get('_route') in ['agri_evenements','agri_participations'] %}active{% endif %}">
                     <i class="fa fa-calendar-days"></i> Événements
                     <i class="fa fa-chevron-down chevron"></i>
                 </a>
                 <div class="dropdown">
-                   <a href="{{ path('agri_evenement_index') }}" class="{% if app.request.get('_route') == 'agri_evenement_index' %}active{% endif %}">
-    <i class="fa fa-calendar-days"></i> Événements
-</a>
-<a href="{{ path('agri_participation_index') }}" class="{% if app.request.get('_route') == 'agri_participation_index' %}active{% endif %}">
-    <i class="fa fa-ticket"></i> Mes participations
-</a>
+                    <a href="{{ path('agriculteur_evenement_index') }}"><i class="fa fa-calendar-days"></i> Événements</a>
+                    <a href="{{ path('agriculteur_participation_index') }}"><i class="fa fa-ticket"></i> Mes participations</a>
                 </div>
             </div>
 
-        <div class="nav-item">
-            <a href="{{ path('agri_abonnement_front') }}"
-               class="nav-link {% if app.request.get('_route') in ['agri_offre_front','agri_abonnement_front','agri_abonnement_pdf'] %}active{% endif %}">
-                <i class="fa fa-crown"></i> Abonnement
-                <i class="fa fa-chevron-down chevron"></i>
-            </a>
-            <div class="dropdown">
-                <a href="{{ path('agri_offre_front') }}"><i class="fa fa-star"></i> Offres disponibles</a>
-                <a href="{{ path('agri_abonnement_front') }}"
-                   class="{% if app.request.get('_route') in ['agri_abonnement_front','agri_abonnement_pdf'] %}active{% endif %}">
-                    <i class="fa fa-crown"></i> Mes abonnements
+            {# Abonnements #}
+            <div class="nav-item">
+                <a href="{{ path('agriculteur_participation_index') }}"
+                   class="nav-link {% if app.request.get('_route') in ['agri_offres','agri_abonnements'] %}active{% endif %}">
+                    <i class="fa fa-crown"></i> Abonnement
+                    <i class="fa fa-chevron-down chevron"></i>
+                </a>
+                <div class="dropdown">
+                    <a href="{{ path('app_offre_list') }}"><i class="fa fa-star"></i> Offres disponibles</a>
+                    <a href="{{ path('agriculteur_participation_index') }}"><i class="fa fa-crown"></i> Mon abonnement</a>
+                </div>
+            </div>
+
+            {# Tâches #}
+            <div class="nav-item">
+                <a href="{{ path('agri_taches') }}"
+                   class="nav-link {% if app.request.get('_route') == 'agri_taches' %}active{% endif %}">
+                    <i class="fa fa-list-check"></i> Tâches
                 </a>
             </div>
-        </div>
-
-        <div class="nav-item">
-            <a href="{{ path('agri_ouvriers') }}"
-               class="nav-link {% if app.request.get('_route') in ['agri_ouvriers','agri_taches'] %}active{% endif %}">
-                <i class="fa fa-list-check"></i> Mes Ouvriers
-            </a>
-        </div>
 
     </nav>
 
@@ -552,8 +547,10 @@ checkAndRedirect();
     document.addEventListener('click', function(e) {
         var menu = document.getElementById('profileMenu');
         if (menu && !menu.contains(e.target)) {
-            document.getElementById('profilePanel').style.display = 'none';
-            document.getElementById('profileChevron').style.transform = 'rotate(0deg)';
+            var panel = document.getElementById('profilePanel');
+            if (panel) panel.style.display = 'none';
+            var chevron = document.getElementById('profileChevron');
+            if (chevron) chevron.style.transform = 'rotate(0deg)';
         }
     });
 
@@ -607,7 +604,7 @@ checkAndRedirect();
 
         var data = new FormData(document.getElementById('agriProfileForm'));
 
-fetch('{{ path('agri_profile_update') }}', {
+        fetch('/agriculteur/profile/update', {
             method: 'POST',
             body: data,
             headers: { 'X-Requested-With': 'XMLHttpRequest' }
@@ -618,13 +615,11 @@ fetch('{{ path('agri_profile_update') }}', {
             btnSave.innerHTML = '<i class="fa fa-check" style="font-size:10px;"></i> Enregistrer';
 
             if (json.success) {
-                /* Mise à jour des libellés visibles */
                 document.querySelectorAll('.agri-pf-view').forEach(function(view) {
                     var inp = view.parentElement.querySelector('.agri-pf-input');
                     if (inp && inp.value.trim()) view.textContent = inp.value.trim();
                 });
 
-                /* Mise à jour nom + initiales dans la navbar */
                 if (json.prenom && json.nom) {
                     var fullName = json.prenom + ' ' + json.nom;
                     var initials = json.prenom.charAt(0).toUpperCase() + json.nom.charAt(0).toUpperCase();
@@ -653,7 +648,6 @@ fetch('{{ path('agri_profile_update') }}', {
         });
     }
 
-    /* ── Toast ── */
     function agriShowToast(msg, isError) {
         var existing = document.getElementById('agriToast');
         if (existing) existing.remove();
@@ -692,6 +686,5 @@ fetch('{{ path('agri_profile_update') }}', {
     }
 </script>
 {% endblock %}
-
 </body>
 </html>

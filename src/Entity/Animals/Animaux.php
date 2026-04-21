@@ -3,6 +3,7 @@
 namespace App\Entity\Animals;
 
 use App\Repository\Animals\AnimauxRepository;
+use App\Entity\User\User;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -56,6 +57,10 @@ class Animaux
     #[ORM\OneToMany(mappedBy: 'animal', targetEntity: Examen::class, orphanRemoval: true)]
     private Collection $examen;
 
+#[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'cin', nullable: true)]
+    private ?User $user = null;
+
     public function __construct()
     {
         $this->examen = new ArrayCollection();
@@ -73,7 +78,7 @@ class Animaux
         return $this->nom;
     }
 
-    public function setNom(string $nom): static
+    public function setNom(?string $nom): static
     {
         $this->nom = $nom;
         return $this;
@@ -84,7 +89,7 @@ class Animaux
         return $this->espece;
     }
 
-    public function setEspece(string $espece): static
+    public function setEspece(?string $espece): static
     {
         $this->espece = $espece;
         return $this;
@@ -95,7 +100,7 @@ class Animaux
         return $this->date_naissance;
     }
 
-    public function setDateNaissance(\DateTimeInterface $date_naissance): static
+    public function setDateNaissance(?\DateTimeInterface $date_naissance): static
     {
         $this->date_naissance = $date_naissance;
         return $this;
@@ -106,7 +111,7 @@ class Animaux
         return $this->sexe;
     }
 
-    public function setSexe(string $sexe): static
+    public function setSexe(?string $sexe): static
     {
         $this->sexe = $sexe;
         return $this;
@@ -131,25 +136,14 @@ class Animaux
         return $this->examen;
     }
 
-    public function addExaman(Examen $examan): static
+    public function getUser(): ?User
     {
-        if (!$this->examen->contains($examan)) {
-            $this->examen->add($examan);
-            $examan->setAnimal($this);
-        }
-
-        return $this;
+        return $this->user;
     }
 
-    public function removeExaman(Examen $examan): static
+    public function setUser(?User $user): self
     {
-        if ($this->examen->removeElement($examan)) {
-            // set the owning side to null (unless already changed)
-            if ($examan->getAnimal() === $this) {
-                $examan->setAnimal(null);
-            }
-        }
-
+        $this->user = $user;
         return $this;
     }
 }

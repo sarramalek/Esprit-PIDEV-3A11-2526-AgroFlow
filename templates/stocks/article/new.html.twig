@@ -104,16 +104,34 @@
                 {{ form_widget(form.categorie, {'attr': {'class': 'form-control-modern'}}) }}
             </div>
 
-            {# PRIX #}
+            {# DEVISE & PRIX ACHAT #}
+            <div class="form-group">
+                {{ form_label(form.devise) }}
+                {{ form_widget(form.devise, {'attr': {'class': 'form-control-modern'}}) }}
+            </div>
+
+            <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    {{ form_label(form.prix_achat_devise) }}
+                    <span id="msg-prix-achat-ajax" class="validation-msg"></span>
+                </div>
+                <div class="field-icon-wrapper has-icon">
+                    <i class="fa fa-wallet field-icon"></i>
+                    {{ form_widget(form.prix_achat_devise, {'attr': {'class': 'form-control-modern', 'placeholder': 'Prix original'}}) }}
+                </div>
+            </div>
+
+            {# PRIX FINAL TND #}
             <div class="form-group">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     {{ form_label(form.prix_unitaire) }}
                     <span id="msg-prix-ajax" class="validation-msg"></span>
                 </div>
                 <div class="field-icon-wrapper has-icon">
-                    <i class="fa fa-tag field-icon"></i>
-                    {{ form_widget(form.prix_unitaire, {'attr': {'class': 'form-control-modern', 'placeholder': '0.000'}}) }}
+                    <i class="fa fa-calculator field-icon"></i>
+                    {{ form_widget(form.prix_unitaire, {'attr': {'class': 'form-control-modern', 'placeholder': 'Automatique si devise choisie', 'readonly': 'readonly', 'style': 'background:#eef2f7;'}}) }}
                 </div>
+                <small style="font-size: 10px; color: #7f8c8d; font-style: italic;">* Sera calculé automatiquement via API</small>
             </div>
 
             {# UNITE #}
@@ -171,11 +189,11 @@
             }
         },
         {
-            input: form.querySelector('[name*="[prix_unitaire]"]'),
-            msg: document.getElementById('msg-prix-ajax'),
+            input: form.querySelector('[name*="[prix_achat_devise]"]'),
+            msg: document.getElementById('msg-prix-achat-ajax'),
             check: (val) => {
-                if (val === "" || parseFloat(val) <= 0) return { text: "Prix > 0 requis", color: "#dc3545" };
-                return { text: "Valide ✓", color: "#2D5A27" };
+                if (val !== "" && parseFloat(val) <= 0) return { text: "Prix > 0", color: "#dc3545" };
+                return { text: "", color: "#2D5A27" };
             }
         },
         {
@@ -196,6 +214,34 @@
         }
     ];
 
+    // Logique de conversion en temps réel (Aperçu)
+    const deviseSelect = form.querySelector('[name*="[devise]"]');
+    const prixAchatInput = form.querySelector('[name*="[prix_achat_devise]"]');
+    const prixUnitaireInput = form.querySelector('[name*="[prix_unitaire]"]');
+    
+    const rates = { 'EUR': 3.385, 'USD': 3.120, 'GBP': 3.920, 'DZD': 0.023, 'MAD': 0.312, 'TND': 1 };
+
+    function updatePreview() {
+        const amount = parseFloat(prixAchatInput.value) || 0;
+        const currency = deviseSelect.value;
+        
+        if (currency === 'TND') {
+            prixUnitaireInput.value = amount.toFixed(3);
+            prixUnitaireInput.style.background = "#f8fafc";
+            prixUnitaireInput.readOnly = false;
+        } else {
+            const estimation = amount * (rates[currency] || 1);
+            prixUnitaireInput.value = estimation.toFixed(3);
+            prixUnitaireInput.style.background = "#eef2f7";
+            prixUnitaireInput.readOnly = true;
+        }
+    }
+
+    if (deviseSelect && prixAchatInput) {
+        deviseSelect.addEventListener('change', updatePreview);
+        prixAchatInput.addEventListener('input', updatePreview);
+    }
+
     function validateField(v) {
         if (!v.input) return;
         const result = v.check(v.input.value.trim());
@@ -207,7 +253,6 @@
     validations.forEach(v => {
         if (v.input) {
             v.input.addEventListener('input', () => validateField(v));
-            // Optionnel : valider au chargement si les champs sont pré-remplis
             validateField(v);
         }
     });

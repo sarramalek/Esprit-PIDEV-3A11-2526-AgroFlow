@@ -1,0 +1,206 @@
+{% extends 'base_admin.html.twig' %}
+{% block title %}Plantes — AgroFlow{% endblock %}
+{% block page_title %}Gestion des Plantes{% endblock %}
+{% block breadcrumb %}Plantes{% endblock %}
+
+{% block stylesheets %}
+.stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:28px; }
+.stat-card { background:var(--white); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px 24px; display:flex; align-items:center; gap:16px; }
+.stat-icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+.stat-icon.green  { background:#D1FAE5; color:#065F46; }
+.stat-icon.blue   { background:#DBEAFE; color:#1D4ED8; }
+.stat-icon.yellow { background:#FEF3C7; color:#92400E; }
+.stat-value { font-size:24px; font-weight:700; color:var(--navy); line-height:1; }
+.stat-label { font-size:12px; color:var(--text-muted); margin-top:4px; }
+.toolbar { display:flex; align-items:center; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
+.search-box { position:relative; flex:1; min-width:220px; }
+.search-box input { width:100%; padding:10px 14px 10px 38px; border:1.5px solid var(--cream-dark); border-radius:8px; font-size:14px; font-family:'DM Sans',sans-serif; background:var(--white); color:var(--navy); }
+.search-box input:focus { outline:none; border-color:var(--green-accent); }
+.search-box i { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:13px; }
+.btn-primary { display:inline-flex; align-items:center; gap:8px; background:var(--green-accent); color:white; padding:10px 20px; border-radius:var(--radius); font-size:14px; font-weight:600; text-decoration:none; border:none; cursor:pointer; white-space:nowrap; }
+.btn-primary:hover { background:var(--green-mid); }
+.result-count { font-size:13px; color:var(--text-muted); }
+.card { background:var(--white); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
+.flash-success { background:#D1FAE5; color:#065F46; padding:12px 18px; border-radius:var(--radius); margin-bottom:20px; font-size:14px; font-weight:500; display:flex; align-items:center; gap:8px; }
+.data-table { width:100%; border-collapse:collapse; }
+.data-table thead th { background:var(--cream); padding:13px 18px; text-align:left; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); border-bottom:1px solid var(--cream-dark); white-space:nowrap; cursor:pointer; user-select:none; }
+.data-table thead th:hover { color:var(--green-accent); }
+.data-table thead th .sort-icon { margin-left:5px; opacity:0.4; font-size:10px; }
+.data-table thead th.sort-asc .sort-icon,
+.data-table thead th.sort-desc .sort-icon { opacity:1; color:var(--green-accent); }
+.data-table tbody td { padding:14px 18px; font-size:14px; border-bottom:1px solid var(--cream-dark); vertical-align:middle; }
+.data-table tbody tr:last-child td { border-bottom:none; }
+.data-table tbody tr:hover { background:#FAFDF8; }
+.data-table tbody tr.hidden-row { display:none; }
+.badge-plant { background:#DCFCE7; color:#166534; display:inline-block; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; }
+.actions { display:flex; gap:8px; align-items:center; }
+.btn-danger { background:#FEE2E2; color:#DC2626; border:none; padding:6px 12px; border-radius:7px; font-size:13px; cursor:pointer; }
+.btn-danger:hover { background:#FECACA; }
+.btn-edit { display:inline-flex; align-items:center; gap:5px; background:var(--cream-dark); color:var(--navy); border:1px solid #ddd; padding:6px 12px; border-radius:7px; font-size:13px; text-decoration:none; }
+.btn-show { display:inline-flex; align-items:center; gap:5px; background:#EFF6FF; color:#2563EB; border:1px solid #BFDBFE; padding:6px 12px; border-radius:7px; font-size:13px; text-decoration:none; }
+.empty-state { text-align:center; padding:60px 20px; color:var(--text-muted); }
+.no-results { text-align:center; padding:40px; color:var(--text-muted); display:none; }
+{% endblock %}
+
+{% block body %}
+
+{% for msg in app.flashes('success') %}
+<div class="flash-success"><i class="fa fa-check-circle"></i> {{ msg }}</div>
+{% endfor %}
+
+{# ══ STATS ══ #}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon green"><i class="fa fa-seedling"></i></div>
+        <div><div class="stat-value">{{ total }}</div><div class="stat-label">Total plantes</div></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon blue"><i class="fa fa-droplet"></i></div>
+        <div><div class="stat-value">{{ avgBesoinEau ?? '—' }}</div><div class="stat-label">Besoin eau moy. (L/j)</div></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon yellow"><i class="fa fa-calendar-days"></i></div>
+        <div><div class="stat-value">{{ avgCycleJours ?? '—' }}</div><div class="stat-label">Cycle moy. (jours)</div></div>
+    </div>
+</div>
+
+{# ══ TOOLBAR ══ #}
+<div class="toolbar">
+    <div class="search-box">
+        <i class="fa fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" placeholder="Rechercher par nom, variété…">
+    </div>
+    <span class="result-count" id="resultCount"></span>
+    <a href="{{ path('admin_plantes_new') }}" class="btn-primary">
+        <i class="fa fa-plus"></i> Nouvelle plante
+    </a>
+</div>
+
+{# ══ TABLE ══ #}
+<div class="card">
+    {% if plantes is empty %}
+    <div class="empty-state">
+        <i class="fa fa-seedling" style="font-size:48px;opacity:0.3;display:block;margin-bottom:16px"></i>
+        <p>Aucune plante enregistrée.</p>
+    </div>
+    {% else %}
+    <table class="data-table" id="planteTable">
+        <thead>
+            <tr>
+                <th data-col="0">ID <i class="fa fa-sort sort-icon"></i></th>
+                <th data-col="1">Nom <i class="fa fa-sort sort-icon"></i></th>
+                <th data-col="2">Variété <i class="fa fa-sort sort-icon"></i></th>
+                <th data-col="3">Besoin eau (L/j) <i class="fa fa-sort sort-icon"></i></th>
+                <th data-col="4">Cycle (jours) <i class="fa fa-sort sort-icon"></i></th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="planteBody">
+        {% for plante in plantes %}
+            <tr data-nom="{{ plante.nomP|lower }}"
+                data-variete="{{ plante.variete ? plante.variete|lower : '' }}">
+                <td style="color:var(--text-muted);font-family:'DM Mono',monospace;font-size:13px">{{ plante.id }}</td>
+                <td><strong>{{ plante.nomP }}</strong></td>
+                <td><span class="badge-plant">{{ plante.variete ?? '—' }}</span></td>
+                <td>{{ plante.besoinEau ?? '—' }}</td>
+                <td>{{ plante.cycleJours ?? '—' }} j</td>
+                <td>
+                    <div class="actions">
+                        <a href="{{ path('admin_plantes_show', {id: plante.id}) }}" class="btn-show">
+                            <i class="fa fa-eye"></i>
+                        </a>
+                        <a href="{{ path('admin_plantes_edit', {id: plante.id}) }}" class="btn-edit">
+                            <i class="fa fa-pen"></i>
+                        </a>
+                        <form method="post" action="{{ path('admin_plantes_delete', {id: plante.id}) }}"
+                              onsubmit="return confirm('Supprimer cette plante ?')">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete'~plante.id) }}">
+                            <button class="btn-danger"><i class="fa fa-trash"></i></button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="no-results" id="noResults">
+        <i class="fa fa-magnifying-glass" style="font-size:32px;opacity:0.3;display:block;margin-bottom:12px"></i>
+        Aucun résultat trouvé.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+const searchInput = document.getElementById('searchInput');
+const resultCount = document.getElementById('resultCount');
+const noResults   = document.getElementById('noResults');
+const tbody       = document.getElementById('planteBody');
+
+function filterTable() {
+    if (!tbody) return;
+    const q     = searchInput ? searchInput.value.toLowerCase().trim() : '';
+    const rows  = Array.from(tbody.getElementsByTagName('tr'));
+    let visible = 0;
+
+    rows.forEach(row => {
+        const nom     = row.dataset.nom     || '';
+        const variete = row.dataset.variete || '';
+        const match   = !q || nom.includes(q) || variete.includes(q);
+        row.style.display = match ? '' : 'none';
+        if (match) visible++;
+    });
+
+    if (resultCount) resultCount.textContent = visible + ' résultat' + (visible > 1 ? 's' : '');
+    if (noResults)   noResults.style.display  = visible === 0 ? 'block' : 'none';
+}
+
+if (searchInput) searchInput.addEventListener('input', filterTable);
+window.addEventListener('DOMContentLoaded', filterTable);
+
+// ── Tri par colonne ──────────────────────────────────────
+let sortCol = -1, sortAsc = true;
+
+document.querySelectorAll('th[data-col]').forEach(th => {
+    th.addEventListener('click', () => {
+        if (!tbody) return;
+        const col = parseInt(th.dataset.col);
+
+        document.querySelectorAll('th[data-col]').forEach(t => {
+            t.classList.remove('sort-asc', 'sort-desc');
+            const icon = t.querySelector('.sort-icon');
+            if (icon) icon.className = 'fa fa-sort sort-icon';
+        });
+
+        sortAsc = (sortCol === col) ? !sortAsc : true;
+        sortCol = col;
+
+        th.classList.add(sortAsc ? 'sort-asc' : 'sort-desc');
+        const thIcon = th.querySelector('.sort-icon');
+        if (thIcon) thIcon.className = 'fa fa-sort-' + (sortAsc ? 'up' : 'down') + ' sort-icon';
+
+        const rows = Array.from(tbody.getElementsByTagName('tr'));
+
+        rows.sort((a, b) => {
+            const aCell = a.cells[col];
+            const bCell = b.cells[col];
+            const aVal  = aCell ? aCell.textContent.trim() : '';
+            const bVal  = bCell ? bCell.textContent.trim() : '';
+            const aNum  = parseFloat(aVal.replace(/[^\d.]/g, ''));
+            const bNum  = parseFloat(bVal.replace(/[^\d.]/g, ''));
+
+            if (!isNaN(aNum) && !isNaN(bNum)) {
+                return sortAsc ? aNum - bNum : bNum - aNum;
+            }
+            return sortAsc
+                ? aVal.localeCompare(bVal, 'fr')
+                : bVal.localeCompare(aVal, 'fr');
+        });
+
+        rows.forEach(r => tbody.appendChild(r));
+        filterTable();
+    });
+});
+</script>
+{% endblock %}

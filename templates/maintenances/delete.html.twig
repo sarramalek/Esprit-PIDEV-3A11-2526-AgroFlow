@@ -1,0 +1,18 @@
+{# ... reste de votre code (breadcrumb, summary, etc.) ... #}
+
+<div class="del-footer">
+    {# Le formulaire DOIT être en méthode POST #}
+    <form method="post" action="{{ path('agri_maintenances_delete', {id: maintenance.idMain}) }}">
+        
+        {# CORRECTION CRITIQUE : Le nom du jeton doit être 'delete' ~ ID #}
+        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ maintenance.idMain) }}">
+        
+        <button type="submit" class="btn-confirm-del">
+            🗑 Oui, supprimer définitivement
+        </button>
+    </form>
+    
+    <a href="{{ path('agri_maintenances_show', {id: maintenance.idMain}) }}" class="btn-cancel">
+        ✕ Annuler
+    </a>
+</div>

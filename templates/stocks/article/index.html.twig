@@ -16,127 +16,127 @@
         {% endfor %}
     {% endfor %}
 
-    {# --- EN-TÃŠTE --- #}
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+    {# --- EN-TÊTE --- #}
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
         <div>
-            <h2 style="margin:0; color:#1a2a19; font-size:28px; font-weight: 800; letter-spacing: -0.5px;">
-                <i class="fa fa-boxes-stacked" style="color: #2D5A27; margin-right: 10px;"></i>Gestion des Articles
+            <h2 style="margin:0; color:#1a2a19; font-size:32px; font-weight: 800; letter-spacing: -1.5px;">
+                <i class="fa fa-boxes-stacked" style="color: #2D5A27; margin-right: 15px;"></i>Gestion des Stocks
             </h2>
-            <p style="margin:5px 0 0; color:#6c757d; font-size:15px;">Suivi en temps rÃ©el de votre inventaire agricole</p>
+            <p style="margin:8px 0 0; color:#596662; font-size:16px; font-weight: 500;">Suivi intelligent et analytique de votre inventaire agricole</p>
         </div>
         
-        <div style="display: flex; gap: 10px;">
-            <a href="{{ path('app_mouvement_index') }}" class="btn-secondary-action">
+        <div style="display: flex; gap: 12px;">
+            <a href="{{ path('app_mouvement_index') }}" class="btn-secondary-action" style="padding: 14px 28px; border-radius: 14px; background: white; border: 1px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
                 <i class="fa fa-list-ul"></i> Journal des flux
             </a>
-            <button onclick="openAddProductModal()" class="btn-primary-action">
+            <button onclick="openAddProductModal()" class="btn-primary-action" style="padding: 14px 28px; border-radius: 14px; background: #2D5A27; box-shadow: 0 8px 20px rgba(45, 90, 39, 0.2);">
                 <i class="fa fa-plus"></i> Nouveau Produit
             </button>
-            <button onclick="document.getElementById('smartScanInput').click()" class="btn-primary-action" style="background: #8e44ad; color: white; border:none; box-shadow: 0 4px 15px rgba(142, 68, 173, 0.3);">
+            <button onclick="openCameraModal()" class="btn-primary-action" style="padding: 14px 28px; border-radius: 14px; background: #8e44ad; color: white; border:none; box-shadow: 0 8px 20px rgba(142, 68, 173, 0.25);">
                 <i class="fa fa-camera"></i> Smart Scan IA
             </button>
             <input type="file" id="smartScanInput" accept="image/*" capture="environment" style="display: none;" onchange="handleSmartScan(event)">
         </div>
     </div>
 
-
+    {# --- FILTRES REDESSINÉS --- #}
+    <form method="GET" action="{{ path('agri_produits') }}" style="display: flex; gap: 15px; margin-bottom: 30px; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); align-items: center; border: 1px solid rgba(0,0,0,0.02);">
+        <div style="position: relative; flex: 2; display: flex; align-items: center;">
+            <i class="fa fa-search" style="position: absolute; left: 20px; color: #94a3b8; font-size: 18px;"></i>
+            <input type="text" name="search" value="{{ currentSearch }}" placeholder="Rechercher un produit, une référence..." 
+                   style="width: 100%; padding: 16px 16px 16px 55px; border-radius: 15px; border: 1px solid #e2e8f0; font-size: 15px; outline: none; background: #f8fafc; transition: 0.3s; font-weight: 500;"
+                   onfocus="this.style.borderColor='#2D5A27'; this.style.background='white'; this.style.boxShadow='0 0 0 4px rgba(45,90,39,0.05)'"
+                   onblur="this.style.borderColor='#e2e8f0'; this.style.background='#f8fafc'; this.style.boxShadow='none'">
+        </div>
+        
+        <div style="flex: 1; position: relative;">
+            <i class="fa fa-tag" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; z-index: 1;"></i>
+            <select name="category" onchange="this.form.submit()" 
+                    style="width: 100%; padding: 16px 15px 16px 45px; border-radius: 15px; border: 1px solid #e2e8f0; font-size: 15px; outline: none; background: #f8fafc; appearance: none; cursor: pointer; font-weight: 500;">
+                <option value="">Toutes les catégories</option>
+                {% for cat in categories %}
+                    <option value="{{ cat.id }}" {{ currentCategory == cat.id ? 'selected' : '' }}>{{ cat.nom }}</option>
+                {% endfor %}
+            </select>
+            <i class="fa fa-chevron-down" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; pointer-events: none; font-size: 12px;"></i>
+        </div>
+        
+        <button type="submit" style="background: #1a2a19; color: white; border-radius: 15px; padding: 16px 30px; border: none; cursor: pointer; font-weight: 700; font-size: 15px; transition: 0.3s; display: flex; align-items: center; gap: 10px;">
+            <i class="fa fa-filter"></i> Appliquer les filtres
+        </button>
+    </form>
 
     {# --- STATISTIQUES --- #}
-    <div style="display: flex; gap: 20px; margin-bottom: 25px;">
-        <div class="stat-card">
-            <div class="stat-icon" style="background: #e3f2fd; color: #1976d2;"><i class="fa fa-box"></i></div>
+    <div style="display: flex; gap: 25px; margin-bottom: 35px;">
+        <div class="stat-card" style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);">
+            <div class="stat-icon" style="background: #EAF3DE; color: #2D5A27;"><i class="fa fa-box-open"></i></div>
             <div><div class="stat-value">{{ totalArticles }}</div><div class="stat-label">Total Produits</div></div>
         </div>
-        <div class="stat-card" style="border-bottom: 3px solid #f1c40f;">
+        <div class="stat-card" style="background: linear-gradient(135deg, #ffffff 0%, #fffdf5 100%); border-bottom: 4px solid #f1c40f;">
             <div class="stat-icon" style="background: #fff9db; color: #f1c40f;"><i class="fa fa-coins"></i></div>
             <div><div class="stat-value">{{ valeurTotaleStock|number_format(2, '.', ' ') }} DT</div><div class="stat-label">Valeur Inventaire</div></div>
         </div>
-        <div class="stat-card" style="border-left: 4px solid #e74c3c;">
+        <div class="stat-card" style="background: linear-gradient(135deg, #ffffff 0%, #fffafa 100%); border-bottom: 4px solid #e74c3c;">
             <div class="stat-icon" style="background: #fdeded; color: #e74c3c;"><i class="fa fa-triangle-exclamation"></i></div>
             <div><div class="stat-value" style="color: #e74c3c;">{{ alerteCount }}</div><div class="stat-label">Alertes Stock</div></div>
         </div>
     </div>
 
-    {# --- FILTRES --- #}
-    <form method="GET" action="{{ path('agri_produits') }}" class="filter-bar">
-        <div style="position: relative; flex: 1;">
-            <i class="fa fa-search search-icon"></i>
-            <input type="text" name="search" value="{{ currentSearch }}" placeholder="Rechercher par nom..." class="filter-input">
-        </div>
-        <select name="category" onchange="this.form.submit()" class="filter-input" style="min-width: 200px;">
-            <option value="">Toutes les catÃ©gories</option>
-            {% for cat in categories %}
-                <option value="{{ cat.id }}" {{ currentCategory == cat.id ? 'selected' : '' }}>{{ cat.nom }}</option>
-            {% endfor %}
-        </select>
-        <button type="submit" class="btn-filter-submit">Filtrer</button>
-    </form>
-
     {# --- TABLEAU --- #}
-    <div class="main-card-table">
-        <table style="width: 100%; border-collapse: separate; border-spacing: 0;">
+    <div class="main-card-table" style="border: 1px solid #f1f5f9;">
+        <table style="width: 100%; border-collapse: collapse;">
             <thead>
-                <tr>
-                    <th class="th-style">DÃ©signation</th>
-                    <th class="th-style">CatÃ©gorie</th>
-                    <th class="th-style">Prix Unitaire</th>
-                    <th class="th-style">Ã‰tat du Stock</th>
-                    <th class="th-style">Valeur Totale</th>
-                    <th class="th-style" style="text-align: center;">Actions</th>
+                <tr style="background: #f8fafc; border-bottom: 2px solid #f1f5f9;">
+                    <th class="th-style" style="font-weight: 800; color: #475569; padding: 20px 25px;">Désignation</th>
+                    <th class="th-style" style="font-weight: 800; color: #475569; padding: 20px 25px;">Catégorie</th>
+                    <th class="th-style" style="font-weight: 800; color: #475569; padding: 20px 25px;">Prix Unitaire</th>
+                    <th class="th-style" style="font-weight: 800; color: #475569; padding: 20px 25px;">État du Stock</th>
+                    <th class="th-style" style="font-weight: 800; color: #475569; padding: 20px 25px;">Valeur Totale</th>
+                    <th class="th-style" style="font-weight: 800; color: #475569; padding: 20px 25px; text-align: center;">Actions</th>
                 </tr>
             </thead>
             <tbody>
             {% for article in articles %}
-                <tr class="article-row">
-                    <td style="padding: 15px 25px;">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div class="article-icon"><i class="fa fa-seedling"></i></div>
+                <tr class="article-row" style="border-bottom: 1px solid #f1f5f9; transition: 0.2s;">
+                    <td style="padding: 20px 25px;">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <div class="article-icon" style="width: 45px; height: 45px; font-size: 18px;"><i class="fa fa-seedling"></i></div>
                             <div>
-                                <span style="font-weight: 600; color: #2C3E50; display:block;">{{ article.nom }}</span>
-                                <div style="display: flex; gap: 5px; margin-top: 4px;">
-                                    <button onclick="traduireEtLire('Le produit est {{ article.nom|escape('js') }}. Catégorie : {{ article.categorie ? article.categorie.nom|escape('js') : '' }}. Description : {{ article.categorie ? article.categorie.description|escape('js') : '' }}', 'ar', 'ar-SA')" style="border:none; background:#f0f9ff; padding:2px 5px; border-radius:4px; cursor:pointer; font-size:0.9rem;" title="Lire en Arabe">🇹🇳</button>
-                                    <button onclick="traduireEtLire('Le produit est {{ article.nom|escape('js') }}. Catégorie : {{ article.categorie ? article.categorie.nom|escape('js') : '' }}. Description : {{ article.categorie ? article.categorie.description|escape('js') : '' }}', 'fr', 'fr-FR')" style="border:none; background:#f0f9ff; padding:2px 5px; border-radius:4px; cursor:pointer; font-size:0.9rem;" title="Lire en Français">🇫🇷</button>
-                                    <button onclick="traduireEtLire('Le produit est {{ article.nom|escape('js') }}. Catégorie : {{ article.categorie ? article.categorie.nom|escape('js') : '' }}. Description : {{ article.categorie ? article.categorie.description|escape('js') : '' }}', 'en', 'en-US')" style="border:none; background:#f0f9ff; padding:2px 5px; border-radius:4px; cursor:pointer; font-size:0.9rem;" title="Lire en Anglais">🇬🇧</button>
+                                <span style="font-weight: 700; color: #1e293b; display:block; font-size: 15px;">{{ article.nom }}</span>
+                                <div style="display: flex; gap: 4px; margin-top: 6px;">
+                                    <button onclick="traduireEtLire('Le produit est {{ article.nom|escape('js') }}. Catégorie : {{ article.categorie ? article.categorie.nom|escape('js') : '' }}.', 'ar', 'ar-SA')" style="border:none; background:#f1f5f9; padding:3px 6px; border-radius:6px; cursor:pointer; font-size:0.85rem;" title="Arabe">🇹🇳</button>
+                                    <button onclick="traduireEtLire('Le produit est {{ article.nom|escape('js') }}. Catégorie : {{ article.categorie ? article.categorie.nom|escape('js') : '' }}.', 'fr', 'fr-FR')" style="border:none; background:#f1f5f9; padding:3px 6px; border-radius:6px; cursor:pointer; font-size:0.85rem;" title="Français">🇫🇷</button>
+                                    <button onclick="traduireEtLire('Le produit est {{ article.nom|escape('js') }}. Catégorie : {{ article.categorie ? article.categorie.nom|escape('js') : '' }}.', 'en', 'en-US')" style="border:none; background:#f1f5f9; padding:3px 6px; border-radius:6px; cursor:pointer; font-size:0.85rem;" title="Anglais">🇬🇧</button>
                                 </div>
                             </div>
                         </div>
                     </td>
-                    <td><span class="category-badge">{{ article.categorie ? article.categorie.nom : 'Non classÃ©' }}</span></td>
-                    <td><span style="font-weight: 600;">{{ article.prixUnitaire|number_format(2, '.', ' ') }} DT</span></td>
-                    <td>
-                        <div style="min-width: 140px;">
-                            <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px;">
-                                <span style="font-weight:700; color: {{ article.quantiteEnStock <= article.seuilAlerte ? '#e74c3c' : '#2D5A27' }}">{{ article.quantiteEnStock }} {{ article.uniteMesure }}</span>
-                                <span style="color: #bdc3c7;">Seuil: {{ article.seuilAlerte }}</span>
+                    <td style="padding: 20px 25px;"><span class="category-badge" style="padding: 6px 14px; font-size: 11px; letter-spacing: 0.3px;">{{ article.categorie ? article.categorie.nom : 'Non classé' }}</span></td>
+                    <td style="padding: 20px 25px;"><span style="font-weight: 700; color: #334155;">{{ article.prixUnitaire|number_format(2, '.', ' ') }} <small>DT</small></span></td>
+                    <td style="padding: 20px 25px;">
+                        <div style="min-width: 160px;">
+                            <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; font-weight: 700;">
+                                <span style="color: {{ article.quantiteEnStock <= article.seuilAlerte ? '#e74c3c' : '#2D5A27' }}">{{ article.quantiteEnStock }} <small>{{ article.uniteMesure }}</small></span>
+                                <span style="color: #94a3b8; font-size: 10px;">Seuil: {{ article.seuilAlerte }}</span>
                             </div>
-                            <div class="progress-bg">
-                                <div class="progress-bar" style="width: {{ (article.quantiteEnStock / (article.seuilAlerte + 1) * 50)|default(50) }}%; background: {{ article.quantiteEnStock <= article.seuilAlerte ? '#e74c3c' : '#2ecc71' }};"></div>
+                            <div class="progress-bg" style="height: 8px; background: #f1f5f9; border-radius: 10px; overflow: hidden; position: relative;">
+                                {% set percent = (article.quantiteEnStock / (article.seuilAlerte + 1) * 50) %}
+                                {% set finalPercent = percent > 100 ? 100 : percent %}
+                                <div class="progress-bar" style="width: {{ finalPercent }}%; background: {{ article.quantiteEnStock <= article.seuilAlerte ? '#ef4444' : '#2ecc71' }}; height: 100%; border-radius: 10px; transition: 0.5s;"></div>
                             </div>
                         </div>
                     </td>
-                    <td><span style="font-weight: 700;">{{ (article.quantiteEnStock * article.prixUnitaire)|number_format(2, '.', ' ') }} DT</span></td>
-                    <td style="padding: 15px 25px;">
-                        <div style="display: flex; justify-content: center; gap: 8px;">
-                            <a href="{{ path('app_mouvement_index', {'article': article.id}) }}" class="action-btn btn-history"><i class="fa fa-eye"></i></a>
-                            <button onclick="openMouvementModal('{{ article.id }}', '{{ article.nom|escape('js') }}', '{{ article.quantiteEnStock }}')" class="action-btn btn-stock"><i class="fa fa-exchange-alt"></i></button>
-                            
-                            {# --- BOUTON MODIFIER EN POPUP --- #}
-                            <button type="button" onclick="openEditProductModal('{{ article.id }}')" class="action-btn btn-edit">
-                                <i class="fa fa-pen"></i>
-                            </button>
-
-                            {# --- BOUTONS QR CODE --- #}
-                            <button type="button" onclick="openQRCodeModal('{{ article.id }}', '{{ article.nom|escape('js') }}')" class="action-btn" style="background: #e3f2fd; color: #1976d2;" title="Voir le QR Code">
-                                <i class="fa fa-qrcode"></i>
-                            </button>
-
+                    <td style="padding: 20px 25px;"><span style="font-weight: 800; color: #0f172a; font-size: 15px;">{{ (article.quantiteEnStock * article.prixUnitaire)|number_format(2, '.', ' ') }} <small>DT</small></span></td>
+                    <td style="padding: 20px 25px;">
+                        <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                            <a href="{{ path('app_mouvement_index', {'article': article.id}) }}" class="action-btn btn-history" title="Historique"><i class="fa fa-history"></i></a>
+                            <button onclick="openMouvementModal('{{ article.id }}', '{{ article.nom|escape('js') }}', '{{ article.quantiteEnStock }}')" class="action-btn btn-stock" title="Mouvement"><i class="fa fa-right-left"></i></button>
+                            <button type="button" onclick="openEditProductModal('{{ article.id }}')" class="action-btn btn-edit" title="Modifier"><i class="fa fa-edit"></i></button>
+                            <button type="button" onclick="openQRCodeModal('{{ article.id }}', '{{ article.nom|escape('js') }}')" class="action-btn" style="background: #eef2f7; color: #475569;" title="QR Code"><i class="fa fa-qrcode"></i></button>
                             {% if article.quantiteEnStock <= 0 %}
-                                <button type="button" onclick="openEmergencyModalForArticle('{{ article.nom|escape('js') }}', '{{ article.categorie ? article.categorie.nom|escape('js') : '' }}')" class="action-btn btn-emergency" title="OÃ¹ trouver cet article ?">
-                                    <i class="fa fa-map-marker-alt"></i>
-                                </button>
+                                <button type="button" onclick="openEmergencyModalForArticle('{{ article.nom|escape('js') }}', '{{ article.categorie ? article.categorie.nom|escape('js') : '' }}')" class="action-btn btn-emergency" title="Fournisseurs"><i class="fa fa-map-location-dot"></i></button>
                             {% endif %}
-
-                            <div class="action-btn btn-delete">{{ include('stocks/article/_delete_form.html.twig') }}</div>
+                            <div class="action-btn btn-delete" title="Supprimer">{{ include('stocks/article/_delete_form.html.twig') }}</div>
                         </div>
                     </td>
                 </tr>
@@ -243,6 +243,35 @@
             <div id="supplierList" style="max-height: 200px; overflow-y: auto;">
                 <p id="supplierLoading" style="text-align: center;"><i class="fa fa-spinner fa-spin"></i> Recherche des fournisseurs à proximité...</p>
             </div>
+        </div>
+    </div>
+</div>
+
+{# --- MODAL CAMÉRA SMART SCAN --- #}
+<div id="cameraModal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 600px; overflow: hidden; border-radius: 24px;">
+        <div class="modal-header" style="background: #8e44ad; padding: 20px;">
+            <h3 style="margin:0; font-size: 18px; display:flex; align-items:center; gap:10px;"><i class="fa fa-camera"></i> Capture Smart Scan IA</h3>
+            <span class="close-modal" onclick="closeCameraModal()" style="cursor:pointer; font-size: 28px;">&times;</span>
+        </div>
+        <div class="modal-body" style="padding: 0; background: #000; position: relative; height: 400px; display: flex; align-items: center; justify-content: center;">
+            <video id="webcamVideo" autoplay playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+            <canvas id="captureCanvas" style="display: none;"></canvas>
+            
+            <div style="position: absolute; bottom: 25px; left: 0; right: 0; display: flex; justify-content: center; gap: 20px; align-items: center;">
+                <button onclick="document.getElementById('smartScanInput').click()" style="background: rgba(255,255,255,0.2); border: 2px solid white; color: white; width: 45px; height: 45px; border-radius: 50%; cursor: pointer;" title="Importer un fichier">
+                    <i class="fa fa-upload"></i>
+                </button>
+                
+                <button onclick="capturePhoto()" style="background: white; color: #8e44ad; border: none; width: 70px; height: 70px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 25px rgba(255,255,255,0.4); transition: 0.2s;" onmousedown="this.style.transform='scale(0.9)'" onmouseup="this.style.transform='scale(1)'">
+                    <div style="width: 55px; height: 55px; border: 2px solid #8e44ad; border-radius: 50%;"></div>
+                </button>
+
+                <div style="width: 45px;"></div> {# Spacer #}
+            </div>
+        </div>
+        <div style="padding: 15px; background: #f8fafc; text-align: center; border-top: 1px solid #eee;">
+            <p style="margin: 0; color: #64748b; font-size: 13px; font-weight: 600;">Placez l'article devant l'objectif et capturez</p>
         </div>
     </div>
 </div>
@@ -523,8 +552,8 @@ function openQRCodeModal(articleId, articleName) {
     const downloadLink = document.getElementById('downloadQRCodeLink');
     
     modalTitle.textContent = 'QR Code - ' + articleName;
-    qrCodeImg.src = '/agriculteur/articles/qr/' + articleId;
-    downloadLink.href = '/agriculteur/articles/qr/' + articleId + '/download';
+    qrCodeImg.src = '/agriculteur/stocks/' + articleId + '/qr-code';
+    downloadLink.href = '/agriculteur/stocks/' + articleId + '/qr-code/download';
     
     modal.style.display = 'flex';
 }
@@ -538,15 +567,85 @@ function closeQRCodeModal() {
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
 <script>
+// ── SMART SCAN AVEC CAMÉRA LIVE ──────────────────────────────────────────
+let webcamStream = null;
+
+async function openCameraModal() {
+    const modal = document.getElementById('cameraModal');
+    const video = document.getElementById('webcamVideo');
+    modal.style.display = 'flex';
+
+    try {
+        // Demander une résolution précise pour améliorer l'OCR
+        webcamStream = await navigator.mediaDevices.getUserMedia({ 
+            video: { 
+                facingMode: "environment",
+                width: { ideal: 1920 },
+                height: { ideal: 1080 }
+            } 
+        });
+        video.srcObject = webcamStream;
+        
+        // Attendre que la vidéo soit prête
+        video.onloadedmetadata = () => {
+            video.play();
+        };
+    } catch (err) {
+        console.error("Erreur caméra:", err);
+        alert("Accès caméra refusé ou non supporté. Vérifiez vos paramètres.");
+        closeCameraModal();
+    }
+}
+
+function closeCameraModal() {
+    if (webcamStream) {
+        webcamStream.getTracks().forEach(track => track.stop());
+        webcamStream = null;
+    }
+    document.getElementById('cameraModal').style.display = 'none';
+}
+
+function capturePhoto() {
+    const video = document.getElementById('webcamVideo');
+    const canvas = document.getElementById('captureCanvas');
+    
+    if (!video.videoWidth) {
+        alert("La caméra n'est pas encore prête.");
+        return;
+    }
+
+    const context = canvas.getContext('2d');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
+    // Dessiner l'image actuelle de la vidéo sur le canvas
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+    // Convertir en Blob haute qualité
+    canvas.toBlob((blob) => {
+        if (blob) {
+            console.log("Photo capturée avec succès, envoi à l'IA...");
+            closeCameraModal();
+            analyzeImage(blob);
+        } else {
+            alert("Erreur lors de la capture de l'image.");
+        }
+    }, 'image/jpeg', 0.95);
+}
+
 async function handleSmartScan(event) {
     const file = event.target.files[0];
     if (!file) return;
+    analyzeImage(file);
+}
 
-    // Afficher le chargement
+async function analyzeImage(imageSource) {
     document.getElementById('smartScanLoadingModal').style.display = 'flex';
 
     const formData = new FormData();
-    formData.append('image', file);
+    // Symfony a besoin d'un nom de fichier pour traiter le blob comme un UploadedFile
+    const filename = imageSource instanceof File ? imageSource.name : 'capture.jpg';
+    formData.append('image', imageSource, filename);
 
     try {
         const response = await fetch("{{ path('api_vision_analyze') }}", {
@@ -556,42 +655,29 @@ async function handleSmartScan(event) {
 
         const data = await response.json();
         document.getElementById('smartScanLoadingModal').style.display = 'none';
-        event.target.value = ''; // Reset input
-
+        
         if (response.ok) {
             if (data.matchType === 'exact') {
-                // Redirection directe vers les mouvements
                 window.location.href = "{{ path('app_mouvement_index') }}?article=" + data.articleId;
             } else {
-                // Saisie Augmentée : Ouvrir la modale et pré-remplir
                 openAddProductModal();
-                
                 setTimeout(() => {
                     const form = document.querySelector('#addProductModal form');
                     if (form) {
-                        // Pré-remplir le Nom
                         const nomInput = form.querySelector('input[name*="[nom]"]');
-                        if (nomInput && data.suggestedName) {
-                            nomInput.value = data.suggestedName;
-                            nomInput.style.backgroundColor = '#fff9db'; // Surbrillance jaune pour montrer que c'est de l'IA
-                        }
-
-                        // Pré-remplir la Catégorie
+                        if (nomInput && data.suggestedName) nomInput.value = data.suggestedName;
                         const catSelect = form.querySelector('select[name*="[categorie]"]');
-                        if (catSelect && data.categoryId) {
-                            catSelect.value = data.categoryId;
-                            catSelect.style.backgroundColor = '#fff9db';
-                        }
+                        if (catSelect && data.categoryId) catSelect.value = data.categoryId;
                     }
                 }, 600);
             }
         } else {
-            alert("❌ Erreur IA : " + (data.error || "Impossible d'identifier l'image."));
+            alert("❌ IA : " + (data.error || "Identification impossible."));
         }
     } catch (e) {
-        console.error(e);
+        console.error("Erreur Fetch IA:", e);
         document.getElementById('smartScanLoadingModal').style.display = 'none';
-        alert("Une erreur de connexion est survenue.");
+        alert("Erreur de communication avec le serveur.");
     }
 }
 

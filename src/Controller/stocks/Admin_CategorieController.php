@@ -43,14 +43,14 @@ class Admin_CategorieController extends AbstractController
             /** @var User|null $currentUser */
             $currentUser = $this->getUser();
             if ($currentUser && \in_array('ROLE_ADMIN', $currentUser->getRoles(), true)) {
-                $categorie->setIdAdmin($currentUser->getCin());
+                $categorie->setAgriculteur($currentUser->getCin());
             }
 
             $em->persist($categorie);
             $em->flush();
 
             $this->addFlash('success', 'Votre catégorie a été ajoutée avec succès.');
-            return $this->redirectToRoute('admin_categories_index');
+            return $this->redirectToRoute('admin_dashboard');
         }
 
         return $this->render('stocks/categorie/Admin_new_categorie.html.twig', [
@@ -66,7 +66,7 @@ class Admin_CategorieController extends AbstractController
         if (!$currentUser || !\in_array('ROLE_ADMIN', $currentUser->getRoles(), true)) {
             throw $this->createAccessDeniedException();
         }
-        if ((int)($categorie->getIdAdmin() ?? 0) !== (int)$currentUser->getCin()) {
+        if ((int)($categorie->getAgriculteur() ?? 0) !== (int)$currentUser->getCin()) {
             throw $this->createAccessDeniedException('Vous ne pouvez modifier que vos propres catégories.');
         }
 
@@ -94,11 +94,11 @@ class Admin_CategorieController extends AbstractController
         if (!$currentUser || !\in_array('ROLE_ADMIN', $currentUser->getRoles(), true)) {
             throw $this->createAccessDeniedException();
         }
-        if ((int)($categorie->getIdAdmin() ?? 0) !== (int)$currentUser->getCin()) {
+        if ((int)($categorie->getAgriculteur() ?? 0) !== (int)$currentUser->getCin()) {
             throw $this->createAccessDeniedException('Vous ne pouvez supprimer que vos propres catégories.');
         }
 
-        if ($this->isCsrfTokenValid('delete_categorie'.$categorie->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete_categorie' . $categorie->getId(), $request->request->get('_token'))) {
             $em->remove($categorie);
             $em->flush();
             $this->addFlash('success', 'La catégorie a été supprimée avec succès.');

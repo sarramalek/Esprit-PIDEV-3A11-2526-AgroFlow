@@ -6,10 +6,20 @@ framework:
             # https://symfony.com/doc/current/messenger.html#transport-configuration
             async:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                # Correction pour MariaDB / Windows (évite l'erreur SKIP LOCKED)
+                options:
+# Désactive l'écoute temps réel (cause du SKIP LOCKED sur MariaDB)
+                    use_notify: false
+                    get_notify_timeout: 0
+                    # Vérifie les messages retardés toutes les 60 secondes
+                    check_delayed_interval: 60000
+                    table_name: 'messenger_messages'
                 retry_strategy:
                     max_retries: 3
                     multiplier: 2
+
             failed: 'doctrine://default?queue_name=failed'
+            
             sync: 'sync://'
 
         default_bus: messenger.bus.default
@@ -18,7 +28,11 @@ framework:
             messenger.bus.default: []
 
         routing:
+            # Envoi des emails en temps réel (synchrone)
             Symfony\Component\Mailer\Messenger\SendEmailMessage: sync
+            
+            # Envoi Telegram et SMS en arrière-plan (asynchrone)
+            # Une fois le code stable, lancez 'php bin/console messenger:consume async'
             Symfony\Component\Notifier\Message\ChatMessage: async
             Symfony\Component\Notifier\Message\SmsMessage: async
 

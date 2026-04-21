@@ -43,11 +43,11 @@ class CategorieRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findByAdminCin(int $adminCin): array
+    public function findByAdminCin($admin): array
     {
         return $this->createQueryBuilder('c')
-            ->andWhere('c.idAdmin = :cin')
-            ->setParameter('cin', $adminCin)
+            ->andWhere('c.agriculteur = :user')
+            ->setParameter('user', $admin)
             ->orderBy('c.nom', 'ASC')
             ->getQuery()
             ->getResult();

@@ -17,20 +17,34 @@
                     <div class="form-error-message">{{ form_errors(form.categorie) }}</div>
                 </div>
 
-                {# --- PRIX --- #}
-                <div>
-                    <label class="form-label-modern"><i class="fa fa-money-bill-wave"></i> Prix Unitaire (DT)</label>
-                    {{ form_widget(form.prix_unitaire, {'attr': {'class': 'form-input-modern'}}) }}
-                    <div class="form-error-message">{{ form_errors(form.prix_unitaire) }}</div>
-                </div>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
                 {# --- UNITE --- #}
                 <div>
                     <label class="form-label-modern"><i class="fa fa-balance-scale"></i> Unité de mesure</label>
                     {{ form_widget(form.unite_mesure, {'attr': {'class': 'form-input-modern'}}) }}
                     <div class="form-error-message">{{ form_errors(form.unite_mesure) }}</div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                {# --- DEVISE --- #}
+                <div>
+                    <label class="form-label-modern"><i class="fa fa-coins"></i> Devise d'achat</label>
+                    {{ form_widget(form.devise, {'attr': {'class': 'form-input-modern'}}) }}
+                </div>
+
+                {# --- PRIX ACHAT --- #}
+                <div>
+                    <label class="form-label-modern"><i class="fa fa-wallet"></i> Prix d'achat original</label>
+                    {{ form_widget(form.prix_achat_devise, {'attr': {'class': 'form-input-modern'}}) }}
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                {# --- PRIX TND --- #}
+                <div>
+                    <label class="form-label-modern"><i class="fa fa-calculator"></i> Prix Unitaire (TND)</label>
+                    {{ form_widget(form.prix_unitaire, {'attr': {'class': 'form-input-modern', 'readonly': 'readonly', 'style': 'background:#f8fafc;'}}) }}
+                    <small style="font-size: 10px; color: #7f8c8d;">* Automatique via taux de change</small>
                 </div>
 
                 {# --- SEUIL --- #}
@@ -43,7 +57,7 @@
 
             {# Champ caché ou lecture seule si nécessaire pour la cohérence #}
             {% if form.quantite_en_stock is defined %}
-            <div style="opacity: 0.7;">
+            <div style="opacity: 0.7; margin-top: 10px;">
                 <label class="form-label-modern"><i class="fa fa-warehouse"></i> Stock actuel (Lecture seule)</label>
                 {{ form_widget(form.quantite_en_stock, {'attr': {'class': 'form-input-modern', 'readonly': 'readonly'}}) }}
             </div>
@@ -58,6 +72,38 @@
         </div>
     {{ form_end(form) }}
 </div>
+
+<script>
+(function() {
+    const form = document.getElementById('edit-product-form');
+    const deviseSelect = form.querySelector('[name*="[devise]"]');
+    const prixAchatInput = form.querySelector('[name*="[prix_achat_devise]"]');
+    const prixUnitaireInput = form.querySelector('[name*="[prix_unitaire]"]');
+    
+    const rates = { 'EUR': 3.385, 'USD': 3.120, 'GBP': 3.920, 'DZD': 0.023, 'MAD': 0.312, 'TND': 1 };
+
+    function updatePreview() {
+        const amount = parseFloat(prixAchatInput.value) || 0;
+        const currency = deviseSelect.value;
+        
+        if (currency === 'TND') {
+            prixUnitaireInput.readOnly = false;
+            prixUnitaireInput.style.background = "white";
+        } else {
+            const estimation = amount * (rates[currency] || 1);
+            prixUnitaireInput.value = estimation.toFixed(3);
+            prixUnitaireInput.style.background = "#f1f5f9";
+            prixUnitaireInput.readOnly = true;
+        }
+    }
+
+    if (deviseSelect && prixAchatInput) {
+        deviseSelect.addEventListener('change', updatePreview);
+        prixAchatInput.addEventListener('input', updatePreview);
+        updatePreview(); // Init au chargement
+    }
+})();
+</script>
 
 <style>
     .form-label-modern {

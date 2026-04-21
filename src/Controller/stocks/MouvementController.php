@@ -149,45 +149,62 @@ class MouvementController extends AbstractController
     public function rotation(Request $request, CategorieRepository $catRepo, EntityManagerInterface $em): Response
     {
         $user = $this->getUser();
+        $dateDebutStr = $request->query->get('debut');
+        $dateFinStr = $request->query->get('fin');
+        
+        // Valeurs par défaut : 30 derniers jours si vide
+        $dateDebut = $dateDebutStr ? new \DateTime($dateDebutStr) : new \DateTime('-30 days');
+        $dateFin = $dateFinStr ? new \DateTime($dateFinStr . ' 23:59:59') : new \DateTime('now');
+
         $categories = $catRepo->findBy(['agriculteur' => $user]);
+        $stats = [];
+        $chartData = [
+            'labels' => [],
+            'entrees' => [],
+            'sorties' => []
+        ];
 
-        $rotationData = [];
-        foreach ($categories as $categorie) {
-            $totalEntrees = $em->getRepository(MouvementStock::class)
-                ->createQueryBuilder('m')
+        foreach ($categories as $cat) {
+            // Requête unique pour entrées et sorties
+            $mouvements = $em->getRepository(MouvementStock::class)->createQueryBuilder('m')
+                ->select('m.type, SUM(m.quantite) as total')
                 ->join('m.article', 'a')
-                ->where('a.categorie = :categorie')
-                ->andWhere('a.user = :user')
-                ->andWhere('m.type = :type')
-                ->setParameter('categorie', $categorie)
-                ->setParameter('user', $user)
-                ->setParameter('type', 'ENTREE')
-                ->select('SUM(m.quantite)')
+                ->where('a.categorie = :cat')
+                ->andWhere('m.dateMouvement >= :debut')
+                ->andWhere('m.dateMouvement <= :fin')
+                ->setParameter('cat', $cat)
+                ->setParameter('debut', \DateTimeImmutable::createFromMutable($dateDebut))
+                ->setParameter('fin', \DateTimeImmutable::createFromMutable($dateFin))
+                ->groupBy('m.type')
                 ->getQuery()
-                ->getSingleScalarResult() ?? 0;
+                ->getResult();
 
-            $totalSorties = $em->getRepository(MouvementStock::class)
-                ->createQueryBuilder('m')
-                ->join('m.article', 'a')
-                ->where('a.categorie = :categorie')
-                ->andWhere('a.user = :user')
-                ->andWhere('m.type = :type')
-                ->setParameter('categorie', $categorie)
-                ->setParameter('user', $user)
-                ->setParameter('type', 'SORTIE')
-                ->select('SUM(m.quantite)')
-                ->getQuery()
-                ->getSingleScalarResult() ?? 0;
+            $entrees = 0;
+            $sorties = 0;
+            foreach ($mouvements as $m) {
+                if ($m['type'] === 'ENTREE') $entrees = (float)$m['total'];
+                if ($m['type'] === 'SORTIE') $sorties = (float)$m['total'];
+            }
 
-            $rotationData[$categorie->getNom()] = [
-                'entrees' => $totalEntrees,
-                'sorties' => $totalSorties,
-                'rotation' => $totalSorties > 0 ? round(($totalEntrees / $totalSorties) * 100, 2) : 0
+            $indice = $sorties > 0 ? round($entrees / $sorties, 2) : ($entrees > 0 ? 1 : 0);
+
+            $stats[] = [
+                'categorie' => $cat,
+                'entrees' => $entrees,
+                'sorties' => $sorties,
+                'indice' => $indice
             ];
+
+            $chartData['labels'][] = $cat->getNom();
+            $chartData['entrees'][] = $entrees;
+            $chartData['sorties'][] = $sorties;
         }
 
         return $this->render('stocks/article/mouvement/rotation.html.twig', [
-            'rotationData' => $rotationData
+            'stats' => $stats,
+            'chartData' => $chartData,
+            'dateDebut' => $dateDebut->format('Y-m-d'),
+            'dateFin' => $dateFin->format('Y-m-d')
         ]);
     }
 

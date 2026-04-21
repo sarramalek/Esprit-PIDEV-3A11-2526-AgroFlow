@@ -58,7 +58,7 @@
             position: absolute;
             top: 70px;
             left: 0;
-            width: 210px;
+            width: 200px;
             background: white;
             border-radius: 0 0 14px 14px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
@@ -67,6 +67,7 @@
             z-index: 1000;
         }
         .dropdown-panel.show { display: block; animation: fadeIn 0.2s ease-out; }
+        
         .dropdown-item {
             display: flex;
             align-items: center;
@@ -79,6 +80,7 @@
         }
         .dropdown-item:hover { background: #f5faf4; color: #2D5A27; }
         .dropdown-item i { width: 24px; font-size: 14px; color: #2D5A27; margin-right: 12px; }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-5px); }
             to { opacity: 1; transform: translateY(0); }
@@ -214,6 +216,7 @@ checkAndRedirect();
             <a href="javascript:void(0)" class="nav-link" onclick="toggleDropdown('stocksMenu')">
                 <i class="fa fa-boxes-stacked"></i> Stocks <i class="fa fa-chevron-down" style="font-size: 8px; margin-left: 5px;"></i>
             </a>
+            
             <div class="dropdown-panel" id="stocksMenu">
                 <a href="{{ path('ouvrier_categories') }}" class="dropdown-item">
                     <i class="fa fa-tags"></i>
@@ -437,11 +440,10 @@ checkAndRedirect();
     /* ── Dropdown Stocks ── */
     function toggleDropdown(id) {
         const menu = document.getElementById(id);
-        if (!menu) return;
         menu.classList.toggle('show');
     }
 
-    /* ── Ouvrir / fermer le panel ── */
+    /* ── Ouvrir / fermer le profil ── */
     function toggleProfilePanel() {
         var panel   = document.getElementById('profilePanel');
         var chevron = document.getElementById('profileChevron');
@@ -457,9 +459,10 @@ checkAndRedirect();
             document.getElementById('profileChevron').style.transform = 'rotate(0deg)';
         }
 
+        // Stocks Dropdown
         var stocksDropdown = document.getElementById('stocksDropdown');
         if (stocksDropdown && !stocksDropdown.contains(e.target)) {
-            document.getElementById('stocksMenu')?.classList.remove('show');
+            document.getElementById('stocksMenu').classList.remove('show');
         }
     });
 

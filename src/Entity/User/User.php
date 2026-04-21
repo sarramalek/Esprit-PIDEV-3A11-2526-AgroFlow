@@ -3,10 +3,10 @@
 namespace App\Entity\User;
 
 use App\Repository\User\UserRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use App\Entity\Terrain\Terrain;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'users')]
@@ -61,13 +61,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $img = null;
 
-    #[ORM\ManyToOne(targetEntity: self::class)]
-    #[ORM\JoinColumn(name: 'id_agricole', referencedColumnName: 'cin', nullable: true, onDelete: 'SET NULL')]
-    private ?self $agriculteur = null;
-
     // CORRECTION : nullable: true et initialisation à null
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $telegramChatId = null;
+
+    /**
+     * Terrain auquel l'ouvrier est assigné (nullable).
+     * Un ouvrier appartient à un seul terrain à la fois.
+     */
+    #[ORM\ManyToOne(targetEntity: Terrain::class, inversedBy: 'ouvriers')]
+    #[ORM\JoinColumn(name: 'id_terrain', referencedColumnName: 'id_terrain', nullable: true, onDelete: 'SET NULL')]
+    private ?Terrain $terrain = null;
+
 
     // ==================== UserInterface ====================
 
@@ -78,13 +83,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
+        // On aligne les chiffres avec tes routes de sécurité
+        // 1 = Ouvrier, 2 = Agriculteur, 3 = Admin
         $roles = match ((int)$this->role) {
-            1 => ['ROLE_OUVRIER'],
-            2 => ['ROLE_AGRICULTEUR'],
-            3 => ['ROLE_ADMIN'],
+            1 => ['ROLE_OUVRIER'],      // Correspond à ^/ouvrier
+            2 => ['ROLE_AGRICULTEUR'],  // Correspond à ^/agriculteur
+            3 => ['ROLE_ADMIN'],        // Correspond à ^/admin
             default => [],
         };
 
+        // Toujours ajouter ROLE_USER par défaut
         $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
@@ -103,7 +111,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->cin;
     }
-
     public function setCin(int $cin): self
     {
         $this->cin = $cin;
@@ -114,7 +121,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->nom;
     }
-
     public function setNom(?string $nom): self
     {
         $this->nom = $nom;
@@ -125,7 +131,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->prenom;
     }
-
     public function setPrenom(?string $prenom): self
     {
         $this->prenom = $prenom;
@@ -136,7 +141,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->tel;
     }
-
     public function setTel(?string $tel): self
     {
         $this->tel = $tel;
@@ -147,7 +151,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->dateNaiss;
     }
-
     public function setDateNaiss(?\DateTimeInterface $dateNaiss): self
     {
         $this->dateNaiss = $dateNaiss;
@@ -158,7 +161,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->email;
     }
-
     public function setEmail(?string $email): self
     {
         $this->email = $email;
@@ -169,7 +171,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->mdp;
     }
-
     public function setMdp(?string $mdp): self
     {
         $this->mdp = $mdp;
@@ -180,7 +181,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->adresse;
     }
-
     public function setAdresse(?string $adresse): self
     {
         $this->adresse = $adresse;
@@ -191,7 +191,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->ville;
     }
-
     public function setVille(?string $ville): self
     {
         $this->ville = $ville;
@@ -202,7 +201,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->role;
     }
-
     public function setRole(?int $role): self
     {
         $this->role = $role;
@@ -213,7 +211,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->dateCreationcpt;
     }
-
     public function setDateCreationcpt(?\DateTimeInterface $dateCreationcpt): self
     {
         $this->dateCreationcpt = $dateCreationcpt;
@@ -224,7 +221,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->dateDernierchg;
     }
-
     public function setDateDernierchg(?\DateTimeInterface $dateDernierchg): self
     {
         $this->dateDernierchg = $dateDernierchg;
@@ -235,7 +231,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->twoFactorEnabled;
     }
-
     public function setTwoFactorEnabled(bool $twoFactorEnabled): self
     {
         $this->twoFactorEnabled = $twoFactorEnabled;
@@ -246,7 +241,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->twoFactorSecret;
     }
-
     public function setTwoFactorSecret(?string $twoFactorSecret): self
     {
         $this->twoFactorSecret = $twoFactorSecret;
@@ -257,21 +251,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->twoFactorBackupCodes;
     }
-
     public function setTwoFactorBackupCodes(?string $twoFactorBackupCodes): self
     {
         $this->twoFactorBackupCodes = $twoFactorBackupCodes;
-        return $this;
-    }
-
-    public function getAgriculteur(): ?self
-    {
-        return $this->agriculteur;
-    }
-
-    public function setAgriculteur(?self $agriculteur): self
-    {
-        $this->agriculteur = $agriculteur;
         return $this;
     }
 
@@ -279,13 +261,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->img;
     }
-
     public function setImg(?string $img): self
     {
         $this->img = $img;
         return $this;
     }
-
     public function getTelegramChatId(): ?string
     {
         return $this->telegramChatId;
@@ -294,6 +274,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setTelegramChatId(?string $telegramChatId): self
     {
         $this->telegramChatId = $telegramChatId;
+        return $this;
+    }
+
+    // ==================== TERRAIN ====================
+
+    public function getTerrain(): ?Terrain
+    {
+        return $this->terrain;
+    }
+
+    public function setTerrain(?Terrain $terrain): self
+    {
+        $this->terrain = $terrain;
         return $this;
     }
 }

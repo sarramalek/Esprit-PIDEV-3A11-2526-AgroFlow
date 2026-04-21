@@ -17,25 +17,25 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 class AuthController extends AbstractController
 {
     // ==================== LOGIN ====================
-   #[Route('/login', name: 'app_login')]
-public function login(AuthenticationUtils $authenticationUtils): Response
-{
-    if ($this->getUser()) {
-        return $this->redirectByRole($this->getUser());
+    #[Route('/login', name: 'app_login')]
+    public function login(AuthenticationUtils $authenticationUtils): Response
+    {
+        if ($this->getUser()) {
+            return $this->redirectByRole($this->getUser());
+        }
+
+        $error        = $authenticationUtils->getLastAuthenticationError();
+        $lastUsername = $authenticationUtils->getLastUsername();
+
+        $loginForm = $this->createForm(LoginFormType::class, [
+            '_username' => $lastUsername,
+        ]);
+
+        return $this->render('auth/login.html.twig', [
+            'loginForm' => $loginForm->createView(),
+            'error'     => $error,
+        ]);
     }
-
-    $error        = $authenticationUtils->getLastAuthenticationError();
-    $lastUsername = $authenticationUtils->getLastUsername();
-
-    $loginForm = $this->createForm(LoginFormType::class, [
-        '_username' => $lastUsername,
-    ]);
-
-   return $this->render('auth/login.html.twig', [
-    'loginForm' => $loginForm->createView(),
-    'error'     => $error,   // ← obligatoire
-]);
-}
 
     // ==================== REGISTER ====================
     #[Route('/register', name: 'app_register')]
@@ -61,7 +61,6 @@ public function login(AuthenticationUtils $authenticationUtils): Response
             $em->persist($user);
             $em->flush();
 
-            // Redirection selon le rôle après inscription
             return $this->redirectByRole($user);
         }
 
@@ -82,19 +81,16 @@ public function login(AuthenticationUtils $authenticationUtils): Response
 
     // ==================== LOGOUT ====================
     #[Route('/logout', name: 'app_logout')]
-    public function logout(): void
-    {
-        // Géré automatiquement par Symfony Security
-    }
+    public function logout(): void {}
 
     // ==================== REDIRECTION PAR ROLE ====================
-   private function redirectByRole($user): Response
-{
-    return match((int)$user->getRole()) {
-        1       => $this->redirectToRoute('ouvrier_home'),
-        2       => $this->redirectToRoute('agri_home'),
-        3       => $this->redirectToRoute('admin_dashboard'),
-        default => $this->redirectToRoute('app_login'),
-    };
-}
+    private function redirectByRole($user): Response
+    {
+        return match ((int)$user->getRole()) {
+            1       => $this->redirectToRoute('ouvrier_dashboard'),
+            2       => $this->redirectToRoute('agri_home'),
+            3       => $this->redirectToRoute('admin_dashboard'),
+            default => $this->redirectToRoute('app_login'), // ← add this
+        };
+    }
 }

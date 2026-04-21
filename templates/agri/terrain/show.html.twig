@@ -1,0 +1,151 @@
+{% extends 'base_agriculteur.html.twig' %}
+{% block title %}{{ terrain.nomTerrain }} — AgroFlow{% endblock %}
+
+{% block stylesheets %}
+<style>
+.show-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+
+.show-card {
+    background:#fff; border-radius:12px; border:1px solid #e8e4d0;
+    overflow:hidden;
+}
+.show-card-header {
+    background:linear-gradient(135deg,#1A3A1F,#2D5A27);
+    padding:18px 22px;
+}
+.show-card-header h2 { font-size:18px; font-weight:700; color:#fff; }
+.show-card-header p  { font-size:12px; color:rgba(255,255,255,.6); margin-top:3px; }
+.show-card-body { padding:20px 22px; }
+
+.info-row {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:11px 0; border-bottom:1px solid #F0EAD0;
+}
+.info-row:last-child { border-bottom:none; }
+.info-label { font-size:12px; color:#7A8A95; font-weight:600;
+              text-transform:uppercase; letter-spacing:.06em; }
+.info-value { font-size:14px; font-weight:600; color:#1C2B3A; }
+
+.badge-sol {
+    background:#f0fff4; color:#2D5A27; border:1px solid #C8E6C0;
+    padding:3px 12px; border-radius:20px; font-size:12px; font-weight:600;
+}
+
+.ph-meter { width:100%; }
+.ph-meter-bar { height:10px; background:#F0EAD0; border-radius:5px; margin-top:6px; }
+.ph-meter-fill { height:100%; border-radius:5px;
+                 background:linear-gradient(90deg,#4A8C3F,#C8E6C0); }
+
+.rot-list { list-style:none; }
+.rot-list li {
+    display:flex; align-items:center; gap:10px;
+    padding:10px 0; border-bottom:1px solid #F0EAD0; font-size:13px;
+}
+.rot-list li:last-child { border-bottom:none; }
+.rot-dot { width:8px; height:8px; border-radius:50%; background:#4A8C3F; flex-shrink:0; }
+
+.back-bar { display:flex; gap:10px; margin-bottom:22px; }
+.btn-back {
+    background:#FCF8E6; color:#1C2B3A; border:1px solid #e8e4d0;
+    padding:9px 18px; border-radius:8px; font-weight:600; font-size:13px;
+    text-decoration:none; display:inline-flex; align-items:center; gap:7px;
+}
+.btn-edit-top {
+    background:#ebf8ff; color:#2b6cb0; border:1px solid #bee3f8;
+    padding:9px 18px; border-radius:8px; font-weight:600; font-size:13px;
+    text-decoration:none; display:inline-flex; align-items:center; gap:7px;
+}
+</style>
+{% endblock %}
+
+{% block body %}
+
+<div class="back-bar">
+    <a href="{{ path('agri_terrains') }}" class="btn-back">
+        <i class="fa fa-arrow-left"></i> Mes terrains
+    </a>
+    <a href="{{ path('agri_terrains_edit', {id: terrain.id}) }}" class="btn-edit-top">
+        <i class="fa fa-pen"></i> Modifier
+    </a>
+    <!-- Bouton PDF avec le même style que "Modifier" -->
+    <a href="{{ path('agri_terrains_certificat_propriete', {id: terrain.id}) }}" 
+       class="btn-pdf" 
+       target="_blank">
+        <i class="fa fa-file-pdf"></i> Certificat PDF
+    </a>
+</div>
+
+<div class="show-grid">
+
+    {# Infos générales #}
+    <div class="show-card">
+        <div class="show-card-header">
+            <h2>{{ terrain.nomTerrain }}</h2>
+            <p><i class="fa fa-location-dot"></i> {{ terrain.localisation }}</p>
+        </div>
+        <div class="show-card-body">
+            <div class="info-row">
+                <span class="info-label">Surface</span>
+                <span class="info-value">{{ terrain.surface }} ha</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Type de sol</span>
+                <span class="badge-sol">{{ terrain.typeSol }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Localisation</span>
+                <span class="info-value">{{ terrain.localisation }}</span>
+            </div>
+            <div class="info-row" style="flex-direction:column;align-items:flex-start;gap:6px">
+                <span class="info-label">pH du sol — {{ terrain.pH ?? '—' }}/14</span>
+                {% if terrain.pH %}
+                <div class="ph-meter-bar" style="width:100%">
+                    <div class="ph-meter-fill"
+                         style="width:{{ ((terrain.pH / 14) * 100)|round }}%">
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {# Rotations associées #}
+    <div class="show-card">
+        <div class="show-card-header">
+            <h2>Rotations de culture</h2>
+            <p>{{ terrain.rotations|length }} rotation(s) enregistrée(s)</p>
+        </div>
+        <div class="show-card-body">
+            {% if terrain.rotations is empty %}
+                <p style="color:#7A8A95;font-size:13px;text-align:center;padding:20px 0">
+                    <i class="fa fa-seedling" style="font-size:24px;display:block;margin-bottom:8px;opacity:.3"></i>
+                    Aucune rotation enregistrée
+                </p>
+            {% else %}
+                <ul class="rot-list">
+                {% for rot in terrain.rotations %}
+                    <li>
+                        <span class="rot-dot"></span>
+                        <div>
+                            <strong>{{ rot.plante.nomP ?? 'Plante' }}</strong>
+                            <div style="font-size:11px;color:#7A8A95">
+    {{ rot.dateDebutT is defined ? rot.dateDebutT|date('d/m/Y') : (rot.getDateDebutT() ?? '—') }}
+    → 
+    {{ rot.dateFinT is defined ? rot.dateFinT|date('d/m/Y') : (rot.getDateFinT() ?? '—') }}
+</div>
+                        </div>
+                        <span style="margin-left:auto">
+                            <span style="background:{% if rot.status == 1 %}#f0fff4;color:#276749{% else %}#fffbeb;color:#92400e{% endif %};
+                                         padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600">
+                                {{ rot.status == 1 ? 'Actif' : 'Terminé' }}
+                            </span>
+                        </span>
+                    </li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

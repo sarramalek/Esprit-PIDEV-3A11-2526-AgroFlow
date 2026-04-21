@@ -15,7 +15,7 @@
             <p style="margin:5px 0 0; color:#6c757d; font-size: 15px;">Suivi détaillé des entrées et sorties de votre inventaire</p>
         </div>
         <div style="display: flex; gap: 12px;">
-             <a href="{{ path('app_mouvement_export_pdf', app.request.query.all) }}" class="btn-export-pdf">
+             <a href="{{ path('app_mouvement_pdf', app.request.query.all) }}" class="btn-export-pdf">
                 <i class="fas fa-file-pdf"></i> PDF
             </a>
             <a href="{{ path('agri_produits') }}" class="btn-back-stock">
