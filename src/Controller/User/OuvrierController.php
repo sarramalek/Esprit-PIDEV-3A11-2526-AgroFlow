@@ -130,12 +130,16 @@ class OuvrierController extends AbstractController
             $detailUrl     = $this->resolveDetailUrl($categorie, $nom, $animaux, $terrains, $plantes, $isPlante, $maintenances);
             $detailLabel   = $this->resolveDetailLabel($categorie, $isPlante);
 
+            // Conserver la priorité brute (FR) pour le badge de couleur
+            $prioriteRaw = $t->getPriorite();
+
             return [
                 'id'             => $t->getIdTache(),
                 'titre'          => $taskTranslator->translate($t->getNomTache() ?? '', $locale),
                 'description'    => $taskTranslator->translate($t->getDescription() ?? '', $locale),
                 'statut'         => $this->mapStatut($t->getEtat()),
-                'priorite'       => $t->getPriorite(),
+                'priorite'       => $taskTranslator->translate($prioriteRaw ?? '', $locale),
+                'priorite_raw'   => $prioriteRaw,
                 'dateDebut'      => null,
                 'dateFin'        => $t->getDateEcheancee(),
                 'categorie'      => $categorie,
@@ -252,14 +256,24 @@ class OuvrierController extends AbstractController
         if (!$categorie) return null;
 
         switch ($categorie) {
+
             case 'animal':
+                // 1. Chercher par nom exact de l'animal dans le texte de la tâche
                 foreach ($animaux as $animal) {
                     $nomAnimal = strtolower($animal->getNom() ?? '');
                     if ($nomAnimal && str_contains($texte, $nomAnimal)) {
                         return $this->generateUrl('app_animaux_show', ['id' => $animal->getId()]);
                     }
                 }
-                return !empty($animaux) ? $this->generateUrl('app_animaux_index') : null;
+                // 2. Chercher par espèce de l'animal dans le texte
+                foreach ($animaux as $animal) {
+                    $espece = strtolower($animal->getEspece() ?? '');
+                    if ($espece && str_contains($texte, $espece)) {
+                        return $this->generateUrl('app_animaux_show', ['id' => $animal->getId()]);
+                    }
+                }
+                // 3. Fallback : rediriger vers la liste des animaux
+                return !empty($animaux) ? $this->generateUrl('app_animaux_show', ['id' => $animaux[0]->getId()]) : null;
 
             case 'maintenance':
                 foreach ($maintenances as $maintenance) {
