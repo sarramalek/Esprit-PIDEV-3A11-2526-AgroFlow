@@ -6,7 +6,10 @@ use App\Entity\Animals\Animaux;
 use App\Form\Animals\AnimauxType;
 use App\Repository\Animals\AnimauxRepository;
 use App\Service\PdfService;
+use App\Service\Animals\OpenFoodFactsService;
+use App\Service\Animals\RescueGroupsService;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,27 +21,45 @@ final class AnimauxController extends AbstractController
 {
     #[Route(name: 'app_animaux_index', methods: ['GET'])]
     #[IsGranted('ROLE_AGRICULTEUR')]
-    public function index(Request $request, AnimauxRepository $animauxRepository): Response
+    public function index(Request $request, AnimauxRepository $animauxRepository, RescueGroupsService $rescueGroupsService, PaginatorInterface $paginator): Response
     {
         $user = $this->getUser();
         $searchTerm = $request->query->get('q');
-        $sortBy = $request->query->get('sort', 'id');
-        $direction = $request->query->get('direction', 'DESC');
+        $sortBy = $request->query->get('sortBy', 'id');
+        $direction = $request->query->get('sortDirection', 'DESC');
+        $page = $request->query->getInt('page', 1);
+        $limit = 5; // Nombre d'animaux par page
 
         // Admin voit tout, Agriculteur voit les siens
         $filterUser = $this->isGranted('ROLE_ADMIN') ? null : $user;
         
-        $animaux = $animauxRepository->searchDashboard($searchTerm, $sortBy, $direction, $filterUser);
+        // Requête sans pagination d'abord pour obtenir tous les résultats
+        $query = $animauxRepository->createQueryBuilderForSearch($searchTerm, $sortBy, $direction, $filterUser);
+        
+        // Appliquer la pagination sans tri automatique (tri déjà appliqué au QueryBuilder)
+        $animaux = $paginator->paginate(
+            $query,
+            $page,
+            $limit,
+            [
+                'sortFieldParameterName' => false,
+                'sortDirectionParameterName' => false,
+            ]
+        );
         
         // Moyennes globales par espèce pour le calcul de l'IQ (Index Qualité)
         $averages = $animauxRepository->getAverageWeightsBySpecies();
+
+        // Récupérer les encyclopédies de toutes les espèces
+        $encyclopedias = $rescueGroupsService->getAllEncyclopedias();
 
         return $this->render('Animals/animaux/index.html.twig', [
             'animaux' => $animaux,
             'searchTerm' => $searchTerm,
             'currentSort' => $sortBy,
             'currentDirection' => $direction,
-            'averages' => $averages
+            'averages' => $averages,
+            'encyclopedias' => $encyclopedias,
         ]);
     }
 
@@ -80,15 +101,19 @@ final class AnimauxController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_animaux_show', methods: ['GET'])]
-    public function show(Animaux $animaux): Response
+    public function show(Animaux $animaux, OpenFoodFactsService $openFoodFactsService): Response
     {
         // Sécurité : l'agriculteur ne peut voir que ses animaux
         if (!$this->isGranted('ROLE_ADMIN') && $animaux->getUser() !== $this->getUser()) {
             throw $this->createAccessDeniedException("Vous n'avez pas accès à cet animal.");
         }
 
+        // Récupérer les suggestions alimentaires pour l'espèce de l'animal
+        $foodSuggestions = $openFoodFactsService->getFoodSuggestionsForSpecies($animaux->getEspece());
+
         return $this->render('Animals/animaux/show.html.twig', [
             'animaux' => $animaux,
+            'foodSuggestions' => $foodSuggestions,
         ]);
     }
 

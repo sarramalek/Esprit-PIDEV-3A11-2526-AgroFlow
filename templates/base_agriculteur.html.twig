@@ -562,7 +562,7 @@ checkAndRedirect();
 {% endif %}
 
 <body>
-
+{% include '_tts_button.html.twig' %}
 <header class="header">
 
     <a href="{{ path('agri_home') }}" class="header-brand">
@@ -578,17 +578,18 @@ checkAndRedirect();
             </a>
         </div>
 
-        <div class="nav-item">
-            <a href="{{ path('app_animaux_index') }}"
-               class="nav-link {% if app.request.get('_route') in ['app_animaux_index','app_examens_index'] %}active{% endif %}">
-                <i class="fa fa-paw"></i> Animaux
-                <i class="fa fa-chevron-down chevron"></i>
-            </a>
-            <div class="dropdown">
-                <a href="{{ path('app_animaux_index') }}"><i class="fa fa-paw"></i> Mes animaux</a>
-                <a href="{{ path('app_examens_index') }}"><i class="fa fa-stethoscope"></i> Examens vétérinaires</a>
+            {# Animaux #}
+            <div class="nav-item">
+                <a href="{{ path('app_animaux_index') }}"
+                   class="nav-link {% if app.request.get('_route') in ['app_animaux_index','app_examens_index'] %}active{% endif %}">
+                    <i class="fa fa-paw"></i> Animaux
+                    <i class="fa fa-chevron-down chevron"></i>
+                </a>
+                <div class="dropdown">
+                    <a href="{{ path('app_animaux_index') }}"><i class="fa fa-paw"></i> Mes animaux</a>
+                    <a href="{{ path('app_examens_index') }}"><i class="fa fa-stethoscope"></i> Examens vétérinaires</a>
+                </div>
             </div>
-        </div>
 
         <div class="nav-item">
             <a href="{{ path('agri_categories') }}"
@@ -602,18 +603,18 @@ checkAndRedirect();
             </div>
         </div>
 
-        <div class="nav-item">
-            <a href="{{ path('agri_terrains') }}"
-               class="nav-link {% if app.request.get('_route') in ['agri_terrains','agri_rotations'] %}active{% endif %}">
-                <i class="fa fa-map"></i> Terrains
-                <i class="fa fa-chevron-down chevron"></i>
-            </a>
-            <div class="dropdown">
-                <a href="{{ path('agri_terrains') }}"><i class="fa fa-map"></i> Mes terrains</a>
-                <a href="{{ path('agri_plantes') }}"><i class="fa fa-seedling"></i> Mes plantes</a>
-                <a href="{{ path('agri_rotations') }}"><i class="fa fa-rotate"></i> Rotations de culture</a>
+            {# Terrains #}
+            <div class="nav-item">
+                <a href="{{ path('agri_terrains') }}"
+                   class="nav-link {% if app.request.get('_route') in ['agri_terrains','agri_rotations'] %}active{% endif %}">
+                    <i class="fa fa-map"></i> Terrains
+                    <i class="fa fa-chevron-down chevron"></i>
+                </a>
+                <div class="dropdown">
+                    <a href="{{ path('agri_terrains') }}"><i class="fa fa-map"></i> Mes terrains</a>
+                    <a href="{{ path('agri_rotations') }}"><i class="fa fa-rotate"></i> Rotations de culture</a>
+                </div>
             </div>
-        </div>
 
         <div class="nav-item">
             <a href="{{ path('agri_machines') }}"

@@ -1,0 +1,228 @@
+{% extends 'base_agriculteur.html.twig' %}
+
+{% block title %}AgroFlow - Tableau de Bord des Rappels{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .reminder-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            border-left: 5px solid #3498db;
+            transition: transform 0.3s ease;
+        }
+        .reminder-card:hover { transform: translateY(-2px); }
+
+        .reminder-card.soon {
+            border-left-color: #e74c3c;
+            background: rgba(231, 76, 60, 0.02);
+        }
+
+        .reminder-card.overdue {
+            border-left-color: #e67e22;
+            background: rgba(230, 126, 34, 0.02);
+        }
+
+        .reminder-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin-right: 15px;
+        }
+
+        .reminder-icon.soon { background: #e74c3c; color: white; }
+        .reminder-icon.upcoming { background: #3498db; color: white; }
+        .reminder-icon.overdue { background: #e67e22; color: white; }
+
+        .reminder-date {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .reminder-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-soon {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .badge-upcoming {
+            background: #27ae60;
+            color: white;
+        }
+
+        .badge-overdue {
+            background: #e67e22;
+            color: white;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stats-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        .stats-number {
+            font-size: 36px;
+            font-weight: 800;
+            color: #2D5A27;
+            margin-bottom: 10px;
+        }
+
+        .stats-label {
+            font-size: 14px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div style="padding: 10px;">
+        <!-- Header : Breadcrumb -->
+        <div style="margin-bottom: 25px; color: #666; font-size: 14px;">
+            <span>Gestion</span> <i class="fa fa-chevron-right" style="font-size: 10px; margin: 0 5px;"></i>
+            <strong style="color: #2C3E50;">Tableau de Bord des Rappels</strong>
+        </div>
+
+        <div style="background: white; border-radius: 15px; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px;">
+            <h2 style="margin: 0 0 20px 0; color: #2C3E50; font-size: 20px;">
+                <i class="fa fa-calendar-check" style="color: #3498db; margin-right: 10px;"></i>
+                Système de Rappels Intelligents
+            </h2>
+
+            <!-- Statistiques -->
+            <div class="stats-grid">
+                <div class="stats-card">
+                    <div class="stats-number">{{ total_active }}</div>
+                    <div class="stats-label">Rappels Actifs</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-number" style="color: #e74c3c;">{{ upcoming_reminders|length }}</div>
+                    <div class="stats-label">Bientôt</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-number" style="color: #e67e22;">{{ overdue_reminders|length }}</div>
+                    <div class="stats-label">En Retard</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rappels Bientôt -->
+        {% if upcoming_reminders is not empty %}
+        <div style="background: white; border-radius: 15px; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px;">
+            <h3 style="margin: 0 0 20px 0; color: #e74c3c; font-size: 18px;">
+                <i class="fa fa-exclamation-triangle" style="margin-right: 10px;"></i>
+                Rappels Arrivant Bientôt
+            </h3>
+
+            {% for examen in upcoming_reminders %}
+            <div class="reminder-card soon">
+                <div style="display: flex; align-items: center;">
+                    <div class="reminder-icon soon">
+                        <i class="fa fa-bell"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <strong style="font-size: 16px; color: #2C3E50;">{{ examen.animal.nom }}</strong>
+                        <div style="font-size: 14px; color: #666; margin-top: 2px;">{{ examen.reminderType }}</div>
+                        <div class="reminder-date">
+                            <i class="fa fa-calendar" style="margin-right: 5px;"></i>
+                            {{ examen.nextReminderDate|date('d/m/Y') }}
+                        </div>
+                    </div>
+                    <div>
+                        <span class="reminder-badge badge-soon">Bientôt</span>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+                    <a href="{{ path('app_examens_show', {'id': examen.id}) }}" style="color: #3498db; text-decoration: none; font-size: 14px;">
+                        <i class="fa fa-eye" style="margin-right: 5px;"></i>
+                        Voir le rapport
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Rappels en Retard -->
+        {% if overdue_reminders is not empty %}
+        <div style="background: white; border-radius: 15px; padding: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 30px;">
+            <h3 style="margin: 0 0 20px 0; color: #e67e22; font-size: 18px;">
+                <i class="fa fa-clock" style="margin-right: 10px;"></i>
+                Rappels en Retard
+            </h3>
+
+            {% for examen in overdue_reminders %}
+            <div class="reminder-card overdue">
+                <div style="display: flex; align-items: center;">
+                    <div class="reminder-icon overdue">
+                        <i class="fa fa-exclamation-circle"></i>
+                    </div>
+                    <div style="flex: 1;">
+                        <strong style="font-size: 16px; color: #2C3E50;">{{ examen.animal.nom }}</strong>
+                        <div style="font-size: 14px; color: #666; margin-top: 2px;">{{ examen.reminderType }}</div>
+                        <div class="reminder-date">
+                            <i class="fa fa-calendar" style="margin-right: 5px;"></i>
+                            {{ examen.nextReminderDate|date('d/m/Y') }}
+                        </div>
+                    </div>
+                    <div>
+                        <span class="reminder-badge badge-overdue">En retard</span>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee;">
+                    <a href="{{ path('app_examens_show', {'id': examen.id}) }}" style="color: #3498db; text-decoration: none; font-size: 14px;">
+                        <i class="fa fa-eye" style="margin-right: 5px;"></i>
+                        Voir le rapport
+                    </a>
+                    <a href="{{ path('app_examens_new') }}" style="color: #27ae60; text-decoration: none; font-size: 14px; margin-left: 15px;">
+                        <i class="fa fa-plus" style="margin-right: 5px;"></i>
+                        Nouveau rappel
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Message si aucun rappel -->
+        {% if upcoming_reminders is empty and overdue_reminders is empty %}
+        <div style="background: white; border-radius: 15px; padding: 40px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center;">
+            <div style="font-size: 48px; color: #ddd; margin-bottom: 20px;">
+                <i class="fa fa-calendar-check"></i>
+            </div>
+            <h3 style="color: #666; margin-bottom: 10px;">Aucun rappel actif</h3>
+            <p style="color: #999; margin-bottom: 20px;">Tous vos rappels sont à jour. Les nouveaux vaccins créeront automatiquement des rappels.</p>
+            <a href="{{ path('app_examens_index') }}" style="background: #2D5A27; color: white; padding: 12px 25px; border-radius: 8px; text-decoration: none; font-weight: bold;">
+                <i class="fa fa-stethoscope" style="margin-right: 8px;"></i>
+                Voir les examens
+            </a>
+        </div>
+        {% endif %}
+    </div>
+{% endblock %}
