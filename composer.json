@@ -15,6 +15,7 @@
         "doctrine/instantiator": "1.5",
         "doctrine/orm": "^2.19",
         "dompdf/dompdf": "^3.1",
+        "endroid/qr-code": "5.0",
         "gedmo/doctrine-extensions": "*",
         "knplabs/knp-paginator-bundle": "^6.10",
         "phpdocumentor/reflection-docblock": "^5.2",

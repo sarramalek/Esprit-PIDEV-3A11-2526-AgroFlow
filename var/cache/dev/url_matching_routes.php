@@ -79,7 +79,6 @@ return [
             [['_route' => 'ouvrier_evenement_index', '_controller' => 'App\\Controller\\Evenements\\Ouvrier\\EvenementController::index'], null, null, null, false, false, null],
             [['_route' => 'ouvrier_evenements', '_controller' => 'App\\Controller\\User\\OuvrierController::evenements'], null, null, null, false, false, null],
         ],
-        '/ouvrier/participations' => [[['_route' => 'ouvrier_participation_index', '_controller' => 'App\\Controller\\Evenements\\Ouvrier\\ParticipationController::index'], null, null, null, true, false, null]],
         '/evenements' => [[['_route' => 'evenement_index', '_controller' => 'App\\Controller\\Evenements\\EvenementController::index'], null, null, null, false, false, null]],
         '/evenements/ajouter' => [[['_route' => 'evenement_ajouter', '_controller' => 'App\\Controller\\Evenements\\EvenementController::ajouter'], null, null, null, false, false, null]],
         '/participations' => [[['_route' => 'participation_index', '_controller' => 'App\\Controller\\Evenements\\ParticipationController::index'], null, null, null, false, false, null]],
@@ -95,6 +94,10 @@ return [
         '/agriculteur/maintenances/new' => [[['_route' => 'agri_maintenances_new', '_controller' => 'App\\Controller\\Materiels\\MaintenancesController::new'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
         '/agriculteur/maintenances/export/excel' => [[['_route' => 'agri_maintenances_export_excel', '_controller' => 'App\\Controller\\Materiels\\MaintenancesController::exportExcel'], null, ['GET' => 0], null, false, false, null]],
         '/agriculteur/maintenances/export/pdf' => [[['_route' => 'agri_maintenances_export_pdf', '_controller' => 'App\\Controller\\Materiels\\MaintenancesController::exportPdf'], null, ['GET' => 0], null, false, false, null]],
+        '/ouvrier/stocks/categories' => [[['_route' => 'ouvrier_categories', '_controller' => 'App\\Controller\\OuvrierDashboardController::categories'], null, null, null, false, false, null]],
+        '/ouvrier/stocks/produits' => [[['_route' => 'ouvrier_produits', '_controller' => 'App\\Controller\\OuvrierDashboardController::produits'], null, null, null, false, false, null]],
+        '/ouvrier/profile/update' => [[['_route' => 'ouvrier_profile_update', '_controller' => 'App\\Controller\\OuvrierDashboardController::profileUpdate'], null, ['POST' => 0], null, false, false, null]],
+        '/ouvrier/participations' => [[['_route' => 'ouvrier_participation_index', '_controller' => 'App\\Controller\\OuvrierDashboardController::participations'], null, null, null, false, false, null]],
         '/agri/plantes' => [[['_route' => 'agri_plantes', '_controller' => 'App\\Controller\\Terrain\\AgriPlanteController::index'], null, ['GET' => 0], null, false, false, null]],
         '/agri/plantes/new' => [[['_route' => 'agri_plantes_new', '_controller' => 'App\\Controller\\Terrain\\AgriPlanteController::new'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
         '/agri/rotations' => [[['_route' => 'agri_rotations', '_controller' => 'App\\Controller\\Terrain\\AgriRotationController::index'], null, ['GET' => 0], null, false, false, null]],
@@ -137,14 +140,19 @@ return [
         '/tache/new' => [[['_route' => 'app_tache_new', '_controller' => 'App\\Controller\\User\\TacheController::new'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
         '/agriculteur/tache/front' => [[['_route' => 'app_tache_front', '_controller' => 'App\\Controller\\User\\TacheFrontController::front'], null, ['GET' => 0], null, false, false, null]],
         '/agriculteur/tache/auto-assigner' => [[['_route' => 'app_tache_auto_assigner', '_controller' => 'App\\Controller\\User\\TacheFrontController::autoAssigner'], null, ['POST' => 0], null, false, false, null]],
+        '/admin/gestion-stocks' => [[['_route' => 'admin_stock_index', '_controller' => 'App\\Controller\\stocks\\AdminStockController::index'], null, ['GET' => 0], null, true, false, null]],
         '/admin/gestion-stocks/ajouter-produit' => [[['_route' => 'admin_stock_new', '_controller' => 'App\\Controller\\stocks\\AdminStockController::new'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        '/admin/gestion-stocks/export/pdf' => [[['_route' => 'admin_stock_pdf', '_controller' => 'App\\Controller\\stocks\\AdminStockController::exportPdf'], null, null, null, false, false, null]],
+        '/admin/gestion-stocks/mouvements' => [[['_route' => 'admin_stock_mouvements', '_controller' => 'App\\Controller\\stocks\\AdminStockController::mouvements'], null, ['GET' => 0], null, false, false, null]],
+        '/admin/gestion-stocks/categories' => [[['_route' => 'admin_categories_index', '_controller' => 'App\\Controller\\stocks\\Admin_CategorieController::index'], null, ['GET' => 0], null, false, false, null]],
         '/admin/gestion-stocks/ajouter-categorie' => [[['_route' => 'admin_categorie_new', '_controller' => 'App\\Controller\\stocks\\Admin_CategorieController::new'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
         '/agriculteur/stocks' => [[['_route' => 'agri_produits', '_controller' => 'App\\Controller\\stocks\\ArticleController::index'], null, ['GET' => 0, 'POST' => 1], null, true, false, null]],
         '/agriculteur/stocks/new' => [[['_route' => 'app_article_new', '_controller' => 'App\\Controller\\stocks\\ArticleController::new'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
         '/agriculteur/stocks/categories/new' => [[['_route' => 'agri_categories_new', '_controller' => 'App\\Controller\\stocks\\CategorieController::new'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
         '/agriculteur/mouvements' => [[['_route' => 'app_mouvement_index', '_controller' => 'App\\Controller\\stocks\\MouvementController::historique'], null, null, null, false, false, null]],
         '/agriculteur/mouvements/rotation' => [[['_route' => 'app_mouvement_rotation', '_controller' => 'App\\Controller\\stocks\\MouvementController::rotation'], null, null, null, false, false, null]],
-        '/agriculteur/mouvements/export' => [[['_route' => 'app_mouvement_export_pdf', '_controller' => 'App\\Controller\\stocks\\MouvementController::exportPdf'], null, null, null, false, false, null]],
+        '/agriculteur/mouvements/pdf' => [[['_route' => 'app_mouvement_pdf', '_controller' => 'App\\Controller\\stocks\\MouvementController::exportPdf'], null, null, null, false, false, null]],
+        '/agriculteur/api/vision/analyze' => [[['_route' => 'api_vision_analyze', '_controller' => 'App\\Controller\\stocks\\VisionController::analyze'], null, ['POST' => 0], null, false, false, null]],
         '/agriculteur/maintenances/api/gemini/generate' => [[['_route' => 'agri_maintenances_api_gemini_generate', '_controller' => 'App\\Controller\\Materiels\\MaintenancesController::generateWithGemini'], null, ['POST' => 0], null, false, false, null]],
     ],
     [ // $regexpList
@@ -214,94 +222,116 @@ return [
                             .'|(\\d+)/pdf(*:688)'
                             .'|(\\d+)/edit(*:706)'
                         .')'
+                        .'|gestion\\-stocks/(?'
+                            .'|([^/]++)/(?'
+                                .'|edit(*:750)'
+                                .'|delete(*:764)'
+                            .')'
+                            .'|mouvement/([^/]++)(*:791)'
+                            .'|categorie/([^/]++)/(?'
+                                .'|edit(*:825)'
+                                .'|delete(*:839)'
+                            .')'
+                        .')'
                     .')'
                     .'|nimaux/([^/]++)(?'
-                        .'|(*:734)'
+                        .'|(*:868)'
                         .'|/(?'
                             .'|e(?'
                                 .'|xport/(?'
-                                    .'|card(*:763)'
-                                    .'|medical(*:778)'
+                                    .'|card(*:897)'
+                                    .'|medical(*:912)'
                                 .')'
-                                .'|dit(*:790)'
+                                .'|dit(*:924)'
                             .')'
-                            .'|match(*:804)'
+                            .'|match(*:938)'
                         .')'
-                        .'|(*:813)'
+                        .'|(*:947)'
                     .')'
-                    .'|pi/terrains/([^/]++)(*:842)'
+                    .'|pi/terrains/([^/]++)(*:976)'
                     .'|gri(?'
                         .'|culteur/(?'
-                            .'|evenements/inscription/([^/]++)(*:898)'
+                            .'|evenements/inscription/([^/]++)(*:1032)'
                             .'|participations/(?'
-                                .'|modifier/([^/]++)(*:941)'
-                                .'|annuler/([^/]++)(*:965)'
+                                .'|modifier/([^/]++)(*:1076)'
+                                .'|annuler/([^/]++)(*:1101)'
                             .')'
                             .'|m(?'
                                 .'|a(?'
                                     .'|teriels/machines/(?'
-                                        .'|(\\d+)(*:1007)'
-                                        .'|(\\d+)/edit(*:1026)'
-                                        .'|(\\d+)/delete(*:1047)'
+                                        .'|(\\d+)(*:1144)'
+                                        .'|(\\d+)/edit(*:1163)'
+                                        .'|(\\d+)/delete(*:1184)'
                                     .')'
                                     .'|intenances/(?'
                                         .'|api/(?'
-                                            .'|generate\\-custom\\-prompt/([^/]++)(*:1111)'
-                                            .'|calendar/([^/]++)(*:1137)'
-                                            .'|lifetime/([^/]++)(*:1163)'
+                                            .'|generate\\-custom\\-prompt/([^/]++)(*:1248)'
+                                            .'|calendar/([^/]++)(*:1274)'
+                                            .'|lifetime/([^/]++)(*:1300)'
                                         .')'
                                         .'|([^/]++)(?'
-                                            .'|(*:1184)'
+                                            .'|(*:1321)'
                                             .'|/(?'
-                                                .'|edit(*:1201)'
-                                                .'|delete(*:1216)'
+                                                .'|edit(*:1338)'
+                                                .'|delete(*:1353)'
                                             .')'
                                         .')'
                                         .'|api/(?'
-                                            .'|diagnostics/(\\d+)(*:1251)'
-                                            .'|schedule/(\\d+)(*:1274)'
+                                            .'|diagnostics/(\\d+)(*:1388)'
+                                            .'|schedule/(\\d+)(*:1411)'
                                         .')'
                                     .')'
                                 .')'
-                                .'|ouvements/new/([^/]++)(*:1308)'
+                                .'|ouvements/new/([^/]++)(*:1445)'
                             .')'
-                            .'|abonnement/front/pdf/([^/]++)(*:1347)'
+                            .'|abonnement/front/pdf/([^/]++)(*:1484)'
                             .'|o(?'
-                                .'|ffre/souscrire/([^/]++)(*:1383)'
+                                .'|ffre/souscrire/([^/]++)(*:1520)'
                                 .'|uvriers/(?'
                                     .'|([^/]++)/(?'
-                                        .'|modifier(*:1423)'
-                                        .'|supprimer(*:1441)'
+                                        .'|modifier(*:1560)'
+                                        .'|supprimer(*:1578)'
                                         .'|taches(?'
-                                            .'|(*:1459)'
-                                            .'|/ajouter(*:1476)'
+                                            .'|(*:1596)'
+                                            .'|/ajouter(*:1613)'
                                         .')'
                                     .')'
                                     .'|tache/([^/]++)/(?'
-                                        .'|etat(*:1509)'
-                                        .'|supprimer(*:1527)'
+                                        .'|etat(*:1646)'
+                                        .'|supprimer(*:1664)'
                                     .')'
                                 .')'
                             .')'
                             .'|tache/(?'
-                                .'|front/agriculteur/([^/]++)(*:1574)'
+                                .'|front/agriculteur/([^/]++)(*:1711)'
                                 .'|terrain/([^/]++)/(?'
-                                    .'|ouvriers(*:1611)'
-                                    .'|assigner\\-ouvrier(*:1637)'
+                                    .'|ouvriers(*:1748)'
+                                    .'|assigner\\-ouvrier(*:1774)'
                                 .')'
-                                .'|ouvrier/([^/]++)/desassigner(*:1675)'
+                                .'|ouvrier/([^/]++)/desassigner(*:1812)'
                             .')'
                             .'|stocks/(?'
                                 .'|([^/]++)(?'
-                                    .'|/edit(*:1711)'
-                                    .'|(*:1720)'
+                                    .'|/edit(*:1848)'
+                                    .'|(*:1857)'
                                 .')'
-                                .'|mouvements/new/([^/]++)(*:1753)'
+                                .'|mouvements/new/([^/]++)(*:1890)'
+                                .'|([^/]++)/(?'
+                                    .'|qr\\-code(?'
+                                        .'|(*:1922)'
+                                        .'|/(?'
+                                            .'|download(*:1943)'
+                                            .'|view(*:1956)'
+                                        .')'
+                                    .')'
+                                    .'|details(*:1974)'
+                                    .'|scan\\-redirect(*:1997)'
+                                .')'
                                 .'|categories(?'
-                                    .'|(*:1775)'
+                                    .'|(*:2020)'
                                     .'|/([^/]++)(?'
-                                        .'|/edit(*:1801)'
-                                        .'|(*:1810)'
+                                        .'|/edit(*:2046)'
+                                        .'|(*:2055)'
                                     .')'
                                 .')'
                             .')'
@@ -310,109 +340,117 @@ return [
                             .'|plantes/(?'
                                 .'|([^/]++)(?'
                                     .'|/(?'
-                                        .'|edit(*:1857)'
-                                        .'|delete(*:1872)'
+                                        .'|edit(*:2102)'
+                                        .'|delete(*:2117)'
                                     .')'
-                                    .'|(*:1882)'
+                                    .'|(*:2127)'
                                 .')'
-                                .'|langue/([^/]++)(*:1907)'
+                                .'|langue/([^/]++)(*:2152)'
                             .')'
                             .'|rotations/([^/]++)(?'
                                 .'|/(?'
-                                    .'|edit(*:1946)'
-                                    .'|delete(*:1961)'
+                                    .'|edit(*:2191)'
+                                    .'|delete(*:2206)'
                                 .')'
-                                .'|(*:1971)'
+                                .'|(*:2216)'
                             .')'
                             .'|terrains/([^/]++)(?'
                                 .'|/(?'
-                                    .'|edit(*:2009)'
-                                    .'|delete(*:2024)'
-                                    .'|certificat\\-propriete(*:2054)'
+                                    .'|edit(*:2254)'
+                                    .'|delete(*:2269)'
+                                    .'|certificat\\-propriete(*:2299)'
                                 .')'
-                                .'|(*:2064)'
+                                .'|(*:2309)'
                             .')'
                         .')'
                     .')'
                 .')'
                 .'|/e(?'
                     .'|xamen/([^/]++)(?'
-                        .'|(*:2099)'
-                        .'|/edit(*:2113)'
-                        .'|(*:2122)'
+                        .'|(*:2344)'
+                        .'|/edit(*:2358)'
+                        .'|(*:2367)'
                     .')'
                     .'|venements/(?'
-                        .'|modifier/([^/]++)(*:2162)'
-                        .'|supprimer/([^/]++)(*:2189)'
+                        .'|modifier/([^/]++)(*:2407)'
+                        .'|supprimer/([^/]++)(*:2434)'
                     .')'
                 .')'
-                .'|/modifierCategorieEvenement/([^/]++)(*:2236)'
+                .'|/modifierCategorieEvenement/([^/]++)(*:2481)'
                 .'|/s(?'
-                    .'|upprimerCategorieEvenement/([^/]++)(*:2285)'
-                    .'|et\\-locale/([^/]++)(*:2313)'
+                    .'|upprimerCategorieEvenement/([^/]++)(*:2530)'
+                    .'|et\\-locale/([^/]++)(*:2558)'
                 .')'
                 .'|/o(?'
                     .'|uvrier/(?'
-                        .'|evenements/inscription/([^/]++)(*:2369)'
+                        .'|evenements/inscription/([^/]++)(*:2614)'
                         .'|participations/(?'
-                            .'|modifier/([^/]++)(*:2413)'
-                            .'|annuler/([^/]++)(*:2438)'
+                            .'|modifier/([^/]++)(*:2658)'
+                            .'|annuler/([^/]++)(*:2683)'
                         .')'
-                        .'|tache/([^/]++)/statut/([^/]++)(*:2478)'
-                        .'|langue/([^/]++)(*:2502)'
+                        .'|stocks/(?'
+                            .'|produits/(?'
+                                .'|(\\d+)(*:2720)'
+                                .'|(\\d+)/sortie(*:2741)'
+                                .'|(\\d+)/mouvements(*:2766)'
+                            .')'
+                            .'|mouvements/(\\d+)/modifier(*:2801)'
+                        .')'
+                        .'|tache/([^/]++)/statut/([^/]++)(*:2841)'
+                        .'|langue/([^/]++)(*:2865)'
                     .')'
                     .'|ffre/([^/]++)(?'
-                        .'|(*:2528)'
+                        .'|(*:2891)'
                         .'|/(?'
-                            .'|pdf(*:2544)'
-                            .'|edit(*:2557)'
-                            .'|delete(*:2572)'
+                            .'|pdf(*:2907)'
+                            .'|edit(*:2920)'
+                            .'|delete(*:2935)'
                         .')'
                     .')'
                 .')'
                 .'|/p(?'
                     .'|articipations/(?'
-                        .'|modifier/([^/]++)(*:2623)'
-                        .'|supprimer/([^/]++)(*:2650)'
+                        .'|modifier/([^/]++)(*:2986)'
+                        .'|supprimer/([^/]++)(*:3013)'
                     .')'
                     .'|lantes/([^/]++)(?'
                         .'|/(?'
-                            .'|edit(*:2686)'
-                            .'|delete(*:2701)'
+                            .'|edit(*:3049)'
+                            .'|delete(*:3064)'
                         .')'
-                        .'|(*:2711)'
+                        .'|(*:3074)'
                     .')'
                 .')'
                 .'|/rotations/(?'
                     .'|([^/]++)(?'
                         .'|/(?'
-                            .'|edit(*:2755)'
-                            .'|delete(*:2770)'
+                            .'|edit(*:3118)'
+                            .'|delete(*:3133)'
                         .')'
-                        .'|(*:2780)'
+                        .'|(*:3143)'
                     .')'
                     .'|agri/rotations/([^/]++)(?'
                         .'|/(?'
-                            .'|edit(*:2824)'
-                            .'|delete(*:2839)'
+                            .'|edit(*:3187)'
+                            .'|delete(*:3202)'
                         .')'
-                        .'|(*:2849)'
+                        .'|(*:3212)'
                     .')'
                 .')'
                 .'|/t(?'
                     .'|errains/([^/]++)(?'
                         .'|/(?'
-                            .'|edit(*:2892)'
-                            .'|delete(*:2907)'
+                            .'|edit(*:3255)'
+                            .'|delete(*:3270)'
                         .')'
-                        .'|(*:2917)'
+                        .'|(*:3280)'
                     .')'
                     .'|ache/([^/]++)(?'
-                        .'|(*:2943)'
+                        .'|(*:3306)'
                         .'|/(?'
-                            .'|pdf(*:2959)'
-                            .'|edit(*:2972)'
-                            .'|delete(*:2987)'
+                            .'|pdf(*:3322)'
+                            .'|edit(*:3335)'
+                            .'|delete(*:3350)'
                         .')'
                     .')'
                 .')'
@@ -450,92 +488,106 @@ return [
         671 => [[['_route' => 'admin_users_delete', '_controller' => 'App\\Controller\\User\\AdminUserController::delete'], ['cin'], ['POST' => 0], null, false, false, null]],
         688 => [[['_route' => 'admin_users_pdf', '_controller' => 'App\\Controller\\User\\AdminUserController::pdf'], ['cin'], ['GET' => 0], null, false, false, null]],
         706 => [[['_route' => 'admin_users_edit', '_controller' => 'App\\Controller\\User\\AdminUserController::edit'], ['cin'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        734 => [[['_route' => 'app_animaux_show', '_controller' => 'App\\Controller\\Animals\\AnimauxController::show'], ['id'], ['GET' => 0], null, false, true, null]],
-        763 => [[['_route' => 'app_animaux_export_card', '_controller' => 'App\\Controller\\Animals\\AnimauxController::exportCard'], ['id'], ['GET' => 0], null, false, false, null]],
-        778 => [[['_route' => 'app_animaux_export_medical', '_controller' => 'App\\Controller\\Animals\\AnimauxController::exportMedical'], ['id'], ['GET' => 0], null, false, false, null]],
-        790 => [[['_route' => 'app_animaux_edit', '_controller' => 'App\\Controller\\Animals\\AnimauxController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        804 => [[['_route' => 'app_animaux_match', '_controller' => 'App\\Controller\\Animals\\AnimauxController::match'], ['id'], ['GET' => 0], null, false, false, null]],
-        813 => [[['_route' => 'app_animaux_delete', '_controller' => 'App\\Controller\\Animals\\AnimauxController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
-        842 => [[['_route' => 'api_terrains_by_agriculteur', '_controller' => 'App\\Controller\\AuthController::terrainsByAgriculteur'], ['cinAgriculteur'], null, null, false, true, null]],
-        898 => [[['_route' => 'agriculteur_evenement_inscription', '_controller' => 'App\\Controller\\Evenements\\Agriculteur\\EvenementController::inscrire'], ['id'], ['GET' => 0, 'POST' => 1], null, false, true, null]],
-        941 => [[['_route' => 'agriculteur_participation_modifier', '_controller' => 'App\\Controller\\Evenements\\Agriculteur\\ParticipationController::modifier'], ['id'], ['GET' => 0, 'POST' => 1], null, false, true, null]],
-        965 => [[['_route' => 'agriculteur_participation_annuler', '_controller' => 'App\\Controller\\Evenements\\Agriculteur\\ParticipationController::annuler'], ['id'], ['POST' => 0], null, false, true, null]],
-        1007 => [[['_route' => 'agri_machine_show', '_controller' => 'App\\Controller\\Materiels\\MachineController::machineShow'], ['id'], ['GET' => 0], null, false, true, null]],
-        1026 => [[['_route' => 'agri_machine_edit', '_controller' => 'App\\Controller\\Materiels\\MachineController::machineEdit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        1047 => [[['_route' => 'agri_machine_delete', '_controller' => 'App\\Controller\\Materiels\\MachineController::machineDelete'], ['id'], ['POST' => 0], null, false, false, null]],
-        1111 => [[['_route' => 'agri_maintenances_api_custom_prompt', '_controller' => 'App\\Controller\\Materiels\\MaintenancesController::generateCustomPrompt'], ['id'], ['POST' => 0], null, false, true, null]],
-        1137 => [[['_route' => 'agri_maintenances_api_calendar', '_controller' => 'App\\Controller\\Materiels\\MaintenancesController::generateCalendar'], ['id'], ['GET' => 0], null, false, true, null]],
-        1163 => [[['_route' => 'agri_maintenances_api_lifetime', '_controller' => 'App\\Controller\\Materiels\\MaintenancesController::generateLifetime'], ['id'], ['GET' => 0], null, false, true, null]],
-        1184 => [[['_route' => 'agri_maintenances_show', '_controller' => 'App\\Controller\\Materiels\\MaintenancesController::show'], ['id'], ['GET' => 0], null, false, true, null]],
-        1201 => [[['_route' => 'agri_maintenances_edit', '_controller' => 'App\\Controller\\Materiels\\MaintenancesController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        1216 => [[['_route' => 'agri_maintenances_delete', '_controller' => 'App\\Controller\\Materiels\\MaintenancesController::delete'], ['id'], ['POST' => 0], null, false, false, null]],
-        1251 => [[['_route' => 'agri_maintenances_api_diagnostics', '_controller' => 'App\\Controller\\Materiels\\MaintenancesController::apiDiagnostics'], ['id'], ['GET' => 0], null, false, true, null]],
-        1274 => [[['_route' => 'agri_maintenances_api_schedule', '_controller' => 'App\\Controller\\Materiels\\MaintenancesController::apiSchedule'], ['id'], ['GET' => 0], null, false, true, null]],
-        1308 => [[['_route' => 'app_mouvement_new_alias', '_controller' => 'App\\Controller\\stocks\\MouvementController::gestionStockAlias'], ['id'], ['GET' => 0, 'POST' => 1], null, false, true, null]],
-        1347 => [[['_route' => 'app_abonnement_pdf', '_controller' => 'App\\Controller\\User\\AbonnementFrontController::pdf'], ['id'], ['GET' => 0], null, false, true, null]],
-        1383 => [[['_route' => 'app_offre_souscrire', '_controller' => 'App\\Controller\\User\\OffreFrontController::souscrire'], ['id'], ['POST' => 0], null, false, true, null]],
-        1423 => [[['_route' => 'app_ouvrier_edit', '_controller' => 'App\\Controller\\User\\Ouvrier_agriController::edit'], ['cin'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        1441 => [[['_route' => 'app_ouvrier_delete', '_controller' => 'App\\Controller\\User\\Ouvrier_agriController::deleteOuvrier'], ['cin'], ['POST' => 0], null, false, false, null]],
-        1459 => [[['_route' => 'app_ouvrier_taches', '_controller' => 'App\\Controller\\User\\Ouvrier_agriController::taches'], ['cin'], ['GET' => 0], null, false, false, null]],
-        1476 => [[['_route' => 'app_ouvrier_tache_add', '_controller' => 'App\\Controller\\User\\Ouvrier_agriController::ajouterTache'], ['cin'], ['POST' => 0], null, false, false, null]],
-        1509 => [[['_route' => 'app_tache_update_etat', '_controller' => 'App\\Controller\\User\\Ouvrier_agriController::updateEtatTache'], ['id'], ['POST' => 0], null, false, false, null]],
-        1527 => [[['_route' => 'app_ouvrier_tache_delete', '_controller' => 'App\\Controller\\User\\Ouvrier_agriController::supprimerTache'], ['id'], ['POST' => 0], null, false, false, null]],
-        1574 => [[['_route' => 'app_tache_by_ouvrier', '_controller' => 'App\\Controller\\User\\TacheFrontController::tachesByOuvrier'], ['cin'], ['GET' => 0], null, false, true, null]],
-        1611 => [[['_route' => 'app_ouvriers_by_terrain', '_controller' => 'App\\Controller\\User\\TacheFrontController::ouvriersByTerrain'], ['idTerrain'], ['GET' => 0], null, false, false, null]],
-        1637 => [[['_route' => 'app_assigner_ouvrier_terrain', '_controller' => 'App\\Controller\\User\\TacheFrontController::assignerOuvrierTerrain'], ['idTerrain'], ['POST' => 0], null, false, false, null]],
-        1675 => [[['_route' => 'app_desassigner_ouvrier', '_controller' => 'App\\Controller\\User\\TacheFrontController::desassignerOuvrier'], ['cin'], ['POST' => 0], null, false, false, null]],
-        1711 => [[['_route' => 'app_article_edit', '_controller' => 'App\\Controller\\stocks\\ArticleController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        1720 => [[['_route' => 'app_article_delete', '_controller' => 'App\\Controller\\stocks\\ArticleController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
-        1753 => [[['_route' => 'app_mouvement_new', '_controller' => 'App\\Controller\\stocks\\ArticleController::gestionStock'], ['id'], ['GET' => 0, 'POST' => 1], null, false, true, null]],
-        1775 => [[['_route' => 'agri_categories', '_controller' => 'App\\Controller\\stocks\\CategorieController::index'], [], ['GET' => 0], null, true, false, null]],
-        1801 => [[['_route' => 'agri_categories_edit', '_controller' => 'App\\Controller\\stocks\\CategorieController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        1810 => [[['_route' => 'agri_categories_delete', '_controller' => 'App\\Controller\\stocks\\CategorieController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
-        1857 => [[['_route' => 'agri_plantes_edit', '_controller' => 'App\\Controller\\Terrain\\AgriPlanteController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        1872 => [[['_route' => 'agri_plantes_delete', '_controller' => 'App\\Controller\\Terrain\\AgriPlanteController::delete'], ['id'], ['POST' => 0], null, false, false, null]],
-        1882 => [[['_route' => 'agri_plantes_show', '_controller' => 'App\\Controller\\Terrain\\AgriPlanteController::show'], ['id'], ['GET' => 0], null, false, true, null]],
-        1907 => [[['_route' => 'agri_plantes_changer_langue', '_controller' => 'App\\Controller\\Terrain\\AgriPlanteController::changerLangue'], ['locale'], null, null, false, true, null]],
-        1946 => [[['_route' => 'agri_rotations_edit', '_controller' => 'App\\Controller\\Terrain\\AgriRotationController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        1961 => [[['_route' => 'agri_rotations_delete', '_controller' => 'App\\Controller\\Terrain\\AgriRotationController::delete'], ['id'], ['POST' => 0], null, false, false, null]],
-        1971 => [[['_route' => 'agri_rotations_show', '_controller' => 'App\\Controller\\Terrain\\AgriRotationController::show'], ['id'], ['GET' => 0], null, false, true, null]],
-        2009 => [[['_route' => 'agri_terrains_edit', '_controller' => 'App\\Controller\\Terrain\\AgriTerrainController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        2024 => [[['_route' => 'agri_terrains_delete', '_controller' => 'App\\Controller\\Terrain\\AgriTerrainController::delete'], ['id'], ['POST' => 0], null, false, false, null]],
-        2054 => [[['_route' => 'agri_terrains_certificat_propriete', '_controller' => 'App\\Controller\\Terrain\\AgriTerrainController::certificatPropriete'], ['id'], ['GET' => 0], null, false, false, null]],
-        2064 => [[['_route' => 'agri_terrains_show', '_controller' => 'App\\Controller\\Terrain\\AgriTerrainController::show'], ['id'], ['GET' => 0], null, false, true, null]],
-        2099 => [[['_route' => 'app_examens_show', '_controller' => 'App\\Controller\\Animals\\ExamensController::show'], ['id'], ['GET' => 0], null, false, true, null]],
-        2113 => [[['_route' => 'app_examens_edit', '_controller' => 'App\\Controller\\Animals\\ExamensController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        2122 => [[['_route' => 'app_examens_delete', '_controller' => 'App\\Controller\\Animals\\ExamensController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
-        2162 => [[['_route' => 'evenement_modifier', '_controller' => 'App\\Controller\\Evenements\\EvenementController::modifier'], ['id'], null, null, false, true, null]],
-        2189 => [[['_route' => 'evenement_supprimer', '_controller' => 'App\\Controller\\Evenements\\EvenementController::supprimer'], ['id'], null, null, false, true, null]],
-        2236 => [[['_route' => 'categorie_evenement_modifier', '_controller' => 'App\\Controller\\Evenements\\CategorieEvenementController::modifier'], ['id'], null, null, false, true, null]],
-        2285 => [[['_route' => 'categorie_evenement_supprimer', '_controller' => 'App\\Controller\\Evenements\\CategorieEvenementController::supprimer'], ['id'], null, null, false, true, null]],
-        2313 => [[['_route' => 'app_set_locale', '_controller' => 'App\\Controller\\LocaleController::setLocale'], ['locale'], ['GET' => 0], null, false, true, null]],
-        2369 => [[['_route' => 'ouvrier_evenement_inscription', '_controller' => 'App\\Controller\\Evenements\\Ouvrier\\EvenementController::inscrire'], ['id'], null, null, false, true, null]],
-        2413 => [[['_route' => 'ouvrier_participation_modifier', '_controller' => 'App\\Controller\\Evenements\\Ouvrier\\ParticipationController::modifier'], ['id'], ['GET' => 0, 'POST' => 1], null, false, true, null]],
-        2438 => [[['_route' => 'ouvrier_participation_annuler', '_controller' => 'App\\Controller\\Evenements\\Ouvrier\\ParticipationController::annuler'], ['id'], ['POST' => 0], null, false, true, null]],
-        2478 => [[['_route' => 'ouvrier_tache_statut', '_controller' => 'App\\Controller\\User\\OuvrierController::changerStatut'], ['id', 'statut'], null, null, false, true, null]],
-        2502 => [[['_route' => 'ouvrier_changer_langue', '_controller' => 'App\\Controller\\User\\OuvrierController::changerLangue'], ['locale'], null, null, false, true, null]],
-        2528 => [[['_route' => 'app_offre_show', '_controller' => 'App\\Controller\\User\\OffreController::show'], ['idOffres'], ['GET' => 0], null, false, true, null]],
-        2544 => [[['_route' => 'app_offre_pdf', '_controller' => 'App\\Controller\\User\\OffreController::pdf'], ['idOffres'], ['GET' => 0], null, false, false, null]],
-        2557 => [[['_route' => 'app_offre_edit', '_controller' => 'App\\Controller\\User\\OffreController::edit'], ['idOffres'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        2572 => [[['_route' => 'app_offre_delete', '_controller' => 'App\\Controller\\User\\OffreController::delete'], ['idOffres'], ['POST' => 0], null, false, false, null]],
-        2623 => [[['_route' => 'participation_modifier', '_controller' => 'App\\Controller\\Evenements\\ParticipationController::modifier'], ['id'], null, null, false, true, null]],
-        2650 => [[['_route' => 'participation_supprimer', '_controller' => 'App\\Controller\\Evenements\\ParticipationController::supprimer'], ['id'], null, null, false, true, null]],
-        2686 => [[['_route' => 'admin_plantes_edit', '_controller' => 'App\\Controller\\Terrain\\PlanteController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        2701 => [[['_route' => 'admin_plantes_delete', '_controller' => 'App\\Controller\\Terrain\\PlanteController::delete'], ['id'], ['POST' => 0], null, false, false, null]],
-        2711 => [[['_route' => 'admin_plantes_show', '_controller' => 'App\\Controller\\Terrain\\PlanteController::show'], ['id'], ['GET' => 0], null, false, true, null]],
-        2755 => [[['_route' => 'admin_rotations_edit', '_controller' => 'App\\Controller\\Terrain\\RotationController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        2770 => [[['_route' => 'admin_rotations_delete', '_controller' => 'App\\Controller\\Terrain\\RotationController::delete'], ['id'], ['POST' => 0], null, false, false, null]],
-        2780 => [[['_route' => 'admin_rotations_show', '_controller' => 'App\\Controller\\Terrain\\RotationController::show'], ['id'], ['GET' => 0], null, false, true, null]],
-        2824 => [[['_route' => 'admin_rotationsagri_rotations_edit', '_controller' => 'App\\Controller\\Terrain\\RotationController::agriEdit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        2839 => [[['_route' => 'admin_rotationsagri_rotations_delete', '_controller' => 'App\\Controller\\Terrain\\RotationController::agriDelete'], ['id'], ['POST' => 0], null, false, false, null]],
-        2849 => [[['_route' => 'admin_rotationsagri_rotations_show', '_controller' => 'App\\Controller\\Terrain\\RotationController::agriShow'], ['id'], ['GET' => 0], null, false, true, null]],
-        2892 => [[['_route' => 'admin_terrains_edit', '_controller' => 'App\\Controller\\Terrain\\TerrainController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        2907 => [[['_route' => 'admin_terrains_delete', '_controller' => 'App\\Controller\\Terrain\\TerrainController::delete'], ['id'], ['POST' => 0], null, false, false, null]],
-        2917 => [[['_route' => 'admin_terrains_show', '_controller' => 'App\\Controller\\Terrain\\TerrainController::show'], ['id'], ['GET' => 0], null, false, true, null]],
-        2943 => [[['_route' => 'app_tache_show', '_controller' => 'App\\Controller\\User\\TacheController::show'], ['idTache'], ['GET' => 0], null, false, true, null]],
-        2959 => [[['_route' => 'app_tache_pdf', '_controller' => 'App\\Controller\\User\\TacheController::pdf'], ['idTache'], ['GET' => 0], null, false, false, null]],
-        2972 => [[['_route' => 'app_tache_edit', '_controller' => 'App\\Controller\\User\\TacheController::edit'], ['idTache'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        2987 => [
+        750 => [[['_route' => 'admin_stock_edit', '_controller' => 'App\\Controller\\stocks\\AdminStockController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        764 => [[['_route' => 'admin_stock_delete', '_controller' => 'App\\Controller\\stocks\\AdminStockController::delete'], ['id'], ['POST' => 0], null, false, false, null]],
+        791 => [[['_route' => 'admin_stock_mouvement', '_controller' => 'App\\Controller\\stocks\\AdminStockController::gestionStock'], ['id'], ['POST' => 0], null, false, true, null]],
+        825 => [[['_route' => 'admin_categorie_edit', '_controller' => 'App\\Controller\\stocks\\Admin_CategorieController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        839 => [[['_route' => 'admin_categorie_delete', '_controller' => 'App\\Controller\\stocks\\Admin_CategorieController::delete'], ['id'], ['POST' => 0], null, false, false, null]],
+        868 => [[['_route' => 'app_animaux_show', '_controller' => 'App\\Controller\\Animals\\AnimauxController::show'], ['id'], ['GET' => 0], null, false, true, null]],
+        897 => [[['_route' => 'app_animaux_export_card', '_controller' => 'App\\Controller\\Animals\\AnimauxController::exportCard'], ['id'], ['GET' => 0], null, false, false, null]],
+        912 => [[['_route' => 'app_animaux_export_medical', '_controller' => 'App\\Controller\\Animals\\AnimauxController::exportMedical'], ['id'], ['GET' => 0], null, false, false, null]],
+        924 => [[['_route' => 'app_animaux_edit', '_controller' => 'App\\Controller\\Animals\\AnimauxController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        938 => [[['_route' => 'app_animaux_match', '_controller' => 'App\\Controller\\Animals\\AnimauxController::match'], ['id'], ['GET' => 0], null, false, false, null]],
+        947 => [[['_route' => 'app_animaux_delete', '_controller' => 'App\\Controller\\Animals\\AnimauxController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
+        976 => [[['_route' => 'api_terrains_by_agriculteur', '_controller' => 'App\\Controller\\AuthController::terrainsByAgriculteur'], ['cinAgriculteur'], null, null, false, true, null]],
+        1032 => [[['_route' => 'agriculteur_evenement_inscription', '_controller' => 'App\\Controller\\Evenements\\Agriculteur\\EvenementController::inscrire'], ['id'], ['GET' => 0, 'POST' => 1], null, false, true, null]],
+        1076 => [[['_route' => 'agriculteur_participation_modifier', '_controller' => 'App\\Controller\\Evenements\\Agriculteur\\ParticipationController::modifier'], ['id'], ['GET' => 0, 'POST' => 1], null, false, true, null]],
+        1101 => [[['_route' => 'agriculteur_participation_annuler', '_controller' => 'App\\Controller\\Evenements\\Agriculteur\\ParticipationController::annuler'], ['id'], ['POST' => 0], null, false, true, null]],
+        1144 => [[['_route' => 'agri_machine_show', '_controller' => 'App\\Controller\\Materiels\\MachineController::machineShow'], ['id'], ['GET' => 0], null, false, true, null]],
+        1163 => [[['_route' => 'agri_machine_edit', '_controller' => 'App\\Controller\\Materiels\\MachineController::machineEdit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        1184 => [[['_route' => 'agri_machine_delete', '_controller' => 'App\\Controller\\Materiels\\MachineController::machineDelete'], ['id'], ['POST' => 0], null, false, false, null]],
+        1248 => [[['_route' => 'agri_maintenances_api_custom_prompt', '_controller' => 'App\\Controller\\Materiels\\MaintenancesController::generateCustomPrompt'], ['id'], ['POST' => 0], null, false, true, null]],
+        1274 => [[['_route' => 'agri_maintenances_api_calendar', '_controller' => 'App\\Controller\\Materiels\\MaintenancesController::generateCalendar'], ['id'], ['GET' => 0], null, false, true, null]],
+        1300 => [[['_route' => 'agri_maintenances_api_lifetime', '_controller' => 'App\\Controller\\Materiels\\MaintenancesController::generateLifetime'], ['id'], ['GET' => 0], null, false, true, null]],
+        1321 => [[['_route' => 'agri_maintenances_show', '_controller' => 'App\\Controller\\Materiels\\MaintenancesController::show'], ['id'], ['GET' => 0], null, false, true, null]],
+        1338 => [[['_route' => 'agri_maintenances_edit', '_controller' => 'App\\Controller\\Materiels\\MaintenancesController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        1353 => [[['_route' => 'agri_maintenances_delete', '_controller' => 'App\\Controller\\Materiels\\MaintenancesController::delete'], ['id'], ['POST' => 0], null, false, false, null]],
+        1388 => [[['_route' => 'agri_maintenances_api_diagnostics', '_controller' => 'App\\Controller\\Materiels\\MaintenancesController::apiDiagnostics'], ['id'], ['GET' => 0], null, false, true, null]],
+        1411 => [[['_route' => 'agri_maintenances_api_schedule', '_controller' => 'App\\Controller\\Materiels\\MaintenancesController::apiSchedule'], ['id'], ['GET' => 0], null, false, true, null]],
+        1445 => [[['_route' => 'app_mouvement_new_alias', '_controller' => 'App\\Controller\\stocks\\MouvementController::gestionStockAlias'], ['id'], ['GET' => 0, 'POST' => 1], null, false, true, null]],
+        1484 => [[['_route' => 'app_abonnement_pdf', '_controller' => 'App\\Controller\\User\\AbonnementFrontController::pdf'], ['id'], ['GET' => 0], null, false, true, null]],
+        1520 => [[['_route' => 'app_offre_souscrire', '_controller' => 'App\\Controller\\User\\OffreFrontController::souscrire'], ['id'], ['POST' => 0], null, false, true, null]],
+        1560 => [[['_route' => 'app_ouvrier_edit', '_controller' => 'App\\Controller\\User\\Ouvrier_agriController::edit'], ['cin'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        1578 => [[['_route' => 'app_ouvrier_delete', '_controller' => 'App\\Controller\\User\\Ouvrier_agriController::deleteOuvrier'], ['cin'], ['POST' => 0], null, false, false, null]],
+        1596 => [[['_route' => 'app_ouvrier_taches', '_controller' => 'App\\Controller\\User\\Ouvrier_agriController::taches'], ['cin'], ['GET' => 0], null, false, false, null]],
+        1613 => [[['_route' => 'app_ouvrier_tache_add', '_controller' => 'App\\Controller\\User\\Ouvrier_agriController::ajouterTache'], ['cin'], ['POST' => 0], null, false, false, null]],
+        1646 => [[['_route' => 'app_tache_update_etat', '_controller' => 'App\\Controller\\User\\Ouvrier_agriController::updateEtatTache'], ['id'], ['POST' => 0], null, false, false, null]],
+        1664 => [[['_route' => 'app_ouvrier_tache_delete', '_controller' => 'App\\Controller\\User\\Ouvrier_agriController::supprimerTache'], ['id'], ['POST' => 0], null, false, false, null]],
+        1711 => [[['_route' => 'app_tache_by_ouvrier', '_controller' => 'App\\Controller\\User\\TacheFrontController::tachesByOuvrier'], ['cin'], ['GET' => 0], null, false, true, null]],
+        1748 => [[['_route' => 'app_ouvriers_by_terrain', '_controller' => 'App\\Controller\\User\\TacheFrontController::ouvriersByTerrain'], ['idTerrain'], ['GET' => 0], null, false, false, null]],
+        1774 => [[['_route' => 'app_assigner_ouvrier_terrain', '_controller' => 'App\\Controller\\User\\TacheFrontController::assignerOuvrierTerrain'], ['idTerrain'], ['POST' => 0], null, false, false, null]],
+        1812 => [[['_route' => 'app_desassigner_ouvrier', '_controller' => 'App\\Controller\\User\\TacheFrontController::desassignerOuvrier'], ['cin'], ['POST' => 0], null, false, false, null]],
+        1848 => [[['_route' => 'app_article_edit', '_controller' => 'App\\Controller\\stocks\\ArticleController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        1857 => [[['_route' => 'app_article_delete', '_controller' => 'App\\Controller\\stocks\\ArticleController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
+        1890 => [[['_route' => 'app_mouvement_new', '_controller' => 'App\\Controller\\stocks\\ArticleController::gestionStock'], ['id'], ['GET' => 0, 'POST' => 1], null, false, true, null]],
+        1922 => [[['_route' => 'article_qr_code', '_controller' => 'App\\Controller\\stocks\\ArticleController::generateQRCode'], ['id'], ['GET' => 0], null, false, false, null]],
+        1943 => [[['_route' => 'article_qr_code_download', '_controller' => 'App\\Controller\\stocks\\ArticleController::downloadQRCode'], ['id'], ['GET' => 0], null, false, false, null]],
+        1956 => [[['_route' => 'article_qr_code_view', '_controller' => 'App\\Controller\\stocks\\ArticleController::viewQRCode'], ['id'], ['GET' => 0], null, false, false, null]],
+        1974 => [[['_route' => 'app_article_show', '_controller' => 'App\\Controller\\stocks\\ArticleController::show'], ['id'], ['GET' => 0], null, false, false, null]],
+        1997 => [[['_route' => 'article_scan_redirect', '_controller' => 'App\\Controller\\stocks\\ArticleController::scanRedirect'], ['id'], ['GET' => 0], null, false, false, null]],
+        2020 => [[['_route' => 'agri_categories', '_controller' => 'App\\Controller\\stocks\\CategorieController::index'], [], ['GET' => 0], null, true, false, null]],
+        2046 => [[['_route' => 'agri_categories_edit', '_controller' => 'App\\Controller\\stocks\\CategorieController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        2055 => [[['_route' => 'agri_categories_delete', '_controller' => 'App\\Controller\\stocks\\CategorieController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
+        2102 => [[['_route' => 'agri_plantes_edit', '_controller' => 'App\\Controller\\Terrain\\AgriPlanteController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        2117 => [[['_route' => 'agri_plantes_delete', '_controller' => 'App\\Controller\\Terrain\\AgriPlanteController::delete'], ['id'], ['POST' => 0], null, false, false, null]],
+        2127 => [[['_route' => 'agri_plantes_show', '_controller' => 'App\\Controller\\Terrain\\AgriPlanteController::show'], ['id'], ['GET' => 0], null, false, true, null]],
+        2152 => [[['_route' => 'agri_plantes_changer_langue', '_controller' => 'App\\Controller\\Terrain\\AgriPlanteController::changerLangue'], ['locale'], null, null, false, true, null]],
+        2191 => [[['_route' => 'agri_rotations_edit', '_controller' => 'App\\Controller\\Terrain\\AgriRotationController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        2206 => [[['_route' => 'agri_rotations_delete', '_controller' => 'App\\Controller\\Terrain\\AgriRotationController::delete'], ['id'], ['POST' => 0], null, false, false, null]],
+        2216 => [[['_route' => 'agri_rotations_show', '_controller' => 'App\\Controller\\Terrain\\AgriRotationController::show'], ['id'], ['GET' => 0], null, false, true, null]],
+        2254 => [[['_route' => 'agri_terrains_edit', '_controller' => 'App\\Controller\\Terrain\\AgriTerrainController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        2269 => [[['_route' => 'agri_terrains_delete', '_controller' => 'App\\Controller\\Terrain\\AgriTerrainController::delete'], ['id'], ['POST' => 0], null, false, false, null]],
+        2299 => [[['_route' => 'agri_terrains_certificat_propriete', '_controller' => 'App\\Controller\\Terrain\\AgriTerrainController::certificatPropriete'], ['id'], ['GET' => 0], null, false, false, null]],
+        2309 => [[['_route' => 'agri_terrains_show', '_controller' => 'App\\Controller\\Terrain\\AgriTerrainController::show'], ['id'], ['GET' => 0], null, false, true, null]],
+        2344 => [[['_route' => 'app_examens_show', '_controller' => 'App\\Controller\\Animals\\ExamensController::show'], ['id'], ['GET' => 0], null, false, true, null]],
+        2358 => [[['_route' => 'app_examens_edit', '_controller' => 'App\\Controller\\Animals\\ExamensController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        2367 => [[['_route' => 'app_examens_delete', '_controller' => 'App\\Controller\\Animals\\ExamensController::delete'], ['id'], ['POST' => 0], null, false, true, null]],
+        2407 => [[['_route' => 'evenement_modifier', '_controller' => 'App\\Controller\\Evenements\\EvenementController::modifier'], ['id'], null, null, false, true, null]],
+        2434 => [[['_route' => 'evenement_supprimer', '_controller' => 'App\\Controller\\Evenements\\EvenementController::supprimer'], ['id'], null, null, false, true, null]],
+        2481 => [[['_route' => 'categorie_evenement_modifier', '_controller' => 'App\\Controller\\Evenements\\CategorieEvenementController::modifier'], ['id'], null, null, false, true, null]],
+        2530 => [[['_route' => 'categorie_evenement_supprimer', '_controller' => 'App\\Controller\\Evenements\\CategorieEvenementController::supprimer'], ['id'], null, null, false, true, null]],
+        2558 => [[['_route' => 'app_set_locale', '_controller' => 'App\\Controller\\LocaleController::setLocale'], ['locale'], ['GET' => 0], null, false, true, null]],
+        2614 => [[['_route' => 'ouvrier_evenement_inscription', '_controller' => 'App\\Controller\\Evenements\\Ouvrier\\EvenementController::inscrire'], ['id'], null, null, false, true, null]],
+        2658 => [[['_route' => 'ouvrier_participation_modifier', '_controller' => 'App\\Controller\\Evenements\\Ouvrier\\ParticipationController::modifier'], ['id'], ['GET' => 0, 'POST' => 1], null, false, true, null]],
+        2683 => [[['_route' => 'ouvrier_participation_annuler', '_controller' => 'App\\Controller\\Evenements\\Ouvrier\\ParticipationController::annuler'], ['id'], ['POST' => 0], null, false, true, null]],
+        2720 => [[['_route' => 'ouvrier_article_show', '_controller' => 'App\\Controller\\OuvrierDashboardController::articleShow'], ['id'], ['GET' => 0], null, false, true, null]],
+        2741 => [[['_route' => 'ouvrier_article_sortie', '_controller' => 'App\\Controller\\OuvrierDashboardController::sortie'], ['id'], ['POST' => 0], null, false, false, null]],
+        2766 => [[['_route' => 'ouvrier_article_mouvements', '_controller' => 'App\\Controller\\OuvrierDashboardController::mouvements'], ['id'], ['GET' => 0], null, false, false, null]],
+        2801 => [[['_route' => 'ouvrier_mouvement_modifier', '_controller' => 'App\\Controller\\OuvrierDashboardController::modifierMouvement'], ['id'], ['POST' => 0], null, false, false, null]],
+        2841 => [[['_route' => 'ouvrier_tache_statut', '_controller' => 'App\\Controller\\User\\OuvrierController::changerStatut'], ['id', 'statut'], null, null, false, true, null]],
+        2865 => [[['_route' => 'ouvrier_changer_langue', '_controller' => 'App\\Controller\\User\\OuvrierController::changerLangue'], ['locale'], null, null, false, true, null]],
+        2891 => [[['_route' => 'app_offre_show', '_controller' => 'App\\Controller\\User\\OffreController::show'], ['idOffres'], ['GET' => 0], null, false, true, null]],
+        2907 => [[['_route' => 'app_offre_pdf', '_controller' => 'App\\Controller\\User\\OffreController::pdf'], ['idOffres'], ['GET' => 0], null, false, false, null]],
+        2920 => [[['_route' => 'app_offre_edit', '_controller' => 'App\\Controller\\User\\OffreController::edit'], ['idOffres'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        2935 => [[['_route' => 'app_offre_delete', '_controller' => 'App\\Controller\\User\\OffreController::delete'], ['idOffres'], ['POST' => 0], null, false, false, null]],
+        2986 => [[['_route' => 'participation_modifier', '_controller' => 'App\\Controller\\Evenements\\ParticipationController::modifier'], ['id'], null, null, false, true, null]],
+        3013 => [[['_route' => 'participation_supprimer', '_controller' => 'App\\Controller\\Evenements\\ParticipationController::supprimer'], ['id'], null, null, false, true, null]],
+        3049 => [[['_route' => 'admin_plantes_edit', '_controller' => 'App\\Controller\\Terrain\\PlanteController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        3064 => [[['_route' => 'admin_plantes_delete', '_controller' => 'App\\Controller\\Terrain\\PlanteController::delete'], ['id'], ['POST' => 0], null, false, false, null]],
+        3074 => [[['_route' => 'admin_plantes_show', '_controller' => 'App\\Controller\\Terrain\\PlanteController::show'], ['id'], ['GET' => 0], null, false, true, null]],
+        3118 => [[['_route' => 'admin_rotations_edit', '_controller' => 'App\\Controller\\Terrain\\RotationController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        3133 => [[['_route' => 'admin_rotations_delete', '_controller' => 'App\\Controller\\Terrain\\RotationController::delete'], ['id'], ['POST' => 0], null, false, false, null]],
+        3143 => [[['_route' => 'admin_rotations_show', '_controller' => 'App\\Controller\\Terrain\\RotationController::show'], ['id'], ['GET' => 0], null, false, true, null]],
+        3187 => [[['_route' => 'admin_rotationsagri_rotations_edit', '_controller' => 'App\\Controller\\Terrain\\RotationController::agriEdit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        3202 => [[['_route' => 'admin_rotationsagri_rotations_delete', '_controller' => 'App\\Controller\\Terrain\\RotationController::agriDelete'], ['id'], ['POST' => 0], null, false, false, null]],
+        3212 => [[['_route' => 'admin_rotationsagri_rotations_show', '_controller' => 'App\\Controller\\Terrain\\RotationController::agriShow'], ['id'], ['GET' => 0], null, false, true, null]],
+        3255 => [[['_route' => 'admin_terrains_edit', '_controller' => 'App\\Controller\\Terrain\\TerrainController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        3270 => [[['_route' => 'admin_terrains_delete', '_controller' => 'App\\Controller\\Terrain\\TerrainController::delete'], ['id'], ['POST' => 0], null, false, false, null]],
+        3280 => [[['_route' => 'admin_terrains_show', '_controller' => 'App\\Controller\\Terrain\\TerrainController::show'], ['id'], ['GET' => 0], null, false, true, null]],
+        3306 => [[['_route' => 'app_tache_show', '_controller' => 'App\\Controller\\User\\TacheController::show'], ['idTache'], ['GET' => 0], null, false, true, null]],
+        3322 => [[['_route' => 'app_tache_pdf', '_controller' => 'App\\Controller\\User\\TacheController::pdf'], ['idTache'], ['GET' => 0], null, false, false, null]],
+        3335 => [[['_route' => 'app_tache_edit', '_controller' => 'App\\Controller\\User\\TacheController::edit'], ['idTache'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        3350 => [
             [['_route' => 'app_tache_delete', '_controller' => 'App\\Controller\\User\\TacheController::delete'], ['idTache'], ['POST' => 0], null, false, false, null],
             [null, null, null, null, false, false, 0],
         ],

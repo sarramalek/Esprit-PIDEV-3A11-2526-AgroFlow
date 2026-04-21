@@ -1,0 +1,129 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails de {{ article.nom }} - AgroFlow{% endblock %}
+
+{% block body %}
+<div class="container mt-5" style="font-family: 'DM Sans', sans-serif;">
+    {# Header #}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 style="color: #2D5A27; font-weight: 800; margin: 0;">
+                <i class="fa fa-info-circle"></i> Détails du Produit
+            </h1>
+            <p class="text-muted">Informations complètes sur {{ article.nom }}</p>
+        </div>
+        <a href="{{ path('agri_produits') }}" class="btn btn-outline-secondary" style="border-radius: 10px;">
+            <i class="fa fa-arrow-left"></i> Retour au stock
+        </a>
+    </div>
+
+    <div class="row">
+        {# Carte Informations Principales #}
+        <div class="col-md-5 mb-4">
+            <div class="card shadow-sm" style="border-radius: 20px; border: none; background-color: #fcf8e6;">
+                <div class="card-body p-4 text-center">
+                    <div style="background: white; width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                        <i class="fa fa-box-open" style="font-size: 40px; color: #2D5A27;"></i>
+                    </div>
+                    <h2 style="font-weight: 700; color: #1a2a19;">{{ article.nom }}</h2>
+                    <span class="badge bg-success mb-3" style="font-size: 14px; padding: 8px 15px;">
+                        {{ article.categorie ? article.categorie.nom : 'Sans catégorie' }}
+                    </span>
+                    
+                    <div class="row mt-4">
+                        <div class="col-6 border-end">
+                            <h6 class="text-muted">Stock Actuel</h6>
+                            <h4 style="font-weight: 800; color: {{ article.quantiteEnStock <= article.seuilAlerte ? '#e74c3c' : '#2D5A27' }};">
+                                {{ article.quantiteEnStock }} <small style="font-size: 12px;">{{ article.uniteMesure }}</small>
+                            </h4>
+                        </div>
+                        <div class="col-6">
+                            <h6 class="text-muted">Prix Unitaire</h6>
+                            <h4 style="font-weight: 800; color: #2D5A27;">
+                                {{ article.prixUnitaire|number_format(3, ',', ' ') }} <small style="font-size: 12px;">DT</small>
+                            </h4>
+                        </div>
+                    </div>
+
+                    <hr class="my-4" style="opacity: 0.1;">
+
+                    <div class="text-start">
+                        <div class="mb-3 d-flex align-items-center">
+                            <div style="width: 35px; color: #2D5A27;"><i class="fa fa-bell"></i></div>
+                            <div>
+                                <small class="text-muted d-block">Seuil d'alerte</small>
+                                <strong>{{ article.seuilAlerte }} {{ article.uniteMesure }}</strong>
+                            </div>
+                        </div>
+                        <div class="mb-3 d-flex align-items-center">
+                            <div style="width: 35px; color: #2D5A27;"><i class="fa fa-qrcode"></i></div>
+                            <div>
+                                <small class="text-muted d-block">Identifiant Article</small>
+                                <strong>#{{ article.id }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# Carte Historique des Mouvements #}
+        <div class="col-md-7 mb-4">
+            <div class="card shadow-sm" style="border-radius: 20px; border: none;">
+                <div class="card-header bg-white p-4 border-0 d-flex justify-content-between align-items-center">
+                    <h4 style="font-weight: 700; color: #2D5A27; margin: 0;">
+                        <i class="fa fa-history"></i> Historique des Mouvements
+                    </h4>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead style="background-color: #f8f9fa;">
+                                <tr>
+                                    <th class="ps-4">Date</th>
+                                    <th>Type</th>
+                                    <th>Quantité</th>
+                                    <th class="pe-4">Motif</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for m in movements|reverse|slice(0, 10) %}
+                                    <tr>
+                                        <td class="ps-4">
+                                            <div style="font-size: 13px;">{{ m.dateMouvement|date('d/m/Y') }}</div>
+                                            <small class="text-muted">{{ m.dateMouvement|date('H:i') }}</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge {{ m.type == 'ENTREE' ? 'bg-success' : 'bg-danger' }}" style="font-size: 10px;">
+                                                {{ m.type }}
+                                            </span>
+                                        </td>
+                                        <td style="font-weight: 700;">
+                                            {{ m.type == 'SORTIE' ? '-' : '+' }}{{ m.quantite }}
+                                        </td>
+                                        <td class="pe-4 text-muted" style="font-size: 13px;">{{ m.motif ?: '-' }}</td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="4" class="text-center p-5 text-muted">
+                                            <i class="fa fa-info-circle d-block mb-2" style="font-size: 30px; opacity: 0.3;"></i>
+                                            Aucun mouvement enregistré pour cet article.
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card { transition: transform 0.3s ease; }
+    .card:hover { transform: translateY(-5px); }
+    .badge { border-radius: 6px; }
+    .table th { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #6c757d; }
+</style>
+{% endblock %}
