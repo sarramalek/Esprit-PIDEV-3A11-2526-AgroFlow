@@ -27,7 +27,7 @@ class QRCodeService
     {
         $host = $_SERVER['HTTP_HOST'] ?? '127.0.0.1';
         
-        if (str_contains($host, 'localhost') || str_contains($host, '127.0.0.1')) {
+        if ( str_contains($host, '127.0.0.1')) {
             $qrContent = sprintf(
                 "AgroFlow - Details Article\n" .
                 "--------------------------\n" .
