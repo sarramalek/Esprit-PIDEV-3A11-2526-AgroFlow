@@ -21,7 +21,6 @@
 .ms-value--id   { font-size: 1.25rem; font-weight: 700; color: #2d6a2d; }
 .ms-value--cost { font-size: 1.2rem; font-weight: 700; font-variant-numeric: tabular-nums; }
 .ms-value--desc { font-size: .95rem; color: #4a5e4a; line-height: 1.7; font-weight: 400; }
-/* panne badges */
 .panne-badge { display: inline-block; padding: .35rem 1rem; border-radius: 50px; font-size: .82rem; font-weight: 600; }
 .badge--mecanique    { background: #e1f5ee; color: #085041; }
 .badge--electrique   { background: #faeeda; color: #633806; }
@@ -33,12 +32,10 @@
 .badge--revision     { background: #e8f4fd; color: #1a5276; }
 .badge--pneumatique  { background: #ddeeff; color: #0a3d6b; }
 .badge--autre, .badge--default { background: #f1efe8; color: #2c2c2a; }
-/* statut */
 .statut-badge { display: inline-flex; align-items: center; gap: 5px; padding: .3rem .9rem; border-radius: 50px; font-size: .82rem; font-weight: 600; }
 .statut--planifie  { background: #e6f1fb; color: #0c447c; }
 .statut--en_cours  { background: #fff8e1; color: #7b5200; }
 .statut--termine   { background: #e1f5ee; color: #085041; }
-/* priorité */
 .prio-badge { display: inline-flex; align-items: center; gap: 5px; padding: .3rem .9rem; border-radius: 50px; font-size: .82rem; font-weight: 700; }
 .prio--faible   { background: #e6f1fb; color: #0c447c; }
 .prio--moyenne  { background: #eaf3de; color: #27500a; }
@@ -51,11 +48,8 @@
 .btn-edit:hover { background: #235223; }
 .btn-delete { display: inline-flex; align-items: center; gap: .4rem; padding: .65rem 1.4rem; border-radius: 10px; background: transparent; color: #a32d2d; font-size: .9rem; font-weight: 600; border: 1.5px solid #f7c1c1; cursor: pointer; transition: all .14s; }
 .btn-delete:hover { background: #fcebeb; border-color: #a32d2d; }
-/* API buttons */
 .btn-api-plan { display: inline-flex; align-items: center; gap: .4rem; padding: .65rem 1.4rem; border-radius: 10px; background: #534AB7; color: #fff; font-size: .9rem; font-weight: 600; text-decoration: none; border: none; cursor: pointer; transition: background .15s; }
 .btn-api-plan:hover { background: #3C3489; }
-.btn-api-diag { display: inline-flex; align-items: center; gap: .4rem; padding: .65rem 1.4rem; border-radius: 10px; background: #0F6E56; color: #fff; font-size: .9rem; font-weight: 600; text-decoration: none; border: none; cursor: pointer; transition: background .15s; }
-.btn-api-diag:hover { background: #085041; }
 </style>
 
 <div class="ms-page">
@@ -102,7 +96,6 @@
                 <span class="ms-value">{{ maintenance.dateMain ? maintenance.dateMain|date('d/m/Y') : '—' }}</span>
             </div>
 
-            {# Statut #}
             <div class="ms-info-item">
                 <span class="ms-label">Statut</span>
                 {% set statutLabels = {'planifie':'📅 Planifié','en_cours':'⚙️ En cours','termine':'✅ Terminé'} %}
@@ -111,7 +104,6 @@
                 </span>
             </div>
 
-            {# Priorité #}
             <div class="ms-info-item">
                 <span class="ms-label">Priorité</span>
                 {% set prioLabels = {'faible':'🔵 Faible','moyenne':'🟢 Moyenne','haute':'🟠 Haute','urgente':'🔴 Urgente'} %}
@@ -120,7 +112,6 @@
                 </span>
             </div>
 
-            {# Kilométrage #}
             <div class="ms-info-item">
                 <span class="ms-label">Kilométrage</span>
                 <span class="ms-value">
@@ -166,15 +157,9 @@
 
         <div class="ms-actions">
             <a href="{{ path('agri_maintenances_edit', {id: maintenance.idMain}) }}" class="btn-edit">✏️ Modifier</a>
-
-            {# ── API Buttons ── #}
             <a href="{{ path('agri_maintenances_api_schedule', {id: maintenance.idMain}) }}" class="btn-api-plan" target="_blank">
                 🤖 Plan de maintenance IA
             </a>
-            <a href="{{ path('agri_maintenances_api_diagnostics', {id: maintenance.idMain}) }}" class="btn-api-diag" target="_blank">
-                🔍 Diagnostics IA
-            </a>
-
             <form method="post"
                   action="{{ path('agri_maintenances_delete', {id: maintenance.idMain}) }}"
                   onsubmit="return confirm('⚠️ Voulez-vous vraiment supprimer cette maintenance ?')"
