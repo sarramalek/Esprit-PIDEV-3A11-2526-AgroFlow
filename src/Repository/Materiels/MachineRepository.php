@@ -1,5 +1,4 @@
 <?php
-// src/Repository/Materiels/MachineRepository.php
 
 namespace App\Repository\Materiels;
 
@@ -15,13 +14,12 @@ class MachineRepository extends ServiceEntityRepository
     }
 
     // =========================================================================
-    // Recherche filtrée pour l'index
+    // Recherche filtrée — retourne un array (sans paginator)
     // =========================================================================
     public function search(array $filters = []): array
     {
         $cin = isset($filters['cin']) ? (int) $filters['cin'] : 0;
 
-        // Sans CIN valide on ne retourne rien (sécurité)
         if ($cin <= 0) {
             return [];
         }
@@ -32,28 +30,30 @@ class MachineRepository extends ServiceEntityRepository
             ->andWhere('u.cin = :cin')
             ->setParameter('cin', $cin);
 
-        // Recherche textuelle (nom, marque, modèle, numéro de série)
-        if (!empty($filters['search'])) {
-            $search = '%' . mb_strtolower(trim($filters['search'])) . '%';
+        // Recherche textuelle
+        $search = trim((string) ($filters['search'] ?? ''));
+        if ($search !== '') {
+            $like = '%' . mb_strtolower($search) . '%';
             $qb->andWhere(
                 $qb->expr()->orX(
-                    $qb->expr()->like('LOWER(m.nom)', ':search'),
-                    $qb->expr()->like('LOWER(m.marque)', ':search'),
-                    $qb->expr()->like('LOWER(m.modele)', ':search'),
+                    $qb->expr()->like('LOWER(m.nom)',         ':search'),
+                    $qb->expr()->like('LOWER(m.marque)',      ':search'),
+                    $qb->expr()->like('LOWER(m.modele)',      ':search'),
                     $qb->expr()->like('LOWER(m.numeroSerie)', ':search')
                 )
-            )->setParameter('search', $search);
+            )->setParameter('search', $like);
         }
 
-        // Filtre par état
-        if (!empty($filters['etat'])) {
+        // Filtre état
+        $etat = trim((string) ($filters['etat'] ?? ''));
+        if ($etat !== '') {
             $qb->andWhere('m.etatM = :etat')
-               ->setParameter('etat', $filters['etat']);
+               ->setParameter('etat', $etat);
         }
 
         // Tri
-        $allowedSortFields = ['nom', 'marque', 'modele', 'etatM', 'dateAchat', 'kilometrage', 'id'];
-        $sortBy  = in_array($filters['sortBy'] ?? '', $allowedSortFields, true)
+        $allowed = ['nom', 'marque', 'modele', 'etatM', 'dateAchat', 'kilometrage', 'id'];
+        $sortBy  = in_array($filters['sortBy'] ?? '', $allowed, true)
                      ? $filters['sortBy']
                      : 'dateAchat';
         $sortDir = strtoupper($filters['sortDir'] ?? 'DESC') === 'ASC' ? 'ASC' : 'DESC';
@@ -67,7 +67,7 @@ class MachineRepository extends ServiceEntityRepository
     }
 
     // =========================================================================
-    // Statistiques globales (admin)
+    // Statistiques globales
     // =========================================================================
     public function getStatistiques(): array
     {
@@ -100,7 +100,6 @@ class MachineRepository extends ServiceEntityRepository
             $parMarque[$row['marque']] = (int) $row['nb'];
         }
 
-        // Statistiques kilométrage
         $statsKm = $this->createQueryBuilder('m')
             ->select(
                 'AVG(m.kilometrage) AS avgKm',
@@ -130,7 +129,7 @@ class MachineRepository extends ServiceEntityRepository
     }
 
     // =========================================================================
-    // Machines dont la prochaine maintenance arrive bientôt
+    // Machines dont la maintenance arrive bientôt
     // =========================================================================
     public function findMachinesWithMaintenanceSoon(\DateTimeInterface $dateLimit): array
     {
