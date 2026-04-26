@@ -21,6 +21,8 @@
 .btn--stats:hover,.btn--stats.active { background:#CECBF6; border-color:#7F77DD; }
 .btn--view-toggle { background:#fff; color:#5f7a5f; border:1.5px solid #d4e8d4; font-size:.82rem; padding:.55rem .9rem; border-radius:10px; cursor:pointer; }
 .btn--view-toggle.active { background:#eaf3de; color:#2d6a2d; border-color:#2d6a2d; }
+.btn--calendar { background:#fff; color:#a32d2d; border:1.5px solid #f7c1c1; font-size:.82rem; padding:.55rem .9rem; border-radius:10px; cursor:pointer; }
+.btn--calendar.active { background:#fcebeb; color:#a32d2d; border-color:#a32d2d; }
 .btn--red-outline { background:#fff; color:#a32d2d; border:1.5px solid #f7c1c1; font-size:.82rem; padding:.55rem 1rem; border-radius:10px; cursor:pointer; }
 .btn--red-outline:hover { background:#fcebeb; }
 .alert { display:flex; align-items:center; justify-content:space-between; padding:.8rem 1.1rem; border-radius:10px; font-size:.9rem; font-weight:500; margin-bottom:1rem; border-left:4px solid; }
@@ -36,8 +38,8 @@
 /* ── Modal IA ── */
 .modal { display:none; position:fixed; z-index:10000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.5); }
 .modal.show { display:flex; align-items:center; justify-content:center; }
-.modal-content { background:#fff; border-radius:20px; width:92%; max-width:620px; box-shadow:0 20px 60px rgba(0,0,0,0.25); animation:slideIn .25s; overflow:hidden; }
-@keyframes slideIn { from { transform:translateY(-40px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+.modal-content { background:#fff; border-radius:20px; width:92%; max-width:680px; box-shadow:0 20px 60px rgba(0,0,0,0.25); animation:slideIn .25s; overflow:hidden; }
+@keyframes slideIn { from { transform:translateY(-40px); opacity:0; } to { transform:translateY(0px); opacity:1; } }
 .modal-hdr { padding:1rem 1.5rem; background:#2d6a2d; display:flex; justify-content:space-between; align-items:center; }
 .modal-hdr h3 { margin:0; color:#EAF3DE; font-size:15px; font-weight:600; display:flex; align-items:center; gap:8px; }
 .modal-hdr .badge-ia { background:#EAF3DE; color:#27500A; font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; }
@@ -51,7 +53,7 @@
 .modal-tab { flex:1; padding:.6rem .5rem; font-size:12px; font-weight:600; color:#6b8c6b; cursor:pointer; border:none; background:none; border-bottom:2px solid transparent; transition:all .15s; white-space:nowrap; }
 .modal-tab.active { color:#2d6a2d; border-bottom-color:#2d6a2d; background:#fff; }
 .modal-tab:hover:not(.active) { background:#fff; color:#1a2e1a; }
-.modal-panel { display:none; padding:1.1rem 1.25rem; }
+.modal-panel { display:none; padding:1.1rem 1.25rem; max-height:500px; overflow-y:auto; }
 .modal-panel.active { display:block; }
 .modal-field-label { font-size:11px; font-weight:700; color:#7a9a7a; margin-bottom:6px; text-transform:uppercase; letter-spacing:.5px; }
 .modal-chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:.9rem; }
@@ -75,6 +77,52 @@
 .modal-life-bar-fill { height:100%; border-radius:4px; transition:width .5s; }
 .modal-footer { padding:.75rem 1.25rem; border-top:1px solid #e4edde; display:flex; align-items:center; justify-content:space-between; background:#f7faf4; }
 
+/* Loader spinner centré dans les onglets */
+.modal-loader { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem; gap:.75rem; }
+.modal-loader__spinner { width:32px; height:32px; border:3px solid #e4edde; border-top-color:#2d6a2d; border-radius:50%; animation:spin .7s linear infinite; }
+.modal-loader__text { font-size:13px; color:#7a9a7a; }
+
+/* ── MODALE RAPPEL MAINTENANCE ── */
+.reminder-modal { display:none; position:fixed; z-index:10001; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.6); backdrop-filter:blur(4px); font-family:'Segoe UI',system-ui,sans-serif; }
+.reminder-modal.show { display:flex; align-items:center; justify-content:center; }
+.reminder-modal__content { background:white; border-radius:24px; width:90%; max-width:480px; animation:modalSlideIn 0.3s ease-out; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); overflow:hidden; }
+@keyframes modalSlideIn { from { opacity:0; transform:translateY(-30px) scale(0.95); } to { opacity:1; transform:translateY(0) scale(1); } }
+.reminder-modal__header { background:linear-gradient(135deg, #e74a3b 0%, #c0392b 100%); padding:1.25rem 1.5rem; color:white; display:flex; align-items:center; gap:12px; }
+.reminder-modal__header-icon { font-size:28px; }
+.reminder-modal__header-title { margin:0; font-size:1.25rem; font-weight:700; flex:1; }
+.reminder-modal__close { background:rgba(255,255,255,0.2); border:none; color:white; font-size:24px; cursor:pointer; width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; transition:all 0.2s; }
+.reminder-modal__close:hover { background:rgba(255,255,255,0.3); transform:scale(1.05); }
+.reminder-modal__body { padding:1.75rem 1.5rem; }
+.reminder-message { text-align:center; margin-bottom:1.5rem; }
+.reminder-message-icon { font-size:48px; margin-bottom:12px; }
+.reminder-message-text { font-size:1.1rem; font-weight:700; color:#1a2e1a; margin-bottom:8px; }
+.reminder-message-sub { font-size:0.9rem; color:#7a9a7a; }
+.reminder-details { background:#f8f9fa; border-radius:16px; padding:1rem; margin:1rem 0; }
+.reminder-detail-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #e9ecef; }
+.reminder-detail-row:last-child { border-bottom:none; }
+.reminder-detail-label { font-weight:600; color:#495057; }
+.reminder-detail-value { color:#2d6a2d; font-weight:500; }
+.reminder-badge { display:inline-block; background:#fcebeb; color:#a32d2d; padding:4px 12px; border-radius:20px; font-size:0.75rem; font-weight:600; }
+.reminder-modal__footer { display:flex; gap:12px; padding:1rem 1.5rem 1.5rem; }
+.reminder-modal__footer .btn { flex:1; justify-content:center; }
+
+/* ── Calendar ── */
+.calendar-panel { display:none; background:#fff; border-radius:16px; border:1.5px solid #f7c1c1; border-left:4px solid #a32d2d; padding:1.5rem; margin-bottom:1.5rem; box-shadow:0 2px 14px rgba(163,45,45,.08); }
+.calendar-panel.is-open { display:block; }
+.calendar-panel__header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; padding-bottom:.9rem; border-bottom:1px solid #fcebeb; }
+.calendar-panel__title { margin:0; font-size:.95rem; font-weight:700; color:#a32d2d; display:flex; align-items:center; gap:8px; }
+.calendar-panel__close { background:none; border:none; cursor:pointer; color:#7a9a7a; font-size:1.2rem; padding:0 4px; }
+.calendar-panel__close:hover { color:#a32d2d; }
+#calendar { min-height:500px; }
+.fc { font-family:'Segoe UI',system-ui,sans-serif; }
+.fc-toolbar-title { font-size:1.2rem; font-weight:700; color:#1a2e1a; }
+.fc-button-primary { background-color:#2d6a2d !important; border-color:#235223 !important; }
+.fc-button-primary:hover { background-color:#235223 !important; }
+.fc-daygrid-day-number { color:#1a2e1a; }
+.fc-event { cursor:pointer; border-radius:6px; font-size:0.8rem; font-weight:500; }
+.reminder-event { animation:pulse 2s infinite; }
+@keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(231,74,59,0.4);}70%{box-shadow:0 0 0 6px rgba(231,74,59,0);}100%{box-shadow:0 0 0 0 rgba(231,74,59,0);} }
+
 /* ── Stats panel ── */
 .charts-panel { display:none; background:#fff; border-radius:16px; border:1.5px solid #CECBF6; border-left:4px solid #534AB7; padding:1.5rem; margin-bottom:1.5rem; box-shadow:0 2px 14px rgba(83,74,183,.08); }
 .charts-panel.is-open { display:block; }
@@ -82,15 +130,15 @@
 .charts-panel__title { margin:0; font-size:.95rem; font-weight:700; color:#3C3489; }
 .charts-panel__close { background:none; border:none; cursor:pointer; color:#7a9a7a; font-size:1.2rem; padding:0 4px; }
 .charts-panel__close:hover { color:#3C3489; }
-.panel-stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:12px; margin-bottom:1.5rem; }
+.panel-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-bottom:1.5rem; }
 .pstat { border-radius:12px; padding:.9rem 1.1rem; }
-.pstat--purple { background:#EEEDFE; } .pstat--green { background:#EAF3DE; } .pstat--teal { background:#E1F5EE; } .pstat--amber { background:#FAEEDA; }
+.pstat--purple{background:#EEEDFE;}.pstat--green{background:#EAF3DE;}.pstat--teal{background:#E1F5EE;}.pstat--amber{background:#FAEEDA;}
 .pstat__label { font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.6px; margin-bottom:.25rem; }
-.pstat--purple .pstat__label { color:#534AB7; } .pstat--green .pstat__label { color:#3B6D11; } .pstat--teal .pstat__label { color:#0F6E56; } .pstat--amber .pstat__label { color:#854F0B; }
+.pstat--purple .pstat__label{color:#534AB7;}.pstat--green .pstat__label{color:#3B6D11;}.pstat--teal .pstat__label{color:#0F6E56;}.pstat--amber .pstat__label{color:#854F0B;}
 .pstat__value { font-size:1.5rem; font-weight:800; }
-.pstat--purple .pstat__value { color:#26215C; } .pstat--green .pstat__value { color:#173404; } .pstat--teal .pstat__value { color:#04342C; font-size:1.1rem; margin-top:.2rem; } .pstat--amber .pstat__value { color:#412402; }
+.pstat--purple .pstat__value{color:#26215C;}.pstat--green .pstat__value{color:#173404;}.pstat--teal .pstat__value{color:#04342C;font-size:1.1rem;margin-top:.2rem;}.pstat--amber .pstat__value{color:#412402;}
 .charts-row { display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; }
-@media(max-width:700px){ .charts-row { grid-template-columns:1fr; } }
+@media(max-width:700px){.charts-row{grid-template-columns:1fr;}}
 .chart-card { background:#f9f7ff; border-radius:12px; padding:1.1rem 1.25rem; border:1px solid #EEEDFE; }
 .chart-card h3 { margin:0 0 1rem; font-size:.875rem; font-weight:700; color:#3C3489; }
 
@@ -112,14 +160,14 @@
 
 /* ── Badges ── */
 .badge { display:inline-block; padding:.28rem .85rem; border-radius:50px; font-size:.78rem; font-weight:600; white-space:nowrap; }
-.badge--mecanique { background:#e1f5ee; color:#085041; } .badge--electrique { background:#faeeda; color:#633806; } .badge--hydraulique { background:#eaf3de; color:#27500a; }
-.badge--logicielle { background:#e6f1fb; color:#0c447c; } .badge--transmission { background:#ede8fa; color:#4a1d8c; } .badge--moteur { background:#fde8e8; color:#a32d2d; }
-.badge--vidange { background:#fff8e1; color:#7b5200; } .badge--revision { background:#e8f4fd; color:#1a5276; } .badge--pneumatique { background:#ddeeff; color:#0a3d6b; }
-.badge--autre,.badge--default { background:#f1efe8; color:#2c2c2a; }
+.badge--mecanique{background:#e1f5ee;color:#085041;}.badge--electrique{background:#faeeda;color:#633806;}.badge--hydraulique{background:#eaf3de;color:#27500a;}
+.badge--logicielle{background:#e6f1fb;color:#0c447c;}.badge--transmission{background:#ede8fa;color:#4a1d8c;}.badge--moteur{background:#fde8e8;color:#a32d2d;}
+.badge--vidange{background:#fff8e1;color:#7b5200;}.badge--revision{background:#e8f4fd;color:#1a5276;}.badge--pneumatique{background:#ddeeff;color:#0a3d6b;}
+.badge--autre,.badge--default{background:#f1efe8;color:#2c2c2a;}
 .statut-badge { display:inline-flex; align-items:center; gap:4px; padding:.2rem .7rem; border-radius:50px; font-size:.76rem; font-weight:600; white-space:nowrap; }
-.statut--planifie { background:#e6f1fb; color:#0c447c; } .statut--en_cours { background:#fff8e1; color:#7b5200; } .statut--termine { background:#e1f5ee; color:#085041; }
+.statut--planifie{background:#e6f1fb;color:#0c447c;}.statut--en_cours{background:#fff8e1;color:#7b5200;}.statut--termine{background:#e1f5ee;color:#085041;}
 .prio-badge { display:inline-flex; align-items:center; gap:4px; padding:.2rem .7rem; border-radius:50px; font-size:.76rem; font-weight:700; white-space:nowrap; }
-.prio--faible { background:#e6f1fb; color:#0c447c; } .prio--moyenne { background:#eaf3de; color:#27500a; } .prio--haute { background:#faeeda; color:#854F0B; } .prio--urgente { background:#fde8e8; color:#a32d2d; }
+.prio--faible{background:#e6f1fb;color:#0c447c;}.prio--moyenne{background:#eaf3de;color:#27500a;}.prio--haute{background:#faeeda;color:#854F0B;}.prio--urgente{background:#fde8e8;color:#a32d2d;}
 
 /* ── TABLE ── */
 .maint-card { background:#fff; border-radius:16px; box-shadow:0 2px 18px rgba(0,0,0,.07); overflow-x:auto; }
@@ -137,41 +185,50 @@
 .td-desc { color:#4a6a4a; font-size:.87rem; max-width:180px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .actions { display:flex; align-items:center; gap:.35rem; flex-wrap:wrap; }
 .act-btn { display:inline-flex; align-items:center; gap:.3rem; padding:.3rem .7rem; border-radius:8px; font-size:.78rem; font-weight:600; text-decoration:none; cursor:pointer; border:1.5px solid; background:#fff; transition:all .13s; white-space:nowrap; }
-.act-btn--view { border-color:#b3d4b3; color:#2d6a2d; } .act-btn--view:hover { background:#eaf3de; }
-.act-btn--edit { border-color:#f5c4b3; color:#993c1d; } .act-btn--edit:hover { background:#faece7; }
-.act-btn--del  { border-color:#f7c1c1; color:#a32d2d; } .act-btn--del:hover  { background:#fcebeb; }
-.act-btn--magic { border-color:#b3d4b3; color:#2d6a2d; } .act-btn--magic:hover { background:#eaf3de; }
+.act-btn--view{border-color:#b3d4b3;color:#2d6a2d;}.act-btn--view:hover{background:#eaf3de;}
+.act-btn--edit{border-color:#f5c4b3;color:#993c1d;}.act-btn--edit:hover{background:#faece7;}
+.act-btn--del{border-color:#f7c1c1;color:#a32d2d;}.act-btn--del:hover{background:#fcebeb;}
+.act-btn--magic{border-color:#b3d4b3;color:#2d6a2d;}.act-btn--magic:hover{background:#eaf3de;}
 
 /* ── CARDS ── */
-.cards-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(340px,1fr)); gap:1.1rem; }
+.cards-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:1.1rem; }
 .maint-card-item { background:#fff; border-radius:16px; box-shadow:0 2px 14px rgba(0,0,0,.08); overflow:hidden; transition:box-shadow .2s,transform .15s; display:flex; flex-direction:column; }
 .maint-card-item:hover { box-shadow:0 6px 28px rgba(0,0,0,.13); transform:translateY(-2px); }
 .mci-header { padding:1.1rem 1.2rem .9rem; display:flex; justify-content:space-between; align-items:flex-start; background:#2d6a2d; color:#fff; }
-.mci-header.h--planifie { background:#0c447c; } .mci-header.h--en_cours { background:#7b5200; } .mci-header.h--termine { background:#2d6a2d; } .mci-header.h--urgente { background:#a32d2d; }
+.mci-header.h--planifie{background:#0c447c;}.mci-header.h--en_cours{background:#7b5200;}.mci-header.h--termine{background:#2d6a2d;}.mci-header.h--urgente{background:#a32d2d;}
 .mci-title { font-size:1rem; font-weight:700; margin-bottom:.15rem; }
-.mci-sub   { font-size:.78rem; opacity:.85; display:flex; align-items:center; gap:.35rem; }
+.mci-sub { font-size:.78rem; opacity:.85; display:flex; align-items:center; gap:.35rem; }
 .mci-status-pill { background:rgba(255,255,255,.22); border-radius:20px; padding:.2rem .75rem; font-size:.78rem; font-weight:700; color:#fff; white-space:nowrap; border:1.5px solid rgba(255,255,255,.4); }
 .mci-alert { background:#fffbe6; border-left:4px solid #f5a623; padding:.55rem 1rem; font-size:.8rem; font-weight:600; color:#7b4f00; display:flex; align-items:center; gap:.4rem; }
-.mci-alert.alert-danger  { background:#fcebeb; border-left-color:#a32d2d; color:#501313; }
-.mci-alert.alert-warning { background:#fff3cd; border-left-color:#ffc107; color:#856404; }
+.mci-alert.alert-danger{background:#fcebeb;border-left-color:#a32d2d;color:#501313;}
+.mci-alert.alert-warning{background:#fff3cd;border-left-color:#ffc107;color:#856404;}
 .mci-stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:0; border-bottom:1px solid #f0f4ef; }
 .mci-stat { padding:.75rem .6rem; text-align:center; border-right:1px solid #f0f4ef; }
 .mci-stat:last-child { border-right:none; }
 .mci-stat__val { font-size:1.15rem; font-weight:800; color:#1a2e1a; line-height:1; }
 .mci-stat__lbl { font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#8aaa8a; margin-top:.2rem; }
 .mci-body { padding:.9rem 1.2rem; flex:1; display:flex; flex-direction:column; gap:.55rem; }
-.mci-row  { display:flex; align-items:center; gap:.5rem; font-size:.83rem; color:#3a5a3a; }
+.mci-row { display:flex; align-items:center; gap:.5rem; font-size:.83rem; color:#3a5a3a; }
 .mci-row-label { color:#8aaa8a; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.4px; min-width:70px; }
 .mci-desc { font-size:.8rem; color:#5a7a5a; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
 .mci-actions { display:grid; grid-template-columns:1fr 1fr auto; gap:.4rem; padding:.75rem 1rem; border-top:1px solid #f0f4ef; background:#fafcf8; }
 .mci-btn { display:inline-flex; align-items:center; justify-content:center; gap:.3rem; padding:.42rem .6rem; border-radius:9px; font-size:.78rem; font-weight:600; text-decoration:none; cursor:pointer; border:1.5px solid; background:#fff; transition:all .13s; white-space:nowrap; }
-.mci-btn--view { border-color:#b3d4b3; color:#2d6a2d; } .mci-btn--view:hover { background:#eaf3de; }
-.mci-btn--edit { border-color:#f5c4b3; color:#993c1d; } .mci-btn--edit:hover { background:#faece7; }
-.mci-btn--magic { border-color:#b3d4b3; color:#2d6a2d; } .mci-btn--magic:hover { background:#eaf3de; }
-.mci-btn--del  { border-color:#f7c1c1; color:#a32d2d; } .mci-btn--del:hover  { background:#fcebeb; }
+.mci-btn--view{border-color:#b3d4b3;color:#2d6a2d;}.mci-btn--view:hover{background:#eaf3de;}
+.mci-btn--edit{border-color:#f5c4b3;color:#993c1d;}.mci-btn--edit:hover{background:#faece7;}
+.mci-btn--magic{border-color:#b3d4b3;color:#2d6a2d;}.mci-btn--magic:hover{background:#eaf3de;}
+.mci-btn--del{border-color:#f7c1c1;color:#a32d2d;}.mci-btn--del:hover{background:#fcebeb;}
 .empty { text-align:center; padding:4rem 2rem; background:#fff; border-radius:16px; border:1.5px dashed #c8dac8; }
 .loading-spinner { display:inline-block; width:13px; height:13px; border:2px solid rgba(255,255,255,.3); border-radius:50%; border-top-color:#fff; animation:spin .6s linear infinite; }
 @keyframes spin { to { transform:rotate(360deg); } }
+
+/* Suggestion cards dans la modale */
+.suggestion-card { background:#fff; border-radius:10px; padding:12px; margin-bottom:12px; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
+.suggestion-card__header { display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+.suggestion-card__icon { font-size:20px; }
+.suggestion-card__title { font-weight:700; flex:1; }
+.suggestion-card__badge { margin-left:auto; color:white; padding:2px 8px; border-radius:12px; font-size:10px; font-weight:600; }
+.suggestion-card__msg { margin:8px 0; font-size:13px; color:#2c3e50; }
+.suggestion-card__btn { font-size:11px; padding:4px 12px; }
 </style>
 
 <div class="mp">
@@ -189,6 +246,7 @@
     <div class="mh__right">
       <button type="button" class="btn btn--view-toggle active" id="viewCards" onclick="setView('cards')">⊞ Cartes</button>
       <button type="button" class="btn btn--view-toggle" id="viewTable" onclick="setView('table')">☰ Tableau</button>
+      <button type="button" class="btn btn--calendar" id="calendarToggle" onclick="toggleCalendar()">📅 Rappels annuels</button>
       <button type="button" class="btn btn--stats" id="statsToggle" onclick="toggleStats()">📊 Stats</button>
       <a href="{{ path('agri_maintenances_export_pdf') }}" target="_blank" class="btn btn--outline">📄 PDF</a>
       <a href="{{ path('agri_maintenances_export_excel') }}" class="btn btn--outline">📥 Excel</a>
@@ -201,6 +259,17 @@
       <div class="alert alert--{{ type }}"><span>{{ msg }}</span><button class="alert__close" onclick="this.parentElement.remove()">✕</button></div>
     {% endfor %}
   {% endfor %}
+
+  {# Calendrier des rappels annuels #}
+  <div class="calendar-panel" id="calendarPanel">
+    <div class="calendar-panel__header">
+      <p class="calendar-panel__title">
+        <span>🔔</span> Calendrier des rappels de maintenance annuelle
+      </p>
+      <button class="calendar-panel__close" onclick="toggleCalendar()">✕</button>
+    </div>
+    <div id="calendar"></div>
+  </div>
 
   {# Stats panel #}
   <div class="charts-panel" id="chartsPanel">
@@ -300,7 +369,8 @@
         {% set statutLabels = {'planifie':'📅 Planifié','en_cours':'⚙️ En cours','termine':'✅ Terminé'} %}
         {% set prioOrder = {'faible':1,'moyenne':2,'haute':3,'urgente':4} %}
         {% set headerCls = m.priorite == 'urgente' ? 'h--urgente' : 'h--' ~ (m.statut|default('planifie')) %}
-        {% set machineName = m.nomMateriel ?? m.nom ?? 'Machine non définie' %}
+        {# ── FIX : utiliser nomMateriel s'il existe, sinon nom, sinon fallback ── #}
+        {% set machineName = m.nomMateriel is defined and m.nomMateriel is not null ? m.nomMateriel : (m.nom is defined and m.nom is not null ? m.nom : 'Machine non définie') %}
 
         <div class="maint-card-item"
              data-id="{{ m.idMain }}"
@@ -378,7 +448,7 @@
             {% set alert = item.alert %}
             {% set typeMap2 = {'Mécanique':'mecanique','Électricité':'electrique','Hydraulique':'hydraulique','Logicielle':'logicielle','Transmission':'transmission','Moteur':'moteur','Vidange & filtres':'vidange','Révision générale':'revision','Pneumatique':'pneumatique'} %}
             {% set bc2 = typeMap2[m.typePanne]|default('default') %}
-            {% set machineName2 = m.nomMateriel ?? m.nom ?? '' %}
+            {% set machineName2 = m.nomMateriel is defined and m.nomMateriel is not null ? m.nomMateriel : (m.nom is defined and m.nom is not null ? m.nom : '') %}
             <tr data-id="{{ m.idMain }}" data-type="{{ m.typePanne|default('')|lower }}" data-desc="{{ m.description|default('')|lower }}"
                 data-cout="{{ m.cout|default(0) }}" data-date="{{ m.dateMain ? m.dateMain|date('Y-m-d') : '0000-00-00' }}"
                 data-statut="{{ m.statut|default('planifie') }}" data-priorite="{{ m.priorite|default('moyenne') }}"
@@ -424,7 +494,43 @@
   {% endif %}
 </div>
 
-{# ══ MODAL IA — 2 ONGLETS (Prompt + Durée de vie) ══ #}
+{# ══ MODALE RAPPEL MAINTENANCE (CALENDRIER) ══ #}
+<div id="reminderModal" class="reminder-modal">
+  <div class="reminder-modal__content">
+    <div class="reminder-modal__header">
+      <span class="reminder-modal__header-icon">🔔</span>
+      <h3 class="reminder-modal__header-title">Rappel de maintenance</h3>
+      <button class="reminder-modal__close" onclick="closeReminderModal()">×</button>
+    </div>
+    <div class="reminder-modal__body">
+      <div class="reminder-message">
+        <div class="reminder-message-icon">🚜</div>
+        <div class="reminder-message-text" id="reminderMachineName">—</div>
+        <div class="reminder-message-sub" id="reminderSubText">a un rappel de visite ou maintenance programmée</div>
+      </div>
+      <div class="reminder-details">
+        <div class="reminder-detail-row">
+          <span class="reminder-detail-label">📅 Dernière maintenance</span>
+          <span class="reminder-detail-value" id="reminderLastDate">—</span>
+        </div>
+        <div class="reminder-detail-row">
+          <span class="reminder-detail-label">⏰ Âge du rappel</span>
+          <span class="reminder-detail-value" id="reminderAge">—</span>
+        </div>
+        <div class="reminder-detail-row">
+          <span class="reminder-detail-label">⚠️ Type</span>
+          <span class="reminder-detail-value" id="reminderType">—</span>
+        </div>
+      </div>
+    </div>
+    <div class="reminder-modal__footer">
+      <a href="#" id="reminderViewLink" class="btn btn--green">👁 Voir détails</a>
+      <button class="btn btn--outline" onclick="closeReminderModal()">⏰ Plus tard</button>
+    </div>
+  </div>
+</div>
+
+{# ══ MODAL IA — 3 ONGLETS ══ #}
 <div id="aiModal" class="modal">
   <div class="modal-content">
     <div class="modal-hdr">
@@ -441,10 +547,10 @@
       <span class="modal-machine-info" id="aiMachineInfo"></span>
     </div>
 
-    {# 2 onglets seulement #}
     <div class="modal-tabs">
-      <button class="modal-tab active" id="aitab-prompt" onclick="switchAITab('prompt')">💬 Prompt libre</button>
-      <button class="modal-tab" id="aitab-life" onclick="switchAITab('life')">⏳ Durée de vie</button>
+      <button class="modal-tab active" id="aitab-prompt"  onclick="switchAITab('prompt')">💬 Prompt libre</button>
+      <button class="modal-tab"        id="aitab-life"    onclick="switchAITab('life')">⏳ Durée de vie</button>
+      <button class="modal-tab"        id="aitab-suggest" onclick="switchAITab('suggest')">🤖 Suggestion auto</button>
     </div>
 
     {# ── Onglet Prompt libre ── #}
@@ -484,6 +590,42 @@
       </div>
     </div>
 
+    {# ── Onglet Suggestion automatique ── #}
+    <div id="aipanel-suggest" class="modal-panel">
+      <div class="modal-alert-info" style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border-left-color:#fff;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        Analyse intelligente basée sur l'historique, la fréquence et l'état de la machine
+      </div>
+
+      {# Scores #}
+      <div class="modal-score-row" style="margin-bottom:1rem;">
+        <div class="modal-score-card">
+          <div class="modal-score-val" id="suggestUrgencyScore">—</div>
+          <div class="modal-score-lbl">Urgence</div>
+          <div class="modal-progress-bar"><div class="modal-progress-fill" id="suggestUrgencyBar" style="width:0%;background:#e74a3b;"></div></div>
+        </div>
+        <div class="modal-score-card">
+          <div class="modal-score-val" id="suggestNextDate" style="font-size:14px;">—</div>
+          <div class="modal-score-lbl">Prochaine recommandée</div>
+        </div>
+        <div class="modal-score-card">
+          <div class="modal-score-val" id="suggestHealthScore">—</div>
+          <div class="modal-score-lbl">Santé machine</div>
+        </div>
+      </div>
+
+      {# Zone pour les cartes de suggestions — loader par défaut #}
+      <div id="suggestionsList">
+        <div class="modal-loader" id="suggestLoader">
+          <div class="modal-loader__spinner"></div>
+          <div class="modal-loader__text">Chargement de l'analyse…</div>
+        </div>
+      </div>
+
+      <div class="modal-section-title">🎯 Actions recommandées</div>
+      <div class="modal-result-box" id="suggestActions" style="background:#f0faf7;min-height:48px;"></div>
+    </div>
+
     <div class="modal-footer">
       <span style="font-size:12px;color:#6b8c6b;" id="aiFooterMsg">Prêt</span>
       <div style="display:flex;gap:8px;">
@@ -498,8 +640,11 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 <script>
-// ══ VUE TOGGLE ══
+// ════════════════════════════════════════
+// VUE TOGGLE
+// ════════════════════════════════════════
 let currentView = localStorage.getItem('maintView') || 'cards';
 function setView(v) {
     currentView = v;
@@ -512,162 +657,95 @@ function setView(v) {
 }
 setView(currentView);
 
+// ════════════════════════════════════════
+// CALENDRIER DES RAPPELS ANNUELS
+// ════════════════════════════════════════
+let calendar = null;
+let calendarShown = false;
+
+async function toggleCalendar() {
+    const panel = document.getElementById('calendarPanel');
+    const btn   = document.getElementById('calendarToggle');
+    calendarShown = !calendarShown;
+    if (calendarShown) {
+        panel.classList.add('is-open');
+        btn.classList.add('active');
+        if (!calendar) await initCalendar();
+        else calendar.render();
+    } else {
+        panel.classList.remove('is-open');
+        btn.classList.remove('active');
+        if (calendar) { calendar.destroy(); calendar = null; }
+    }
+}
+
+async function initCalendar() {
+    try {
+        const response = await fetch('{{ path('api_maintenance_calendar_reminders') }}');
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        const events = await response.json();
+        const calendarEl = document.getElementById('calendar');
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'fr',
+            headerToolbar: { left:'prev,next today', center:'title', right:'dayGridMonth,dayGridWeek' },
+            events: events,
+            eventClick: function(info) {
+                const p = info.event.extendedProps;
+                showReminderModal({ id:p.maintenanceId, machine:p.machine, type:p.type,
+                    lastMaintenance:p.lastMaintenance, age:p.age, priority:p.priority });
+            },
+            eventDidMount: function(info) { info.el.style.cursor = 'pointer'; },
+            height: 550,
+            buttonText: { today:"Aujourd'hui", month:'Mois', week:'Semaine' }
+        });
+        calendar.render();
+    } catch (error) {
+        console.error('Erreur calendrier:', error);
+        showNotification('❌ Erreur de chargement du calendrier', 'danger');
+    }
+}
+
+// ════════════════════════════════════════
+// MODALE RAPPEL
+// ════════════════════════════════════════
+function showReminderModal(data) {
+    document.getElementById('reminderMachineName').textContent = data.machine || 'Matériel';
+    document.getElementById('reminderLastDate').textContent    = data.lastMaintenance || 'Date inconnue';
+    document.getElementById('reminderAge').textContent         = data.age || 'Rappel annuel';
+    document.getElementById('reminderType').innerHTML = data.priority === 'urgente'
+        ? '<span class="reminder-badge">🔴 URGENT - Intervention immédiate</span>'
+        : (data.type || 'Maintenance préventive');
+    document.getElementById('reminderViewLink').href = '/agriculteur/maintenances/' + data.id;
+    document.getElementById('reminderModal').classList.add('show');
+}
+function closeReminderModal() {
+    document.getElementById('reminderModal').classList.remove('show');
+}
+document.getElementById('reminderModal').addEventListener('click', function(e) {
+    if (e.target === this) closeReminderModal();
+});
+
 function toggleStats() {
     document.getElementById('chartsPanel').classList.toggle('is-open');
     document.getElementById('statsToggle').classList.toggle('active');
 }
 
-// ══ MODAL IA ══
-let aiActiveTab   = 'prompt';
-let aiMachineData = {};
-
-function openAIPrompt(id, type, priorite, km, nom, statut, cout, description) {
-    aiMachineData = { id, type: type||'—', priorite: priorite||'moyenne', km: parseInt(km)||0,
-                      nom: nom||'Machine', statut: statut||'planifie', cout: parseFloat(cout)||0,
-                      description: description||'' };
-    document.getElementById('aiMachinePill').textContent = nom || 'Machine';
-    document.getElementById('aiMachineInfo').innerHTML =
-        `Panne <strong>${type}</strong> · priorité <strong>${priorite}</strong> · ${km} km`;
-    document.getElementById('aiModal').classList.add('show');
-    switchAITab('prompt');
-    renderAILifeLocal();
+// ════════════════════════════════════════
+// NOTIFICATION TOAST
+// ════════════════════════════════════════
+function showNotification(message, type) {
+    const n = document.createElement('div');
+    n.className = `alert alert--${type}`;
+    n.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:9999;max-width:350px;animation:slideIn .25s;';
+    n.innerHTML = `<span>${message}</span><button class="alert__close" onclick="this.parentElement.remove()">✕</button>`;
+    document.body.appendChild(n);
+    setTimeout(() => n.remove(), 5000);
 }
 
-function closeAIModal() {
-    document.getElementById('aiModal').classList.remove('show');
-}
-
-function switchAITab(t) {
-    aiActiveTab = t;
-    ['prompt','life'].forEach(tab => {
-        const tabBtn = document.getElementById('aitab-' + tab);
-        const panel = document.getElementById('aipanel-' + tab);
-        if (tabBtn) tabBtn.classList.toggle('active', tab === t);
-        if (panel) panel.style.display = tab === t ? 'block' : 'none';
-    });
-}
-
-function setAISug(chip, txt) {
-    document.querySelectorAll('.modal-chip').forEach(c => c.classList.remove('sel'));
-    chip.classList.add('sel');
-    document.getElementById('aiPromptTxt').value = txt;
-}
-
-// ── Durée de vie (calcul local) ──
-function renderAILifeLocal() {
-    const km  = aiMachineData.km || 0;
-    const maxKm = 20000;
-    const penalite = {urgente:25,haute:15,moyenne:8,faible:3}[aiMachineData.priorite] || 8;
-    const vie = Math.max(0, Math.min(100, Math.round(((maxKm - km) / maxKm) * 100)) - penalite);
-    const ans = Math.max(0, ((maxKm - km) / 3000)).toFixed(1);
-    const risque = (aiMachineData.priorite === 'urgente' || km > 15000) ? 'Élevé'
-                 : (aiMachineData.priorite === 'haute'   || km > 10000) ? 'Moyen' : 'Faible';
-    document.getElementById('aiLifeScore').textContent = vie + '%';
-    document.getElementById('aiLifeBar').style.width   = vie + '%';
-    document.getElementById('aiLifeYears').textContent  = ans + ' ans';
-    document.getElementById('aiLifeRisk').textContent   = risque;
-    const composants = [
-        {nom:'Moteur',       usure: Math.min(100, Math.round(km/200)),  color:'#A32D2D'},
-        {nom:'Transmission', usure: Math.min(100, Math.round(km/300)),  color:'#854F0B'},
-        {nom:'Hydraulique',  usure: Math.min(100, Math.round(km/400)),  color:'#0C447C'},
-        {nom:'Électricité',  usure: Math.min(100, Math.round(km/600)),  color:'#3B6D11'},
-        {nom:'Pneumatique',  usure: Math.min(100, Math.round(km/250)),  color:'#4a1d8c'},
-    ];
-    const bars = document.getElementById('aiLifeBars');
-    bars.innerHTML = '';
-    composants.forEach(c => {
-        const row = document.createElement('div'); row.className = 'modal-life-bar-row';
-        row.innerHTML = `<div class="modal-life-bar-label">${c.nom}</div>
-            <div class="modal-life-bar-track"><div class="modal-life-bar-fill" style="width:${c.usure}%;background:${c.color}"></div></div>
-            <div style="font-size:11px;font-weight:600;color:#1a2e1a;">${c.usure}%</div>`;
-        bars.appendChild(row);
-    });
-}
-
-// ── Génération (appels Symfony) ──
-function setAIStatus(m) { document.getElementById('aiFooterMsg').textContent = m; }
-function setAILoading(on) {
-    const btn = document.getElementById('aiGenBtn');
-    if (on) { btn.disabled = true; btn.innerHTML = '<span class="loading-spinner"></span> Génération…'; }
-    else    { btn.disabled = false; btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Générer'; }
-}
-
-async function generateAI() {
-    setAILoading(true);
-    try {
-        if (aiActiveTab === 'prompt') await aiRunPrompt();
-        else await aiRunLife();
-    } catch(e) {
-        setAIStatus('Erreur: ' + e.message);
-        showNotification('❌ Erreur: ' + e.message, 'danger');
-    }
-    setAILoading(false);
-}
-
-async function aiRunPrompt() {
-    const prompt = document.getElementById('aiPromptTxt').value.trim();
-    if (!prompt) { setAIStatus('Entrez une demande'); setAILoading(false); return; }
-    setAIStatus('Appel API…');
-    const res  = await fetch(`/agriculteur/maintenances/api/generate-custom-prompt/${aiMachineData.id}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt })
-    });
-    const data = await res.json();
-    if (data.success) {
-        document.getElementById('aiPromptResTxt').textContent = data.response;
-        document.getElementById('aiPromptRes').style.display  = 'block';
-        setAIStatus('Réponse générée');
-    } else {
-        setAIStatus('Erreur serveur');
-        showNotification('❌ ' + (data.error || 'Erreur'), 'danger');
-    }
-}
-
-async function aiRunLife() {
-    setAIStatus('Analyse durée de vie…');
-    const res  = await fetch(`/agriculteur/maintenances/api/lifetime/${aiMachineData.id}`);
-    const data = await res.json();
-    if (data.success) {
-        document.getElementById('aiLifeScore').textContent = data.vieRestante + '%';
-        document.getElementById('aiLifeBar').style.width   = data.vieRestante + '%';
-        document.getElementById('aiLifeYears').textContent = data.anneesEstimees + ' ans';
-        document.getElementById('aiLifeRisk').textContent  = data.risquePanne;
-        if (data.composants?.length) {
-            const colors = ['#A32D2D','#854F0B','#0C447C','#3B6D11','#4a1d8c'];
-            const bars   = document.getElementById('aiLifeBars');
-            bars.innerHTML = '';
-            data.composants.forEach((c, i) => {
-                const row = document.createElement('div'); row.className = 'modal-life-bar-row';
-                row.innerHTML = `<div class="modal-life-bar-label">${c.nom}</div>
-                    <div class="modal-life-bar-track"><div class="modal-life-bar-fill" style="width:${c.usure}%;background:${colors[i % colors.length]}"></div></div>
-                    <div style="font-size:11px;font-weight:600;color:#1a2e1a;">${c.usure}%</div>`;
-                bars.appendChild(row);
-            });
-        }
-        const recs = (data.recommandations || []).map((r, i) => `${i+1}. ${r}`).join('\n');
-        document.getElementById('aiLifeResTxt').textContent = recs;
-        document.getElementById('aiLifeRes').style.display  = 'block';
-        setAIStatus('Analyse terminée');
-    } else {
-        setAIStatus('Erreur analyse');
-    }
-}
-
-function resetAITab() {
-    ['aiPromptRes','aiLifeRes'].forEach(id => {
-        const el = document.getElementById(id); if (el) el.style.display = 'none';
-    });
-    document.getElementById('aiPromptTxt').value = '';
-    renderAILifeLocal();
-    setAIStatus('Réinitialisé');
-}
-
-document.getElementById('aiModal').addEventListener('click', function(e) {
-    if (e.target === this) closeAIModal();
-});
-
-// ══ FILTRES ══
+// ════════════════════════════════════════
+// FILTRES
+// ════════════════════════════════════════
 function filterItems() {
     const search = (document.getElementById('searchInput').value || '').toLowerCase();
     const type   = (document.getElementById('typeFilter').value   || '').toLowerCase();
@@ -725,7 +803,8 @@ function onSearchInput(input) {
     filterItems();
 }
 function clearSearch() {
-    const input = document.getElementById('searchInput'); input.value = ''; input.focus();
+    const input = document.getElementById('searchInput');
+    input.value = ''; input.focus();
     document.getElementById('clearSearch').classList.remove('visible');
     filterItems();
 }
@@ -738,32 +817,359 @@ function resetFilters() {
     filterItems();
 }
 
-// ══ NOTIFICATIONS ══
-function showNotification(message, type) {
-    const n = document.createElement('div');
-    n.className = `alert alert--${type}`;
-    n.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;max-width:350px;';
-    n.innerHTML = `<span>${message}</span><button class="alert__close" onclick="this.parentElement.remove()">✕</button>`;
-    document.body.appendChild(n);
-    setTimeout(() => n.remove(), 5000);
+// ════════════════════════════════════════
+// MODAL IA
+// ════════════════════════════════════════
+let aiActiveTab   = 'prompt';
+let aiMachineData = {};
+let suggestionsLoaded = false;  // ← FIX : évite de recharger inutilement
+
+function openAIPrompt(id, type, priorite, km, nom, statut, cout, description) {
+    aiMachineData = {
+        id, type: type||'—', priorite: priorite||'moyenne',
+        km: parseInt(km)||0, nom: nom||'Machine',
+        statut: statut||'planifie', cout: parseFloat(cout)||0,
+        description: description||''
+    };
+    suggestionsLoaded = false;  // ← reset pour forcer rechargement à chaque ouverture
+    document.getElementById('aiMachinePill').textContent = nom || 'Machine';
+    document.getElementById('aiMachineInfo').innerHTML =
+        `Panne <strong>${type||'—'}</strong> · priorité <strong>${priorite||'—'}</strong> · ${km||0} km`;
+    document.getElementById('aiModal').classList.add('show');
+    switchAITab('prompt');
+    renderAILifeLocal();
+    resetSuggestTab();
 }
 
-// ══ CHARTS ══
+function resetSuggestTab() {
+    // Remettre les scores à "—"
+    document.getElementById('suggestUrgencyScore').textContent = '—';
+    document.getElementById('suggestUrgencyBar').style.width   = '0%';
+    document.getElementById('suggestNextDate').textContent     = '—';
+    document.getElementById('suggestHealthScore').textContent  = '—';
+    document.getElementById('suggestActions').innerHTML        = '';
+    // Remettre le loader
+    document.getElementById('suggestionsList').innerHTML = `
+        <div class="modal-loader" id="suggestLoader">
+            <div class="modal-loader__spinner"></div>
+            <div class="modal-loader__text">Prêt — cliquez sur "Générer" ou ouvrez l'onglet pour analyser</div>
+        </div>`;
+}
+
+function closeAIModal() {
+    document.getElementById('aiModal').classList.remove('show');
+}
+
+function switchAITab(t) {
+    aiActiveTab = t;
+    ['prompt','life','suggest'].forEach(tab => {
+        const btn   = document.getElementById('aitab-' + tab);
+        const panel = document.getElementById('aipanel-' + tab);
+        if (btn)   btn.classList.toggle('active', tab === t);
+        if (panel) panel.style.display = tab === t ? 'block' : 'none';
+    });
+    // Auto-charger les suggestions à l'ouverture de l'onglet si pas encore chargé
+    if (t === 'suggest' && aiMachineData.id && !suggestionsLoaded) {
+        loadAISuggestions();
+    }
+}
+
+function setAISug(chip, txt) {
+    document.querySelectorAll('.modal-chip').forEach(c => c.classList.remove('sel'));
+    chip.classList.add('sel');
+    document.getElementById('aiPromptTxt').value = txt;
+}
+
+// ════════════════════════════════════════
+// DURÉE DE VIE — CALCUL LOCAL (affichage immédiat à l'ouverture)
+// ════════════════════════════════════════
+function renderAILifeLocal() {
+    const km = aiMachineData.km || 0;
+    const maxKm = 20000;
+    const penalite = {urgente:25,haute:15,moyenne:8,faible:3}[aiMachineData.priorite] || 8;
+    const vie = Math.max(0, Math.min(100, Math.round(((maxKm - km) / maxKm) * 100)) - penalite);
+    const ans = Math.max(0, ((maxKm - km) / 3000)).toFixed(1);
+    const risque = (aiMachineData.priorite === 'urgente' || km > 15000) ? 'Élevé'
+                 : (aiMachineData.priorite === 'haute'   || km > 10000) ? 'Moyen' : 'Faible';
+    document.getElementById('aiLifeScore').textContent = vie + '%';
+    document.getElementById('aiLifeBar').style.width   = vie + '%';
+    document.getElementById('aiLifeYears').textContent = ans + ' ans';
+    document.getElementById('aiLifeRisk').textContent  = risque;
+    const composants = [
+        {nom:'Moteur',       usure:Math.min(100, Math.round(km/200)),  color:'#A32D2D'},
+        {nom:'Transmission', usure:Math.min(100, Math.round(km/300)),  color:'#854F0B'},
+        {nom:'Hydraulique',  usure:Math.min(100, Math.round(km/400)),  color:'#0C447C'},
+        {nom:'Électricité',  usure:Math.min(100, Math.round(km/600)),  color:'#3B6D11'},
+        {nom:'Pneumatique',  usure:Math.min(100, Math.round(km/250)),  color:'#4a1d8c'},
+    ];
+    const bars = document.getElementById('aiLifeBars');
+    bars.innerHTML = '';
+    composants.forEach(c => {
+        const row = document.createElement('div');
+        row.className = 'modal-life-bar-row';
+        row.innerHTML = `<div class="modal-life-bar-label">${c.nom}</div>
+            <div class="modal-life-bar-track"><div class="modal-life-bar-fill" style="width:${c.usure}%;background:${c.color}"></div></div>
+            <div style="font-size:11px;font-weight:600;color:#1a2e1a;">${c.usure}%</div>`;
+        bars.appendChild(row);
+    });
+}
+
+// ════════════════════════════════════════
+// SUGGESTIONS IA — FIX PRINCIPAL
+// ════════════════════════════════════════
+async function loadAISuggestions() {
+    if (!aiMachineData.id) {
+        showSuggestError('Aucune maintenance sélectionnée.');
+        return;
+    }
+
+    setAIStatus('Analyse en cours…');
+    // Afficher le loader
+    document.getElementById('suggestionsList').innerHTML = `
+        <div class="modal-loader" id="suggestLoader">
+            <div class="modal-loader__spinner"></div>
+            <div class="modal-loader__text">Analyse de la machine en cours…</div>
+        </div>`;
+
+    try {
+        // ── FIX : URL corrigée pour correspondre exactement à la route Symfony ──
+        const url = `/agriculteur/maintenances/api/ai-suggest-maintenance/${aiMachineData.id}`;
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+        });
+
+        if (!response.ok) {
+            const errText = await response.text();
+            throw new Error(`HTTP ${response.status} — ${errText.substring(0,120)}`);
+        }
+
+        const contentType = response.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) {
+            const txt = await response.text();
+            throw new Error('Réponse non-JSON reçue : ' + txt.substring(0, 120));
+        }
+
+        const data = await response.json();
+
+        if (!data.success) {
+            throw new Error(data.error || 'Erreur serveur inconnue');
+        }
+
+        suggestionsLoaded = true;
+
+        // Mise à jour des scores
+        document.getElementById('suggestUrgencyScore').textContent = (data.urgencyScore ?? 0) + '%';
+        document.getElementById('suggestUrgencyBar').style.width   = (data.urgencyScore ?? 0) + '%';
+        document.getElementById('suggestNextDate').textContent     = data.nextRecommendedDate || 'N/A';
+        document.getElementById('suggestHealthScore').textContent  = (data.currentState?.healthScore ?? '—') + (data.currentState?.healthScore != null ? '/100' : '');
+
+        // Couleur de la barre d'urgence
+        const urgencyBar = document.getElementById('suggestUrgencyBar');
+        const score = data.urgencyScore ?? 0;
+        urgencyBar.style.background = score >= 70 ? '#e74a3b' : score >= 50 ? '#e67e22' : score >= 30 ? '#f39c12' : '#27ae60';
+
+        // Cartes de suggestions
+        const container = document.getElementById('suggestionsList');
+        container.innerHTML = '';
+
+        const priorityColors = { urgente:'#a32d2d', haute:'#e67e22', moyenne:'#f39c12', basse:'#27ae60' };
+
+        (data.suggestions || []).forEach(sug => {
+            const color = priorityColors[sug.priority] || '#7f8c8d';
+            const card = document.createElement('div');
+            card.className = 'suggestion-card';
+            card.style.borderLeft = `4px solid ${color}`;
+            card.innerHTML = `
+                <div class="suggestion-card__header">
+                    <span class="suggestion-card__icon">${sug.icon || '🔧'}</span>
+                    <strong class="suggestion-card__title" style="color:${color};">${sug.title || ''}</strong>
+                    <span class="suggestion-card__badge" style="background:${color};">${sug.priority || ''}</span>
+                </div>
+                <p class="suggestion-card__msg">${sug.message || ''}</p>
+                <button class="btn btn--outline suggestion-card__btn"
+                    onclick="applySuggestionAction('${(sug.action||'').replace(/'/g,"\\'")}', ${aiMachineData.id})">
+                    ${sug.action || 'Voir'}
+                </button>`;
+            container.appendChild(card);
+        });
+
+        if (!data.suggestions || data.suggestions.length === 0) {
+            container.innerHTML = '<div style="text-align:center;padding:1.5rem;color:#7a9a7a;">✅ Aucune suggestion urgente — machine en bonne état.</div>';
+        }
+
+        // Actions recommandées
+        const actionsEl = document.getElementById('suggestActions');
+        actionsEl.innerHTML = (data.recommendedActions || []).map((a, i) => `${i+1}. ${a}`).join('<br>');
+
+        setAIStatus('Analyse terminée ✓');
+
+    } catch (error) {
+        console.error('Erreur loadAISuggestions:', error);
+        showSuggestError(error.message);
+    }
+}
+
+function showSuggestError(msg) {
+    suggestionsLoaded = false;
+    document.getElementById('suggestionsList').innerHTML = `
+        <div style="background:#fcebeb;border:1px solid #f7c1c1;border-radius:10px;padding:1rem;text-align:center;color:#501313;">
+            <div style="font-size:24px;margin-bottom:8px;">❌</div>
+            <div style="font-weight:600;margin-bottom:4px;">Erreur d'analyse</div>
+            <div style="font-size:12px;color:#7a9a7a;">${msg}</div>
+            <button class="btn btn--outline" style="margin-top:10px;font-size:.8rem;" onclick="loadAISuggestions()">🔄 Réessayer</button>
+        </div>`;
+    setAIStatus('Erreur — ' + msg.substring(0, 60));
+}
+
+function applySuggestionAction(action, id) {
+    const act = action.toLowerCase();
+    if (act.includes('planifier') || act.includes('programmer')) {
+        window.location.href = `/agriculteur/maintenances/${id}/edit`;
+    } else if (act.includes('intervenir')) {
+        window.location.href = `/agriculteur/maintenances/${id}/edit`;
+    } else if (act.includes('contacter')) {
+        showNotification('📞 Service technique notifié', 'info');
+    } else if (act.includes('consulter') || act.includes('voir')) {
+        window.location.href = `/agriculteur/maintenances/${id}`;
+    } else {
+        showNotification('📝 ' + action, 'info');
+    }
+}
+
+// ════════════════════════════════════════
+// STATUT & LOADING
+// ════════════════════════════════════════
+function setAIStatus(m) {
+    document.getElementById('aiFooterMsg').textContent = m;
+}
+function setAILoading(on) {
+    const btn = document.getElementById('aiGenBtn');
+    if (on) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading-spinner"></span> Génération…';
+    } else {
+        btn.disabled = false;
+        btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Générer';
+    }
+}
+
+// ════════════════════════════════════════
+// GÉNÉRER (bouton principal)
+// ════════════════════════════════════════
+async function generateAI() {
+    setAILoading(true);
+    try {
+        if      (aiActiveTab === 'prompt')  await aiRunPrompt();
+        else if (aiActiveTab === 'life')    await aiRunLife();
+        else if (aiActiveTab === 'suggest') { suggestionsLoaded = false; await loadAISuggestions(); }
+    } catch(e) {
+        setAIStatus('Erreur: ' + e.message);
+        showNotification('❌ Erreur: ' + e.message, 'danger');
+    }
+    setAILoading(false);
+}
+
+// ── Prompt libre ──
+async function aiRunPrompt() {
+    const prompt = document.getElementById('aiPromptTxt').value.trim();
+    if (!prompt) { setAIStatus('Entrez une demande'); setAILoading(false); return; }
+    setAIStatus('Appel API…');
+    const res  = await fetch(`/agriculteur/maintenances/api/generate-custom-prompt/${aiMachineData.id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+        body: JSON.stringify({ prompt })
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (data.success) {
+        document.getElementById('aiPromptResTxt').textContent = data.response;
+        document.getElementById('aiPromptRes').style.display  = 'block';
+        setAIStatus('Réponse générée ✓');
+    } else {
+        setAIStatus('Erreur serveur');
+        showNotification('❌ ' + (data.error || 'Erreur'), 'danger');
+    }
+}
+
+// ── Durée de vie ──
+async function aiRunLife() {
+    setAIStatus('Analyse durée de vie…');
+    const res  = await fetch(`/agriculteur/maintenances/api/lifetime/${aiMachineData.id}`, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (data.success) {
+        document.getElementById('aiLifeScore').textContent = data.vieRestante + '%';
+        document.getElementById('aiLifeBar').style.width   = data.vieRestante + '%';
+        document.getElementById('aiLifeYears').textContent = data.anneesEstimees + ' ans';
+        document.getElementById('aiLifeRisk').textContent  = data.risquePanne;
+        if (data.composants?.length) {
+            const colors = ['#A32D2D','#854F0B','#0C447C','#3B6D11','#4a1d8c'];
+            const bars   = document.getElementById('aiLifeBars');
+            bars.innerHTML = '';
+            data.composants.forEach((c, i) => {
+                const row = document.createElement('div');
+                row.className = 'modal-life-bar-row';
+                row.innerHTML = `<div class="modal-life-bar-label">${c.nom}</div>
+                    <div class="modal-life-bar-track"><div class="modal-life-bar-fill" style="width:${c.usure}%;background:${colors[i % colors.length]}"></div></div>
+                    <div style="font-size:11px;font-weight:600;color:#1a2e1a;">${c.usure}%</div>`;
+                bars.appendChild(row);
+            });
+        }
+        const recs = (data.recommandations || []).map((r, i) => `${i+1}. ${r}`).join('\n');
+        document.getElementById('aiLifeResTxt').textContent = recs;
+        document.getElementById('aiLifeRes').style.display  = 'block';
+        setAIStatus('Analyse terminée ✓');
+    } else {
+        throw new Error('Erreur analyse durée de vie');
+    }
+}
+
+function resetAITab() {
+    ['aiPromptRes','aiLifeRes'].forEach(id => {
+        const el = document.getElementById(id); if (el) el.style.display = 'none';
+    });
+    document.getElementById('aiPromptTxt').value = '';
+    document.querySelectorAll('.modal-chip').forEach(c => c.classList.remove('sel'));
+    renderAILifeLocal();
+    suggestionsLoaded = false;
+    resetSuggestTab();
+    setAIStatus('Réinitialisé');
+}
+
+document.getElementById('aiModal').addEventListener('click', function(e) {
+    if (e.target === this) closeAIModal();
+});
+
+// ════════════════════════════════════════
+// CHARTS
+// ════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', function() {
     const countByType = {{ countByType|json_encode|raw }};
     const coutByMonth = {{ coutByMonth|json_encode|raw }};
     if (document.getElementById('barChart') && countByType?.length) {
         new Chart(document.getElementById('barChart'), {
             type: 'bar',
-            data: { labels: countByType.map(r => r.type), datasets: [{ label: 'Nombre', data: countByType.map(r => r.total), backgroundColor: ['#2d6a2d','#0F6E56','#854F0B','#a32d2d','#0c447c','#7b5200','#1a5276','#4a1d8c','#534AB7','#2c2c2a'] }] },
-            options: { responsive:true, plugins:{ legend:{display:false} }, scales:{ y:{ beginAtZero:true, ticks:{stepSize:1} } } }
+            data: {
+                labels: countByType.map(r => r.type),
+                datasets: [{ label:'Nombre', data:countByType.map(r => r.total),
+                    backgroundColor:['#2d6a2d','#0F6E56','#854F0B','#a32d2d','#0c447c','#7b5200','#1a5276','#4a1d8c','#534AB7','#2c2c2a'] }]
+            },
+            options: { responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true,ticks:{stepSize:1}}} }
         });
     }
     if (document.getElementById('lineChart') && coutByMonth?.length) {
         new Chart(document.getElementById('lineChart'), {
             type: 'line',
-            data: { labels: coutByMonth.map(r => r.mois), datasets: [{ label: 'Coût (DT)', data: coutByMonth.map(r => r.total), borderColor:'#2d6a2d', backgroundColor:'rgba(45,106,45,.1)', borderWidth:2, tension:.4, fill:true, pointRadius:4 }] },
-            options: { responsive:true, plugins:{ legend:{display:false} }, scales:{ y:{ beginAtZero:true } } }
+            data: {
+                labels: coutByMonth.map(r => r.mois),
+                datasets: [{ label:'Coût (DT)', data:coutByMonth.map(r => r.total),
+                    borderColor:'#2d6a2d', backgroundColor:'rgba(45,106,45,.1)',
+                    borderWidth:2, tension:.4, fill:true, pointRadius:4 }]
+            },
+            options: { responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} }
         });
     }
 });
