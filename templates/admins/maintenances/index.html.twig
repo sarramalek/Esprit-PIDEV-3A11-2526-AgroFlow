@@ -1,3 +1,4 @@
+{# templates/admins/maintenances/index.html.twig #}
 {% extends 'base_admin.html.twig' %}
 
 {% block title %}Liste des maintenances — AgroFlow{% endblock %}
@@ -7,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-    /* ===== STYLES COMPLETS (garder tous les styles existants) ===== */
+    /* ===== STYLES COMPLETS ===== */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: 'DM Sans', sans-serif; background: #f5f2ec; color: #1a1a18; }
 
@@ -438,7 +439,7 @@
         {% endfor %}
     {% endfor %}
 
-    {# Header avec tous les boutons (avec emojis) #}
+    {# Header avec tous les boutons #}
     <div class="page-header">
         <div class="header-left">
             <h1>📋 Liste des maintenances</h1>
@@ -453,6 +454,9 @@
             </a>
             <a href="{{ path('admin_maintenances_export_pdf') }}" class="btn-secondary" target="_blank">
                 📄 Export PDF
+            </a>
+            <a href="{{ path('admin_maintenances_wiki') }}" class="btn-secondary">
+                📚 Documentation technique
             </a>
             <a href="{{ path('admin_maintenances_new') }}" class="btn-primary">
                 ➕ Nouvelle maintenance

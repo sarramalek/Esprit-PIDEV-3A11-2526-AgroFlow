@@ -1,0 +1,622 @@
+{# templates/admins/maintenances/wiki.html.twig #}
+{% extends 'base_admin.html.twig' %}
+
+{% block title %}Documentation technique — AgroFlow Wiki{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: #f5f2ec; color: #1a1a18; }
+    
+    .wiki-container {
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 28px 24px;
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 28px;
+    }
+    
+    .wiki-sidebar {
+        background: white;
+        border: 1px solid #ece7dd;
+        border-radius: 20px;
+        padding: 24px 0;
+        position: sticky;
+        top: 20px;
+        height: fit-content;
+        max-height: calc(100vh - 40px);
+        overflow-y: auto;
+    }
+    
+    .wiki-sidebar-header {
+        padding: 0 20px 20px 20px;
+        border-bottom: 2px solid #1d3d17;
+        margin-bottom: 16px;
+    }
+    
+    .wiki-sidebar-header h2 {
+        font-size: 20px;
+        font-weight: 600;
+        color: #1d3d17;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .wiki-search {
+        margin: 0 20px 20px 20px;
+    }
+    
+    .wiki-search-input {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1.5px solid #ece7dd;
+        border-radius: 12px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13px;
+        background: #f5f2ec;
+        transition: all 0.15s;
+    }
+    
+    .wiki-search-input:focus {
+        outline: none;
+        border-color: #1d3d17;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(29,61,23,.1);
+    }
+    
+    .wiki-nav {
+        list-style: none;
+        padding: 0;
+        margin: 16px 0;
+    }
+    
+    .wiki-nav-item {
+        margin: 2px 0;
+    }
+    
+    .wiki-nav-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 20px;
+        text-decoration: none;
+        color: #3d3d38;
+        font-size: 13px;
+        font-weight: 500;
+        transition: all 0.15s;
+        border-left: 3px solid transparent;
+    }
+    
+    .wiki-nav-link:hover {
+        background: #f5f2ec;
+        color: #1d3d17;
+    }
+    
+    .wiki-nav-link.active {
+        background: #e8f5e9;
+        border-left-color: #1d3d17;
+        color: #1d3d17;
+        font-weight: 600;
+    }
+    
+    .wiki-nav-category {
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #9e9d95;
+        padding: 16px 20px 8px 20px;
+    }
+    
+    .wiki-content {
+        background: white;
+        border: 1px solid #ece7dd;
+        border-radius: 20px;
+        padding: 32px 40px;
+    }
+    
+    .wiki-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 24px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #1d3d17;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+    
+    .wiki-title {
+        font-size: 32px;
+        font-weight: 700;
+        color: #1d3d17;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+    
+    .wiki-category-badge {
+        background: #e8f5e9;
+        color: #1d3d17;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    
+    .wiki-wiki-link {
+        background: #f5f2ec;
+        color: #1d3d17;
+        padding: 8px 16px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.15s;
+    }
+    
+    .wiki-wiki-link:hover {
+        background: #e8f5e9;
+        transform: translateY(-1px);
+    }
+    
+    .wiki-image {
+        margin: 24px 0;
+        text-align: center;
+        background: linear-gradient(135deg, #f5f2ec 0%, #ece7dd 100%);
+        border-radius: 16px;
+        padding: 20px;
+        border: 1px solid #e0dcd0;
+    }
+    
+    .wiki-image img {
+        max-width: 100%;
+        max-height: 350px;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    
+    .wiki-image img:hover {
+        transform: scale(1.02);
+    }
+    
+    .wiki-image-caption {
+        font-size: 12px;
+        color: #6b6b64;
+        margin-top: 12px;
+        font-style: italic;
+    }
+    
+    .wiki-section {
+        margin: 32px 0;
+    }
+    
+    .wiki-section h3 {
+        font-size: 20px;
+        font-weight: 600;
+        color: #1d3d17;
+        margin-bottom: 16px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #ece7dd;
+    }
+    
+    .wiki-content-text {
+        font-size: 15px;
+        line-height: 1.6;
+        color: #3d3d38;
+        margin-bottom: 24px;
+    }
+    
+    .wiki-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        margin: 20px 0;
+    }
+    
+    .wiki-card {
+        background: #f5f2ec;
+        border-radius: 16px;
+        padding: 20px;
+        transition: all 0.2s;
+    }
+    
+    .wiki-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    
+    .wiki-card h4 {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1d3d17;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .wiki-list {
+        list-style: none;
+        padding: 0;
+    }
+    
+    .wiki-list li {
+        padding: 8px 0;
+        border-bottom: 1px solid #e0dcd0;
+        font-size: 13px;
+        color: #3d3d38;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .wiki-list li:last-child {
+        border-bottom: none;
+    }
+    
+    .wiki-list li::before {
+        content: "•";
+        color: #1d3d17;
+        font-weight: bold;
+        font-size: 16px;
+    }
+    
+    .wiki-meta {
+        background: #f5f2ec;
+        border-radius: 16px;
+        padding: 20px;
+        margin-top: 32px;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    
+    .wiki-meta-item {
+        flex: 1;
+        text-align: center;
+    }
+    
+    .wiki-meta-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #9e9d95;
+        margin-bottom: 6px;
+    }
+    
+    .wiki-meta-value {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1d3d17;
+        font-family: 'DM Mono', monospace;
+    }
+    
+    .wiki-related {
+        margin-top: 40px;
+        padding-top: 24px;
+        border-top: 2px solid #ece7dd;
+    }
+    
+    .wiki-related h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1d3d17;
+        margin-bottom: 16px;
+    }
+    
+    .wiki-related-links {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    
+    .wiki-related-link {
+        background: #f5f2ec;
+        color: #1d3d17;
+        padding: 8px 16px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+        transition: all 0.15s;
+    }
+    
+    .wiki-related-link:hover {
+        background: #e8f5e9;
+        transform: translateY(-1px);
+    }
+    
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: white;
+        color: #1d3d17;
+        border: 1.5px solid #1d3d17;
+        border-radius: 12px;
+        padding: 10px 20px;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.18s;
+        margin-bottom: 20px;
+    }
+    
+    .btn-back:hover {
+        background: #e8f5e9;
+        transform: translateY(-1px);
+    }
+    
+    .no-results {
+        text-align: center;
+        padding: 60px 20px;
+    }
+    
+    .no-results-icon {
+        font-size: 48px;
+        margin-bottom: 16px;
+    }
+    
+    .no-results h3 {
+        font-size: 20px;
+        color: #3d3d38;
+        margin-bottom: 8px;
+    }
+    
+    .no-results p {
+        color: #9e9d95;
+    }
+    
+    @media (max-width: 1024px) {
+        .wiki-container {
+            grid-template-columns: 1fr;
+            padding: 20px 16px;
+        }
+        
+        .wiki-sidebar {
+            position: static;
+            max-height: none;
+        }
+        
+        .wiki-content {
+            padding: 24px 20px;
+        }
+        
+        .wiki-title {
+            font-size: 24px;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .wiki-meta {
+            flex-direction: column;
+        }
+        
+        .wiki-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="wiki-container">
+    <aside class="wiki-sidebar">
+        <div class="wiki-sidebar-header">
+            <h2>
+                <span>📚</span>
+                AgroFlow Wiki
+            </h2>
+        </div>
+        
+        <div class="wiki-search">
+            <form method="get" action="{{ path('admin_maintenances_wiki') }}">
+                <input type="text" 
+                       name="search" 
+                       class="wiki-search-input" 
+                       placeholder="Rechercher un type de panne..." 
+                       value="{{ search }}">
+                <button type="submit" style="display: none;">Rechercher</button>
+            </form>
+        </div>
+        
+        <div class="wiki-nav-category">📂 TYPES DE PANNE</div>
+        <ul class="wiki-nav">
+            {% for key, topic in filteredTopics %}
+                <li class="wiki-nav-item">
+                    <a href="{{ path('admin_maintenances_wiki', { topic: key, search: search }) }}" 
+                       class="wiki-nav-link {% if selectedTopic == key %}active{% endif %}">
+                        <span>{{ topic.category == 'Mécanique' ? '🔧' : 
+                                   topic.category == 'Hydraulique' ? '💧' :
+                                   topic.category == 'Électricité' ? '⚡' :
+                                   topic.category == 'Transmission' ? '🔄' :
+                                   topic.category == 'Pneumatique' ? '🎈' :
+                                   topic.category == 'Entretien' ? '🛢️' :
+                                   topic.category == 'Sécurité' ? '🛑' : '📄' }}</span>
+                        {{ topic.title }}
+                    </a>
+                </li>
+            {% else %}
+                <li class="wiki-nav-item">
+                    <span class="wiki-nav-link" style="color: #9e9d95;">
+                        Aucun résultat trouvé
+                    </span>
+                </li>
+            {% endfor %}
+        </ul>
+    </aside>
+    
+    <main class="wiki-content">
+        {% if currentTopic %}
+            <a href="{{ path('admin_maintenances_index') }}" class="btn-back">
+                ← Retour à la liste des maintenances
+            </a>
+            
+            <div class="wiki-header">
+                <div>
+                    <div class="wiki-title">
+                        {{ currentTopic.title }}
+                        <span class="wiki-category-badge">{{ currentTopic.category }}</span>
+                    </div>
+                </div>
+                <a href="{{ currentTopic.wiki_link }}" target="_blank" class="wiki-wiki-link">
+                    🌐 Lire sur Wikipédia
+                    <span>↗</span>
+                </a>
+            </div>
+            
+            <div class="wiki-content-text">
+                {{ currentTopic.content }}
+            </div>
+            
+            <!-- SECTION IMAGE AVEC GESTION D'ERREUR -->
+            <div class="wiki-image">
+                {% if currentTopic.image and currentTopic.image is not empty %}
+                    <img src="{{ currentTopic.image }}" 
+                         alt="{{ currentTopic.title }}"
+                         loading="eager"
+                         onerror="this.onerror=null; this.src='https://placehold.co/800x400/f5f2ec/1d3d17?text={{ currentTopic.title|replace({' ': '+'}) }}';">
+                {% else %}
+                    <div style="background: #e8f5e9; border-radius: 12px; padding: 40px; text-align: center;">
+                        <span style="font-size: 64px;">
+                            {% if currentTopic.category == 'Mécanique' %}🔧
+                            {% elseif currentTopic.category == 'Hydraulique' %}💧
+                            {% elseif currentTopic.category == 'Électricité' %}⚡
+                            {% elseif currentTopic.category == 'Transmission' %}🔄
+                            {% elseif currentTopic.category == 'Pneumatique' %}🎈
+                            {% elseif currentTopic.category == 'Entretien' %}🛢️
+                            {% elseif currentTopic.category == 'Sécurité' %}🛑
+                            {% else %}📦{% endif %}
+                        </span>
+                        <p style="margin-top: 16px; color: #1d3d17; font-weight: 500;">{{ currentTopic.title }}</p>
+                    </div>
+                {% endif %}
+                <div class="wiki-image-caption">
+                    📷 Illustration - {{ currentTopic.title }}
+                    {% if currentTopic.wiki_link %}
+                        • <a href="{{ currentTopic.wiki_link }}" target="_blank" style="color: #1d3d17;">Voir sur Wikipédia</a>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="wiki-grid">
+                {% if currentTopic.symptoms %}
+                <div class="wiki-card">
+                    <h4>⚠️ Symptômes</h4>
+                    <ul class="wiki-list">
+                        {% for symptom in currentTopic.symptoms %}
+                            <li>{{ symptom }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                
+                {% if currentTopic.causes %}
+                <div class="wiki-card">
+                    <h4>🔍 Causes possibles</h4>
+                    <ul class="wiki-list">
+                        {% for cause in currentTopic.causes %}
+                            <li>{{ cause }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                
+                {% if currentTopic.solutions %}
+                <div class="wiki-card">
+                    <h4>🛠️ Solutions recommandées</h4>
+                    <ul class="wiki-list">
+                        {% for solution in currentTopic.solutions %}
+                            <li>{{ solution }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+            
+            {% if currentTopic.prevention %}
+            <div class="wiki-section">
+                <h3>🛡️ Prévention</h3>
+                <div class="wiki-content-text">
+                    {{ currentTopic.prevention }}
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="wiki-meta">
+                <div class="wiki-meta-item">
+                    <div class="wiki-meta-label">💰 Coût estimé</div>
+                    <div class="wiki-meta-value">{{ currentTopic.estimated_cost|default('N/A') }}</div>
+                </div>
+                <div class="wiki-meta-item">
+                    <div class="wiki-meta-label">⏱️ Durée moyenne</div>
+                    <div class="wiki-meta-value">{{ currentTopic.avg_duration|default('N/A') }}</div>
+                </div>
+                <div class="wiki-meta-item">
+                    <div class="wiki-meta-label">📊 Catégorie</div>
+                    <div class="wiki-meta-value">{{ currentTopic.category }}</div>
+                </div>
+            </div>
+            
+            {% if relatedTopics|length > 0 %}
+            <div class="wiki-related">
+                <h3>📖 Sujets connexes</h3>
+                <div class="wiki-related-links">
+                    {% for key, topic in relatedTopics %}
+                        <a href="{{ path('admin_maintenances_wiki', { topic: key, search: search }) }}" class="wiki-related-link">
+                            {{ topic.title }}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+        {% else %}
+            <div class="no-results">
+                <div class="no-results-icon">🔍</div>
+                <h3>Aucun résultat trouvé</h3>
+                <p>Essayez d'autres mots-clés ou consultez la liste complète des types de panne.</p>
+                <a href="{{ path('admin_maintenances_wiki') }}" class="btn-back" style="margin-top: 20px;">
+                    Voir tous les types de panne
+                </a>
+            </div>
+        {% endif %}
+    </main>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Gestionnaire pour toutes les images
+        const images = document.querySelectorAll('.wiki-image img');
+        images.forEach(img => {
+            img.addEventListener('error', function() {
+                console.log('Erreur de chargement pour:', this.src);
+                this.onerror = null;
+                const topicTitle = '{{ currentTopic.title|default("Panne")|replace({" ": "+"}) }}';
+                this.src = 'https://placehold.co/800x400/f5f2ec/1d3d17?text=' + topicTitle;
+            });
+        });
+    });
+</script>
+{% endblock %}

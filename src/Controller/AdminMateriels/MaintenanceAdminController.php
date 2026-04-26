@@ -84,7 +84,344 @@ class MaintenanceAdminController extends AbstractController
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // HISTORIQUE - Timeline des maintenances AVEC IA GEMINI
+    // WIKIPEDIA-LIKE DOCUMENTATION
+    // ─────────────────────────────────────────────────────────────────────────
+    #[Route('/wiki', name: 'wiki', methods: ['GET'])]
+    public function wikiDocumentation(Request $request): Response
+    {
+        $search = $request->query->get('search', '');
+        $selectedTopic = $request->query->get('topic', '');
+        
+        $knowledgeBase = $this->getKnowledgeBase();
+        
+        $filteredTopics = $knowledgeBase;
+        if (!empty($search)) {
+            $filteredTopics = array_filter($knowledgeBase, function($topic) use ($search) {
+                return stripos($topic['title'], $search) !== false || 
+                       stripos($topic['content'], $search) !== false ||
+                       stripos($topic['category'], $search) !== false;
+            });
+        }
+        
+        $currentTopic = null;
+        if (!empty($selectedTopic) && isset($knowledgeBase[$selectedTopic])) {
+            $currentTopic = $knowledgeBase[$selectedTopic];
+        } elseif (!empty($filteredTopics)) {
+            $firstKey = array_key_first($filteredTopics);
+            $currentTopic = $filteredTopics[$firstKey];
+            $selectedTopic = $firstKey;
+        } else {
+            $currentTopic = $knowledgeBase['moteur'] ?? null;
+            $selectedTopic = 'moteur';
+        }
+        
+        $relatedTopics = $this->getRelatedTopics($selectedTopic, $knowledgeBase);
+        
+        return $this->render('admins/maintenances/wiki.html.twig', [
+            'knowledgeBase' => $knowledgeBase,
+            'filteredTopics' => $filteredTopics,
+            'currentTopic' => $currentTopic,
+            'selectedTopic' => $selectedTopic,
+            'search' => $search,
+            'relatedTopics' => $relatedTopics,
+        ]);
+    }
+    
+    #[Route('/wiki/api/{topic}', name: 'wiki_api', methods: ['GET'])]
+    public function wikiApi(string $topic): JsonResponse
+    {
+        $knowledgeBase = $this->getKnowledgeBase();
+        
+        if (!isset($knowledgeBase[$topic])) {
+            return $this->json(['error' => 'Topic not found'], 404);
+        }
+        
+        return $this->json([
+            'title' => $knowledgeBase[$topic]['title'],
+            'content' => $knowledgeBase[$topic]['content'],
+            'category' => $knowledgeBase[$topic]['category'],
+            'image' => $knowledgeBase[$topic]['image'],
+            'wiki_link' => $knowledgeBase[$topic]['wiki_link'],
+            'symptoms' => $knowledgeBase[$topic]['symptoms'] ?? [],
+            'causes' => $knowledgeBase[$topic]['causes'] ?? [],
+            'solutions' => $knowledgeBase[$topic]['solutions'] ?? [],
+            'prevention' => $knowledgeBase[$topic]['prevention'] ?? '',
+            'estimated_cost' => $knowledgeBase[$topic]['estimated_cost'] ?? 'N/A',
+            'avg_duration' => $knowledgeBase[$topic]['avg_duration'] ?? 'N/A',
+        ]);
+    }
+    
+    /**
+     * Base de connaissances complète avec IMAGES RÉELLES
+     * Images libres de droit provenant de Unsplash
+     */
+    private function getKnowledgeBase(): array
+    {
+        return [
+            'moteur' => [
+                'title' => '🔧 Panne Moteur',
+                'category' => 'Mécanique',
+                'content' => 'Les pannes moteur sont parmi les plus critiques en maintenance industrielle et agricole. Un moteur peut présenter divers symptômes allant de la perte de puissance à l\'arrêt complet. Les causes courantes incluent l\'usure des composants, un manque d\'entretien, ou une contamination du carburant et de l\'huile.',
+                'image' => 'https://images.unsplash.com/photo-1581093588401-fbb62a02e120?w=800&h=450&fit=crop',
+                'wiki_link' => 'https://fr.wikipedia.org/wiki/Moteur',
+                'symptoms' => [
+                    '💢 Perte de puissance',
+                    '🔥 Surchauffe moteur',
+                    '💨 Fumée excessive (noire, bleue, blanche)',
+                    '🔊 Bruits anormaux (cliquetis, cognements)',
+                    '⚡ Difficulté au démarrage',
+                    '🛢️ Consommation d\'huile excessive'
+                ],
+                'causes' => [
+                    'Filtres obstrués (air, carburant, huile)',
+                    'Injecteurs encrassés ou défectueux',
+                    'Usure des segments ou pistons',
+                    'Joint de culasse endommagé',
+                    'Système de refroidissement défaillant',
+                    'Carburant de mauvaise qualité'
+                ],
+                'solutions' => [
+                    '🔧 Nettoyage ou remplacement des injecteurs',
+                    '🛠️ Révision complète du moteur',
+                    '🌡️ Vérification du système de refroidissement',
+                    '💧 Changement d\'huile et filtres',
+                    '🔩 Remplacement des bougies/prechauffages'
+                ],
+                'prevention' => 'Effectuez les vidanges aux intervalles recommandés, utilisez des carburants et lubrifiants de qualité, surveillez les températures et pressions, et respectez les heures de fonctionnement maximales.',
+                'estimated_cost' => '500 - 5000 DT',
+                'avg_duration' => '2 - 10 jours'
+            ],
+            'hydraulique' => [
+                'title' => '💧 Panne Hydraulique',
+                'category' => 'Hydraulique',
+                'content' => 'Les systèmes hydrauliques sont essentiels pour les engins agricoles (relevage, direction, chargeur). Les pannes hydrauliques se manifestent souvent par une perte de puissance, des mouvements saccadés, ou des fuites visibles. La contamination de l\'huile est la cause principale des défaillances.',
+                'image' => 'https://images.unsplash.com/photo-1581091226033-d5c48150dbaa?w=800&h=450&fit=crop',
+                'wiki_link' => 'https://fr.wikipedia.org/wiki/Hydraulique',
+                'symptoms' => [
+                    '💧 Fuites d\'huile visibles',
+                    '📉 Perte de puissance ou réponse lente',
+                    '🔊 Bruits de pompe (grincements, claquements)',
+                    '🌡️ Surchauffe de l\'huile',
+                    '🔄 Mouvements saccadés ou irréguliers',
+                    '⚙️ Impossibilité de lever une charge'
+                ],
+                'causes' => [
+                    'Usure des joints ou flexibles',
+                    'Huile contaminée ou de mauvais niveau',
+                    'Filtre hydraulique obstrué',
+                    'Pompe hydraulique défectueuse',
+                    'Distributeur ou vérin endommagé',
+                    'Surcharge du système'
+                ],
+                'solutions' => [
+                    '🔧 Remplacement des joints et flexibles',
+                    '🛢️ Vidange et remplacement de l\'huile',
+                    '🧹 Nettoyage ou remplacement du filtre',
+                    '🔄 Révision ou remplacement de la pompe',
+                    '⚙️ Réparation du vérin ou distributeur'
+                ],
+                'prevention' => 'Contrôlez régulièrement le niveau et l\'état de l\'huile, remplacez les filtres selon préconisations, vérifiez l\'état des flexibles, et évitez les surcharges prolongées.',
+                'estimated_cost' => '300 - 3000 DT',
+                'avg_duration' => '1 - 5 jours'
+            ],
+            'electrique' => [
+                'title' => '⚡ Panne Électrique',
+                'category' => 'Électricité',
+                'content' => 'Les pannes électriques sont fréquentes et peuvent être difficiles à diagnostiquer. Elles affectent le démarrage, l\'éclairage, les instruments de bord, ou les calculateurs électroniques. Un mauvais contact ou une batterie défaillante sont souvent en cause.',
+                'image' => 'https://images.unsplash.com/photo-1562426509-9f954dc9fec3?w=800&h=450&fit=crop',
+                'wiki_link' => 'https://fr.wikipedia.org/wiki/%C3%89lectricit%C3%A9_automobile',
+                'symptoms' => [
+                    '🔋 Batterie qui se décharge rapidement',
+                    '💡 Voyants d\'alerte au tableau de bord',
+                    '🔌 Démarrage difficile ou impossible',
+                    '⚡ Coupures de courant intermittentes',
+                    '🎛️ Capteurs ou afficheurs défaillants',
+                    '😤 Odeur de brûlé'
+                ],
+                'causes' => [
+                    'Batterie usée ou sulfatée',
+                    'Alternateur défaillant (ne recharge pas)',
+                    'Mauvais contacts ou oxydation',
+                    'Fusible ou relais grillé',
+                    'Faisceau électrique endommagé',
+                    'Calculateur (ECU) défectueux'
+                ],
+                'solutions' => [
+                    '🔋 Test et remplacement de la batterie',
+                    '🔄 Révision ou remplacement de l\'alternateur',
+                    '🧹 Nettoyage des connexions électriques',
+                    '🔌 Remplacement des fusibles/relais défectueux',
+                    '💻 Diagnostic électronique complet'
+                ],
+                'prevention' => 'Nettoyez régulièrement les bornes de batterie, vérifiez la tension de charge, protégez les connecteurs de l\'humidité, et effectuez un diagnostic électronique annuel.',
+                'estimated_cost' => '100 - 2000 DT',
+                'avg_duration' => '1 - 3 jours'
+            ],
+            'transmission' => [
+                'title' => '🔄 Panne Transmission',
+                'category' => 'Transmission',
+                'content' => 'La transmission transmet la puissance du moteur aux roues. Une panne de transmission peut rendre le véhicule inutilisable. Les symptômes incluent des difficultés à passer les vitesses, des bruits anormaux, ou une perte totale de motricité.',
+                'image' => 'https://images.unsplash.com/photo-1581092335871-5a5b5b2b7a6f?w=800&h=450&fit=crop',
+                'wiki_link' => 'https://fr.wikipedia.org/wiki/Transmission_m%C3%A9canique',
+                'symptoms' => [
+                    '🎛️ Difficulté à passer les vitesses',
+                    '🔊 Grincements ou claquements',
+                    '🔄 Patinage (régime moteur qui monte sans accélération)',
+                    '⚙️ À-coups lors du passage de vitesse',
+                    '💧 Fuite d\'huile de transmission',
+                    '🚫 Perte totale de motricité'
+                ],
+                'causes' => [
+                    'Niveau d\'huile insuffisant',
+                    'Embrayage usé (transmission manuelle)',
+                    'Boîte de vitesses endommagée',
+                    'Cardans ou joints homocinétiques usés',
+                    'Pont ou différentiel défectueux',
+                    'Surcharge ou utilisation intensive'
+                ],
+                'solutions' => [
+                    '🛢️ Vidange et remplacement de l\'huile',
+                    '🔧 Remplacement de l\'embrayage',
+                    '🔄 Révision ou échange de la boîte',
+                    '⚙️ Remplacement des cardans ou joints',
+                    '🔩 Réparation du différentiel'
+                ],
+                'prevention' => 'Contrôlez le niveau d\'huile transmission régulièrement, évitez les à-coups brusques, ne surchargez pas l\'engin, et faites vidanger aux intervalles préconisés.',
+                'estimated_cost' => '800 - 8000 DT',
+                'avg_duration' => '2 - 8 jours'
+            ],
+            'pneumatique' => [
+                'title' => '🎈 Panne Pneumatique',
+                'category' => 'Pneumatique',
+                'content' => 'Les systèmes pneumatiques utilisent l\'air comprimé pour le freinage, la suspension ou divers actionneurs. Les pannes se manifestent par des fuites d\'air, une pression insuffisante, ou des organes qui ne répondent plus.',
+                'image' => 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&h=450&fit=crop',
+                'wiki_link' => 'https://fr.wikipedia.org/wiki/Pneumatique',
+                'symptoms' => [
+                    '💨 Bruit de fuite d\'air',
+                    '📉 Manomètre indiquant une pression basse',
+                    '🚫 Freins moins efficaces',
+                    '🔊 Compresseur qui tourne en continu',
+                    '⏱️ Temps de recharge trop long',
+                    '🎛️ Actionneurs qui ne répondent pas'
+                ],
+                'causes' => [
+                    'Joints ou flexibles usés/perforés',
+                    'Compresseur défectueux',
+                    'Sécheur d\'air obstrué',
+                    'Clapets anti-retour défaillants',
+                    'Réservoir d\'air percé ou corrodé',
+                    'Condensation excessive dans le circuit'
+                ],
+                'solutions' => [
+                    '🔍 Détection et réparation des fuites (eau savonneuse)',
+                    '🔄 Remplacement du compresseur',
+                    '💧 Vidange régulière des réservoirs',
+                    '🔧 Nettoyage ou remplacement du sécheur',
+                    '⚙️ Révision des vannes et clapets'
+                ],
+                'prevention' => 'Purgez quotidiennement les réservoirs, vérifiez l\'absence de fuites, contrôlez l\'état des flexibles, et assurez une lubrification adéquate du compresseur.',
+                'estimated_cost' => '200 - 2500 DT',
+                'avg_duration' => '1 - 4 jours'
+            ],
+            'vidange' => [
+                'title' => '🛢️ Vidange & Filtres',
+                'category' => 'Entretien',
+                'content' => 'La vidange est une opération d\'entretien préventif essentielle qui consiste à remplacer l\'huile moteur et le filtre à huile. Une vidange régulière prolonge la durée de vie du moteur et prévient les pannes graves.',
+                'image' => 'https://images.unsplash.com/photo-1581092335953-4e6a2f4d8b5c?w=800&h=450&fit=crop',
+                'wiki_link' => 'https://fr.wikipedia.org/wiki/Vidange_(m%C3%A9canique)',
+                'symptoms' => [
+                    '⏰ Kilométrage ou temps dépassé',
+                    '🟤 Huile noire et épaisse',
+                    '🔊 Bruit moteur anormal',
+                    '🌡️ Température moteur élevée',
+                    '💡 Voyant de pression d\'huile allumé'
+                ],
+                'causes' => [
+                    'Huile dégradée par la chaleur et l\'usage',
+                    'Filtre colmaté par les impuretés',
+                    'Utilisation d\'huile non adaptée',
+                    'Surcharge ou usage intensif',
+                    'Dépassement des intervalles préconisés'
+                ],
+                'solutions' => [
+                    '🛢️ Vidanger l\'huile usagée',
+                    '🔧 Remplacer le filtre à huile',
+                    '💧 Remplir avec huile neuve adaptée',
+                    '✅ Contrôler l\'absence de fuites',
+                    '📝 Enregistrer l\'intervention'
+                ],
+                'prevention' => 'Respectez scrupuleusement les intervalles de vidange (heures ou kilométrage), utilisez l\'huile préconisée par le constructeur, et notez chaque intervention pour le suivi.',
+                'estimated_cost' => '80 - 400 DT',
+                'avg_duration' => '1 - 3 heures'
+            ],
+            'freinage' => [
+                'title' => '🛑 Panne Freinage',
+                'category' => 'Sécurité',
+                'content' => 'Le système de freinage est critique pour la sécurité. Une défaillance peut avoir des conséquences graves. Les signes d\'usure incluent des bruits, des vibrations, ou une pédale qui s\'enfonce trop.',
+                'image' => 'https://images.unsplash.com/photo-1562426509-9f954dc9fec3?w=800&h=450&fit=crop',
+                'wiki_link' => 'https://fr.wikipedia.org/wiki/Freinage',
+                'symptoms' => [
+                    '🔊 Grincements ou couinements au freinage',
+                    '📉 Freinage moins efficace',
+                    '🦶 Pédale de frein qui pompe ou s\'enfonce',
+                    '🔴 Voyant d\'usure allumé',
+                    '🚗 Vibrations dans le volant au freinage',
+                    '💧 Fuite de liquide de frein'
+                ],
+                'causes' => [
+                    'Plaquettes ou mâchoires usées',
+                    'Disques ou tambours voilés',
+                    'Étage hydraulique endommagé',
+                    'Liquide de frein absorbé (usé)',
+                    'Défaut du système ABS',
+                    'Fuite dans le circuit'
+                ],
+                'solutions' => [
+                    '🔧 Remplacement des plaquettes/disques',
+                    '🔄 Révision des étriers',
+                    '💧 Purge et remplacement du liquide',
+                    '🛢️ Réparation des fuites',
+                    '💻 Diagnostic ABS'
+                ],
+                'prevention' => 'Surveillez l\'usure des plaquettes visuellement, changez le liquide de frein tous les 2 ans, ne roulez pas avec le voyant de frein allumé, et effectuez un contrôle annuel complet.',
+                'estimated_cost' => '150 - 1500 DT',
+                'avg_duration' => '1 - 2 jours'
+            ]
+        ];
+    }
+    
+    private function getRelatedTopics(string $currentTopic, array $knowledgeBase): array
+    {
+        $related = [];
+        $categories = [];
+        
+        foreach ($knowledgeBase as $key => $topic) {
+            if ($key !== $currentTopic) {
+                $categories[$topic['category']][] = $key;
+            }
+        }
+        
+        $currentCategory = $knowledgeBase[$currentTopic]['category'] ?? '';
+        if (isset($categories[$currentCategory])) {
+            foreach ($categories[$currentCategory] as $relatedKey) {
+                $related[$relatedKey] = $knowledgeBase[$relatedKey];
+            }
+        }
+        
+        if (count($related) < 3) {
+            foreach ($knowledgeBase as $key => $topic) {
+                if ($key !== $currentTopic && !isset($related[$key])) {
+                    $related[$key] = $topic;
+                    if (count($related) >= 3) break;
+                }
+            }
+        }
+        
+        return $related;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // HISTORIQUE
     // ─────────────────────────────────────────────────────────────────────────
     #[Route('/historique', name: 'history', methods: ['GET'])]
     public function history(
@@ -104,7 +441,6 @@ class MaintenanceAdminController extends AbstractController
             $criteria['idM'] = (int) $idM;
         }
 
-        /** @var Maintenance[] $maintenances */
         $maintenances = $repo->findBy($criteria, ['dateMain' => 'DESC']);
 
         if ($statut !== '') {
@@ -121,7 +457,6 @@ class MaintenanceAdminController extends AbstractController
 
         $maintenances = array_values($maintenances);
 
-        // Génération des recommandations IA
         foreach ($maintenances as $maintenance) {
             try {
                 $existingReco = $maintenance->getRecommandation();
@@ -142,7 +477,6 @@ class MaintenanceAdminController extends AbstractController
             }
         }
 
-        // Regroupement par mois
         $grouped = [];
         foreach ($maintenances as $m) {
             $date = $m->getDateMain();
@@ -174,7 +508,7 @@ class MaintenanceAdminController extends AbstractController
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // DASHBOARD IA - Vue globale
+    // DASHBOARD IA
     // ─────────────────────────────────────────────────────────────────────────
     #[Route('/ai/dashboard', name: 'ai_dashboard', methods: ['GET'])]
     public function aiDashboard(
@@ -197,7 +531,6 @@ class MaintenanceAdminController extends AbstractController
         $priorities = $geminiService->prioritizeInterventions($machines);
         $schedule = $geminiService->generateOptimizedSchedule($priorities, 30);
         
-        // Statistiques globales
         $avgHealthScore = !empty($healthScores) ? array_sum(array_column($healthScores, 'score')) / count($healthScores) : 0;
         $criticalAlerts = count(array_filter($allAlerts, fn($a) => $a['type'] === 'critique'));
         $highRiskMachines = count(array_filter($predictions, fn($p) => $p['risque_panne'] === 'élevé'));
@@ -217,7 +550,7 @@ class MaintenanceAdminController extends AbstractController
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // API: Prédiction pour une machine
+    // API ROUTES
     // ─────────────────────────────────────────────────────────────────────────
     #[Route('/ai/predict/{id}', name: 'ai_predict', methods: ['GET'])]
     public function apiPredictMachine(
@@ -246,9 +579,6 @@ class MaintenanceAdminController extends AbstractController
         ]);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // API: Planning optimisé
-    // ─────────────────────────────────────────────────────────────────────────
     #[Route('/ai/schedule', name: 'ai_schedule', methods: ['GET'])]
     public function apiOptimizedSchedule(
         MachineRepository $machineRepo,
@@ -266,9 +596,6 @@ class MaintenanceAdminController extends AbstractController
         ]);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // API: Alertes globales
-    // ─────────────────────────────────────────────────────────────────────────
     #[Route('/ai/alerts', name: 'ai_alerts', methods: ['GET'])]
     public function apiGlobalAlerts(
         MachineRepository $machineRepo,
@@ -290,9 +617,6 @@ class MaintenanceAdminController extends AbstractController
         ]);
     }
 
-    /**
-     * Recommandation de secours (fallback)
-     */
     private function getFallbackRecommendation(Maintenance $m): string
     {
         $type = strtolower($m->getTypePanne());
@@ -346,7 +670,7 @@ class MaintenanceAdminController extends AbstractController
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // NEW - Créer une nouvelle maintenance
+    // CRUD OPERATIONS
     // ─────────────────────────────────────────────────────────────────────────
     #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
     public function new(
@@ -362,7 +686,6 @@ class MaintenanceAdminController extends AbstractController
         $maintenance->setPriorite('moyenne');
 
         if ($request->isMethod('POST')) {
-
             $typePanne = trim($request->request->get('typePanne', ''));
             if (empty($typePanne)) {
                 $errors['typePanne'] = 'Le type de panne est obligatoire.';
@@ -483,9 +806,6 @@ class MaintenanceAdminController extends AbstractController
         ]);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // SHOW - Afficher une maintenance
-    // ─────────────────────────────────────────────────────────────────────────
     #[Route('/{id}', name: 'show', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function show(int $id, MaintenanceRepository $repo): Response
     {
@@ -500,9 +820,6 @@ class MaintenanceAdminController extends AbstractController
         ]);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // EDIT - Modifier une maintenance
-    // ─────────────────────────────────────────────────────────────────────────
     #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
     public function edit(
         int $id,
@@ -521,7 +838,6 @@ class MaintenanceAdminController extends AbstractController
         $errors = [];
 
         if ($request->isMethod('POST')) {
-
             $typePanne = trim($request->request->get('typePanne', ''));
             if (empty($typePanne)) {
                 $errors['typePanne'] = 'Le type de panne est obligatoire.';
@@ -647,9 +963,6 @@ class MaintenanceAdminController extends AbstractController
         ]);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // DELETE - Supprimer une maintenance
-    // ─────────────────────────────────────────────────────────────────────────
     #[Route('/{id}/delete', name: 'delete', methods: ['POST'], requirements: ['id' => '\d+'])]
     public function delete(
         int $id,
@@ -673,99 +986,90 @@ class MaintenanceAdminController extends AbstractController
 
         return $this->redirectToRoute('admin_maintenances_index');
     }
-    // ─────────────────────────────────────────────────────────────────────────
-// API: Analyse IA complète pour une maintenance
-// ─────────────────────────────────────────────────────────────────────────
-#[Route('/ai/analyze/{id}', name: 'ai_analyze', methods: ['GET'])]
-public function aiAnalyzeMaintenance(
-    int $id,
-    MaintenanceRepository $repo,
-    GeminiRecommendationService $geminiService
-): JsonResponse {
-    $maintenance = $repo->find($id);
-    if (!$maintenance) {
-        return $this->json(['error' => 'Maintenance non trouvée'], 404);
+    
+    #[Route('/ai/analyze/{id}', name: 'ai_analyze', methods: ['GET'])]
+    public function aiAnalyzeMaintenance(
+        int $id,
+        MaintenanceRepository $repo,
+        GeminiRecommendationService $geminiService
+    ): JsonResponse {
+        $maintenance = $repo->find($id);
+        if (!$maintenance) {
+            return $this->json(['error' => 'Maintenance non trouvée'], 404);
+        }
+        
+        $recommendation = $geminiService->generateRecommendation($maintenance);
+        $analysis = $this->generateDetailedAnalysis($maintenance);
+        
+        return $this->json([
+            'recommendation' => $recommendation,
+            'analysis' => $analysis['description'],
+            'next_maintenance' => $analysis['next_maintenance'],
+            'actions' => $analysis['actions'],
+            'tips' => $analysis['tips']
+        ]);
     }
-    
-    // Générer une analyse complète
-    $recommendation = $geminiService->generateRecommendation($maintenance);
-    
-    // Analyse supplémentaire basée sur le type de panne
-    $analysis = $this->generateDetailedAnalysis($maintenance);
-    
-    return $this->json([
-        'recommendation' => $recommendation,
-        'analysis' => $analysis['description'],
-        'next_maintenance' => $analysis['next_maintenance'],
-        'actions' => $analysis['actions'],
-        'tips' => $analysis['tips']
-    ]);
-}
 
-/**
- * Génère une analyse détaillée basée sur le type de panne
- */
-private function generateDetailedAnalysis(Maintenance $m): array
-{
-    $type = strtolower($m->getTypePanne());
-    $priorite = $m->getPriorite();
-    $km = $m->getKilometrage();
-    
-    $analyses = [
-        'moteur' => [
-            'description' => 'Analyse moteur: Usure normale détectée. Surveillance recommandée des niveaux d\'huile et de liquide de refroidissement.',
-            'next_maintenance' => $km ? 'Dans ' . min(5000, $km * 0.5) . ' km ou 6 mois' : 'Dans 6 mois',
-            'actions' => ['Contrôle du niveau d\'huile', 'Vérification des bougies', 'Inspection des courroies'],
-            'tips' => 'Utilisez une huile moteur de qualité premium pour prolonger la durée de vie.'
-        ],
-        'vidange' => [
-            'description' => 'Maintenance vidange standard. Le cycle de vidange est respecté.',
-            'next_maintenance' => $km ? 'Dans ' . min(5000, $km * 0.6) . ' km' : 'Dans 5000 km',
-            'actions' => ['Changement d\'huile', 'Remplacement du filtre à huile', 'Contrôle du niveau'],
-            'tips' => 'Respectez scrupuleusement les intervalles de vidange pour éviter l\'usure prématurée.'
-        ],
-        'électrique' => [
-            'description' => 'Système électrique: Diagnostic recommandé. Risque de panne batterie/alternateur.',
-            'next_maintenance' => 'Dans 30 jours',
-            'actions' => ['Test de batterie', 'Vérification alternateur', 'Contrôle du faisceau'],
-            'tips' => 'Un voyant batterie qui s\'allume indique souvent un problème d\'alternateur.'
-        ],
-        'hydraulique' => [
-            'description' => 'Circuit hydraulique: Contrôle préventif nécessaire. Risque de fuite modéré.',
+    private function generateDetailedAnalysis(Maintenance $m): array
+    {
+        $type = strtolower($m->getTypePanne());
+        $priorite = $m->getPriorite();
+        $km = $m->getKilometrage();
+        
+        $analyses = [
+            'moteur' => [
+                'description' => 'Analyse moteur: Usure normale détectée. Surveillance recommandée des niveaux d\'huile et de liquide de refroidissement.',
+                'next_maintenance' => $km ? 'Dans ' . min(5000, $km * 0.5) . ' km ou 6 mois' : 'Dans 6 mois',
+                'actions' => ['Contrôle du niveau d\'huile', 'Vérification des bougies', 'Inspection des courroies'],
+                'tips' => 'Utilisez une huile moteur de qualité premium pour prolonger la durée de vie.'
+            ],
+            'vidange' => [
+                'description' => 'Maintenance vidange standard. Le cycle de vidange est respecté.',
+                'next_maintenance' => $km ? 'Dans ' . min(5000, $km * 0.6) . ' km' : 'Dans 5000 km',
+                'actions' => ['Changement d\'huile', 'Remplacement du filtre à huile', 'Contrôle du niveau'],
+                'tips' => 'Respectez scrupuleusement les intervalles de vidange pour éviter l\'usure prématurée.'
+            ],
+            'électrique' => [
+                'description' => 'Système électrique: Diagnostic recommandé. Risque de panne batterie/alternateur.',
+                'next_maintenance' => 'Dans 30 jours',
+                'actions' => ['Test de batterie', 'Vérification alternateur', 'Contrôle du faisceau'],
+                'tips' => 'Un voyant batterie qui s\'allume indique souvent un problème d\'alternateur.'
+            ],
+            'hydraulique' => [
+                'description' => 'Circuit hydraulique: Contrôle préventif nécessaire. Risque de fuite modéré.',
+                'next_maintenance' => 'Dans 3 mois',
+                'actions' => ['Contrôle niveau huile', 'Inspection flexibles', 'Test de pression'],
+                'tips' => 'Surveillez les traces d\'huile sous la machine après utilisation.'
+            ],
+            'transmission' => [
+                'description' => 'Transmission: Point de contrôle atteint. Révision recommandée.',
+                'next_maintenance' => $km ? 'Dans ' . min(10000, $km) . ' km' : 'Dans 10000 km',
+                'actions' => ['Vidange transmission', 'Réglage embrayage', 'Contrôle cardans'],
+                'tips' => 'Une transmission qui patine ou accroche nécessite une intervention rapide.'
+            ],
+            'frein' => [
+                'description' => 'Système de freinage: Usure dans les normes. Surveillance continue.',
+                'next_maintenance' => $km ? 'Dans ' . min(5000, $km * 0.8) . ' km' : 'Dans 5000 km',
+                'actions' => ['Contrôle plaquettes', 'Vérification disques', 'Test efficacité'],
+                'tips' => 'Un grincement au freinage indique des plaquettes à remplacer.'
+            ]
+        ];
+        
+        $default = [
+            'description' => "Maintenance {$m->getTypePanne()} analysée. Aucune anomalie majeure détectée.",
             'next_maintenance' => 'Dans 3 mois',
-            'actions' => ['Contrôle niveau huile', 'Inspection flexibles', 'Test de pression'],
-            'tips' => 'Surveillez les traces d\'huile sous la machine après utilisation.'
-        ],
-        'transmission' => [
-            'description' => 'Transmission: Point de contrôle atteint. Révision recommandée.',
-            'next_maintenance' => $km ? 'Dans ' . min(10000, $km) . ' km' : 'Dans 10000 km',
-            'actions' => ['Vidange transmission', 'Réglage embrayage', 'Contrôle cardans'],
-            'tips' => 'Une transmission qui patine ou accroche nécessite une intervention rapide.'
-        ],
-        'frein' => [
-            'description' => 'Système de freinage: Usure dans les normes. Surveillance continue.',
-            'next_maintenance' => $km ? 'Dans ' . min(5000, $km * 0.8) . ' km' : 'Dans 5000 km',
-            'actions' => ['Contrôle plaquettes', 'Vérification disques', 'Test efficacité'],
-            'tips' => 'Un grincement au freinage indique des plaquettes à remplacer.'
-        ]
-    ];
-    
-    $default = [
-        'description' => "Maintenance {$m->getTypePanne()} analysée. Aucune anomalie majeure détectée.",
-        'next_maintenance' => 'Dans 3 mois',
-        'actions' => ['Maintenance préventive standard', 'Contrôle visuel', 'Test fonctionnel'],
-        'tips' => 'Documentez chaque intervention pour un meilleur suivi.'
-    ];
-    
-    $result = $analyses[$type] ?? $default;
-    
-    // Ajustement selon priorité
-    if ($priorite === 'urgente') {
-        $result['description'] = '⚠️ URGENT: ' . $result['description'];
-        $result['next_maintenance'] = 'IMMÉDIAT';
-        $result['actions'][] = 'Intervention d\'urgence requise';
+            'actions' => ['Maintenance préventive standard', 'Contrôle visuel', 'Test fonctionnel'],
+            'tips' => 'Documentez chaque intervention pour un meilleur suivi.'
+        ];
+        
+        $result = $analyses[$type] ?? $default;
+        
+        if ($priorite === 'urgente') {
+            $result['description'] = '⚠️ URGENT: ' . $result['description'];
+            $result['next_maintenance'] = 'IMMÉDIAT';
+            $result['actions'][] = 'Intervention d\'urgence requise';
+        }
+        
+        return $result;
     }
-    
-    return $result;
-}
 }
