@@ -96,6 +96,11 @@ public function profileUpdate(Request $request, EntityManagerInterface $em, User
     if ($pwd = $request->request->get('password')) {
         $user->setMdp($hasher->hashPassword($user, $pwd));
     }
+    $photo = $request->request->get('photo'); // récupère l'URL Cloudinary
+if ($photo) {
+    $user->setImg($photo);
+}
+$em->flush();
 
     $em->flush();
 
@@ -104,6 +109,9 @@ public function profileUpdate(Request $request, EntityManagerInterface $em, User
         'prenom'  => $user->getPrenom(),
         'nom'     => $user->getNom(),
         'email'   => $user->getEmail(),
+            'photo'   => $user->getImg(), // ← important
+
     ]);
 }
+
 }

@@ -24,25 +24,19 @@ body { background: var(--beige); font-family: 'Segoe UI', sans-serif; }
 }
 .btn-primary:hover { background: var(--terre); color: white; }
 
-/* Grille terrains */
 .terrain-section { margin-bottom: 2.5rem; }
 .terrain-title {
     background: white;
-      padding: 0.6rem 1rem;
+    padding: 0.6rem 1rem 0.6rem 0.75rem;
     border-radius: 8px;
-    border: 0.5px solid var(--color-border-tertiary);
+    border-left: 4px solid var(--vert-l);
     margin-bottom: 1rem;
     font-size: 1.1rem; font-weight: 700; color: var(--vert);
-    border-left: 4px solid var(--vert-l); padding-left: .75rem;
 }
-.terrain-header {
-    
-    padding: 0.6rem 1rem;
-    border-radius: 8px;
-    border: 0.5px solid var(--color-border-tertiary);
-    margin-bottom: 1rem;
+.terrain-meta {
+    font-size: 0.85rem; font-weight: 400; color: #777; margin-left: 0.5rem;
 }
-/* Cards ouvriers */
+
 .ouvrier-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -72,12 +66,75 @@ body { background: var(--beige); font-family: 'Segoe UI', sans-serif; }
 .btn-edit:hover   { background: #f4a261; }
 .btn-delete:hover { background: #9b1c1c; }
 
-.badge-taches {
-    background: var(--vert-l); color: white;
-    border-radius: 2rem; padding: .15rem .55rem;
-    font-size: .75rem; font-weight: 700;
+.pagination-wrapper {
+    display: flex; justify-content: center; align-items: center;
+    gap: 8px; margin-top: 20px;
+}
+.page-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; border-radius: 10px;
+    background: white; color: #2C3E50;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    text-decoration: none; font-weight: 600; font-size: 14px;
+}
+.page-btn.active {
+    background: var(--vert); color: white;
+    box-shadow: 0 2px 8px rgba(45,106,79,0.3);
+}
+.page-ellipsis {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; color: #aaa; font-weight: 600;
+}
+.pagination-info {
+    text-align: center; margin-top: 10px;
+    font-size: 13px; color: #aaa;
 }
 .empty { color: #aaa; font-style: italic; padding: 1rem 0; }
+
+.auto-field-error {
+    color: var(--danger);
+    font-size: .75rem;
+    font-weight: 600;
+    display: none;
+    margin-top: .25rem;
+}
+.auto-invalid { border-color: var(--danger) !important; }
+
+#auto-form-errors {
+    display: none;
+    background: #f8d7da;
+    color: #842029;
+    border: 1px solid #f5c2c7;
+    border-radius: .5rem;
+    padding: .75rem 1rem;
+    margin-bottom: 1rem;
+    font-size: .85rem;
+}
+
+.btn-ia {
+    background: linear-gradient(135deg, #2d6a4f, #52b788);
+    color: white;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 15px rgba(82, 183, 136, 0.4);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    margin-bottom: 1.2rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.btn-ia:hover {
+    background: linear-gradient(135deg, #1b4332, #40916c);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(82, 183, 136, 0.6);
+}
+.btn-ia:active { transform: translateY(0); }
+.btn-ia:disabled { opacity: 0.75; cursor: not-allowed; transform: none; }
 </style>
 {% endblock %}
 
@@ -92,11 +149,123 @@ body { background: var(--beige); font-family: 'Segoe UI', sans-serif; }
     {% for message in app.flashes('success') %}
         <div class="alert alert-success">{{ message }}</div>
     {% endfor %}
+    {% for message in app.flashes('danger') %}
+        <div class="alert alert-danger">{{ message }}</div>
+    {% endfor %}
 
     {% if terrains is empty %}
         <p class="empty">Aucun terrain enregistré. Créez d'abord un terrain pour y affecter des ouvriers.</p>
     {% else %}
-        {% for terrain in terrains %}
+
+    {# ══════════════════════════════════════════════
+       SECTION ASSIGNATION AUTOMATIQUE
+    ══════════════════════════════════════════════ #}
+    <div style="background:white;border-radius:1rem;box-shadow:0 2px 12px rgba(0,0,0,.08);
+                padding:1.5rem;margin-bottom:2rem;border-left:4px solid var(--vert-l);">
+
+        <h5 style="color:var(--vert);margin:0 0 .5rem;">🤖 Assignation automatique</h5>
+        <p style="font-size:.88rem;color:#666;margin-bottom:1.2rem;">
+            Renseignez la tâche — l'ouvrier sera choisi automatiquement selon
+            sa disponibilité et sa charge de travail.
+        </p>
+
+        {# ── Bouton IA — EN DEHORS du modal et du formulaire ── #}
+        <button type="button" id="btn-ia-suggest" class="btn-ia">
+            <span id="btn-ia-default">✨ Suggérer une tâche (IA)</span>
+            <span id="btn-ia-loading" style="display:none;align-items:center;gap:6px;">
+                <span class="spinner-border spinner-border-sm"></span>
+                Génération en cours...
+            </span>
+        </button>
+
+        {# ── Formulaire manuel ── #}
+        <form id="auto-form" method="post" action="{{ path('app_ouvrier_tache_auto') }}" novalidate>
+
+            <div id="auto-form-errors"></div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;">
+                <div>
+                    <label style="font-size:.85rem;font-weight:600;color:#444;display:block;margin-bottom:.3rem;">
+                        Nom de la tâche *
+                    </label>
+                    <input type="text" id="auto-nom" name="nom_tache"
+                           style="width:100%;padding:.5rem .75rem;border:1px solid #ddd;
+                                  border-radius:.5rem;font-size:.9rem;">
+                    <span class="auto-field-error" id="auto-err-nom"></span>
+                </div>
+                <div>
+                    <label style="font-size:.85rem;font-weight:600;color:#444;display:block;margin-bottom:.3rem;">
+                        Date d'échéance *
+                    </label>
+                    <input type="date" id="auto-date" name="date_echeancee"
+                           style="width:100%;padding:.5rem .75rem;border:1px solid #ddd;
+                                  border-radius:.5rem;font-size:.9rem;">
+                    <span class="auto-field-error" id="auto-err-date"></span>
+                </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1rem;">
+                <div>
+                    <label style="font-size:.85rem;font-weight:600;color:#444;display:block;margin-bottom:.3rem;">
+                        Description
+                    </label>
+                    <textarea id="auto-desc" name="description" rows="6"
+                              style="width:100%;padding:.5rem .75rem;border:1px solid #ddd;
+                                     border-radius:.5rem;font-size:.9rem;resize:vertical;"></textarea>
+                    <span class="auto-field-error" id="auto-err-desc"></span>
+                    <small id="auto-desc-counter" style="color:#aaa;font-size:.75rem;">0 / 1000</small>
+                </div>
+                <div>
+                    <label style="font-size:.85rem;font-weight:600;color:#444;display:block;margin-bottom:.3rem;">
+                        État
+                    </label>
+                    <select name="etat"
+                            style="width:100%;padding:.5rem .75rem;border:1px solid #ddd;
+                                   border-radius:.5rem;font-size:.9rem;">
+                        <option value="à faire">À faire</option>
+                        <option value="en cours">En cours</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size:.85rem;font-weight:600;color:#444;display:block;margin-bottom:.3rem;">
+                        Priorité
+                    </label>
+                    <select name="priorite"
+                            style="width:100%;padding:.5rem .75rem;border:1px solid #ddd;
+                                   border-radius:.5rem;font-size:.9rem;">
+                        <option value="basse">Basse</option>
+                        <option value="normale" selected>Normale</option>
+                        <option value="haute">Haute</option>
+                        <option value="urgente">Urgente</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit"
+                    style="background:var(--vert);color:white;border:none;padding:.6rem 1.4rem;
+                           border-radius:.6rem;font-weight:600;font-size:.95rem;cursor:pointer;
+                           transition:background .2s;"
+                    onmouseover="this.style.background='var(--vert-l)'"
+                    onmouseout="this.style.background='var(--vert)'">
+                🤖 Assigner automatiquement
+            </button>
+
+        </form>
+    </div>{# fin bloc assignation #}
+
+   
+
+    {# ══════════════════════════════════════════════
+       LISTE DES TERRAINS ET OUVRIERS
+    ══════════════════════════════════════════════ #}
+    {% for terrain in terrains %}
+        {% set tid            = terrain.id %}
+        {% set paramKey       = 'page_terrain_' ~ tid %}
+        {% set ouvriersTerrain = ouvriersByTerrain[tid] ?? [] %}
+        {% set pagination     = paginationByTerrain[tid] ?? {page: 1, totalPages: 1, total: 0} %}
+        {% set currentPage    = pagination.page %}
+        {% set totalPages     = pagination.totalPages %}
+
         <div class="terrain-section">
             <div class="terrain-title">
                 🌿 {{ terrain.nomTerrain }}
@@ -105,42 +274,212 @@ body { background: var(--beige); font-family: 'Segoe UI', sans-serif; }
                 </span>
             </div>
 
-            {% set ouvriersTerrain = terrain.ouvriers %}
             {% if ouvriersTerrain is empty %}
                 <p class="empty">Aucun ouvrier assigné à ce terrain.</p>
             {% else %}
-            <div class="ouvrier-grid">
-                {% for ouvrier in ouvriersTerrain %}
-                <div class="ouvrier-card">
-                    <div class="ouvrier-name">
-                        {{ ouvrier.prenom }} {{ ouvrier.nom }}
+                <div class="ouvrier-grid">
+                    {% for ouvrier in ouvriersTerrain %}
+                    <div class="ouvrier-card">
+                        <div class="ouvrier-name">{{ ouvrier.prenom }} {{ ouvrier.nom }}</div>
+                        <div class="ouvrier-info">📧 {{ ouvrier.email }}</div>
+                        <div class="ouvrier-info">📞 {{ ouvrier.tel ?? '—' }}</div>
+                        <div class="ouvrier-info">📍 {{ ouvrier.ville ?? '—' }}</div>
+                        <div class="ouvrier-actions">
+                            <a href="{{ path('app_ouvrier_taches', {cin: ouvrier.cin}) }}"
+                               class="btn-sm btn-taches">📋 Tâches</a>
+                            <a href="{{ path('app_ouvrier_edit', {cin: ouvrier.cin}) }}"
+                               class="btn-sm btn-edit">✏️ Modifier</a>
+                            <form method="post"
+                                  action="{{ path('app_ouvrier_delete', {cin: ouvrier.cin}) }}"
+                                  onsubmit="return confirm('Supprimer cet ouvrier ?')">
+                                <button type="submit" class="btn-sm btn-delete">🗑 Supprimer</button>
+                            </form>
+                        </div>
                     </div>
-                    <div class="ouvrier-info">📧 {{ ouvrier.email }}</div>
-                    <div class="ouvrier-info">📞 {{ ouvrier.tel ?? '—' }}</div>
-                    <div class="ouvrier-info">📍 {{ ouvrier.ville ?? '—' }}</div>
-
-                    <div class="ouvrier-actions">
-                        <a href="{{ path('app_ouvrier_taches', {cin: ouvrier.cin}) }}"
-                           class="btn-sm btn-taches">
-                            📋 Tâches
-                        </a>
-                        <a href="{{ path('app_ouvrier_edit', {cin: ouvrier.cin}) }}"
-                           class="btn-sm btn-edit">
-                            ✏️ Modifier
-                        </a>
-                        <form method="post"
-                              action="{{ path('app_ouvrier_delete', {cin: ouvrier.cin}) }}"
-                              onsubmit="return confirm('Supprimer cet ouvrier ?')">
-                            <button type="submit" class="btn-sm btn-delete">🗑 Supprimer</button>
-                        </form>
-                    </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
-            </div>
+
+                {% if totalPages > 1 %}
+                <div class="pagination-wrapper">
+                    {% if currentPage > 1 %}
+                        {% set prevParams = app.request.query.all|merge({(paramKey): currentPage - 1}) %}
+                        <a href="{{ path('app_ouvrier_index', prevParams) }}" class="page-btn">
+                            <i class="fa fa-chevron-left"></i>
+                        </a>
+                    {% endif %}
+
+                    {% for p in 1..totalPages %}
+                        {% if p == currentPage %}
+                            <span class="page-btn active">{{ p }}</span>
+                        {% elseif p == 1 or p == totalPages or (p >= currentPage - 2 and p <= currentPage + 2) %}
+                            {% set pageParams = app.request.query.all|merge({(paramKey): p}) %}
+                            <a href="{{ path('app_ouvrier_index', pageParams) }}" class="page-btn">{{ p }}</a>
+                        {% elseif p == currentPage - 3 or p == currentPage + 3 %}
+                            <span class="page-ellipsis">…</span>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if currentPage < totalPages %}
+                        {% set nextParams = app.request.query.all|merge({(paramKey): currentPage + 1}) %}
+                        <a href="{{ path('app_ouvrier_index', nextParams) }}" class="page-btn">
+                            <i class="fa fa-chevron-right"></i>
+                        </a>
+                    {% endif %}
+                </div>
+                <div class="pagination-info">
+                    Page {{ currentPage }} sur {{ totalPages }} — {{ pagination.total }} ouvrier(s)
+                </div>
+                {% endif %}
             {% endif %}
         </div>
-        {% endfor %}
-    {% endif %}
+    {% endfor %}
 
-</div>
+    {% endif %}{# fin terrains not empty #}
+</div>{# fin container #}
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+(function () {
+    const form    = document.getElementById('auto-form');
+    const nomEl   = document.getElementById('auto-nom');
+    const descEl  = document.getElementById('auto-desc');
+    const dateEl  = document.getElementById('auto-date');
+    const errBox  = document.getElementById('auto-form-errors');
+    const counter = document.getElementById('auto-desc-counter');
+
+    descEl.addEventListener('input', () => {
+        counter.textContent = descEl.value.length + ' / 1000';
+    });
+
+    function markInvalid(el, errId, msg) {
+        el.classList.add('auto-invalid');
+        const span = document.getElementById(errId);
+        if (span) { span.textContent = msg; span.style.display = 'block'; }
+    }
+    function clearField(el, errId) {
+        el.classList.remove('auto-invalid');
+        const span = document.getElementById(errId);
+        if (span) { span.textContent = ''; span.style.display = 'none'; }
+    }
+
+    function validateNom() {
+        clearField(nomEl, 'auto-err-nom');
+        const val   = nomEl.value.trim();
+        const regex = /^[\p{L}0-9 \-_.,!?'"()]+$/u;
+        if (!val)             { markInvalid(nomEl, 'auto-err-nom', 'Le nom est obligatoire.'); return false; }
+        if (val.length < 3)   { markInvalid(nomEl, 'auto-err-nom', 'Minimum 3 caractères.'); return false; }
+        if (val.length > 100) { markInvalid(nomEl, 'auto-err-nom', 'Maximum 100 caractères.'); return false; }
+        if (!regex.test(val)) { markInvalid(nomEl, 'auto-err-nom', 'Caractères non autorisés.'); return false; }
+        return true;
+    }
+    function validateDesc() {
+        clearField(descEl, 'auto-err-desc');
+        if (descEl.value.length > 1000) {
+            markInvalid(descEl, 'auto-err-desc', 'Maximum 1000 caractères.'); return false;
+        }
+        return true;
+    }
+    function validateDate() {
+        clearField(dateEl, 'auto-err-date');
+        if (!dateEl.value) { markInvalid(dateEl, 'auto-err-date', "Date obligatoire."); return false; }
+        const chosen = new Date(dateEl.value); chosen.setHours(0,0,0,0);
+        const today  = new Date();             today.setHours(0,0,0,0);
+        if (chosen < today) { markInvalid(dateEl, 'auto-err-date', "La date doit être dans le futur."); return false; }
+        return true;
+    }
+
+    nomEl.addEventListener('blur',  validateNom);
+    descEl.addEventListener('blur', validateDesc);
+    dateEl.addEventListener('blur', validateDate);
+
+    form.addEventListener('submit', function (e) {
+        errBox.style.display = 'none';
+        errBox.innerHTML     = '';
+        const ok = validateNom() & validateDesc() & validateDate();
+        if (!ok) {
+            e.preventDefault();
+            const msgs = ['auto-err-nom','auto-err-desc','auto-err-date']
+                .map(id => document.getElementById(id).textContent).filter(Boolean);
+            errBox.innerHTML =
+                '<strong>Corrigez les erreurs suivantes :</strong>' +
+                '<ul style="margin:.4rem 0 0;padding-left:1.2rem;">' +
+                msgs.map(m => '<li>' + m + '</li>').join('') + '</ul>';
+            errBox.style.display = 'block';
+            errBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    });
+})();
+
+// ── Bouton Suggestion IA → remplit le formulaire principal directement ──
+document.getElementById('btn-ia-suggest').addEventListener('click', function () {
+    const btn        = this;
+    const btnDefault = document.getElementById('btn-ia-default');
+    const btnLoad    = document.getElementById('btn-ia-loading');
+
+    btn.disabled             = true;
+    btnDefault.style.display = 'none';
+    btnLoad.style.display    = 'inline-flex';
+
+    fetch('{{ path('app_ouvrier_tache_ia_suggest') }}')
+        .then(r => {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+        })
+        .then(data => {
+            btn.disabled             = false;
+            btnDefault.style.display = 'inline';
+            btnLoad.style.display    = 'none';
+
+            if (data.error) {
+                alert('⚠️ ' + data.error);
+                return;
+            }
+
+            // ── Remplir le formulaire principal ──
+            document.getElementById('auto-nom').value  = data.nom_tache    ?? '';
+            document.getElementById('auto-desc').value = data.description  ?? '';
+            document.getElementById('auto-date').value = data.date_echeancee ?? '';
+
+            // Mettre à jour le compteur description
+            const counter = document.getElementById('auto-desc-counter');
+            if (counter) counter.textContent = (data.description ?? '').length + ' / 1000';
+
+            // Sélectionner la priorité
+            const selPrio = document.querySelector('#auto-form select[name="priorite"]');
+            if (selPrio) {
+                for (let opt of selPrio.options) {
+                    if (opt.value.toLowerCase() === (data.priorite ?? '').toLowerCase()) {
+                        opt.selected = true; break;
+                    }
+                }
+            }
+
+            // Sélectionner l'état
+            const selEtat = document.querySelector('#auto-form select[name="etat"]');
+            if (selEtat) {
+                for (let opt of selEtat.options) {
+                    if (opt.value.toLowerCase() === (data.etat ?? '').toLowerCase()) {
+                        opt.selected = true; break;
+                    }
+                }
+            }
+
+            // Scroll vers le formulaire + highlight flash
+            const formBox = document.getElementById('auto-form').closest('div');
+            formBox.style.transition  = 'box-shadow 0.3s';
+            formBox.style.boxShadow   = '0 0 0 3px #52b788';
+            setTimeout(() => { formBox.style.boxShadow = '0 2px 12px rgba(0,0,0,.08)'; }, 1500);
+            formBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        })
+        .catch(err => {
+            btn.disabled             = false;
+            btnDefault.style.display = 'inline';
+            btnLoad.style.display    = 'none';
+            alert('Erreur de connexion à l\'IA. Veuillez réessayer.');
+            console.error(err);
+        });
+});
+</script>
 {% endblock %}

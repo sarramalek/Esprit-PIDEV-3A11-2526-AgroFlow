@@ -16,28 +16,24 @@ class MouvementStockRepository extends ServiceEntityRepository
         parent::__construct($registry, MouvementStock::class);
     }
 
-    //    /**
-    //     * @return MouvementStock[] Returns an array of MouvementStock objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('m')
-    //            ->andWhere('m.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('m.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findByAdminSearch(?string $search, ?int $idAdmin = null): array
+    {
+        $qb = $this->createQueryBuilder('m')
+            ->join('m.article', 'a')
+            ->leftJoin('a.user', 'u');
 
-    //    public function findOneBySomeField($value): ?MouvementStock
-    //    {
-    //        return $this->createQueryBuilder('m')
-    //            ->andWhere('m.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        if ($idAdmin) {
+            $qb->andWhere('m.idAdmin = :idAdmin')
+               ->setParameter('idAdmin', $idAdmin);
+        }
+
+        if ($search) {
+            $qb->andWhere('a.nom LIKE :search OR u.nom LIKE :search OR u.prenom LIKE :search')
+               ->setParameter('search', '%' . $search . '%');
+        }
+
+        return $qb->orderBy('m.dateMouvement', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }

@@ -5,6 +5,86 @@
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
+      <trans-unit id="vAA0PNI" resname="taches.titre">
+        <source>taches.titre</source>
+        <target>Mes Tâches</target>
+      </trans-unit>
+      <trans-unit id="Ns3v68N" resname="taches.aucune">
+        <source>taches.aucune</source>
+        <target>Aucune tâche assignée</target>
+      </trans-unit>
+      <trans-unit id="rv0l2Oe" resname="taches.aucune_desc">
+        <source>taches.aucune_desc</source>
+        <target>Vous n'avez pas encore de tâches. Revenez plus tard !</target>
+      </trans-unit>
+      <trans-unit id="C0Kw3C2" resname="taches.commencer">
+        <source>taches.commencer</source>
+        <target>Commencer</target>
+      </trans-unit>
+      <trans-unit id="r7lcwqa" resname="taches.terminer">
+        <source>taches.terminer</source>
+        <target>Marquer terminée</target>
+      </trans-unit>
+      <trans-unit id="eVVsce3" resname="taches.completee">
+        <source>taches.completee</source>
+        <target>Tâche complétée</target>
+      </trans-unit>
+      <trans-unit id="9f4VXZ8" resname="taches.toutes">
+        <source>taches.toutes</source>
+        <target>Toutes</target>
+      </trans-unit>
+      <trans-unit id="MWqDc5j" resname="taches.a_faire">
+        <source>taches.a_faire</source>
+        <target>À faire</target>
+      </trans-unit>
+      <trans-unit id="wmv5FAT" resname="taches.en_cours">
+        <source>taches.en_cours</source>
+        <target>En cours</target>
+      </trans-unit>
+      <trans-unit id="BqUnLUt" resname="taches.terminees">
+        <source>taches.terminees</source>
+        <target>Terminées</target>
+      </trans-unit>
+      <trans-unit id="i7OM_Mq" resname="taches.animaux">
+        <source>taches.animaux</source>
+        <target>Animaux</target>
+      </trans-unit>
+      <trans-unit id="66Zl6Oe" resname="taches.machines">
+        <source>taches.machines</source>
+        <target>Machines</target>
+      </trans-unit>
+      <trans-unit id="QX8Cdc3" resname="taches.terrains">
+        <source>taches.terrains</source>
+        <target>Terrains</target>
+      </trans-unit>
+      <trans-unit id="CfvrTR_" resname="taches.voir_animal">
+        <source>taches.voir_animal</source>
+        <target>Voir l'animal</target>
+      </trans-unit>
+      <trans-unit id="vVHVLHB" resname="taches.voir_machine">
+        <source>taches.voir_machine</source>
+        <target>Voir la machine</target>
+      </trans-unit>
+      <trans-unit id="Ipwq746" resname="taches.voir_terrain">
+        <source>taches.voir_terrain</source>
+        <target>Voir le terrain</target>
+      </trans-unit>
+      <trans-unit id="4MUy6Xl" resname="taches.priorite">
+        <source>taches.priorite</source>
+        <target>Priorité</target>
+      </trans-unit>
+      <trans-unit id="2jMUm5m" resname="taches.statut_afaire">
+        <source>taches.statut_afaire</source>
+        <target>À faire</target>
+      </trans-unit>
+      <trans-unit id="sQJf56D" resname="taches.statut_encours">
+        <source>taches.statut_encours</source>
+        <target>En cours</target>
+      </trans-unit>
+      <trans-unit id="YqKsi3b" resname="taches.statut_terminee">
+        <source>taches.statut_terminee</source>
+        <target>Terminée</target>
+      </trans-unit>
       <trans-unit id="SS.OayZ" resname="plante.retour">
         <source>plante.retour</source>
         <target>__plante.retour</target>

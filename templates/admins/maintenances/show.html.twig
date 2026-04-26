@@ -151,6 +151,35 @@
     .type-logicielle { background: #eceff1; color: #263238; }
     .type-autre { background: #f5f5f5; color: #424242; }
 
+    /* Statut badges */
+    .statut-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    .statut-planifie { background: #e3f2fd; color: #1565c0; }
+    .statut-en_cours { background: #fff3e0; color: #e65100; }
+    .statut-termine { background: #e8f5e9; color: #2e7d32; }
+
+    /* Priorité badges */
+    .priorite-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    .priorite-faible { background: #f5f5f5; color: #616161; }
+    .priorite-moyenne { background: #e3f2fd; color: #1565c0; }
+    .priorite-haute { background: #fff3e0; color: #e65100; }
+    .priorite-urgente { background: #ffebee; color: #c62828; }
+
     .machine-link {
         text-decoration: none;
         color: #2d5a1b;
@@ -192,7 +221,7 @@
     .date-main { font-size: 15px; font-weight: 500; color: #1a1a18; }
     .date-sub { font-size: 11px; color: #9e9d95; margin-top: 3px; font-family: 'DM Mono', monospace; }
 
-    .desc-box {
+    .desc-box, .reco-box {
         background: #f5f2ec;
         border: 1px solid #ece7dd;
         border-radius: 12px;
@@ -202,6 +231,18 @@
         color: #3d3d38;
         white-space: pre-wrap;
         width: 100%;
+    }
+
+    .km-value {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1a1a18;
+        font-family: 'DM Mono', monospace;
+    }
+    .km-unit {
+        font-size: 12px;
+        color: #6b6b64;
+        margin-left: 4px;
     }
 
     /* Actions */
@@ -329,7 +370,7 @@
                         {% elseif maintenance.typePanne == 'Mécanique' %}type-mecanique
                         {% elseif maintenance.typePanne == 'Pneumatique' %}type-pneumatique
                         {% elseif maintenance.typePanne == 'Transmission' %}type-transmission
-                        {% elseif maintenance.typePanne == 'Vidange & Filtres' %}type-vidange
+                        {% elseif maintenance.typePanne == 'Vidange & filtres' %}type-vidange
                         {% elseif maintenance.typePanne == 'Logicielle' %}type-logicielle
                         {% else %}type-autre{% endif %}">
                         {% if maintenance.typePanne == 'Moteur' %}<i class="bi bi-gear-fill"></i>
@@ -349,10 +390,9 @@
                 </div>
                 <div class="info-value">
                     {% if maintenance.nom %}
-                        <a href="{{ path('admin_machines_show', {id: maintenance.idM}) }}" class="machine-link">
-                            <i class="bi bi-link-45deg"></i> {{ maintenance.nom }}
-                        </a>
-                        <span class="machine-id">#{{ maintenance.idM }}</span>
+                        <a href="{{ path('admin_machines_show', {id: maintenance.idM.id}) }}" class="machine-link">
+<span class="machine-id">#{{ maintenance.idM.id }}</span>
+                        <span class="machine-id">#{{ maintenance.idM.id }}</span>
                     {% else %}
                         <span style="color: #9e9d95; font-style: italic;">— Non lié à un matériel —</span>
                     {% endif %}
@@ -387,6 +427,59 @@
                 </div>
             </div>
 
+            <div class="info-row">
+                <div class="info-label">
+                    <div class="info-label-icon"><i class="bi bi-flag-fill"></i></div>
+                    <span class="info-label-text">Statut</span>
+                </div>
+                <div class="info-value">
+                    <span class="statut-badge 
+                        {% if maintenance.statut == 'planifie' %}statut-planifie
+                        {% elseif maintenance.statut == 'en_cours' %}statut-en_cours
+                        {% elseif maintenance.statut == 'termine' %}statut-termine{% endif %}">
+                        <i class="bi bi-{% if maintenance.statut == 'planifie' %}calendar-check{% elseif maintenance.statut == 'en_cours' %}hourglass-split{% else %}check2-circle{% endif %}"></i>
+                        {% if maintenance.statut == 'planifie' %}Planifié
+                        {% elseif maintenance.statut == 'en_cours' %}En cours
+                        {% else %}Terminé{% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label">
+                    <div class="info-label-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
+                    <span class="info-label-text">Priorité</span>
+                </div>
+                <div class="info-value">
+                    <span class="priorite-badge 
+                        {% if maintenance.priorite == 'faible' %}priorite-faible
+                        {% elseif maintenance.priorite == 'moyenne' %}priorite-moyenne
+                        {% elseif maintenance.priorite == 'haute' %}priorite-haute
+                        {% elseif maintenance.priorite == 'urgente' %}priorite-urgente{% endif %}">
+                        <i class="bi bi-{% if maintenance.priorite == 'faible' %}arrow-down-circle{% elseif maintenance.priorite == 'moyenne' %}dash-circle{% elseif maintenance.priorite == 'haute' %}arrow-up-circle{% else %}exclamation-circle{% endif %}"></i>
+                        {% if maintenance.priorite == 'faible' %}Faible
+                        {% elseif maintenance.priorite == 'moyenne' %}Moyenne
+                        {% elseif maintenance.priorite == 'haute' %}Haute
+                        {% else %}Urgente{% endif %}
+                    </span>
+                </div>
+            </div>
+
+            <div class="info-row">
+                <div class="info-label">
+                    <div class="info-label-icon"><i class="bi bi-speedometer2"></i></div>
+                    <span class="info-label-text">Kilométrage</span>
+                </div>
+                <div class="info-value">
+                    {% if maintenance.kilometrage %}
+                        <span class="km-value">{{ maintenance.kilometrage|number_format(0, ',', ' ') }}</span>
+                        <span class="km-unit">km</span>
+                    {% else %}
+                        <span style="color: #9e9d95; font-style: italic;">Non renseigné</span>
+                    {% endif %}
+                </div>
+            </div>
+
             <div class="info-row" style="align-items:flex-start;">
                 <div class="info-label">
                     <div class="info-label-icon"><i class="bi bi-file-text-fill"></i></div>
@@ -397,6 +490,20 @@
                         <div class="desc-box">{{ maintenance.description|nl2br }}</div>
                     {% else %}
                         <span style="color: #9e9d95; font-style: italic;">Aucune description fournie</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="info-row" style="align-items:flex-start;">
+                <div class="info-label">
+                    <div class="info-label-icon"><i class="bi bi-chat-dots-fill"></i></div>
+                    <span class="info-label-text">Recommandation</span>
+                </div>
+                <div class="info-value">
+                    {% if maintenance.recommandation %}
+                        <div class="reco-box">{{ maintenance.recommandation|nl2br }}</div>
+                    {% else %}
+                        <span style="color: #9e9d95; font-style: italic;">Aucune recommandation</span>
                     {% endif %}
                 </div>
             </div>

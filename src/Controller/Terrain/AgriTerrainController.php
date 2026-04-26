@@ -15,7 +15,7 @@ use Dompdf\Options;
 
 
 #[Route('/agri/terrains', name: 'agri_terrains')]
-#[IsGranted('ROLE_AGRICULTEUR')]   // ← corrigé ici
+   // ← corrigé ici
 class AgriTerrainController extends AbstractController
 {
     #[Route('', name: '', methods: ['GET'])]
@@ -107,7 +107,6 @@ class AgriTerrainController extends AbstractController
     #[Route('/{id}', name: '_show', methods: ['GET'])]
     public function show(Terrain $terrain): Response
     {
-        $this->denyAccessUnlessGranted('TERRAIN_OWNER', $terrain);
 
         return $this->render('agri/terrain/show.html.twig', [
             'terrain' => $terrain,

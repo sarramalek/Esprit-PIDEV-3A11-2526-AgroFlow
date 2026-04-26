@@ -26,6 +26,23 @@
         background: white;
         box-shadow: 0 0 0 3px rgba(74,163,66,.1);
     }
+
+    /* Calendrier natif */
+    .form-group input[type="date"] {
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+    }
+    .form-group input[type="date"]::-webkit-calendar-picker-indicator {
+        cursor: pointer;
+        opacity: 0.6;
+        filter: invert(30%) sepia(60%) saturate(400%) hue-rotate(80deg);
+        transition: opacity 0.2s;
+    }
+    .form-group input[type="date"]::-webkit-calendar-picker-indicator:hover {
+        opacity: 1;
+    }
+
     .field-hint { font-size: 11px; color: var(--text-muted); }
     .form-errors { font-size: 12px; color: #DC2626; margin-top: 2px; }
 
@@ -69,13 +86,21 @@
 
     <div class="form-group">
         {{ form_label(form.dateInscription) }}
-        {{ form_widget(form.dateInscription) }}
+        {{ form_widget(form.dateInscription, {'type': 'date', 'attr': {
+            'class': 'date-picker',
+            'placeholder': 'JJ/MM/AAAA'
+        }}) }}
+        <span class="field-hint"><i class="fa fa-calendar-day" style="color:var(--green-accent);"></i> Date d'inscription</span>
         <div class="form-errors">{{ form_errors(form.dateInscription) }}</div>
     </div>
 
     <div class="form-group">
         {{ form_label(form.dateExpiration) }}
-        {{ form_widget(form.dateExpiration) }}
+        {{ form_widget(form.dateExpiration, {'type': 'date', 'attr': {
+            'class': 'date-picker',
+            'placeholder': 'JJ/MM/AAAA'
+        }}) }}
+        <span class="field-hint"><i class="fa fa-calendar-xmark" style="color:var(--green-accent);"></i> Date d'expiration</span>
         <div class="form-errors">{{ form_errors(form.dateExpiration) }}</div>
     </div>
 

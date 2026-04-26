@@ -3,3 +3,26 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+# Routes pour les Diagnostics et Schedules
+
+# Diagnostics HTML
+agri_maintenances_api_diagnostics:
+    path: /agriculteur/maintenances/api/diagnostics/{id}
+    controller: App\Controller\Materiels\MaintenancesController::apiDiagnostics
+    methods: GET
+    requirements:
+        id: \d+
+
+# Schedule HTML (Plan de maintenance)
+agri_maintenances_api_schedule:
+    path: /agriculteur/maintenances/api/schedule/{id}
+    controller: App\Controller\Materiels\MaintenancesController::apiSchedule
+    methods: GET
+    requirements:
+        id: \d+
+
+# API Gemini (générique)
+agri_maintenances_api_gemini_generate:
+    path: /agriculteur/maintenances/api/gemini/generate
+    controller: App\Controller\Materiels\MaintenancesController::generateWithGemini
+    methods: POST

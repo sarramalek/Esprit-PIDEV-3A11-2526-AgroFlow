@@ -53,10 +53,12 @@ input:focus, select:focus { border-color: var(--vert); outline: none; }
                 <input type="number" name="cin" required placeholder="Ex: 12345678">
             </div>
 
-            <div class="form-group">
-                <label>Mot de passe *</label>
-                <input type="password" name="mdp" required placeholder="Mot de passe">
-            </div>
+            <div class="form-group full" style="background:#f0faf4; border:1px solid #52b788; border-radius:.5rem; padding:.75rem 1rem;">
+    <small style="color:#2d6a4f; font-weight:600;">
+        🔑 Le mot de passe sera automatiquement défini comme le numéro de téléphone de l'ouvrier, 
+        et lui sera envoyé par email.
+    </small>
+</div>
 
             <div class="form-group">
                 <label>Nom *</label>

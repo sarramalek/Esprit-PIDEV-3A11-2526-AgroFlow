@@ -15,7 +15,7 @@
     .toolbar-tip { color: rgba(255,255,255,.45); font-size: 11px; margin-left: auto; }
 
     /* DOC */
-    .doc { padding: 32px 40px 48px; max-width: 900px; margin: 0 auto; }
+    .doc { padding: 32px 40px 48px; max-width: 1200px; margin: 0 auto; }
 
     /* HEADER */
     .doc-header { background: #1d3d17; border-radius: 10px; padding: 22px 28px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
@@ -25,13 +25,13 @@
     .brand-sub { font-size: 10px; color: rgba(200,230,176,.55); margin-top: 2px; }
 
     /* KPI */
-    .kpi-strip { display: flex; gap: 10px; margin-bottom: 22px; }
-    .kpi-item { flex: 1; background: #f5f2ec; border: 1px solid #ece7dd; border-radius: 8px; padding: 12px 16px; text-align: center; }
+    .kpi-strip { display: flex; gap: 10px; margin-bottom: 22px; flex-wrap: wrap; }
+    .kpi-item { flex: 1; background: #f5f2ec; border: 1px solid #ece7dd; border-radius: 8px; padding: 12px 16px; text-align: center; min-width: 150px; }
     .kpi-val { font-size: 18px; font-weight: 600; color: #2d5a1b; }
     .kpi-lbl { font-size: 10px; color: #9e9d95; margin-top: 3px; text-transform: uppercase; letter-spacing: .5px; }
 
     /* SECTION TITLE */
-    .section-title { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #2d5a1b; border-left: 3px solid #2d5a1b; padding-left: 10px; margin-bottom: 12px; }
+    .section-title { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #2d5a1b; border-left: 3px solid #2d5a1b; padding-left: 10px; margin-bottom: 12px; margin-top: 20px; }
 
     /* BY-TYPE */
     .by-type-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
@@ -40,16 +40,16 @@
     .btype-lbl { font-size: 10px; color: #6b6b64; margin-top: 2px; }
 
     /* TABLE */
-    table { width: 100%; border-collapse: collapse; font-size: 11px; }
+    table { width: 100%; border-collapse: collapse; font-size: 10px; }
     thead tr { background: #1d3d17; }
-    thead th { padding: 9px 12px; color: #c8e6b0; font-weight: 600; font-size: 10px; text-align: left; letter-spacing: .5px; text-transform: uppercase; }
+    thead th { padding: 9px 12px; color: #c8e6b0; font-weight: 600; font-size: 9px; text-align: left; letter-spacing: .5px; text-transform: uppercase; }
     tbody tr:nth-child(even) { background: #f9f8f4; }
     tbody tr:nth-child(odd)  { background: #fff; }
-    tbody td { padding: 9px 12px; border-bottom: 1px solid #ece7dd; vertical-align: middle; color: #3d3d38; }
+    tbody td { padding: 8px 12px; border-bottom: 1px solid #ece7dd; vertical-align: middle; color: #3d3d38; }
     tfoot td { background: #f0ede6; font-weight: 600; padding: 10px 12px; border-top: 2px solid #d8d1c1; color: #1d3d17; }
 
     /* BADGES */
-    .badge { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 10px; font-weight: 600; }
+    .badge { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 9px; font-weight: 600; }
     .bm  { background: #e8f5e9; color: #1b5e20; }
     .bh  { background: #e3f2fd; color: #0d47a1; }
     .be  { background: #fff8e1; color: #e65100; }
@@ -60,14 +60,29 @@
     .bl  { background: #eceff1; color: #263238; }
     .ba  { background: #f5f5f5; color: #424242; }
 
+    .statut-badge { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 9px; font-weight: 600; }
+    .statut-planifie { background: #e3f2fd; color: #1565c0; }
+    .statut-en_cours { background: #fff3e0; color: #e65100; }
+    .statut-termine { background: #e8f5e9; color: #2e7d32; }
+
+    .priorite-badge { display: inline-block; padding: 2px 9px; border-radius: 10px; font-size: 9px; font-weight: 600; }
+    .priorite-faible { background: #f5f5f5; color: #616161; }
+    .priorite-moyenne { background: #e3f2fd; color: #1565c0; }
+    .priorite-haute { background: #fff3e0; color: #e65100; }
+    .priorite-urgente { background: #ffebee; color: #c62828; }
+
+    .km-value { font-family: 'Courier New', monospace; font-size: 10px; font-weight: 500; color: #6b6b64; }
+
     /* FOOTER */
-    .doc-footer { margin-top: 28px; padding-top: 14px; border-top: 1px solid #ece7dd; display: flex; justify-content: space-between; font-size: 10px; color: #9e9d95; }
+    .doc-footer { margin-top: 28px; padding-top: 14px; border-top: 1px solid #ece7dd; display: flex; justify-content: space-between; font-size: 10px; color: #9e9d95; flex-wrap: wrap; gap: 10px; }
 
     @media print {
       .toolbar { display: none !important; }
-      body { font-size: 11px; }
+      body { font-size: 10px; }
       .doc { padding: 0; max-width: 100%; }
       .doc-header { border-radius: 0; }
+      table { font-size: 9px; }
+      thead th { font-size: 8px; }
     }
   </style>
 </head>
@@ -109,11 +124,19 @@
         <div class="kpi-val">{% if maintenances|length > 0 %}{{ (totalCout / maintenances|length)|number_format(2, ',', ' ') }} DT{% else %}—{% endif %}</div>
         <div class="kpi-lbl">Coût moyen</div>
       </div>
+      <div class="kpi-item">
+        <div class="kpi-val">{{ maintenances|filter(m => m.statut == 'en_cours')|length }}</div>
+        <div class="kpi-lbl">En cours</div>
+      </div>
+      <div class="kpi-item">
+        <div class="kpi-val">{{ maintenances|filter(m => m.priorite == 'urgente')|length }}</div>
+        <div class="kpi-lbl">Urgentes</div>
+      </div>
     </div>
 
     {% if byType|length > 0 %}
-    <div class="section-title" style="margin-bottom:12px;">Répartition par type</div>
-    <div class="by-type-grid" style="margin-bottom:24px;">
+    <div class="section-title">Répartition par type</div>
+    <div class="by-type-grid">
       {% for r in byType %}
       <div class="btype-item">
         <div class="btype-num">{{ r.total }}</div>
@@ -123,35 +146,65 @@
     </div>
     {% endif %}
 
-    <div class="section-title" style="margin-bottom:12px;">Liste détaillée</div>
+    <div class="section-title">Liste détaillée</div>
     <table>
       <thead>
         <tr>
-          <th>Type de panne</th><th>Matériel</th><th>Coût (DT)</th><th>Date</th><th>Description</th>
+          <th>Type</th>
+          <th>Matériel</th>
+          <th>Statut</th>
+          <th>Priorité</th>
+          <th>Coût (DT)</th>
+          <th>Date</th>
+          <th>Km</th>
+          <th>Description</th>
         </tr>
       </thead>
       <tbody>
         {% for m in maintenances %}
         <tr>
           <td>
-            <span class="badge {% if m.typePanne == 'Moteur' %}bm{% elseif m.typePanne == 'Hydraulique' %}bh{% elseif m.typePanne in ['Électrique','Electricité'] %}be{% elseif m.typePanne == 'Mécanique' %}bme{% elseif m.typePanne == 'Pneumatique' %}bp{% elseif m.typePanne == 'Transmission' %}bt{% elseif m.typePanne == 'Vidange & Filtres' %}bv{% elseif m.typePanne == 'Logicielle' %}bl{% else %}ba{% endif %}">{{ m.typePanne }}</span>
-          </td>
+            <span class="badge {% if m.typePanne == 'Moteur' %}bm{% elseif m.typePanne == 'Hydraulique' %}bh{% elseif m.typePanne in ['Électrique','Electricité'] %}be{% elseif m.typePanne == 'Mécanique' %}bme{% elseif m.typePanne == 'Pneumatique' %}bp{% elseif m.typePanne == 'Transmission' %}bt{% elseif m.typePanne == 'Vidange & filtres' %}bv{% elseif m.typePanne == 'Logicielle' %}bl{% else %}ba{% endif %}">{{ m.typePanne }}</span>
+           </td>
           <td>
-            {% if m.nom %}<strong>{{ m.nom }}</strong><div style="font-size:10px;color:#9e9d95;">#{{ m.idM }}</div>{% else %}<span style="color:#9e9d95;font-style:italic;">— Non lié —</span>{% endif %}
-          </td>
+            {% if m.nom %}<strong>{{ m.nom }}</strong><div style="font-size:9px;color:#9e9d95;">#{{ m.idM.id }}</div>{% else %}<span style="color:#9e9d95;font-style:italic;">— Non lié —</span>{% endif %}
+           </td>
+          <td>
+            <span class="statut-badge 
+              {% if m.statut == 'planifie' %}statut-planifie
+              {% elseif m.statut == 'en_cours' %}statut-en_cours
+              {% else %}statut-termine{% endif %}">
+              {% if m.statut == 'planifie' %}Planifié
+              {% elseif m.statut == 'en_cours' %}En cours
+              {% else %}Terminé{% endif %}
+            </span>
+           </td>
+          <td>
+            <span class="priorite-badge 
+              {% if m.priorite == 'faible' %}priorite-faible
+              {% elseif m.priorite == 'moyenne' %}priorite-moyenne
+              {% elseif m.priorite == 'haute' %}priorite-haute
+              {% else %}priorite-urgente{% endif %}">
+              {% if m.priorite == 'faible' %}Faible
+              {% elseif m.priorite == 'moyenne' %}Moyenne
+              {% elseif m.priorite == 'haute' %}Haute
+              {% else %}Urgente{% endif %}
+            </span>
+           </td>
           <td style="font-weight:600;color:#2d5a1b;font-variant-numeric:tabular-nums;">{{ m.cout|number_format(2, ',', ' ') }}</td>
           <td style="white-space:nowrap;">{{ m.dateMain ? m.dateMain|date('d/m/Y') : '—' }}</td>
-          <td style="max-width:230px;color:#6b6b64;">{{ m.description ? m.description|slice(0,85)~(m.description|length > 85 ? '…' : '') : '—' }}</td>
+          <td>{% if m.kilometrage %}<span class="km-value">{{ m.kilometrage|number_format(0, ',', ' ') }} km</span>{% else %}—{% endif %}</td>
+          <td style="max-width:200px;color:#6b6b64;">{{ m.description ? m.description|slice(0,60)~(m.description|length > 60 ? '…' : '') : '—' }}</td>
         </tr>
         {% else %}
-        <tr><td colspan="5" style="text-align:center;padding:24px;color:#9e9d95;">Aucune maintenance</td></tr>
+        <tr><td colspan="8" style="text-align:center;padding:24px;color:#9e9d95;">Aucune maintenance</td></tr>
         {% endfor %}
       </tbody>
       <tfoot>
         <tr>
-          <td colspan="2">TOTAL</td>
+          <td colspan="4">TOTAL</td>
           <td style="font-variant-numeric:tabular-nums;">{{ totalCout|number_format(2, ',', ' ') }} DT</td>
-          <td colspan="2">{{ maintenances|length }} intervention{{ maintenances|length != 1 ? 's' : '' }}</td>
+          <td colspan="3">{{ maintenances|length }} intervention{{ maintenances|length != 1 ? 's' : '' }}</td>
         </tr>
       </tfoot>
     </table>

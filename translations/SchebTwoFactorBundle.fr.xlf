@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="fr" target-language="fr" datatype="plaintext" original="file.ext">
+    <header>
+      <tool tool-id="symfony" tool-name="Symfony"/>
+    </header>
+    <body>
+      <trans-unit id="IzVxWl6" resname="auth_code">
+        <source>auth_code</source>
+        <target>Code d'authentification</target>
+      </trans-unit>
+      <trans-unit id="We3AAkR" resname="choose_provider">
+        <source>choose_provider</source>
+        <target>Changer de méthode d'authentification</target>
+      </trans-unit>
+      <trans-unit id="QoghNQ6" resname="login">
+        <source>login</source>
+        <target>Connexion</target>
+      </trans-unit>
+      <trans-unit id="rnaEeya" resname="code_invalid">
+        <source>code_invalid</source>
+        <target>Le code de vérification n'est pas valide.</target>
+      </trans-unit>
+      <trans-unit id="qaCJGVx" resname="trusted">
+        <source>trusted</source>
+        <target>Je suis sur un appareil de confiance</target>
+      </trans-unit>
+      <trans-unit id="I3TZF5S" resname="cancel">
+        <source>cancel</source>
+        <target>Annuler</target>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

@@ -107,9 +107,123 @@
     .info-val { font-size: 14px; color: var(--navy); font-weight: 500; }
     .info-val.mono { font-family: 'DM Mono', monospace; }
     .info-val.empty { color: var(--text-muted); font-style: italic; font-weight: 400; }
+    /* ── Terrains & Ouvriers ── */
+.terrains-card {
+    background: var(--white);
+    border: 1px solid var(--cream-dark);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+.terrains-card-header {
+    padding: 16px 22px;
+    border-bottom: 1px solid var(--cream-dark);
+    font-size: 14px; font-weight: 600; color: var(--navy);
+    display: flex; align-items: center; justify-content: space-between;
+}
+.terrains-card-header i { color: var(--green-accent); }
+.terrain-count-badge {
+    background: var(--cream-dark);
+    color: var(--text-muted);
+    font-size: 11px; font-weight: 600;
+    padding: 3px 10px; border-radius: 20px;
+}
+.terrain-item {
+    border-bottom: 1px solid var(--cream-dark);
+    overflow: hidden;
+}
+.terrain-item:last-child { border-bottom: none; }
+.terrain-header {
+    padding: 14px 22px;
+    display: flex; align-items: center; gap: 12px;
+    background: #FAFDF8;
+    cursor: pointer;
+    transition: background 0.2s;
+    user-select: none;
+}
+.terrain-header:hover { background: #F0F7ED; }
+.terrain-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: #D1FAE5; color: #065F46;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; flex-shrink: 0;
+}
+.terrain-name { font-size: 14px; font-weight: 600; color: var(--navy); }
+.terrain-meta { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.terrain-chevron {
+    margin-left: auto;
+    color: var(--text-muted);
+    font-size: 12px;
+    transition: transform 0.25s;
+}
+.terrain-chevron.open { transform: rotate(180deg); }
+.ouvriers-list {
+    display: none;
+    padding: 0 22px 14px;
+}
+.ouvriers-list.open { display: block; }
+.ouvrier-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--cream-dark);
+}
+.ouvrier-row:last-child { border-bottom: none; }
+.ouvrier-av {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: linear-gradient(135deg, #DBEAFE, #93C5FD);
+    color: #1D4ED8;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; flex-shrink: 0;
+}
+.ouvrier-name { font-size: 13px; font-weight: 600; color: var(--navy); }
+.ouvrier-email { font-size: 11px; color: var(--text-muted); }
+.ouvrier-tel {
+    margin-left: auto;
+    font-size: 12px; color: var(--text-muted);
+    display: flex; align-items: center; gap: 5px;
+}
+.no-ouvriers {
+    padding: 14px 0;
+    font-size: 13px; color: var(--text-muted);
+    font-style: italic;
+    display: flex; align-items: center; gap: 8px;
+}
+.ouvrier-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: #DBEAFE; color: #1D4ED8;
+    font-size: 10px; font-weight: 600;
+    padding: 2px 8px; border-radius: 20px;
+    margin-left: 8px;
+}
+.empty-terrains {
+    padding: 40px 22px;
+    text-align: center; color: var(--text-muted);
+}
+.empty-terrains i { font-size: 32px; display: block; margin-bottom: 12px; opacity: 0.3; }
+/* ── Avatar avec photo Cloudinary ── */
+.profile-av-wrap {
+    position: relative;
+    width: 64px; height: 64px;
+    margin: 0 auto 12px;
+}
+.profile-av-wrap img {
+    display: none;
+    width: 64px; height: 64px;
+    border-radius: 16px;
+    object-fit: cover;
+    border: 3px solid white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+.profile-av {
+    width: 64px; height: 64px; border-radius: 16px;
+    background: linear-gradient(135deg, var(--green-accent), var(--green-mid));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 700; color: white;
+    border: 3px solid white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
 </style>
 {% endblock %}
-
 {% block body %}
 <div class="page">
 
@@ -119,13 +233,21 @@
 
     <div class="show-grid">
 
-        {# Profile card #}
+        {# ── Profile card (inchangée) ── #}
         <div class="profile-card">
             <div class="profile-banner"></div>
             <div class="profile-body">
-                <div class="profile-av">
-                    {{ user.prenom|first|upper }}{{ user.nom|first|upper }}
-                </div>
+                <div class="profile-av-wrap">
+    <img id="showUserPhoto"
+         style="display:none; width:64px; height:64px; border-radius:16px; object-fit:cover; border:3px solid white; box-shadow:0 4px 12px rgba(0,0,0,0.12);"
+         data-cloudinary-src="{{ user.img is defined and user.img ? user.img : '' }}"
+         data-w="64" data-h="64"
+         data-fallback-id="showUserAvatar"
+         src="" alt="Photo de profil">
+    <div class="profile-av" id="showUserAvatar">
+        {{ user.prenom|first|upper }}{{ user.nom|first|upper }}
+    </div>
+</div>
                 <div class="profile-name">{{ user.prenom }} {{ user.nom }}</div>
                 <div class="profile-email">{{ user.email }}</div>
 
@@ -135,6 +257,10 @@
                     <div class="profile-badge badge-agri"><i class="fa fa-tractor"></i> Agriculteur</div>
                 {% elseif user.role == 1 %}
                     <div class="profile-badge badge-ouv"><i class="fa fa-person-digging"></i> Ouvrier</div>
+                {% elseif user.role == 0 %}
+                    <div class="profile-badge" style="background:#FEE2E2;color:#DC2626;">
+                        <i class="fa fa-ban"></i> Banni
+                    </div>
                 {% endif %}
 
                 <div class="profile-actions">
@@ -152,53 +278,178 @@
             </div>
         </div>
 
-        {# Info card #}
-        <div class="info-card">
-            <div class="info-card-header">
-                <i class="fa fa-circle-info"></i> Informations personnelles
-            </div>
-            <div class="info-grid">
-                <div class="info-row">
-                    <div class="info-label">CIN</div>
-                    <div class="info-val mono">{{ user.cin }}</div>
-                </div>
-                <div class="info-row">
-                    <div class="info-label">Téléphone</div>
-                    <div class="info-val {% if not user.tel %}empty{% endif %}">{{ user.tel ?? 'Non renseigné' }}</div>
-                </div>
-                <div class="info-row">
-                    <div class="info-label">Date de naissance</div>
-                    <div class="info-val {% if not user.dateNaiss %}empty{% endif %}">
-                        {{ user.dateNaiss ? user.dateNaiss|date('d/m/Y') : 'Non renseignée' }}
-                    </div>
-                </div>
-                <div class="info-row">
-                    <div class="info-label">Ville</div>
-                    <div class="info-val {% if not user.ville %}empty{% endif %}">{{ user.ville ?? 'Non renseignée' }}</div>
-                </div>
-                <div class="info-row">
-                    <div class="info-label">Adresse</div>
-                    <div class="info-val {% if not user.adresse %}empty{% endif %}">{{ user.adresse ?? 'Non renseignée' }}</div>
-                </div>
-                <div class="info-row">
-                    <div class="info-label">2FA activé</div>
-                    <div class="info-val">{{ user.twoFactorEnabled ? '✅ Oui' : '❌ Non' }}</div>
-                </div>
-                <div class="info-row">
-                    <div class="info-label">Date d'inscription</div>
-                    <div class="info-val {% if not user.dateCreationcpt %}empty{% endif %}">
-                        {{ user.dateCreationcpt ? user.dateCreationcpt|date('d/m/Y') : '—' }}
-                    </div>
-                </div>
-                <div class="info-row">
-                    <div class="info-label">Dernière modification</div>
-                    <div class="info-val {% if not user.dateDernierchg %}empty{% endif %}">
-                        {{ user.dateDernierchg ? user.dateDernierchg|date('d/m/Y') : '—' }}
-                    </div>
-                </div>
-            </div>
-        </div>
+        {# ── Colonne droite ── #}
+        <div style="display:flex; flex-direction:column; gap:20px;">
 
+            {# ── Info card (inchangée) ── #}
+            <div class="info-card">
+                <div class="info-card-header">
+                    <i class="fa fa-circle-info"></i> Informations personnelles
+                </div>
+                <div class="info-grid">
+                    <div class="info-row">
+                        <div class="info-label">CIN</div>
+                        <div class="info-val mono">{{ user.cin }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Téléphone</div>
+                        <div class="info-val {% if not user.tel %}empty{% endif %}">{{ user.tel ?? 'Non renseigné' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Date de naissance</div>
+                        <div class="info-val {% if not user.dateNaiss %}empty{% endif %}">
+                            {{ user.dateNaiss ? user.dateNaiss|date('d/m/Y') : 'Non renseignée' }}
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Ville</div>
+                        <div class="info-val {% if not user.ville %}empty{% endif %}">{{ user.ville ?? 'Non renseignée' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Adresse</div>
+                        <div class="info-val {% if not user.adresse %}empty{% endif %}">{{ user.adresse ?? 'Non renseignée' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">2FA activé</div>
+                        <div class="info-val">{{ user.twoFactorEnabled ? '✅ Oui' : '❌ Non' }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Date d'inscription</div>
+                        <div class="info-val {% if not user.dateCreationcpt %}empty{% endif %}">
+                            {{ user.dateCreationcpt ? user.dateCreationcpt|date('d/m/Y') : '—' }}
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">Dernière modification</div>
+                        <div class="info-val {% if not user.dateDernierchg %}empty{% endif %}">
+                            {{ user.dateDernierchg ? user.dateDernierchg|date('d/m/Y') : '—' }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {# ── Terrains & Ouvriers ── #}
+            {% if user.role == 2 %}
+            <div class="terrains-card">
+                <div class="terrains-card-header">
+                    <span>
+                        <i class="fa fa-map"></i>
+                        Terrains &amp; Ouvriers
+                    </span>
+                    <span class="terrain-count-badge">{{ terrains|length }} terrain(s)</span>
+                </div>
+
+                {% if terrains|length == 0 %}
+                    <div class="empty-terrains">
+                        <i class="fa fa-map-location-dot"></i>
+                        <div style="font-size:14px; font-weight:600; color:var(--navy);">Aucun terrain enregistré</div>
+                        <div style="margin-top:4px; font-size:13px;">Cet agriculteur n'a pas encore de terrain.</div>
+                    </div>
+                {% else %}
+                    {% for terrain in terrains %}
+                    <div class="terrain-item">
+
+                        {# En-tête cliquable du terrain #}
+                        <div class="terrain-header" onclick="toggleTerrain({{ loop.index }})">
+                            <div class="terrain-icon">
+                                <i class="fa fa-seedling"></i>
+                            </div>
+                            <div>
+                                <div class="terrain-name">
+                                    {{ terrain.nomTerrain ?? 'Terrain #' ~ terrain.id }}
+                                    <span class="ouvrier-badge">
+                                        <i class="fa fa-person-digging"></i>
+                                        {{ terrain.ouvriers|length }} ouvrier(s)
+                                    </span>
+                                </div>
+                                <div class="terrain-meta">
+                                    {% if terrain.surface %}
+                                        <i class="fa fa-ruler-combined"></i> {{ terrain.surface }} ha
+                                    {% endif %}
+                                    {% if terrain.typeSol %}
+                                        &nbsp;·&nbsp; <i class="fa fa-layer-group"></i> {{ terrain.typeSol }}
+                                    {% endif %}
+                                    {% if terrain.localisation %}
+                                        &nbsp;·&nbsp; <i class="fa fa-location-dot"></i> {{ terrain.localisation|slice(0,30) }}{% if terrain.localisation|length > 30 %}…{% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <i class="fa fa-chevron-down terrain-chevron" id="chevron-{{ loop.index }}"></i>
+                        </div>
+
+                        {# Liste des ouvriers (masquée par défaut) #}
+                        <div class="ouvriers-list" id="ouvriers-{{ loop.index }}">
+                            {% if terrain.ouvriers|length == 0 %}
+                                <div class="no-ouvriers">
+                                    <i class="fa fa-user-slash"></i>
+                                    Aucun ouvrier assigné à ce terrain.
+                                </div>
+                            {% else %}
+                                {% for ouvrier in terrain.ouvriers %}
+                                <div class="ouvrier-row">
+                                    <div class="ouvrier-av">
+                                        {{ ouvrier.prenom|first|upper }}{{ ouvrier.nom|first|upper }}
+                                    </div>
+                                    <div>
+                                        <div class="ouvrier-name">{{ ouvrier.prenom }} {{ ouvrier.nom }}</div>
+                                        <div class="ouvrier-email">{{ ouvrier.email }}</div>
+                                    </div>
+                                    {% if ouvrier.tel %}
+                                    <div class="ouvrier-tel">
+                                        <i class="fa fa-phone"></i> {{ ouvrier.tel }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            {% endif %}
+
+        </div>{# fin colonne droite #}
     </div>
 </div>
 {% endblock %}
+
+{% block javascripts %}
+<script>
+// Réutilise la même fonction Cloudinary du base layout
+document.addEventListener('DOMContentLoaded', function () {
+
+    function cloudinaryAvatar(rawUrl, w, h) {
+        if (!rawUrl) return null;
+        if (!/\/upload\//.test(rawUrl)) return rawUrl;
+        var transform = 'c_fill,g_face,w_' + w + ',h_' + h + ',q_auto,f_auto/';
+        return rawUrl.replace('/upload/', '/upload/' + transform);
+    }
+
+    var img    = document.getElementById('showUserPhoto');
+    var fb     = document.getElementById('showUserAvatar');
+    var rawUrl = img ? img.dataset.cloudinarySrc : '';
+
+    if (img && rawUrl && rawUrl.trim() !== '' && rawUrl !== 'null') {
+        img.src = cloudinaryAvatar(rawUrl.trim(), 64, 64);
+        img.style.display = 'block';
+        if (fb) fb.style.display = 'none';
+        img.onerror = function () {
+            img.style.display = 'none';
+            if (fb) fb.style.display = 'flex';
+        };
+    }
+});
+
+// Accordéon terrains
+function toggleTerrain(index) {
+    const list    = document.getElementById('ouvriers-' + index);
+    const chevron = document.getElementById('chevron-' + index);
+    const isOpen  = list.classList.contains('open');
+    list.classList.toggle('open', !isOpen);
+    chevron.classList.toggle('open', !isOpen);
+}
+</script>
+{% endblock %}
+

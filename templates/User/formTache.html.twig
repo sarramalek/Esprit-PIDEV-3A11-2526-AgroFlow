@@ -1,5 +1,7 @@
 {% set inputStyle = 'width:100%; padding:12px 15px; border:2px solid #eee; border-radius:8px; font-size:14px; box-sizing:border-box; font-family:Arial,sans-serif;' %}
 
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
 <div style="margin-bottom:18px;">
     <label style="display:block; color:#2C3E50; font-weight:600; margin-bottom:8px; font-size:14px;">Nom de la tâche</label>
     {{ form_widget(form.nomTache, {'attr': {'style': inputStyle}}) }}
@@ -36,3 +38,5 @@
     {{ form_widget(form.dateEcheancee, {'attr': {'style': inputStyle}}) }}
     {{ form_errors(form.dateEcheancee) }}
 </div>
+
+{{ form_end(form) }}

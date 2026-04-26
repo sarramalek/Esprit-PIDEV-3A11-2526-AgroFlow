@@ -5,6 +5,7 @@ namespace App\Controller\User;
 use App\Entity\User\Offre;
 use App\Form\User\OffreType;
 use App\Repository\User\OffreRepository;
+use App\Repository\User\AbonnementRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,31 +18,124 @@ use Dompdf\Options;
 class OffreController extends AbstractController
 {
     // ==================== LIST ====================
-    #[Route('/', name: 'app_offre_list', methods: ['GET'])]
-    public function list(Request $request, OffreRepository $offreRepo): Response
-    {
-        $search    = $request->query->get('q', '');
-        $sort      = $request->query->get('sort', 'idOffres');
-        $direction = $request->query->get('direction', 'ASC');
+   #[Route('/', name: 'app_offre_list', methods: ['GET'])]
+public function list(
+    Request $request,
+    OffreRepository $offreRepo,
+    AbonnementRepository $abonnRepo
+): Response {
+    $search    = $request->query->get('q', '');
+    $sort      = $request->query->get('sort', 'idOffres');
+    $direction = $request->query->get('direction', 'ASC');
+    $page      = max(1, $request->query->getInt('page', 1));
+    $limit     = 5;
 
-        $allowedSorts = ['idOffres', 'nomOffre', 'prix', 'dureeOffre'];
-        if (!in_array($sort, $allowedSorts)) $sort = 'idOffres';
-        if (!in_array($direction, ['ASC', 'DESC'])) $direction = 'ASC';
+    $allowedSorts = ['idOffres', 'nomOffre', 'prix', 'dureeOffre'];
+    if (!in_array($sort, $allowedSorts)) $sort = 'idOffres';
+    if (!in_array($direction, ['ASC', 'DESC'])) $direction = 'ASC';
 
-        return $this->render('User/listOffre.html.twig', [
-            'offres'      => $offreRepo->searchAndSort($search, $sort, $direction),
-            'searchTerm'  => $search,
-            'currentSort' => $sort,
-            'currentDir'  => $direction,
-            'stats' => [
-                'total'   => $offreRepo->countAll(),
-                'avgPrix' => round($offreRepo->avgPrix(), 2),
-                'minCher' => $offreRepo->findMoinsCher(1)[0] ?? null,
-                'maxLong' => $offreRepo->findPlusLong(1)[0] ?? null,
-            ],
-        ]);
+    // ── Total pour la pagination ──────────────────────────────
+    $total      = $offreRepo->countSearched($search);
+    $totalPages = max(1, (int) ceil($total / $limit));
+    $page       = min($page, $totalPages);
+
+    // ── Résultats paginés ─────────────────────────────────────
+    $offres = $offreRepo->searchAndSortPaginated($search, $sort, $direction, $page, $limit);
+
+    // ── Suggestion IA (inchangée) ─────────────────────────────
+    $suggestion       = null;
+    $raisonSuggestion = null;
+    $user = $this->getUser();
+
+    if ($user && (int)$user->getRole() === 2 && count($offres) > 0) {
+        $allOffres   = $offreRepo->searchAndSort($search, $sort, $direction); // toutes pour l'IA
+        $abonnements = $abonnRepo->findByCin($user->getCin());
+
+        $offresData = array_map(fn($o) => [
+            'id'          => $o->getIdOffres(),
+            'nom'         => $o->getNomOffre(),
+            'prix'        => $o->getPrix(),
+            'duree'       => $o->getDureeOffre(),
+            'description' => $o->getDescription(),
+        ], $allOffres);
+
+        $abonnementsData = array_map(fn($a) => [
+            'offre_id'   => $a->getIdOffre(),
+            'situation'  => $a->getSituation(),
+            'expiration' => $a->getDateExpiration()->format('Y-m-d'),
+        ], $abonnements);
+
+        try {
+            $prompt = "Tu es un conseiller agricole pour AgroFlow.
+            
+Voici les offres disponibles :
+" . json_encode($offresData, JSON_UNESCAPED_UNICODE) . "
+
+Voici l'historique d'abonnements de l'agriculteur :
+" . json_encode($abonnementsData ?: 'Aucun abonnement', JSON_UNESCAPED_UNICODE) . "
+
+Analyse les offres et l'historique, puis recommande l'offre la plus adaptée à cet agriculteur.
+Réponds UNIQUEMENT en JSON avec ce format exact :
+{
+  \"offre_id\": <id de l'offre recommandée>,
+  \"raison\": \"<explication courte en français, max 2 phrases>\"
+}";
+
+            $response = \Symfony\Component\HttpClient\HttpClient::create()->request('POST',
+                'https://api.anthropic.com/v1/messages',
+                [
+                    'headers' => [
+                        'x-api-key'         => $_ENV['ANTHROPIC_API_KEY'],
+                        'anthropic-version' => '2023-06-01',
+                        'content-type'      => 'application/json',
+                    ],
+                    'json' => [
+                        'model'      => 'claude-sonnet-4-20250514',
+                        'max_tokens' => 200,
+                        'messages'   => [['role' => 'user', 'content' => $prompt]],
+                    ],
+                ]
+            );
+
+            $data = $response->toArray();
+            $text = $data['content'][0]['text'] ?? '';
+            $text = preg_replace('/```json|```/', '', $text);
+            $json = json_decode(trim($text), true);
+
+            if ($json && isset($json['offre_id'])) {
+                foreach ($allOffres as $o) {
+                    if ($o->getIdOffres() === (int)$json['offre_id']) {
+                        $suggestion       = $o;
+                        $raisonSuggestion = $json['raison'];
+                        break;
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            // Silencieux
+        }
     }
- // ==================== EXPORT PDF LISTE ====================
+
+    return $this->render('User/listOffre.html.twig', [
+        'offres'           => $offres,
+        'searchTerm'       => $search,
+        'currentSort'      => $sort,
+        'currentDir'       => $direction,
+        'suggestion'       => $suggestion,
+        'raisonSuggestion' => $raisonSuggestion,
+        'page'             => $page,
+        'totalPages'       => $totalPages,
+        'total'            => $total,
+        'stats' => [
+            'total'   => $offreRepo->countAll(),
+            'avgPrix' => round($offreRepo->avgPrix(), 2),
+            'minCher' => $offreRepo->findMoinsCher(1)[0] ?? null,
+            'maxLong' => $offreRepo->findPlusLong(1)[0] ?? null,
+        ],
+    ]);
+}
+
+    // ==================== EXPORT PDF LISTE ====================
     #[Route('/export/pdf', name: 'app_offre_export_pdf', methods: ['GET'])]
     public function exportPdf(OffreRepository $offreRepo): Response
     {
@@ -150,7 +244,8 @@ class OffreController extends AbstractController
             'offre' => $offre,
         ]);
     }
-// ==================== PDF UNE OFFRE ====================
+
+    // ==================== PDF UNE OFFRE ====================
     #[Route('/{idOffres}/pdf', name: 'app_offre_pdf', methods: ['GET'])]
     public function pdf(Offre $offre): Response
     {
@@ -191,12 +286,8 @@ class OffreController extends AbstractController
             <div class="content">
                 <div class="offre-name">' . htmlspecialchars($offre->getNomOffre() ?? '—') . '</div>
                 <div class="offre-id">Offre #' . $offre->getIdOffres() . '</div>
-
                 <div class="prix">' . ($offre->getPrix() ? number_format($offre->getPrix(), 2) . ' TND' : '—') . '</div>
-                <div class="duration-box">
-                    <i>Durée : ' . ($offre->getDureeOffre() ? $offre->getDureeOffre() . ' jours' : '—') . '</i>
-                </div>
-
+                <div class="duration-box">Durée : ' . ($offre->getDureeOffre() ? $offre->getDureeOffre() . ' jours' : '—') . '</div>
                 <div class="section-title">Détails</div>
                 <div class="row"><span class="label">Description</span><span class="value">' . htmlspecialchars($offre->getDescription() ?? '—') . '</span></div>
                 <div class="row"><span class="label">Prix</span><span class="value">' . ($offre->getPrix() ? number_format($offre->getPrix(), 2) . ' TND' : '—') . '</span></div>
@@ -219,6 +310,7 @@ class OffreController extends AbstractController
             ]
         );
     }
+
     // ==================== EDIT ====================
     #[Route('/{idOffres}/edit', name: 'app_offre_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Offre $offre, EntityManagerInterface $em): Response

@@ -20,13 +20,11 @@ class Abonnement
 
     #[ORM\Column(name: 'id_offre', type: Types::INTEGER)]
     private int $idOffre;
+#[ORM\Column(type: 'date', nullable: true)]
+private ?\DateTime $dateInscription = null;
 
-    #[ORM\Column(name: 'date_inscription', type: Types::DATE_MUTABLE)]
-    private \DateTimeInterface $dateInscription;
-
-    #[ORM\Column(name: 'date_expiration', type: Types::DATE_MUTABLE)]
-    private \DateTimeInterface $dateExpiration;
-
+#[ORM\Column(type: 'date', nullable: true)]
+private ?\DateTime $dateExpiration = null;
     #[ORM\Column(name: 'situation', type: Types::STRING, length: 9)]
     private string $situation;
 

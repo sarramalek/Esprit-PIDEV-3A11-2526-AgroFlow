@@ -11,6 +11,12 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Validator\Constraints\Choice;
+use Symfony\Component\Validator\Constraints\GreaterThan;
+use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\LessThanOrEqual;
+
 
 class AbonnementType extends AbstractType
 {
@@ -36,7 +42,7 @@ class AbonnementType extends AbstractType
         $usersChoices = [];
         foreach ($users as $user) {
             if ($user->getCin() === $currentCin) {
-                continue; // exclure l'utilisateur connecté
+                continue;
             }
             $label = $user->getPrenom() . ' ' . $user->getNom() . ' — CIN: ' . $user->getCin();
             $usersChoices[$label] = $user->getCin();
@@ -47,30 +53,76 @@ class AbonnementType extends AbstractType
                 'label'       => 'Utilisateur',
                 'choices'     => $usersChoices,
                 'placeholder' => '-- Sélectionner un utilisateur --',
-                'required'    => true,
+                'required'    => false,
                 'attr'        => ['style' => 'width:100%'],
+                'constraints' => [
+                    new NotBlank(['message' => 'Veuillez sélectionner un utilisateur.']),
+                    new Choice([
+                        'choices' => array_values($usersChoices),
+                        'message' => 'Utilisateur invalide.',
+                    ]),
+                ],
             ])
             ->add('idOffre', ChoiceType::class, [
                 'label'       => 'Offre',
                 'choices'     => $offresChoices,
                 'placeholder' => '-- Sélectionner une offre --',
-                'required'    => true,
+                'required'    => false,
                 'attr'        => ['style' => 'width:100%'],
+                'constraints' => [
+                    new NotBlank(['message' => 'Veuillez sélectionner une offre.']),
+                    new Choice([
+                        'choices' => array_values($offresChoices),
+                        'message' => 'Offre invalide.',
+                    ]),
+                ],
             ])
             ->add('dateInscription', DateType::class, [
-                'label'  => 'Date d\'inscription',
-                'widget' => 'single_text',
-            ])
-            ->add('dateExpiration', DateType::class, [
-                'label'  => 'Date d\'expiration',
-                'widget' => 'single_text',
-            ])
+    'label'       => 'Date d\'inscription',
+    'widget'      => 'single_text',
+    'html5'       => false,
+    'required'    => false,
+    'empty_data'  => null,
+    'constraints' => [
+        new NotBlank(['message' => 'Veuillez entrer la date d\'inscription.']),
+        new GreaterThanOrEqual([
+            'value'   => new \DateTime('first day of January this year'),
+            'message' => 'La date d\'inscription doit être dans l\'année en cours.',
+        ]),
+        new LessThanOrEqual([
+            'value'   => new \DateTime('last day of December this year'),
+            'message' => 'La date d\'inscription doit être dans l\'année en cours.',
+        ]),
+    ],
+])
+->add('dateExpiration', DateType::class, [
+    'label'       => 'Date d\'expiration',
+    'widget'      => 'single_text',
+    'html5'       => false,
+    'required'    => false,
+    'empty_data'  => null,
+    'constraints' => [
+        new NotBlank(['message' => 'Veuillez entrer la date d\'expiration.']),
+        new GreaterThan([
+            'value'   => new \DateTime('today'),
+            'message' => 'La date d\'expiration doit être dans le futur.',
+        ]),
+    ],
+])
             ->add('situation', ChoiceType::class, [
-                'label'   => 'Situation',
-                'choices' => [
+                'label'       => 'Situation',
+                'required'    => false,
+                'choices'     => [
                     'Actif'   => 'actif',
                     'Inactif' => 'inactif',
                     'Expiré'  => 'expire',
+                ],
+                'constraints' => [
+                    new NotBlank(['message' => 'Veuillez sélectionner une situation.']),
+                    new Choice([
+                        'choices' => ['actif', 'inactif', 'expire'],
+                        'message' => 'La situation sélectionnée est invalide.',
+                    ]),
                 ],
             ]);
     }
@@ -78,7 +130,9 @@ class AbonnementType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Abonnement::class,
+            'data_class'     => Abonnement::class,
+            'error_bubbling' => false,
+            'attr'           => ['novalidate' => 'novalidate'],
         ]);
     }
 }

@@ -85,6 +85,16 @@ textarea { resize: vertical; min-height: 70px; }
     color: var(--vert); text-decoration: none; font-size: .9rem;
 }
 .back-link:hover { text-decoration: underline; }
+.field-error {
+    color: var(--danger);
+    font-size: .75rem;
+    font-weight: 600;
+    display: none;
+    margin-top: .2rem;
+}
+input.invalid, select.invalid, textarea.invalid {
+    border-color: var(--danger) !important;
+}
 </style>
 {% endblock %}
 
@@ -179,46 +189,134 @@ textarea { resize: vertical; min-height: 70px; }
         </div>
 
         {# ---- Formulaire ajout tâche ---- #}
-        <div class="form-card">
-            <h3>➕ Assigner une nouvelle tâche</h3>
-            <form method="post" action="{{ path('app_ouvrier_tache_add', {cin: ouvrier.cin}) }}">
+        {# ---- Formulaire ajout tâche ---- #}
+        
+<div class="form-card">
 
-                <div class="form-group">
-                    <label>Nom de la tâche *</label>
-                    <input type="text" name="nom_tache" required placeholder="Ex: Arrosage parcelle A">
-                </div>
+    <h3>➕ Assigner une nouvelle tâche</h3>
+<button type="button" id="btn-generate" class="btn-add" style="margin-bottom:10px; background:#6A1B9A;">
+    ✨ Générer automatiquement
+</button>
+<div id="ai-reason" style="font-size:12px;color:#666;margin-top:5px;"></div>
+    {# Messages d'erreur JS #}
+    <div id="form-errors" style="display:none; background:#f8d7da; color:#842029; border:1px solid #f5c2c7; border-radius:.5rem; padding:.75rem 1rem; margin-bottom:1rem; font-size:.85rem;"></div>
 
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea name="description" placeholder="Détails de la tâche..."></textarea>
-                </div>
+    <form id="tache-form" method="post" action="{{ path('app_ouvrier_tache_add', {cin: ouvrier.cin}) }}" novalidate>
 
-                <div class="form-group">
-                    <label>État</label>
-                    <select name="etat">
-                        <option value="à faire">À faire</option>
-                        <option value="en cours">En cours</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Priorité</label>
-                    <select name="priorite">
-                        <option value="normale">Normale</option>
-                        <option value="haute">Haute</option>
-                        <option value="basse">Basse</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Date d'échéance</label>
-                    <input type="date" name="date_echeancee">
-                </div>
-
-                <button type="submit" class="btn-add">✅ Assigner la tâche</button>
-            </form>
+        <div class="form-group">
+            <label for="nom_tache">Nom de la tâche *</label>
+            <input type="text" id="nom_tache" name="nom_tache" placeholder="Ex: Arrosage parcelle A" maxlength="100">
+            <span class="field-error" id="err-nom"></span>
         </div>
 
-    </div>{# /layout #}
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" placeholder="Détails de la tâche..." maxlength="1000"></textarea>
+            <span class="field-error" id="err-desc"></span>
+            <small id="desc-counter" style="color:#aaa; font-size:.75rem; text-align:right;">0 / 1000</small>
+        </div>
+
+        <div class="form-group">
+            <label for="etat">État</label>
+            <select id="etat" name="etat">
+                <option value="à faire">À faire</option>
+                <option value="en cours">En cours</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="priorite">Priorité</label>
+            <select id="priorite" name="priorite">
+                <option value="normale">Normale</option>
+                <option value="haute">Haute</option>
+                <option value="basse">Basse</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="date_echeancee">Date d'échéance</label>
+            <input type="date" id="date_echeancee" name="date_echeancee">
+            <span class="field-error" id="err-date"></span>
+        </div>
+
+        <button type="submit" class="btn-add">✅ Assigner la tâche</button>
+    </form>
 </div>
+</div>
+{% endblock %}
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const btn = document.getElementById('btn-generate');
+
+    if (!btn) {
+        console.error("Bouton non trouvé");
+        return;
+    }
+
+    btn.addEventListener('click', function () {
+        btn.disabled = true;
+        btn.textContent = "⏳ Génération...";
+
+        fetch('{{ path('app_ouvrier_tache_ia_suggest') }}')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Erreur HTTP : " + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Réponse IA :", data);
+
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                // Remplissage du formulaire
+                document.getElementById('nom_tache').value = data.nom_tache || '';
+                document.getElementById('description').value = data.description || '';
+                document.getElementById('date_echeancee').value = data.date_echeancee || '';
+
+                document.getElementById('priorite').value = data.priorite || 'normale';
+                document.getElementById('etat').value = data.etat || 'à faire';
+
+                // compteur description
+                const counter = document.getElementById('desc-counter');
+                if (counter) {
+                    counter.textContent = (data.description ? data.description.length : 0) + " / 1000";
+                }
+
+                // raison IA
+                const reason = document.getElementById('ai-reason');
+                if (reason) {
+                    reason.textContent = data.raison || '';
+                }
+
+                btn.textContent = "✅ Généré !";
+
+                setTimeout(() => {
+                    btn.textContent = "✨ Générer automatiquement";
+                    btn.disabled = false;
+                }, 1500);
+            })
+            .catch(error => {
+                console.error("Erreur IA :", error);
+
+                const reason = document.getElementById('ai-reason');
+                if (reason) {
+                    reason.textContent = "❌ Erreur lors de la génération IA";
+                }
+
+                alert("Erreur : " + error.message);
+
+                btn.textContent = "❌ Erreur";
+                btn.disabled = false;
+            });
+    });
+
+});
+</script>
+
 {% endblock %}

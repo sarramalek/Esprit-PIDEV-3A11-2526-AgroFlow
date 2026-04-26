@@ -12,6 +12,8 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Entity\Materiels\Machine;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 class MaintenanceType extends AbstractType
 {
@@ -60,6 +62,41 @@ class MaintenanceType extends AbstractType
                     ]),
                 ],
             ])
+            ->add('statut', ChoiceType::class, [
+                'label'   => false,
+                'choices' => [
+                    'Planifié'   => 'planifie',
+                    'En cours'   => 'en_cours',
+                    'Terminé'    => 'termine',
+                ],
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'Veuillez sélectionner un statut.']),
+                ],
+            ])
+            ->add('priorite', ChoiceType::class, [
+                'label'   => false,
+                'choices' => [
+                    'Faible'   => 'faible',
+                    'Moyenne'  => 'moyenne',
+                    'Haute'    => 'haute',
+                    'Urgente'  => 'urgente',
+                ],
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'Veuillez sélectionner une priorité.']),
+                ],
+            ])
+            ->add('kilometrage', IntegerType::class, [
+                'label'    => false,
+                'required' => false,
+                'attr'     => ['min' => 0, 'placeholder' => 'Ex: 12500'],
+                'constraints' => [
+                    new Assert\PositiveOrZero(['message' => 'Le kilométrage doit être positif ou zéro.']),
+                    new Assert\LessThanOrEqual([
+                        'value'   => 9999999,
+                        'message' => 'Kilométrage trop élevé.',
+                    ]),
+                ],
+            ])
             ->add('description', TextareaType::class, [
                 'label'    => false,
                 'required' => false,
@@ -76,11 +113,24 @@ class MaintenanceType extends AbstractType
                     ]),
                 ],
             ])
-            ->add('idM', IntegerType::class, [
+            ->add('recommandation', TextareaType::class, [
                 'label'    => false,
                 'required' => false,
-                'attr'     => ['min' => 1],
+                'constraints' => [
+                    new Assert\Length([
+                        'max'        => 2000,
+                        'maxMessage' => 'La recommandation ne peut pas dépasser {{ limit }} caractères.',
+                    ]),
+                ],
             ])
+            // ✅ Remplacer par
+->add('idM', EntityType::class, [
+    'class'        => Machine::class,
+    'choice_label' => 'nom',
+    'label'        => false,
+    'required'     => false,
+    'placeholder'  => '— Aucune machine —',
+])
         ;
     }
 
