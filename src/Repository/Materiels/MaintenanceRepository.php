@@ -15,34 +15,22 @@ class MaintenanceRepository extends ServiceEntityRepository
     }
 
     private function hydrate(array $row): Maintenance
-{
-    $m = new Maintenance();
-    $m->setIdMain($row['idMain']);
-    $m->setTypePanne($row['typePanne']);
-    $m->setCout((float) $row['cout']);
-    $m->setDateMain($row['dateMain'] ? new \DateTime($row['dateMain']) : null);
-    $m->setDescription($row['description']);
-    $m->setStatut($row['statut'] ?? 'planifie');
-    $m->setRecommandation($row['recommandation'] ?? null);
-    $m->setPriorite($row['priorite'] ?? 'moyenne');
-    $m->setKilometrage(isset($row['kilometrage']) && $row['kilometrage'] !== null ? (int)$row['kilometrage'] : null);
-
-    if ($row['idM']) {
-        $machine = new Machine();
-        $ref = new \ReflectionProperty(Machine::class, 'id');
-        $ref->setAccessible(true);
-        $ref->setValue($machine, (int)$row['idM']);
-        $machine->setNom($row['nom'] ?? null);
-        $m->setIdM($machine);
-    } else {
-        $m->setIdM(null);
+    {
+        $m = new Maintenance();
+        $m->setIdMain($row['idMain']);
+        $m->setTypePanne($row['typePanne']);
+        $m->setCout((float) $row['cout']);
+        $m->setDateMain($row['dateMain'] ? new \DateTime($row['dateMain']) : null);
+        $m->setDescription($row['description']);
+        $m->setIdM($row['idM'] ? (int)$row['idM'] : null);
+        $m->setStatut($row['statut'] ?? 'planifie');
+        $m->setRecommandation($row['recommandation'] ?? null);
+        $m->setPriorite($row['priorite'] ?? 'moyenne');
+        $m->setKilometrage(isset($row['kilometrage']) && $row['kilometrage'] !== null ? (int)$row['kilometrage'] : null);
+        $m->setNom($row['nom'] ?? null);
+        return $m;
     }
 
-    // ✅ Cette ligne manquait — stocke le nom directement sur la Maintenance
-    $m->setNom($row['nom'] ?? null);
-
-    return $m;
-}
     public function getAllMachines(): array
     {
         $conn = $this->getEntityManager()->getConnection();
@@ -218,14 +206,4 @@ class MaintenanceRepository extends ServiceEntityRepository
         }
         return $result;
     }
-    public function findByAgriculteurCin(string $cin): array
-{
-    return $this->createQueryBuilder('m')
-         ->join('m.idM', 'mac')              // Maintenance → Machine (propriété idM)
-        ->join('mac.agriculteur', 'u')       // Machine → User (propriété agriculteur)
-        ->where('u.cin = :cin')              // User.cin
-        ->setParameter('cin', $cin)
-        ->getQuery()
-        ->getResult();
-}
 }

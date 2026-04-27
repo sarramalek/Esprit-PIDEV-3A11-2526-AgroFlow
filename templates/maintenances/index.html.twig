@@ -1,12 +1,5 @@
-{% if is_granted('ROLE_OUVRIER') %}
-    {% set layout = 'base_ouvrier.html.twig' %}
-    {% set cancel_route = 'ouvrier_taches' %}
-{% elseif is_granted('ROLE_AGRICULTEUR') %}
-    {% set layout = 'base_agriculteur.html.twig' %}
-    {% set cancel_route = 'agri_maintenances_index' %}
-{% endif %}
-
-{% extends layout %}{% block title %}Maintenances — AgroFlow{% endblock %}
+{% extends 'agriculteur_dashboard.html.twig' %}
+{% block title %}Maintenances — AgroFlow{% endblock %}
 {% block body %}
 <style>
 *, *::before, *::after { box-sizing: border-box; }
@@ -28,8 +21,12 @@
 .btn--stats:hover,.btn--stats.active { background:#CECBF6; border-color:#7F77DD; }
 .btn--view-toggle { background:#fff; color:#5f7a5f; border:1.5px solid #d4e8d4; font-size:.82rem; padding:.55rem .9rem; border-radius:10px; cursor:pointer; }
 .btn--view-toggle.active { background:#eaf3de; color:#2d6a2d; border-color:#2d6a2d; }
+.btn--calendar { background:#fff; color:#a32d2d; border:1.5px solid #f7c1c1; font-size:.82rem; padding:.55rem .9rem; border-radius:10px; cursor:pointer; }
+.btn--calendar.active { background:#fcebeb; color:#a32d2d; border-color:#a32d2d; }
 .btn--red-outline { background:#fff; color:#a32d2d; border:1.5px solid #f7c1c1; font-size:.82rem; padding:.55rem 1rem; border-radius:10px; cursor:pointer; }
 .btn--red-outline:hover { background:#fcebeb; }
+.btn--ia-pro { background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:#fff; border:none; }
+.btn--ia-pro:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(102,126,234,0.4); }
 .alert { display:flex; align-items:center; justify-content:space-between; padding:.8rem 1.1rem; border-radius:10px; font-size:.9rem; font-weight:500; margin-bottom:1rem; border-left:4px solid; }
 .alert--success { background:#eaf3de; color:#27500a; border-color:#3b6d11; }
 .alert--danger  { background:#fcebeb; color:#501313; border-color:#a32d2d; }
@@ -43,7 +40,7 @@
 /* ── Modal IA ── */
 .modal { display:none; position:fixed; z-index:10000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.5); }
 .modal.show { display:flex; align-items:center; justify-content:center; }
-.modal-content { background:#fff; border-radius:20px; width:92%; max-width:620px; box-shadow:0 20px 60px rgba(0,0,0,0.25); animation:slideIn .25s; overflow:hidden; }
+.modal-content { background:#fff; border-radius:20px; width:92%; max-width:680px; box-shadow:0 20px 60px rgba(0,0,0,0.25); animation:slideIn .25s; overflow:hidden; }
 @keyframes slideIn { from { transform:translateY(-40px); opacity:0; } to { transform:translateY(0); opacity:1; } }
 .modal-hdr { padding:1rem 1.5rem; background:#2d6a2d; display:flex; justify-content:space-between; align-items:center; }
 .modal-hdr h3 { margin:0; color:#EAF3DE; font-size:15px; font-weight:600; display:flex; align-items:center; gap:8px; }
@@ -58,7 +55,7 @@
 .modal-tab { flex:1; padding:.6rem .5rem; font-size:12px; font-weight:600; color:#6b8c6b; cursor:pointer; border:none; background:none; border-bottom:2px solid transparent; transition:all .15s; white-space:nowrap; }
 .modal-tab.active { color:#2d6a2d; border-bottom-color:#2d6a2d; background:#fff; }
 .modal-tab:hover:not(.active) { background:#fff; color:#1a2e1a; }
-.modal-panel { display:none; padding:1.1rem 1.25rem; }
+.modal-panel { display:none; padding:1.1rem 1.25rem; max-height:500px; overflow-y:auto; }
 .modal-panel.active { display:block; }
 .modal-field-label { font-size:11px; font-weight:700; color:#7a9a7a; margin-bottom:6px; text-transform:uppercase; letter-spacing:.5px; }
 .modal-chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:.9rem; }
@@ -75,26 +72,6 @@
 .modal-score-lbl { font-size:10px; color:#7a9a7a; text-transform:uppercase; letter-spacing:.4px; margin-top:2px; }
 .modal-progress-bar { height:4px; background:#e4edde; border-radius:2px; overflow:hidden; margin-top:.4rem; }
 .modal-progress-fill { height:100%; background:#2d6a2d; border-radius:2px; transition:width .5s; }
-.modal-cal-nav { display:flex; align-items:center; justify-content:space-between; margin-bottom:.6rem; }
-.modal-cal-nav button { background:#fff; border:1px solid #d4e8d4; border-radius:8px; padding:3px 10px; cursor:pointer; font-size:14px; color:#1a2e1a; }
-.modal-cal-nav button:hover { background:#eaf3de; }
-.modal-cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-bottom:.75rem; }
-.modal-cal-hdr { font-size:10px; font-weight:700; color:#7a9a7a; text-align:center; padding:2px 0; text-transform:uppercase; }
-.modal-cal-cell { aspect-ratio:1; border-radius:8px; border:1px solid #e4edde; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:11px; cursor:pointer; transition:all .15s; background:#fff; }
-.modal-cal-cell:hover { background:#f7faf4; }
-.modal-cal-cell.today { border-color:#2d6a2d; color:#2d6a2d; font-weight:700; }
-.modal-cal-cell.has-event { background:#EAF3DE; border-color:#97C459; }
-.modal-cal-cell.has-event.urgent { background:#FCEBEB; border-color:#F09595; }
-.modal-cal-cell.other-month { opacity:.35; }
-.modal-event-list { display:flex; flex-direction:column; gap:5px; max-height:120px; overflow-y:auto; }
-.modal-event-item { display:flex; align-items:center; gap:8px; padding:.35rem .7rem; border-radius:8px; border:1px solid #e4edde; font-size:12px; background:#fff; }
-.modal-event-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-.modal-event-date { color:#7a9a7a; min-width:60px; font-size:11px; }
-.modal-event-label { font-weight:600; flex:1; color:#1a2e1a; }
-.modal-event-badge { font-size:10px; padding:2px 7px; border-radius:20px; font-weight:600; white-space:nowrap; }
-.eb-green { background:#EAF3DE; color:#27500A; }
-.eb-amber { background:#FAEEDA; color:#633806; }
-.eb-red   { background:#FCEBEB; color:#791F1F; }
 .modal-life-bars { display:flex; flex-direction:column; gap:8px; margin-bottom:.75rem; }
 .modal-life-bar-row { display:grid; grid-template-columns:110px 1fr 40px; align-items:center; gap:8px; font-size:12px; }
 .modal-life-bar-label { color:#7a9a7a; text-align:right; }
@@ -102,26 +79,40 @@
 .modal-life-bar-fill { height:100%; border-radius:4px; transition:width .5s; }
 .modal-footer { padding:.75rem 1.25rem; border-top:1px solid #e4edde; display:flex; align-items:center; justify-content:space-between; background:#f7faf4; }
 
-/* ── Stats panel ── */
+/* Loader */
+.modal-loader { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem; gap:.75rem; }
+.modal-loader__spinner { width:32px; height:32px; border:3px solid #e4edde; border-top-color:#2d6a2d; border-radius:50%; animation:spin .7s linear infinite; }
+.modal-loader__text { font-size:13px; color:#7a9a7a; }
+
+/* Stats panel */
 .charts-panel { display:none; background:#fff; border-radius:16px; border:1.5px solid #CECBF6; border-left:4px solid #534AB7; padding:1.5rem; margin-bottom:1.5rem; box-shadow:0 2px 14px rgba(83,74,183,.08); }
 .charts-panel.is-open { display:block; }
 .charts-panel__header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; padding-bottom:.9rem; border-bottom:1px solid #EEEDFE; }
 .charts-panel__title { margin:0; font-size:.95rem; font-weight:700; color:#3C3489; }
 .charts-panel__close { background:none; border:none; cursor:pointer; color:#7a9a7a; font-size:1.2rem; padding:0 4px; }
 .charts-panel__close:hover { color:#3C3489; }
-.panel-stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:12px; margin-bottom:1.5rem; }
+.panel-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-bottom:1.5rem; }
 .pstat { border-radius:12px; padding:.9rem 1.1rem; }
-.pstat--purple { background:#EEEDFE; } .pstat--green { background:#EAF3DE; } .pstat--teal { background:#E1F5EE; } .pstat--amber { background:#FAEEDA; }
+.pstat--purple { background:#EEEDFE; }
+.pstat--green  { background:#EAF3DE; }
+.pstat--teal   { background:#E1F5EE; }
+.pstat--amber  { background:#FAEEDA; }
 .pstat__label { font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.6px; margin-bottom:.25rem; }
-.pstat--purple .pstat__label { color:#534AB7; } .pstat--green .pstat__label { color:#3B6D11; } .pstat--teal .pstat__label { color:#0F6E56; } .pstat--amber .pstat__label { color:#854F0B; }
+.pstat--purple .pstat__label { color:#534AB7; }
+.pstat--green  .pstat__label { color:#3B6D11; }
+.pstat--teal   .pstat__label { color:#0F6E56; }
+.pstat--amber  .pstat__label { color:#854F0B; }
 .pstat__value { font-size:1.5rem; font-weight:800; }
-.pstat--purple .pstat__value { color:#26215C; } .pstat--green .pstat__value { color:#173404; } .pstat--teal .pstat__value { color:#04342C; font-size:1.1rem; margin-top:.2rem; } .pstat--amber .pstat__value { color:#412402; }
+.pstat--purple .pstat__value { color:#26215C; }
+.pstat--green  .pstat__value { color:#173404; }
+.pstat--teal   .pstat__value { color:#04342C; font-size:1.1rem; margin-top:.2rem; }
+.pstat--amber  .pstat__value { color:#412402; }
 .charts-row { display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; }
 @media(max-width:700px){ .charts-row { grid-template-columns:1fr; } }
 .chart-card { background:#f9f7ff; border-radius:12px; padding:1.1rem 1.25rem; border:1px solid #EEEDFE; }
 .chart-card h3 { margin:0 0 1rem; font-size:.875rem; font-weight:700; color:#3C3489; }
 
-/* ── Toolbar ── */
+/* Toolbar */
 .toolbar { display:flex; gap:.75rem; flex-wrap:wrap; margin-bottom:1.25rem; align-items:center; background:#fff; border-radius:14px; padding:.85rem 1.1rem; box-shadow:0 2px 12px rgba(0,0,0,.06); border:1.5px solid #eaf3de; }
 .toolbar__search { position:relative; flex:1; min-width:220px; }
 .toolbar__search-icon { position:absolute; left:.8rem; top:50%; transform:translateY(-50%); pointer-events:none; color:#7a9a7a; display:flex; align-items:center; }
@@ -133,22 +124,33 @@
 .toolbar__search-clear:hover { color:#a32d2d; }
 .toolbar__select-wrap { position:relative; display:flex; align-items:center; }
 .toolbar__select-icon { position:absolute; left:.7rem; top:50%; transform:translateY(-50%); pointer-events:none; color:#7a9a7a; display:flex; align-items:center; z-index:1; }
-.toolbar select { padding:.55rem .9rem .55rem 2.2rem; border:1.5px solid #d4e8d4; border-radius:9px; font-size:.875rem; color:#1a2e1a; background:#f9fcf7; outline:none; height:40px; cursor:pointer; transition:border-color .15s; appearance:none; padding-right:2rem; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a9a7a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right .6rem center; }
+.toolbar select { padding:.55rem .9rem .55rem 2.2rem; border:1.5px solid #d4e8d4; border-radius:9px; font-size:.875rem; color:#1a2e1a; background:#f9fcf7; outline:none; height:40px; cursor:pointer; transition:border-color .15s; -webkit-appearance:none; appearance:none; padding-right:2rem; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a9a7a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right .6rem center; }
 .toolbar select:focus { border-color:#2d6a2d; background-color:#fff; }
 .toolbar__sep { width:1px; height:26px; background:#d4e8d4; flex-shrink:0; }
 
-/* ── Badges ── */
+/* Badges */
 .badge { display:inline-block; padding:.28rem .85rem; border-radius:50px; font-size:.78rem; font-weight:600; white-space:nowrap; }
-.badge--mecanique { background:#e1f5ee; color:#085041; } .badge--electrique { background:#faeeda; color:#633806; } .badge--hydraulique { background:#eaf3de; color:#27500a; }
-.badge--logicielle { background:#e6f1fb; color:#0c447c; } .badge--transmission { background:#ede8fa; color:#4a1d8c; } .badge--moteur { background:#fde8e8; color:#a32d2d; }
-.badge--vidange { background:#fff8e1; color:#7b5200; } .badge--revision { background:#e8f4fd; color:#1a5276; } .badge--pneumatique { background:#ddeeff; color:#0a3d6b; }
+.badge--mecanique   { background:#e1f5ee; color:#085041; }
+.badge--electrique  { background:#faeeda; color:#633806; }
+.badge--hydraulique { background:#eaf3de; color:#27500a; }
+.badge--logicielle  { background:#e6f1fb; color:#0c447c; }
+.badge--transmission{ background:#ede8fa; color:#4a1d8c; }
+.badge--moteur      { background:#fde8e8; color:#a32d2d; }
+.badge--vidange     { background:#fff8e1; color:#7b5200; }
+.badge--revision    { background:#e8f4fd; color:#1a5276; }
+.badge--pneumatique { background:#ddeeff; color:#0a3d6b; }
 .badge--autre,.badge--default { background:#f1efe8; color:#2c2c2a; }
 .statut-badge { display:inline-flex; align-items:center; gap:4px; padding:.2rem .7rem; border-radius:50px; font-size:.76rem; font-weight:600; white-space:nowrap; }
-.statut--planifie { background:#e6f1fb; color:#0c447c; } .statut--en_cours { background:#fff8e1; color:#7b5200; } .statut--termine { background:#e1f5ee; color:#085041; }
+.statut--planifie { background:#e6f1fb; color:#0c447c; }
+.statut--en_cours  { background:#fff8e1; color:#7b5200; }
+.statut--termine   { background:#e1f5ee; color:#085041; }
 .prio-badge { display:inline-flex; align-items:center; gap:4px; padding:.2rem .7rem; border-radius:50px; font-size:.76rem; font-weight:700; white-space:nowrap; }
-.prio--faible { background:#e6f1fb; color:#0c447c; } .prio--moyenne { background:#eaf3de; color:#27500a; } .prio--haute { background:#faeeda; color:#854F0B; } .prio--urgente { background:#fde8e8; color:#a32d2d; }
+.prio--faible  { background:#e6f1fb; color:#0c447c; }
+.prio--moyenne { background:#eaf3de; color:#27500a; }
+.prio--haute   { background:#faeeda; color:#854F0B; }
+.prio--urgente { background:#fde8e8; color:#a32d2d; }
 
-/* ── TABLE ── */
+/* Table */
 .maint-card { background:#fff; border-radius:16px; box-shadow:0 2px 18px rgba(0,0,0,.07); overflow-x:auto; }
 .maint-table { width:100%; border-collapse:collapse; font-size:.88rem; min-width:1000px; }
 .maint-table thead tr { background:#f7faf4; border-bottom:1.5px solid #e4edde; }
@@ -164,19 +166,24 @@
 .td-desc { color:#4a6a4a; font-size:.87rem; max-width:180px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .actions { display:flex; align-items:center; gap:.35rem; flex-wrap:wrap; }
 .act-btn { display:inline-flex; align-items:center; gap:.3rem; padding:.3rem .7rem; border-radius:8px; font-size:.78rem; font-weight:600; text-decoration:none; cursor:pointer; border:1.5px solid; background:#fff; transition:all .13s; white-space:nowrap; }
-.act-btn--view { border-color:#b3d4b3; color:#2d6a2d; } .act-btn--view:hover { background:#eaf3de; }
-.act-btn--edit { border-color:#f5c4b3; color:#993c1d; } .act-btn--edit:hover { background:#faece7; }
-.act-btn--del  { border-color:#f7c1c1; color:#a32d2d; } .act-btn--del:hover  { background:#fcebeb; }
+.act-btn--view  { border-color:#b3d4b3; color:#2d6a2d; } .act-btn--view:hover  { background:#eaf3de; }
+.act-btn--edit  { border-color:#f5c4b3; color:#993c1d; } .act-btn--edit:hover  { background:#faece7; }
+.act-btn--del   { border-color:#f7c1c1; color:#a32d2d; } .act-btn--del:hover   { background:#fcebeb; }
 .act-btn--magic { border-color:#b3d4b3; color:#2d6a2d; } .act-btn--magic:hover { background:#eaf3de; }
+.act-btn--ia-pro { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:#fff; border:none; }
+.act-btn--ia-pro:hover { transform:translateY(-1px); }
 
-/* ── CARDS ── */
-.cards-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(340px,1fr)); gap:1.1rem; }
+/* Cards */
+.cards-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:1.1rem; }
 .maint-card-item { background:#fff; border-radius:16px; box-shadow:0 2px 14px rgba(0,0,0,.08); overflow:hidden; transition:box-shadow .2s,transform .15s; display:flex; flex-direction:column; }
 .maint-card-item:hover { box-shadow:0 6px 28px rgba(0,0,0,.13); transform:translateY(-2px); }
 .mci-header { padding:1.1rem 1.2rem .9rem; display:flex; justify-content:space-between; align-items:flex-start; background:#2d6a2d; color:#fff; }
-.mci-header.h--planifie { background:#0c447c; } .mci-header.h--en_cours { background:#7b5200; } .mci-header.h--termine { background:#2d6a2d; } .mci-header.h--urgente { background:#a32d2d; }
+.mci-header.h--planifie { background:#0c447c; }
+.mci-header.h--en_cours { background:#7b5200; }
+.mci-header.h--termine  { background:#2d6a2d; }
+.mci-header.h--urgente  { background:#a32d2d; }
 .mci-title { font-size:1rem; font-weight:700; margin-bottom:.15rem; }
-.mci-sub   { font-size:.78rem; opacity:.85; display:flex; align-items:center; gap:.35rem; }
+.mci-sub { font-size:.78rem; opacity:.85; display:flex; align-items:center; gap:.35rem; }
 .mci-status-pill { background:rgba(255,255,255,.22); border-radius:20px; padding:.2rem .75rem; font-size:.78rem; font-weight:700; color:#fff; white-space:nowrap; border:1.5px solid rgba(255,255,255,.4); }
 .mci-alert { background:#fffbe6; border-left:4px solid #f5a623; padding:.55rem 1rem; font-size:.8rem; font-weight:600; color:#7b4f00; display:flex; align-items:center; gap:.4rem; }
 .mci-alert.alert-danger  { background:#fcebeb; border-left-color:#a32d2d; color:#501313; }
@@ -187,88 +194,183 @@
 .mci-stat__val { font-size:1.15rem; font-weight:800; color:#1a2e1a; line-height:1; }
 .mci-stat__lbl { font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#8aaa8a; margin-top:.2rem; }
 .mci-body { padding:.9rem 1.2rem; flex:1; display:flex; flex-direction:column; gap:.55rem; }
-.mci-row  { display:flex; align-items:center; gap:.5rem; font-size:.83rem; color:#3a5a3a; }
+.mci-row { display:flex; align-items:center; gap:.5rem; font-size:.83rem; color:#3a5a3a; }
 .mci-row-label { color:#8aaa8a; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.4px; min-width:70px; }
 .mci-desc { font-size:.8rem; color:#5a7a5a; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-.mci-actions { display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:.4rem; padding:.75rem 1rem; border-top:1px solid #f0f4ef; background:#fafcf8; }
+.mci-actions { display:grid; grid-template-columns:1fr 1fr auto; gap:.4rem; padding:.75rem 1rem; border-top:1px solid #f0f4ef; background:#fafcf8; }
 .mci-btn { display:inline-flex; align-items:center; justify-content:center; gap:.3rem; padding:.42rem .6rem; border-radius:9px; font-size:.78rem; font-weight:600; text-decoration:none; cursor:pointer; border:1.5px solid; background:#fff; transition:all .13s; white-space:nowrap; }
-.mci-btn--view { border-color:#b3d4b3; color:#2d6a2d; } .mci-btn--view:hover { background:#eaf3de; }
-.mci-btn--edit { border-color:#f5c4b3; color:#993c1d; } .mci-btn--edit:hover { background:#faece7; }
+.mci-btn--view  { border-color:#b3d4b3; color:#2d6a2d; } .mci-btn--view:hover  { background:#eaf3de; }
+.mci-btn--edit  { border-color:#f5c4b3; color:#993c1d; } .mci-btn--edit:hover  { background:#faece7; }
 .mci-btn--magic { border-color:#b3d4b3; color:#2d6a2d; } .mci-btn--magic:hover { background:#eaf3de; }
-.mci-btn--del  { border-color:#f7c1c1; color:#a32d2d; } .mci-btn--del:hover  { background:#fcebeb; }
+.mci-btn--del   { border-color:#f7c1c1; color:#a32d2d; } .mci-btn--del:hover   { background:#fcebeb; }
+.mci-btn--ia-pro { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:#fff; border:none; }
+.mci-btn--ia-pro:hover { transform:translateY(-1px); }
 .empty { text-align:center; padding:4rem 2rem; background:#fff; border-radius:16px; border:1.5px dashed #c8dac8; }
 .loading-spinner { display:inline-block; width:13px; height:13px; border:2px solid rgba(255,255,255,.3); border-radius:50%; border-top-color:#fff; animation:spin .6s linear infinite; }
 @keyframes spin { to { transform:rotate(360deg); } }
+
+/* Suggestion cards */
+.suggestion-card { background:#fff; border-radius:10px; padding:12px; margin-bottom:12px; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
+.suggestion-card__header { display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+.suggestion-card__icon { font-size:20px; }
+.suggestion-card__title { font-weight:700; flex:1; }
+.suggestion-card__badge { margin-left:auto; color:white; padding:2px 8px; border-radius:12px; font-size:10px; font-weight:600; }
+.suggestion-card__msg { margin:8px 0; font-size:13px; color:#2c3e50; }
+.suggestion-card__btn { font-size:11px; padding:4px 12px; }
+
+/* FullCalendar overrides */
+.fc { font-family:'Segoe UI',system-ui,sans-serif; }
+.fc-toolbar-title { font-size:1.2rem; font-weight:700; color:#1a2e1a; }
+.fc-button-primary { background-color:#2d6a2d !important; border-color:#235223 !important; }
+.fc-button-primary:hover { background-color:#235223 !important; }
+.fc-daygrid-day-number { color:#1a2e1a; }
+.fc-event { cursor:pointer; border-radius:6px; font-size:.8rem; font-weight:500; }
+.reminder-marker { width:8px; height:8px; background:#e74a3b; border-radius:50%; display:inline-block; margin-left:5px; animation:pulseRed 1.5s infinite; }
+@keyframes pulseRed {
+    0%   { box-shadow:0 0 0 0 rgba(231,74,59,0.4); }
+    70%  { box-shadow:0 0 0 6px rgba(231,74,59,0); }
+    100% { box-shadow:0 0 0 0 rgba(231,74,59,0); }
+}
+
+/* Popup rappel */
+.reminder-popup { display:none; position:fixed; z-index:10050; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); justify-content:center; align-items:center; }
+.reminder-popup.show { display:flex; }
+.reminder-popup-content { background:#fff; border-radius:24px; width:90%; max-width:500px; max-height:85vh; overflow-y:auto; animation:popupSlideIn .3s ease-out; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); }
+@keyframes popupSlideIn {
+    from { opacity:0; transform:translateY(-30px) scale(.95); }
+    to   { opacity:1; transform:translateY(0) scale(1); }
+}
+.reminder-popup-header { background:linear-gradient(135deg,#e74a3b 0%,#c0392b 100%); padding:1.25rem 1.5rem; color:#fff; display:flex; justify-content:space-between; align-items:center; border-radius:24px 24px 0 0; }
+.reminder-popup-header h3 { margin:0; font-size:1.2rem; display:flex; align-items:center; gap:10px; }
+.reminder-popup-close { background:rgba(255,255,255,.2); border:none; color:#fff; width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:1.2rem; display:flex; align-items:center; justify-content:center; }
+.reminder-popup-body { padding:1.5rem; }
+.reminder-message-box { background:#fef3e8; border-left:4px solid #e74a3b; padding:1rem; border-radius:12px; margin-bottom:1.5rem; }
+.reminder-message-text { font-size:1rem; font-weight:700; color:#a32d2d; margin-bottom:8px; }
+.reminder-detail-row { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #e4edde; }
+.reminder-detail-label { font-weight:600; color:#7a9a7a; font-size:.8rem; }
+.reminder-detail-value { font-weight:500; color:#1a2e1a; }
 </style>
 
+{# ══════════════════════════════════════════════════════════ #}
+{# PAGE PRINCIPALE                                           #}
+{# ══════════════════════════════════════════════════════════ #}
 <div class="mp">
+
+  {# Fil d'Ariane #}
   <nav class="bc">
     <a href="#">Matériels</a>
     <span class="bc__sep">›</span>
     <span>Maintenances</span>
   </nav>
 
+  {# En-tête #}
   <div class="mh">
     <div>
       <h1>🔧 Maintenances</h1>
-      <p>{{ maintenancesWithAlerts|length }} maintenance(s) · Total : <strong>{{ totalCout|number_format(2,',',' ') }} DT</strong></p>
+      <p>
+        {{ maintenancesWithAlerts|length }} maintenance(s) ·
+        Total : <strong>{{ totalCout|number_format(2, ',', ' ') }} DT</strong>
+      </p>
     </div>
     <div class="mh__right">
-      <button type="button" class="btn btn--view-toggle active" id="viewCards" onclick="setView('cards')">⊞ Cartes</button>
-      <button type="button" class="btn btn--view-toggle" id="viewTable" onclick="setView('table')">☰ Tableau</button>
-      <button type="button" class="btn btn--stats" id="statsToggle" onclick="toggleStats()">📊 Stats</button>
-      <a href="{{ path('agri_maintenances_export_pdf') }}" target="_blank" class="btn btn--outline">📄 PDF</a>
-      <a href="{{ path('agri_maintenances_export_excel') }}" class="btn btn--outline">📥 Excel</a>
-      <a href="{{ path('agri_maintenances_new') }}" class="btn btn--green">+ Nouvelle maintenance</a>
+      <button type="button" class="btn btn--view-toggle active" id="viewCards"  onclick="setView('cards')">⊞ Cartes</button>
+      <button type="button" class="btn btn--view-toggle"        id="viewTable"  onclick="setView('table')">☰ Tableau</button>
+      <button type="button" class="btn btn--calendar"           id="openCalendarBtn" onclick="openReminderCalendar()">📅 Rappels annuels</button>
+      <button type="button" class="btn btn--stats"              id="statsToggle" onclick="toggleStats()">📊 Stats</button>
+      <a href="{{ path('agri_maintenances_export_pdf') }}"   target="_blank" class="btn btn--outline">📄 PDF</a>
+      <a href="{{ path('agri_maintenances_export_excel') }}"              class="btn btn--outline">📥 Excel</a>
+      <a href="{{ path('agri_maintenances_new') }}"                       class="btn btn--green">+ Nouvelle maintenance</a>
     </div>
   </div>
 
-  {% for type, messages in app.flashes %}
-    {% for msg in messages %}
-      <div class="alert alert--{{ type }}"><span>{{ msg }}</span><button class="alert__close" onclick="this.parentElement.remove()">✕</button></div>
+  {# Flash messages #}
+  {% for flashType, flashMessages in app.flashes %}
+    {% for msg in flashMessages %}
+      <div class="alert alert--{{ flashType }}">
+        <span>{{ msg }}</span>
+        <button class="alert__close" onclick="this.parentElement.remove()">✕</button>
+      </div>
     {% endfor %}
   {% endfor %}
 
-  {# Stats panel #}
+  {# ── Panneau Statistiques ── #}
   <div class="charts-panel" id="chartsPanel">
     <div class="charts-panel__header">
       <p class="charts-panel__title">📊 Statistiques des maintenances</p>
       <button class="charts-panel__close" onclick="toggleStats()">✕</button>
     </div>
+
     <div class="panel-stats">
-      <div class="pstat pstat--purple"><div class="pstat__label">Total</div><div class="pstat__value">{{ maintenancesWithAlerts|length }}</div></div>
-      <div class="pstat pstat--green"><div class="pstat__label">Coût total</div><div class="pstat__value">{{ totalCout|number_format(0,',',' ') }} DT</div></div>
-      {% if countByType is defined and countByType|length > 0 %}
-        <div class="pstat pstat--teal"><div class="pstat__label">Type dominant</div><div class="pstat__value">{{ countByType[0].type|capitalize }}</div></div>
+      <div class="pstat pstat--purple">
+        <div class="pstat__label">Total</div>
+        <div class="pstat__value">{{ maintenancesWithAlerts|length }}</div>
+      </div>
+      <div class="pstat pstat--green">
+        <div class="pstat__label">Coût total</div>
+        <div class="pstat__value">{{ totalCout|number_format(0, ',', ' ') }} DT</div>
+      </div>
+      {# CORRECTION : vérification robuste avant d'accéder à countByType[0] #}
+      {% if countByType is defined and countByType is not empty %}
+        <div class="pstat pstat--teal">
+          <div class="pstat__label">Type dominant</div>
+          <div class="pstat__value">{{ countByType[0].type|capitalize }}</div>
+        </div>
+      {% else %}
+        <div class="pstat pstat--teal">
+          <div class="pstat__label">Type dominant</div>
+          <div class="pstat__value">—</div>
+        </div>
       {% endif %}
       <div class="pstat pstat--amber">
         <div class="pstat__label">Coût moyen</div>
-        <div class="pstat__value">{% if maintenancesWithAlerts|length > 0 %}{{ (totalCout / maintenancesWithAlerts|length)|number_format(0,',',' ') }} DT{% else %}0 DT{% endif %}</div>
+        <div class="pstat__value">
+          {% if maintenancesWithAlerts|length > 0 %}
+            {{ (totalCout / maintenancesWithAlerts|length)|number_format(0, ',', ' ') }} DT
+          {% else %}
+            0 DT
+          {% endif %}
+        </div>
       </div>
     </div>
+
     <div class="charts-row">
-      <div class="chart-card"><h3>📊 Répartition par type</h3><canvas id="barChart" height="200"></canvas></div>
-      <div class="chart-card"><h3>📈 Coût mensuel (DT)</h3><canvas id="lineChart" height="200"></canvas></div>
+      <div class="chart-card"><h3>📊 Répartition par type</h3><canvas id="barChart"  height="200"></canvas></div>
+      <div class="chart-card"><h3>📈 Coût mensuel (DT)</h3>  <canvas id="lineChart" height="200"></canvas></div>
     </div>
   </div>
 
-  {# Toolbar #}
+  {# ── Barre de recherche / filtres ── #}
   <div class="toolbar">
     <div class="toolbar__search">
-      <span class="toolbar__search-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
-      <input type="text" id="searchInput" placeholder="Rechercher (type, description, machine…)" oninput="onSearchInput(this)">
+      <span class="toolbar__search-icon">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+      </span>
+      <input type="text" id="searchInput"
+             placeholder="Rechercher (type, description, machine…)"
+             oninput="onSearchInput(this)">
       <button class="toolbar__search-clear" id="clearSearch" onclick="clearSearch()" title="Effacer">✕</button>
     </div>
+
     <div class="toolbar__sep"></div>
+
     <div class="toolbar__select-wrap">
-      <span class="toolbar__select-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></span>
+      <span class="toolbar__select-icon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+        </svg>
+      </span>
       <select id="typeFilter" onchange="filterItems()">
         <option value="">Tous les types</option>
         {% if countByType is defined and countByType is not empty %}
-          {% for row in countByType %}<option value="{{ row.type|lower }}">{{ row.type }} ({{ row.total }})</option>{% endfor %}
+          {% for row in countByType %}
+            <option value="{{ row.type|lower }}">{{ row.type }} ({{ row.total }})</option>
+          {% endfor %}
         {% endif %}
       </select>
     </div>
+
     <div class="toolbar__select-wrap">
       <span class="toolbar__select-icon">🔄</span>
       <select id="statutFilter" onchange="filterItems()">
@@ -278,6 +380,7 @@
         <option value="termine">✅ Terminé</option>
       </select>
     </div>
+
     <div class="toolbar__select-wrap">
       <span class="toolbar__select-icon">⚡</span>
       <select id="prioriteFilter" onchange="filterItems()">
@@ -288,6 +391,7 @@
         <option value="faible">🔵 Faible</option>
       </select>
     </div>
+
     <div class="toolbar__select-wrap">
       <select id="sortFilter" onchange="filterItems()">
         <option value="date">Trier par date</option>
@@ -298,144 +402,335 @@
         <option value="km">Trier par km</option>
       </select>
     </div>
+
     <div class="toolbar__select-wrap">
       <select id="dirFilter" onchange="filterItems()">
         <option value="desc">Décroissant</option>
         <option value="asc">Croissant</option>
       </select>
     </div>
-    <button type="button" class="btn btn--red-outline" id="resetBtn" onclick="resetFilters()" style="display:none;">✕ Réinitialiser</button>
+
+    <button type="button" class="btn btn--red-outline" id="resetBtn"
+            onclick="resetFilters()" style="display:none;">✕ Réinitialiser</button>
   </div>
 
+  {# ══════════════ VUE VIDE ══════════════ #}
   {% if maintenancesWithAlerts is empty %}
     <div class="empty">
-      <p style="font-size:2.5rem; margin:0 0 .5rem;">🔧</p>
-      <p style="color:#6b8c6b; margin:0 0 1.5rem;">Aucune maintenance enregistrée.</p>
+      <p style="font-size:2.5rem;margin:0 0 .5rem;">🔧</p>
+      <p style="color:#6b8c6b;margin:0 0 1.5rem;">Aucune maintenance enregistrée.</p>
       <a href="{{ path('agri_maintenances_new') }}" class="btn btn--green">Ajouter une maintenance</a>
     </div>
+
   {% else %}
 
-  {# ══ CARD VIEW ══ #}
+  {# ══════════════ VUE CARTES ══════════════ #}
   <div id="viewCardsContainer">
     <div class="cards-grid" id="cardsGrid">
       {% for item in maintenancesWithAlerts %}
-        {% set m = item.maintenance %}
+        {# — variables locales — #}
+        {% set m     = item.maintenance %}
         {% set alert = item.alert %}
-        {% set typeMap = {'Mécanique':'mecanique','Électricité':'electrique','Hydraulique':'hydraulique','Logicielle':'logicielle','Transmission':'transmission','Moteur':'moteur','Vidange & filtres':'vidange','Révision générale':'revision','Pneumatique':'pneumatique'} %}
-        {% set bc = typeMap[m.typePanne]|default('default') %}
+
+        {# CORRECTION : récupération sécurisée du nom de la machine #}
+        {% set machineName = 'Machine non définie' %}
+        {% if m.nomMateriel is defined and m.nomMateriel is not null and m.nomMateriel != '' %}
+          {% set machineName = m.nomMateriel %}
+        {% elseif m.nom is defined and m.nom is not null and m.nom != '' %}
+          {% set machineName = m.nom %}
+        {% endif %}
+
+        {# CORRECTION : valeurs par défaut pour éviter les erreurs null #}
+        {% set typePanne  = m.typePanne  is defined and m.typePanne  is not null ? m.typePanne  : '' %}
+        {% set priorite   = m.priorite   is defined and m.priorite   is not null ? m.priorite   : 'moyenne' %}
+        {% set statut     = m.statut     is defined and m.statut     is not null ? m.statut     : 'planifie' %}
+        {% set cout       = m.cout       is defined and m.cout       is not null ? m.cout       : 0 %}
+        {% set kilometrage= m.kilometrage is defined and m.kilometrage is not null ? m.kilometrage : null %}
+        {% set description= m.description is defined and m.description is not null ? m.description : '' %}
+        {% set recommandation = m.recommandation is defined and m.recommandation is not null ? m.recommandation : '' %}
+
+        {# maps #}
+        {% set typeMap = {
+          'Mécanique'       : 'mecanique',
+          'Électricité'     : 'electrique',
+          'Hydraulique'     : 'hydraulique',
+          'Logicielle'      : 'logicielle',
+          'Transmission'    : 'transmission',
+          'Moteur'          : 'moteur',
+          'Vidange & filtres': 'vidange',
+          'Révision générale': 'revision',
+          'Pneumatique'     : 'pneumatique'
+        } %}
+        {% set bc         = typeMap[typePanne]|default('default') %}
+        {% set prioOrder  = {'faible':1,'moyenne':2,'haute':3,'urgente':4} %}
         {% set prioLabels = {'faible':'🔵 Faible','moyenne':'🟢 Moyenne','haute':'🟠 Haute','urgente':'🔴 Urgente'} %}
-        {% set statutLabels = {'planifie':'📅 Planifié','en_cours':'⚙️ En cours','termine':'✅ Terminé'} %}
-        {% set prioOrder = {'faible':1,'moyenne':2,'haute':3,'urgente':4} %}
-        {% set headerCls = m.priorite == 'urgente' ? 'h--urgente' : 'h--' ~ (m.statut|default('planifie')) %}
-        {% set machineName = m.nomMateriel ?? m.nom ?? 'Machine non définie' %}
+        {% set statLabels = {'planifie':'📅 Planifié','en_cours':'⚙️ En cours','termine':'✅ Terminé'} %}
+        {% set headerCls  = priorite == 'urgente' ? 'h--urgente' : 'h--' ~ statut %}
 
         <div class="maint-card-item"
              data-id="{{ m.idMain }}"
-             data-type="{{ m.typePanne|default('')|lower }}"
-             data-desc="{{ m.description|default('')|lower }}"
-             data-cout="{{ m.cout|default(0) }}"
-             data-date="{{ m.dateMain ? m.dateMain|date('Y-m-d') : '0000-00-00' }}"
-             data-statut="{{ m.statut|default('planifie') }}"
-             data-priorite="{{ m.priorite|default('moyenne') }}"
-             data-prio-order="{{ prioOrder[m.priorite]|default(2) }}"
-             data-km="{{ m.kilometrage|default(0) }}"
+             data-type="{{ typePanne|lower }}"
+             data-desc="{{ description|lower }}"
+             data-cout="{{ cout }}"
+             data-date="{{ m.dateMain is defined and m.dateMain is not null ? m.dateMain|date('Y-m-d') : '0000-00-00' }}"
+             data-statut="{{ statut }}"
+             data-priorite="{{ priorite }}"
+             data-prio-order="{{ prioOrder[priorite]|default(2) }}"
+             data-km="{{ kilometrage|default(0) }}"
              data-nom="{{ machineName|lower }}">
 
+          {# Header coloré #}
           <div class="mci-header {{ headerCls }}">
             <div>
               <div class="mci-title">{{ machineName }}</div>
-              <div class="mci-sub"><span>📍</span><span>{{ m.typePanne|default('—') }}</span>{% if m.idM %}&nbsp;·&nbsp;#{{ m.idM.id }}{% endif %}</div>
+              <div class="mci-sub">
+                <span>📍</span>
+                <span>{{ typePanne|default('—') }}</span>
+                {% if m.idM is defined and m.idM is not null %}&nbsp;·&nbsp;#{{ m.idM }}{% endif %}
+              </div>
             </div>
             <div class="mci-status-pill">
-              {% if m.priorite == 'urgente' %}🔴 Urgente
-              {% elseif m.statut == 'termine' %}✅ Terminé
-              {% elseif m.statut == 'en_cours' %}⚙️ En cours
-              {% else %}📅 Planifié{% endif %}
+              {% if priorite == 'urgente' %}🔴 Urgente
+              {% elseif statut == 'termine' %}✅ Terminé
+              {% elseif statut == 'en_cours' %}⚙️ En cours
+              {% else %}📅 Planifié
+              {% endif %}
             </div>
           </div>
 
-          {% if alert.status == 'overdue' %}<div class="mci-alert alert-danger">⚠️ {{ alert.message }}</div>
-          {% elseif alert.status == 'warning' %}<div class="mci-alert alert-warning">⏰ {{ alert.message }}</div>
-          {% elseif m.dateMain %}<div class="mci-alert" style="background:#f0faf7;border-left-color:#0F6E56;color:#085041;">📅 Maintenance le {{ m.dateMain|date('d/m/Y') }}</div>
+          {# Bandeau alerte #}
+          {% if alert is defined and alert.status is defined %}
+            {% if alert.status == 'overdue' %}
+              <div class="mci-alert alert-danger">⚠️ {{ alert.message }}</div>
+            {% elseif alert.status == 'warning' %}
+              <div class="mci-alert alert-warning">⏰ {{ alert.message }}</div>
+            {% elseif m.dateMain is defined and m.dateMain is not null %}
+              <div class="mci-alert" style="background:#f0faf7;border-left-color:#0F6E56;color:#085041;">
+                📅 Maintenance le {{ m.dateMain|date('d/m/Y') }}
+              </div>
+            {% endif %}
           {% endif %}
 
+          {# Stats KM / Année / Coût #}
           <div class="mci-stats">
-            <div class="mci-stat"><div class="mci-stat__val">{{ m.kilometrage is not null ? m.kilometrage|number_format(0,' ',' ') : '—' }}</div><div class="mci-stat__lbl">KM</div></div>
-            <div class="mci-stat"><div class="mci-stat__val">{{ m.dateMain ? m.dateMain|date('Y') : '—' }}</div><div class="mci-stat__lbl">ANNÉE</div></div>
-            <div class="mci-stat"><div class="mci-stat__val" style="font-size:.9rem;">{{ m.cout|number_format(0,' ',' ') }} DT</div><div class="mci-stat__lbl">COÛT</div></div>
+            <div class="mci-stat">
+              <div class="mci-stat__val">
+                {{ kilometrage is not null ? kilometrage|number_format(0, ' ', ' ') : '—' }}
+              </div>
+              <div class="mci-stat__lbl">KM</div>
+            </div>
+            <div class="mci-stat">
+              <div class="mci-stat__val">
+                {{ m.dateMain is defined and m.dateMain is not null ? m.dateMain|date('Y') : '—' }}
+              </div>
+              <div class="mci-stat__lbl">ANNÉE</div>
+            </div>
+            <div class="mci-stat">
+              <div class="mci-stat__val" style="font-size:.9rem;">
+                {{ cout|number_format(0, ' ', ' ') }} DT
+              </div>
+              <div class="mci-stat__lbl">COÛT</div>
+            </div>
           </div>
 
+          {# Corps #}
           <div class="mci-body">
-            <div class="mci-row"><span class="mci-row-label">Type</span><span class="badge badge--{{ bc }}">{{ m.typePanne|default('—') }}</span></div>
-            <div class="mci-row"><span class="mci-row-label">Priorité</span><span class="prio-badge prio--{{ m.priorite|default('moyenne') }}">{{ prioLabels[m.priorite]|default('—') }}</span></div>
-            <div class="mci-row"><span class="mci-row-label">Statut</span><span class="statut-badge statut--{{ m.statut|default('planifie') }}">{{ statutLabels[m.statut]|default('—') }}</span></div>
-            <div class="mci-row"><span class="mci-row-label">Coût</span><strong>{{ m.cout|number_format(2,',',' ') }} DT</strong></div>
-            {% if m.description %}<div class="mci-desc" title="{{ m.description }}">{{ m.description }}</div>{% endif %}
-            {% if m.recommandation %}
-              <div class="mci-row" style="margin-top:4px;"><span class="mci-row-label">💡 Reco</span><span style="font-size:.75rem;color:#2d6a2d;">{{ m.recommandation|slice(0,60) }}{{ m.recommandation|length > 60 ? '…' : '' }}</span></div>
+            <div class="mci-row">
+              <span class="mci-row-label">Type</span>
+              <span class="badge badge--{{ bc }}">{{ typePanne|default('—') }}</span>
+            </div>
+            <div class="mci-row">
+              <span class="mci-row-label">Priorité</span>
+              <span class="prio-badge prio--{{ priorite }}">{{ prioLabels[priorite]|default('—') }}</span>
+            </div>
+            <div class="mci-row">
+              <span class="mci-row-label">Statut</span>
+              <span class="statut-badge statut--{{ statut }}">{{ statLabels[statut]|default('—') }}</span>
+            </div>
+            <div class="mci-row">
+              <span class="mci-row-label">Coût</span>
+              <strong>{{ cout|number_format(2, ',', ' ') }} DT</strong>
+            </div>
+            {% if description %}
+              <div class="mci-desc" title="{{ description }}">{{ description }}</div>
+            {% endif %}
+            {% if recommandation %}
+              <div class="mci-row" style="margin-top:4px;">
+                <span class="mci-row-label">💡 Reco</span>
+                <span style="font-size:.75rem;color:#2d6a2d;">
+                  {{ recommandation|slice(0,60) }}{{ recommandation|length > 60 ? '…' : '' }}
+                </span>
+              </div>
             {% endif %}
           </div>
 
+          {# Actions #}
           <div class="mci-actions">
             <a href="{{ path('agri_maintenances_show', {id: m.idMain}) }}" class="mci-btn mci-btn--view">👁 Voir</a>
             <a href="{{ path('agri_maintenances_edit', {id: m.idMain}) }}" class="mci-btn mci-btn--edit">✏️ Edit</a>
+            {# CORRECTION : échappement JS sécurisé avec |e('js') sur toutes les variables string #}
             <a href="javascript:void(0)" class="mci-btn mci-btn--magic"
-               onclick="openAIPrompt({{ m.idMain }},'{{ m.typePanne|e('js') }}','{{ m.priorite|e('js') }}','{{ m.kilometrage|default(0) }}','{{ machineName|e('js') }}','{{ m.statut|e('js') }}','{{ m.cout|default(0) }}','{{ m.description|default('')|e('js')|slice(0,100) }}')">🤖 IA</a>
-            <form method="post" action="{{ path('agri_maintenances_delete', {id: m.idMain}) }}" onsubmit="return confirm('⚠️ Supprimer cette maintenance ?')" style="margin:0;">
+               onclick="openAIPrompt(
+                 {{ m.idMain }},
+                 '{{ typePanne|e('js') }}',
+                 '{{ priorite|e('js') }}',
+                 '{{ kilometrage|default(0) }}',
+                 '{{ machineName|e('js') }}',
+                 '{{ statut|e('js') }}',
+                 '{{ cout }}',
+                 '{{ description|e('js')|slice(0,100) }}'
+               )">🤖 IA</a>
+            <a href="javascript:void(0)" class="mci-btn mci-btn--ia-pro"
+               onclick="showIntelligentRecommendation({{ m.idMain }})">🧠 IA Pro</a>
+            <form method="post"
+                  action="{{ path('agri_maintenances_delete', {id: m.idMain}) }}"
+                  onsubmit="return confirm('⚠️ Supprimer cette maintenance ?')"
+                  style="margin:0;">
               <input type="hidden" name="_token" value="{{ csrf_token('delete_maintenance_' ~ m.idMain) }}">
               <button type="submit" class="mci-btn mci-btn--del" title="Supprimer">🗑</button>
             </form>
           </div>
-        </div>
-      {% endfor %}
-    </div>
-    <div id="noResultsCards" style="display:none;text-align:center;padding:3rem;color:#7a9a7a;">🔍 Aucun résultat.</div>
-  </div>
 
-  {# ══ TABLE VIEW ══ #}
+        </div>{# /maint-card-item #}
+      {% endfor %}
+    </div>{# /cards-grid #}
+
+    <div id="noResultsCards" style="display:none;text-align:center;padding:3rem;color:#7a9a7a;">
+      🔍 Aucun résultat.
+    </div>
+  </div>{# /viewCardsContainer #}
+
+  {# ══════════════ VUE TABLEAU ══════════════ #}
   <div id="viewTableContainer" style="display:none;">
     <div class="maint-card">
       <table class="maint-table">
         <thead>
-          <tr><th>Type</th><th>Coût (DT)</th><th>Date</th><th>Statut</th><th>Priorité</th><th>Km</th><th>Alerte</th><th>Machine</th><th>Description</th><th>Actions</th></tr>
+          <tr>
+            <th>Type</th>
+            <th>Coût (DT)</th>
+            <th>Date</th>
+            <th>Statut</th>
+            <th>Priorité</th>
+            <th>Km</th>
+            <th>Alerte</th>
+            <th>Machine</th>
+            <th>Description</th>
+            <th>Actions</th>
+          </tr>
         </thead>
         <tbody id="maintBody">
           {% for item in maintenancesWithAlerts %}
-            {% set m = item.maintenance %}
+            {% set m     = item.maintenance %}
             {% set alert = item.alert %}
-            {% set typeMap2 = {'Mécanique':'mecanique','Électricité':'electrique','Hydraulique':'hydraulique','Logicielle':'logicielle','Transmission':'transmission','Moteur':'moteur','Vidange & filtres':'vidange','Révision générale':'revision','Pneumatique':'pneumatique'} %}
-            {% set bc2 = typeMap2[m.typePanne]|default('default') %}
-            {% set machineName2 = m.nomMateriel ?? m.nom ?? '' %}
-            <tr data-id="{{ m.idMain }}" data-type="{{ m.typePanne|default('')|lower }}" data-desc="{{ m.description|default('')|lower }}"
-                data-cout="{{ m.cout|default(0) }}" data-date="{{ m.dateMain ? m.dateMain|date('Y-m-d') : '0000-00-00' }}"
-                data-statut="{{ m.statut|default('planifie') }}" data-priorite="{{ m.priorite|default('moyenne') }}"
-                data-prio-order="{{ {'faible':1,'moyenne':2,'haute':3,'urgente':4}[m.priorite]|default(2) }}"
-                data-km="{{ m.kilometrage|default(0) }}" data-nom="{{ machineName2|lower }}">
-              <td><span class="badge badge--{{ bc2 }}">{{ m.typePanne|default('—') }}</span></td>
-              <td class="td-cost">{{ m.cout|number_format(2,',',' ') }} DT</td>
-              <td class="td-date">{{ m.dateMain ? m.dateMain|date('d/m/Y') : '—' }}</td>
-              <td><span class="statut-badge statut--{{ m.statut|default('planifie') }}">{{ {'planifie':'📅 Planifié','en_cours':'⚙️ En cours','termine':'✅ Terminé'}[m.statut]|default('—') }}</span></td>
-              <td><span class="prio-badge prio--{{ m.priorite|default('moyenne') }}">{{ {'faible':'🔵 Faible','moyenne':'🟢 Moyenne','haute':'🟠 Haute','urgente':'🔴 Urgente'}[m.priorite]|default('—') }}</span></td>
-              <td style="font-size:.85rem;">{{ m.kilometrage is not null ? m.kilometrage ~ ' km' : '—' }}</td>
-              <td>
-                {% if alert.status == 'overdue' %}<span style="color:#a32d2d;font-weight:600;">⚠️ {{ alert.message }}</span>
-                {% elseif alert.status == 'warning' %}<span style="color:#856404;">⏰ {{ alert.message }}</span>
-                {% elseif alert.status == 'ok' %}<span style="color:#27500a;">✅ {{ alert.message }}</span>
-                {% else %}<span style="color:#7a9a7a;">📅 {{ alert.message }}</span>{% endif %}
+
+            {# CORRECTION : mêmes valeurs par défaut que pour les cartes #}
+            {% set machineName2  = 'Machine non définie' %}
+            {% if m.nomMateriel is defined and m.nomMateriel is not null and m.nomMateriel != '' %}
+              {% set machineName2 = m.nomMateriel %}
+            {% elseif m.nom is defined and m.nom is not null and m.nom != '' %}
+              {% set machineName2 = m.nom %}
+            {% endif %}
+
+            {% set typePanne2   = m.typePanne   is defined and m.typePanne   is not null ? m.typePanne   : '' %}
+            {% set priorite2    = m.priorite    is defined and m.priorite    is not null ? m.priorite    : 'moyenne' %}
+            {% set statut2      = m.statut      is defined and m.statut      is not null ? m.statut      : 'planifie' %}
+            {% set cout2        = m.cout        is defined and m.cout        is not null ? m.cout        : 0 %}
+            {% set kilometrage2 = m.kilometrage is defined and m.kilometrage is not null ? m.kilometrage : null %}
+            {% set description2 = m.description is defined and m.description is not null ? m.description : '' %}
+
+            {% set typeMap2 = {
+              'Mécanique'       : 'mecanique',
+              'Électricité'     : 'electrique',
+              'Hydraulique'     : 'hydraulique',
+              'Logicielle'      : 'logicielle',
+              'Transmission'    : 'transmission',
+              'Moteur'          : 'moteur',
+              'Vidange & filtres': 'vidange',
+              'Révision générale': 'revision',
+              'Pneumatique'     : 'pneumatique'
+            } %}
+            {% set bc2       = typeMap2[typePanne2]|default('default') %}
+            {% set prioOrder2= {'faible':1,'moyenne':2,'haute':3,'urgente':4} %}
+
+            <tr data-id="{{ m.idMain }}"
+                data-type="{{ typePanne2|lower }}"
+                data-desc="{{ description2|lower }}"
+                data-cout="{{ cout2 }}"
+                data-date="{{ m.dateMain is defined and m.dateMain is not null ? m.dateMain|date('Y-m-d') : '0000-00-00' }}"
+                data-statut="{{ statut2 }}"
+                data-priorite="{{ priorite2 }}"
+                data-prio-order="{{ prioOrder2[priorite2]|default(2) }}"
+                data-km="{{ kilometrage2|default(0) }}"
+                data-nom="{{ machineName2|lower }}">
+
+              <td><span class="badge badge--{{ bc2 }}">{{ typePanne2|default('—') }}</span></td>
+              <td class="td-cost">{{ cout2|number_format(2, ',', ' ') }} DT</td>
+              <td class="td-date">
+                {{ m.dateMain is defined and m.dateMain is not null ? m.dateMain|date('d/m/Y') : '—' }}
               </td>
               <td>
-                {% if m.idM and machineName2 %}<div class="machine-badge">🚜 #{{ m.idM.id }}</div><div class="machine-name" style="margin-top:4px;">{{ machineName2 }}</div>
-{% elseif m.idM %}<div class="machine-badge">🚜 #{{ m.idM.id }}</div>
-                {% else %}<span class="machine-badge machine-badge--none">—</span>{% endif %}
+                <span class="statut-badge statut--{{ statut2 }}">
+                  {{ {'planifie':'📅 Planifié','en_cours':'⚙️ En cours','termine':'✅ Terminé'}[statut2]|default('—') }}
+                </span>
               </td>
-              <td class="td-desc" title="{{ m.description|default('') }}">{{ m.description|default('—')|slice(0,40) }}{{ m.description|length > 40 ? '…' : '' }}</td>
+              <td>
+                <span class="prio-badge prio--{{ priorite2 }}">
+                  {{ {'faible':'🔵 Faible','moyenne':'🟢 Moyenne','haute':'🟠 Haute','urgente':'🔴 Urgente'}[priorite2]|default('—') }}
+                </span>
+              </td>
+              <td style="font-size:.85rem;">
+                {{ kilometrage2 is not null ? kilometrage2 ~ ' km' : '—' }}
+              </td>
+              <td>
+                {# CORRECTION : vérification robuste du tableau alert #}
+                {% if alert is defined and alert.status is defined %}
+                  {% if alert.status == 'overdue' %}
+                    <span style="color:#a32d2d;font-weight:600;">⚠️ {{ alert.message|default('') }}</span>
+                  {% elseif alert.status == 'warning' %}
+                    <span style="color:#856404;">⏰ {{ alert.message|default('') }}</span>
+                  {% elseif alert.status == 'ok' %}
+                    <span style="color:#27500a;">✅ {{ alert.message|default('') }}</span>
+                  {% else %}
+                    <span style="color:#7a9a7a;">📅 {{ alert.message|default('') }}</span>
+                  {% endif %}
+                {% else %}
+                  <span style="color:#7a9a7a;">—</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if m.idM is defined and m.idM is not null and machineName2 != 'Machine non définie' %}
+                  <div class="machine-badge">🚜 #{{ m.idM }}</div>
+                  <div class="machine-name" style="margin-top:4px;">{{ machineName2 }}</div>
+                {% elseif m.idM is defined and m.idM is not null %}
+                  <div class="machine-badge">🚜 #{{ m.idM }}</div>
+                {% else %}
+                  <span class="machine-badge machine-badge--none">—</span>
+                {% endif %}
+              </td>
+              <td class="td-desc" title="{{ description2 }}">
+                {{ description2|slice(0,40) }}{{ description2|length > 40 ? '…' : '' }}
+              </td>
               <td>
                 <div class="actions">
                   <a href="{{ path('agri_maintenances_show', {id: m.idMain}) }}" class="act-btn act-btn--view">👁</a>
                   <a href="{{ path('agri_maintenances_edit', {id: m.idMain}) }}" class="act-btn act-btn--edit">✏️</a>
                   <a href="javascript:void(0)" class="act-btn act-btn--magic"
-                     onclick="openAIPrompt({{ m.idMain }},'{{ m.typePanne|e('js') }}','{{ m.priorite|e('js') }}','{{ m.kilometrage|default(0) }}','{{ machineName2|e('js') }}','{{ m.statut|e('js') }}','{{ m.cout|default(0) }}','{{ m.description|default('')|e('js')|slice(0,100) }}')">🤖 IA</a>
-                  <form method="post" action="{{ path('agri_maintenances_delete', {id: m.idMain}) }}" onsubmit="return confirm('Supprimer ?')" style="display:inline;margin:0;">
+                     onclick="openAIPrompt(
+                       {{ m.idMain }},
+                       '{{ typePanne2|e('js') }}',
+                       '{{ priorite2|e('js') }}',
+                       '{{ kilometrage2|default(0) }}',
+                       '{{ machineName2|e('js') }}',
+                       '{{ statut2|e('js') }}',
+                       '{{ cout2 }}',
+                       '{{ description2|e('js')|slice(0,100) }}'
+                     )">🤖 IA</a>
+                  <a href="javascript:void(0)" class="act-btn act-btn--ia-pro"
+                     onclick="showIntelligentRecommendation({{ m.idMain }})">🧠 IA Pro</a>
+                  <form method="post"
+                        action="{{ path('agri_maintenances_delete', {id: m.idMain}) }}"
+                        onsubmit="return confirm('Supprimer ?')"
+                        style="display:inline;margin:0;">
                     <input type="hidden" name="_token" value="{{ csrf_token('delete_maintenance_' ~ m.idMain) }}">
                     <button type="submit" class="act-btn act-btn--del">🗑</button>
                   </form>
@@ -445,18 +740,95 @@
           {% endfor %}
         </tbody>
       </table>
-      <div id="noResultsTable" style="display:none;text-align:center;padding:3rem;color:#7a9a7a;">🔍 Aucun résultat.</div>
+      <div id="noResultsTable" style="display:none;text-align:center;padding:3rem;color:#7a9a7a;">
+        🔍 Aucun résultat.
+      </div>
+    </div>
+  </div>{# /viewTableContainer #}
+
+  {% endif %}{# /maintenancesWithAlerts not empty #}
+</div>{# /mp #}
+
+{# ══════════════════════════════════════════════════════════ #}
+{# MODALE CALENDRIER RAPPELS ANNUELS                         #}
+{# ══════════════════════════════════════════════════════════ #}
+<div id="reminderCalendarModal" class="modal" style="display:none;z-index:10002;">
+  <div class="modal-content" style="max-width:1100px;width:95%;">
+    <div class="modal-hdr" style="background:linear-gradient(135deg,#e74a3b 0%,#c0392b 100%);">
+      <h3 style="color:#fff;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8"  y1="2" x2="8"  y2="6"/>
+          <line x1="3"  y1="10" x2="21" y2="10"/>
+        </svg>
+        Calendrier des rappels annuels
+        <span class="badge-ia" style="background:#fff;color:#a32d2d;">🔔 Maintenance préventive</span>
+      </h3>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn--ia-pro"
+                style="padding:.4rem 1rem;font-size:.8rem;"
+                onclick="analyzeAllRemindersWithAI()">
+          🧠 IA Pro - Analyse globale
+        </button>
+        <button class="modal-close-btn" onclick="closeReminderCalendar()" style="color:#fff;">×</button>
+      </div>
+    </div>
+    <div style="padding:20px;background:#f9fcf7;">
+      <div style="margin-bottom:15px;background:#fff;border-radius:12px;padding:12px 20px;
+                  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="reminder-marker" style="width:12px;height:12px;"></span>
+          <span style="font-size:13px;color:#5f7a5f;">
+            Les dates <strong style="color:#a32d2d;">surlignées en rouge</strong>
+            indiquent les machines ayant besoin d'une maintenance annuelle ou urgente
+          </span>
+        </div>
+        <div style="display:flex;gap:15px;">
+          <div style="display:flex;align-items:center;gap:5px;">
+            <div style="width:12px;height:12px;background:#e74a3b;border-radius:50%;"></div>
+            <span style="font-size:11px;">Rappel annuel (1+ an)</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:5px;">
+            <div style="width:12px;height:12px;background:#a32d2d;border-radius:50%;"></div>
+            <span style="font-size:11px;">Urgent</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:5px;">
+            <div style="width:12px;height:12px;background:#f39c12;border-radius:50%;"></div>
+            <span style="font-size:11px;">Kilométrage élevé</span>
+          </div>
+        </div>
+      </div>
+      <div id="reminderCalendar"></div>
     </div>
   </div>
-  {% endif %}
 </div>
 
-{# ══ MODAL IA — 3 onglets ══ #}
+{# ══════════════════════════════════════════════════════════ #}
+{# POPUP DÉTAIL RAPPEL / IA PRO                              #}
+{# ══════════════════════════════════════════════════════════ #}
+<div id="reminderDetailPopup" class="reminder-popup">
+  <div class="reminder-popup-content">
+    <div class="reminder-popup-header">
+      <h3><span>🧠</span> Analyse IA intelligente</h3>
+      <button class="reminder-popup-close" onclick="closeReminderDetailPopup()">×</button>
+    </div>
+    <div class="reminder-popup-body" id="reminderDetailBody">
+      <div class="modal-loader">Chargement...</div>
+    </div>
+  </div>
+</div>
+
+{# ══════════════════════════════════════════════════════════ #}
+{# MODALE IA STANDARD                                        #}
+{# ══════════════════════════════════════════════════════════ #}
 <div id="aiModal" class="modal">
   <div class="modal-content">
     <div class="modal-hdr">
       <h3>
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+        </svg>
         Assistant IA — Maintenance
         <span class="badge-ia">AgroFlow AI</span>
       </h3>
@@ -465,63 +837,56 @@
 
     <div class="modal-machine-bar">
       <span class="modal-machine-pill" id="aiMachinePill">—</span>
-      <span class="modal-machine-info" id="aiMachineInfo"></span>
+      <span class="modal-machine-info"  id="aiMachineInfo"></span>
     </div>
 
     <div class="modal-tabs">
-      <button class="modal-tab active" id="aitab-prompt" onclick="switchAITab('prompt')">💬 Prompt libre</button>
-      <button class="modal-tab" id="aitab-cal" onclick="switchAITab('cal')">📅 Calendrier</button>
-      <button class="modal-tab" id="aitab-life" onclick="switchAITab('life')">⏳ Durée de vie</button>
+      <button class="modal-tab active" id="aitab-prompt"  onclick="switchAITab('prompt')">💬 Prompt libre</button>
+      <button class="modal-tab"        id="aitab-life"    onclick="switchAITab('life')">⏳ Durée de vie</button>
+      <button class="modal-tab"        id="aitab-suggest" onclick="switchAITab('suggest')">🤖 Suggestion auto</button>
     </div>
 
-    {# ── Onglet Prompt libre ── #}
+    {# Panel Prompt #}
     <div id="aipanel-prompt" class="modal-panel active">
       <div class="modal-field-label">Suggestions rapides</div>
       <div class="modal-chips">
         <span class="modal-chip" onclick="setAISug(this,'Quelles vérifications étape par étape pour cette panne ?')">Vérifications</span>
         <span class="modal-chip" onclick="setAISug(this,'Quelles pièces contrôler et remplacer en priorité ?')">Pièces</span>
         <span class="modal-chip" onclick="setAISug(this,'Précautions de sécurité pour cette intervention')">Sécurité</span>
-        <span class="modal-chip" onclick="setAISug(this,'Temps estimé et outils nécessaires')">Temps & outils</span>
+        <span class="modal-chip" onclick="setAISug(this,'Temps estimé et outils nécessaires')">Temps &amp; outils</span>
         <span class="modal-chip" onclick="setAISug(this,'Coût estimé et pièces détachées recommandées')">Estimation coût</span>
       </div>
       <div class="modal-field-label">Votre demande</div>
-      <textarea id="aiPromptTxt" class="modal-textarea" rows="3" placeholder="Ex : Décris les étapes pour réparer cette panne…"></textarea>
+      <textarea id="aiPromptTxt" class="modal-textarea" rows="3"
+                placeholder="Ex : Décris les étapes pour réparer cette panne…"></textarea>
       <div id="aiPromptRes" style="display:none;">
         <div class="modal-section-title">Réponse générée</div>
         <div class="modal-result-box" id="aiPromptResTxt"></div>
       </div>
     </div>
 
-    {# ── Onglet Calendrier ── #}
-    <div id="aipanel-cal" class="modal-panel">
-      <div class="modal-alert-info">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
-        Calendrier d'interventions personnalisé selon votre machine
-      </div>
-      <div class="modal-cal-nav">
-        <button onclick="aiCalNav(-1)">‹</button>
-        <span id="aiCalTitle" style="font-size:13px;font-weight:600;color:#1a2e1a;"></span>
-        <button onclick="aiCalNav(1)">›</button>
-      </div>
-      <div id="aiCalGrid" class="modal-cal-grid"></div>
-      <div class="modal-section-title">Interventions planifiées</div>
-      <div id="aiEventList" class="modal-event-list"></div>
-      <div id="aiCalRes" style="display:none;margin-top:.6rem;">
-        <div class="modal-section-title">Suggestion IA</div>
-        <div class="modal-result-box" id="aiCalResTxt"></div>
-      </div>
-    </div>
-
-    {# ── Onglet Durée de vie ── #}
+    {# Panel Durée de vie #}
     <div id="aipanel-life" class="modal-panel">
       <div class="modal-alert-info">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2v20M2 12h20"/>
+        </svg>
         Prévision basée sur le kilométrage, le type de panne et la priorité
       </div>
       <div class="modal-score-row">
-        <div class="modal-score-card"><div class="modal-score-val" id="aiLifeScore">—</div><div class="modal-score-lbl">Vie restante</div><div class="modal-progress-bar"><div class="modal-progress-fill" id="aiLifeBar" style="width:0%"></div></div></div>
-        <div class="modal-score-card"><div class="modal-score-val" id="aiLifeYears">—</div><div class="modal-score-lbl">Années est.</div></div>
-        <div class="modal-score-card"><div class="modal-score-val" id="aiLifeRisk">—</div><div class="modal-score-lbl">Risque panne</div></div>
+        <div class="modal-score-card">
+          <div class="modal-score-val" id="aiLifeScore">—</div>
+          <div class="modal-score-lbl">Vie restante</div>
+          <div class="modal-progress-bar"><div class="modal-progress-fill" id="aiLifeBar" style="width:0%"></div></div>
+        </div>
+        <div class="modal-score-card">
+          <div class="modal-score-val" id="aiLifeYears">—</div>
+          <div class="modal-score-lbl">Années est.</div>
+        </div>
+        <div class="modal-score-card">
+          <div class="modal-score-val" id="aiLifeRisk">—</div>
+          <div class="modal-score-lbl">Risque panne</div>
+        </div>
       </div>
       <div class="modal-field-label">Usure par composant</div>
       <div id="aiLifeBars" class="modal-life-bars"></div>
@@ -531,12 +896,50 @@
       </div>
     </div>
 
+    {# Panel Suggestion auto #}
+    <div id="aipanel-suggest" class="modal-panel">
+      <div class="modal-alert-info"
+           style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border-left-color:#fff;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>
+        </svg>
+        Analyse intelligente basée sur l'historique, la fréquence et l'état de la machine
+      </div>
+      <div class="modal-score-row" style="margin-bottom:1rem;">
+        <div class="modal-score-card">
+          <div class="modal-score-val" id="suggestUrgencyScore">—</div>
+          <div class="modal-score-lbl">Urgence</div>
+          <div class="modal-progress-bar">
+            <div class="modal-progress-fill" id="suggestUrgencyBar" style="width:0%;background:#e74a3b;"></div>
+          </div>
+        </div>
+        <div class="modal-score-card">
+          <div class="modal-score-val" id="suggestNextDate" style="font-size:14px;">—</div>
+          <div class="modal-score-lbl">Prochaine recommandée</div>
+        </div>
+        <div class="modal-score-card">
+          <div class="modal-score-val" id="suggestHealthScore">—</div>
+          <div class="modal-score-lbl">Santé machine</div>
+        </div>
+      </div>
+      <div id="suggestionsList">
+        <div class="modal-loader" id="suggestLoader">
+          <div class="modal-loader__spinner"></div>
+          <div class="modal-loader__text">Prêt — cliquez sur "Générer" ou ouvrez l'onglet pour analyser</div>
+        </div>
+      </div>
+      <div class="modal-section-title">🎯 Actions recommandées</div>
+      <div class="modal-result-box" id="suggestActions" style="background:#f0faf7;min-height:48px;"></div>
+    </div>
+
     <div class="modal-footer">
       <span style="font-size:12px;color:#6b8c6b;" id="aiFooterMsg">Prêt</span>
       <div style="display:flex;gap:8px;">
         <button class="btn btn--outline" style="font-size:.82rem;padding:.45rem .9rem;" onclick="resetAITab()">Réinitialiser</button>
-        <button class="btn btn--green" style="font-size:.82rem;padding:.45rem 1.1rem;" id="aiGenBtn" onclick="generateAI()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        <button class="btn btn--green"   style="font-size:.82rem;padding:.45rem 1.1rem;" id="aiGenBtn" onclick="generateAI()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
           Générer
         </button>
       </div>
@@ -544,289 +947,55 @@
   </div>
 </div>
 
+{# ══════════════════════════════════════════════════════════ #}
+{# SCRIPTS                                                   #}
+{# ══════════════════════════════════════════════════════════ #}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 <script>
-// ══ VUE TOGGLE ══
+/* ════════════════════════════════════════
+   VUE TOGGLE
+════════════════════════════════════════ */
 let currentView = localStorage.getItem('maintView') || 'cards';
 function setView(v) {
     currentView = v;
     localStorage.setItem('maintView', v);
     document.getElementById('viewCardsContainer').style.display = v === 'cards' ? '' : 'none';
-    document.getElementById('viewTableContainer').style.display = v === 'table'  ? '' : 'none';
+    document.getElementById('viewTableContainer').style.display = v === 'table' ? '' : 'none';
     document.getElementById('viewCards').classList.toggle('active', v === 'cards');
     document.getElementById('viewTable').classList.toggle('active', v === 'table');
     filterItems();
 }
 setView(currentView);
 
+/* ════════════════════════════════════════
+   STATS PANEL
+════════════════════════════════════════ */
 function toggleStats() {
     document.getElementById('chartsPanel').classList.toggle('is-open');
     document.getElementById('statsToggle').classList.toggle('active');
 }
 
-// ══ MODAL IA ══
-let aiActiveTab   = 'prompt';
-let aiCalYear     = new Date().getFullYear();
-let aiCalMonth    = new Date().getMonth();
-let aiMachineData = {};
-let aiEvents      = [];
-
-function openAIPrompt(id, type, priorite, km, nom, statut, cout, description) {
-    aiMachineData = { id, type: type||'—', priorite: priorite||'moyenne', km: parseInt(km)||0,
-                      nom: nom||'Machine', statut: statut||'planifie', cout: parseFloat(cout)||0,
-                      description: description||'' };
-    document.getElementById('aiMachinePill').textContent = nom || 'Machine';
-    document.getElementById('aiMachineInfo').innerHTML =
-        `Panne <strong>${type}</strong> · priorité <strong>${priorite}</strong> · ${km} km`;
-    aiCalYear  = new Date().getFullYear();
-    aiCalMonth = new Date().getMonth();
-    aiEvents   = [];
-    document.getElementById('aiModal').classList.add('show');
-    switchAITab('prompt');
-    renderAICal();
-    renderAILifeLocal();
-}
-
-function closeAIModal() {
-    document.getElementById('aiModal').classList.remove('show');
-}
-
-function switchAITab(t) {
-    aiActiveTab = t;
-    ['prompt','cal','life'].forEach(tab => {
-        document.getElementById('aitab-'  + tab)?.classList.toggle('active', tab === t);
-        document.getElementById('aipanel-'+ tab).style.display = tab === t ? 'block' : 'none';
-    });
-}
-
-function setAISug(chip, txt) {
-    document.querySelectorAll('.modal-chip').forEach(c => c.classList.remove('sel'));
-    chip.classList.add('sel');
-    document.getElementById('aiPromptTxt').value = txt;
-}
-
-// ── Calendrier ──
-function aiCalNav(d) {
-    aiCalMonth += d;
-    if (aiCalMonth > 11) { aiCalMonth = 0; aiCalYear++; }
-    if (aiCalMonth <  0) { aiCalMonth = 11; aiCalYear--; }
-    renderAICal();
-}
-
-function renderAICal() {
-    const months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-    document.getElementById('aiCalTitle').textContent = months[aiCalMonth] + ' ' + aiCalYear;
-    const grid = document.getElementById('aiCalGrid');
-    grid.innerHTML = '';
-    ['Lu','Ma','Me','Je','Ve','Sa','Di'].forEach(d => {
-        const c = document.createElement('div'); c.className = 'modal-cal-hdr'; c.textContent = d; grid.appendChild(c);
-    });
-    const first    = new Date(aiCalYear, aiCalMonth, 1);
-    const startDay = (first.getDay() + 6) % 7;
-    const daysInM  = new Date(aiCalYear, aiCalMonth + 1, 0).getDate();
-    const daysInP  = new Date(aiCalYear, aiCalMonth, 0).getDate();
-    const today    = new Date();
-    for (let i = 0; i < startDay; i++) {
-        const c = document.createElement('div'); c.className = 'modal-cal-cell other-month';
-        c.textContent = daysInP - startDay + 1 + i; grid.appendChild(c);
-    }
-    for (let d = 1; d <= daysInM; d++) {
-        const c   = document.createElement('div'); c.className = 'modal-cal-cell';
-        c.textContent = d;
-        const evs = aiEvents.filter(e => e.day === d && e.month === aiCalMonth && e.year === aiCalYear);
-        if (evs.length) {
-            c.classList.add('has-event');
-            if (evs.some(e => e.color === 'red')) c.classList.add('urgent');
-            const dot = document.createElement('div');
-            dot.style.cssText = `width:5px;height:5px;border-radius:50%;margin-top:2px;background:${evs[0].color==='red'?'#A32D2D':evs[0].color==='amber'?'#854F0B':'#3B6D11'}`;
-            c.appendChild(dot);
-        }
-        if (d === today.getDate() && aiCalMonth === today.getMonth() && aiCalYear === today.getFullYear())
-            c.classList.add('today');
-        grid.appendChild(c);
-    }
-    const rem = (7 - (startDay + daysInM) % 7) % 7;
-    for (let i = 1; i <= rem; i++) {
-        const c = document.createElement('div'); c.className = 'modal-cal-cell other-month'; c.textContent = i; grid.appendChild(c);
-    }
-    const list = document.getElementById('aiEventList');
-    list.innerHTML = '';
-    const visible = aiEvents.filter(e => e.month === aiCalMonth && e.year === aiCalYear).sort((a,b) => a.day - b.day);
-    if (!visible.length) {
-        list.innerHTML = '<div style="font-size:12px;color:#7a9a7a;padding:.3rem 0;">Aucune intervention ce mois — cliquez Générer pour planifier.</div>';
-        return;
-    }
-    visible.forEach(e => {
-        const item = document.createElement('div'); item.className = 'modal-event-item';
-        const bc   = e.color === 'red' ? 'eb-red' : e.color === 'amber' ? 'eb-amber' : 'eb-green';
-        const bg   = e.color === 'red' ? '#A32D2D' : e.color === 'amber' ? '#854F0B' : '#3B6D11';
-        const lab  = e.prio  === 'urgente' ? 'Urgente' : e.prio === 'haute' ? 'Haute' : 'Normale';
-        item.innerHTML = `<div class="modal-event-dot" style="background:${bg}"></div>
-            <span class="modal-event-date">${String(e.day).padStart(2,'0')}/${String(e.month+1).padStart(2,'0')}/${e.year}</span>
-            <span class="modal-event-label">${e.label}</span>
-            <span class="modal-event-badge ${bc}">${lab}</span>`;
-        list.appendChild(item);
-    });
-}
-
-// ── Durée de vie (calcul local) ──
-function renderAILifeLocal() {
-    const km  = aiMachineData.km || 0;
-    const maxKm = 20000;
-    const penalite = {urgente:25,haute:15,moyenne:8,faible:3}[aiMachineData.priorite] || 8;
-    const vie = Math.max(0, Math.min(100, Math.round(((maxKm - km) / maxKm) * 100)) - penalite);
-    const ans = Math.max(0, ((maxKm - km) / 3000)).toFixed(1);
-    const risque = (aiMachineData.priorite === 'urgente' || km > 15000) ? 'Élevé'
-                 : (aiMachineData.priorite === 'haute'   || km > 10000) ? 'Moyen' : 'Faible';
-    document.getElementById('aiLifeScore').textContent = vie + '%';
-    document.getElementById('aiLifeBar').style.width   = vie + '%';
-    document.getElementById('aiLifeYears').textContent  = ans + ' ans';
-    document.getElementById('aiLifeRisk').textContent   = risque;
-    const composants = [
-        {nom:'Moteur',       usure: Math.min(100, Math.round(km/200)),  color:'#A32D2D'},
-        {nom:'Transmission', usure: Math.min(100, Math.round(km/300)),  color:'#854F0B'},
-        {nom:'Hydraulique',  usure: Math.min(100, Math.round(km/400)),  color:'#0C447C'},
-        {nom:'Électricité',  usure: Math.min(100, Math.round(km/600)),  color:'#3B6D11'},
-        {nom:'Pneumatique',  usure: Math.min(100, Math.round(km/250)),  color:'#4a1d8c'},
-    ];
-    const bars = document.getElementById('aiLifeBars');
-    bars.innerHTML = '';
-    composants.forEach(c => {
-        const row = document.createElement('div'); row.className = 'modal-life-bar-row';
-        row.innerHTML = `<div class="modal-life-bar-label">${c.nom}</div>
-            <div class="modal-life-bar-track"><div class="modal-life-bar-fill" style="width:${c.usure}%;background:${c.color}"></div></div>
-            <div style="font-size:11px;font-weight:600;color:#1a2e1a;">${c.usure}%</div>`;
-        bars.appendChild(row);
-    });
-}
-
-// ── Génération (appels Symfony) ──
-function setAIStatus(m) { document.getElementById('aiFooterMsg').textContent = m; }
-function setAILoading(on) {
-    const btn = document.getElementById('aiGenBtn');
-    if (on) { btn.disabled = true; btn.innerHTML = '<span class="loading-spinner"></span> Génération…'; }
-    else    { btn.disabled = false; btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Générer'; }
-}
-
-async function generateAI() {
-    setAILoading(true);
-    try {
-        if      (aiActiveTab === 'prompt') await aiRunPrompt();
-        else if (aiActiveTab === 'cal')    await aiRunCal();
-        else                               await aiRunLife();
-    } catch(e) {
-        setAIStatus('Erreur: ' + e.message);
-        showNotification('❌ Erreur: ' + e.message, 'danger');
-    }
-    setAILoading(false);
-}
-
-async function aiRunPrompt() {
-    const prompt = document.getElementById('aiPromptTxt').value.trim();
-    if (!prompt) { setAIStatus('Entrez une demande'); setAILoading(false); return; }
-    setAIStatus('Appel API…');
-    const res  = await fetch(`/agriculteur/maintenances/api/generate-custom-prompt/${aiMachineData.id}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt })
-    });
-    const data = await res.json();
-    if (data.success) {
-        document.getElementById('aiPromptResTxt').textContent = data.response;
-        document.getElementById('aiPromptRes').style.display  = 'block';
-        setAIStatus('Réponse générée');
-    } else {
-        setAIStatus('Erreur serveur');
-        showNotification('❌ ' + (data.error || 'Erreur'), 'danger');
-    }
-}
-
-async function aiRunCal() {
-    setAIStatus('Chargement du calendrier…');
-    const res  = await fetch(`/agriculteur/maintenances/api/calendar/${aiMachineData.id}`);
-    const data = await res.json();
-    if (data.success) {
-        aiEvents = [];
-        (data.suggestions || []).forEach(s => {
-            const parts = s.date.split('/');
-            if (parts.length === 3) {
-                aiEvents.push({
-                    day: parseInt(parts[0]), month: parseInt(parts[1]) - 1, year: parseInt(parts[2]),
-                    label: s.intervention, prio: s.priorite, color: s.color || 'green'
-                });
-            }
-        });
-        renderAICal();
-        const txt = (data.suggestions || []).map(s =>
-            `📅 ${s.date} — ${s.intervention}\n   Durée: ${s.duree} · ${s.technicien}`
-        ).join('\n\n');
-        document.getElementById('aiCalResTxt').textContent = txt || '—';
-        document.getElementById('aiCalRes').style.display  = 'block';
-        setAIStatus('Calendrier généré');
-    } else {
-        setAIStatus('Erreur calendrier');
-    }
-}
-
-async function aiRunLife() {
-    setAIStatus('Analyse durée de vie…');
-    const res  = await fetch(`/agriculteur/maintenances/api/lifetime/${aiMachineData.id}`);
-    const data = await res.json();
-    if (data.success) {
-        document.getElementById('aiLifeScore').textContent = data.vieRestante + '%';
-        document.getElementById('aiLifeBar').style.width   = data.vieRestante + '%';
-        document.getElementById('aiLifeYears').textContent = data.anneesEstimees + ' ans';
-        document.getElementById('aiLifeRisk').textContent  = data.risquePanne;
-        if (data.composants?.length) {
-            const colors = ['#A32D2D','#854F0B','#0C447C','#3B6D11','#4a1d8c'];
-            const bars   = document.getElementById('aiLifeBars');
-            bars.innerHTML = '';
-            data.composants.forEach((c, i) => {
-                const row = document.createElement('div'); row.className = 'modal-life-bar-row';
-                row.innerHTML = `<div class="modal-life-bar-label">${c.nom}</div>
-                    <div class="modal-life-bar-track"><div class="modal-life-bar-fill" style="width:${c.usure}%;background:${colors[i % colors.length]}"></div></div>
-                    <div style="font-size:11px;font-weight:600;color:#1a2e1a;">${c.usure}%</div>`;
-                bars.appendChild(row);
-            });
-        }
-        const recs = (data.recommandations || []).map((r, i) => `${i+1}. ${r}`).join('\n');
-        document.getElementById('aiLifeResTxt').textContent = recs;
-        document.getElementById('aiLifeRes').style.display  = 'block';
-        setAIStatus('Analyse terminée');
-    } else {
-        setAIStatus('Erreur analyse');
-    }
-}
-
-function resetAITab() {
-    ['aiPromptRes','aiCalRes','aiLifeRes'].forEach(id => {
-        const el = document.getElementById(id); if (el) el.style.display = 'none';
-    });
-    document.getElementById('aiPromptTxt').value = '';
-    aiEvents = [];
-    renderAICal();
-    renderAILifeLocal();
-    setAIStatus('Réinitialisé');
-}
-
-document.getElementById('aiModal').addEventListener('click', function(e) {
-    if (e.target === this) closeAIModal();
-});
-
-// ══ FILTRES ══
+/* ════════════════════════════════════════
+   FILTRES / TRI
+════════════════════════════════════════ */
 function filterItems() {
     const search = (document.getElementById('searchInput').value || '').toLowerCase();
     const type   = (document.getElementById('typeFilter').value   || '').toLowerCase();
-    const statut = (document.getElementById('statutFilter').value || '').toLowerCase();
-    const prio   = (document.getElementById('prioriteFilter').value || '').toLowerCase();
-    const sort   = document.getElementById('sortFilter').value;
-    const dir    = document.getElementById('dirFilter').value;
-    document.getElementById('resetBtn').style.display = (search||type||statut||prio) ? 'inline-flex' : 'none';
+    const statut = (document.getElementById('statutFilter').value  || '').toLowerCase();
+    const prio   = (document.getElementById('prioriteFilter').value|| '').toLowerCase();
+    const sort   =  document.getElementById('sortFilter').value;
+    const dir    =  document.getElementById('dirFilter').value;
+
+    document.getElementById('resetBtn').style.display =
+        (search || type || statut || prio) ? 'inline-flex' : 'none';
 
     function matches(el) {
-        return (!search || (el.dataset.type||'').toLowerCase().includes(search) || (el.dataset.desc||'').toLowerCase().includes(search) || (el.dataset.nom||'').toLowerCase().includes(search))
+        return (!search || (el.dataset.type||'').toLowerCase().includes(search)
+                        || (el.dataset.desc||'').toLowerCase().includes(search)
+                        || (el.dataset.nom ||'').toLowerCase().includes(search))
             && (!type   || (el.dataset.type  ||'').toLowerCase().includes(type))
-            && (!statut || (el.dataset.statut||'').toLowerCase() === statut)
+            && (!statut || (el.dataset.statut ||'').toLowerCase() === statut)
             && (!prio   || (el.dataset.priorite||'').toLowerCase() === prio);
     }
 
@@ -852,12 +1021,12 @@ function sortItems(items, sort, dir, container) {
     items.sort((a, b) => {
         let va, vb;
         switch (sort) {
-            case 'cout':     va = parseFloat(a.dataset.cout||0);    vb = parseFloat(b.dataset.cout||0);    break;
-            case 'type':     va = a.dataset.type||'';               vb = b.dataset.type||'';               break;
-            case 'statut':   va = a.dataset.statut||'';             vb = b.dataset.statut||'';             break;
-            case 'priorite': va = parseInt(a.dataset.prioOrder||2); vb = parseInt(b.dataset.prioOrder||2); break;
-            case 'km':       va = parseInt(a.dataset.km||0);        vb = parseInt(b.dataset.km||0);        break;
-            default:         va = a.dataset.date||'';               vb = b.dataset.date||'';
+            case 'cout'    : va = parseFloat(a.dataset.cout||0);   vb = parseFloat(b.dataset.cout||0); break;
+            case 'type'    : va = a.dataset.type||'';              vb = b.dataset.type||''; break;
+            case 'statut'  : va = a.dataset.statut||'';           vb = b.dataset.statut||''; break;
+            case 'priorite': va = parseInt(a.dataset.prioOrder||2);vb = parseInt(b.dataset.prioOrder||2); break;
+            case 'km'      : va = parseInt(a.dataset.km||0);       vb = parseInt(b.dataset.km||0); break;
+            default        : va = a.dataset.date||'';              vb = b.dataset.date||'';
         }
         if (va < vb) return dir === 'asc' ? -1 : 1;
         if (va > vb) return dir === 'asc' ?  1 : -1;
@@ -871,7 +1040,8 @@ function onSearchInput(input) {
     filterItems();
 }
 function clearSearch() {
-    const input = document.getElementById('searchInput'); input.value = ''; input.focus();
+    const inp = document.getElementById('searchInput');
+    inp.value = ''; inp.focus();
     document.getElementById('clearSearch').classList.remove('visible');
     filterItems();
 }
@@ -879,37 +1049,651 @@ function resetFilters() {
     document.getElementById('searchInput').value = '';
     document.getElementById('clearSearch').classList.remove('visible');
     ['typeFilter','statutFilter','prioriteFilter','sortFilter','dirFilter'].forEach(id => {
-        const el = document.getElementById(id); if (el) el.selectedIndex = 0;
+        const el = document.getElementById(id);
+        if (el) el.selectedIndex = 0;
     });
     filterItems();
 }
 
-// ══ NOTIFICATIONS ══
+/* ════════════════════════════════════════
+   CALENDRIER RAPPELS ANNUELS
+════════════════════════════════════════ */
+let reminderCalendar = null;
+let reminderEvents   = [];
+
+async function openReminderCalendar() {
+    document.getElementById('reminderCalendarModal').style.display = 'flex';
+    if (!reminderCalendar) {
+        await initReminderCalendar();
+    } else {
+        reminderCalendar.refetchEvents();
+    }
+}
+function closeReminderCalendar() {
+    document.getElementById('reminderCalendarModal').style.display = 'none';
+}
+
+async function initReminderCalendar() {
+    reminderCalendar = new FullCalendar.Calendar(
+        document.getElementById('reminderCalendar'), {
+        initialView : 'dayGridMonth',
+        locale      : 'fr',
+        headerToolbar: { left:'prev,next today', center:'title', right:'dayGridMonth,dayGridWeek' },
+        buttonText  : { today:"Aujourd'hui", month:'Mois', week:'Semaine' },
+        height      : 500,
+        events      : loadReminderEvents,
+        eventDidMount(info) {
+            info.el.style.cursor          = 'pointer';
+            info.el.style.backgroundColor = info.event.backgroundColor;
+            info.el.style.borderColor     = info.event.borderColor;
+            info.el.title = info.event.extendedProps.message || 'Cliquer pour voir les détails';
+        },
+        eventClick(info) { showReminderDetail(info.event.id); },
+        dayCellDidMount(info) {
+            const ds = info.date.toISOString().split('T')[0];
+            if (reminderEvents.some(r => r.start === ds)) {
+                info.el.style.background  = 'linear-gradient(135deg,#fff5f5 0%,#fcebeb 100%)';
+                info.el.style.borderLeft  = '3px solid #e74a3b';
+            }
+        }
+    });
+    reminderCalendar.render();
+}
+
+async function loadReminderEvents(fetchInfo, successCallback, failureCallback) {
+    try {
+        const resp = await fetch('{{ path('agri_maintenances_api_reminder_dates') }}');
+        if (!resp.ok) throw new Error('Erreur HTTP ' + resp.status);
+        const data = await resp.json();
+        if (!data.success) throw new Error(data.error || 'Erreur inconnue');
+
+        reminderEvents = data.reminders.map(r => ({
+            id    : r.id,
+            title : r.machineName,
+            start : r.date,
+            allDay: true,
+            backgroundColor: r.priorite === 'urgente' ? '#a32d2d' : '#e74a3b',
+            borderColor    : r.priorite === 'urgente' ? '#8b0000' : '#c0392b',
+            textColor      : '#ffffff',
+            extendedProps  : {
+                message    : r.message,
+                machineName: r.machineName,
+                type       : r.type,
+                priorite   : r.priorite,
+                yearsSince : r.yearsSince,
+                monthsSince: r.monthsSince,
+                ageText    : r.ageText,
+                km         : r.km,
+                cout       : r.cout,
+                description: r.description
+            }
+        }));
+        successCallback(reminderEvents);
+    } catch (err) {
+        console.error(err);
+        failureCallback(err);
+    }
+}
+
+/* ════════════════════════════════════════
+   UTILITAIRES
+════════════════════════════════════════ */
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>"']/g, m => (
+        {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]
+    ));
+}
+
 function showNotification(message, type) {
     const n = document.createElement('div');
-    n.className = `alert alert--${type}`;
-    n.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;max-width:350px;';
-    n.innerHTML = `<span>${message}</span><button class="alert__close" onclick="this.parentElement.remove()">✕</button>`;
+    n.className  = 'alert alert--' + type;
+    n.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:9999;max-width:350px;animation:slideIn .25s;';
+    n.innerHTML  = `<span>${message}</span><button class="alert__close" onclick="this.parentElement.remove()">✕</button>`;
     document.body.appendChild(n);
     setTimeout(() => n.remove(), 5000);
 }
 
-// ══ CHARTS ══
-document.addEventListener('DOMContentLoaded', function() {
-    const countByType = {{ countByType|json_encode|raw }};
-    const coutByMonth = {{ coutByMonth|json_encode|raw }};
+/* ════════════════════════════════════════
+   POPUP DÉTAIL RAPPEL
+════════════════════════════════════════ */
+async function showReminderDetail(maintenanceId) {
+    const modal = document.getElementById('reminderDetailPopup');
+    const body  = document.getElementById('reminderDetailBody');
+    modal.style.display = 'flex';
+    body.innerHTML = '<div class="modal-loader"><div class="modal-loader__spinner"></div><div class="modal-loader__text">Chargement des détails...</div></div>';
+
+    try {
+        const resp = await fetch('/agriculteur/maintenances/api/calendar/reminder-detail/' + maintenanceId);
+        const data = await resp.json();
+
+        if (data.success) {
+            const urgColors = { critique:'#a32d2d', élevé:'#e67e22', moyen:'#f39c12', faible:'#2d6a2d' };
+            body.innerHTML = `
+                <div class="reminder-message-box">
+                    <div class="reminder-message-text">${escapeHtml(data.message)}</div>
+                    <div style="font-size:12px;color:#7a9a7a;">Dernière maintenance : ${data.dateMain || 'Date inconnue'}</div>
+                </div>
+                <div class="reminder-detail-row"><span class="reminder-detail-label">🚜 Machine</span><span class="reminder-detail-value"><strong>${escapeHtml(data.machineName)}</strong></span></div>
+                <div class="reminder-detail-row"><span class="reminder-detail-label">🔧 Type</span><span class="reminder-detail-value">${escapeHtml(data.type || '—')}</span></div>
+                <div class="reminder-detail-row">
+                    <span class="reminder-detail-label">🎯 Urgence</span>
+                    <span class="reminder-detail-value">
+                        <span style="background:${urgColors[data.urgenceLevel.level] || '#7a9a7a'};color:#fff;padding:2px 10px;border-radius:20px;font-size:11px;">
+                            ${escapeHtml(data.urgenceLevel.label)}
+                        </span>
+                    </span>
+                </div>
+                <div class="reminder-detail-row">
+                    <span class="reminder-detail-label">⏰ Temps écoulé</span>
+                    <span class="reminder-detail-value">
+                        ${data.yearsSince > 0
+                            ? `${data.yearsSince} an${data.yearsSince > 1 ? 's' : ''}${data.monthsSince > 0 ? ` et ${data.monthsSince} mois` : ''}`
+                            : 'Maintenance récente'}
+                    </span>
+                </div>
+                <div class="reminder-detail-row"><span class="reminder-detail-label">💰 Coût</span><span class="reminder-detail-value">${data.cout ? data.cout.toLocaleString() + ' DT' : '—'}</span></div>
+                <div class="reminder-detail-row"><span class="reminder-detail-label">📊 Kilométrage</span><span class="reminder-detail-value">${data.km ? data.km.toLocaleString() + ' km' : '—'}</span></div>
+                ${data.description ? `<div class="reminder-detail-row"><span class="reminder-detail-label">📝 Description</span><span class="reminder-detail-value">${escapeHtml(data.description)}</span></div>` : ''}
+                <div style="background:#f7faf4;border-radius:12px;padding:12px;margin:15px 0;">
+                    <div style="font-weight:700;color:#2d6a2d;margin-bottom:8px;">🤖 RECOMMANDATIONS IA</div>
+                    <ul style="margin:0;padding-left:20px;">
+                        ${(data.recommendations || []).map(r => `<li style="margin:5px 0;font-size:13px;">${escapeHtml(r)}</li>`).join('')}
+                    </ul>
+                </div>
+                <div style="display:flex;gap:10px;margin-top:15px;">
+                    <a href="/agriculteur/maintenances/${data.id}" class="btn btn--green" style="flex:1;text-align:center;">👁 Voir détails</a>
+                    <a href="/agriculteur/maintenances/${data.id}/edit" class="btn btn--outline" style="flex:1;text-align:center;">✏️ Planifier</a>
+                    <button class="btn btn--calendar" onclick="exportReminderToGoogleCalendar(${data.id},'${escapeHtml(data.machineName)}','${data.dateMain || ''}')">📤 Google</button>
+                </div>`;
+        } else {
+            body.innerHTML = `<div style="color:#a32d2d;text-align:center;">❌ ${escapeHtml(data.error)}</div>`;
+        }
+    } catch (err) {
+        body.innerHTML = `<div style="color:#a32d2d;text-align:center;">❌ Erreur réseau : ${escapeHtml(err.message)}</div>`;
+    }
+}
+
+/* ════════════════════════════════════════
+   IA PRO — RECOMMANDATION INTELLIGENTE
+════════════════════════════════════════ */
+async function showIntelligentRecommendation(maintenanceId) {
+    const modal  = document.getElementById('reminderDetailPopup');
+    const body   = document.getElementById('reminderDetailBody');
+    const header = document.querySelector('#reminderDetailPopup .reminder-popup-header h3');
+    if (header) header.innerHTML = '<span>🧠</span> Analyse IA intelligente';
+
+    modal.style.display = 'flex';
+    body.innerHTML = '<div class="modal-loader"><div class="modal-loader__spinner"></div><div class="modal-loader__text">Analyse IA en cours...</div></div>';
+
+    try {
+        const resp = await fetch('/agriculteur/maintenances/api/ai-intelligent-recommendation/' + maintenanceId);
+        const data = await resp.json();
+
+        if (data.success) {
+            const riskColors  = { critique:'#a32d2d', élevé:'#e67e22', modéré:'#f39c12', faible:'#2d6a2d' };
+            const riskLabels  = { critique:'🔴 CRITIQUE', élevé:'🟠 ÉLEVÉ', modéré:'🟡 MODÉRÉ', faible:'🟢 FAIBLE' };
+            const statLabels  = { planifie:'📅 Planifié', en_cours:'⚙️ En cours', termine:'✅ Terminé' };
+            const prioLabels  = { urgente:'🔴 Urgente', haute:'🟠 Haute', moyenne:'🟢 Moyenne', faible:'🔵 Faible' };
+            const rc = riskColors[data.riskLevel] || '#7a9a7a';
+            const rl = riskLabels[data.riskLevel] || data.riskLevel;
+
+            body.innerHTML = `
+                <div class="reminder-message-box" style="border-left-color:${rc}">
+                    <div class="reminder-message-text">${escapeHtml(data.mainMessage)}</div>
+                </div>
+                <div style="margin-bottom:15px;">
+                    <div style="background:#f0faf7;border-radius:12px;padding:12px;">
+                        <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                            <span style="font-weight:600;">📊 État de la maintenance</span>
+                            <span style="background:${rc};color:#fff;padding:2px 10px;border-radius:20px;font-size:11px;">${rl}</span>
+                        </div>
+                        <div class="reminder-detail-row"><span class="reminder-detail-label">📌 Statut</span><span class="reminder-detail-value">${statLabels[data.statut] || escapeHtml(data.statut)}</span></div>
+                        <div class="reminder-detail-row"><span class="reminder-detail-label">⚠️ Priorité</span><span class="reminder-detail-value">${prioLabels[data.priorite] || escapeHtml(data.priorite)}</span></div>
+                        <div class="reminder-detail-row"><span class="reminder-detail-label">📊 Kilométrage</span><span class="reminder-detail-value">${(data.km || 0).toLocaleString()} km</span></div>
+                    </div>
+                </div>
+                <div style="margin-bottom:15px;">
+                    <div style="font-weight:700;color:#2d6a2d;margin-bottom:8px;">🔎 Interprétation IA</div>
+                    <div style="background:#f7faf4;border-radius:12px;padding:12px;">
+                        ${(data.interpretation || []).map(l => `<p style="margin:5px 0;font-size:13px;">${escapeHtml(l)}</p>`).join('')}
+                    </div>
+                </div>
+                <div style="margin-bottom:15px;">
+                    <div style="font-weight:700;color:#2d6a2d;margin-bottom:8px;">✅ Actions recommandées</div>
+                    <div style="background:#eaf3de;border-radius:12px;padding:12px;">
+                        ${(data.actions || []).map(a => `<p style="margin:5px 0;font-size:13px;">${escapeHtml(a)}</p>`).join('')}
+                    </div>
+                </div>
+                ${(data.additionalTips || []).length > 0 ? `
+                <div style="margin-bottom:15px;">
+                    <div style="font-weight:700;color:#2d6a2d;margin-bottom:8px;">💡 Conseils supplémentaires</div>
+                    <div style="background:#f7faf4;border-radius:12px;padding:12px;">
+                        ${data.additionalTips.map(t => `<p style="margin:5px 0;font-size:13px;">🔧 ${escapeHtml(t)}</p>`).join('')}
+                    </div>
+                </div>` : ''}
+                <div style="display:flex;gap:10px;margin-top:15px;">
+                    <a href="/agriculteur/maintenances/${data.id}" class="btn btn--green" style="flex:1;text-align:center;">👁 Voir détails</a>
+                    <a href="/agriculteur/maintenances/${data.id}/edit" class="btn btn--outline" style="flex:1;text-align:center;">✏️ Planifier</a>
+                    <button class="btn btn--calendar" onclick="exportReminderToGoogleCalendar(${data.id},'${escapeHtml(data.machineName)}','')">📤 Google</button>
+                </div>`;
+        } else {
+            body.innerHTML = `<div style="color:#a32d2d;text-align:center;">❌ ${escapeHtml(data.error)}</div>`;
+        }
+    } catch (err) {
+        body.innerHTML = `<div style="color:#a32d2d;text-align:center;">❌ Erreur réseau : ${escapeHtml(err.message)}</div>`;
+    }
+}
+
+/* ════════════════════════════════════════
+   ANALYSE GLOBALE IA
+════════════════════════════════════════ */
+async function analyzeAllRemindersWithAI() {
+    const modal  = document.getElementById('reminderDetailPopup');
+    const body   = document.getElementById('reminderDetailBody');
+    const header = document.querySelector('#reminderDetailPopup .reminder-popup-header h3');
+    if (header) header.innerHTML = '<span>🧠</span> Analyse IA globale — Tous les rappels';
+
+    modal.style.display = 'flex';
+    body.innerHTML = '<div class="modal-loader"><div class="modal-loader__spinner"></div><div class="modal-loader__text">Analyse globale en cours...</div></div>';
+
+    try {
+        const resp = await fetch('{{ path('agri_maintenances_api_reminder_dates') }}');
+        const data = await resp.json();
+
+        if (data.success && data.reminders.length > 0) {
+            const reminders    = data.reminders;
+            const urgentCount  = reminders.filter(r => r.priorite === 'urgente').length;
+            const highCount    = reminders.filter(r => r.priorite === 'haute').length;
+            const totalCost    = reminders.reduce((s, r) => s + (r.cout || 0), 0);
+            const avgKm        = reminders.reduce((s, r) => s + (r.km   || 0), 0) / reminders.length;
+
+            const recs = [];
+            if (urgentCount > 0) recs.push(`🔴 ${urgentCount} intervention(s) URGENTE(s) à traiter immédiatement`);
+            if (highCount   > 0) recs.push(`🟠 ${highCount} maintenance(s) haute priorité à planifier sous 48h`);
+            if (avgKm > 10000)   recs.push(`📊 Kilométrage moyen élevé (${Math.round(avgKm).toLocaleString()} km) — révisions générales recommandées`);
+            if (totalCost   > 0) recs.push(`💰 Coût total estimé : ${totalCost.toLocaleString()} DT`);
+            recs.push('💡 Planifier les interventions par ordre de priorité pour optimiser la disponibilité des machines.');
+
+            body.innerHTML = `
+                <div class="reminder-message-box" style="border-left-color:#667eea">
+                    <div class="reminder-message-text">🤖 Analyse IA Globale</div>
+                    <div style="font-size:12px;color:#7a9a7a;">${reminders.length} rappel(s) détecté(s)</div>
+                </div>
+                <div style="background:#f0faf7;border-radius:12px;padding:12px;margin-bottom:15px;">
+                    <div class="reminder-detail-row"><span class="reminder-detail-label">📊 Total</span><span class="reminder-detail-value"><strong>${reminders.length}</strong></span></div>
+                    <div class="reminder-detail-row"><span class="reminder-detail-label">🔴 Urgents</span><span class="reminder-detail-value"><strong style="color:#a32d2d;">${urgentCount}</strong></span></div>
+                    <div class="reminder-detail-row"><span class="reminder-detail-label">🟠 Haute prio.</span><span class="reminder-detail-value"><strong style="color:#e67e22;">${highCount}</strong></span></div>
+                    <div class="reminder-detail-row"><span class="reminder-detail-label">📊 Km moyen</span><span class="reminder-detail-value">${Math.round(avgKm).toLocaleString()} km</span></div>
+                    <div class="reminder-detail-row"><span class="reminder-detail-label">💰 Coût total</span><span class="reminder-detail-value">${totalCost.toLocaleString()} DT</span></div>
+                </div>
+                <div style="font-weight:700;color:#2d6a2d;margin-bottom:8px;">📋 Liste des rappels</div>
+                <div style="background:#f7faf4;border-radius:12px;padding:12px;max-height:200px;overflow-y:auto;margin-bottom:15px;">
+                    ${reminders.map(r => `
+                        <div class="reminder-detail-row" style="cursor:pointer;" onclick="showReminderDetail(${r.id})">
+                            <span class="reminder-detail-label">${escapeHtml(r.machineName)}</span>
+                            <span class="reminder-detail-value">${r.date} — ${r.priorite === 'urgente' ? '🔴 Urgent' : '📅 Annuel'}</span>
+                        </div>`).join('')}
+                </div>
+                <div style="font-weight:700;color:#2d6a2d;margin-bottom:8px;">✅ Recommandations IA</div>
+                <div style="background:#eaf3de;border-radius:12px;padding:12px;margin-bottom:15px;">
+                    ${recs.map(r => `<p style="margin:5px 0;font-size:13px;">${r}</p>`).join('')}
+                </div>
+                <div style="display:flex;gap:10px;">
+                    <button class="btn btn--green" style="flex:1;text-align:center;"
+                            onclick="closeReminderDetailPopup();openReminderCalendar();">📅 Voir calendrier</button>
+                    <button class="btn btn--calendar" style="flex:1;text-align:center;"
+                            onclick="exportReminderToGoogleCalendar(${reminders[0].id},'${escapeHtml(reminders[0].machineName)}','${reminders[0].date}')">
+                        📤 Exporter le 1er
+                    </button>
+                </div>`;
+        } else {
+            body.innerHTML = '<div style="color:#2d6a2d;text-align:center;">✅ Aucun rappel de maintenance à afficher.</div>';
+        }
+    } catch (err) {
+        body.innerHTML = `<div style="color:#a32d2d;text-align:center;">❌ ${escapeHtml(err.message)}</div>`;
+    }
+}
+
+function closeReminderDetailPopup() {
+    document.getElementById('reminderDetailPopup').style.display = 'none';
+}
+
+/* ════════════════════════════════════════
+   EXPORT GOOGLE CALENDAR
+════════════════════════════════════════ */
+function exportReminderToGoogleCalendar(id, machineName, dateMain) {
+    let startDate = (dateMain && dateMain !== 'null' && dateMain !== '')
+        ? new Date(dateMain) : new Date();
+    if (isNaN(startDate.getTime())) startDate = new Date();
+
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 1);
+
+    const fmt = d => {
+        const y = d.getFullYear();
+        const m = String(d.getMonth()+1).padStart(2,'0');
+        const day = String(d.getDate()).padStart(2,'0');
+        return `${y}${m}${day}`;
+    };
+
+    const title   = encodeURIComponent(`Maintenance préventive : ${machineName}`);
+    const details = encodeURIComponent(
+        `🔔 RAPPEL DE MAINTENANCE\nMachine : ${machineName}\n\n` +
+        `Vérifications recommandées :\n` +
+        `• Inspection générale\n• Vidange moteur et filtres\n` +
+        `• Niveaux (huile, liquide, hydraulique)\n` +
+        `• Courroies et chaînes\n• Pression des pneus\n• Éclairage\n\n` +
+        `Généré par AgroFlow IA`
+    );
+    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${fmt(startDate)}/${fmt(endDate)}&details=${details}&sf=true&output=xml`;
+    window.open(url, '_blank');
+    showNotification(`📤 Rappel "${machineName}" exporté vers Google Calendar`, 'success');
+}
+
+/* ════════════════════════════════════════
+   MODALE IA STANDARD
+════════════════════════════════════════ */
+let aiActiveTab       = 'prompt';
+let aiMachineData     = {};
+let suggestionsLoaded = false;
+
+function openAIPrompt(id, type, priorite, km, nom, statut, cout, description) {
+    aiMachineData = {
+        id,
+        type       : type        || '—',
+        priorite   : priorite    || 'moyenne',
+        km         : parseInt(km)||0,
+        nom        : nom         || 'Machine',
+        statut     : statut      || 'planifie',
+        cout       : parseFloat(cout)||0,
+        description: description || ''
+    };
+    suggestionsLoaded = false;
+    document.getElementById('aiMachinePill').textContent = nom || 'Machine';
+    document.getElementById('aiMachineInfo').innerHTML =
+        `Panne <strong>${type||'—'}</strong> · priorité <strong>${priorite||'—'}</strong> · ${km||0} km`;
+    document.getElementById('aiModal').classList.add('show');
+    switchAITab('prompt');
+    renderAILifeLocal();
+    resetSuggestTab();
+}
+function closeAIModal() { document.getElementById('aiModal').classList.remove('show'); }
+
+function switchAITab(t) {
+    aiActiveTab = t;
+    ['prompt','life','suggest'].forEach(tab => {
+        document.getElementById('aitab-'   + tab)?.classList.toggle('active', tab === t);
+        const panel = document.getElementById('aipanel-' + tab);
+        if (panel) panel.style.display = tab === t ? 'block' : 'none';
+    });
+    if (t === 'suggest' && aiMachineData.id && !suggestionsLoaded) loadAISuggestions();
+}
+
+function setAISug(chip, txt) {
+    document.querySelectorAll('.modal-chip').forEach(c => c.classList.remove('sel'));
+    chip.classList.add('sel');
+    document.getElementById('aiPromptTxt').value = txt;
+}
+
+function renderAILifeLocal() {
+    const km      = aiMachineData.km || 0;
+    const maxKm   = 20000;
+    const penalte = ({urgente:25,haute:15,moyenne:8,faible:3})[aiMachineData.priorite] || 8;
+    const vie     = Math.max(0, Math.min(100, Math.round((maxKm-km)/maxKm*100)) - penalte);
+    const ans     = Math.max(0, (maxKm-km)/3000).toFixed(1);
+    const risque  = (aiMachineData.priorite==='urgente'||km>15000) ? 'Élevé'
+                  : (aiMachineData.priorite==='haute'  ||km>10000) ? 'Moyen' : 'Faible';
+
+    document.getElementById('aiLifeScore').textContent = vie + '%';
+    document.getElementById('aiLifeBar').style.width   = vie + '%';
+    document.getElementById('aiLifeYears').textContent = ans + ' ans';
+    document.getElementById('aiLifeRisk').textContent  = risque;
+
+    const composants = [
+        {nom:'Moteur',       usure:Math.min(100,Math.round(km/200)),  color:'#A32D2D'},
+        {nom:'Transmission', usure:Math.min(100,Math.round(km/300)),  color:'#854F0B'},
+        {nom:'Hydraulique',  usure:Math.min(100,Math.round(km/400)),  color:'#0C447C'},
+        {nom:'Électricité',  usure:Math.min(100,Math.round(km/600)),  color:'#3B6D11'},
+        {nom:'Pneumatique',  usure:Math.min(100,Math.round(km/250)),  color:'#4a1d8c'},
+    ];
+    const bars = document.getElementById('aiLifeBars');
+    bars.innerHTML = '';
+    composants.forEach(c => {
+        const row = document.createElement('div');
+        row.className = 'modal-life-bar-row';
+        row.innerHTML = `
+            <div class="modal-life-bar-label">${c.nom}</div>
+            <div class="modal-life-bar-track">
+                <div class="modal-life-bar-fill" style="width:${c.usure}%;background:${c.color}"></div>
+            </div>
+            <div style="font-size:11px;font-weight:600;color:#1a2e1a;">${c.usure}%</div>`;
+        bars.appendChild(row);
+    });
+}
+
+async function loadAISuggestions() {
+    if (!aiMachineData.id) { showSuggestError('Aucune maintenance sélectionnée.'); return; }
+    setAIStatus('Analyse en cours…');
+    document.getElementById('suggestionsList').innerHTML =
+        `<div class="modal-loader"><div class="modal-loader__spinner"></div>
+         <div class="modal-loader__text">Analyse de la machine en cours…</div></div>`;
+    try {
+        const resp = await fetch(
+            `/agriculteur/maintenances/api/ai-suggest-maintenance/${aiMachineData.id}`,
+            { headers:{'Accept':'application/json','X-Requested-With':'XMLHttpRequest'} }
+        );
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const data = await resp.json();
+        if (!data.success) throw new Error(data.error || 'Erreur serveur');
+
+        suggestionsLoaded = true;
+        const score = data.urgencyScore ?? 0;
+        document.getElementById('suggestUrgencyScore').textContent = score + '%';
+        document.getElementById('suggestUrgencyBar').style.width   = score + '%';
+        document.getElementById('suggestUrgencyBar').style.background =
+            score >= 70 ? '#e74a3b' : score >= 50 ? '#e67e22' : score >= 30 ? '#f39c12' : '#27ae60';
+        document.getElementById('suggestNextDate').textContent =
+            data.nextRecommendedDate || 'N/A';
+        const hs = data.currentState?.healthScore;
+        document.getElementById('suggestHealthScore').textContent =
+            hs != null ? hs + '/100' : '—';
+
+        const pColors = {urgente:'#a32d2d',haute:'#e67e22',moyenne:'#f39c12',basse:'#27ae60'};
+        const container = document.getElementById('suggestionsList');
+        container.innerHTML = '';
+        (data.suggestions || []).forEach(sug => {
+            const color = pColors[sug.priority] || '#7f8c8d';
+            const card  = document.createElement('div');
+            card.className   = 'suggestion-card';
+            card.style.borderLeft = `4px solid ${color}`;
+            card.innerHTML = `
+                <div class="suggestion-card__header">
+                    <span class="suggestion-card__icon">${sug.icon||'🔧'}</span>
+                    <strong class="suggestion-card__title" style="color:${color};">${escapeHtml(sug.title||'')}</strong>
+                    <span class="suggestion-card__badge" style="background:${color};">${escapeHtml(sug.priority||'')}</span>
+                </div>
+                <p class="suggestion-card__msg">${escapeHtml(sug.message||'')}</p>
+                <button class="btn btn--outline suggestion-card__btn"
+                        onclick="applySuggestionAction('${(sug.action||'').replace(/'/g,"\\'")}',${aiMachineData.id})">
+                    ${escapeHtml(sug.action||'Voir')}
+                </button>`;
+            container.appendChild(card);
+        });
+        if (!data.suggestions?.length)
+            container.innerHTML = '<div style="text-align:center;padding:1.5rem;color:#7a9a7a;">✅ Aucune suggestion urgente — machine en bon état.</div>';
+
+        document.getElementById('suggestActions').innerHTML =
+            (data.recommendedActions || []).map((a,i) => `${i+1}. ${escapeHtml(a)}`).join('<br>');
+        setAIStatus('Analyse terminée ✓');
+    } catch (err) { showSuggestError(err.message); }
+}
+
+function showSuggestError(msg) {
+    suggestionsLoaded = false;
+    document.getElementById('suggestionsList').innerHTML = `
+        <div style="background:#fcebeb;border:1px solid #f7c1c1;border-radius:10px;padding:1rem;text-align:center;color:#501313;">
+            <div style="font-size:24px;margin-bottom:8px;">❌</div>
+            <div style="font-weight:600;margin-bottom:4px;">Erreur d'analyse</div>
+            <div style="font-size:12px;color:#7a9a7a;">${escapeHtml(msg)}</div>
+            <button class="btn btn--outline" style="margin-top:10px;font-size:.8rem;" onclick="loadAISuggestions()">🔄 Réessayer</button>
+        </div>`;
+    setAIStatus('Erreur — ' + msg.substring(0,60));
+}
+
+function applySuggestionAction(action, id) {
+    const act = action.toLowerCase();
+    if (act.includes('planifier') || act.includes('programmer') || act.includes('intervenir'))
+        window.location.href = `/agriculteur/maintenances/${id}/edit`;
+    else if (act.includes('contacter'))
+        showNotification('📞 Service technique notifié', 'info');
+    else if (act.includes('consulter') || act.includes('voir'))
+        window.location.href = `/agriculteur/maintenances/${id}`;
+    else
+        showNotification('📝 ' + action, 'info');
+}
+
+function resetSuggestTab() {
+    document.getElementById('suggestUrgencyScore').textContent = '—';
+    document.getElementById('suggestUrgencyBar').style.width   = '0%';
+    document.getElementById('suggestNextDate').textContent     = '—';
+    document.getElementById('suggestHealthScore').textContent  = '—';
+    document.getElementById('suggestActions').innerHTML        = '';
+    document.getElementById('suggestionsList').innerHTML       = `
+        <div class="modal-loader">
+            <div class="modal-loader__spinner"></div>
+            <div class="modal-loader__text">Prêt — cliquez sur "Générer" pour analyser</div>
+        </div>`;
+}
+
+function setAIStatus(m) { document.getElementById('aiFooterMsg').textContent = m; }
+function setAILoading(on) {
+    const btn = document.getElementById('aiGenBtn');
+    btn.disabled = on;
+    btn.innerHTML = on
+        ? '<span class="loading-spinner"></span> Génération…'
+        : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Générer';
+}
+
+async function generateAI() {
+    setAILoading(true);
+    try {
+        if      (aiActiveTab === 'prompt')  await aiRunPrompt();
+        else if (aiActiveTab === 'life')    await aiRunLife();
+        else if (aiActiveTab === 'suggest') { suggestionsLoaded = false; await loadAISuggestions(); }
+    } catch (e) {
+        setAIStatus('Erreur : ' + e.message);
+        showNotification('❌ Erreur : ' + e.message, 'danger');
+    }
+    setAILoading(false);
+}
+
+async function aiRunPrompt() {
+    const prompt = document.getElementById('aiPromptTxt').value.trim();
+    if (!prompt) { setAIStatus('Entrez une demande'); return; }
+    setAIStatus('Appel API…');
+    const res  = await fetch(
+        `/agriculteur/maintenances/api/generate-custom-prompt/${aiMachineData.id}`,
+        { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({prompt}) }
+    );
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (data.success) {
+        document.getElementById('aiPromptResTxt').textContent = data.response;
+        document.getElementById('aiPromptRes').style.display  = 'block';
+        setAIStatus('Réponse générée ✓');
+    } else {
+        setAIStatus('Erreur serveur');
+        showNotification('❌ ' + (data.error || 'Erreur'), 'danger');
+    }
+}
+
+async function aiRunLife() {
+    setAIStatus('Analyse durée de vie…');
+    const res  = await fetch(`/agriculteur/maintenances/api/lifetime/${aiMachineData.id}`);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (!data.success) throw new Error('Erreur analyse durée de vie');
+
+    document.getElementById('aiLifeScore').textContent = data.vieRestante   + '%';
+    document.getElementById('aiLifeBar').style.width   = data.vieRestante   + '%';
+    document.getElementById('aiLifeYears').textContent = data.anneesEstimees + ' ans';
+    document.getElementById('aiLifeRisk').textContent  = data.risquePanne;
+
+    if (data.composants?.length) {
+        const colors = ['#A32D2D','#854F0B','#0C447C','#3B6D11','#4a1d8c'];
+        const bars   = document.getElementById('aiLifeBars');
+        bars.innerHTML = '';
+        data.composants.forEach((c,i) => {
+            const row = document.createElement('div');
+            row.className = 'modal-life-bar-row';
+            row.innerHTML = `
+                <div class="modal-life-bar-label">${escapeHtml(c.nom)}</div>
+                <div class="modal-life-bar-track">
+                    <div class="modal-life-bar-fill" style="width:${c.usure}%;background:${colors[i%colors.length]}"></div>
+                </div>
+                <div style="font-size:11px;font-weight:600;color:#1a2e1a;">${c.usure}%</div>`;
+            bars.appendChild(row);
+        });
+    }
+    document.getElementById('aiLifeResTxt').textContent =
+        (data.recommandations || []).map((r,i) => `${i+1}. ${r}`).join('\n');
+    document.getElementById('aiLifeRes').style.display = 'block';
+    setAIStatus('Analyse terminée ✓');
+}
+
+function resetAITab() {
+    ['aiPromptRes','aiLifeRes'].forEach(id => {
+        const el = document.getElementById(id); if (el) el.style.display = 'none';
+    });
+    document.getElementById('aiPromptTxt').value = '';
+    document.querySelectorAll('.modal-chip').forEach(c => c.classList.remove('sel'));
+    renderAILifeLocal();
+    suggestionsLoaded = false;
+    resetSuggestTab();
+    setAIStatus('Réinitialisé');
+}
+
+/* Fermeture modales au clic fond */
+document.getElementById('aiModal').addEventListener('click',
+    e => { if (e.target === e.currentTarget) closeAIModal(); });
+document.getElementById('reminderCalendarModal').addEventListener('click',
+    e => { if (e.target === e.currentTarget) closeReminderCalendar(); });
+document.getElementById('reminderDetailPopup').addEventListener('click',
+    e => { if (e.target === e.currentTarget) closeReminderDetailPopup(); });
+
+/* ════════════════════════════════════════
+   CHARTS
+════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', function () {
+    {# CORRECTION : json_encode avec raw pour éviter le double-escape Twig #}
+    const countByType = {{ countByType is defined ? countByType|json_encode|raw : '[]' }};
+    const coutByMonth = {{ coutByMonth is defined ? coutByMonth|json_encode|raw : '[]' }};
+
     if (document.getElementById('barChart') && countByType?.length) {
         new Chart(document.getElementById('barChart'), {
-            type: 'bar',
-            data: { labels: countByType.map(r => r.type), datasets: [{ label: 'Nombre', data: countByType.map(r => r.total), backgroundColor: ['#2d6a2d','#0F6E56','#854F0B','#a32d2d','#0c447c','#7b5200','#1a5276','#4a1d8c','#534AB7','#2c2c2a'] }] },
-            options: { responsive:true, plugins:{ legend:{display:false} }, scales:{ y:{ beginAtZero:true, ticks:{stepSize:1} } } }
+            type : 'bar',
+            data : {
+                labels  : countByType.map(r => r.type),
+                datasets: [{ label:'Nombre', data:countByType.map(r => r.total),
+                    backgroundColor:['#2d6a2d','#0F6E56','#854F0B','#a32d2d','#0c447c',
+                                     '#7b5200','#1a5276','#4a1d8c','#534AB7','#2c2c2a'] }]
+            },
+            options: { responsive:true, plugins:{legend:{display:false}},
+                       scales:{y:{beginAtZero:true,ticks:{stepSize:1}}} }
         });
     }
     if (document.getElementById('lineChart') && coutByMonth?.length) {
         new Chart(document.getElementById('lineChart'), {
-            type: 'line',
-            data: { labels: coutByMonth.map(r => r.mois), datasets: [{ label: 'Coût (DT)', data: coutByMonth.map(r => r.total), borderColor:'#2d6a2d', backgroundColor:'rgba(45,106,45,.1)', borderWidth:2, tension:.4, fill:true, pointRadius:4 }] },
-            options: { responsive:true, plugins:{ legend:{display:false} }, scales:{ y:{ beginAtZero:true } } }
+            type : 'line',
+            data : {
+                labels  : coutByMonth.map(r => r.mois),
+                datasets: [{ label:'Coût (DT)', data:coutByMonth.map(r => r.total),
+                    borderColor:'#2d6a2d', backgroundColor:'rgba(45,106,45,.1)',
+                    borderWidth:2, tension:.4, fill:true, pointRadius:4 }]
+            },
+            options: { responsive:true, plugins:{legend:{display:false}},
+                       scales:{y:{beginAtZero:true}} }
         });
     }
 });

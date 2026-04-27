@@ -577,7 +577,6 @@
     <service id="App\Controller\Materiels\MachineController" class="App\Controller\Materiels\MachineController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
-      <argument type="service" id=".debug.http_client"/>
       <call method="setContainer">
         <argument type="service" id=".service_locator.Ccg8tS2.App\Controller\Materiels\MachineController"/>
       </call>
@@ -1085,7 +1084,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.cjETtTl"/>
+      <argument type="service" id=".service_locator.QjbeY6q"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -4191,7 +4190,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.cjETtTl"/>
+      <argument type="service" id=".service_locator.QjbeY6q"/>
     </service>
     <service id="debug.log_processor" class="Symfony\Bridge\Monolog\Processor\DebugProcessor">
       <tag name="kernel.reset" method="reset"/>
@@ -9990,7 +9989,7 @@
         <argument key="visionService" type="service_closure" id="App\Service\SmartVisionService"/>
       </argument>
     </service>
-    <service id=".service_locator.cjETtTl" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.QjbeY6q" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Controller\AdminDashboardController::index" type="service_closure" id=".service_locator.qni5W9T"/>
@@ -10084,17 +10083,20 @@
         <argument key="App\Controller\Materiels\MachineController::machineNew" type="service_closure" id=".service_locator.2oEUwKR"/>
         <argument key="App\Controller\Materiels\MachineController::machineShow" type="service_closure" id=".service_locator.6xRxq88"/>
         <argument key="App\Controller\Materiels\MachineController::machineStatistiques" type="service_closure" id=".service_locator.2E5fScC"/>
-        <argument key="App\Controller\Materiels\MaintenancesController::apiDiagnostics" type="service_closure" id=".service_locator.b5YG.FV"/>
+        <argument key="App\Controller\Materiels\MaintenancesController::aiSuggestMaintenance" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\Materiels\MaintenancesController::apiSchedule" type="service_closure" id=".service_locator.b5YG.FV"/>
+        <argument key="App\Controller\Materiels\MaintenancesController::calendarRemindersPage" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\Materiels\MaintenancesController::delete" type="service_closure" id=".service_locator.kLp2YUI"/>
         <argument key="App\Controller\Materiels\MaintenancesController::edit" type="service_closure" id=".service_locator.kLp2YUI"/>
         <argument key="App\Controller\Materiels\MaintenancesController::exportExcel" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\Materiels\MaintenancesController::exportPdf" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\Materiels\MaintenancesController::generateCalendar" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\Materiels\MaintenancesController::generateCustomPrompt" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\Materiels\MaintenancesController::generateDiagnostics" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\Materiels\MaintenancesController::generateLifetime" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\Materiels\MaintenancesController::generateSchedule" type="service_closure" id=".service_locator.b5YG.FV"/>
+        <argument key="App\Controller\Materiels\MaintenancesController::getCalendarReminders" type="service_closure" id=".service_locator.b5YG.FV"/>
+        <argument key="App\Controller\Materiels\MaintenancesController::getIntelligentRecommendation" type="service_closure" id=".service_locator.b5YG.FV"/>
+        <argument key="App\Controller\Materiels\MaintenancesController::getReminderDates" type="service_closure" id=".service_locator.b5YG.FV"/>
+        <argument key="App\Controller\Materiels\MaintenancesController::getReminderDetail" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\Materiels\MaintenancesController::index" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\Materiels\MaintenancesController::new" type="service_closure" id=".service_locator.9kKwU2t"/>
         <argument key="App\Controller\Materiels\MaintenancesController::show" type="service_closure" id=".service_locator.b5YG.FV"/>
@@ -10318,17 +10320,20 @@
         <argument key="App\Controller\Materiels\MachineController:machineNew" type="service_closure" id=".service_locator.2oEUwKR"/>
         <argument key="App\Controller\Materiels\MachineController:machineShow" type="service_closure" id=".service_locator.6xRxq88"/>
         <argument key="App\Controller\Materiels\MachineController:machineStatistiques" type="service_closure" id=".service_locator.2E5fScC"/>
-        <argument key="App\Controller\Materiels\MaintenancesController:apiDiagnostics" type="service_closure" id=".service_locator.b5YG.FV"/>
+        <argument key="App\Controller\Materiels\MaintenancesController:aiSuggestMaintenance" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\Materiels\MaintenancesController:apiSchedule" type="service_closure" id=".service_locator.b5YG.FV"/>
+        <argument key="App\Controller\Materiels\MaintenancesController:calendarRemindersPage" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\Materiels\MaintenancesController:delete" type="service_closure" id=".service_locator.kLp2YUI"/>
         <argument key="App\Controller\Materiels\MaintenancesController:edit" type="service_closure" id=".service_locator.kLp2YUI"/>
         <argument key="App\Controller\Materiels\MaintenancesController:exportExcel" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\Materiels\MaintenancesController:exportPdf" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\Materiels\MaintenancesController:generateCalendar" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\Materiels\MaintenancesController:generateCustomPrompt" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\Materiels\MaintenancesController:generateDiagnostics" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\Materiels\MaintenancesController:generateLifetime" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\Materiels\MaintenancesController:generateSchedule" type="service_closure" id=".service_locator.b5YG.FV"/>
+        <argument key="App\Controller\Materiels\MaintenancesController:getCalendarReminders" type="service_closure" id=".service_locator.b5YG.FV"/>
+        <argument key="App\Controller\Materiels\MaintenancesController:getIntelligentRecommendation" type="service_closure" id=".service_locator.b5YG.FV"/>
+        <argument key="App\Controller\Materiels\MaintenancesController:getReminderDates" type="service_closure" id=".service_locator.b5YG.FV"/>
+        <argument key="App\Controller\Materiels\MaintenancesController:getReminderDetail" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\Materiels\MaintenancesController:index" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\Materiels\MaintenancesController:new" type="service_closure" id=".service_locator.9kKwU2t"/>
         <argument key="App\Controller\Materiels\MaintenancesController:show" type="service_closure" id=".service_locator.b5YG.FV"/>
@@ -13239,7 +13244,7 @@
     <service id="Knp\Component\Pager\ArgumentAccess\ArgumentAccessInterface" alias="Knp\Component\Pager\ArgumentAccess\RequestArgumentAccess"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.w7.f4fT" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.cjETtTl"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.QjbeY6q"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id=".Psr\Log\LoggerInterface $request.logger" alias="monolog.logger.request"/>
@@ -13328,7 +13333,7 @@
     <service id=".service_locator.wDI7hJ0" alias=".service_locator..1lCTzi"/>
     <service id=".service_locator.8J1nalj" alias=".service_locator.SsD9eLO"/>
     <service id=".service_locator.wo826zD" alias=".service_locator.f4l_PHz"/>
-    <service id=".service_locator.IFgFLDg" alias=".service_locator.cjETtTl"/>
+    <service id=".service_locator.4oz7FQq" alias=".service_locator.QjbeY6q"/>
     <service id=".service_locator.BFrsqsn" alias=".service_locator.F9PKc.7"/>
     <service id=".service_locator.oIHygA7" alias=".service_locator.xOkKGYY"/>
     <service id=".service_locator.3ijAwyK" alias=".service_locator.vtjw4Bs"/>
