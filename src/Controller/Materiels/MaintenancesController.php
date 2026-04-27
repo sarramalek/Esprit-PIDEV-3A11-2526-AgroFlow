@@ -14,15 +14,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
-/**
- * CORRECTIONS APPORTÉES :
- * 1. Toutes les routes /api/... sont placées AVANT /{id} pour éviter les conflits Symfony
- * 2. findOneWithMaterielName() est sécurisé avec fallback sur findOneBy(['idMain'=>$id])
- * 3. getMachineName() helper centralisé pour récupérer le nom de la machine
- * 4. aiSuggestMaintenance() utilise findBy(['idMain'=>$idMaintenance]) pour l'historique
- * 5. JSON responses avec headers explicites pour éviter les erreurs de parsing côté JS
- * 6. Gestion d'erreur améliorée dans tous les endpoints API
- */
 #[Route('/agriculteur/maintenances')]
 class MaintenancesController extends AbstractController
 {
@@ -69,25 +60,41 @@ class MaintenancesController extends AbstractController
     }
 
     // ────────────────────────────────────────────────────────
-    // CREATE  (AVANT /{id} !)
+    // CREATE
     // ────────────────────────────────────────────────────────
     #[Route('/new', name: 'agri_maintenances_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         $maintenance = new Maintenance();
+        
+        // Générer une recommandation IA par défaut
+        $defaultReco = $this->generateAIRecommendation('', 'moyenne', null, 'planifie', '');
+        $maintenance->setRecommandation($defaultReco);
+        
         $form = $this->createForm(MaintenanceType::class, $maintenance);
         $form->handleRequest($request);
+        
         if ($form->isSubmitted() && $form->isValid()) {
+            // Générer la recommandation IA automatiquement
+            $typePanne = $maintenance->getTypePanne();
+            $priorite = $maintenance->getPriorite();
+            $kilometrage = $maintenance->getKilometrage();
+            $statut = $maintenance->getStatut();
+            $description = $maintenance->getDescription();
+            
+            $iaRecommendation = $this->generateAIRecommendation($typePanne, $priorite, $kilometrage, $statut, $description);
+            $maintenance->setRecommandation($iaRecommendation);
+            
             $em->persist($maintenance);
             $em->flush();
-            $this->addFlash('success', 'Maintenance ajoutée avec succès.');
+            $this->addFlash('success', 'Maintenance ajoutée avec succès (recommandation IA générée).');
             return $this->redirectToRoute('agri_maintenances_index');
         }
         return $this->render('maintenances/new.html.twig', ['form' => $form->createView()]);
     }
 
     // ────────────────────────────────────────────────────────
-    // EXPORT EXCEL  (AVANT /{id} !)
+    // EXPORT EXCEL
     // ────────────────────────────────────────────────────────
     #[Route('/export/excel', name: 'agri_maintenances_export_excel', methods: ['GET'])]
     public function exportExcel(MaintenanceRepository $repo): StreamedResponse
@@ -129,7 +136,7 @@ class MaintenancesController extends AbstractController
     }
 
     // ────────────────────────────────────────────────────────
-    // EXPORT PDF  (AVANT /{id} !)
+    // EXPORT PDF
     // ────────────────────────────────────────────────────────
     #[Route('/export/pdf', name: 'agri_maintenances_export_pdf', methods: ['GET'])]
     public function exportPdf(MaintenanceRepository $repo): Response
@@ -142,125 +149,34 @@ class MaintenancesController extends AbstractController
     }
 
     // ────────────────────────────────────────────────────────
-    // CALENDRIER DES RAPPELS ANNUELS
+    // API : GÉNÉRATION RECOMMANDATION IA (pour AJAX dans formulaire)
     // ────────────────────────────────────────────────────────
-    #[Route('/calendar-reminders', name: 'agri_maintenances_calendar_reminders_page', methods: ['GET'])]
-    public function calendarRemindersPage(MaintenanceRepository $repo): Response
-    {
-        return $this->render('maintenances/calendar_reminders.html.twig', [
-            'maintenances' => $repo->findAllOrderedByDate(),
-            'totalCout' => $repo->getTotalCout(),
-            'countByType' => $repo->countByTypePanne(),
-        ]);
-    }
-
-    // API : Récupérer les dates de rappel (dates surlignées en rouge)
-    #[Route('/api/calendar/reminder-dates', name: 'agri_maintenances_api_reminder_dates', methods: ['GET'])]
-    public function getReminderDates(MaintenanceRepository $repo): JsonResponse
+    #[Route('/api/generate-recommendation', name: 'agri_maintenances_api_generate_reco', methods: ['POST'])]
+    public function generateRecommendationAPI(Request $request): JsonResponse
     {
         try {
-            $maintenances = $repo->findAll();
-            $reminderDates = [];
-            $now = new \DateTime();
-
-            foreach ($maintenances as $m) {
-                $dateMain = $m->getDateMain();
-                if (!$dateMain) continue;
-
-                $machineName = $this->getMachineName($m);
-                $interval = $dateMain->diff($now);
-                $yearsSince = $interval->y;
-                $monthsSince = $interval->m;
-                
-                $isReminder = ($yearsSince >= 1) || ($m->getPriorite() === 'urgente');
-                
-                if (!$isReminder) continue;
-
-                if ($yearsSince >= 1) {
-                    $ageText = "Il y a {$yearsSince} an" . ($yearsSince > 1 ? 's' : '');
-                    if ($monthsSince > 0) $ageText .= " et {$monthsSince} mois";
-                    $message = "🔔 RAPPEL ANNUEL : {$machineName} n'a pas eu de maintenance depuis {$ageText}.";
-                } else {
-                    $message = "🔴 URGENT : {$machineName} nécessite une intervention immédiate !";
-                }
-
-                $reminderDates[] = [
-                    'id' => $m->getIdMain(),
-                    'date' => $dateMain->format('Y-m-d'),
-                    'machineName' => $machineName,
-                    'type' => $m->getTypePanne(),
-                    'priorite' => $m->getPriorite(),
-                    'statut' => $m->getStatut(),
-                    'cout' => $m->getCout(),
-                    'km' => $m->getKilometrage(),
-                    'description' => $m->getDescription(),
-                    'yearsSince' => $yearsSince,
-                    'monthsSince' => $monthsSince,
-                    'message' => $message,
-                    'ageText' => $ageText ?? 'Maintenance urgente',
-                ];
-            }
-
-            return $this->json([
-                'success' => true,
-                'reminders' => $reminderDates,
-                'total' => count($reminderDates)
-            ]);
-
-        } catch (\Throwable $e) {
-            return $this->json(['success' => false, 'error' => $e->getMessage()], 500);
-        }
-    }
-
-    // API : Détails d'un rappel spécifique
-    #[Route('/api/calendar/reminder-detail/{id}', name: 'agri_maintenances_api_reminder_detail', methods: ['GET'], requirements: ['id' => '\d+'])]
-    public function getReminderDetail(int $id, MaintenanceRepository $repo): JsonResponse
-    {
-        try {
-            $maintenance = $this->findMaintenance($id, $repo);
-            if (!$maintenance) {
-                return $this->json(['success' => false, 'error' => 'Maintenance non trouvée'], 404);
-            }
-
-            $machineName = $this->getMachineName($maintenance);
-            $dateMain = $maintenance->getDateMain();
-            $now = new \DateTime();
-            $interval = $dateMain ? $dateMain->diff($now) : null;
-            $yearsSince = $interval ? $interval->y : 0;
-            $monthsSince = $interval ? $interval->m : 0;
+            $data = json_decode($request->getContent(), true);
             
-            $recommendations = $this->generateReminderRecommendations($maintenance, $yearsSince);
-            $urgenceLevel = $this->calculateReminderUrgence($maintenance, $yearsSince);
-
-            return $this->json([
-                'success' => true,
-                'id' => $maintenance->getIdMain(),
-                'machineName' => $machineName,
-                'type' => $maintenance->getTypePanne(),
-                'priorite' => $maintenance->getPriorite(),
-                'statut' => $maintenance->getStatut(),
-                'dateMain' => $dateMain?->format('d/m/Y'),
-                'cout' => $maintenance->getCout(),
-                'km' => $maintenance->getKilometrage(),
-                'description' => $maintenance->getDescription(),
-                'recommandation' => $maintenance->getRecommandation(),
-                'yearsSince' => $yearsSince,
-                'monthsSince' => $monthsSince,
-                'urgenceLevel' => $urgenceLevel,
-                'recommendations' => $recommendations,
-                'message' => $this->getReminderMessage($machineName, $yearsSince, $monthsSince, $maintenance->getPriorite()),
-            ]);
-
+            $typePanne = $data['typePanne'] ?? '';
+            $priorite = $data['priorite'] ?? 'moyenne';
+            $kilometrage = $data['kilometrage'] ?? 0;
+            $statut = $data['statut'] ?? 'planifie';
+            $description = $data['description'] ?? '';
+            
+            $recommendation = $this->generateAIRecommendation($typePanne, $priorite, $kilometrage, $statut, $description);
+            
+            return $this->json(['success' => true, 'recommendation' => $recommendation]);
+            
         } catch (\Throwable $e) {
             return $this->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
     }
 
     // ────────────────────────────────────────────────────────
-    // API : Calendrier des rappels annuels (ancien)
+    // API : CALENDRIER COMPLET (TOUTES LES MAINTENANCES)
     // ────────────────────────────────────────────────────────
-    #[Route('/api/calendar/reminders', name: 'api_maintenance_calendar_reminders', methods: ['GET'])]
-    public function getCalendarReminders(MaintenanceRepository $repo): JsonResponse
+    #[Route('/api/calendar/all-events', name: 'agri_maintenances_api_calendar_events', methods: ['GET'])]
+    public function getAllCalendarEvents(MaintenanceRepository $repo): JsonResponse
     {
         try {
             $maintenances = $repo->findAll();
@@ -271,51 +187,97 @@ class MaintenancesController extends AbstractController
                 $dateMain = $m->getDateMain();
                 if (!$dateMain) continue;
 
-                $interval    = $dateMain->diff($now);
-                $yearsSince  = $interval->y;
-                $monthsSince = $interval->m;
-                $isReminder  = ($yearsSince >= 1) || ($m->getPriorite() === 'urgente');
-
-                if (!$isReminder) continue;
-
                 $machineName = $this->getMachineName($m);
-                $id          = $m->getIdMain();
+                $type = $m->getTypePanne() ?? 'Générale';
+                $priorite = $m->getPriorite() ?? 'moyenne';
+                $statut = $m->getStatut() ?? 'planifie';
 
-                if ($yearsSince >= 1) {
-                    $ageText = "Il y a {$yearsSince} an" . ($yearsSince > 1 ? 's' : '');
-                    if ($monthsSince > 0) $ageText .= " et {$monthsSince} mois";
-                } else {
-                    $ageText = 'URGENT - Intervention immédiate requise';
-                }
+                $backgroundColor = $this->getEventColor($priorite, $statut);
+                $borderColor = $this->getBorderColor($priorite, $statut);
 
                 $events[] = [
-                    'id'              => $id,
-                    'title'           => '🔔 ' . $machineName,
-                    'start'           => $dateMain->format('Y-m-d'),
-                    'backgroundColor' => '#e74a3b',
-                    'borderColor'     => '#c0392b',
-                    'textColor'       => '#ffffff',
-                    'classNames'      => ['reminder-event'],
-                    'extendedProps'   => [
-                        'machine'         => $machineName,
-                        'type'            => $m->getTypePanne(),
-                        'lastMaintenance' => $dateMain->format('d/m/Y'),
-                        'age'             => $ageText,
-                        'priority'        => $m->getPriorite(),
-                        'maintenanceId'   => $id,
-                    ],
+                    'id' => $m->getIdMain(),
+                    'title' => $machineName . ' - ' . $type,
+                    'start' => $dateMain->format('Y-m-d'),
+                    'allDay' => true,
+                    'backgroundColor' => $backgroundColor,
+                    'borderColor' => $borderColor,
+                    'textColor' => '#ffffff',
+                    'extendedProps' => [
+                        'id' => $m->getIdMain(),
+                        'machineName' => $machineName,
+                        'type' => $type,
+                        'priorite' => $priorite,
+                        'statut' => $statut,
+                        'km' => $m->getKilometrage() ?? 0,
+                        'cout' => $m->getCout() ?? 0,
+                        'description' => $m->getDescription(),
+                        'dateMain' => $dateMain->format('d/m/Y'),
+                    ]
                 ];
             }
 
-            return $this->json($events);
+            return $this->json(['success' => true, 'events' => $events, 'total' => count($events)]);
 
         } catch (\Throwable $e) {
-            return $this->json(['error' => $e->getMessage()], 500);
+            return $this->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
     }
 
     // ────────────────────────────────────────────────────────
-    // API : Suggestion automatique IA
+    // API : DÉTAIL MAINTENANCE AVEC RECOMMANDATION IA
+    // ────────────────────────────────────────────────────────
+    #[Route('/api/maintenance/{id}/detail', name: 'agri_maintenances_api_detail', methods: ['GET'], requirements: ['id' => '\d+'])]
+    public function getMaintenanceDetail(int $id, MaintenanceRepository $repo): JsonResponse
+    {
+        try {
+            $maintenance = $this->findMaintenance($id, $repo);
+            if (!$maintenance) {
+                return $this->json(['success' => false, 'error' => 'Maintenance non trouvée'], 404);
+            }
+
+            $machineName = $this->getMachineName($maintenance);
+            $now = new \DateTime();
+            $dateMain = $maintenance->getDateMain();
+            $km = $maintenance->getKilometrage() ?? 0;
+            $priorite = $maintenance->getPriorite() ?? 'moyenne';
+            $statut = $maintenance->getStatut() ?? 'planifie';
+            $type = $maintenance->getTypePanne() ?? 'générale';
+            $cout = $maintenance->getCout() ?? 0;
+            $description = $maintenance->getDescription() ?? '';
+
+            $daysSince = $dateMain ? $now->diff($dateMain)->days : null;
+            $yearsSince = $dateMain ? $now->diff($dateMain)->y : 0;
+
+            // Générer la recommandation IA dynamique
+            $iaRecommendation = $this->generateDynamicAIRecommendation(
+                $machineName, $type, $priorite, $statut, $km, $cout, $description, $daysSince, $yearsSince
+            );
+
+            return $this->json([
+                'success' => true,
+                'id' => $maintenance->getIdMain(),
+                'machineName' => $machineName,
+                'type' => $type,
+                'priorite' => $priorite,
+                'statut' => $statut,
+                'dateMain' => $dateMain?->format('d/m/Y'),
+                'cout' => $cout,
+                'km' => $km,
+                'description' => $description,
+                'daysSince' => $daysSince,
+                'yearsSince' => $yearsSince,
+                'iaRecommendation' => $iaRecommendation,
+                'urgencyLevel' => $this->calculateUrgencyLevel($priorite, $statut, $km, $daysSince),
+            ]);
+
+        } catch (\Throwable $e) {
+            return $this->json(['success' => false, 'error' => $e->getMessage()], 500);
+        }
+    }
+
+    // ────────────────────────────────────────────────────────
+    // API : SUGGESTION AUTOMATIQUE IA
     // ────────────────────────────────────────────────────────
     #[Route('/api/ai-suggest-maintenance/{id}', name: 'agri_maintenances_api_ai_suggest', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function aiSuggestMaintenance(int $id, MaintenanceRepository $repo): JsonResponse
@@ -345,64 +307,12 @@ class MaintenancesController extends AbstractController
             ]);
 
         } catch (\Throwable $e) {
-            return $this->json([
-                'success' => false,
-                'error'   => 'Erreur serveur : ' . $e->getMessage(),
-            ], 500);
+            return $this->json(['success' => false, 'error' => 'Erreur serveur : ' . $e->getMessage()], 500);
         }
     }
 
     // ────────────────────────────────────────────────────────
-    // API : RECOMMANDATION IA INTELLIGENTE (NOUVELLE)
-    // ────────────────────────────────────────────────────────
-    #[Route('/api/ai-intelligent-recommendation/{id}', name: 'agri_maintenances_api_ai_intelligent', methods: ['GET'], requirements: ['id' => '\d+'])]
-    public function getIntelligentRecommendation(int $id, MaintenanceRepository $repo): JsonResponse
-    {
-        try {
-            $maintenance = $this->findMaintenance($id, $repo);
-            if (!$maintenance) {
-                return $this->json(['success' => false, 'error' => 'Maintenance non trouvée'], 404);
-            }
-
-            $km = $maintenance->getKilometrage() ?? 0;
-            $priorite = $maintenance->getPriorite() ?? 'moyenne';
-            $statut = $maintenance->getStatut() ?? 'planifie';
-            $typePanne = $maintenance->getTypePanne() ?? 'Générale';
-            $machineName = $this->getMachineName($maintenance);
-            
-            $riskScore = $this->calculateRiskScore($km, $priorite, $statut);
-            $riskLevel = $this->getRiskLevel($riskScore);
-            $nextKmRecommendation = $this->calculateNextKmRecommendation($km);
-            $mainMessage = $this->getIntelligentMainMessage($machineName, $priorite, $statut, $km);
-            $interpretation = $this->getIntelligentInterpretation($km, $priorite, $statut, $riskLevel);
-            $actions = $this->getIntelligentActions($priorite, $statut, $km, $nextKmRecommendation);
-            $additionalTips = $this->getAdditionalTips($typePanne, $km, $priorite);
-
-            return $this->json([
-                'success' => true,
-                'id' => $maintenance->getIdMain(),
-                'machineName' => $machineName,
-                'km' => $km,
-                'priorite' => $priorite,
-                'statut' => $statut,
-                'typePanne' => $typePanne,
-                'riskScore' => $riskScore,
-                'riskLevel' => $riskLevel,
-                'nextKmRecommendation' => $nextKmRecommendation,
-                'mainMessage' => $mainMessage,
-                'interpretation' => $interpretation,
-                'actions' => $actions,
-                'additionalTips' => $additionalTips,
-                'isUrgent' => ($priorite === 'urgente' || $statut === 'en_cours'),
-            ]);
-            
-        } catch (\Throwable $e) {
-            return $this->json(['success' => false, 'error' => $e->getMessage()], 500);
-        }
-    }
-
-    // ────────────────────────────────────────────────────────
-    // API : Prompt libre IA
+    // API : PROMPT LIBRE IA
     // ────────────────────────────────────────────────────────
     #[Route('/api/generate-custom-prompt/{id}', name: 'agri_maintenances_api_custom_prompt', methods: ['POST'], requirements: ['id' => '\d+'])]
     public function generateCustomPrompt(int $id, Request $request, MaintenanceRepository $repo): JsonResponse
@@ -413,14 +323,13 @@ class MaintenancesController extends AbstractController
                 return $this->json(['success' => false, 'error' => 'Maintenance non trouvée'], 404);
             }
 
-            $data   = json_decode($request->getContent(), true);
+            $data = json_decode($request->getContent(), true);
             $prompt = trim($data['prompt'] ?? '');
             if (!$prompt) {
                 return $this->json(['success' => false, 'error' => 'Prompt vide'], 400);
             }
 
             $response = $this->buildLocalPromptResponse($prompt, $maintenance);
-
             return $this->json(['success' => true, 'response' => $response]);
 
         } catch (\Throwable $e) {
@@ -429,7 +338,7 @@ class MaintenancesController extends AbstractController
     }
 
     // ────────────────────────────────────────────────────────
-    // API : Durée de vie IA
+    // API : DURÉE DE VIE IA
     // ────────────────────────────────────────────────────────
     #[Route('/api/lifetime/{id}', name: 'agri_maintenances_api_lifetime', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function generateLifetime(int $id, MaintenanceRepository $repo): JsonResponse
@@ -440,50 +349,32 @@ class MaintenancesController extends AbstractController
                 return $this->json(['success' => false, 'error' => 'Maintenance non trouvée'], 404);
             }
 
-            $km    = $maintenance->getKilometrage() ?? 0;
-            $prio  = $maintenance->getPriorite() ?? 'moyenne';
-            $type  = $maintenance->getTypePanne() ?? 'Général';
+            $km = $maintenance->getKilometrage() ?? 0;
+            $prio = $maintenance->getPriorite() ?? 'moyenne';
+            $type = $maintenance->getTypePanne() ?? 'Général';
             $maxKm = 20000;
 
             $vieRestante = max(0, min(100, (int) round((($maxKm - $km) / $maxKm) * 100)));
-            $penalite = match($prio) {
-                'urgente' => 25, 'haute' => 15, 'moyenne' => 8, default => 3,
-            };
-            $vieRestante    = max(0, $vieRestante - $penalite);
+            $penalite = match($prio) { 'urgente' => 25, 'haute' => 15, 'moyenne' => 8, default => 3 };
+            $vieRestante = max(0, $vieRestante - $penalite);
             $anneesEstimees = round(max(0, ($maxKm - $km)) / 3000, 1);
-            $risque = match(true) {
-                $prio === 'urgente' || $km > 15000 => 'Élevé',
-                $prio === 'haute'   || $km > 10000 => 'Moyen',
-                default                            => 'Faible',
-            };
+            $risque = match(true) { $prio === 'urgente' || $km > 15000 => 'Élevé', $prio === 'haute' || $km > 10000 => 'Moyen', default => 'Faible' };
 
             $composants = [
-                ['nom' => 'Moteur',       'usure' => min(100, (int) round($km / 200))],
+                ['nom' => 'Moteur', 'usure' => min(100, (int) round($km / 200))],
                 ['nom' => 'Transmission', 'usure' => min(100, (int) round($km / 300))],
-                ['nom' => 'Hydraulique',  'usure' => min(100, (int) round($km / 400))],
-                ['nom' => 'Électricité',  'usure' => min(100, (int) round($km / 600))],
-                ['nom' => 'Pneumatique',  'usure' => min(100, (int) round($km / 250))],
+                ['nom' => 'Hydraulique', 'usure' => min(100, (int) round($km / 400))],
+                ['nom' => 'Électricité', 'usure' => min(100, (int) round($km / 600))],
+                ['nom' => 'Pneumatique', 'usure' => min(100, (int) round($km / 250))],
             ];
 
-            $typeNorm = strtolower(explode(' ', $type)[0]);
-            foreach ($composants as &$comp) {
-                if (strtolower($comp['nom']) === $typeNorm) {
-                    $bonus = match($prio) { 'urgente' => 30, 'haute' => 20, default => 10 };
-                    $comp['usure'] = min(100, $comp['usure'] + $bonus);
-                }
-            }
-            unset($comp);
-
             return $this->json([
-                'success'            => true,
-                'vieRestante'        => $vieRestante,
-                'anneesEstimees'     => $anneesEstimees,
-                'risquePanne'        => $risque,
-                'composants'         => $composants,
-                'recommandations'    => $this->buildLifetimeRecommendations($type, $prio, $km, $composants),
-                'kilometrage'        => $km,
-                'prochaine_vidange'  => max(0, (int) ceil($km / 5000) * 5000 - $km) . ' km',
-                'prochaine_revision' => max(0, (int) ceil($km / 10000) * 10000 - $km) . ' km',
+                'success' => true,
+                'vieRestante' => $vieRestante,
+                'anneesEstimees' => $anneesEstimees,
+                'risquePanne' => $risque,
+                'composants' => $composants,
+                'recommandations' => $this->buildLifetimeRecommendations($type, $prio, $km, $composants),
             ]);
 
         } catch (\Throwable $e) {
@@ -492,61 +383,7 @@ class MaintenancesController extends AbstractController
     }
 
     // ────────────────────────────────────────────────────────
-    // API : Plan de maintenance JSON
-    // ────────────────────────────────────────────────────────
-    #[Route('/api/schedules/generate', name: 'agri_maintenances_api_schedule_generate', methods: ['POST'])]
-    public function generateSchedule(Request $request, MaintenanceRepository $repo): JsonResponse
-    {
-        try {
-            $data        = json_decode($request->getContent(), true);
-            $maintenance = null;
-
-            if (isset($data['maintenanceId'])) {
-                $maintenance = $this->findMaintenance((int) $data['maintenanceId'], $repo);
-                if (!$maintenance) {
-                    return $this->json(['success' => false, 'error' => 'Maintenance non trouvée'], 404);
-                }
-            }
-
-            $options = $data['options'] ?? ['intervention','prevention','pieces','optimisation','securite','controle'];
-
-            $machineData = [
-                'type'           => $maintenance ? $maintenance->getTypePanne()    : ($data['typePanne']    ?? 'Non spécifié'),
-                'priorite'       => $maintenance ? $maintenance->getPriorite()     : ($data['priorite']     ?? 'moyenne'),
-                'statut'         => $maintenance ? $maintenance->getStatut()       : ($data['statut']       ?? 'planifie'),
-                'kilometrage'    => $maintenance ? $maintenance->getKilometrage()  : ($data['kilometrage']  ?? null),
-                'nom'            => $maintenance ? $this->getMachineName($maintenance) : ($data['nomMachine'] ?? 'Machine non spécifiée'),
-                'description'    => $maintenance ? $maintenance->getDescription()  : ($data['description']  ?? ''),
-                'recommandation' => $maintenance ? $maintenance->getRecommandation(): ($data['recommandation'] ?? ''),
-                'cout'           => $maintenance ? $maintenance->getCout()         : ($data['cout']         ?? 0),
-                'dateMain'       => $maintenance && $maintenance->getDateMain()
-                                        ? $maintenance->getDateMain()->format('Y-m-d')
-                                        : ($data['dateMain'] ?? null),
-            ];
-
-            $interventions = $this->calculateRecommendedInterventions($machineData);
-            $plan          = $this->generateSchedulePlan($machineData, $options, $interventions);
-
-            return $this->json(['success' => true, 'plan' => $plan, 'generatedBy' => 'local_algorithm']);
-
-        } catch (\Throwable $e) {
-            return $this->json(['success' => false, 'error' => $e->getMessage()], 500);
-        }
-    }
-
-    // ────────────────────────────────────────────────────────
-    // API : Page HTML Schedule
-    // ────────────────────────────────────────────────────────
-    #[Route('/api/schedule/{id}', name: 'agri_maintenances_api_schedule', methods: ['GET'], requirements: ['id' => '\d+'])]
-    public function apiSchedule(int $id, MaintenanceRepository $repo): Response
-    {
-        $maintenance = $this->findMaintenance($id, $repo);
-        if (!$maintenance) throw $this->createNotFoundException('Maintenance non trouvée.');
-        return $this->render('maintenances/api_schedule_html.html.twig', ['maintenance' => $maintenance]);
-    }
-
-    // ────────────────────────────────────────────────────────
-    // SHOW  — /{id} en dernier !
+    // SHOW
     // ────────────────────────────────────────────────────────
     #[Route('/{id}', name: 'agri_maintenances_show', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function show(int $id, MaintenanceRepository $repo): Response
@@ -564,9 +401,20 @@ class MaintenancesController extends AbstractController
     {
         $form = $this->createForm(MaintenanceType::class, $maintenance);
         $form->handleRequest($request);
+        
         if ($form->isSubmitted() && $form->isValid()) {
+            // Regénérer la recommandation IA automatiquement
+            $typePanne = $maintenance->getTypePanne();
+            $priorite = $maintenance->getPriorite();
+            $kilometrage = $maintenance->getKilometrage();
+            $statut = $maintenance->getStatut();
+            $description = $maintenance->getDescription();
+            
+            $iaRecommendation = $this->generateAIRecommendation($typePanne, $priorite, $kilometrage, $statut, $description);
+            $maintenance->setRecommandation($iaRecommendation);
+            
             $em->flush();
-            $this->addFlash('success', 'Maintenance mise à jour avec succès.');
+            $this->addFlash('success', 'Maintenance mise à jour avec succès (recommandation IA régénérée).');
             return $this->redirectToRoute('agri_maintenances_show', ['id' => $maintenance->getIdMain()]);
         }
         return $this->render('maintenances/edit.html.twig', ['form' => $form->createView(), 'maintenance' => $maintenance]);
@@ -597,8 +445,7 @@ class MaintenancesController extends AbstractController
         try {
             $m = $repo->findOneWithMaterielName($id);
             if ($m) return $m;
-        } catch (\Throwable $e) {
-        }
+        } catch (\Throwable $e) {}
         return $repo->findOneBy(['idMain' => $id]);
     }
 
@@ -613,20 +460,205 @@ class MaintenancesController extends AbstractController
         return 'Machine non définie';
     }
 
+    // ────────────────────────────────────────────────────────
+    // GÉNÉRATION RECOMMANDATION IA (POUR STOCKAGE EN BASE)
+    // ────────────────────────────────────────────────────────
+    private function generateAIRecommendation(string $typePanne, string $priorite, ?int $kilometrage, string $statut, ?string $description): string
+    {
+        $recommendation = "";
+        $km = $kilometrage ?? 0;
+        
+        // 1. Analyse de la priorité
+        if ($priorite === 'urgente') {
+            $recommendation .= "🚨 INTERVENTION URGENTE REQUISE !\n";
+            $recommendation .= "• Ne pas utiliser la machine avant réparation complète\n";
+            $recommendation .= "• Contacter immédiatement le service technique\n";
+            $recommendation .= "• Prévoir les pièces de rechange en urgence\n\n";
+        } elseif ($priorite === 'haute') {
+            $recommendation .= "⚠️ HAUTE PRIORITÉ - Intervention sous 48h\n";
+            $recommendation .= "• Planifier l'intervention rapidement\n";
+            $recommendation .= "• Préparer les pièces nécessaires\n\n";
+        } elseif ($priorite === 'moyenne') {
+            $recommendation .= "🟡 PRIORITÉ MOYENNE - Planifier sous 15 jours\n";
+            $recommendation .= "• Programmer la maintenance préventive\n";
+            $recommendation .= "• Effectuer des contrôles visuels réguliers\n\n";
+        } else {
+            $recommendation .= "🟢 PRIORITÉ FAIBLE - Maintenance préventive\n";
+            $recommendation .= "• Maintenir le planning d'entretien régulier\n";
+            $recommendation .= "• Inspections périodiques standards\n\n";
+        }
+        
+        // 2. Analyse du kilométrage
+        if ($km >= 15000) {
+            $recommendation .= "📊 KILOMÉTRAGE CRITIQUE ({$km} km) :\n";
+            $recommendation .= "• Révision majeure OBLIGATOIRE immédiate\n";
+            $recommendation .= "• Vidange complète + tous les filtres\n";
+            $recommendation .= "• Contrôle exhaustif moteur et transmission\n\n";
+        } elseif ($km >= 10000) {
+            $recommendation .= "📊 KILOMÉTRAGE ÉLEVÉ ({$km} km) :\n";
+            $recommendation .= "• Révision générale conseillée\n";
+            $recommendation .= "• Vidange moteur et changement filtres\n\n";
+        } elseif ($km >= 5000) {
+            $recommendation .= "📊 KILOMÉTRAGE INTERMÉDIAIRE ({$km} km) :\n";
+            $recommendation .= "• Vidange et entretien courant requis\n";
+            $recommendation .= "• Vérification des niveaux et courroies\n\n";
+        }
+        
+        // 3. Recommandation spécifique au type de panne
+        $recommendation .= $this->getTypeSpecificReco($typePanne, $priorite);
+        
+        // 4. Analyse de la description
+        if (!empty($description)) {
+            $descLower = strtolower($description);
+            if (str_contains($descLower, 'fuite')) {
+                $recommendation .= "💧 FUITE DÉTECTÉE :\n• Identifier et localiser la fuite\n• Vérifier joints, flexibles et raccords\n\n";
+            }
+            if (str_contains($descLower, 'bruit') || str_contains($descLower, 'claquement')) {
+                $recommendation .= "🔊 BRUIT ANORMAL :\n• Inspecter les roulements et pièces mobiles\n\n";
+            }
+            if (str_contains($descLower, 'fumée') || str_contains($descLower, 'fumee')) {
+                $recommendation .= "💨 FUMÉE ANORMALE :\n• Contrôler l'injection et la combustion\n\n";
+            }
+        }
+        
+        // 5. Recommandations de sécurité
+        $recommendation .= "\n⚠️ RECOMMANDATIONS DE SÉCURITÉ :\n";
+        $recommendation .= "• Port des EPI obligatoires\n";
+        $recommendation .= "• Couper le moteur avant intervention\n";
+        $recommendation .= "• Déconnecter la batterie (pôle négatif)\n";
+        $recommendation .= "• Extincteur à portée de main\n\n";
+        
+        // 6. Maintenance préventive
+        $recommendation .= "📋 MAINTENANCE PRÉVENTIVE :\n";
+        if ($km > 0) {
+            $nextKm = ceil(($km + 1) / 5000) * 5000;
+            $recommendation .= "• Prochaine vidange : tous les 5000 km (" . ($nextKm - $km) . " km restants)\n";
+        }
+        $recommendation .= "• Contrôle hebdomadaire : niveaux, pression pneus\n";
+        $recommendation .= "• Tenir à jour le carnet de maintenance\n";
+        
+        return $recommendation;
+    }
+
+    private function getTypeSpecificReco(string $typePanne, string $priorite): string
+    {
+        $urgence = ($priorite === 'urgente') ? "URGENT - " : "";
+        
+        return match($typePanne) {
+            'Moteur' => "🔧 PANNE MOTEUR :\n• {$urgence}Vérifier la compression\n• Contrôler les niveaux d'huile\n• Inspecter les injecteurs\n\n",
+            'Électricité' => "⚡ PANNE ÉLECTRIQUE :\n• {$urgence}Tester la batterie\n• Vérifier les fusibles\n• Diagnostic OBD\n\n",
+            'Hydraulique' => "💧 PANNE HYDRAULIQUE :\n• {$urgence}Contrôler le niveau de fluide\n• Inspecter les flexibles\n• Rechercher les fuites\n\n",
+            'Transmission' => "⚙️ PANNE TRANSMISSION :\n• {$urgence}Vérifier l'huile de boîte\n• Contrôler les embrayages\n\n",
+            'Pneumatique' => "🔵 PROBLÈME PNEUMATIQUE :\n• Contrôler la pression\n• Vérifier l'usure des pneus\n\n",
+            'Vidange & filtres' => "🛢️ ENTRETIEN VIDANGE :\n• Vidange moteur complète\n• Remplacer tous les filtres\n\n",
+            'Révision générale' => "📋 RÉVISION GÉNÉRALE :\n• Révision complète moteur\n• Contrôle transmission\n• Inspection hydraulique\n\n",
+            default => "🔍 DIAGNOSTIC GÉNÉRAL :\n• Réaliser un diagnostic complet\n• Identifier la source du problème\n\n",
+        };
+    }
+
+    // ────────────────────────────────────────────────────────
+    // GÉNÉRATION RECOMMANDATION IA DYNAMIQUE (POUR POPUP CALENDRIER)
+    // ────────────────────────────────────────────────────────
+    private function generateDynamicAIRecommendation(string $machineName, string $type, string $priorite, string $statut, int $km, float $cout, string $description, ?int $daysSince, int $yearsSince): array
+    {
+        $recommendations = [];
+        $actions = [];
+        $summary = '';
+        $priorityMessage = '';
+
+        if ($priorite === 'urgente') {
+            $priorityMessage = "🚨 **URGENCE ABSOLUE** - Intervention immédiate requise !";
+            $actions[] = "🔧 Déployer un technicien d'urgence sans délai";
+            $actions[] = "⛔ Ne pas utiliser la machine avant réparation";
+        } elseif ($priorite === 'haute') {
+            $priorityMessage = "⚠️ **HAUTE PRIORITÉ** - Planifier l'intervention sous 48h";
+            $actions[] = "📅 Planifier une intervention dans les 48h";
+        } elseif ($priorite === 'moyenne') {
+            $priorityMessage = "🟡 **PRIORITÉ MOYENNE** - Planifier sous 15 jours";
+            $actions[] = "📅 Programmer la maintenance sous 15 jours";
+        } else {
+            $priorityMessage = "🟢 **PRIORITÉ FAIBLE** - Maintenance préventive";
+        }
+
+        if ($km >= 15000) {
+            $recommendations[] = "📊 Kilométrage critique ({$km} km) - Révision majeure obligatoire";
+            $actions[] = "⚙️ Révision complète du moteur";
+        } elseif ($km >= 10000) {
+            $recommendations[] = "📊 Kilométrage élevé ({$km} km) - Révision générale conseillée";
+        } elseif ($km >= 5000) {
+            $recommendations[] = "📊 Kilométrage intermédiaire ({$km} km) - Entretien courant";
+        }
+
+        if ($yearsSince >= 2) {
+            $recommendations[] = "⏰ Plus de 2 ans sans maintenance - Audit complet requis";
+        } elseif ($yearsSince >= 1) {
+            $recommendations[] = "📅 Maintenance annuelle recommandée";
+        }
+
+        if ($statut === 'en_cours') {
+            $actions[] = "✅ Finaliser l'intervention en cours";
+        } elseif ($statut === 'termine') {
+            $actions[] = "📝 Mettre à jour le carnet de maintenance";
+        }
+
+        $summary = match(true) {
+            $priorite === 'urgente' => "🔴 **ACTION IMMÉDIATE** : {$machineName} nécessite une intervention urgente !",
+            $statut === 'en_cours' => "🔧 **INTERVENTION EN COURS** sur {$machineName}",
+            $statut === 'termine' => "✅ **MAINTENANCE TERMINÉE** sur {$machineName}",
+            default => "📋 **PLANIFICATION** : Maintenance programmée pour {$machineName}"
+        };
+
+        return [
+            'summary' => $summary,
+            'priorityMessage' => $priorityMessage,
+            'recommendations' => array_slice($recommendations, 0, 5),
+            'actions' => array_slice($actions, 0, 5),
+        ];
+    }
+
+    // ────────────────────────────────────────────────────────
+    // COULEURS POUR CALENDRIER
+    // ────────────────────────────────────────────────────────
+    private function getEventColor(string $priorite, string $statut): string
+    {
+        if ($priorite === 'urgente') return '#e74a3b';
+        if ($statut === 'termine') return '#27ae60';
+        if ($statut === 'en_cours') return '#f39c12';
+        if ($priorite === 'haute') return '#e67e22';
+        if ($priorite === 'moyenne') return '#3498db';
+        if ($priorite === 'faible') return '#95a5a6';
+        return '#2d6a2d';
+    }
+
+    private function getBorderColor(string $priorite, string $statut): string
+    {
+        if ($priorite === 'urgente') return '#c0392b';
+        if ($statut === 'termine') return '#1e8449';
+        if ($statut === 'en_cours') return '#e67e22';
+        return '#2d6a2d';
+    }
+
+    private function calculateUrgencyLevel(string $priorite, string $statut, int $km, ?int $daysSince): array
+    {
+        $score = 0;
+        if ($priorite === 'urgente') $score += 50;
+        elseif ($priorite === 'haute') $score += 30;
+        if ($km > 15000) $score += 30;
+        elseif ($km > 10000) $score += 20;
+        if ($daysSince && $daysSince > 365) $score += 40;
+
+        if ($score >= 80) return ['level' => 'critique', 'label' => '🔴 CRITIQUE - Action immédiate', 'color' => '#e74a3b'];
+        if ($score >= 60) return ['level' => 'elevé', 'label' => '🟠 ÉLEVÉ - Intervention sous 48h', 'color' => '#e67e22'];
+        if ($score >= 40) return ['level' => 'moyen', 'label' => '🟡 MOYEN - Planifier sous 15j', 'color' => '#f39c12'];
+        return ['level' => 'faible', 'label' => '🟢 FAIBLE - Surveillance normale', 'color' => '#27ae60'];
+    }
+
     private function getMachineHistory(Maintenance $maintenance, MaintenanceRepository $repo): array
     {
         if (method_exists($maintenance, 'getIdM') && $maintenance->getIdM()) {
             try {
                 return $repo->findBy(['idM' => $maintenance->getIdM()], ['dateMain' => 'DESC']);
-            } catch (\Throwable $e) {
-            }
-        }
-        $nom = $this->getMachineName($maintenance);
-        if ($nom !== 'Machine non définie') {
-            try {
-                return $repo->findBy(['nom' => $nom], ['dateMain' => 'DESC']);
-            } catch (\Throwable $e) {
-            }
+            } catch (\Throwable $e) {}
         }
         return [$maintenance];
     }
@@ -635,13 +667,7 @@ class MaintenancesController extends AbstractController
     {
         $count = count($history);
         if ($count < 2) {
-            return [
-                'hasHistory'          => false,
-                'totalMaintenances'   => $count,
-                'averageInterval'     => null,
-                'frequency'           => 'première maintenance',
-                'recommendedInterval' => 90,
-            ];
+            return ['hasHistory' => false, 'totalMaintenances' => $count, 'averageInterval' => null, 'frequency' => 'première maintenance', 'recommendedInterval' => 90];
         }
 
         $totalInterval = 0;
@@ -654,49 +680,23 @@ class MaintenancesController extends AbstractController
         }
 
         $avgInterval = $count > 1 ? round($totalInterval / ($count - 1)) : 0;
-        $frequency   = match(true) {
-            $avgInterval <= 30  => 'très fréquente',
-            $avgInterval <= 90  => 'fréquente',
-            $avgInterval <= 180 => 'modérée',
-            default             => 'espacée',
-        };
-
-        return [
-            'hasHistory'          => true,
-            'totalMaintenances'   => $count,
-            'averageInterval'     => $avgInterval,
-            'frequency'           => $frequency,
-            'recommendedInterval' => max(30, min(365, $avgInterval)),
-        ];
+        return ['hasHistory' => true, 'totalMaintenances' => $count, 'averageInterval' => $avgInterval, 'frequency' => 'modérée', 'recommendedInterval' => max(30, min(365, $avgInterval))];
     }
 
     private function analyzeMachineState(Maintenance $m): array
     {
-        $km       = $m->getKilometrage() ?? 0;
-        $prio     = $m->getPriorite() ?? 'moyenne';
-        $statut   = $m->getStatut() ?? 'planifie';
+        $km = $m->getKilometrage() ?? 0;
+        $prio = $m->getPriorite() ?? 'moyenne';
+        $statut = $m->getStatut() ?? 'planifie';
         $lastDate = $m->getDateMain();
 
         return [
-            'km'                        => $km,
-            'kmStatus'                  => $this->getKmStatus($km),
-            'type'                      => $m->getTypePanne(),
-            'priority'                  => $prio,
-            'status'                    => $statut,
-            'daysSinceLastMaintenance'  => $lastDate ? (new \DateTime())->diff($lastDate)->days : null,
-            'healthScore'               => $this->calculateHealthScore($km, $prio, $statut),
+            'km' => $km,
+            'priority' => $prio,
+            'status' => $statut,
+            'daysSinceLastMaintenance' => $lastDate ? (new \DateTime())->diff($lastDate)->days : null,
+            'healthScore' => $this->calculateHealthScore($km, $prio, $statut),
         ];
-    }
-
-    private function getKmStatus(int $km): string
-    {
-        return match(true) {
-            $km >= 15000 => 'critique',
-            $km >= 10000 => 'élevé',
-            $km >= 5000  => 'modéré',
-            $km >= 1000  => 'normal',
-            default      => 'faible',
-        };
     }
 
     private function calculateHealthScore(int $km, string $prio, string $statut): int
@@ -708,151 +708,34 @@ class MaintenancesController extends AbstractController
         return max(0, min(100, $score));
     }
 
-    // ════════════════════════════════════════════════════════
-    // ✅ SEULE MÉTHODE MODIFIÉE : generateAISuggestions()
-    // Ajout d'une suggestion spécifique au typePanne
-    // ════════════════════════════════════════════════════════
     private function generateAISuggestions(Maintenance $m, array $frequency, array $state): array
     {
         $suggestions = [];
         $machineName = $this->getMachineName($m);
-        $km          = $state['km'];
-        $daysSince   = $state['daysSinceLastMaintenance'];
-        $type        = $m->getTypePanne() ?? '';
+        $km = $state['km'];
+        $daysSince = $state['daysSinceLastMaintenance'];
+        $type = $m->getTypePanne() ?? '';
 
-        // ── Suggestion spécifique au type de panne (ajoutée en premier) ──
         $typeSpecificMap = [
-            'Moteur' => [
-                'icon'    => '🔧',
-                'title'   => 'Panne Moteur détectée',
-                'message' => "Vérifier la compression, les niveaux d'huile et le système de refroidissement. Inspecter les joints de culasse, les injecteurs et les courroies de distribution.",
-                'action'  => 'Diagnostic moteur complet',
-            ],
-            'Électricité' => [
-                'icon'    => '⚡',
-                'title'   => 'Problème électrique',
-                'message' => "Tester la batterie, l'alternateur et le circuit de démarrage. Vérifier les fusibles, relais, connecteurs électriques et le tableau de bord.",
-                'action'  => 'Diagnostic électrique complet',
-            ],
-            'Hydraulique' => [
-                'icon'    => '💧',
-                'title'   => 'Défaillance hydraulique',
-                'message' => "Contrôler le niveau de fluide hydraulique, inspecter les flexibles, joints, vérins et distributeurs. Rechercher toute fuite sur l'ensemble du circuit.",
-                'action'  => 'Inspection circuit hydraulique',
-            ],
-            'Transmission' => [
-                'icon'    => '⚙️',
-                'title'   => 'Problème de transmission',
-                'message' => "Vérifier le niveau d'huile de boîte, contrôler les embrayages, courroies, pignons et joints d'étanchéité. Tester les passages de vitesse à froid et à chaud.",
-                'action'  => 'Contrôle transmission complet',
-            ],
-            'Mécanique' => [
-                'icon'    => '🔩',
-                'title'   => 'Défaut mécanique général',
-                'message' => "Inspecter toutes les pièces mécaniques mobiles : roulements, paliers, axes et fixations. Contrôler les jeux, usures anormales et bruits suspects.",
-                'action'  => 'Inspection mécanique générale',
-            ],
-            'Vidange & filtres' => [
-                'icon'    => '🛢️',
-                'title'   => 'Entretien Vidange & Filtres',
-                'message' => "Effectuer la vidange moteur et remplacer les filtres à huile, à air et à carburant. Vérifier et purger le circuit de refroidissement. Contrôler le niveau de tous les fluides.",
-                'action'  => 'Vidange et remplacement filtres',
-            ],
-            'Pneumatique' => [
-                'icon'    => '🔵',
-                'title'   => 'Problème pneumatique',
-                'message' => "Contrôler la pression et l'état d'usure des pneus, vérifier l'équilibrage et le parallélisme. Inspecter les jantes pour déformation ou fissure.",
-                'action'  => 'Contrôle complet pneumatique',
-            ],
-            'Révision générale' => [
-                'icon'    => '📋',
-                'title'   => 'Révision générale planifiée',
-                'message' => "Révision complète de tous les systèmes : moteur, transmission, hydraulique, électrique et pneumatique. Remplacement préventif des pièces d'usure selon le carnet constructeur.",
-                'action'  => 'Lancer révision générale complète',
-            ],
-            'Logicielle' => [
-                'icon'    => '💻',
-                'title'   => 'Défaillance logicielle / électronique',
-                'message' => "Effectuer un diagnostic OBD complet, mettre à jour les firmwares et vérifier les capteurs (sondes, débitmètres, régulateurs). Réinitialiser les codes défauts après intervention.",
-                'action'  => 'Diagnostic électronique OBD',
-            ],
+            'Moteur' => ['icon' => '🔧', 'title' => 'Panne Moteur détectée', 'message' => "Vérifier la compression et les niveaux d'huile.", 'action' => 'Diagnostic moteur'],
+            'Électricité' => ['icon' => '⚡', 'title' => 'Problème électrique', 'message' => "Tester la batterie et l'alternateur.", 'action' => 'Diagnostic électrique'],
+            'Hydraulique' => ['icon' => '💧', 'title' => 'Défaillance hydraulique', 'message' => "Contrôler le niveau de fluide.", 'action' => 'Inspection hydraulique'],
         ];
 
         if (isset($typeSpecificMap[$type])) {
-            $suggestions[] = array_merge($typeSpecificMap[$type], [
-                'type'     => 'type_specific',
-                'priority' => match($state['priority']) {
-                    'urgente' => 'urgente',
-                    'haute'   => 'haute',
-                    default   => 'moyenne',
-                },
-            ]);
+            $suggestions[] = array_merge($typeSpecificMap[$type], ['priority' => $state['priority'] === 'urgente' ? 'urgente' : 'moyenne']);
         }
 
-        // ── Suggestions existantes (inchangées) ──
         if ($daysSince !== null && $daysSince > ($frequency['recommendedInterval'] ?? 90)) {
-            $suggestions[] = [
-                'type'     => 'time_overdue',
-                'icon'     => '⏰',
-                'title'    => 'Maintenance dépassée',
-                'message'  => "La dernière maintenance de {$machineName} date de {$daysSince} jours. L'intervalle recommandé est de " . ($frequency['recommendedInterval'] ?? 90) . " jours.",
-                'priority' => 'haute',
-                'action'   => 'Planifier immédiatement',
-            ];
+            $suggestions[] = ['icon' => '⏰', 'title' => 'Maintenance dépassée', 'message' => "Dernière maintenance il y a {$daysSince} jours.", 'priority' => 'haute', 'action' => 'Planifier'];
         }
 
-        if ($km >= 5000) {
-            $suggestions[] = [
-                'type'     => 'km_threshold',
-                'icon'     => '📊',
-                'title'    => 'Kilométrage élevé',
-                'message'  => "{$machineName} a atteint {$km} km. Une vidange et un contrôle général sont recommandés.",
-                'priority' => $km >= 10000 ? 'urgente' : 'haute',
-                'action'   => 'Programmer vidange',
-            ];
-        }
-
-        if ($frequency['hasHistory'] && ($frequency['averageInterval'] ?? 0) > 0) {
-            $trend = $frequency['averageInterval'] < 60 ? 'maintenances rapprochées' : 'maintenances espacées';
-            $suggestions[] = [
-                'type'     => 'frequency_analysis',
-                'icon'     => '📈',
-                'title'    => 'Analyse de fréquence',
-                'message'  => "Historique : {$frequency['totalMaintenances']} maintenance(s), intervalle moyen de {$frequency['averageInterval']} jours ({$trend}).",
-                'priority' => 'basse',
-                'action'   => "Consulter l'historique",
-            ];
-        }
-
-        if ($state['healthScore'] < 50) {
-            $suggestions[] = [
-                'type'     => 'health_critical',
-                'icon'     => '🆘',
-                'title'    => 'État critique',
-                'message'  => "Score de santé : {$state['healthScore']}/100. Une intervention urgente est nécessaire.",
-                'priority' => 'urgente',
-                'action'   => 'Intervenir maintenant',
-            ];
-        } elseif ($state['healthScore'] < 70) {
-            $suggestions[] = [
-                'type'     => 'health_warning',
-                'icon'     => '⚠️',
-                'title'    => 'Attention requise',
-                'message'  => "Score de santé : {$state['healthScore']}/100. Planifier une maintenance préventive.",
-                'priority' => 'haute',
-                'action'   => 'Planifier',
-            ];
+        if ($km >= 10000) {
+            $suggestions[] = ['icon' => '📊', 'title' => 'Kilométrage élevé', 'message' => "{$machineName} a atteint {$km} km.", 'priority' => 'urgente', 'action' => 'Révision'];
         }
 
         if (empty($suggestions)) {
-            $suggestions[] = [
-                'type'     => 'preventive',
-                'icon'     => '✅',
-                'title'    => 'Maintenance préventive',
-                'message'  => "{$machineName} semble en bon état. Une inspection préventive dans " . ($frequency['recommendedInterval'] ?? 90) . " jours est recommandée.",
-                'priority' => 'basse',
-                'action'   => 'Planifier plus tard',
-            ];
+            $suggestions[] = ['icon' => '✅', 'title' => 'Maintenance préventive', 'message' => "{$machineName} semble en bon état.", 'priority' => 'basse', 'action' => 'Planifier'];
         }
 
         return $suggestions;
@@ -863,25 +746,23 @@ class MaintenancesController extends AbstractController
         $lastDate = $m->getDateMain();
         if (!$lastDate) return null;
 
-        $interval  = clone $lastDate;
+        $interval = clone $lastDate;
         $daysToAdd = $frequency['recommendedInterval'] ?? 90;
-        $km        = $m->getKilometrage() ?? 0;
-        $prio      = $m->getPriorite() ?? 'moyenne';
+        $km = $m->getKilometrage() ?? 0;
+        $prio = $m->getPriorite() ?? 'moyenne';
 
         if ($km > 10000) $daysToAdd = max(30, $daysToAdd - 30);
-        elseif ($km > 5000) $daysToAdd = max(60, $daysToAdd - 15);
-
-        if ($prio === 'urgente')    $daysToAdd = 7;
-        elseif ($prio === 'haute')  $daysToAdd = 30;
+        if ($prio === 'urgente') $daysToAdd = 7;
+        elseif ($prio === 'haute') $daysToAdd = 30;
 
         return $interval->modify("+{$daysToAdd} days");
     }
 
     private function calculateUrgencyScore(Maintenance $m, array $frequency, array $state): int
     {
-        $score      = 0;
-        $daysSince  = $state['daysSinceLastMaintenance'] ?? 0;
-        $recommended= $frequency['recommendedInterval'] ?? 90;
+        $score = 0;
+        $daysSince = $state['daysSinceLastMaintenance'] ?? 0;
+        $recommended = $frequency['recommendedInterval'] ?? 90;
 
         if ($daysSince > $recommended) {
             $score += min(40, (int) round(($daysSince - $recommended) / max(1, $recommended) * 40));
@@ -897,532 +778,55 @@ class MaintenancesController extends AbstractController
 
     private function getUrgencyLevel(int $score): string
     {
-        return match(true) {
-            $score >= 70 => 'critique',
-            $score >= 50 => 'élevée',
-            $score >= 30 => 'modérée',
-            default      => 'faible',
-        };
+        return match(true) { $score >= 70 => 'critique', $score >= 50 => 'élevée', $score >= 30 => 'modérée', default => 'faible' };
     }
 
     private function getRecommendedActions(int $score, Maintenance $m): array
     {
-        $actions     = [];
+        $actions = [];
         $machineName = $this->getMachineName($m);
 
         if ($score >= 70) {
-            $actions[] = "🚨 INTERVENTION IMMÉDIATE — {$machineName} nécessite une réparation urgente";
-            $actions[] = "📞 Contacter le service technique d'urgence";
-            $actions[] = "⛔ Ne pas utiliser la machine avant réparation";
+            $actions[] = "🚨 INTERVENTION IMMÉDIATE — {$machineName}";
         } elseif ($score >= 50) {
             $actions[] = "⚠️ Planifier une intervention sous 48h";
-            $actions[] = "🔧 Préparer les pièces de rechange nécessaires";
-            $actions[] = "📋 Réaliser un diagnostic complet";
         } elseif ($score >= 30) {
-            $actions[] = "📅 Programmer une maintenance préventive sous 15 jours";
-            $actions[] = "👀 Effectuer une inspection visuelle quotidienne";
-            $actions[] = "📝 Tenir un journal de bord des anomalies";
+            $actions[] = "📅 Programmer une maintenance sous 15 jours";
         } else {
-            $actions[] = "✅ Maintenir le planning de maintenance régulier";
-            $actions[] = "🔍 Contrôles périodiques standards";
-            $actions[] = "📊 Surveiller l'évolution des indicateurs";
+            $actions[] = "✅ Maintenir le planning régulier";
         }
-
-        $type = $m->getTypePanne() ?? '';
-        if ($type === 'Moteur')       $actions[] = "🔧 Contrôler les niveaux d'huile et liquide de refroidissement";
-        elseif ($type === 'Électricité') $actions[] = "⚡ Vérifier la batterie et le circuit électrique";
-        elseif ($type === 'Hydraulique') $actions[] = "💧 Inspecter les flexibles et rechercher les fuites";
-
         return $actions;
     }
 
     private function buildLocalPromptResponse(string $prompt, Maintenance $maintenance): string
     {
-        $type      = $maintenance->getTypePanne() ?? 'générale';
-        $prio      = $maintenance->getPriorite() ?? 'moyenne';
-        $km        = $maintenance->getKilometrage() ?? 0;
-        $nom       = $this->getMachineName($maintenance);
-        $promptLc  = strtolower($prompt);
+        $type = $maintenance->getTypePanne() ?? 'générale';
+        $prio = $maintenance->getPriorite() ?? 'moyenne';
+        $km = $maintenance->getKilometrage() ?? 0;
+        $nom = $this->getMachineName($maintenance);
+        $promptLc = strtolower($prompt);
 
-        if (str_contains($promptLc, 'vérif') || str_contains($promptLc, 'étape')) {
-            return "📋 RECOMMANDATIONS - Vérifications pour {$nom} (panne {$type}) :\n\n"
-                . "1. 🔍 Inspection visuelle générale (fuites, câbles, fixations)\n"
-                . "2. 🚀 Test de démarrage et fonctionnement à vide\n"
-                . "3. 🌡️ Relevé des températures et pressions\n"
-                . "4. 💧 Contrôle des niveaux (huile, liquide refroidissement, hydraulique)\n"
-                . "5. 💻 Diagnostic électronique si disponible\n"
-                . "6. ⚡ Test de charge progressive\n"
-                . ($prio === 'urgente' ? "\n⚠️ RECOMMANDATION URGENTE : Ne pas utiliser la machine avant réparation." : '');
+        if (str_contains($promptLc, 'vérif')) {
+            return "📋 Vérifications pour {$nom} :\n1. Inspection visuelle\n2. Test démarrage\n3. Contrôle niveaux\n" . ($prio === 'urgente' ? "\n⚠️ URGENT" : '');
         }
-
-        if (str_contains($promptLc, 'pièce') || str_contains($promptLc, 'remplacer')) {
-            $rec  = "🔧 RECOMMANDATIONS - Pièces à contrôler/remplacer pour {$nom} :\n\n";
-            $rec .= "| Pièce | Action | Priorité |\n|-------|--------|----------|\n";
-            $rec .= "| Filtres (air, huile, carburant) | Vérifier et remplacer si nécessaire | Haute |\n";
-            $rec .= "| Courroies et chaînes | Contrôler l'usure | Haute |\n";
-            $rec .= "| Joints et flexibles | Inspection fuites | Moyenne |\n";
-            if ($km > 5000)  $rec .= "| Huile moteur + filtre | Vidange obligatoire (km > 5000) | Haute |\n";
-            if ($km > 10000) $rec .= "| Roulements et paliers | Inspection approfondie (km > 10000) | Haute |\n";
-            if ($km > 15000) $rec .= "| Pièces d'usure moteur | Remplacement préventif (km > 15000) | Urgente |\n";
-            $rec .= "| Bougies/injecteurs | Nettoyage ou remplacement si perte puissance | Moyenne |\n";
-            $rec .= "| Batterie | Test et recharge si démarrage difficile | Basse |\n";
-            return $rec;
+        if (str_contains($promptLc, 'coût')) {
+            return "💰 Estimation pour {$nom} :\n- Pièces : 100-500 DT\n- Main d'œuvre : 50-120 DT/h";
         }
-
-        if (str_contains($promptLc, 'sécurité') || str_contains($promptLc, 'précaution')) {
-            return "⚠️ RECOMMANDATIONS DE SÉCURITÉ pour l'intervention sur {$nom} :\n\n"
-                . "Équipements obligatoires :\n"
-                . "• Casque, gants résistants, lunettes de protection\n"
-                . "• Chaussures de sécurité avec semelle anti-perforation\n"
-                . "• Gilet haute visibilité si intervention en extérieur\n\n"
-                . "Procédures avant intervention :\n"
-                . "• Couper le moteur et attendre le refroidissement complet\n"
-                . "• Déconnecter la batterie (pôle négatif en premier)\n"
-                . "• Caler les roues pour éviter tout mouvement\n"
-                . "• Utiliser des chandelles certifiées\n\n"
-                . "Pendant l'intervention :\n"
-                . "• Extincteur à portée de main — zone bien ventilée\n"
-                . "• Ne jamais travailler seul sur une intervention lourde\n\n"
-                . "Après intervention :\n"
-                . "• Rebrancher la batterie (pôle positif en premier)\n"
-                . "• Tester la machine à vide avant utilisation normale";
-        }
-
-        if (str_contains($promptLc, 'temps') || str_contains($promptLc, 'outil') || str_contains($promptLc, 'durée')) {
-            $duree = match($type) {
-                'Moteur'            => '4 à 8 heures',
-                'Transmission'      => '3 à 6 heures',
-                'Hydraulique'       => '2 à 4 heures',
-                'Électricité'       => '1 à 3 heures',
-                'Vidange & filtres' => '1 à 2 heures',
-                default             => '2 à 4 heures',
-            };
-            return "⏱️ RECOMMANDATIONS - Temps et outils pour panne {$type} :\n\n"
-                . "Durée estimée : {$duree}\n\n"
-                . "Outils nécessaires :\n"
-                . "• Clés à douilles (jeu complet 8-24mm)\n"
-                . "• Multimètre digital\n"
-                . "• Valise de diagnostic OBD\n"
-                . "• Manomètre de compression\n"
-                . "• Thermomètre infrarouge\n"
-                . "• Bac de récupération\n\n"
-                . "Technicien recommandé : Spécialiste en maintenance agricole";
-        }
-
-        if (str_contains($promptLc, 'coût') || str_contains($promptLc, 'estimation') || str_contains($promptLc, 'prix')) {
-            $coutPieces = match($type) {
-                'Moteur'            => '300 – 800',
-                'Transmission'      => '250 – 600',
-                'Hydraulique'       => '150 – 400',
-                'Électricité'       => '80 – 250',
-                'Vidange & filtres' => '60 – 150',
-                default             => '100 – 400',
-            };
-            return "💰 RECOMMANDATIONS - Estimation des coûts pour {$nom} :\n\n"
-                . "| Poste | Coût estimé (DT) |\n|-------|------------------|\n"
-                . "| Pièces détachées | {$coutPieces} |\n"
-                . "| Main d'œuvre (taux horaire) | 50 – 120 |\n"
-                . "| Forfait déplacement technicien | 30 – 80 |\n"
-                . ($km > 10000 ? "| Révision générale supplémentaire | +200 à 500 |\n" : '')
-                . "| Total estimé | À partir de " . explode(' – ', $coutPieces)[0] . " DT |\n\n"
-                . "💡 Recommandations : Demander 2-3 devis, vérifier la garantie des pièces";
-        }
-
-        return "📋 RECOMMANDATION GÉNÉRALE pour {$nom} (panne {$type}, priorité {$prio}) :\n\n"
-            . "Plan d'action recommandé :\n"
-            . "1. 🔍 Réaliser un diagnostic complet avant toute intervention\n"
-            . "2. 🎯 Identifier précisément la source du problème\n"
-            . "3. 📦 Préparer les pièces et outils nécessaires\n"
-            . "4. 🔧 Intervenir selon les procédures constructeur\n"
-            . "5. ✅ Tester le bon fonctionnement après intervention\n"
-            . "6. 📝 Documenter l'intervention dans le carnet de maintenance\n\n"
-            . ($prio === 'urgente'
-                ? "⚠️ ACTION IMMÉDIATE : Priorité urgente — intervenir sans délai."
-                : "📅 PLANIFICATION : Planifier l'intervention dans les meilleurs délais.");
+        return "📋 Recommandation pour {$nom} :\n1. Diagnostic complet\n2. Préparer les pièces\n3. Intervenir\n" . ($prio === 'urgente' ? "\n⚠️ ACTION IMMÉDIATE" : "");
     }
 
     private function buildLifetimeRecommendations(string $type, string $prio, int $km, array $composants): array
     {
         $recs = [];
-        if ($prio === 'urgente') $recs[] = "Intervention immédiate requise — risque d'aggravation si non traité.";
-        elseif ($prio === 'haute') $recs[] = "Planifier l'intervention sous 2 semaines maximum.";
-        if ($km >= 5000)  $recs[] = "Vidange moteur et remplacement des filtres requis (kilométrage > 5 000 km).";
-        if ($km >= 10000) $recs[] = "Révision générale conseillée — contrôle complet de tous les systèmes.";
-        if ($km >= 15000) $recs[] = "Inspection approfondie de la transmission et du moteur (kilométrage critique).";
+        if ($prio === 'urgente') $recs[] = "Intervention immédiate requise";
+        if ($km >= 15000) $recs[] = "Révision majeure obligatoire";
+        elseif ($km >= 10000) $recs[] = "Révision générale conseillée";
+        elseif ($km >= 5000) $recs[] = "Vidange moteur requise";
 
         usort($composants, fn($a, $b) => $b['usure'] - $a['usure']);
         if ($composants[0]['usure'] > 70) {
-            $recs[] = "Composant critique : {$composants[0]['nom']} ({$composants[0]['usure']}% d'usure) — prévoir remplacement.";
+            $recs[] = "Composant critique : {$composants[0]['nom']} ({$composants[0]['usure']}%)";
         }
-        $recs[] = "Effectuer des inspections visuelles quotidiennes et noter toute anomalie.";
-        $recs[] = "Tenir à jour le carnet de maintenance pour assurer la traçabilité.";
         return array_slice($recs, 0, 5);
-    }
-
-    private function calculateRecommendedInterventions(array $d): array
-    {
-        $interventions = [];
-        $km            = $d['kilometrage'] ?? 0;
-        $typePanne     = $d['type'] ?? '';
-        $priorite      = $d['priorite'] ?? 'moyenne';
-
-        if ($km >= 5000)  $interventions[] = ['name' => '🛢️ Vidange moteur',           'reason' => 'Kilométrage > 5 000 km',  'priority' => $km >= 8000 ? 'haute' : 'moyenne'];
-        if ($km >= 10000) $interventions[] = ['name' => '🔧 Révision générale',         'reason' => 'Kilométrage > 10 000 km', 'priority' => 'haute'];
-        if ($km >= 15000) $interventions[] = ['name' => '⚙️ Remplacement transmission', 'reason' => 'Kilométrage > 15 000 km', 'priority' => 'urgente'];
-
-        $typeInterventions = [
-            'Mécanique'         => [['name' => '🔧 Contrôle des pièces mécaniques', 'priority' => 'haute'],   ['name' => '📊 Test de performance moteur',  'priority' => 'moyenne']],
-            'Électricité'       => [['name' => '⚡ Diagnostic circuit électrique',  'priority' => 'haute'],   ['name' => '🔋 Test batterie et alternateur', 'priority' => 'moyenne']],
-            'Hydraulique'       => [['name' => '💧 Contrôle circuit hydraulique',   'priority' => 'haute'],   ['name' => '🔍 Détection des fuites',         'priority' => 'haute']],
-            'Moteur'            => [['name' => '🔧 Diagnostic complet moteur',      'priority' => 'urgente'], ['name' => '🌡️ Contrôle du refroidissement',  'priority' => 'haute']],
-            'Vidange & filtres' => [['name' => '🛢️ Vidange et changement filtres',  'priority' => 'moyenne'], ['name' => '🌬️ Nettoyage filtre à air',       'priority' => 'basse']],
-        ];
-        if (isset($typeInterventions[$typePanne])) {
-            foreach ($typeInterventions[$typePanne] as $i) $interventions[] = $i;
-        }
-        if (empty($interventions)) {
-            $interventions[] = ['name' => '🔍 Diagnostic général', 'reason' => 'Inspection préventive', 'priority' => 'moyenne'];
-        }
-        if ($priorite === 'urgente') {
-            $interventions[] = ['name' => "🚨 Intervention d'urgence", 'reason' => 'Panne prioritaire détectée', 'priority' => 'urgente'];
-        }
-        return $interventions;
-    }
-
-    private function generateSchedulePlan(array $d, array $options, array $interventions): string
-    {
-        $plan  = "# 📋 PLAN DE MAINTENANCE\n\n## Récapitulatif\n";
-        $plan .= "- Machine : {$d['nom']}\n";
-        $plan .= "- Type : {$d['type']}\n";
-        $plan .= "- Priorité : " . ucfirst($d['priorite']) . "\n";
-        $plan .= "- Kilométrage : " . ($d['kilometrage'] ? $d['kilometrage'] . ' km' : 'Non renseigné') . "\n";
-        $plan .= "- Date prévue : " . ($d['dateMain'] ?? 'Non renseignée') . "\n";
-        $plan .= "- Coût estimé : " . number_format($d['cout'], 2, ',', ' ') . " DT\n\n";
-
-        if (in_array('intervention', $options)) {
-            $plan .= "## 🔍 DIAGNOSTIC PRÉLIMINAIRE\n1. Inspection visuelle générale\n2. Test à vide\n3. Relevé des paramètres\n4. Identification des anomalies\n\n## 📝 ÉTAPES D'INTERVENTION\n";
-            foreach ($interventions as $idx => $i) {
-                $plan .= ($idx + 1) . ". {$i['name']}\n";
-                if (isset($i['reason'])) $plan .= "   - Motif : {$i['reason']}\n";
-                $plan .= "   - Priorité : " . ucfirst($i['priority']) . "\n";
-            }
-            $plan .= "\n";
-        }
-
-        if (in_array('prevention', $options)) {
-            $days = match($d['priorite']) { 'urgente' => 30, 'haute' => 60, 'moyenne' => 90, default => 180 };
-            $plan .= "## 📅 PLANNING PRÉVENTIF\n- Prochaine maintenance : dans {$days} jours\n";
-            if ($d['kilometrage'] > 0) {
-                $plan .= "- Prochaine vidange : tous les 5 000 km\n- Révision générale : tous les 10 000 km\n";
-            }
-            $plan .= "- Contrôle hebdomadaire : niveaux, pression pneus, éclairage\n- Contrôle mensuel : courroies, filtres, batterie\n\n";
-        }
-
-        if (in_array('pieces', $options)) {
-            $plan .= "## 🔩 PIÈCES DÉTACHÉES\n| Pièce | Qté | Disponibilité | Coût (DT) |\n|-------|-----|---------------|----------|\n";
-            $plan .= "| Filtre à huile | 1 | En stock | 45 |\n| Filtre à air | 1 | En stock | 35 |\n";
-            $plan .= "| Filtre gasoil | 1 | En stock | 55 |\n| Huile moteur 5L | 1 | En stock | 85 |\n";
-            $plan .= "| Courroie distribution | 1 | Sur commande (3-5j) | 120 |\n| Bougies | 4 | En stock | 25/pièce |\n\n";
-        }
-
-        if (in_array('optimisation', $options)) {
-            $plan .= "## ⚡ OPTIMISATION\n- Regrouper la vidange avec le changement des filtres\n- Planifier la révision avec le contrôle de la transmission\n- Commander les pièces à l'avance\n\n";
-        }
-
-        if (in_array('securite', $options)) {
-            $plan .= "## ⚠️ PRÉCAUTIONS DE SÉCURITÉ\n- EPI obligatoires (gants, lunettes, chaussures)\n- Couper le moteur et attendre le refroidissement\n- Chandelles obligatoires pour travail sous la machine\n- Extincteur à proximité — zone ventilée\n\n";
-        }
-
-        if (in_array('controle', $options)) {
-            $plan .= "## ✅ CONTRÔLE POST-INTERVENTION\n- [ ] Absence de fuites\n- [ ] Niveaux des fluides\n- [ ] Fonctionnement à chaud\n- [ ] Absence de voyants\n- [ ] Freins et direction\n- [ ] Serrage des éléments\n- [ ] Documentation dans le carnet\n\n";
-        }
-
-        $score  = 100;
-        $score -= match($d['priorite']) { 'urgente' => 30, 'haute' => 20, 'moyenne' => 10, default => 0 };
-        $score -= match(true) { ($d['kilometrage'] ?? 0) > 15000 => 25, ($d['kilometrage'] ?? 0) > 10000 => 15, default => 0 };
-
-        $plan .= "## 📊 SCORE DE SANTÉ : " . max(0, $score) . "/100\n\n";
-        $plan .= "## 💡 RECOMMANDATIONS\n1. Suivre rigoureusement le planning d'entretien\n"
-               . "2. Former les opérateurs aux bonnes pratiques\n"
-               . "3. Tenir un carnet de bord à jour\n"
-               . "4. Maintenir un stock minimum de pièces consommables\n"
-               . "5. Inspections visuelles quotidiennes\n";
-
-        return $plan;
-    }
-
-    // ────────────────────────────────────────────────────────
-    // HELPERS POUR LE CALENDRIER DES RAPPELS
-    // ────────────────────────────────────────────────────────
-    private function generateReminderRecommendations(Maintenance $m, int $yearsSince): array
-    {
-        $recommendations = [];
-        $km = $m->getKilometrage() ?? 0;
-        $priorite = $m->getPriorite();
-
-        if ($priorite === 'urgente') {
-            $recommendations[] = "🚨 INTERVENTION IMMÉDIATE - Ne pas utiliser la machine";
-            $recommendations[] = "📞 Contacter le service technique d'urgence";
-            $recommendations[] = "🔧 Préparer les pièces de rechange nécessaires";
-        } elseif ($yearsSince >= 2) {
-            $recommendations[] = "⚠️ REVISION MAJEURE - Plus de 2 ans sans maintenance";
-            $recommendations[] = "🔧 Contrôle complet du moteur et de la transmission";
-            $recommendations[] = "🛢️ Vidange complète et changement de tous les filtres";
-            $recommendations[] = "🔍 Inspection approfondie du système hydraulique";
-        } elseif ($yearsSince >= 1) {
-            $recommendations[] = "📅 RAPPEL ANNUEL - Maintenance préventive recommandée";
-            $recommendations[] = "🔧 Vérification générale de l'état de la machine";
-            $recommendations[] = "🛢️ Vidange moteur et changement des filtres";
-            $recommendations[] = "🔍 Contrôle des courroies et des niveaux";
-        }
-
-        if ($km > 10000) {
-            $recommendations[] = "📊 Kilométrage élevé ({$km} km) - Révision complète nécessaire";
-        } elseif ($km > 5000) {
-            $recommendations[] = "📊 Kilométrage intermédiaire ({$km} km) - Vérification recommandée";
-        }
-
-        return $recommendations;
-    }
-
-    private function calculateReminderUrgence(Maintenance $m, int $yearsSince): array
-    {
-        $priorite = $m->getPriorite();
-        $km = $m->getKilometrage() ?? 0;
-        
-        $score = 0;
-        $level = 'faible';
-        $color = '#2d6a2d';
-        
-        if ($priorite === 'urgente') {
-            $score = 100;
-            $level = 'critique';
-            $color = '#a32d2d';
-        } elseif ($yearsSince >= 2) {
-            $score = 90;
-            $level = 'critique';
-            $color = '#a32d2d';
-        } elseif ($yearsSince >= 1) {
-            $score = 70;
-            $level = 'élevé';
-            $color = '#e67e22';
-        } elseif ($km > 15000) {
-            $score = 80;
-            $level = 'élevé';
-            $color = '#e67e22';
-        } elseif ($km > 10000) {
-            $score = 50;
-            $level = 'moyen';
-            $color = '#f39c12';
-        }
-        
-        return [
-            'score' => $score,
-            'level' => $level,
-            'color' => $color,
-            'label' => $this->getReminderUrgenceLabel($level),
-        ];
-    }
-
-    private function getReminderUrgenceLabel(string $level): string
-    {
-        return match($level) {
-            'critique' => '🔴 CRITIQUE - Action immédiate',
-            'élevé' => '🟠 ÉLEVÉ - Planifier sous 48h',
-            'moyen' => '🟡 MOYEN - Planifier sous 15 jours',
-            default => '🟢 FAIBLE - Surveillance normale',
-        };
-    }
-
-    private function getReminderMessage(string $machineName, int $yearsSince, int $monthsSince, string $priorite): string
-    {
-        if ($priorite === 'urgente') {
-            return "🔴 URGENT : {$machineName} nécessite une intervention immédiate !";
-        }
-        
-        if ($yearsSince >= 2) {
-            return "⚠️ ALERTE MAJEURE : {$machineName} n'a pas eu de maintenance depuis {$yearsSince} ans et {$monthsSince} mois. Révision complète obligatoire !";
-        }
-        
-        if ($yearsSince >= 1) {
-            if ($monthsSince > 0) {
-                return "🔔 RAPPEL ANNUEL : {$machineName} n'a pas eu de maintenance depuis {$yearsSince} an" . ($yearsSince > 1 ? 's' : '') . " et {$monthsSince} mois. Une visite de maintenance est recommandée.";
-            }
-            return "🔔 RAPPEL ANNUEL : {$machineName} n'a pas eu de maintenance depuis {$yearsSince} an" . ($yearsSince > 1 ? 's' : '') . ". Une visite de maintenance est recommandée.";
-        }
-        
-        return "📅 {$machineName} a un rappel de visite ou maintenance programmée.";
-    }
-
-    // ════════════════════════════════════════════════════════
-    // HELPERS POUR LA RECOMMANDATION IA INTELLIGENTE
-    // ════════════════════════════════════════════════════════
-
-    private function calculateRiskScore(int $km, string $priorite, string $statut): int
-    {
-        $score = 0;
-        
-        if ($km >= 15000) $score += 40;
-        elseif ($km >= 10000) $score += 30;
-        elseif ($km >= 5000) $score += 20;
-        elseif ($km >= 2000) $score += 10;
-        
-        $score += match($priorite) {
-            'urgente' => 35,
-            'haute' => 25,
-            'moyenne' => 15,
-            default => 5,
-        };
-        
-        $score += match($statut) {
-            'en_cours' => 20,
-            'planifie' => 10,
-            'termine' => 0,
-            default => 5,
-        };
-        
-        return min(100, $score);
-    }
-    
-    private function getRiskLevel(int $score): string
-    {
-        if ($score >= 70) return 'critique';
-        if ($score >= 50) return 'élevé';
-        if ($score >= 30) return 'modéré';
-        return 'faible';
-    }
-    
-    private function calculateNextKmRecommendation(int $km): int
-    {
-        if ($km >= 15000) return 20000;
-        if ($km >= 10000) return 15000;
-        if ($km >= 5000) return 10000;
-        if ($km >= 2000) return 5000;
-        return 5000;
-    }
-    
-    private function getIntelligentMainMessage(string $machineName, string $priorite, string $statut, int $km): string
-    {
-        if ($priorite === 'urgente' && $statut === 'en_cours') {
-            return "⚠️ INTERVENTION EN COURS - {$machineName} est actuellement en réparation urgente. 🔥";
-        }
-        
-        if ($priorite === 'urgente') {
-            return "🚨 ALERTE CRITIQUE - {$machineName} nécessite une intervention immédiate ! 🔥";
-        }
-        
-        if ($statut === 'en_cours') {
-            return "🔧 INTERVENTION EN COURS - Une maintenance est en cours sur {$machineName}.";
-        }
-        
-        if ($priorite === 'haute') {
-            return "⚠️ HAUTE PRIORITÉ - {$machineName} doit être maintenue dans les plus brefs délais.";
-        }
-        
-        if ($km >= 15000) {
-            return "📊 KILOMÉTRAGE CRITIQUE - {$machineName} a atteint {$km} km. Révision majeure requise !";
-        }
-        
-        if ($km >= 10000) {
-            return "📊 KILOMÉTRAGE ÉLEVÉ - {$machineName} approche les {$km} km. Maintenance préventive recommandée.";
-        }
-        
-        return "🔔 RECOMMANDATION IA - Sur la base des données actuelles et des cas similaires, il est fortement recommandé d'adopter un cycle de maintenance préventive tous les 5000 km afin de réduire les risques futurs et optimiser la durée de vie de {$machineName}.";
-    }
-    
-    private function getIntelligentInterpretation(int $km, string $priorite, string $statut, string $riskLevel): array
-    {
-        $interpretation = [];
-        
-        if ($riskLevel === 'critique') {
-            $interpretation[] = "⚠️ Niveau de risque : CRITIQUE";
-            $interpretation[] = "Le système détecte un risque de panne majeur basé sur :";
-        } elseif ($riskLevel === 'élevé') {
-            $interpretation[] = "⚠️ Niveau de risque : ÉLEVÉ";
-            $interpretation[] = "Le système détecte un niveau de risque modéré à élevé basé sur :";
-        } elseif ($riskLevel === 'modéré') {
-            $interpretation[] = "📊 Niveau de risque : MODÉRÉ";
-            $interpretation[] = "Le système détecte un niveau de risque basé sur :";
-        } else {
-            $interpretation[] = "✅ Niveau de risque : FAIBLE";
-            $interpretation[] = "La machine semble en bonne état, surveillance recommandée basée sur :";
-        }
-        
-        $factors = [];
-        if ($km > 0) $factors[] = "le kilométrage actuel ({$km} km)";
-        if ($priorite !== 'faible') $factors[] = "la priorité ({$priorite})";
-        if ($statut !== 'termine') $factors[] = "le statut actuel ({$statut})";
-        
-        if (!empty($factors)) {
-            $interpretation[] = "• " . implode("\n• ", $factors);
-        }
-        
-        if ($riskLevel === 'critique' || $riskLevel === 'élevé') {
-            $interpretation[] = "\n💡 Une maintenance doit être planifiée immédiatement pour éviter une panne critique.";
-        } elseif ($riskLevel === 'modéré') {
-            $interpretation[] = "\n💡 Une maintenance est planifiée à l'avance pour éviter une panne critique.";
-        } else {
-            $interpretation[] = "\n💡 Continuer le suivi régulier et les inspections périodiques.";
-        }
-        
-        return $interpretation;
-    }
-    
-    private function getIntelligentActions(string $priorite, string $statut, int $km, int $nextKm): array
-    {
-        $actions = [];
-        
-        if ($priorite === 'urgente' && $statut === 'en_cours') {
-            $actions[] = "🔧 Finaliser l'intervention en cours et tester la machine";
-            $actions[] = "📝 Documenter les réparations effectuées";
-            $actions[] = "🔄 Planifier la prochaine maintenance préventive";
-        } elseif ($priorite === 'urgente') {
-            $actions[] = "🚨 DÉPLACER LE TECHNICIEN D'URGENCE - Intervention immédiate requise";
-            $actions[] = "📞 Contacter le service technique sans délai";
-            $actions[] = "⛔ Ne pas utiliser la machine avant intervention";
-        } elseif ($priorite === 'haute') {
-            $actions[] = "📅 Planifier la maintenance sous 48 heures maximum";
-            $actions[] = "🔧 Préparer les pièces de rechange nécessaires";
-            $actions[] = "📋 Réaliser un diagnostic complet avant intervention";
-        } elseif ($statut === 'en_cours') {
-            $actions[] = "🔧 Poursuivre l'intervention en cours";
-            $actions[] = "✅ Effectuer les tests de validation";
-            $actions[] = "🔄 Mettre à jour le statut après intervention";
-        } else {
-            $actions[] = "📅 Programmer la prochaine maintenance avant d'atteindre {$nextKm} km";
-            if ($km >= 5000) {
-                $actions[] = "🛢️ Prévoir une vidange et changement des filtres";
-                $actions[] = "🔍 Contrôle des courroies et niveaux";
-            }
-            $actions[] = "🔧 Effectuer une vérification complète des composants principaux";
-            $actions[] = "🔄 Mettre à jour régulièrement le statut après intervention";
-        }
-        
-        return $actions;
-    }
-    
-    private function getAdditionalTips(string $typePanne, int $km, string $priorite): array
-    {
-        $tips = [];
-        
-        if ($typePanne === 'Moteur' || $km > 10000) {
-            $tips[] = "Contrôler la compression moteur et l'injection";
-        }
-        if ($typePanne === 'Hydraulique' || $km > 8000) {
-            $tips[] = "Vérifier l'absence de fuites sur le circuit hydraulique";
-        }
-        if ($typePanne === 'Électricité') {
-            $tips[] = "Tester la batterie et l'alternateur";
-        }
-        if ($priorite === 'haute' || $priorite === 'urgente') {
-            $tips[] = "Prévoir un technicien spécialisé pour l'intervention";
-        }
-        
-        if (empty($tips)) {
-            $tips[] = "Effectuer une inspection visuelle hebdomadaire";
-            $tips[] = "Tenir à jour le carnet de maintenance";
-        }
-        
-        return $tips;
     }
 }
