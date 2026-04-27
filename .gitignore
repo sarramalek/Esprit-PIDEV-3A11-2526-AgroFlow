@@ -9,9 +9,9 @@
 /var/cache/
 /var/log/
 /vendor/
-.env
-###< symfony/framework-bundle ###
 
+###< symfony/framework-bundle ###
+.env
 ###> phpunit/phpunit ###
 /phpunit.xml
 .phpunit.result.cache
