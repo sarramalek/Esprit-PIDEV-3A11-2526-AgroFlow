@@ -25,7 +25,7 @@ class LocaleSubscriber implements EventSubscriberInterface
         $session = $request->getSession();
         $locale = null;
 
-        if ($session && $session->has('_locale')) {
+        if ($session->has('_locale')) {
             $locale = $session->get('_locale');
         } elseif ($request->cookies->has('locale')) {
             $locale = $request->cookies->get('locale');

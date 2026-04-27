@@ -23,7 +23,7 @@ class categorieevenement
         minMessage: 'Le nom doit contenir au moins {{ limit }} caractères !',
         maxMessage: 'Le nom ne doit pas dépasser {{ limit }} caractères !'
     )]
-    private ?string $nomCategorie = null;
+    private string $nomCategorie = '';
 
     #[ORM\Column(name: 'description', type: 'text')]
     #[Assert\NotBlank(message: 'La description ne peut pas être vide !')]
@@ -33,7 +33,7 @@ class categorieevenement
         minMessage: 'La description doit contenir au moins {{ limit }} caractères !',
         maxMessage: 'La description ne doit pas dépasser {{ limit }} caractères !'
     )]
-    private ?string $descriptionCategorie = null;
+    private string $descriptionCategorie = '';
 
     // ================= GETTERS & SETTERS =================
 
@@ -66,6 +66,6 @@ class categorieevenement
 
     public function __toString(): string
     {
-        return $this->nomCategorie ?? '';
+        return $this->nomCategorie;
     }
 }

@@ -6,6 +6,9 @@ use App\Entity\stocks\Article;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<Article>
+ */
 class ArticleRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -15,6 +18,9 @@ class ArticleRepository extends ServiceEntityRepository
 
     /**
      * Recherche, filtre et trie les articles
+     * 
+     * @param mixed $user
+     * @return array<int, Article>
      */
     public function findBySearchCriteria(?string $search, ?string $categoryId, $user, string $sortBy = 'nom', ?int $idAdmin = null): array
     {
@@ -41,7 +47,7 @@ class ArticleRepository extends ServiceEntityRepository
         }
 
         // 3. Filtre par catégorie (Dropdown)
-        if ($categoryId && $categoryId !== '') {
+        if ($categoryId) {
             if (!$search) { $qb->leftJoin('a.categorie', 'c'); } // Join si pas deja fait
             $qb->andWhere('a.categorie = :catId')
                ->setParameter('catId', $categoryId);
@@ -69,6 +75,8 @@ class ArticleRepository extends ServiceEntityRepository
 
     /**
      * Trouve les articles créés par des utilisateurs ayant un rôle spécifique
+     * 
+     * @return array<int, Article>
      */
     public function findByUserRole(int $role): array
     {
@@ -81,6 +89,10 @@ class ArticleRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @param mixed $admin
+     * @return array<int, Article>
+     */
     public function findByAdminCin($admin): array
     {
         return $this->createQueryBuilder('a')

@@ -16,27 +16,28 @@ class Article
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
+    /** @var int|null */
     #[ORM\Column(name: "id_article", type: "integer")]
     private ?int $id = null;
 
     #[ORM\Column(length: 150)]
     #[Assert\NotBlank(message: "Le nom du produit ne peut pas être vide.")]
     #[Assert\Length(min: 3, minMessage: "Le nom doit contenir au moins {{ limit }} caractères.")]
-    private ?string $nom = null;
+    private string $nom = '';
 
     #[ORM\Column]
     #[Assert\NotNull(message: "La quantité est obligatoire.")]
     #[Assert\PositiveOrZero(message: "La quantité ne peut pas être négative.")]
-    private ?float $quantite_en_stock = null;
+    private float $quantite_en_stock = 0.0;
 
     #[ORM\Column]
     #[Assert\NotNull(message: "Le seuil d'alerte est obligatoire.")]
     #[Assert\PositiveOrZero(message: "Le seuil doit être un nombre positif.")]
-    private ?float $seuil_alerte = null;
+    private float $seuil_alerte = 0.0;
 
     #[ORM\Column(length: 20)]
     #[Assert\NotBlank(message: "Veuillez préciser l'unité (Kg, Litre, etc.).")]
-    private ?string $unite_mesure = null;
+    private string $unite_mesure = '';
 
     #[ORM\Column(type: "float", nullable: true)]
     #[Assert\NotNull(message: "Le prix unitaire est requis.")]
@@ -44,7 +45,7 @@ class Article
     private ?float $prix_unitaire = null;
 
     #[ORM\Column(length: 3, options: ["default" => "TND"])]
-    private ?string $devise = "TND";
+    private string $devise = "TND";
 
     #[ORM\Column(type: "float", nullable: true)]
     private ?float $prix_achat_devise = null;
@@ -58,7 +59,9 @@ class Article
     #[ORM\JoinColumn(name: "id_user", referencedColumnName: "cin", nullable: true)]
     private ?User $user = null;
 
-    // Correction : Le nom de la propriété doit être 'mouvements' pour matcher ton MouvementStock
+    /**
+     * @var Collection<int, MouvementStock>
+     */
     #[ORM\OneToMany(targetEntity: MouvementStock::class, mappedBy: 'article', orphanRemoval: true)]
     private Collection $mouvements;
 
@@ -76,7 +79,7 @@ class Article
         return $this->id;
     }
 
-    public function getNom(): ?string
+    public function getNom(): string
     {
         return $this->nom;
     }
@@ -86,7 +89,7 @@ class Article
         return $this;
     }
 
-    public function getQuantiteEnStock(): ?float
+    public function getQuantiteEnStock(): float
     {
         return $this->quantite_en_stock;
     }
@@ -96,7 +99,7 @@ class Article
         return $this;
     }
 
-    public function getSeuilAlerte(): ?float
+    public function getSeuilAlerte(): float
     {
         return $this->seuil_alerte;
     }
@@ -106,7 +109,7 @@ class Article
         return $this;
     }
 
-    public function getUniteMesure(): ?string
+    public function getUniteMesure(): string
     {
         return $this->unite_mesure;
     }
@@ -188,16 +191,14 @@ class Article
     public function removeMouvement(MouvementStock $mouvement): static
     {
         if ($this->mouvements->removeElement($mouvement)) {
-            if ($mouvement->getArticle() === $this) {
-                $mouvement->setArticle(null);
-            }
+            // owning side cannot be null (DB nullable=false), keep current link unchanged
         }
         return $this;
     }
 
     public function getValeurTotaleStock(): float
     {
-        return ($this->quantite_en_stock ?? 0) * ($this->prix_unitaire ?? 0);
+        return $this->quantite_en_stock * ($this->prix_unitaire ?? 0);
     }
 
     public function isStockCritique(): bool

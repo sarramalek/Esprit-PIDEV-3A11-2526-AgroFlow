@@ -5,6 +5,9 @@ use App\Entity\Terrain\Terrain;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<Terrain>
+ */
 class TerrainRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -12,6 +15,9 @@ class TerrainRepository extends ServiceEntityRepository
         parent::__construct($registry, Terrain::class);
     }
 
+    /**
+     * @return array<int, mixed>
+     */
     public function findWithStats(): array
     {
         return $this->createQueryBuilder('t')
@@ -22,6 +28,9 @@ class TerrainRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return array<int, Terrain>
+     */
      public function findByAgriculteur(int $cinAgriculteur): array
     {
         return $this->createQueryBuilder('t')
@@ -50,7 +59,10 @@ class TerrainRepository extends ServiceEntityRepository
     }
  // src/Repository/Terrain/TerrainRepository.php
 
-/** Retourne tous les ouvriers (User) appartenant aux terrains de l'agriculteur */
+/**
+ * Retourne tous les ouvriers (User) appartenant aux terrains de l'agriculteur
+ * @return array<int, \App\Entity\User\User>
+ */
 public function findOuvriersDeAgriculteur(int $cinAgriculteur): array
 {
     return $this->getEntityManager()

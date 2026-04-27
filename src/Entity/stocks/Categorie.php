@@ -16,24 +16,28 @@ class Categorie
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
+    /** @var int|null */
     #[ORM\Column(name: "id_categorie")]
     private ?int $id = null;
 
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank(message: "Le nom de la catégorie est obligatoire.")]
-    private ?string $nom = null;
+    private string $nom = '';
 
     #[ORM\Column(type: "text", nullable: true)]
     private ?string $description = null;
 
     // Utilisation de CamelCase pour PHP, snake_case pour la base de données
     #[ORM\Column(name: "date_creation", type: "datetime_immutable")]
-    private ?\DateTimeImmutable $dateCreation = null;
+    private \DateTimeImmutable $dateCreation;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: "id_user", referencedColumnName: "cin", nullable: false)]
-    private ?User $agriculteur = null;
+    private User $agriculteur;
 
+    /**
+     * @var Collection<int, Article>
+     */
     #[ORM\OneToMany(mappedBy: 'categorie', targetEntity: Article::class)]
     private Collection $articles;
 
@@ -48,7 +52,7 @@ class Categorie
         return $this->id;
     }
 
-    public function getNom(): ?string
+    public function getNom(): string
     {
         return $this->nom;
     }
@@ -68,7 +72,7 @@ class Categorie
         return $this;
     }
 
-    public function getDateCreation(): ?\DateTimeImmutable
+    public function getDateCreation(): \DateTimeImmutable
     {
         return $this->dateCreation;
     }
@@ -78,11 +82,11 @@ class Categorie
         return $this;
     }
 
-    public function getAgriculteur(): ?User
+    public function getAgriculteur(): User
     {
         return $this->agriculteur;
     }
-    public function setAgriculteur(?User $agriculteur): self
+    public function setAgriculteur(User $agriculteur): self
     {
         $this->agriculteur = $agriculteur;
         return $this;

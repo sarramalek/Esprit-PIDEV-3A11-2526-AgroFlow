@@ -351,7 +351,7 @@ class MaintenancesController extends AbstractController
             'success'     => true,
             'suggestions' => $suggestions,
             'machine'     => $maintenance->getNom() ?? 'Machine',
-            'nextMainDate'=> $suggestions[0]['date'] ?? null,
+            'nextMainDate'=> $suggestions[0]['date'],
         ]);
     }
 
@@ -463,6 +463,10 @@ class MaintenancesController extends AbstractController
         ]);
     }
 
+    /**
+     * @param array<int, array{nom:string, usure:int}> $composants
+     * @return array<int, string>
+     */
     private function buildLifetimeRecommendations(string $type, string $prio, int $km, array $composants): array
     {
         $recs = [];
@@ -529,6 +533,10 @@ class MaintenancesController extends AbstractController
         return $this->json(['success' => true, 'plan' => $plan, 'generatedBy' => 'local_algorithm']);
     }
 
+    /**
+     * @param array<string, mixed> $machineData
+     * @return array<int, array{name:string, priority:string, reason?:string}>
+     */
     private function calculateRecommendedInterventions(array $machineData): array
     {
         $interventions = [];
@@ -562,6 +570,11 @@ class MaintenancesController extends AbstractController
         return $interventions;
     }
 
+    /**
+     * @param array<string, mixed> $d
+     * @param array<int, string> $options
+     * @param array<int, array{name:string, priority:string, reason?:string}> $interventions
+     */
     private function generateSchedulePlan(array $d, array $options, array $interventions): string
     {
         $plan  = "# 📋 PLAN DE MAINTENANCE\n\n## Récapitulatif\n";
@@ -642,6 +655,9 @@ class MaintenancesController extends AbstractController
         ]);
     }
 
+    /**
+     * @param array<int, string> $types
+     */
     private function generateDiagnosticReport(Maintenance $m, array $types): string
     {
         $km  = $m->getKilometrage() ?? 0;
@@ -763,7 +779,7 @@ class MaintenancesController extends AbstractController
                 fputcsv($handle, [$idx++, $m->getTypePanne(), number_format($m->getCout(), 2, ',', ' '),
                     $m->getDateMain()?->format('d/m/Y') ?? '', $m->getStatut() ?? '', $m->getPriorite() ?? '',
                     $m->getKilometrage() ?? '', $m->getDescription() ?? '', $m->getRecommandation() ?? '',
-                    $m->getIdM() ? '#'.$m->getIdM() : '', $m->getNom() ?? ''], ';');
+                    $m->getIdM() ? '#' . $m->getIdM()->getId() : '', $m->getNom() ?? ''], ';');
                 $total += $m->getCout();
             }
             fputcsv($handle, [], ';');

@@ -19,6 +19,8 @@ class AnimauxRepository extends ServiceEntityRepository
 
     /**
      * Recherche les animaux par nom, espèce ou sexe avec option de tri et filtrage par utilisateur.
+     * 
+     * @return array<int, Animaux>
      */
     public function searchDashboard(?string $term, ?string $sortBy = 'id', ?string $direction = 'DESC', ?User $user = null): array
     {
@@ -47,6 +49,8 @@ class AnimauxRepository extends ServiceEntityRepository
 
     /**
      * Créer un QueryBuilder pour la pagination des animaux
+     * 
+     * @return \Doctrine\ORM\QueryBuilder
      */
     public function createQueryBuilderForSearch(?string $term, ?string $sortBy = 'id', ?string $direction = 'DESC', ?User $user = null)
     {
@@ -76,6 +80,9 @@ class AnimauxRepository extends ServiceEntityRepository
 
     /**
      * Recherche les animaux par nom, espèce ou sexe pour l'admin (en filtrant par ID).
+     * 
+     * @param int[] $ids
+     * @return array<int, Animaux>
      */
     public function searchDashboardAdmin(?string $term, ?string $sortBy = 'id', ?string $direction = 'DESC', array $ids = []): array
     {
@@ -105,6 +112,8 @@ class AnimauxRepository extends ServiceEntityRepository
 
     /**
      * Statistiques par espèce, filtrées par utilisateur si nécessaire.
+     * 
+     * @return array<int, array{espece: string, total: int}>
      */
     public function countByEspece(?User $user = null): array
     {
@@ -121,6 +130,8 @@ class AnimauxRepository extends ServiceEntityRepository
     }
     /**
      * Trouve des partenaires potentiels (même espèce, sexe opposé).
+     * 
+     * @return array<int, Animaux>
      */
     public function findPotentialPartners(Animaux $animal): array
     {
@@ -140,6 +151,8 @@ class AnimauxRepository extends ServiceEntityRepository
     }
     /**
      * Calcule le poids moyen par espèce pour l'ensemble des animaux.
+     * 
+     * @return array<string, float>
      */
     public function getAverageWeightsBySpecies(): array
     {

@@ -5,6 +5,9 @@ use App\Entity\Terrain\Rotation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<Rotation>
+ */
 class RotationRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -14,6 +17,9 @@ class RotationRepository extends ServiceEntityRepository
 
     // ── ADMIN ──────────────────────────────────────────
 
+    /**
+     * @return array<int, Rotation>
+     */
     public function search(string $q): array
     {
         return $this->createQueryBuilder('r')
@@ -36,6 +42,9 @@ class RotationRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    /**
+     * @return array<int, Rotation>
+     */
     public function findAllWithRelations(): array
     {
         return $this->createQueryBuilder('r')
@@ -49,7 +58,10 @@ class RotationRepository extends ServiceEntityRepository
 
     // ── AGRICULTEUR (par CIN) ──────────────────────────
 
-    public function findByUserCin($cin): array
+    /**
+     * @return array<int, Rotation>
+     */
+    public function findByUserCin(int $cin): array
     {
         return $this->createQueryBuilder('r')
             ->join('r.terrain', 't')
@@ -62,7 +74,10 @@ class RotationRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function searchByUserCin(string $q, $cin): array
+    /**
+     * @return array<int, Rotation>
+     */
+    public function searchByUserCin(string $q, int $cin): array
     {
         return $this->createQueryBuilder('r')
             ->join('r.terrain', 't')
@@ -77,7 +92,7 @@ class RotationRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function countByStatusAndCin(int $status, $cin): int
+    public function countByStatusAndCin(int $status, int $cin): int
     {
         return (int) $this->createQueryBuilder('r')
             ->select('COUNT(r.id)')

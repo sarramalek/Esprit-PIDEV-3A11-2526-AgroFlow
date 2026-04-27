@@ -2,6 +2,7 @@
 // src/EventListener/TwoFactorListener.php
 namespace App\EventListener;
 
+use App\Entity\User\User;
 use App\Service\TwoFactorCodeSender;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
@@ -20,12 +21,16 @@ class TwoFactorListener
     {
         $user = $event->getAuthenticatedToken()->getUser();
 
+        if (!$user instanceof User) {
+            return;
+        }
+
         if (!$user->isTwoFactorEnabled()) {
             return; // pas de 2FA, connexion normale
         }
 
         $session = $event->getRequest()->getSession();
-        $session->set('2fa_pending_user_id', $user->getId());
+        $session->set('2fa_pending_user_id', $user->getCin());
 
         // Envoyer le code
         $this->sender->send($user, $session);

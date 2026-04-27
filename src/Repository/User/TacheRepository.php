@@ -7,6 +7,9 @@ use App\Entity\User\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<Tache>
+ */
 class TacheRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -15,6 +18,9 @@ class TacheRepository extends ServiceEntityRepository
     }
 
     // ==================== FIND BY ASSIGNEE ====================
+    /**
+     * @return array<int, Tache>
+     */
     public function findByAssignee(User $user): array
     {
         return $this->createQueryBuilder('t')
@@ -26,18 +32,27 @@ class TacheRepository extends ServiceEntityRepository
     }
 
     // ==================== FIND BY ETAT ====================
+    /**
+     * @return array<int, Tache>
+     */
     public function findByEtat(string $etat): array
     {
         return $this->findBy(['etat' => $etat]);
     }
 
     // ==================== FIND BY PRIORITE ====================
+    /**
+     * @return array<int, Tache>
+     */
     public function findByPriorite(string $priorite): array
     {
         return $this->findBy(['priorite' => $priorite]);
     }
 
     // ==================== FIND BY ASSIGNEE AND ETAT ====================
+    /**
+     * @return array<int, Tache>
+     */
     public function findByAssigneeAndEtat(User $user, string $etat): array
     {
         return $this->createQueryBuilder('t')
@@ -51,6 +66,9 @@ class TacheRepository extends ServiceEntityRepository
     }
 
     // ==================== FIND TACHES EN RETARD ====================
+    /**
+     * @return array<int, Tache>
+     */
     public function findTachesEnRetard(): array
     {
         return $this->createQueryBuilder('t')
@@ -64,6 +82,9 @@ class TacheRepository extends ServiceEntityRepository
     }
 
     // ==================== FIND TACHES EN RETARD BY ASSIGNEE ====================
+    /**
+     * @return array<int, Tache>
+     */
     public function findTachesEnRetardByAssignee(User $user): array
     {
         return $this->createQueryBuilder('t')
@@ -79,6 +100,9 @@ class TacheRepository extends ServiceEntityRepository
     }
 
     // ==================== SEARCH ====================
+    /**
+     * @return array<int, Tache>
+     */
     public function search(string $query): array
     {
         return $this->createQueryBuilder('t')
@@ -140,7 +164,10 @@ class TacheRepository extends ServiceEntityRepository
         }
     }
     // ==================== SEARCH AND SORT ====================
-public function searchAndSort(string $search, string $sort, string $direction): array
+    /**
+     * @return array<int, Tache>
+     */
+    public function searchAndSort(string $search, string $sort, string $direction): array
 {
     $qb = $this->createQueryBuilder('t')
         ->leftJoin('t.assignee', 'u');
@@ -163,6 +190,9 @@ public function searchAndSort(string $search, string $sort, string $direction): 
     return $qb->getQuery()->getResult();
 }
 // Tâches sans assignee ou à l'état "à faire"
+    /**
+     * @return array<int, Tache>
+     */
 public function findTachesAAssigner(): array
 {
     return $this->createQueryBuilder('t')
@@ -176,6 +206,10 @@ public function findTachesAAssigner(): array
 }
 
 // Tâches en conflit pour un ouvrier sur une période
+    /**
+     * @param mixed $ouvrier
+     * @return array<int, Tache>
+     */
 public function findTachesConflict($ouvrier, \DateTime $debut, \DateTime $fin): array
 {
     return $this->createQueryBuilder('t')

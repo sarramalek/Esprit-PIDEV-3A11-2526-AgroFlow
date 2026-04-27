@@ -2,6 +2,7 @@
 namespace App\Controller\Terrain;
 
 use App\Entity\Terrain\Rotation;
+use App\Entity\User\User;
 use App\Form\Terrain\RotationType;
 use App\Repository\Terrain\RotationRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,6 +18,10 @@ class AgriRotationController extends AbstractController
     public function index(Request $req, RotationRepository $repo): Response
     {
         $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException('Vous devez être connecté.');
+        }
+        /** @var User $user */
         $cin  = $user->getCin();
 
         $q         = $req->query->get('q', '');
@@ -51,9 +56,14 @@ class AgriRotationController extends AbstractController
     #[Route('/new', name: '_new', methods: ['GET','POST'])]
     public function new(Request $req, EntityManagerInterface $em): Response
     {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException('Vous devez être connecté.');
+        }
+        /** @var User $user */
         $rotation = new Rotation();
     $form     = $this->createForm(RotationType::class, $rotation, [
-        'user_cin' => $this->getUser()->getCin(),  // ← CIN passé ici
+        'user_cin' => $user->getCin(),  // ← CIN passé ici
     ]);
     $form->handleRequest($req);
 
@@ -74,8 +84,13 @@ class AgriRotationController extends AbstractController
     #[Route('/{id}/edit', name: '_edit', methods: ['GET','POST'])]
     public function edit(Rotation $rotation, Request $req, EntityManagerInterface $em): Response
     {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException('Vous devez être connecté.');
+        }
+        /** @var User $user */
        $form = $this->createForm(RotationType::class, $rotation, [
-        'user_cin' => $this->getUser()->getCin(),  // ← CIN passé ici
+        'user_cin' => $user->getCin(),  // ← CIN passé ici
     ]);
     $form->handleRequest($req);
 

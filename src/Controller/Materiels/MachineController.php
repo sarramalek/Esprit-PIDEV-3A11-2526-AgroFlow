@@ -105,7 +105,7 @@ final class MachineController extends AbstractController
         }
         
         // Supprimer les doublons et les termes vides
-        $searchTerms = array_unique(array_filter($searchTerms));
+        $searchTerms = array_values(array_unique($searchTerms));
         
         // Tenter chaque terme de recherche
         foreach ($searchTerms as $term) {
@@ -125,6 +125,9 @@ final class MachineController extends AbstractController
         ], Response::HTTP_NOT_FOUND);
     }
     
+    /**
+     * @return array<string, mixed>
+     */
     private function searchWikipediaTerm(string $query): array
     {
         try {
@@ -169,6 +172,9 @@ final class MachineController extends AbstractController
         }
     }
     
+    /**
+     * @return array<string, mixed>
+     */
     private function searchWikipediaApi(string $query): array
     {
         try {
@@ -227,6 +233,9 @@ final class MachineController extends AbstractController
         }
     }
     
+    /**
+     * @return array<int, string>
+     */
     private function getSuggestions(string $nom, string $marque, string $modele): array
     {
         $suggestions = [];

@@ -16,10 +16,10 @@ class Maintenance
     private ?int $idMain = null;
 
     #[ORM\Column(name: 'typePanne', length: 255)]
-    private ?string $typePanne = null;
+    private string $typePanne = '';
 
     #[ORM\Column(name: 'cout', type: 'float')]
-    private ?float $cout = null;
+    private float $cout = 0.0;
 
     #[ORM\Column(name: 'dateMain', type: 'date', nullable: true)]
     private ?\DateTimeInterface $dateMain = null;
@@ -32,13 +32,13 @@ class Maintenance
 private ?Machine $idM = null;
 
     #[ORM\Column(name: 'statut', type: 'string', columnDefinition: "ENUM('en_cours','termine','planifie')", options: ['default' => 'planifie'])]
-    private ?string $statut = 'planifie';
+    private string $statut = 'planifie';
 
     #[ORM\Column(name: 'recommandation', type: 'text', nullable: true)]
     private ?string $recommandation = null;
 
     #[ORM\Column(name: 'priorite', type: 'string', columnDefinition: "ENUM('faible','moyenne','haute','urgente')", options: ['default' => 'moyenne'])]
-    private ?string $priorite = 'moyenne';
+    private string $priorite = 'moyenne';
 
     #[ORM\Column(name: 'kilometrage', type: 'integer', nullable: true)]
     private ?int $kilometrage = null;

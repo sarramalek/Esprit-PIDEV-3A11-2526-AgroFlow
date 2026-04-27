@@ -5,6 +5,9 @@ use App\Entity\Terrain\Plante;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<Plante>
+ */
 class PlanteRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -14,6 +17,9 @@ class PlanteRepository extends ServiceEntityRepository
 
     // ── ADMIN ──────────────────────────────────────────
 
+    /**
+     * @return array<int, Plante>
+     */
     public function search(string $q): array
     {
         return $this->createQueryBuilder('p')
@@ -46,6 +52,9 @@ class PlanteRepository extends ServiceEntityRepository
 
     // ── AGRICULTEUR (via rotations → terrains → cin) ──
 
+    /**
+     * @return array<int, Plante>
+     */
     public function findByUserCin(int $cin): array
     {
         return $this->createQueryBuilder('p')
@@ -59,6 +68,9 @@ class PlanteRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return array<int, Plante>
+     */
     public function searchByUserCin(string $q, int $cin): array
     {
         return $this->createQueryBuilder('p')
@@ -73,6 +85,9 @@ class PlanteRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+    /**
+     * @return array<int, Plante>
+     */
     public function findByAgriculteur(string $cin): array
 {
     return $this->createQueryBuilder('p')

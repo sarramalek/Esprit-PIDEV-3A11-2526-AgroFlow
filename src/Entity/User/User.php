@@ -12,11 +12,11 @@ use Scheb\TwoFactorBundle\Model\BackupCodeInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'users')]
-class User implements UserInterface, PasswordAuthenticatedUserInterface , TwoFactorInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFactorInterface, BackupCodeInterface
 {
     #[ORM\Id]
     #[ORM\Column(type: 'integer')]
-    private ?int $cin = null;
+    private int $cin = 0;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $nom = null;
@@ -51,19 +51,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface , TwoFac
     #[ORM\Column(type: 'date', nullable: true)]
     private ?\DateTimeInterface $dateDernierchg = null;
 
-    // src/Entity/User/User.php
-#[ORM\Column(type: 'integer', options: ['default' => 0])]
-private int $twoFactorEnabled = 0;
+    #[ORM\Column(type: 'integer', options: ['default' => 0])]
+    private int $twoFactorEnabled = 0;
 
 
-    #[ORM\Column(type: 'string', length: 32, nullable: true)]
-    private ?string $twoFactorSecret = null;
 
-    #[ORM\Column(type: 'text', nullable: true)]
-    private ?string $twoFactorBackupCodes = null;
+    /**
+     * @var string[]
+     */
+    #[ORM\Column(type: 'json', nullable: false, options: ['default' => '[]'])]
+    private array $backupCodes = [];
 
     #[ORM\Column(type: 'string', length: 255, nullable: false, options: ['default' => 'default.png'])]
-    private ?string $img = 'default.png';
+    private string $img = 'default.png';
 
     /**
      * Terrain auquel l'ouvrier est assigné (nullable).
@@ -73,15 +73,14 @@ private int $twoFactorEnabled = 0;
     #[ORM\JoinColumn(name: 'id_terrain', referencedColumnName: 'id_terrain', nullable: true, onDelete: 'SET NULL')]
     private ?Terrain $terrain = null;
 
-    //----------------------------------------------------------
     #[ORM\Column(type: 'string', nullable: true)]
     private ?string $googleAuthenticatorSecret = null;
 
-   #[ORM\Column(type: 'string', length: 255, nullable: true)]
-private ?string $telegramChatId = null;
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $telegramChatId = null;
 
-public function getTelegramChatId(): ?string { return $this->telegramChatId; }
-public function setTelegramChatId(?string $id): self { $this->telegramChatId = $id; return $this; }
+    public function getTelegramChatId(): ?string { return $this->telegramChatId; }
+    public function setTelegramChatId(?string $id): self { $this->telegramChatId = $id; return $this; }
     // ==================== UserInterface ====================
 
     public function getUserIdentifier(): string
@@ -108,7 +107,7 @@ public function setTelegramChatId(?string $id): self { $this->telegramChatId = $
 
     // ==================== GETTERS & SETTERS ====================
 
-    public function getCin(): ?int { return $this->cin; }
+    public function getCin(): int { return $this->cin; }
     public function setCin(int $cin): self { $this->cin = $cin; return $this; }
 
     public function getNom(): ?string { return $this->nom; }
@@ -145,9 +144,9 @@ public function setTelegramChatId(?string $id): self { $this->telegramChatId = $
     public function setDateDernierchg(?\DateTimeInterface $dateDernierchg): self { $this->dateDernierchg = $dateDernierchg; return $this; }
 
     public function getTwoFactorEnabled(): int { return $this->twoFactorEnabled; }
-public function setTwoFactorEnabled(int $v): self { $this->twoFactorEnabled = $v; return $this; }
-public function isTwoFactorEnabled(): bool { return $this->twoFactorEnabled === 1; }
-    public function getImg(): ?string { return $this->img; }
+    public function setTwoFactorEnabled(int $v): self { $this->twoFactorEnabled = $v; return $this; }
+    public function isTwoFactorEnabled(): bool { return $this->twoFactorEnabled === 1; }
+    public function getImg(): string { return $this->img; }
     public function setImg(?string $img): self { $this->img = $img; return $this; }
 
     // ==================== TERRAIN ====================
@@ -162,7 +161,7 @@ public function isTwoFactorEnabled(): bool { return $this->twoFactorEnabled === 
 
     public function getGoogleAuthenticatorUsername(): string
     {
-        return $this->email;
+        return (string) $this->email;
     }
 
     public function getGoogleAuthenticatorSecret(): ?string
@@ -178,7 +177,7 @@ public function isTwoFactorEnabled(): bool { return $this->twoFactorEnabled === 
     // Interface Backup codes
     public function isBackupCode(string $code): bool
     {
-        return in_array($code, $this->backupCodes);
+        return in_array($code, $this->backupCodes, true);
     }
 
     public function invalidateBackupCode(string $code): void
@@ -189,11 +188,17 @@ public function isTwoFactorEnabled(): bool { return $this->twoFactorEnabled === 
         );
     }
 
+    /**
+     * @param string[] $codes
+     */
     public function setBackupCodes(array $codes): void
     {
         $this->backupCodes = $codes;
     }
 
+    /**
+     * @return string[]
+     */
     public function getBackupCodes(): array
     {
         return $this->backupCodes;

@@ -66,6 +66,9 @@ class DatabaseReaderService
     /**
      * Retourne les métadonnées de la base (nb tables, nom).
      */
+    /**
+     * @return array{database:string, table_count:int, tables:array<int, string>}
+     */
     public function getMeta(): array
     {
         $database = $this->connection->getDatabase();

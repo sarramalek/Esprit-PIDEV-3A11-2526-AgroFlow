@@ -21,6 +21,9 @@ class TacheIAService
         private string              $groqApiKey
     ) {}
 
+    /**
+     * @return array<string, mixed>
+     */
     public function genererSuggestion(int $cinAgriculteur): array
     {
         // ── 1. Terrains ──────────────────────────────────────────────────────
@@ -46,7 +49,7 @@ foreach ($ouvriers as $o) {
     }
 }
 
-$ouvriersData = array_map(function ($o) use ($tachesParTerrain) {
+$ouvriersData = array_map(function ($o) {
     $nomTerrain    = $o->getTerrain()?->getNomTerrain() ?? 'non assigné';
     $taches        = $this->tacheRepo->findByAssignee($o);
     $tachesEnCours = array_filter($taches, fn($t) => $t->getEtat() !== 'terminée');
@@ -184,6 +187,9 @@ if (!empty($tachesParTerrain)) {
     }
 
     // ── Suggestion de secours ────────────────────────────────────────────────
+    /**
+     * @return array{nom_tache:string, description:string, priorite:string, etat:string, date_echeancee:string, raison:string}
+     */
     private function fallback(): array
     {
         return [

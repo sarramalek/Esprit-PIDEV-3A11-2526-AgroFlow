@@ -3,6 +3,7 @@
 namespace App\Controller\User;
 
 use App\Entity\User\Offre;
+use App\Entity\User\User;
 use App\Form\User\OffreType;
 use App\Repository\User\OffreRepository;
 use App\Repository\User\AbonnementRepository;
@@ -46,8 +47,7 @@ public function list(
     $suggestion       = null;
     $raisonSuggestion = null;
     $user = $this->getUser();
-
-    if ($user && (int)$user->getRole() === 2 && count($offres) > 0) {
+    if ($user instanceof User && (int)$user->getRole() === 2 && count($offres) > 0) {
         $allOffres   = $offreRepo->searchAndSort($search, $sort, $direction); // toutes pour l'IA
         $abonnements = $abonnRepo->findByCin($user->getCin());
 

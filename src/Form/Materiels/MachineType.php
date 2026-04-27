@@ -21,6 +21,9 @@ use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Choice;  // ← CORRECTION: Choice au lieu de ChoiceConstraint
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
+/**
+ * @extends AbstractType<Machine>
+ */
 class MachineType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -160,8 +163,10 @@ class MachineType extends AbstractType
             ]);
     }
 
-    // Validation personnalisée pour la date de dernière visite
-    public function validateDateLastVisite($value, ExecutionContextInterface $context)
+    /**
+     * Validation personnalisée pour la date de dernière visite
+     */
+    public function validateDateLastVisite(?\DateTimeInterface $value, ExecutionContextInterface $context): void
     {
         if ($value === null) {
             return;
@@ -181,8 +186,10 @@ class MachineType extends AbstractType
         }
     }
 
-    // Validation personnalisée pour la prochaine maintenance
-    public function validateProchaineMaintenance($value, ExecutionContextInterface $context)
+    /**
+     * Validation personnalisée pour la prochaine maintenance
+     */
+    public function validateProchaineMaintenance(?\DateTimeInterface $value, ExecutionContextInterface $context): void
     {
         if ($value === null) {
             return;
@@ -208,8 +215,10 @@ class MachineType extends AbstractType
         }
     }
 
-    // Validation croisée entre kilométrage et kmLastVisite
-    public function validateKmVisite($value, ExecutionContextInterface $context)
+    /**
+     * Validation croisée entre kilométrage et kmLastVisite
+     */
+    public function validateKmVisite(mixed $value, ExecutionContextInterface $context): void
     {
         $object = $context->getObject();
         
@@ -220,7 +229,7 @@ class MachineType extends AbstractType
         $kilometrage = $object->getKilometrage();
         $kmLastVisite = $object->getKmLastVisite();
 
-        if ($kilometrage !== null && $kmLastVisite !== null && $kmLastVisite > $kilometrage) {
+        if ($kmLastVisite > $kilometrage) {
             $context->buildViolation('Le kilométrage de la dernière visite ne peut pas être supérieur au kilométrage actuel')
                 ->atPath('kmLastVisite')
                 ->addViolation();

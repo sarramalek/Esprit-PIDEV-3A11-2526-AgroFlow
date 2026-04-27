@@ -16,6 +16,9 @@ class MouvementStockRepository extends ServiceEntityRepository
         parent::__construct($registry, MouvementStock::class);
     }
 
+    /**
+     * @return array<int, MouvementStock>
+     */
     public function findByAdminSearch(?string $search, ?int $idAdmin = null): array
     {
         $qb = $this->createQueryBuilder('m')

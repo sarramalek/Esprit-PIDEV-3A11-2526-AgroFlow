@@ -27,6 +27,9 @@ use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\Type;
 
+/**
+ * @extends AbstractType<User>
+ */
 class RegistrationFormType extends AbstractType
 {
     private const VILLES_ADRESSES = [
@@ -210,7 +213,7 @@ class RegistrationFormType extends AbstractType
         ;
 
         // ── FormEvents : adresse selon ville ──────────────────────────────────
-        $addAdresseField = function ($form, ?string $ville) {
+        $addAdresseField = function (\Symfony\Component\Form\FormInterface $form, ?string $ville) {
             $adresses = self::VILLES_ADRESSES[$ville] ?? [];
             $choices  = array_combine($adresses, $adresses);
             $form->add('adresse', ChoiceType::class, [

@@ -10,7 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
@@ -18,18 +18,22 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\LessThanOrEqual;
 
 
+/**
+ * @extends AbstractType<Abonnement>
+ */
 class AbonnementType extends AbstractType
 {
     public function __construct(
         private readonly OffreRepository $offreRepository,
         private readonly UserRepository  $userRepository,
-        private readonly Security        $security,
+        private Security $security
     ) {}
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         // ── Dropdown Offres ──────────────────────────────────────────────────
         $offres        = $this->offreRepository->findAll();
+        /** @var array<string, int> $offresChoices */
         $offresChoices = [];
         foreach ($offres as $offre) {
             $label = '#' . $offre->getIdOffres() . ' — ' . $offre->getNomOffre() . ' (' . $offre->getPrix() . ' TND)';
@@ -37,8 +41,11 @@ class AbonnementType extends AbstractType
         }
 
         // ── Dropdown Users (sauf utilisateur connecté) ───────────────────────
-        $currentCin   = $this->security->getUser()?->getCin();
+        $user = $this->security->getUser();
+        $currentCin = ($user instanceof \App\Entity\User\User) ? $user->getCin() : null;
+
         $users        = $this->userRepository->findAll();
+        /** @var array<string, int> $usersChoices */
         $usersChoices = [];
         foreach ($users as $user) {
             if ($user->getCin() === $currentCin) {

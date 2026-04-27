@@ -22,6 +22,7 @@ class ComposerStaticInit392c2fee464d64f3ee9e8c2f1c58f9b4
         'f598d06aa772fa33d905e87be6398fb1' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/bootstrap.php',
         '9d2b9fc6db0f153a0a149fefb182415e' => __DIR__ . '/..' . '/symfony/polyfill-php84/bootstrap.php',
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
+        '9b38cf48e83f5d8f60375221cd213eee' => __DIR__ . '/..' . '/phpstan/phpstan/bootstrap.php',
         '72243e5536b63e298acb6476f01f1aff' => __DIR__ . '/..' . '/thecodingmachine/safe/lib/special_cases.php',
         '3f648889e687f31c52f949ba8a9d0873' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/apache.php',
         'eeb4581d958421a4244aaa4167c6a575' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/apcu.php',
@@ -240,6 +241,8 @@ class ComposerStaticInit392c2fee464d64f3ee9e8c2f1c58f9b4
             'PhpOffice\\PhpSpreadsheet\\' => 25,
             'ParagonIE\\ConstantTime\\' => 23,
             'PHPStan\\PhpDocParser\\' => 21,
+            'PHPStan\\ExtensionInstaller\\' => 27,
+            'PHPStan\\' => 8,
             'PHPMailer\\PHPMailer\\' => 20,
         ),
         'O' => 
@@ -661,7 +664,8 @@ class ComposerStaticInit392c2fee464d64f3ee9e8c2f1c58f9b4
         array (
             0 => __DIR__ . '/..' . '/scheb/2fa-totp',
             1 => __DIR__ . '/..' . '/scheb/2fa-google-authenticator',
-            2 => __DIR__ . '/..' . '/scheb/2fa-bundle',
+            2 => __DIR__ . '/..' . '/scheb/2fa-backup-code',
+            3 => __DIR__ . '/..' . '/scheb/2fa-bundle',
         ),
         'Sabberworm\\CSS\\' => 
         array (
@@ -719,6 +723,15 @@ class ComposerStaticInit392c2fee464d64f3ee9e8c2f1c58f9b4
         'PHPStan\\PhpDocParser\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src',
+        ),
+        'PHPStan\\ExtensionInstaller\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpstan/extension-installer/src',
+        ),
+        'PHPStan\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpstan/phpstan-symfony/src',
+            1 => __DIR__ . '/..' . '/phpstan/phpstan-doctrine/src',
         ),
         'PHPMailer\\PHPMailer\\' => 
         array (

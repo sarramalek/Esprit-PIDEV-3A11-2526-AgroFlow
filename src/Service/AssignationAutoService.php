@@ -58,7 +58,7 @@ class AssignationAutoService
         }
 
         // Aucun disponible → minimum de tâches parmi tous
-        $tous = array_values($scores);
+        $tous = $scores;
         $trier($tous);
         return $tous[0]['ouvrier'];
     }

@@ -8,7 +8,7 @@ use Exception;
 class CurrencyService
 {
     private HttpClientInterface $httpClient;
-    private ?string $apiKey;
+    private string $apiKey;
 
     public function __construct(HttpClientInterface $httpClient, string $apiKey)
     {

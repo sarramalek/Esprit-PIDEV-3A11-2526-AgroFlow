@@ -7,6 +7,9 @@ use App\Entity\Materiels\Machine;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<Maintenance>
+ */
 class MaintenanceRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -14,6 +17,9 @@ class MaintenanceRepository extends ServiceEntityRepository
         parent::__construct($registry, Maintenance::class);
     }
 
+    /**
+     * @param array<string, mixed> $row
+     */
     private function hydrate(array $row): Maintenance
 {
     $m = new Maintenance();
@@ -25,7 +31,7 @@ class MaintenanceRepository extends ServiceEntityRepository
     $m->setStatut($row['statut'] ?? 'planifie');
     $m->setRecommandation($row['recommandation'] ?? null);
     $m->setPriorite($row['priorite'] ?? 'moyenne');
-    $m->setKilometrage(isset($row['kilometrage']) && $row['kilometrage'] !== null ? (int)$row['kilometrage'] : null);
+    $m->setKilometrage(isset($row['kilometrage']) ? (int) $row['kilometrage'] : null);
 
     if ($row['idM']) {
         $machine = new Machine();
@@ -43,6 +49,9 @@ class MaintenanceRepository extends ServiceEntityRepository
 
     return $m;
 }
+    /**
+     * @return array<int, array{id:mixed, nom:mixed}>
+     */
     public function getAllMachines(): array
     {
         $conn = $this->getEntityManager()->getConnection();
@@ -50,12 +59,17 @@ class MaintenanceRepository extends ServiceEntityRepository
         return $conn->executeQuery($sql)->fetchAllAssociative();
     }
 
+    /**
+     * @return array<int, Maintenance>
+     */
     public function searchWithMaterielName(
         string $search = '',
         string $type   = '',
         string $sort   = 'dateMain',
         string $dir    = 'DESC',
-        string $idM    = ''
+        string $idM    = '',
+        string $statut = '',
+        string $priorite = ''
     ): array {
         $conn = $this->getEntityManager()->getConnection();
 
@@ -93,12 +107,25 @@ class MaintenanceRepository extends ServiceEntityRepository
             $params['idM'] = (int) $idM;
         }
 
+        if ($statut !== '') {
+            $sql .= " AND m.statut = :statut";
+            $params['statut'] = $statut;
+        }
+
+        if ($priorite !== '') {
+            $sql .= " AND m.priorite = :priorite";
+            $params['priorite'] = $priorite;
+        }
+
         $sql .= " ORDER BY m.$sort $dir";
 
         $results = $conn->executeQuery($sql, $params)->fetchAllAssociative();
         return array_map(fn($row) => $this->hydrate($row), $results);
     }
 
+    /**
+     * @return array<int, Maintenance>
+     */
     public function findAllOrderedByDate(): array
     {
         $conn = $this->getEntityManager()->getConnection();
@@ -145,6 +172,9 @@ class MaintenanceRepository extends ServiceEntityRepository
         return (float) ($result ?? 0.0);
     }
 
+    /**
+     * @return array<int, array{type:mixed, total:int}>
+     */
     public function countByTypePanne(): array
     {
         $rows = $this->createQueryBuilder('m')
@@ -160,6 +190,9 @@ class MaintenanceRepository extends ServiceEntityRepository
         ], $rows);
     }
 
+    /**
+     * @return array<int, array{statut:mixed, total:int}>
+     */
     public function countByStatut(): array
     {
         $rows = $this->createQueryBuilder('m')
@@ -174,6 +207,9 @@ class MaintenanceRepository extends ServiceEntityRepository
         ], $rows);
     }
 
+    /**
+     * @return array<int, array{priorite:mixed, total:int}>
+     */
     public function countByPriorite(): array
     {
         $rows = $this->createQueryBuilder('m')
@@ -188,6 +224,9 @@ class MaintenanceRepository extends ServiceEntityRepository
         ], $rows);
     }
 
+    /**
+     * @return array<int, array{mois:string, total:float}>
+     */
     public function getCoutByMonth(): array
     {
         $conn      = $this->getEntityManager()->getConnection();
@@ -218,6 +257,9 @@ class MaintenanceRepository extends ServiceEntityRepository
         }
         return $result;
     }
+    /**
+     * @return array<int, Maintenance>
+     */
     public function findByAgriculteurCin(string $cin): array
 {
     return $this->createQueryBuilder('m')

@@ -10,7 +10,7 @@ class TwoFactorCodeSender
 {
     public function send(User $user, SessionInterface $session): void
     {
-        $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        $code = str_pad((string)random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
         $session->set('2fa_code',       $code);
         $session->set('2fa_expires_at', time() + 300); // 5 min

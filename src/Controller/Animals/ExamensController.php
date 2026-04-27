@@ -3,6 +3,7 @@
 namespace App\Controller\Animals;
 
 use App\Entity\Animals\Examen;
+use App\Entity\User\User;
 use App\Form\Animals\ExamenType;
 use App\Repository\Animals\ExamenRepository;
 use App\Service\Animals\WikipediaService;
@@ -31,7 +32,7 @@ final class ExamensController extends AbstractController
         $limit = 5; // Nombre d'examens par page
 
         // Admin voit tout, Agriculteur voit les siens
-        $filterUser = $this->isGranted('ROLE_ADMIN') ? null : $user;
+        $filterUser = $this->isGranted('ROLE_ADMIN') ? null : ($user instanceof User ? $user : null);
 
         // Créer la requête pour la pagination
         $query = $examenRepository->createQueryBuilderForSearch($searchTerm, $sortBy, $direction, $typeFilter, $filterUser);
@@ -64,7 +65,7 @@ final class ExamensController extends AbstractController
     public function stats(ExamenRepository $examenRepository): Response
     {
         $user = $this->getUser();
-        $filterUser = $this->isGranted('ROLE_ADMIN') ? null : $user;
+        $filterUser = $this->isGranted('ROLE_ADMIN') ? null : ($user instanceof User ? $user : null);
         $stats = $examenRepository->countByType($filterUser);
 
         return $this->render('Animals/examen/stats.html.twig', [
@@ -85,7 +86,7 @@ final class ExamensController extends AbstractController
             // Sécurité : l'animal doit appartenir à l'utilisateur (déjà géré par le filtrage EntityType si possible, mais sécurisé ici)
             if (!$this->isGranted('ROLE_ADMIN')) {
                 $animal = $examen->getAnimal();
-                if ($animal && $animal->getUser() !== $this->getUser()) {
+                if ($animal->getUser() !== $this->getUser()) {
                     throw $this->createAccessDeniedException("Animal invalide.");
                 }
             }

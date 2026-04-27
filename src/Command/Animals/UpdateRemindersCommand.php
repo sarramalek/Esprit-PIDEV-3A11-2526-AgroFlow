@@ -50,7 +50,7 @@ class UpdateRemindersCommand extends Command
                 $nextDate = $examen->calculateNextReminderDate();
                 $io->text(sprintf(
                     '• %s - %s (%s)',
-                    $examen->getAnimal() ? $examen->getAnimal()->getNom() : 'N/A',
+                    $examen->getAnimal()->getNom(),
                     $examen->getReminderType(),
                     $nextDate ? $nextDate->format('d/m/Y') : 'N/A'
                 ));
@@ -63,7 +63,7 @@ class UpdateRemindersCommand extends Command
                 $nextDate = $examen->calculateNextReminderDate();
                 $io->text(sprintf(
                     '• %s - %s (%s)',
-                    $examen->getAnimal() ? $examen->getAnimal()->getNom() : 'N/A',
+                    $examen->getAnimal()->getNom(),
                     $examen->getReminderType(),
                     $nextDate ? $nextDate->format('d/m/Y') : 'N/A'
                 ));

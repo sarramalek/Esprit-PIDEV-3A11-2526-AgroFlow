@@ -26,6 +26,9 @@ public function index(
     TerrainRepository $terrainRepo
 ): Response {
     $agriculteur = $this->getUser();
+    if (!$agriculteur instanceof User) {
+        throw $this->createAccessDeniedException('Vous devez être connecté.');
+    }
     $terrains    = $terrainRepo->findByAgriculteur($agriculteur->getCin());
     $tousOuvriers = $userRepo->findOuvriersByAgriculteur($agriculteur->getCin());
 
@@ -72,6 +75,9 @@ public function new(
     \App\Service\MailerService $mailer
 ): Response {
     $agriculteur = $this->getUser();
+    if (!$agriculteur instanceof User) {
+        throw $this->createAccessDeniedException('Vous devez être connecté.');
+    }
     $terrains    = $terrainRepo->findByAgriculteur($agriculteur->getCin());
 
     if ($request->isMethod('POST')) {
@@ -142,6 +148,9 @@ public function testMail(\App\Service\MailerService $mailer): Response
     public function edit(int $cin, Request $request, UserRepository $userRepo, TerrainRepository $terrainRepo, EntityManagerInterface $em): Response
     {
         $agriculteur = $this->getUser();
+        if (!$agriculteur instanceof User) {
+            throw $this->createAccessDeniedException('Vous devez être connecté.');
+        }
         $ouvrier = $userRepo->findByCin($cin);
         if (!$ouvrier || !$this->appartientAgriculteur($ouvrier, $agriculteur, $terrainRepo)) {
             throw $this->createAccessDeniedException();
@@ -182,6 +191,9 @@ public function testMail(\App\Service\MailerService $mailer): Response
     public function deleteOuvrier(int $cin, UserRepository $userRepo, TerrainRepository $terrainRepo, EntityManagerInterface $em): Response
     {
         $agriculteur = $this->getUser();
+        if (!$agriculteur instanceof User) {
+            throw $this->createAccessDeniedException('Vous devez être connecté.');
+        }
         $ouvrier = $userRepo->findByCin($cin);
         if (!$ouvrier || !$this->appartientAgriculteur($ouvrier, $agriculteur, $terrainRepo)) {
             throw $this->createAccessDeniedException();
@@ -196,6 +208,9 @@ public function testMail(\App\Service\MailerService $mailer): Response
     public function taches(int $cin, UserRepository $userRepo, TacheRepository $tacheRepo, TerrainRepository $terrainRepo): Response
     {
         $agriculteur = $this->getUser();
+        if (!$agriculteur instanceof User) {
+            throw $this->createAccessDeniedException('Vous devez être connecté.');
+        }
         $ouvrier = $userRepo->findByCin($cin);
         if (!$ouvrier || !$this->appartientAgriculteur($ouvrier, $agriculteur, $terrainRepo)) {
             throw $this->createAccessDeniedException();
@@ -211,6 +226,9 @@ public function testMail(\App\Service\MailerService $mailer): Response
     public function ajouterTache(int $cin, Request $request, UserRepository $userRepo, TerrainRepository $terrainRepo, EntityManagerInterface $em): Response
     {
         $agriculteur = $this->getUser();
+        if (!$agriculteur instanceof User) {
+            throw $this->createAccessDeniedException('Vous devez être connecté.');
+        }
         $ouvrier = $userRepo->findByCin($cin);
         if (!$ouvrier || !$this->appartientAgriculteur($ouvrier, $agriculteur, $terrainRepo)) {
             throw $this->createAccessDeniedException();
@@ -238,6 +256,9 @@ public function testMail(\App\Service\MailerService $mailer): Response
     public function updateEtatTache(int $id, Request $request, TacheRepository $tacheRepo, TerrainRepository $terrainRepo, EntityManagerInterface $em): Response
     {
         $agriculteur = $this->getUser();
+        if (!$agriculteur instanceof User) {
+            return $this->json(['error' => 'Accès refusé'], 403);
+        }
         $tache = $tacheRepo->find($id);
         if (!$tache) {
             return $this->json(['error' => 'Tâche introuvable'], 404);
@@ -255,6 +276,9 @@ public function testMail(\App\Service\MailerService $mailer): Response
     public function supprimerTache(int $id, TacheRepository $tacheRepo, TerrainRepository $terrainRepo, EntityManagerInterface $em): Response
     {
         $agriculteur = $this->getUser();
+        if (!$agriculteur instanceof User) {
+            throw $this->createAccessDeniedException('Vous devez être connecté.');
+        }
         $tache = $tacheRepo->find($id);
         if (!$tache) {
             throw $this->createNotFoundException();
@@ -288,6 +312,9 @@ public function assignationAuto(
     AssignationAutoService $assignationService
 ): Response {
     $agriculteur = $this->getUser();
+    if (!$agriculteur instanceof User) {
+        throw $this->createAccessDeniedException('Vous devez être connecté.');
+    }
 
     // Récupère la date saisie
     $echeanceStr = $request->request->get('date_echeancee');
@@ -328,6 +355,9 @@ public function assignationAuto(
 public function suggestionIA(\App\Service\TacheIAService $iaService): Response
 {
     $agriculteur = $this->getUser();
+    if (!$agriculteur instanceof User) {
+        return $this->json(['error' => 'Accès refusé'], 403);
+    }
     try {
         $suggestion = $iaService->genererSuggestion($agriculteur->getCin());
         return $this->json($suggestion); // ex: { nom_tache, description, priorite, etat }
@@ -338,8 +368,12 @@ public function suggestionIA(\App\Service\TacheIAService $iaService): Response
     #[Route('/debug-ia', name: 'app_test_ia', methods: ['GET'])]
 public function testIA(\App\Service\TacheIAService $iaService): Response
 {
+    $user = $this->getUser();
+    if (!$user instanceof User) {
+        return $this->json(['error' => 'Accès refusé'], 403);
+    }
     try {
-        $result = $iaService->genererSuggestion($this->getUser()->getCin());
+        $result = $iaService->genererSuggestion($user->getCin());
         return $this->json(['ok' => true, 'result' => $result]);
     } catch (\Throwable $e) {
         return $this->json([

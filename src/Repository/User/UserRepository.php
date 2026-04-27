@@ -6,6 +6,9 @@ use App\Entity\User\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<User>
+ */
 class UserRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -20,24 +23,36 @@ class UserRepository extends ServiceEntityRepository
     }
 
     // ==================== FIND BY ROLE ====================
+    /**
+     * @return array<int, User>
+     */
     public function findByRole(int $role): array
     {
         return $this->findBy(['role' => $role]);
     }
 
     // ==================== FIND ALL OUVRIERS ====================
+    /**
+     * @return array<int, User>
+     */
     public function findAllOuvriers(): array
     {
         return $this->findBy(['role' => 1]);
     }
 
     // ==================== FIND ALL AGRICULTEURS ====================
+    /**
+     * @return array<int, User>
+     */
     public function findAllAgriculteurs(): array
     {
         return $this->findBy(['role' => 2]);
     }
 
     // ==================== FIND ALL ADMINS ====================
+    /**
+     * @return array<int, User>
+     */
     public function findAllAdmins(): array
     {
         return $this->findBy(['role' => 3]);
@@ -50,12 +65,18 @@ class UserRepository extends ServiceEntityRepository
     }
 
     // ==================== FIND BY VILLE ====================
+    /**
+     * @return array<int, User>
+     */
     public function findByVille(string $ville): array
     {
         return $this->findBy(['ville' => $ville]);
     }
 
     // ==================== SEARCH (nom, prenom, email) ====================
+    /**
+     * @return array<int, User>
+     */
     public function search(string $query): array
     {
         return $this->createQueryBuilder('u')
@@ -67,6 +88,9 @@ class UserRepository extends ServiceEntityRepository
     }
 
     // ==================== FIND RECENT USERS ====================
+    /**
+     * @return array<int, User>
+     */
     public function findRecentUsers(int $limit = 10): array
     {
         return $this->createQueryBuilder('u')
@@ -136,6 +160,9 @@ public function countByMonth(\DateTime $date): int
 }
 // src/Repository/UserRepository.php (ou le nom de votre repo User)
 
+    /**
+     * @return array<int, array{cin: int, nom: string, prenom: string}>
+     */
 public function findAllForSelect(): array
 {
     return $this->createQueryBuilder('u')
@@ -152,7 +179,7 @@ public function findAllForSelect(): array
      * Ouvriers qui travaillent sur les terrains d'un agriculteur donné.
      * Ce sont les ouvriers que l'agriculteur "possède".
      *
-     * @return User[]
+     * @return array<int, User>
      */
     public function findOuvriersByAgriculteur(int $cinAgriculteur): array
     {
@@ -170,7 +197,7 @@ public function findAllForSelect(): array
     /**
      * Ouvriers assignés à un terrain précis.
      *
-     * @return User[]
+     * @return array<int, User>
      */
     public function findOuvriersByTerrain(int $idTerrain): array
     {
@@ -187,7 +214,7 @@ public function findAllForSelect(): array
     /**
      * Ouvriers sans terrain (disponibles pour être assignés).
      *
-     * @return User[]
+     * @return array<int, User>
      */
     public function findOuvriersDisponibles(): array
     {

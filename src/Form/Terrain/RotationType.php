@@ -15,6 +15,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Doctrine\ORM\EntityRepository;
 
+/**
+ * @extends AbstractType<Rotation>
+ */
 class RotationType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -28,7 +31,7 @@ class RotationType extends AbstractType
                 'label'         => 'Terrain',
                 'placeholder'   => '— Choisir un terrain —',
                 'attr'          => ['class' => 'form-input'],
-                'query_builder' => function(EntityRepository $repo) use ($userCin) {
+                'query_builder' => function(\App\Repository\Terrain\TerrainRepository $repo) use ($userCin) {
                     $qb = $repo->createQueryBuilder('t')
                         ->orderBy('t.nomTerrain', 'ASC');
                     if ($userCin !== null) {

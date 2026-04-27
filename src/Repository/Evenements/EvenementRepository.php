@@ -18,6 +18,8 @@ class EvenementRepository extends ServiceEntityRepository
 
     /**
      * Récupère tous les événements triés par date de début décroissante
+     * 
+     * @return array<int, Evenement>
      */
     public function findAll(): array
     {
@@ -29,6 +31,8 @@ class EvenementRepository extends ServiceEntityRepository
 
     /**
      * Recherche/filtre les événements selon les critères (équivalent du filtre JavaFX)
+     * 
+     * @return array<int, Evenement>
      */
     public function findByFilters(
         ?string $search = null,

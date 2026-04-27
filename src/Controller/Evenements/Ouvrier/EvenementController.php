@@ -3,6 +3,7 @@
 namespace App\Controller\Evenements\Ouvrier;
 
 use App\Entity\Evenements\Participation;
+use App\Entity\User\User;
 use App\Repository\Evenements\EvenementRepository;
 use App\Repository\Evenements\ParticipationRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -49,7 +50,7 @@ class EvenementController extends AbstractController
         }
 
         $user = $this->getUser();
-        if (!$user) {
+        if (!$user instanceof User) {
             return $this->redirectToRoute('app_login');
         }
 

@@ -35,9 +35,12 @@ class Terrain
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $cin = null;
 
+    /** @var Collection<int, Rotation> */
     #[ORM\OneToMany(mappedBy: 'terrain', targetEntity: Rotation::class, cascade: ['remove'])]
     private Collection $rotations;
- #[ORM\OneToMany(mappedBy: 'terrain', targetEntity: User::class, cascade: ['persist'])]
+
+    /** @var Collection<int, User> */
+    #[ORM\OneToMany(mappedBy: 'terrain', targetEntity: User::class, cascade: ['persist'])]
     private Collection $ouvriers;
  
    
@@ -67,7 +70,14 @@ class Terrain
     public function getCin(): ?int { return $this->cin; }
     public function setCin(?int $v): static { $this->cin = $v; return $this; }
 
+    /**
+     * @return Collection<int, Rotation>
+     */
     public function getRotations(): Collection { return $this->rotations; }
+
+    /**
+     * @return Collection<int, User>
+     */
      public function getOuvriers(): Collection
     {
         return $this->ouvriers;

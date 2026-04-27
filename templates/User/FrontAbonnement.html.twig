@@ -132,7 +132,17 @@
                         </div>
                         <div class="info-row">
                             <span class="info-label"><i class="fa fa-money"></i> Prix</span>
-                            <span class="info-value">{{ a.prix|number_format(2) }} TND</span>
+                            <span class="info-value">
+                                {% if a.promoApplied %}
+                                    <span style="text-decoration:line-through; color:#999; font-weight:500; margin-right:6px;">
+                                        {{ a.prixInitial|number_format(2) }} TND
+                                    </span>
+                                {% endif %}
+                                {{ a.prix|number_format(2) }} TND
+                                {% if a.promoApplied %}
+                                    <span class="badge badge-green" style="margin-left:6px;">-{{ a.promoPercent }}%</span>
+                                {% endif %}
+                            </span>
                         </div>
                         <div class="info-row">
                             <span class="info-label"><i class="fa fa-calendar"></i> Inscription</span>

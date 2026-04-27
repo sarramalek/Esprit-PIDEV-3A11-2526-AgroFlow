@@ -4,6 +4,7 @@ namespace App\Controller\Evenements\Agriculteur;
 
 use App\Entity\Evenements\Evenement;
 use App\Entity\Evenements\Participation;
+use App\Entity\User\User;
 use App\Form\InscriptionEvenementType;
 use App\Repository\Evenements\EvenementRepository;
 use App\Repository\Evenements\ParticipationRepository;
@@ -50,7 +51,7 @@ public function inscrire(int $id, ManagerRegistry $doctrine, EvenementRepository
     }
 
     $user = $this->getUser();
-    if (!$user) {
+    if (!$user instanceof User) {
         return $this->redirectToRoute('app_login');
     }
 

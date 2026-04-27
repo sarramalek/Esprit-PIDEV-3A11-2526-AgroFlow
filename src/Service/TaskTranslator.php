@@ -8,6 +8,7 @@ class TaskTranslator
     private string $cacheFile;
 
     // Serveurs LibreTranslate publics en fallback
+    /** @var array<int, string> */
     private array $servers = [
         'https://libretranslate.com/translate',
         'https://translate.argosopentech.com/translate',
@@ -57,12 +58,18 @@ class TaskTranslator
         return $text; // fallback : texte original
     }
 
+    /**
+     * @return array<string, string>
+     */
     private function loadCache(): array
     {
         if (!file_exists($this->cacheFile)) return [];
         return json_decode(file_get_contents($this->cacheFile), true) ?? [];
     }
 
+    /**
+     * @param array<string, string> $data
+     */
     private function saveCache(array $data): void
     {
         file_put_contents(
