@@ -11,7 +11,7 @@ class Rotation
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: 'id_rotation')]
+    #[ORM\Column(name: 'id_rotation', type: 'integer')]
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: Terrain::class, inversedBy: 'rotations')]

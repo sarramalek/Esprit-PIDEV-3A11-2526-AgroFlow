@@ -1,0 +1,13 @@
+includes:
+    - vendor/phpstan/phpstan-doctrine/extension.neon
+
+parameters:
+    level: 6
+    paths:
+        - src/Entity/Terrain/Plante.php
+        - tests/Unit/Entity/Terrain/PlanteTest.php
+        - src/Entity/Terrain/Rotation.php
+        - tests/Unit/Entity/Terrain/RotationTest.php
+        - src/Entity/Terrain/Terrain.php
+        - tests/Unit/Entity/Terrain/TerrainTest.php
+

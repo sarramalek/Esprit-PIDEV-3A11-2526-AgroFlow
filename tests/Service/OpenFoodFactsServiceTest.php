@@ -3,23 +3,33 @@
 namespace App\Tests\Service;
 
 use App\Service\OpenFoodFactsService;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Contracts\Cache\CacheInterface;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 
-class OpenFoodFactsServiceTest extends KernelTestCase
+class OpenFoodFactsServiceTest extends TestCase
 {
     private OpenFoodFactsService $service;
-    private HttpClientInterface $httpClient;
-    private CacheInterface $cache;
 
     protected function setUp(): void
     {
-        self::bootKernel();
-        
-        $this->httpClient = static::getContainer()->get('http_client');
-        $this->cache = static::getContainer()->get('cache.app');
-        $this->service = new OpenFoodFactsService($this->httpClient, $this->cache);
+        $httpClient = new MockHttpClient(function (string $method, string $url) {
+            if (str_contains($url, '/api/v0/status.json')) {
+                return new MockResponse(json_encode(['status' => 1], JSON_THROW_ON_ERROR), ['http_code' => 200]);
+            }
+
+            return new MockResponse(json_encode([
+                'products' => [
+                    ['product_name' => 'Alpha', 'brands' => 'B1', 'image_url' => 'https://img/1.png'],
+                    ['product_name' => 'Beta', 'brands' => 'B2', 'image_url' => null],
+                    ['product_name' => 'Gamma', 'brands' => '', 'image_url' => 'https://img/3.png'],
+                ],
+            ], JSON_THROW_ON_ERROR), ['http_code' => 200]);
+        });
+        $cache = new ArrayAdapter();
+
+        $this->service = new OpenFoodFactsService($httpClient, $cache);
     }
 
     /**
@@ -57,15 +67,9 @@ class OpenFoodFactsServiceTest extends KernelTestCase
      */
     public function testCachingFunctionality(): void
     {
-        // Première requête
-        $start1 = microtime(true);
         $suggestions1 = $this->service->getFoodSuggestionsForSpecies('Cheval');
-        $time1 = microtime(true) - $start1;
 
-        // Deuxième requête (devrait être plus rapide via le cache)
-        $start2 = microtime(true);
         $suggestions2 = $this->service->getFoodSuggestionsForSpecies('Cheval');
-        $time2 = microtime(true) - $start2;
 
         // Les résultats doivent être identiques
         $this->assertEquals($suggestions1, $suggestions2);

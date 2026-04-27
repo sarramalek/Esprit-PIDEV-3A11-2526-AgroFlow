@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Form;
+namespace App\Form\auth;
 
 use App\Entity\User\User;
 use App\Repository\User\UserRepository;

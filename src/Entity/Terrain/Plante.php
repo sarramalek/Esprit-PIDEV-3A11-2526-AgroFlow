@@ -10,13 +10,13 @@ class Plante
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: 'id_plante')]
+    #[ORM\Column(name: 'id_plante', type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(name: 'nom_p', length: 100)]
+    #[ORM\Column(name: 'nom_p', type: 'string', length: 100)]
     private ?string $nomP = null;
 
-    #[ORM\Column(length: 100, nullable: true)]
+    #[ORM\Column(type: 'string', length: 100, nullable: true)]
     private ?string $variete = null;
 
     #[ORM\Column(name: 'besoin_eau', type: 'float', nullable: true)]

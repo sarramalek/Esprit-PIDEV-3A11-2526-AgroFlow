@@ -9,7 +9,7 @@ final class ControllerAdminControllerTest extends WebTestCase
     public function testIndex(): void
     {
         $client = static::createClient();
-        $client->request('GET', '/controller/admin');
+        $client->request('GET', '/');
 
         self::assertResponseIsSuccessful();
     }

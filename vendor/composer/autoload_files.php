@@ -109,6 +109,7 @@ return array(
     'de95e0ac670b27c84ef8c5ac41fc1b34' => $vendorDir . '/laminas/laminas-diactoros/src/functions/normalize_server.php',
     'b6c2870932b0250c10334a86dcb33c7f' => $vendorDir . '/laminas/laminas-diactoros/src/functions/normalize_uploaded_files.php',
     'd02cf21124526632320d6f20b1bbf905' => $vendorDir . '/laminas/laminas-diactoros/src/functions/parse_cookie_header.php',
+    '9b38cf48e83f5d8f60375221cd213eee' => $vendorDir . '/phpstan/phpstan/bootstrap.php',
     '0174385c3be07e86008907d06ee66531' => $vendorDir . '/sabberworm/php-css-parser/src/Rule/Rule.php',
     '98aea6e41b9cb79b379b10f37ba1f0b7' => $vendorDir . '/sabberworm/php-css-parser/src/RuleSet/RuleContainer.php',
     '5c70426340c07411ceee79728a2304a8' => $vendorDir . '/vonage/nexmo-bridge/src/autoload.php',

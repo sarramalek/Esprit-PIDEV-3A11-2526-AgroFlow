@@ -789,9 +789,10 @@
     <service id="App\EventListener\LogoutListener" class="App\EventListener\LogoutListener" autowire="true" autoconfigure="true">
       <tag name="kernel.event_subscriber"/>
     </service>
-    <service id="App\EventListener\TwoFactorLListener" class="App\EventListener\TwoFactorLListener" autowire="true" autoconfigure="true">
-      <tag name="container.error" message="The autoloader expected class &quot;App\EventListener\TwoFactorLListener&quot; to be defined in file &quot;C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\EventListener\TwoFactorLListener.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
-      <tag name="container.error" message="Invalid service &quot;App\EventListener\TwoFactorLListener&quot;: the autoloader expected class &quot;App\EventListener\TwoFactorLListener&quot; to be defined in file &quot;C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\EventListener\TwoFactorLListener.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
+    <service id="App\EventListener\TwoFactorListener" class="App\EventListener\TwoFactorListener" autowire="true" autoconfigure="true">
+      <tag name="kernel.event_listener" event="" method="" priority="0" dispatcher=""/>
+      <argument type="service" id="App\Service\TwoFactorCodeSender"/>
+      <argument type="service" id="router.default"/>
     </service>
     <service id="App\EventSubscriber\LocaleSubscriber" class="App\EventSubscriber\LocaleSubscriber" autowire="true" autoconfigure="true">
       <tag name="kernel.event_subscriber"/>
@@ -810,12 +811,10 @@
       <tag name="form.type"/>
     </service>
     <service id="App\Form\Evenements\InscriptionEvenementType" class="App\Form\Evenements\InscriptionEvenementType" autowire="true" autoconfigure="true">
-      <tag name="container.error" message="The autoloader expected class &quot;App\Form\Evenements\InscriptionEvenementType&quot; to be defined in file &quot;C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\Form\Evenements\InscriptionEvenementType.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
-      <tag name="container.error" message="Invalid service &quot;App\Form\Evenements\InscriptionEvenementType&quot;: the autoloader expected class &quot;App\Form\Evenements\InscriptionEvenementType&quot; to be defined in file &quot;C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\Form\Evenements\InscriptionEvenementType.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
+      <tag name="form.type"/>
     </service>
     <service id="App\Form\Evenements\ModifierParticipationUserType" class="App\Form\Evenements\ModifierParticipationUserType" autowire="true" autoconfigure="true">
-      <tag name="container.error" message="The autoloader expected class &quot;App\Form\Evenements\ModifierParticipationUserType&quot; to be defined in file &quot;C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\Form\Evenements\ModifierParticipationUserType.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
-      <tag name="container.error" message="Invalid service &quot;App\Form\Evenements\ModifierParticipationUserType&quot;: the autoloader expected class &quot;App\Form\Evenements\ModifierParticipationUserType&quot; to be defined in file &quot;C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\Form\Evenements\ModifierParticipationUserType.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
+      <tag name="form.type"/>
     </service>
     <service id="App\Form\Evenements\ParticipationType" class="App\Form\Evenements\ParticipationType" autowire="true" autoconfigure="true">
       <tag name="form.type"/>
@@ -828,10 +827,6 @@
     </service>
     <service id="App\Form\Materiels\MaintenanceType" class="App\Form\Materiels\MaintenanceType" autowire="true" autoconfigure="true">
       <tag name="form.type"/>
-    </service>
-    <service id="App\Form\Terrain\AgriRotationType" class="App\Form\Terrain\AgriRotationType" autowire="true" autoconfigure="true">
-      <tag name="container.error" message="The autoloader expected class &quot;App\Form\Terrain\AgriRotationType&quot; to be defined in file &quot;C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\Form\Terrain\AgriRotationType.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
-      <tag name="container.error" message="Invalid service &quot;App\Form\Terrain\AgriRotationType&quot;: the autoloader expected class &quot;App\Form\Terrain\AgriRotationType&quot; to be defined in file &quot;C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\Form\Terrain\AgriRotationType.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
     </service>
     <service id="App\Form\Terrain\AgriTerrainType" class="App\Form\Terrain\AgriTerrainType" autowire="true" autoconfigure="true">
       <tag name="form.type"/>
@@ -855,24 +850,17 @@
     <service id="App\Form\User\OffreType" class="App\Form\User\OffreType" autowire="true" autoconfigure="true">
       <tag name="form.type"/>
     </service>
-    <service id="App\Form\User\Resetpasswordcontroller" class="App\Form\User\Resetpasswordcontroller" autowire="true" autoconfigure="true">
-      <tag name="container.error" message="The autoloader expected class &quot;App\Form\User\Resetpasswordcontroller&quot; to be defined in file &quot;C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\Form\User\Resetpasswordcontroller.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
-      <tag name="container.error" message="Invalid service &quot;App\Form\User\Resetpasswordcontroller&quot;: the autoloader expected class &quot;App\Form\User\Resetpasswordcontroller&quot; to be defined in file &quot;C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\Form\User\Resetpasswordcontroller.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
-    </service>
     <service id="App\Form\User\TacheType" class="App\Form\User\TacheType" autowire="true" autoconfigure="true">
-      <tag name="container.error" message="The autoloader expected class &quot;App\Form\User\TacheType&quot; to be defined in file &quot;C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\Form\User\TacheType.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
-      <tag name="container.error" message="Invalid service &quot;App\Form\User\TacheType&quot;: the autoloader expected class &quot;App\Form\User\TacheType&quot; to be defined in file &quot;C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\Form\User\TacheType.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
+      <tag name="form.type"/>
     </service>
     <service id="App\Form\User\UserFormType" class="App\Form\User\UserFormType" autowire="true" autoconfigure="true">
       <tag name="form.type"/>
     </service>
     <service id="App\Form\auth\LoginFormType" class="App\Form\auth\LoginFormType" autowire="true" autoconfigure="true">
-      <tag name="container.error" message="The autoloader expected class &quot;App\Form\auth\LoginFormType&quot; to be defined in file &quot;C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\Form\auth\LoginFormType.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
-      <tag name="container.error" message="Invalid service &quot;App\Form\auth\LoginFormType&quot;: the autoloader expected class &quot;App\Form\auth\LoginFormType&quot; to be defined in file &quot;C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\Form\auth\LoginFormType.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
+      <tag name="form.type"/>
     </service>
     <service id="App\Form\auth\RegistrationFormType" class="App\Form\auth\RegistrationFormType" autowire="true" autoconfigure="true">
-      <tag name="container.error" message="The autoloader expected class &quot;App\Form\auth\RegistrationFormType&quot; to be defined in file &quot;C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\Form\auth\RegistrationFormType.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
-      <tag name="container.error" message="Invalid service &quot;App\Form\auth\RegistrationFormType&quot;: the autoloader expected class &quot;App\Form\auth\RegistrationFormType&quot; to be defined in file &quot;C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\Form\auth\RegistrationFormType.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
+      <tag name="form.type"/>
     </service>
     <service id="App\Form\stocks\Admin_CategorieType" class="App\Form\stocks\Admin_CategorieType" autowire="true" autoconfigure="true">
       <tag name="container.error" message="The autoloader expected class &quot;App\Form\stocks\Admin_CategorieType&quot; to be defined in file &quot;C:\Users\HP\OneDrive - ESPRIT\Bureau\piweb\Esprit-PIDEV-3A11-2526-AgroFlow\vendor\composer/../../src\Form\stocks\Admin_CategorieType.php&quot;. The file was found but the class was not in it, the class name or namespace probably has a typo."/>
@@ -1020,6 +1008,10 @@
       <argument type="service" id=".debug.http_client"/>
       <argument>%env(default::GEMINI_API_KEY)%</argument>
       <argument type="service" id="monolog.logger"/>
+    </service>
+    <service id="App\Service\OpenFoodFactsService" class="App\Service\OpenFoodFactsService" autowire="true" autoconfigure="true">
+      <argument type="service" id=".debug.http_client"/>
+      <argument type="service" id="cache.app"/>
     </service>
     <service id="App\Service\PdfService" class="App\Service\PdfService" autowire="true" autoconfigure="true">
       <argument type="service" id="twig"/>
@@ -2018,6 +2010,7 @@
         <argument>App\Form\Materiels</argument>
         <argument>App\Form\Terrain</argument>
         <argument>App\Form\User</argument>
+        <argument>App\Form\auth</argument>
         <argument>App\Form\stocks</argument>
         <argument>Symfony\Bridge\Doctrine\Form\Type</argument>
       </argument>
@@ -2026,6 +2019,8 @@
         <argument>App\Form\Animals\AnimauxType</argument>
         <argument>App\Form\Animals\ExamenType</argument>
         <argument>App\Form\Evenements\EvenementType</argument>
+        <argument>App\Form\Evenements\InscriptionEvenementType</argument>
+        <argument>App\Form\Evenements\ModifierParticipationUserType</argument>
         <argument>App\Form\Evenements\ParticipationType</argument>
         <argument>App\Form\Evenements\categorieevenementType</argument>
         <argument>App\Form\Materiels\MachineType</argument>
@@ -2036,7 +2031,10 @@
         <argument>App\Form\Terrain\TerrainType</argument>
         <argument>App\Form\User\AbonnementType</argument>
         <argument>App\Form\User\OffreType</argument>
+        <argument>App\Form\User\TacheType</argument>
         <argument>App\Form\User\UserFormType</argument>
+        <argument>App\Form\auth\LoginFormType</argument>
+        <argument>App\Form\auth\RegistrationFormType</argument>
         <argument>App\Form\stocks\ArticleAdminType</argument>
         <argument>App\Form\stocks\ArticleType</argument>
         <argument>App\Form\stocks\CategorieType</argument>
@@ -3522,6 +3520,14 @@
         <argument>20</argument>
       </call>
       <call method="addListener">
+        <argument>Symfony\Component\Security\Http\Event\LoginSuccessEvent</argument>
+        <argument type="collection">
+          <argument type="service_closure" id="App\EventListener\TwoFactorListener"/>
+          <argument>__invoke</argument>
+        </argument>
+        <argument>0</argument>
+      </call>
+      <call method="addListener">
         <argument>kernel.controller</argument>
         <argument type="collection">
           <argument type="service_closure" id="data_collector.router"/>
@@ -4683,7 +4689,7 @@
       <argument type="service" id="form.registry"/>
     </service>
     <service id="form.extension" class="Symfony\Component\Form\Extension\DependencyInjection\DependencyInjectionExtension">
-      <argument type="service" id=".service_locator.xOkKGYY"/>
+      <argument type="service" id=".service_locator.XoXOZlb"/>
       <argument type="collection">
         <argument key="Symfony\Component\Form\Extension\Core\Type\FormType" type="iterator">
           <argument type="service" id="form.type_extension.form.transformation_failure_handling"/>
@@ -5917,7 +5923,9 @@
       </argument>
       <argument type="service" id="doctrine.dbal.default_connection.configuration"/>
       <argument type="service" id="doctrine.dbal.default_connection.event_manager"/>
-      <argument type="collection"/>
+      <argument type="collection">
+        <argument key="enum">string</argument>
+      </argument>
       <call method="setNestTransactionsWithSavepoints">
         <argument>true</argument>
       </call>
@@ -8681,6 +8689,8 @@
     <service id=".abstract.instanceof.App\EventListener\LocaleListener" class="App\EventListener\LocaleListener" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\EventDispatcher\EventSubscriberInterface.0.App\EventListener\LogoutListener" class="App\EventListener\LogoutListener" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\EventListener\LogoutListener" class="App\EventListener\LogoutListener" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.App\EventListener\TwoFactorListener.0.App\EventListener\TwoFactorListener" class="App\EventListener\TwoFactorListener" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\EventListener\TwoFactorListener" class="App\EventListener\TwoFactorListener" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\EventDispatcher\EventSubscriberInterface.0.App\EventSubscriber\LocaleSubscriber" class="App\EventSubscriber\LocaleSubscriber" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\EventSubscriber\LocaleSubscriber" class="App\EventSubscriber\LocaleSubscriber" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\Animals\Admin\AdminAnimauxType" class="App\Form\Animals\Admin\AdminAnimauxType" autowire="true" abstract="true"/>
@@ -8691,6 +8701,10 @@
     <service id=".abstract.instanceof.App\Form\Animals\ExamenType" class="App\Form\Animals\ExamenType" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\Evenements\EvenementType" class="App\Form\Evenements\EvenementType" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Form\Evenements\EvenementType" class="App\Form\Evenements\EvenementType" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\Evenements\InscriptionEvenementType" class="App\Form\Evenements\InscriptionEvenementType" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Form\Evenements\InscriptionEvenementType" class="App\Form\Evenements\InscriptionEvenementType" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\Evenements\ModifierParticipationUserType" class="App\Form\Evenements\ModifierParticipationUserType" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Form\Evenements\ModifierParticipationUserType" class="App\Form\Evenements\ModifierParticipationUserType" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\Evenements\ParticipationType" class="App\Form\Evenements\ParticipationType" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Form\Evenements\ParticipationType" class="App\Form\Evenements\ParticipationType" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\Evenements\categorieevenementType" class="App\Form\Evenements\categorieevenementType" autowire="true" abstract="true"/>
@@ -8711,8 +8725,14 @@
     <service id=".abstract.instanceof.App\Form\User\AbonnementType" class="App\Form\User\AbonnementType" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\User\OffreType" class="App\Form\User\OffreType" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Form\User\OffreType" class="App\Form\User\OffreType" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\User\TacheType" class="App\Form\User\TacheType" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Form\User\TacheType" class="App\Form\User\TacheType" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\User\UserFormType" class="App\Form\User\UserFormType" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Form\User\UserFormType" class="App\Form\User\UserFormType" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\auth\LoginFormType" class="App\Form\auth\LoginFormType" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Form\auth\LoginFormType" class="App\Form\auth\LoginFormType" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\auth\RegistrationFormType" class="App\Form\auth\RegistrationFormType" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Form\auth\RegistrationFormType" class="App\Form\auth\RegistrationFormType" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\stocks\ArticleAdminType" class="App\Form\stocks\ArticleAdminType" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Form\stocks\ArticleAdminType" class="App\Form\stocks\ArticleAdminType" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\Form\FormTypeInterface.0.App\Form\stocks\ArticleType" class="App\Form\stocks\ArticleType" autowire="true" abstract="true"/>
@@ -10618,13 +10638,15 @@
       <argument type="service" id="argument_resolver.query_parameter_value_resolver"/>
       <argument type="service" id="debug.stopwatch"/>
     </service>
-    <service id=".service_locator.xOkKGYY" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.XoXOZlb" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Form\Animals\Admin\AdminAnimauxType" type="service_closure" id="App\Form\Animals\Admin\AdminAnimauxType"/>
         <argument key="App\Form\Animals\AnimauxType" type="service_closure" id="App\Form\Animals\AnimauxType"/>
         <argument key="App\Form\Animals\ExamenType" type="service_closure" id="App\Form\Animals\ExamenType"/>
         <argument key="App\Form\Evenements\EvenementType" type="service_closure" id="App\Form\Evenements\EvenementType"/>
+        <argument key="App\Form\Evenements\InscriptionEvenementType" type="service_closure" id="App\Form\Evenements\InscriptionEvenementType"/>
+        <argument key="App\Form\Evenements\ModifierParticipationUserType" type="service_closure" id="App\Form\Evenements\ModifierParticipationUserType"/>
         <argument key="App\Form\Evenements\ParticipationType" type="service_closure" id="App\Form\Evenements\ParticipationType"/>
         <argument key="App\Form\Evenements\categorieevenementType" type="service_closure" id="App\Form\Evenements\categorieevenementType"/>
         <argument key="App\Form\Materiels\MachineType" type="service_closure" id="App\Form\Materiels\MachineType"/>
@@ -10635,7 +10657,10 @@
         <argument key="App\Form\Terrain\TerrainType" type="service_closure" id="App\Form\Terrain\TerrainType"/>
         <argument key="App\Form\User\AbonnementType" type="service_closure" id="App\Form\User\AbonnementType"/>
         <argument key="App\Form\User\OffreType" type="service_closure" id="App\Form\User\OffreType"/>
+        <argument key="App\Form\User\TacheType" type="service_closure" id="App\Form\User\TacheType"/>
         <argument key="App\Form\User\UserFormType" type="service_closure" id="App\Form\User\UserFormType"/>
+        <argument key="App\Form\auth\LoginFormType" type="service_closure" id="App\Form\auth\LoginFormType"/>
+        <argument key="App\Form\auth\RegistrationFormType" type="service_closure" id="App\Form\auth\RegistrationFormType"/>
         <argument key="App\Form\stocks\ArticleAdminType" type="service_closure" id="App\Form\stocks\ArticleAdminType"/>
         <argument key="App\Form\stocks\ArticleType" type="service_closure" id="App\Form\stocks\ArticleType"/>
         <argument key="App\Form\stocks\CategorieType" type="service_closure" id="App\Form\stocks\CategorieType"/>
@@ -11086,6 +11111,14 @@
           <argument>postCheckCredentials</argument>
         </argument>
         <argument>256</argument>
+      </call>
+      <call method="addListener">
+        <argument>Symfony\Component\Security\Http\Event\LoginSuccessEvent</argument>
+        <argument type="collection">
+          <argument type="service_closure" id="App\EventListener\TwoFactorListener"/>
+          <argument>__invoke</argument>
+        </argument>
+        <argument>0</argument>
       </call>
       <call method="addListener">
         <argument>Symfony\Component\Security\Http\Event\CheckPassportEvent</argument>
@@ -13330,7 +13363,7 @@
     <service id=".service_locator.wo826zD" alias=".service_locator.f4l_PHz"/>
     <service id=".service_locator.IFgFLDg" alias=".service_locator.cjETtTl"/>
     <service id=".service_locator.BFrsqsn" alias=".service_locator.F9PKc.7"/>
-    <service id=".service_locator.oIHygA7" alias=".service_locator.xOkKGYY"/>
+    <service id=".service_locator.HnJMnBU" alias=".service_locator.XoXOZlb"/>
     <service id=".service_locator.3ijAwyK" alias=".service_locator.vtjw4Bs"/>
     <service id=".service_locator.O24_MAy" alias=".service_locator.yY.p4P7"/>
     <service id=".service_locator.J1zpk2W" alias=".service_locator.YozqdUq"/>

@@ -105,6 +105,7 @@ return array(
     'PhpOffice\\PhpSpreadsheet\\' => array($vendorDir . '/phpoffice/phpspreadsheet/src/PhpSpreadsheet'),
     'ParagonIE\\ConstantTime\\' => array($vendorDir . '/paragonie/constant_time_encoding/src'),
     'PHPStan\\PhpDocParser\\' => array($vendorDir . '/phpstan/phpdoc-parser/src'),
+    'PHPStan\\' => array($vendorDir . '/phpstan/phpstan-symfony/src', $vendorDir . '/phpstan/phpstan-doctrine/src'),
     'PHPMailer\\PHPMailer\\' => array($vendorDir . '/phpmailer/phpmailer/src'),
     'OTPHP\\' => array($vendorDir . '/spomky-labs/otphp/src'),
     'Monolog\\' => array($vendorDir . '/monolog/monolog/src/Monolog'),
