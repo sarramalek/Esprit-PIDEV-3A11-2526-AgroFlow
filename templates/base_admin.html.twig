@@ -613,6 +613,12 @@ checkAndRedirect();
                     <li><a href="#" class="{% if app.request.get('_route') == 'admin_rotations' %}active{% endif %}">
                         <span class="sub-dot"></span> Rotations
                     </a></li>
+                    <li>
+            <a href="{{ path('admin_plantes') }}"
+               class="{% if app.request.get('_route') starts with 'admin_plantes' %}active{% endif %}">
+                <span class="sub-dot"></span> Plantes
+            </a>
+        </li>
                 </ul>
             </div>
 
