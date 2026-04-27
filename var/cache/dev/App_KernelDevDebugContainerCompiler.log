@@ -585,7 +585,7 @@ Symfony\Component\DependencyInjection\Compiler\RemovePrivateAliasesPass: Removed
 Symfony\Component\DependencyInjection\Compiler\RemovePrivateAliasesPass: Removed service ".service_locator.oIHygA7"; reason: private alias.
 Symfony\Component\DependencyInjection\Compiler\RemovePrivateAliasesPass: Removed service ".service_locator.3ijAwyK"; reason: private alias.
 Symfony\Component\DependencyInjection\Compiler\RemovePrivateAliasesPass: Removed service ".service_locator.O24_MAy"; reason: private alias.
-Symfony\Component\DependencyInjection\Compiler\RemovePrivateAliasesPass: Removed service ".service_locator.FyNZ1nz"; reason: private alias.
+Symfony\Component\DependencyInjection\Compiler\RemovePrivateAliasesPass: Removed service ".service_locator.isyh0k3"; reason: private alias.
 Symfony\Component\DependencyInjection\Compiler\RemovePrivateAliasesPass: Removed service "validator"; reason: private alias.
 Symfony\Component\DependencyInjection\Compiler\RemovePrivateAliasesPass: Removed service "http_client"; reason: private alias.
 Symfony\Component\DependencyInjection\Compiler\RemovePrivateAliasesPass: Removed service ".debug.http_client.inner"; reason: private alias.
@@ -720,7 +720,7 @@ Symfony\Component\DependencyInjection\Compiler\RemovePrivateAliasesPass: Removed
 Symfony\Component\DependencyInjection\Compiler\RemovePrivateAliasesPass: Removed service ".service_locator.SoFxSjl"; reason: private alias.
 Symfony\Component\DependencyInjection\Compiler\RemovePrivateAliasesPass: Removed service ".service_locator.Odyyg4J"; reason: private alias.
 Symfony\Component\DependencyInjection\Compiler\RemovePrivateAliasesPass: Removed service ".service_locator.18YFTzl"; reason: private alias.
-Symfony\Component\DependencyInjection\Compiler\RemovePrivateAliasesPass: Removed service ".service_locator.F9XTCQg"; reason: private alias.
+Symfony\Component\DependencyInjection\Compiler\RemovePrivateAliasesPass: Removed service ".service_locator.uBXxleh"; reason: private alias.
 Symfony\Component\DependencyInjection\Compiler\RemovePrivateAliasesPass: Removed service ".service_locator.dGUCsbe"; reason: private alias.
 Symfony\Component\DependencyInjection\Compiler\RemovePrivateAliasesPass: Removed service ".service_locator._kIAbz1"; reason: private alias.
 Symfony\Component\DependencyInjection\Compiler\RemovePrivateAliasesPass: Removed service ".service_locator.hnz5ZNh"; reason: private alias.
@@ -808,7 +808,7 @@ Symfony\Component\DependencyInjection\Compiler\ReplaceAliasByActualDefinitionPas
 Symfony\Component\DependencyInjection\Compiler\ReplaceAliasByActualDefinitionPass: Changed reference of service ".debug.security.voter.security.access.simple_role_voter" previously pointing to "debug.event_dispatcher" to "event_dispatcher".
 Symfony\Component\DependencyInjection\Compiler\ReplaceAliasByActualDefinitionPass: Changed reference of service ".debug.security.voter.security.access.expression_voter" previously pointing to "debug.event_dispatcher" to "event_dispatcher".
 Symfony\Component\DependencyInjection\Compiler\ReplaceAliasByActualDefinitionPass: Changed reference of service ".debug.security.voter.App\Security\TerrainVoter" previously pointing to "debug.event_dispatcher" to "event_dispatcher".
-Symfony\Component\DependencyInjection\Compiler\ReplaceAliasByActualDefinitionPass: Changed reference of service ".service_locator.MEcn9qh" previously pointing to "router.default" to "router".
+Symfony\Component\DependencyInjection\Compiler\ReplaceAliasByActualDefinitionPass: Changed reference of service ".service_locator.Ccg8tS2" previously pointing to "router.default" to "router".
 Symfony\Component\DependencyInjection\Compiler\ReplaceAliasByActualDefinitionPass: Changed reference of service ".service_locator.fuYM_Z." previously pointing to "translator.data_collector" to "translator".
 Symfony\Component\DependencyInjection\Compiler\ReplaceAliasByActualDefinitionPass: Changed reference of service ".service_locator.cUcW89y" previously pointing to "router.default" to "router".
 Symfony\Component\DependencyInjection\Compiler\ReplaceAliasByActualDefinitionPass: Changed reference of service ".service_locator._1SGciK" previously pointing to "debug.event_dispatcher" to "event_dispatcher".
@@ -1326,57 +1326,57 @@ Symfony\Component\DependencyInjection\Compiler\RemoveUnusedDefinitionsPass: Remo
 Symfony\Component\DependencyInjection\Compiler\RemoveUnusedDefinitionsPass: Removed service "monolog.logger.translation"; reason: unused.
 Symfony\Component\DependencyInjection\Compiler\RemoveUnusedDefinitionsPass: Removed service ".service_locator.XXv1IfR"; reason: unused.
 Symfony\Component\DependencyInjection\Compiler\RemoveUnusedDefinitionsPass: Removed service ".service_locator.0TACwl3"; reason: unused.
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\AboutController" to "App\Controller\AboutController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\AdminDashboardController" to "App\Controller\AdminDashboardController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\AdminMateriels\MachineAdminController" to "App\Controller\AdminMateriels\MachineAdminController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\AdminMateriels\MaintenanceAdminController" to "App\Controller\AdminMateriels\MaintenanceAdminController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\AgriculteurDashboardController" to "App\Controller\AgriculteurDashboardController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\Animals\Admin\AdminAnimauxController" to "App\Controller\Animals\Admin\AdminAnimauxController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\Animals\Admin\AdminExamenController" to "App\Controller\Animals\Admin\AdminExamenController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\Animals\AnimauxController" to "App\Controller\Animals\AnimauxController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\Animals\ExamensController" to "App\Controller\Animals\ExamensController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\Animals\ReminderController" to "App\Controller\Animals\ReminderController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\AuthController" to "App\Controller\AuthController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\AboutController" to "App\Controller\AboutController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\AdminDashboardController" to "App\Controller\AdminDashboardController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\AdminMateriels\MachineAdminController" to "App\Controller\AdminMateriels\MachineAdminController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\AdminMateriels\MaintenanceAdminController" to "App\Controller\AdminMateriels\MaintenanceAdminController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\AgriculteurDashboardController" to "App\Controller\AgriculteurDashboardController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\Animals\Admin\AdminAnimauxController" to "App\Controller\Animals\Admin\AdminAnimauxController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\Animals\Admin\AdminExamenController" to "App\Controller\Animals\Admin\AdminExamenController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\Animals\AnimauxController" to "App\Controller\Animals\AnimauxController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\Animals\ExamensController" to "App\Controller\Animals\ExamensController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\Animals\ReminderController" to "App\Controller\Animals\ReminderController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\AuthController" to "App\Controller\AuthController".
 Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service "App\Service\AiAssistantService" to "App\Controller\ChatController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\ChatController" to "App\Controller\ChatController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\Evenements\Agriculteur\EvenementController" to "App\Controller\Evenements\Agriculteur\EvenementController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\Evenements\Agriculteur\ParticipationController" to "App\Controller\Evenements\Agriculteur\ParticipationController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\Evenements\CategorieEvenementController" to "App\Controller\Evenements\CategorieEvenementController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\Evenements\EvenementController" to "App\Controller\Evenements\EvenementController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\Evenements\Ouvrier\EvenementController" to "App\Controller\Evenements\Ouvrier\EvenementController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\Evenements\Ouvrier\ParticipationController" to "App\Controller\Evenements\Ouvrier\ParticipationController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\Evenements\ParticipationController" to "App\Controller\Evenements\ParticipationController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\HomeController" to "App\Controller\HomeController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\LocaleController" to "App\Controller\LocaleController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\Materiels\MachineController" to "App\Controller\Materiels\MachineController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\ChatController" to "App\Controller\ChatController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\Evenements\Agriculteur\EvenementController" to "App\Controller\Evenements\Agriculteur\EvenementController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\Evenements\Agriculteur\ParticipationController" to "App\Controller\Evenements\Agriculteur\ParticipationController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\Evenements\CategorieEvenementController" to "App\Controller\Evenements\CategorieEvenementController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\Evenements\EvenementController" to "App\Controller\Evenements\EvenementController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\Evenements\Ouvrier\EvenementController" to "App\Controller\Evenements\Ouvrier\EvenementController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\Evenements\Ouvrier\ParticipationController" to "App\Controller\Evenements\Ouvrier\ParticipationController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\Evenements\ParticipationController" to "App\Controller\Evenements\ParticipationController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\HomeController" to "App\Controller\HomeController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\LocaleController" to "App\Controller\LocaleController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\Materiels\MachineController" to "App\Controller\Materiels\MachineController".
 Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service "App\Service\MaintenanceAlertService" to "App\Controller\Materiels\MaintenancesController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\Materiels\MaintenancesController" to "App\Controller\Materiels\MaintenancesController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\OuvrierDashboardController" to "App\Controller\OuvrierDashboardController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\Terrain\AgriPlanteController" to "App\Controller\Terrain\AgriPlanteController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\Terrain\AgriRotationController" to "App\Controller\Terrain\AgriRotationController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\Terrain\AgriTerrainController" to "App\Controller\Terrain\AgriTerrainController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\Terrain\AiSuggestionController" to "App\Controller\Terrain\AiSuggestionController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\Terrain\OuvrierPlanteViewController" to "App\Controller\Terrain\OuvrierPlanteViewController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\Terrain\PlanteController" to "App\Controller\Terrain\PlanteController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\Terrain\RotationController" to "App\Controller\Terrain\RotationController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\Terrain\TerrainController" to "App\Controller\Terrain\TerrainController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\Terrain\WorkflowPlanteController" to "App\Controller\Terrain\WorkflowPlanteController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\User\AbonnementController" to "App\Controller\User\AbonnementController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\User\AbonnementFrontController" to "App\Controller\User\AbonnementFrontController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\User\AdminUserController" to "App\Controller\User\AdminUserController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\User\OffreController" to "App\Controller\User\OffreController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\User\OffreFrontController" to "App\Controller\User\OffreFrontController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\User\OuvrierController" to "App\Controller\User\OuvrierController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\User\Ouvrier_agriController" to "App\Controller\User\Ouvrier_agriController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\User\TacheController" to "App\Controller\User\TacheController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\User\TacheFrontController" to "App\Controller\User\TacheFrontController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\stocks\AdminStockController" to "App\Controller\stocks\AdminStockController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\stocks\Admin_CategorieController" to "App\Controller\stocks\Admin_CategorieController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\stocks\ArticleController" to "App\Controller\stocks\ArticleController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\stocks\CategorieController" to "App\Controller\stocks\CategorieController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\stocks\MouvementController" to "App\Controller\stocks\MouvementController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\stocks\QrCodeController" to "App\Controller\stocks\QrCodeController".
-Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.MEcn9qh.App\Controller\stocks\VisionController" to "App\Controller\stocks\VisionController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\Materiels\MaintenancesController" to "App\Controller\Materiels\MaintenancesController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\OuvrierDashboardController" to "App\Controller\OuvrierDashboardController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\Terrain\AgriPlanteController" to "App\Controller\Terrain\AgriPlanteController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\Terrain\AgriRotationController" to "App\Controller\Terrain\AgriRotationController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\Terrain\AgriTerrainController" to "App\Controller\Terrain\AgriTerrainController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\Terrain\AiSuggestionController" to "App\Controller\Terrain\AiSuggestionController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\Terrain\OuvrierPlanteViewController" to "App\Controller\Terrain\OuvrierPlanteViewController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\Terrain\PlanteController" to "App\Controller\Terrain\PlanteController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\Terrain\RotationController" to "App\Controller\Terrain\RotationController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\Terrain\TerrainController" to "App\Controller\Terrain\TerrainController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\Terrain\WorkflowPlanteController" to "App\Controller\Terrain\WorkflowPlanteController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\User\AbonnementController" to "App\Controller\User\AbonnementController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\User\AbonnementFrontController" to "App\Controller\User\AbonnementFrontController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\User\AdminUserController" to "App\Controller\User\AdminUserController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\User\OffreController" to "App\Controller\User\OffreController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\User\OffreFrontController" to "App\Controller\User\OffreFrontController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\User\OuvrierController" to "App\Controller\User\OuvrierController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\User\Ouvrier_agriController" to "App\Controller\User\Ouvrier_agriController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\User\TacheController" to "App\Controller\User\TacheController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\User\TacheFrontController" to "App\Controller\User\TacheFrontController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\stocks\AdminStockController" to "App\Controller\stocks\AdminStockController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\stocks\Admin_CategorieController" to "App\Controller\stocks\Admin_CategorieController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\stocks\ArticleController" to "App\Controller\stocks\ArticleController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\stocks\CategorieController" to "App\Controller\stocks\CategorieController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\stocks\MouvementController" to "App\Controller\stocks\MouvementController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\stocks\QrCodeController" to "App\Controller\stocks\QrCodeController".
+Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service ".service_locator.Ccg8tS2.App\Controller\stocks\VisionController" to "App\Controller\stocks\VisionController".
 Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service "security.helper" to "App\Form\User\AbonnementType".
 Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service "App\Service\GrokService" to "App\Service\AiAssistantService".
 Symfony\Component\DependencyInjection\Compiler\InlineServiceDefinitionsPass: Inlined service "App\Service\DatabaseReaderService" to "App\Service\AiAssistantService".
