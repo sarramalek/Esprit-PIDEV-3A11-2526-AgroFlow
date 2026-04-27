@@ -1,0 +1,354 @@
+{% extends 'base_agriculteur.html.twig' %}
+{% block title %}{{ title }} — AgroFlow{% endblock %}
+
+{% block stylesheets %}
+<style>
+/* ── Layout ──────────────────────────────────────────────── */
+.form-wrap { max-width:640px; margin:0 auto; }
+
+/* ── Card ────────────────────────────────────────────────── */
+.form-card { background:white; border-radius:16px; box-shadow:0 2px 16px rgba(0,0,0,0.08); padding:36px; }
+.form-card-header { display:flex; align-items:center; gap:12px; margin-bottom:28px; padding-bottom:20px; border-bottom:2px solid #EAF3E6; }
+.form-card-header .icon { width:44px; height:44px; background:linear-gradient(135deg,#4A8C3F,#2D5A27); border-radius:11px; display:flex; align-items:center; justify-content:center; color:white; font-size:18px; flex-shrink:0; }
+.form-card-header h2 { font-size:18px; font-weight:700; color:#1B3A20; margin:0; }
+
+/* ── Form elements ───────────────────────────────────────── */
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+.form-group { display:flex; flex-direction:column; gap:6px; }
+.form-group.full { grid-column:1 / -1; }
+.form-label { font-size:13px; font-weight:600; color:#1B3A20; }
+.form-control { padding:11px 14px; border:1.5px solid #ddd; border-radius:10px; font-size:14px; font-family:'DM Sans',sans-serif; color:#1B3A20; background:#FAFFF9; width:100%; transition:border-color 0.2s, box-shadow 0.2s; box-sizing:border-box; }
+.form-control:focus { outline:none; border-color:#2D5A27; background:white; box-shadow:0 0 0 3px rgba(45,90,39,0.08); }
+
+/* ── Actions ─────────────────────────────────────────────── */
+.form-actions { display:flex; gap:12px; margin-top:28px; padding-top:20px; border-top:1px solid #f0f0f0; flex-wrap:wrap; }
+.btn-submit { display:inline-flex; align-items:center; gap:8px; background:#2D5A27; color:white; padding:12px 26px; border-radius:10px; font-size:14px; font-weight:600; border:none; cursor:pointer; transition:background 0.2s; }
+.btn-submit:hover { background:#1B3A20; }
+.btn-cancel { display:inline-flex; align-items:center; gap:8px; background:#f0f0f0; color:#333; padding:12px 22px; border-radius:10px; font-size:14px; font-weight:600; text-decoration:none; transition:background 0.2s; }
+.btn-cancel:hover { background:#e0e0e0; }
+
+/* ── Bouton Suggestion IA ────────────────────────────────── */
+.btn-ai {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    color: #2D5A27;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1.5px solid #4A8C3F;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: background 0.2s, transform 0.1s;
+    font-family: 'DM Sans', sans-serif;
+}
+.btn-ai:hover { background: #EAF3E6; }
+.btn-ai:active { transform: scale(0.98); }
+
+/* ── Spinner ─────────────────────────────────────────────── */
+.ai-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid #9EC994;
+    border-top-color: #2D5A27;
+    border-radius: 50%;
+    animation: ai-spin 0.7s linear infinite;
+    display: none;
+    flex-shrink: 0;
+}
+@keyframes ai-spin { to { transform: rotate(360deg); } }
+.btn-ai.loading .ai-spinner { display: inline-block; }
+.btn-ai.loading .ai-btn-label { display: none; }
+
+/* ── Bannière résultat IA ────────────────────────────────── */
+.ai-banner {
+    display: none;
+    align-items: flex-start;
+    gap: 14px;
+    background: #F2FAF0;
+    border: 1.5px solid #A8D5A2;
+    border-radius: 12px;
+    padding: 16px 18px;
+    margin-bottom: 22px;
+    animation: ai-fadein 0.35s ease;
+}
+@keyframes ai-fadein { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:translateY(0); } }
+.ai-banner.error { background: #FFF5F5; border-color: #FFAAAA; }
+
+.ai-banner-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, #4A8C3F, #2D5A27);
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 15px;
+    flex-shrink: 0;
+}
+.ai-banner-content { flex: 1; min-width: 0; }
+.ai-banner-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #4A8C3F;
+    margin-bottom: 6px;
+}
+.ai-banner-text { font-size: 13.5px; color: #1B3A20; line-height: 1.65; }
+.ai-banner-text strong { color: #2D5A27; }
+.ai-banner-meta { font-size: 12px; color: #5A8A55; margin-top: 4px; }
+
+/* ── Chips alternatives ──────────────────────────────────── */
+.ai-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; align-items: center; }
+.ai-chips-label { font-size: 12px; color: #5A8A55; font-weight: 600; }
+.ai-chip {
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    background: #DDF0D8;
+    color: #2D5A27;
+    border: 1px solid #A8D5A2;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.15s;
+    font-family: 'DM Sans', sans-serif;
+}
+.ai-chip:hover { background: #C5E8BF; }
+
+/* ── Séparateur ──────────────────────────────────────────── */
+.ai-divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    font-size: 12px;
+    color: #aaa;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.ai-divider::before, .ai-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #EAF3E6;
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="form-wrap">
+    <div class="form-card">
+
+        {# En-tête #}
+        <div class="form-card-header">
+            <div class="icon"><i class="fa fa-rotate"></i></div>
+            <h2>{{ title }}</h2>
+        </div>
+
+        {# ── Bouton Suggestion IA ── #}
+        <button type="button" class="btn-ai" id="aiBtn" onclick="getAiSuggestion()">
+            <div class="ai-spinner" id="aiSpinner"></div>
+            <span class="ai-btn-label">
+                <i class="fa fa-wand-magic-sparkles"></i>
+                Suggestion IA
+            </span>
+        </button>
+
+        {# ── Bannière résultat IA ── #}
+        <div class="ai-banner" id="aiBanner">
+            <div class="ai-banner-icon"><i class="fa fa-seedling"></i></div>
+            <div class="ai-banner-content">
+                <div class="ai-banner-title">Recommandation IA</div>
+                <div class="ai-banner-text" id="aiText"></div>
+                <div class="ai-banner-meta" id="aiMeta"></div>
+                <div class="ai-chips" id="aiChips"></div>
+            </div>
+        </div>
+
+        <div class="ai-divider">Formulaire</div>
+
+        {# ── Formulaire Symfony ── #}
+        {{ form_start(form, {attr: {novalidate: 'novalidate', id: 'rotationForm'}}) }}
+        <div class="form-grid">
+
+            <div class="form-group full">
+                {{ form_label(form.terrain, null, {label_attr: {class: 'form-label'}}) }}
+                {{ form_widget(form.terrain, {attr: {class: 'form-control', id: 'field_terrain'}}) }}
+                {{ form_errors(form.terrain) }}
+            </div>
+
+            <div class="form-group full">
+                {{ form_label(form.plante, null, {label_attr: {class: 'form-label'}}) }}
+                {{ form_widget(form.plante, {attr: {class: 'form-control', id: 'field_plante'}}) }}
+                {{ form_errors(form.plante) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.dateDebut, null, {label_attr: {class: 'form-label'}}) }}
+                {{ form_widget(form.dateDebut, {attr: {class: 'form-control', id: 'field_dateDebut'}}) }}
+                {{ form_errors(form.dateDebut) }}
+            </div>
+
+            <div class="form-group">
+                {{ form_label(form.dateFin, null, {label_attr: {class: 'form-label'}}) }}
+                {{ form_widget(form.dateFin, {attr: {class: 'form-control', id: 'field_dateFin'}}) }}
+                {{ form_errors(form.dateFin) }}
+            </div>
+
+            <div class="form-group full">
+                {{ form_label(form.status, null, {label_attr: {class: 'form-label'}}) }}
+                {{ form_widget(form.status, {attr: {class: 'form-control'}}) }}
+                {{ form_errors(form.status) }}
+            </div>
+
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-submit">
+                <i class="fa fa-{{ edit ? 'floppy-disk' : 'plus' }}"></i>
+                {{ edit ? 'Enregistrer' : 'Créer la rotation' }}
+            </button>
+            <a href="{{ path('agri_rotations') }}" class="btn-cancel">
+                <i class="fa fa-arrow-left"></i> Annuler
+            </a>
+        </div>
+        {{ form_end(form) }}
+
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+async function getAiSuggestion() {
+    const btn     = document.getElementById('aiBtn');
+    const banner  = document.getElementById('aiBanner');
+    const aiText  = document.getElementById('aiText');
+    const aiMeta  = document.getElementById('aiMeta');
+    const aiChips = document.getElementById('aiChips');
+
+    // Récupération des valeurs du formulaire Symfony
+    const terrainEl = document.getElementById('field_terrain') || document.querySelector('[id$="_terrain"]');
+    const planteEl  = document.getElementById('field_plante')  || document.querySelector('[id$="_plante"]');
+
+    const terrain = terrainEl
+        ? (terrainEl.options ? terrainEl.options[terrainEl.selectedIndex]?.text : terrainEl.value) || 'non spécifié'
+        : 'non spécifié';
+
+    const plante = planteEl
+        ? (planteEl.options ? planteEl.options[planteEl.selectedIndex]?.text : planteEl.value) || 'non spécifiée'
+        : 'non spécifiée';
+
+    // État chargement
+    btn.classList.add('loading');
+    banner.style.display = 'none';
+    banner.classList.remove('error');
+
+    try {
+        // ✅ Appel vers TON serveur Symfony — la clé API reste côté serveur
+        const response = await fetch('/api/ai-suggestion', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ terrain, plante })
+        });
+
+        const json = await response.json();
+
+        if (!response.ok || json.error) {
+            throw new Error(json.error || 'Erreur serveur');
+        }
+
+        // Affichage du résultat
+        aiText.innerHTML = '<strong>' + escapeHtml(json.prochaine_culture || '—') + '</strong> — ' + escapeHtml(json.conseil || '');
+        aiMeta.textContent = (json.raison || '') + (json.duree_mois ? ' · Durée suggérée : ' + json.duree_mois + ' mois' : '');
+
+        // Chips alternatives
+        aiChips.innerHTML = '';
+        if (Array.isArray(json.alternatives) && json.alternatives.length > 0) {
+            const lbl = document.createElement('span');
+            lbl.className = 'ai-chips-label';
+            lbl.textContent = 'Alternatives :';
+            aiChips.appendChild(lbl);
+
+            json.alternatives.forEach(function(alt) {
+                const chip = document.createElement('button');
+                chip.type = 'button';
+                chip.className = 'ai-chip';
+                chip.textContent = alt;
+                chip.onclick = function() { applyAltSuggestion(alt); };
+                aiChips.appendChild(chip);
+            });
+        }
+
+        // Auto-remplissage
+        autoFillPlante(json.prochaine_culture);
+        autoFillDates(json.duree_mois || 6);
+
+        banner.style.display = 'flex';
+
+    } catch (err) {
+        console.error('AI suggestion error:', err);
+        aiText.textContent = err.message || 'Impossible de générer une suggestion. Veuillez réessayer.';
+        aiMeta.textContent = '';
+        aiChips.innerHTML  = '';
+        banner.classList.add('error');
+        banner.style.display = 'flex';
+    }
+
+    btn.classList.remove('loading');
+}
+
+function autoFillPlante(cultureName) {
+    if (!cultureName) return;
+    const planteEl = document.getElementById('field_plante') || document.querySelector('[id$="_plante"]');
+    if (!planteEl || !planteEl.options) return;
+    const lower = cultureName.toLowerCase();
+    for (let i = 0; i < planteEl.options.length; i++) {
+        if (planteEl.options[i].text.toLowerCase().includes(lower) ||
+            planteEl.options[i].value.toLowerCase().includes(lower)) {
+            planteEl.selectedIndex = i;
+            break;
+        }
+    }
+}
+
+function autoFillDates(dureeMois) {
+    const debutEl = document.getElementById('field_dateDebut') || document.querySelector('[id$="_dateDebut"]');
+    const finEl   = document.getElementById('field_dateFin')   || document.querySelector('[id$="_dateFin"]');
+    if (!debutEl || !finEl) return;
+    const today = new Date();
+    const fin   = new Date();
+    fin.setMonth(fin.getMonth() + dureeMois);
+    debutEl.value = formatDate(today);
+    finEl.value   = formatDate(fin);
+}
+
+function applyAltSuggestion(cultureName) {
+    autoFillPlante(cultureName);
+    const aiText = document.getElementById('aiText');
+    aiText.innerHTML = aiText.innerHTML.replace(/<strong>[^<]*<\/strong>/, '<strong>' + escapeHtml(cultureName) + '</strong>');
+}
+
+function formatDate(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return y + '-' + m + '-' + d;
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+</script>
+{% endblock %}

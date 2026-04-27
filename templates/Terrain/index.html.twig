@@ -1,0 +1,664 @@
+{% extends 'base_admin.html.twig' %}
+{% block title %}Terrains — AgroFlow{% endblock %}
+{% block page_title %}Gestion des Terrains{% endblock %}
+{% block breadcrumb %}Terrains{% endblock %}
+
+{% block stylesheets %}
+<style>
+/* ── Stats Cards ── */
+.stats-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
+.stat-card { background:var(--white); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px 24px; display:flex; align-items:center; gap:16px; }
+.stat-icon { width:48px; height:48px; border-radius:12px; display:inline-block; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+.stat-icon.green  { background:#D1FAE5; color:#065F46; }
+.stat-icon.blue   { background:#DBEAFE; color:#1D4ED8; }
+.stat-icon.yellow { background:#FEF3C7; color:#92400E; }
+.stat-icon.purple { background:#EDE9FE; color:#5B21B6; }
+.stat-value { font-size:24px; font-weight:700; color:var(--navy); line-height:1; }
+.stat-label { font-size:12px; color:var(--text-muted); margin-top:4px; }
+
+/* ── Sol Repartition ── */
+.sol-bars { display:flex; flex-direction:column; gap:8px; margin-top:12px; }
+.sol-bar-row { display:flex; align-items:center; gap:10px; font-size:13px; }
+.sol-bar-label { width:80px; color:var(--text-muted); font-weight:500; }
+.sol-bar-track { flex:1; height:8px; background:var(--cream-dark); border-radius:4px; overflow:hidden; }
+.sol-bar-fill { height:100%; background:var(--green-accent); border-radius:4px; transition:width 0.6s ease; }
+.sol-bar-count { width:24px; text-align:right; font-weight:600; color:var(--navy); }
+
+/* ── Toolbar ── */
+.toolbar { display:flex; align-items:center; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
+.search-box { position:relative; flex:1; min-width:220px; }
+.search-box input { width:100%; padding:10px 14px 10px 38px; border:1.5px solid var(--cream-dark); border-radius:8px; font-size:14px; font-family:'DM Sans',sans-serif; background:var(--white); color:var(--navy); transition:border-color 0.2s; }
+.search-box input:focus { outline:none; border-color:var(--green-accent); }
+.search-box i { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:13px; }
+.filter-select { padding:10px 14px; border:1.5px solid var(--cream-dark); border-radius:8px; font-size:14px; font-family:'DM Sans',sans-serif; background:var(--white); color:var(--navy); cursor:pointer; }
+.filter-select:focus { outline:none; border-color:var(--green-accent); }
+.btn-primary { display:inline-flex; align-items:center; gap:8px; background:var(--green-accent); color:white; padding:10px 20px; border-radius:var(--radius); font-size:14px; font-weight:600; text-decoration:none; border:none; cursor:pointer; white-space:nowrap; }
+.btn-primary:hover { background:var(--green-mid); }
+/* PDF bouton BLEU */
+.btn-pdf { display:inline-flex; align-items:center; gap:8px; background:#1D4ED8; color:white; padding:10px 20px; border-radius:var(--radius); font-size:14px; font-weight:600; border:none; cursor:pointer; white-space:nowrap; }
+.btn-pdf:hover { background:#1E40AF; }
+.result-count { font-size:13px; color:var(--text-muted); margin-left:4px; }
+
+/* ── Table ── */
+.card { background:var(--white); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; }
+.flash-success { background:#D1FAE5; color:#065F46; padding:12px 18px; border-radius:var(--radius); margin-bottom:20px; font-size:14px; font-weight:500; display:flex; align-items:center; gap:8px; }
+.data-table { width:100%; border-collapse:collapse; }
+.data-table thead th { background:var(--cream); padding:13px 18px; text-align:left; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); border-bottom:1px solid var(--cream-dark); white-space:nowrap; }
+.data-table thead th.sortable { cursor:pointer; user-select:none; transition:color 0.2s; }
+.data-table thead th.sortable:hover { color:var(--green-accent); }
+.data-table thead th .sort-icon { margin-left:5px; opacity:0.4; font-size:10px; }
+.data-table thead th.sort-asc .sort-icon,
+.data-table thead th.sort-desc .sort-icon { opacity:1; color:var(--green-accent); }
+.data-table tbody td { padding:14px 18px; font-size:14px; border-bottom:1px solid var(--cream-dark); vertical-align:middle; }
+.data-table tbody tr:last-child td { border-bottom:none; }
+.data-table tbody tr:hover { background:#FAFDF8; }
+.data-table tbody tr.hidden-row { display:none; }
+.badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; }
+.badge-soil { background:#FEF3C7; color:#92400E; }
+.terrain-name { font-weight:600; color:var(--navy); }
+.cin-code { font-family:'DM Mono',monospace; font-size:13px; background:var(--cream); padding:3px 8px; border-radius:6px; }
+
+/* ── Actions : 2 lignes ── */
+.actions { display:flex; flex-direction:column; gap:5px; align-items:flex-start; }
+.actions-row { display:flex; gap:5px; align-items:center; }
+.btn-danger { background:#FEE2E2; color:#DC2626; border:none; padding:6px 10px; border-radius:7px; font-size:12px; cursor:pointer; display:inline-flex; align-items:center; gap:4px; }
+.btn-danger:hover { background:#FECACA; }
+.btn-edit { display:inline-flex; align-items:center; gap:4px; background:var(--cream-dark); color:var(--navy); border:1px solid #ddd; padding:6px 10px; border-radius:7px; font-size:12px; text-decoration:none; }
+.btn-edit:hover { background:#e5e0cc; }
+.btn-show { display:inline-flex; align-items:center; gap:4px; background:#EFF6FF; color:#2563EB; border:1px solid #BFDBFE; padding:6px 10px; border-radius:7px; font-size:12px; text-decoration:none; }
+.btn-show:hover { background:#DBEAFE; }
+.btn-meteo { display:inline-flex; align-items:center; gap:4px; background:#F0FDF4; color:#166534; border:1px solid #86EFAC; padding:6px 10px; border-radius:7px; font-size:12px; cursor:pointer; }
+.btn-meteo:hover { background:#DCFCE7; }
+.btn-analyse { display:inline-flex; align-items:center; gap:4px; background:#FFF7ED; color:#92400E; border:1px solid #FCD34D; padding:6px 10px; border-radius:7px; font-size:12px; cursor:pointer; }
+.btn-analyse:hover { background:#FEF3C7; }
+
+.empty-state { text-align:center; padding:60px 20px; color:var(--text-muted); }
+.empty-state i { font-size:48px; margin-bottom:16px; opacity:0.3; display:block; }
+.no-results { text-align:center; padding:40px; color:var(--text-muted); display:none; }
+
+/* ── Pagination ── */
+.pagination-wrap { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-top:1px solid var(--cream-dark); font-size:13px; flex-wrap:wrap; gap:10px; }
+.pagination-info { color:var(--text-muted); }
+.pagination-btns { display:flex; gap:4px; }
+.page-btn { min-width:34px; height:34px; border-radius:7px; border:1.5px solid var(--cream-dark); background:var(--white); color:var(--navy); font-size:13px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition:all 0.15s; }
+.page-btn:hover { border-color:var(--green-accent); color:var(--green-accent); }
+.page-btn.active { background:var(--green-accent); color:white; border-color:var(--green-accent); }
+.page-btn:disabled { opacity:0.35; cursor:not-allowed; }
+.per-page-select { padding:6px 10px; border:1.5px solid var(--cream-dark); border-radius:7px; font-size:13px; font-family:'DM Sans',sans-serif; background:var(--white); color:var(--navy); cursor:pointer; }
+
+/* ── Modals ── */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center; }
+.modal-overlay.active { display:flex; }
+.modal-box { background:#FFFDF5; border-radius:16px; padding:32px; width:90%; max-width:480px; box-shadow:0 20px 60px rgba(0,0,0,0.2); position:relative; font-family:'DM Sans',sans-serif; animation:modalIn 0.25s ease; }
+@keyframes modalIn { from{transform:translateY(20px);opacity:0} to{transform:none;opacity:1} }
+.modal-close { position:absolute; top:14px; right:16px; background:none; border:none; font-size:20px; cursor:pointer; color:#999; }
+.modal-close:hover { color:#333; }
+.modal-title { font-size:18px; font-weight:700; color:#1B3A20; margin-bottom:4px; display:flex; align-items:center; gap:10px; }
+.modal-subtitle { font-size:13px; color:#6B7280; margin-bottom:20px; }
+.modal-loading { text-align:center; padding:30px 0; color:#6B7280; font-size:14px; }
+.modal-loading i { font-size:28px; display:block; margin-bottom:10px; animation:spin 1s linear infinite; }
+@keyframes spin { to{transform:rotate(360deg)} }
+.meteo-main { font-size:32px; font-weight:700; color:#1B3A20; margin:12px 0 4px; }
+.meteo-desc { font-size:14px; color:#6B7280; margin-bottom:20px; }
+.meteo-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+.meteo-item { background:#F0FDF4; border-radius:10px; padding:12px 14px; }
+.meteo-item-label { font-size:11px; color:#6B7280; font-weight:600; text-transform:uppercase; }
+.meteo-item-val { font-size:18px; font-weight:700; color:#1B3A20; margin-top:2px; }
+.meteo-coords { font-size:12px; color:#9CA3AF; background:#F9FAFB; border-radius:8px; padding:8px 12px; }
+.meteo-reco { background:#D1FAE5; border-radius:10px; padding:12px 14px; font-size:13px; color:#065F46; font-weight:500; margin-top:12px; }
+.analyse-score-wrap { text-align:center; margin:16px 0 20px; }
+.analyse-score-bar { height:14px; background:#E5E7EB; border-radius:7px; overflow:hidden; margin:8px 0 4px; }
+.analyse-score-fill { height:100%; border-radius:7px; transition:width 0.8s ease; }
+.analyse-score-num { font-size:28px; font-weight:700; color:#1B3A20; }
+.analyse-score-label { font-size:13px; color:#6B7280; }
+.analyse-detail { background:#FAFAFA; border-radius:10px; padding:14px; font-size:13px; color:#374151; margin-bottom:14px; line-height:1.6; }
+.analyse-reco { border-radius:10px; padding:14px; font-size:13px; line-height:1.6; }
+.analyse-reco.good   { background:#D1FAE5; color:#065F46; }
+.analyse-reco.medium { background:#FEF3C7; color:#92400E; }
+.analyse-reco.bad    { background:#FEE2E2; color:#991B1B; }
+</style>
+{% endblock %}
+
+{% block body %}
+
+{% for msg in app.flashes('success') %}
+<div class="flash-success"><i class="fa fa-check-circle"></i> {{ msg }}</div>
+{% endfor %}
+
+{# ══ STATISTIQUES — structure identique au code original ══ #}
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon green"><i class="fa fa-map"></i></div>
+        <div>
+            <div class="stat-value">{{ totalTerrains }}</div>
+            <div class="stat-label">Total terrains</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon blue"><i class="fa fa-ruler-combined"></i></div>
+        <div>
+            <div class="stat-value">{{ surfaceTotale|number_format(1) }}</div>
+            <div class="stat-label">Surface totale (ha)</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon yellow"><i class="fa fa-flask"></i></div>
+        <div>
+            <div class="stat-value">{{ pHMoyen ?? '—' }}</div>
+            <div class="stat-label">pH moyen</div>
+        </div>
+    </div>
+    <div class="stat-card" style="flex-direction:column; align-items:flex-start; gap:8px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+            <div class="stat-icon purple"><i class="fa fa-layer-group"></i></div>
+            <div>
+                <div class="stat-value">{{ typeSolStats|length }}</div>
+                <div class="stat-label">Types de sol</div>
+            </div>
+        </div>
+        <div class="sol-bars" style="width:100%">
+            {% for type, count in typeSolStats %}
+            <div class="sol-bar-row">
+                <span class="sol-bar-label">{{ type }}</span>
+                <div class="sol-bar-track">
+                    <div class="sol-bar-fill"
+                         style="width:{{ totalTerrains > 0 ? (count/totalTerrains*100)|round : 0 }}%">
+                    </div>
+                </div>
+                <span class="sol-bar-count">{{ count }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{# ══ TOOLBAR ══ #}
+<div class="toolbar">
+    <div class="search-box">
+        <i class="fa fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" placeholder="Rechercher par nom, localisation, CIN…">
+    </div>
+    <select class="filter-select" id="filterSol">
+        <option value="">Tous les sols</option>
+        <option value="Argileux">Argileux</option>
+        <option value="Sableux">Sableux</option>
+        <option value="Limoneux">Limoneux</option>
+        <option value="Calcaire">Calcaire</option>
+        <option value="Humifère">Humifère</option>
+    </select>
+    <span class="result-count" id="resultCount"></span>
+    <button class="btn-pdf" onclick="exportPDF()">
+        <i class="fa fa-file-pdf"></i> Exporter PDF
+    </button>
+    <a href="{{ path('admin_terrains_new') }}" class="btn-primary">
+        <i class="fa fa-plus"></i> Nouveau terrain
+    </a>
+</div>
+
+{# ══ TABLE ══ #}
+<div class="card">
+    {% if terrains is empty %}
+    <div class="empty-state">
+        <i class="fa fa-map"></i>
+        <p>Aucun terrain enregistré.</p>
+    </div>
+    {% else %}
+    <table class="data-table" id="terrainTable">
+        <thead>
+            <tr>
+                <th class="sortable" data-col="0">Nom<i class="fa fa-sort sort-icon"></i></th>
+                <th class="sortable" data-col="1">Propriétaire<i class="fa fa-sort sort-icon"></i></th>
+                <th class="sortable" data-col="2">Surface<i class="fa fa-sort sort-icon"></i></th>
+                <th class="sortable" data-col="3">Type sol<i class="fa fa-sort sort-icon"></i></th>
+                <th class="sortable" data-col="4">Localisation<i class="fa fa-sort sort-icon"></i></th>
+                <th class="sortable" data-col="5">pH<i class="fa fa-sort sort-icon"></i></th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="terrainBody">
+        {% for terrain in terrains %}
+            <tr data-nom="{{ terrain.nomTerrain|lower }}"
+                data-localisation="{{ terrain.localisation|lower }}"
+                data-cin="{{ terrain.cin|lower }}"
+                data-proprietaire="{{ terrain.cin and cinToName[terrain.cin] is defined ? cinToName[terrain.cin]|lower : '' }}"
+                data-sol="{{ terrain.typeSol }}"
+                data-ph="{{ terrain.pH }}"
+                data-surface="{{ terrain.surface }}"
+                data-nom-raw="{{ terrain.nomTerrain }}"
+                data-localisation-raw="{{ terrain.localisation }}"
+                data-sol-raw="{{ terrain.typeSol }}"
+                data-proprietaire-raw="{{ terrain.cin and cinToName[terrain.cin] is defined ? cinToName[terrain.cin] : terrain.cin }}">
+
+                <td><span class="terrain-name">{{ terrain.nomTerrain }}</span></td>
+                <td>
+                    {% if terrain.cin and cinToName[terrain.cin] is defined %}
+                        <span style="font-weight:600;color:var(--navy)">{{ cinToName[terrain.cin] }}</span>
+                        <br><span class="cin-code" style="font-size:11px">{{ terrain.cin }}</span>
+                    {% elseif terrain.cin %}
+                        <span class="cin-code">{{ terrain.cin }}</span>
+                    {% else %}
+                        <span style="color:var(--text-muted)">—</span>
+                    {% endif %}
+                </td>
+                <td>{{ terrain.surface }} ha</td>
+                <td><span class="badge badge-soil">{{ terrain.typeSol }}</span></td>
+                <td>{{ terrain.localisation }}</td>
+                <td>{{ terrain.pH ?? '—' }}</td>
+                <td>
+                    <div class="actions">
+                        {# Ligne 2 — Détails + Modifier + Supprimer (en bas) #}
+                        <div class="actions-row">
+                            <a href="{{ path('admin_terrains_show', {id: terrain.id}) }}" class="btn-show">
+                                <i class="fa fa-eye"></i> Détails
+                            </a>
+                            <a href="{{ path('admin_terrains_edit', {id: terrain.id}) }}" class="btn-edit">
+                                <i class="fa fa-pen"></i> Modifier
+                            </a>
+                            <form method="post"
+                                  action="{{ path('admin_terrains_delete', {id: terrain.id}) }}"
+                                  onsubmit="return confirm('Supprimer ce terrain ?')">
+                                <input type="hidden" name="_token"
+                                       value="{{ csrf_token('delete'~terrain.id) }}">
+                                <button class="btn-danger">
+                                    <i class="fa fa-trash"></i> Supprimer
+                                </button>
+                            </form>
+                        </div>
+                        {# Ligne 1 — Météo + Analyse (en haut) #}
+                        <div class="actions-row">
+                            <button class="btn-meteo"
+                                onclick="openMeteo('{{ terrain.localisation }}', '{{ terrain.nomTerrain }}')">
+                                <i class="fa fa-cloud-sun"></i> Météo
+                            </button>
+                            <button class="btn-analyse"
+                                onclick="openAnalyse('{{ terrain.nomTerrain }}', '{{ terrain.typeSol }}', {{ terrain.pH ?? 0 }}, {{ terrain.surface ?? 0 }}, '{{ terrain.localisation }}')">
+                                <i class="fa fa-seedling"></i> Analyse
+                            </button>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="no-results" id="noResults">
+        <i class="fa fa-magnifying-glass" style="font-size:32px;opacity:0.3;display:block;margin-bottom:12px"></i>
+        Aucun résultat trouvé.
+    </div>
+
+    {# ══ PAGINATION ══ #}
+    <div class="pagination-wrap">
+        <div class="pagination-info" id="paginationInfo"></div>
+        <div style="display:flex;align-items:center;gap:10px;">
+            <select class="per-page-select" id="perPageSelect">
+                <option value="5">5 / page</option>
+                <option value="10" selected>10 / page</option>
+                <option value="25">25 / page</option>
+                <option value="50">50 / page</option>
+            </select>
+            <div class="pagination-btns" id="paginationBtns"></div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{# ══ MODAL MÉTÉO ══ #}
+<div class="modal-overlay" id="meteoModal">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal('meteoModal')">×</button>
+        <div class="modal-title"><i class="fa fa-cloud-sun" style="color:#F59E0B"></i> <span id="meteoTitle">Météo</span></div>
+        <div class="modal-subtitle" id="meteoSubtitle"></div>
+        <div id="meteoContent">
+            <div class="modal-loading"><i class="fa fa-spinner"></i> Chargement…</div>
+        </div>
+    </div>
+</div>
+
+{# ══ MODAL ANALYSE ══ #}
+<div class="modal-overlay" id="analyseModal">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal('analyseModal')">×</button>
+        <div class="modal-title"><i class="fa fa-seedling" style="color:#4A8C3F"></i> <span id="analyseTitle">Analyse du Terrain</span></div>
+        <div class="modal-subtitle" id="analyseSubtitle"></div>
+        <div id="analyseContent">
+            <div class="modal-loading"><i class="fa fa-spinner"></i> Analyse en cours…</div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script>
+// ══════════════════════════════════════════════════════
+// ÉTAT GLOBAL
+// ══════════════════════════════════════════════════════
+let allRows      = [];
+let filteredRows = [];
+let currentPage  = 1;
+let perPage      = 10;
+
+const searchInput = document.getElementById('searchInput');
+const filterSol   = document.getElementById('filterSol');
+const resultCount = document.getElementById('resultCount');
+const noResults   = document.getElementById('noResults');
+const tbody       = document.getElementById('terrainBody');
+const perPageSel  = document.getElementById('perPageSelect');
+
+window.addEventListener('DOMContentLoaded', () => {
+    if (!tbody) return;
+    allRows = Array.from(tbody.querySelectorAll('tr'));
+    applyFilterAndPaginate();
+});
+
+// ══════════════════════════════════════════════════════
+// FILTRE + PAGINATION
+// ══════════════════════════════════════════════════════
+function applyFilterAndPaginate() {
+    const q   = searchInput ? searchInput.value.toLowerCase().trim() : '';
+    const sol = filterSol   ? filterSol.value : '';
+
+    filteredRows = allRows.filter(row => {
+        const matchSearch = !q   || (row.dataset.nom||'').includes(q) || (row.dataset.localisation||'').includes(q)
+                                  || (row.dataset.cin||'').includes(q) || (row.dataset.proprietaire||'').includes(q);
+        const matchSol    = !sol || (row.dataset.sol||'') === sol;
+        return matchSearch && matchSol;
+    });
+    currentPage = 1;
+    renderPage();
+}
+
+if (searchInput) searchInput.addEventListener('input',  applyFilterAndPaginate);
+if (filterSol)   filterSol.addEventListener('change',   applyFilterAndPaginate);
+if (perPageSel)  perPageSel.addEventListener('change', () => { perPage = parseInt(perPageSel.value); currentPage = 1; renderPage(); });
+
+function renderPage() {
+    if (!tbody) return;
+    const total      = filteredRows.length;
+    const totalPages = Math.max(1, Math.ceil(total / perPage));
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    const start = (currentPage - 1) * perPage;
+    const end   = Math.min(start + perPage, total);
+
+    allRows.forEach(r => r.classList.add('hidden-row'));
+    filteredRows.slice(start, end).forEach(r => r.classList.remove('hidden-row'));
+
+    if (resultCount) resultCount.textContent = total + ' résultat' + (total > 1 ? 's' : '');
+    if (noResults)   noResults.style.display = total === 0 ? 'block' : 'none';
+
+    const info = document.getElementById('paginationInfo');
+    if (info) info.textContent = total === 0 ? 'Aucun résultat' : `${start+1}–${end} sur ${total} terrain${total>1?'s':''}`;
+
+    renderPaginationBtns(totalPages);
+}
+
+function renderPaginationBtns(totalPages) {
+    const wrap = document.getElementById('paginationBtns');
+    if (!wrap) return;
+    wrap.innerHTML = '';
+
+    const mkBtn = (label, page, disabled, active) => {
+        const b = document.createElement('button');
+        b.className = 'page-btn' + (active ? ' active' : '');
+        b.innerHTML = label;
+        b.disabled  = disabled;
+        if (!disabled) b.addEventListener('click', () => { currentPage = page; renderPage(); });
+        return b;
+    };
+
+    wrap.appendChild(mkBtn('<i class="fa fa-chevron-left"></i>', currentPage-1, currentPage===1, false));
+
+    let pages = [];
+    if (totalPages <= 7) {
+        for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+        pages = [1];
+        if (currentPage > 3) pages.push('…');
+        for (let i = Math.max(2, currentPage-1); i <= Math.min(totalPages-1, currentPage+1); i++) pages.push(i);
+        if (currentPage < totalPages-2) pages.push('…');
+        pages.push(totalPages);
+    }
+
+    pages.forEach(p => {
+        if (p === '…') {
+            const sp = document.createElement('span');
+            sp.textContent = '…'; sp.style.cssText = 'padding:0 6px;color:var(--text-muted);line-height:34px';
+            wrap.appendChild(sp);
+        } else {
+            wrap.appendChild(mkBtn(p, p, false, p === currentPage));
+        }
+    });
+
+    wrap.appendChild(mkBtn('<i class="fa fa-chevron-right"></i>', currentPage+1, currentPage===totalPages, false));
+}
+
+// ══════════════════════════════════════════════════════
+// TRI
+// ══════════════════════════════════════════════════════
+let sortCol = -1, sortAsc = true;
+
+document.querySelectorAll('th.sortable').forEach(th => {
+    th.addEventListener('click', () => {
+        const col = parseInt(th.dataset.col);
+        document.querySelectorAll('th.sortable').forEach(t => {
+            t.classList.remove('sort-asc','sort-desc');
+            t.querySelector('.sort-icon').className = 'fa fa-sort sort-icon';
+        });
+        if (sortCol === col) { sortAsc = !sortAsc; } else { sortCol = col; sortAsc = true; }
+        th.classList.add(sortAsc ? 'sort-asc' : 'sort-desc');
+        th.querySelector('.sort-icon').className = 'fa fa-sort-' + (sortAsc ? 'up' : 'down') + ' sort-icon';
+
+        filteredRows.sort((a, b) => {
+            const aVal = a.cells[col]?.textContent.trim() || '';
+            const bVal = b.cells[col]?.textContent.trim() || '';
+            const aNum = parseFloat(aVal.replace(/[^\d.]/g,''));
+            const bNum = parseFloat(bVal.replace(/[^\d.]/g,''));
+            if (!isNaN(aNum) && !isNaN(bNum)) return sortAsc ? aNum-bNum : bNum-aNum;
+            return sortAsc ? aVal.localeCompare(bVal,'fr') : bVal.localeCompare(aVal,'fr');
+        });
+        filteredRows.forEach(r => tbody.appendChild(r));
+        currentPage = 1; renderPage();
+    });
+});
+
+// ══════════════════════════════════════════════════════
+// EXPORT PDF — jsPDF + autoTable (bibliothèques CDN, aucune clé API)
+// ══════════════════════════════════════════════════════
+function exportPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
+
+    doc.setFillColor(45,90,39);
+    doc.rect(0,0,297,22,'F');
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(14); doc.setFont('helvetica','bold');
+    doc.text('AgroFlow — Liste des Terrains', 14, 14);
+    doc.setFontSize(9); doc.setFont('helvetica','normal');
+    doc.text('Exporté le ' + new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'}), 220, 14);
+
+    const rows = filteredRows.map(tr => [
+        tr.dataset.nomRaw          || '',
+        tr.dataset.proprietaireRaw || '—',
+        (tr.dataset.surface||'—') + ' ha',
+        tr.dataset.solRaw          || '—',
+        tr.dataset.localisationRaw || '—',
+        tr.dataset.ph              || '—',
+    ]);
+
+    doc.autoTable({
+        head: [['Nom','Propriétaire','Surface','Type de sol','Localisation','pH']],
+        body: rows, startY: 28, theme: 'striped',
+        headStyles: { fillColor:[74,140,63], textColor:255, fontStyle:'bold', fontSize:10 },
+        bodyStyles: { fontSize:9, textColor:[30,30,30] },
+        alternateRowStyles: { fillColor:[240,255,240] },
+        columnStyles: {
+            0:{fontStyle:'bold',cellWidth:42}, 1:{cellWidth:45},
+            2:{cellWidth:26,halign:'right'},   3:{cellWidth:30},
+            4:{cellWidth:85},                  5:{cellWidth:20,halign:'center'},
+        },
+        margin: { left:14, right:14 },
+    });
+
+    const pc = doc.internal.getNumberOfPages();
+    for (let i=1;i<=pc;i++) {
+        doc.setPage(i); doc.setFontSize(8); doc.setTextColor(150);
+        doc.text('AgroFlow — Confidentiel', 14, 205);
+        doc.text(`Page ${i} / ${pc}`, 270, 205);
+    }
+    doc.save('terrains_agroflow_' + new Date().toISOString().slice(0,10) + '.pdf');
+}
+
+// ══════════════════════════════════════════════════════
+// MODAL HELPERS
+// ══════════════════════════════════════════════════════
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+    m.addEventListener('click', e => { if (e.target===m) m.classList.remove('active'); });
+});
+
+// ══════════════════════════════════════════════════════
+// MÉTÉO
+// API 1 : Nominatim (OpenStreetMap) — géocodage — GRATUIT, sans clé
+// API 2 : Open-Meteo               — météo     — GRATUIT, sans clé
+// ══════════════════════════════════════════════════════
+async function openMeteo(localisation, nom) {
+    document.getElementById('meteoTitle').textContent    = 'Météo — ' + nom;
+    document.getElementById('meteoSubtitle').textContent = localisation;
+    document.getElementById('meteoContent').innerHTML    = '<div class="modal-loading"><i class="fa fa-spinner"></i> Chargement…</div>';
+    document.getElementById('meteoModal').classList.add('active');
+
+    try {
+        const geoResp = await fetch(
+            `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(localisation+', Tunisie')}&format=json&limit=1`,
+            { headers:{'Accept-Language':'fr'} }
+        );
+        const geoData = await geoResp.json();
+        let lat=33.8869, lon=9.5375, displayName=localisation+', Tunisie (approx.)';
+        if (geoData.length>0) { lat=parseFloat(geoData[0].lat); lon=parseFloat(geoData[0].lon); displayName=geoData[0].display_name; }
+
+        const wResp = await fetch(
+            `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+            `&current_weather=true&hourly=relative_humidity_2m,precipitation,windspeed_10m&forecast_days=1&timezone=Africa/Tunis`
+        );
+        const wData = await wResp.json();
+        const cw    = wData.current_weather;
+        const h     = new Date().getHours();
+        const humidity = wData.hourly?.relative_humidity_2m?.[h] ?? '—';
+        const precip   = wData.hourly?.precipitation?.[h]        ?? 0;
+
+        const wcode=cw.weathercode;
+        let icon='☀️', desc='Ciel dégagé';
+        if(wcode>=1&&wcode<=3){icon='⛅';desc='Partiellement nuageux';}
+        if(wcode>=45&&wcode<=48){icon='🌫️';desc='Brouillard';}
+        if(wcode>=51&&wcode<=67){icon='🌧️';desc='Pluie';}
+        if(wcode>=71&&wcode<=77){icon='❄️';desc='Neige';}
+        if(wcode>=80&&wcode<=82){icon='🌦️';desc='Averses';}
+        if(wcode>=95){icon='⛈️';desc='Orage';}
+
+        let reco='💧 Conditions normales — Arrosage standard selon vos plantes.';
+        if(precip>5)          reco='🌧️ Pluie prévue — Arrosage inutile aujourd\'hui.';
+        if(precip>20)         reco='⚠️ Fortes précipitations — Surveiller le drainage.';
+        if(cw.temperature>35) reco='🔥 Forte chaleur — Arroser tôt le matin ou en soirée.';
+        if(humidity<30)       reco='💨 Faible humidité — Augmenter la fréquence d\'arrosage.';
+
+        document.getElementById('meteoContent').innerHTML = `
+            <div style="font-size:40px;text-align:center;margin-bottom:4px">${icon}</div>
+            <div class="meteo-main" style="text-align:center">${cw.temperature} °C</div>
+            <div class="meteo-desc" style="text-align:center">${desc}</div>
+            <div class="meteo-grid">
+                <div class="meteo-item"><div class="meteo-item-label">💧 Humidité</div><div class="meteo-item-val">${humidity} %</div></div>
+                <div class="meteo-item"><div class="meteo-item-label">💨 Vent</div><div class="meteo-item-val">${cw.windspeed} km/h</div></div>
+                <div class="meteo-item"><div class="meteo-item-label">🌧️ Précipitations</div><div class="meteo-item-val">${precip} mm</div></div>
+                <div class="meteo-item"><div class="meteo-item-label">📍 Coordonnées</div><div class="meteo-item-val" style="font-size:13px">${lat.toFixed(4)}, ${lon.toFixed(4)}</div></div>
+            </div>
+            <div class="meteo-coords">📍 ${displayName}</div>
+            <div class="meteo-reco">${reco}</div>`;
+    } catch(e) {
+        document.getElementById('meteoContent').innerHTML='<p style="color:#DC2626;text-align:center">Erreur météo. Vérifiez votre connexion.</p>';
+    }
+}
+
+// ══════════════════════════════════════════════════════
+// ANALYSE TERRAIN — logique interne (aucune API externe)
+// + appel Open-Meteo pour l'arrosage
+// ══════════════════════════════════════════════════════
+async function openAnalyse(nom, typeSol, ph, surface, localisation) {
+    document.getElementById('analyseTitle').textContent    = 'Analyse — ' + nom;
+    document.getElementById('analyseSubtitle').textContent = localisation;
+    document.getElementById('analyseContent').innerHTML    = '<div class="modal-loading"><i class="fa fa-spinner"></i> Analyse en cours…</div>';
+    document.getElementById('analyseModal').classList.add('active');
+
+    let score=50, details=[];
+    const phScore = calculerScorePH(ph);
+    score += phScore.pts;
+    details.push(`pH (${ph}) : ${phScore.label}`);
+    if(surface>=1&&surface<=100){score+=10;details.push(`Surface : ${surface} ha — Idéale`);}
+    else if(surface>100){score+=5;details.push(`Surface : ${surface} ha — Grande`);}
+    else{score-=5;details.push(`Surface : ${surface} ha — Petite`);}
+    const rec = getRecommandations(typeSol, ph);
+    details.push(`Type sol : ${typeSol}`);
+    score = Math.max(0, Math.min(100, score));
+
+    let scoreLabel,scoreClass,scoreColor;
+    if(score>=75){scoreLabel='🌿 Excellent — Terrain très cultivable';scoreClass='good';scoreColor='#16A34A';}
+    else if(score>=50){scoreLabel='⚙️ Moyen — Terrain cultivable avec améliorations';scoreClass='medium';scoreColor='#D97706';}
+    else{scoreLabel='⚠️ Faible — Terrain nécessite des corrections';scoreClass='bad';scoreColor='#DC2626';}
+
+    let arrosageReco='💧 Arrosage standard recommandé.';
+    try {
+        const geoR=await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(localisation+', Tunisie')}&format=json&limit=1`);
+        const geoD=await geoR.json();
+        if(geoD.length>0){
+            const wR=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${geoD[0].lat}&longitude=${geoD[0].lon}&current_weather=true&hourly=precipitation&forecast_days=1&timezone=Africa/Tunis`);
+            const wD=await wR.json();
+            const precip=wD.hourly?.precipitation?.[new Date().getHours()]??0;
+            const temp=wD.current_weather?.temperature??20;
+            if(precip>5) arrosageReco="🌧️ Pluie détectée — Pas d'arrosage nécessaire.";
+            else if(temp>35) arrosageReco="🔥 Chaleur élevée — Arroser tôt le matin ou après 18h.";
+            else arrosageReco="💧 Conditions normales — Arrosage standard.";
+        }
+    } catch(_){}
+
+    document.getElementById('analyseContent').innerHTML = `
+        <div class="analyse-score-wrap">
+            <div class="analyse-score-num">${score} <span style="font-size:16px;color:#9CA3AF">/ 100</span></div>
+            <div class="analyse-score-bar"><div class="analyse-score-fill" style="width:${score}%;background:${scoreColor}"></div></div>
+            <div class="analyse-score-label">${scoreLabel}</div>
+        </div>
+        <div class="analyse-detail">${details.map(d=>`• ${d}`).join('<br>')}</div>
+        <div class="analyse-reco ${scoreClass}">
+            <strong>🌱 Recommandation de Plantes (pH = ${ph})</strong><br>
+            ${rec.contexte}<br>
+            ✔️ <strong>Recommandées :</strong> ${rec.bon.join(', ')}<br>
+            ✖️ <strong>Éviter :</strong> ${rec.eviter.join(', ')}<br><br>
+            🚿 <strong>Arrosage :</strong> ${arrosageReco}
+        </div>`;
+}
+
+function calculerScorePH(ph) {
+    if(ph>=6.0&&ph<=7.0) return{pts:25,label:'Optimal ✅'};
+    if(ph>=5.5&&ph<6.0)  return{pts:15,label:'Légèrement acide ⚠️'};
+    if(ph>7.0&&ph<=7.5)  return{pts:15,label:'Légèrement basique ⚠️'};
+    if(ph>7.5&&ph<=8.0)  return{pts:5, label:'Basique — à corriger ⚠️'};
+    if(ph<5.5)           return{pts:-10,label:'Trop acide ❌'};
+    return                      {pts:-5, label:'Trop basique ❌'};
+}
+
+function getRecommandations(typeSol, ph) {
+    let bon=[],eviter=[],contexte='';
+    if(ph<5.5)      {contexte='🔴 Sol très acide';         bon=['Myrtille','Pomme de terre','Seigle'];               eviter=['Luzerne','Betterave','Asperge'];}
+    else if(ph<=6.5){contexte='🟡 Sol légèrement acide';   bon=['Tomate','Maïs','Carotte','Haricot','Fraise'];        eviter=['Luzerne','Betterave sucrière'];}
+    else if(ph<=7.0){contexte='🟢 Sol neutre (idéal)';     bon=['Blé','Maïs','Tomate','Laitue','Carotte','Chou'];     eviter=['Myrtille','Azalée'];}
+    else if(ph<=7.5){contexte='🟡 Sol légèrement basique'; bon=['Asperge','Chou','Betterave','Epinard','Céleri'];      eviter=['Pomme de terre','Tomate','Fraise'];}
+    else            {contexte='🔴 Sol basique';             bon=['Luzerne','Orge','Datte'];                           eviter=['Pomme de terre','Tomate','Fraise','Maïs'];}
+    if(typeSol==='Sableux')  {bon.push('Melon','Pastèque');                      contexte+=' — Sol sableux (drainage rapide)';}
+    else if(typeSol==='Argileux'){bon.push('Riz','Blé');eviter.push('Carotte (déformation)'); contexte+=' — Sol argileux (rétention eau)';}
+    else if(typeSol==='Humifère'){bon.push('Légumes feuilles','Framboise');       contexte+=' — Sol humifère (riche)';}
+    return{bon,eviter,contexte};
+}
+</script>
+{% endblock %}

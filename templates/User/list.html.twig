@@ -1,0 +1,507 @@
+{% extends 'base_admin.html.twig' %}
+
+{% block title %}Utilisateurs — AgroFlow Admin{% endblock %}
+{% block page_title %}Gestion des Utilisateurs{% endblock %}
+{% block breadcrumb %}Utilisateurs{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .page { display: flex; flex-direction: column; gap: 24px; }
+
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+    }
+    .stat-card {
+        background: var(--white);
+        border: 1px solid var(--cream-dark);
+        border-radius: var(--radius);
+        padding: 20px 22px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        box-shadow: var(--shadow);
+    }
+    .stat-icon {
+        width: 48px; height: 48px;
+        border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 20px; flex-shrink: 0;
+    }
+    .stat-val { font-size: 26px; font-weight: 700; color: var(--navy); line-height: 1; }
+    .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+    .toolbar {
+        background: var(--white);
+        border: 1px solid var(--cream-dark);
+        border-radius: var(--radius);
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: var(--shadow);
+        flex-wrap: wrap;
+    }
+    .search-wrap { position: relative; flex: 1; min-width: 200px; }
+    .search-wrap i {
+        position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+        color: var(--text-muted); font-size: 13px;
+    }
+    .search-input {
+        width: 100%; padding: 9px 12px 9px 36px;
+        border: 1px solid var(--cream-dark);
+        border-radius: 8px; font-size: 14px;
+        font-family: 'DM Sans', sans-serif;
+        background: var(--cream);
+        transition: border 0.2s;
+    }
+    .search-input:focus { outline: none; border-color: var(--green-accent); background: white; }
+
+    .filter-select {
+        padding: 9px 14px;
+        border: 1px solid var(--cream-dark);
+        border-radius: 8px; font-size: 14px;
+        font-family: 'DM Sans', sans-serif;
+        background: var(--cream); color: var(--navy);
+        cursor: pointer;
+    }
+    .filter-select:focus { outline: none; border-color: var(--green-accent); }
+
+    .btn {
+        display: inline-flex; align-items: center; gap: 7px;
+        padding: 9px 18px; border-radius: 8px;
+        font-size: 13px; font-weight: 600;
+        text-decoration: none; border: none; cursor: pointer;
+        transition: all 0.2s; white-space: nowrap;
+    }
+    .btn-primary { background: var(--green-mid); color: white; }
+    .btn-primary:hover { background: var(--green-dark); color: white; }
+    .btn-secondary { background: var(--cream); border: 1px solid var(--cream-dark); color: var(--navy); }
+    .btn-secondary:hover { background: var(--cream-dark); }
+    .btn-danger { background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA; }
+    .btn-danger:hover { background: #DC2626; color: white; }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+    .btn-icon { padding: 7px 10px; }
+
+    .table-card {
+        background: var(--white);
+        border: 1px solid var(--cream-dark);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+    .table-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--cream-dark);
+        display: flex; align-items: center; justify-content: space-between;
+    }
+    .table-title { font-size: 15px; font-weight: 600; color: var(--navy); }
+    .table-count { font-size: 12px; color: var(--text-muted); }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+        background: var(--cream);
+        padding: 11px 16px;
+        text-align: left;
+        font-size: 11px; font-weight: 600;
+        text-transform: uppercase; letter-spacing: 0.07em;
+        color: var(--text-muted);
+        border-bottom: 1px solid var(--cream-dark);
+        user-select: none;
+    }
+    thead th.sortable:hover { background: var(--cream-dark); color: var(--green-dark); }
+    thead th.sorted { color: var(--green-accent); }
+
+    tbody tr { transition: background 0.15s; }
+    tbody tr:hover { background: #FAFDF8; }
+    tbody td {
+        padding: 13px 16px;
+        font-size: 14px;
+        border-bottom: 1px solid var(--cream-dark);
+        vertical-align: middle;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr.hidden { display: none; }
+
+    .user-cell { display: flex; align-items: center; gap: 11px; }
+    .user-av {
+        width: 38px; height: 38px; border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 13px; font-weight: 700; color: white; flex-shrink: 0;
+        background: linear-gradient(135deg, var(--green-accent), var(--green-mid));
+    }
+    .user-name { font-weight: 600; color: var(--navy); }
+    .user-email { font-size: 12px; color: var(--text-muted); }
+
+    .badge {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 4px 10px; border-radius: 20px;
+        font-size: 11px; font-weight: 600;
+    }
+    .badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+    .badge-admin  { background: #FEF3C7; color: #B45309; }
+    .badge-agri   { background: #D1FAE5; color: #065F46; }
+    .badge-ouv    { background: #DBEAFE; color: #1D4ED8; }
+    .badge-other  { background: var(--cream-dark); color: var(--text-muted); }
+
+    .actions { display: flex; align-items: center; gap: 6px; }
+
+    .empty { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+    .empty i { font-size: 40px; margin-bottom: 14px; opacity: 0.3; display: block; }
+
+    .flash { padding: 12px 18px; border-radius: 8px; font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+    .flash-success { background: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0; }
+    .flash-danger  { background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA; }
+
+    .no-results {
+        text-align: center; padding: 40px 20px; color: var(--text-muted);
+        display: none;
+    }
+    .no-results i { font-size: 30px; margin-bottom: 10px; display: block; opacity: 0.3; }
+    /* ── Pagination ── */
+.pagination-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 20px;
+    border-top: 1px solid var(--cream-dark);
+    flex-wrap: wrap;
+}
+.page-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 36px; height: 36px;
+    padding: 0 10px;
+    border-radius: 8px;
+    font-size: 13px; font-weight: 600;
+    border: 1px solid var(--cream-dark);
+    background: var(--white);
+    color: var(--navy);
+    text-decoration: none;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+.page-btn:hover    { background: var(--cream-dark); color: var(--green-dark); }
+.page-btn.active   { background: var(--green-mid); color: white; border-color: var(--green-mid); pointer-events: none; }
+.page-btn.disabled { opacity: 0.35; pointer-events: none; cursor: default; }
+.page-dots         { color: var(--text-muted); font-size: 13px; padding: 0 4px; line-height: 36px; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="page">
+
+    {# Flash messages #}
+    {% for msg in app.flashes('success') %}
+        <div class="flash flash-success"><i class="fa fa-check-circle"></i> {{ msg }}</div>
+    {% endfor %}
+    {% for msg in app.flashes('danger') %}
+        <div class="flash flash-danger"><i class="fa fa-triangle-exclamation"></i> {{ msg }}</div>
+    {% endfor %}
+
+    {# Stats #}
+<div class="stats-row" style="grid-template-columns: repeat(3, 1fr);">
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#D1FAE5;">
+            <i class="fa fa-tractor" style="color:#065F46;"></i>
+        </div>
+        <div>
+            <div class="stat-val">{{ stats.agriculteurs }}</div>
+            <div class="stat-label">Agriculteurs actifs</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#FEE2E2;">
+            <i class="fa fa-ban" style="color:#DC2626;"></i>
+        </div>
+        <div>
+            <div class="stat-val">{{ stats.bannis }}</div>
+            <div class="stat-label">Comptes bannis</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:#EAF3E6;">
+            <i class="fa fa-users" style="color:#2D5A27;"></i>
+        </div>
+        <div>
+            <div class="stat-val">{{ stats.total }}</div>
+            <div class="stat-label">Total agriculteurs</div>
+        </div>
+    </div>
+</div>
+
+    {# Toolbar #}
+    {# Toolbar #}
+<div class="toolbar">
+    <div class="search-wrap">
+        <i class="fa fa-search"></i>
+        <input type="text" id="searchInput"
+               class="search-input" placeholder="Rechercher par nom, prénom ou email…">
+    </div>
+    <select id="roleFilter" class="filter-select">
+        <option value="">Tous les statuts</option>
+        <option value="2">Actifs</option>
+        <option value="0">Bannis</option>
+    </select>
+    <button onclick="resetFilters()" class="btn btn-secondary">
+        <i class="fa fa-xmark"></i> Réinitialiser
+    </button>
+     <a href="{{ path('admin_users_new') }}" class="btn btn-primary">
+            <i class="fa fa-plus"></i> Nouvel utilisateur
+        </a>
+    <a href="{{ path('admin_users_excel') }}" class="btn btn-secondary">
+        <i class="fa fa-file-csv" style="color:#1D6F42;"></i> Exporter Excel
+    </a>
+</div>
+
+    {# Table #}
+    <div class="table-card">
+        <div class="table-header">
+            <div class="table-title">
+                <i class="fa fa-users" style="color:var(--green-accent);margin-right:8px;"></i>
+                Liste des utilisateurs
+            </div>
+            <div class="table-count" id="resultCount">
+    {{ total }} résultat(s) — page {{ page }}/{{ totalPages }}
+</div>
+        </div>
+
+        {% if users|length > 0 %}
+        <table id="usersTable">
+            <thead>
+                <tr>
+                    <th class="sortable" onclick="sortTable(0)">
+                        Utilisateur <i class="fa fa-sort" id="sort-0" style="opacity:0.4;font-size:10px;margin-left:4px;"></i>
+                    </th>
+                    <th class="sortable" onclick="sortTable(1)">
+                        CIN <i class="fa fa-sort" id="sort-1" style="opacity:0.4;font-size:10px;margin-left:4px;"></i>
+                    </th>
+                    <th class="sortable" onclick="sortTable(2)">
+                        Téléphone <i class="fa fa-sort" id="sort-2" style="opacity:0.4;font-size:10px;margin-left:4px;"></i>
+                    </th>
+                    <th class="sortable" onclick="sortTable(3)">
+                        Ville <i class="fa fa-sort" id="sort-3" style="opacity:0.4;font-size:10px;margin-left:4px;"></i>
+                    </th>
+                    <th class="sortable" onclick="sortTable(4)">
+                        Rôle <i class="fa fa-sort" id="sort-4" style="opacity:0.4;font-size:10px;margin-left:4px;"></i>
+                    </th>
+                    <th class="sortable" onclick="sortTable(5)">
+                        Inscription <i class="fa fa-sort" id="sort-5" style="opacity:0.4;font-size:10px;margin-left:4px;"></i>
+                    </th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="usersBody">
+            {% for user in users %}
+                <tr class="user-row"
+                    data-search="{{ (user.nom ~ ' ' ~ user.prenom ~ ' ' ~ user.email)|lower }}"
+                    data-role="{{ user.role }}">
+                    <td data-val="{{ user.nom|lower }} {{ user.prenom|lower }}">
+                        <div class="user-cell">
+                            <div class="user-av">
+                                {{ user.prenom|first|upper }}{{ user.nom|first|upper }}
+                            </div>
+                            <div>
+                                <div class="user-name">{{ user.prenom }} {{ user.nom }}</div>
+                                <div class="user-email">{{ user.email }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td data-val="{{ user.cin }}" style="font-family:'DM Mono',monospace; font-size:13px;">
+                        {{ user.cin }}
+                    </td>
+                    <td data-val="{{ user.tel ?? '' }}">{{ user.tel ?? '—' }}</td>
+                    <td data-val="{{ user.ville ?? '' }}">{{ user.ville ?? '—' }}</td>
+                    {# Badge rôle #}
+<td data-val="{{ user.role }}">
+    {% if user.role == 2 %}
+        <span class="badge badge-agri"><i class="fa fa-tractor"></i> Agriculteur</span>
+    {% elseif user.role == 0 %}
+        <span class="badge" style="background:#FEE2E2; color:#DC2626;">
+            <i class="fa fa-ban"></i> Banni
+        </span>
+    {% else %}
+        <span class="badge badge-other">Inconnu</span>
+    {% endif %}
+</td>
+                    <td data-val="{{ user.dateCreationcpt ? user.dateCreationcpt|date('Ymd') : '0' }}"
+                        style="font-size:13px; color:var(--text-muted);">
+                        {{ user.dateCreationcpt ? user.dateCreationcpt|date('d/m/Y') : '—' }}
+                    </td>
+                {# Actions #}
+<td>
+    <div class="actions">
+        <a href="{{ path('admin_users_show', {cin: user.cin}) }}"
+           class="btn btn-sm btn-secondary btn-icon" title="Voir">
+            <i class="fa fa-eye"></i>
+        </a>
+        <a href="{{ path('admin_users_edit', {cin: user.cin}) }}"
+   class="btn btn-sm btn-secondary btn-icon" title="Modifier email">
+    <i class="fa fa-envelope" style="color:#2D5A27;"></i>
+</a>
+        <a href="{{ path('admin_users_pdf', {cin: user.cin}) }}"
+           class="btn btn-sm btn-secondary btn-icon" title="PDF">
+            <i class="fa fa-file-pdf" style="color:#DC2626;"></i>
+        </a>
+
+        {% if user.role == 2 %}
+            {# Bannir #}
+            <form method="post"
+                  action="{{ path('admin_users_ban', {cin: user.cin}) }}"
+                  onsubmit="return confirm('Bannir {{ user.prenom }} {{ user.nom }} ?')"
+                  style="margin:0;">
+                <input type="hidden" name="_token" value="{{ csrf_token('ban_user_' ~ user.cin) }}">
+                <button type="submit" class="btn btn-sm btn-danger btn-icon" title="Bannir">
+                    <i class="fa fa-ban"></i>
+                </button>
+            </form>
+        {% elseif user.role == 0 %}
+            {# Débannir #}
+            <form method="post"
+                  action="{{ path('admin_users_unban', {cin: user.cin}) }}"
+                  onsubmit="return confirm('Réactiver {{ user.prenom }} {{ user.nom }} ?')"
+                  style="margin:0;">
+                <input type="hidden" name="_token" value="{{ csrf_token('unban_user_' ~ user.cin) }}">
+                <button type="submit"
+                        class="btn btn-sm btn-icon"
+                        style="background:#D1FAE5; color:#065F46; border:1px solid #A7F3D0;"
+                        title="Débannir">
+                    <i class="fa fa-check"></i>
+                </button>
+            </form>
+        {% endif %}
+    </div>
+</td>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="no-results" id="noResults">
+            <i class="fa fa-search"></i>
+            <div style="font-size:15px; font-weight:600; color:var(--navy);">Aucun résultat trouvé</div>
+            <div style="margin-top:6px; font-size:13px;">Modifiez votre recherche ou réinitialisez les filtres</div>
+        </div>
+{# ── Pagination ── #}
+{% if totalPages > 1 %}
+<div class="pagination-wrap">
+
+    {# Précédent #}
+    {% if page > 1 %}
+        <a href="{{ path('admin_users_list', {page: page - 1, q: search}) }}"
+           class="page-btn" title="Page précédente">
+            <i class="fa fa-chevron-left"></i>
+        </a>
+    {% else %}
+        <span class="page-btn disabled"><i class="fa fa-chevron-left"></i></span>
+    {% endif %}
+
+    {# Pages numérotées avec "..." #}
+    {% for p in 1..totalPages %}
+        {% if p == 1 or p == totalPages or (p >= page - 2 and p <= page + 2) %}
+            <a href="{{ path('admin_users_list', {page: p, q: search}) }}"
+               class="page-btn {{ p == page ? 'active' : '' }}">
+                {{ p }}
+            </a>
+        {% elseif p == page - 3 or p == page + 3 %}
+            <span class="page-dots">…</span>
+        {% endif %}
+    {% endfor %}
+
+    {# Suivant #}
+    {% if page < totalPages %}
+        <a href="{{ path('admin_users_list', {page: page + 1, q: search}) }}"
+           class="page-btn" title="Page suivante">
+            <i class="fa fa-chevron-right"></i>
+        </a>
+    {% else %}
+        <span class="page-btn disabled"><i class="fa fa-chevron-right"></i></span>
+    {% endif %}
+
+</div>
+{% endif %}
+        {% else %}
+            <div class="empty">
+                <i class="fa fa-users-slash"></i>
+                <div style="font-size:15px; font-weight:600; color:var(--navy);">Aucun utilisateur trouvé</div>
+                <div style="margin-top:6px; font-size:13px;">Modifiez vos filtres ou ajoutez un utilisateur</div>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+let sortDir = {};
+const total = {{ users|length }};
+
+function filterTable() {
+    const q    = document.getElementById('searchInput').value.toLowerCase().trim();
+    const role = document.getElementById('roleFilter').value;
+    const rows = document.querySelectorAll('.user-row');
+    let count  = 0;
+
+    rows.forEach(row => {
+        const matchSearch = !q    || row.dataset.search.includes(q);
+        const matchRole   = !role || row.dataset.role === role;
+        const show        = matchSearch && matchRole;
+        row.classList.toggle('hidden', !show);
+        if (show) count++;
+    });
+
+    document.getElementById('resultCount').textContent = count + ' résultat(s)';
+    document.getElementById('noResults').style.display = count === 0 ? 'block' : 'none';
+}
+
+function sortTable(colIndex) {
+    const tbody = document.getElementById('usersBody');
+    const rows  = Array.from(document.querySelectorAll('.user-row'));
+    const asc   = !sortDir[colIndex];
+    sortDir     = {};
+    sortDir[colIndex] = asc;
+
+    // Reset all icons
+    document.querySelectorAll('[id^="sort-"]').forEach(i => {
+        i.className    = 'fa fa-sort';
+        i.style.opacity = '0.4';
+        i.style.color  = '';
+    });
+    document.querySelectorAll('thead th').forEach(th => th.classList.remove('sorted'));
+
+    // Active icon
+    const icon = document.getElementById('sort-' + colIndex);
+    if (icon) {
+        icon.className    = 'fa fa-sort-' + (asc ? 'up' : 'down');
+        icon.style.opacity = '1';
+        icon.style.color  = 'var(--green-accent)';
+    }
+    document.querySelectorAll('thead th')[colIndex]?.classList.add('sorted');
+
+    rows.sort((a, b) => {
+        const aCells = a.querySelectorAll('td');
+        const bCells = b.querySelectorAll('td');
+        const aVal   = (aCells[colIndex]?.dataset?.val ?? aCells[colIndex]?.textContent ?? '').trim().toLowerCase();
+        const bVal   = (bCells[colIndex]?.dataset?.val ?? bCells[colIndex]?.textContent ?? '').trim().toLowerCase();
+        const cmp    = isNaN(aVal) || isNaN(bVal) || aVal === '' || bVal === ''
+            ? aVal.localeCompare(bVal, 'fr')
+            : Number(aVal) - Number(bVal);
+        return asc ? cmp : -cmp;
+    });
+
+    rows.forEach(row => tbody.appendChild(row));
+}
+
+function resetFilters() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('roleFilter').value  = '';
+    filterTable();
+}
+
+document.getElementById('searchInput').addEventListener('input', filterTable);
+document.getElementById('roleFilter').addEventListener('change', filterTable);
+</script>
+{% endblock %}

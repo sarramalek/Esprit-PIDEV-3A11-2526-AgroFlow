@@ -1,0 +1,114 @@
+{# templates/User/ouvriers/new.html.twig #}
+{% extends 'base_agriculteur.html.twig' %}
+{% block title %}Nouvel Ouvrier{% endblock %}
+
+{% block stylesheets %}
+<style>
+:root { --vert: #2d6a4f; --vert-l: #52b788; --beige: #fefae0; }
+body { background: var(--beige); font-family: 'Segoe UI', sans-serif; }
+.page-header {
+    background: linear-gradient(135deg, var(--vert), var(--vert-l));
+    color: white; padding: 1.5rem 2rem;
+    border-radius: 0 0 1.5rem 1.5rem; margin-bottom: 2rem;
+}
+.card {
+    background: white; border-radius: 1rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,.08); padding: 2rem;
+    max-width: 700px; margin: 0 auto;
+}
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.form-group { display: flex; flex-direction: column; gap: .35rem; }
+.form-group.full { grid-column: 1 / -1; }
+label { font-size: .85rem; font-weight: 600; color: #444; }
+input, select {
+    padding: .55rem .8rem; border: 1px solid #ddd; border-radius: .5rem;
+    font-size: .95rem; transition: border .2s;
+}
+input:focus, select:focus { border-color: var(--vert); outline: none; }
+.btn-submit {
+    background: var(--vert); color: white; border: none;
+    padding: .7rem 2rem; border-radius: .6rem; font-size: 1rem;
+    font-weight: 600; cursor: pointer; transition: background .2s; margin-top: 1rem;
+}
+.btn-submit:hover { background: var(--vert-l); }
+.btn-cancel {
+    color: #666; text-decoration: none; font-size: .9rem;
+    margin-left: 1rem; line-height: 2.5;
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="page-header container-fluid px-4">
+    <h1 style="margin:0; font-size:1.5rem;">➕ Créer un nouvel ouvrier</h1>
+</div>
+
+<div class="container">
+<div class="card">
+    <form method="post">
+        <div class="form-grid">
+
+            <div class="form-group">
+                <label>CIN *</label>
+                <input type="number" name="cin" required placeholder="Ex: 12345678">
+            </div>
+
+            <div class="form-group full" style="background:#f0faf4; border:1px solid #52b788; border-radius:.5rem; padding:.75rem 1rem;">
+    <small style="color:#2d6a4f; font-weight:600;">
+        🔑 Le mot de passe sera automatiquement défini comme le numéro de téléphone de l'ouvrier, 
+        et lui sera envoyé par email.
+    </small>
+</div>
+
+            <div class="form-group">
+                <label>Nom *</label>
+                <input type="text" name="nom" required placeholder="Nom de famille">
+            </div>
+
+            <div class="form-group">
+                <label>Prénom *</label>
+                <input type="text" name="prenom" required placeholder="Prénom">
+            </div>
+
+            <div class="form-group full">
+                <label>Email *</label>
+                <input type="email" name="email" required placeholder="email@exemple.com">
+            </div>
+
+            <div class="form-group">
+                <label>Téléphone</label>
+                <input type="text" name="tel" placeholder="Ex: 55123456" maxlength="8">
+            </div>
+
+            <div class="form-group">
+                <label>Ville</label>
+                <input type="text" name="ville" placeholder="Ville">
+            </div>
+
+            <div class="form-group full">
+                <label>Adresse</label>
+                <input type="text" name="adresse" placeholder="Adresse complète">
+            </div>
+
+            <div class="form-group full">
+                <label>Assigner à un terrain (optionnel)</label>
+                <select name="id_terrain">
+                    <option value="">— Choisir un terrain —</option>
+                    {% for terrain in terrains %}
+                        <option value="{{ terrain.id }}">
+                            {{ terrain.nomTerrain }} ({{ terrain.localisation }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+        </div>
+
+        <div>
+            <button type="submit" class="btn-submit">✅ Créer l'ouvrier</button>
+            <a href="{{ path('app_ouvrier_index') }}" class="btn-cancel">Annuler</a>
+        </div>
+    </form>
+</div>
+</div>
+{% endblock %}

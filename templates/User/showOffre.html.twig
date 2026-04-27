@@ -1,0 +1,60 @@
+{% extends 'base_admin.html.twig' %}
+{% block title %}Offre #{{ offre.idOffres }} - AgroFlow{% endblock %}
+{% block body %}
+<div style="padding:35px 40px; background:#F4F6F9; min-height:100vh; font-family:Arial,sans-serif;">
+    <div style="max-width:650px; margin:0 auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
+            <div>
+                <a href="{{ path('app_offre_list') }}" style="color:#888; text-decoration:none; font-size:14px;"><i class="fa fa-arrow-left"></i> Retour</a>
+                <h2 style="margin:10px 0 0; color:#2C3E50;">Offre <span style="color:#2D5A27;">#{{ offre.idOffres }}</span></h2>
+            </div>
+            <a href="{{ path('app_offre_edit', {idOffres: offre.idOffres}) }}"
+               style="background:#185FA5; color:white; padding:10px 20px; border-radius:10px; text-decoration:none; font-weight:600; font-size:14px;">
+                <i class="fa fa-edit"></i> Modifier
+            </a>
+        </div>
+
+        <div style="background:white; border-radius:16px; padding:35px; box-shadow:0 4px 20px rgba(0,0,0,0.06);">
+
+            {# Badge prix #}
+            <div style="text-align:center; padding:20px 0 30px; border-bottom:1px solid #f5f5f5; margin-bottom:25px;">
+                <p style="margin:0 0 8px; font-size:28px; font-weight:700; color:#2C3E50;">{{ offre.nomOffre }}</p>
+                <span style="background:#EAF3DE; color:#2D5A27; font-size:22px; font-weight:700; padding:8px 24px; border-radius:12px; display:inline-block;">
+                    {{ offre.prix ? offre.prix|number_format(2, '.', ' ') ~ ' TND' : '—' }}
+                </span>
+            </div>
+
+            <table style="width:100%; border-collapse:collapse; font-size:14px;">
+                <tr style="border-bottom:1px solid #f5f5f5;">
+                    <td style="padding:14px 0; color:#999; width:35%;">Description</td>
+                    <td style="padding:14px 0; color:#555; line-height:1.6;">{{ offre.description ?? '—' }}</td>
+                </tr>
+                <tr style="border-bottom:1px solid #f5f5f5;">
+                    <td style="padding:14px 0; color:#999;">Durée</td>
+                    <td style="padding:14px 0;">
+                        {% if offre.dureeOffre %}
+                            <span style="background:#E6F1FB; color:#185FA5; padding:4px 14px; border-radius:20px; font-size:13px; font-weight:600;">
+                                <i class="fa fa-clock-o"></i> {{ offre.dureeOffre }} jour{{ offre.dureeOffre > 1 ? 's' : '' }}
+                            </span>
+                        {% else %}—{% endif %}
+                    </td>
+                </tr>
+            </table>
+
+            <div style="display:flex; gap:12px; margin-top:30px;">
+                <a href="{{ path('app_offre_edit', {idOffres: offre.idOffres}) }}"
+                   style="flex:1; background:#185FA5; color:white; padding:12px; border:none; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; text-decoration:none; text-align:center;">
+                    <i class="fa fa-edit"></i> Modifier
+                </a>
+                <form method="post" action="{{ path('app_offre_delete', {idOffres: offre.idOffres}) }}"
+                      onsubmit="return confirm('Supprimer cette offre ?')" style="flex:1;">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ offre.idOffres) }}">
+                    <button type="submit" style="width:100%; background:#e74c3c; color:white; padding:12px; border:none; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer;">
+                        <i class="fa fa-trash"></i> Supprimer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

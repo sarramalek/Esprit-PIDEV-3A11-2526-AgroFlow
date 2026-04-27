@@ -1,0 +1,144 @@
+{% extends 'base_agriculteur.html.twig' %}
+
+{% block title %}AgroFlow - {{ 'report.reference'|trans({'%id%': examen.id}) }}{% endblock %}
+
+{% block body %}
+<!-- Sélecteur de langue - EN HAUT -->
+{% set examenType = examen.typeExamen %}
+{% set examenTypeLabel = examenType == 'Vaccin' ? 'report.exam_type.vaccin'|trans : (examenType == 'Radio' ? 'report.exam_type.radio'|trans : examenType) %}
+{% set animalSpeciesLabel = examen.animal and examen.animal.espece == 'Vache' ? 'animal.species.vache'|trans : (examen.animal and examen.animal.espece == 'Mouton' ? 'animal.species.mouton'|trans : (examen.animal ? examen.animal.espece : '')) %}
+{% set animalSexLabel = examen.animal and examen.animal.sexe == 'Mâle' ? 'animal.sex.male'|trans : (examen.animal and examen.animal.sexe == 'Femelle' ? 'animal.sex.female'|trans : (examen.animal ? examen.animal.sexe : '')) %}
+{% set examenTreatmentLabel = examen.traitement == 'Repos' ? 'report.treatment.rest'|trans : (examen.traitement == 'Chirurgie' ? 'report.treatment.surgery'|trans : examen.traitement) %}
+{% set examenDiagnosticLabel = examen.diagnostic == 'En bonne santé' ? 'report.diagnostic.good_health'|trans : examen.diagnostic %}
+<div style="width: 100%; padding: 15px 30px; background: transparent; display: flex; justify-content: flex-end; gap: 10px; border-bottom: none;">
+    <a href="{{ path('app_set_locale', {'locale': 'fr'}) }}" 
+       style="display: inline-flex; align-items: center; justify-content: center; padding: 8px 14px; border-radius: 6px; background: {{ app.request.locale == 'fr' ? '#2D5A27' : '#f0f0f0' }}; color: {{ app.request.locale == 'fr' ? 'white' : '#2C3E50' }}; border: 1px solid {{ app.request.locale == 'fr' ? '#2D5A27' : '#ddd' }}; font-size: 13px; text-decoration: none; font-weight: 600; cursor: pointer;">
+        🇫🇷 FR
+    </a>
+    <a href="{{ path('app_set_locale', {'locale': 'en'}) }}" 
+       style="display: inline-flex; align-items: center; justify-content: center; padding: 8px 14px; border-radius: 6px; background: {{ app.request.locale == 'en' ? '#2D5A27' : '#f0f0f0' }}; color: {{ app.request.locale == 'en' ? 'white' : '#2C3E50' }}; border: 1px solid {{ app.request.locale == 'en' ? '#2D5A27' : '#ddd' }}; font-size: 13px; text-decoration: none; font-weight: 600; cursor: pointer;">
+        🇬🇧 EN
+    </a>
+    <a href="{{ path('app_set_locale', {'locale': 'es'}) }}" 
+       style="display: inline-flex; align-items: center; justify-content: center; padding: 8px 14px; border-radius: 6px; background: {{ app.request.locale == 'es' ? '#2D5A27' : '#f0f0f0' }}; color: {{ app.request.locale == 'es' ? 'white' : '#2C3E50' }}; border: 1px solid {{ app.request.locale == 'es' ? '#2D5A27' : '#ddd' }}; font-size: 13px; text-decoration: none; font-weight: 600; cursor: pointer;">
+        🇪🇸 ES
+    </a>
+</div>
+
+<div style="padding: 10px;">
+    <!-- Header : Breadcrumb -->
+    <div style="margin-bottom: 25px; color: #666; font-size: 14px;">
+        <span>{{ 'breadcrumb.management'|trans }}</span> <i class="fa fa-chevron-right" style="font-size: 10px; margin: 0 5px;"></i> 
+        <span>{{ 'breadcrumb.exams'|trans }}</span> <i class="fa fa-chevron-right" style="font-size: 10px; margin: 0 5px;"></i> 
+        <strong style="color: #2C3E50;">{{ 'breadcrumb.report_details'|trans }}</strong>
+    </div>
+
+    <div style="background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); max-width: 900px; margin: 0 auto; overflow: hidden;">
+        
+        <!-- Header du Rapport -->
+        <div style="background: #2C3E50; padding: 40px; color: white; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <span style="background: rgba(255,255,255,0.1); padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; text-transform: uppercase;">{{ 'report.reference'|trans({'%id%': examen.id}) }}</span>
+                <h2 style="margin: 10px 0 0 0; font-size: 28px; font-weight: 800;">{{ 'report.report_title'|trans({'%type%': examenTypeLabel}) }}</h2>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-size: 14px; opacity: 0.8; margin-bottom: 5px;">{{ 'report.exam_date'|trans }}</div>
+                <div style="font-size: 18px; font-weight: 700;">{{ examen.dateExamen ? examen.dateExamen|date('d/m/Y') : '-' }}</div>
+            </div>
+        </div>
+
+        <!-- Corps du Rapport -->
+        <div style="padding: 40px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px;">
+                
+                <!-- Section Animal -->
+                <div style="background: #F8F9FA; padding: 25px; border-radius: 15px; border-left: 5px solid #2D5A27;">
+                    <h4 style="margin: 0 0 15px 0; color: #2D5A27; text-transform: uppercase; font-size: 11px; letter-spacing: 1px;">{{ 'report.patient_animal'|trans }}</h4>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="width: 50px; height: 50px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #2D5A27; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                            <i class="fa fa-paw"></i>
+                        </div>
+                        <div>
+                            <strong style="display: block; font-size: 18px; color: #2C3E50;">{{ examen.animal ? examen.animal.nom : 'N/A' }}</strong>
+                            <span style="font-size: 13px; color: #7f8c8d;">{{ examen.animal ? animalSpeciesLabel ~ ' (' ~ animalSexLabel ~ ')' : '' }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section Traitement -->
+                <div style="background: rgba(231, 76, 60, 0.05); padding: 25px; border-radius: 15px; border-left: 5px solid #e74c3c;">
+                    <h4 style="margin: 0 0 15px 0; color: #e74c3c; text-transform: uppercase; font-size: 11px; letter-spacing: 1px;">{{ 'report.prescription_action'|trans }}</h4>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="width: 50px; height: 50px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #e74c3c; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                            <i class="fa fa-pills"></i>
+                        </div>
+                        <div>
+                            <strong style="display: block; font-size: 18px; color: #2C3E50;">{{ examenTreatmentLabel }}</strong>
+                            <span style="font-size: 13px; color: #e74c3c; font-weight: 600;">{{ 'report.treatment_assigned'|trans }}</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Diagnostic Complet -->
+            <div style="margin-bottom: 40px;">
+                <h4 style="color: #2C3E50; font-size: 16px; margin-bottom: 15px; border-bottom: 2px solid #F1F3F5; padding-bottom: 10px;">{{ 'report.diagnostic_result'|trans }}</h4>
+                <div style="background: #FFF; border: 2px solid #F1F3F5; padding: 25px; border-radius: 15px; font-size: 16px; line-height: 1.6; color: #444;">
+                    {{ examenDiagnosticLabel|nl2br }}
+                </div>
+            </div>
+
+            <!-- Section Rappels -->
+            {% if examen.isFutureVaccineAlert() %}
+            <div style="margin-bottom: 30px; background: #fff9e6; border: 1px solid #ffecb5; padding: 20px; border-radius: 15px; color: #7f6000;">
+                <strong style="display: block; margin-bottom: 10px;"><i class="fa fa-bell" style="margin-right: 8px;"></i>Vaccin programmé</strong>
+                L'examen vaccinal est prévu le {{ examen.dateExamen|date('d/m/Y') }}. Une alerte est générée pour ce rendez-vous futur.
+            </div>
+            {% endif %}
+            {% if examen.shouldHaveReminder() %}
+            <div style="margin-bottom: 40px;">
+                <h4 style="color: #2C3E50; font-size: 16px; margin-bottom: 15px; border-bottom: 2px solid #F1F3F5; padding-bottom: 10px;">
+                    <i class="fa fa-calendar-check" style="color: #3498db; margin-right: 10px;"></i>
+                    {{ 'report.reminder_system'|trans }}
+                </h4>
+                <div style="background: {{ examen.isReminderSoon() ? 'rgba(231, 76, 60, 0.05)' : 'rgba(39, 174, 96, 0.05)' }}; border: 2px solid {{ examen.isReminderSoon() ? '#e74c3c' : '#27ae60' }}; padding: 25px; border-radius: 15px;">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="width: 50px; height: 50px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; color: {{ examen.isReminderSoon() ? '#e74c3c' : '#27ae60' }}; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                            <i class="fa fa-bell"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <strong style="display: block; font-size: 18px; color: #2C3E50; margin-bottom: 5px;">{{ examen.getReminderType() }}</strong>
+                            <div style="font-size: 14px; color: #666; margin-bottom: 10px;">
+                                {{ 'report.next_reminder'|trans }}: <strong>{{ examen.calculateNextReminderDate()|date('d/m/Y') }}</strong>
+                            </div>
+                            {% if examen.isReminderSoon() %}
+                                <span style="background: #e74c3c; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase;">
+                                    <i class="fa fa-exclamation-triangle" style="margin-right: 5px;"></i>
+                                    {{ 'report.reminder_soon'|trans }}
+                                </span>
+                            {% else %}
+                                <span style="background: #27ae60; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase;">
+                                    <i class="fa fa-check-circle" style="margin-right: 5px;"></i>
+                                    {{ 'report.reminder_planned'|trans }}
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Actions -->
+            <div style="display: flex; gap: 15px; border-top: 1px solid #EEE; padding-top: 30px;">
+                <a href="{{ path('app_examens_edit', {'id': examen.id}) }}" style="background: #3498db; color: white; padding: 12px 25px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa fa-edit"></i> {{ 'report.edit_report'|trans }}
+                </a>
+                <a href="{{ path('app_examens_index') }}" style="background: white; border: 2px solid #EEE; color: #7f8c8d; padding: 12px 25px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                    <i class="fa fa-arrow-left"></i> {{ 'report.back_to_list'|trans }}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

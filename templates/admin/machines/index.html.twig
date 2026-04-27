@@ -1,0 +1,776 @@
+{% extends 'base_admin.html.twig' %}
+
+{% block title %}Machines - Admin{% endblock %}
+{% block page_title %}Gestion des Machines{% endblock %}
+{% block breadcrumb %}Matériels / Machines{% endblock %}
+
+{% block stylesheets %}
+<style>
+    /* ── Badges ── */
+    .badge {
+        display: inline-block; padding: 4px 12px; border-radius: 9999px;
+        font-size: 11px; font-weight: 600; letter-spacing: .2px;
+    }
+    .badge-success { background: #EAF3DE; color: #3B6D11; }
+    .badge-danger  { background: #FCEBEB; color: #A32D2D; }
+    .badge-warning { background: #FAEEDA; color: #854F0B; }
+
+    /* ── Toolbar buttons ── */
+    .tb-btn {
+        display: inline-flex; align-items: center; gap: 7px;
+        padding: 9px 16px; border-radius: 8px; font-size: 13.5px;
+        font-weight: 500; border: 1.5px solid #ddd; cursor: pointer;
+        background: white; color: #444; transition: all .18s; white-space: nowrap;
+    }
+    .tb-btn:hover { border-color: #aaa; background: #f5f5f5; }
+    .tb-btn.btn-green  { background: #2D5A27; border-color: #2D5A27; color: white; }
+    .tb-btn.btn-green:hover  { background: #1e3f1a; border-color: #1e3f1a; }
+    .tb-btn.btn-blue   { background: #185FA5; border-color: #185FA5; color: white; }
+    .tb-btn.btn-blue:hover   { background: #0f4580; border-color: #0f4580; }
+    .tb-btn.btn-reset  { background: #f1f1f1; color: #555; }
+    .tb-btn.btn-reset:hover  { background: #e4e4e4; }
+    .tb-btn.sort-active { background: #2D5A27; border-color: #2D5A27; color: white; }
+
+    /* ── Search input ── */
+    .search-wrap { position: relative; flex: 1; min-width: 260px; }
+    .search-wrap i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #aaa; pointer-events: none; }
+    .search-wrap input {
+        width: 100%; padding: 9px 12px 9px 36px; border: 1.5px solid #ddd;
+        border-radius: 8px; font-size: 14px; box-sizing: border-box; transition: border-color .2s;
+    }
+    .search-wrap input:focus { outline: none; border-color: #2D5A27; box-shadow: 0 0 0 3px rgba(45,90,39,.1); }
+
+    /* ── Select ── */
+    .select-wrap { position: relative; }
+    .select-wrap i { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #aaa; pointer-events: none; }
+    .select-wrap select {
+        padding: 9px 14px 9px 32px; border: 1.5px solid #ddd;
+        border-radius: 8px; font-size: 14px; min-width: 170px;
+        appearance: none; cursor: pointer; background: white;
+    }
+    .select-wrap select:focus { outline: none; border-color: #2D5A27; }
+
+    /* ── Alphabet bar ── */
+    .alpha-bar {
+        background: white; border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.06);
+        padding: 14px 18px; margin-bottom: 16px;
+        display: flex; flex-wrap: wrap; gap: 5px; align-items: center;
+    }
+    .alpha-label { font-size: 12px; color: #888; font-weight: 600; margin-right: 8px; letter-spacing: .5px; }
+    .alpha-btn {
+        width: 30px; height: 30px; border-radius: 6px;
+        border: 1.5px solid #ddd; background: white; color: #555;
+        font-size: 12px; font-weight: 600; cursor: pointer;
+        display: inline-flex; align-items: center; justify-content: center;
+        transition: all .12s;
+    }
+    .alpha-btn:hover:not(.alpha-disabled) { background: #EAF3DE; border-color: #3B6D11; color: #3B6D11; }
+    .alpha-btn.alpha-active { background: #2D5A27; border-color: #2D5A27; color: white; }
+    .alpha-btn.alpha-disabled { opacity: .3; cursor: default; pointer-events: none; }
+    .alpha-clear {
+        margin-left: 10px; font-size: 12px; color: #185FA5;
+        cursor: pointer; text-decoration: underline; display: none;
+    }
+
+    /* ── Stats panel ── */
+    #statsPanel {
+        overflow: hidden; max-height: 0; opacity: 0;
+        transition: max-height .5s ease, opacity .4s ease;
+        margin-bottom: 0;
+    }
+    #statsPanel.open { max-height: 800px; opacity: 1; margin-bottom: 20px; }
+
+    .stats-top-grid {
+        display: grid; grid-template-columns: repeat(4,1fr); gap: 14px;
+        margin-bottom: 14px;
+    }
+    .stats-bottom {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    }
+
+    .stat-card {
+        background: white; border-radius: 12px; padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,.06); text-align: center;
+        transition: transform .2s, box-shadow .2s;
+    }
+    .stat-card:hover { transform: translateY(-3px); box-shadow: 0 6px 18px rgba(0,0,0,.1); }
+    .stat-label { font-size: 12px; color: #777; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .stat-number { font-size: 36px; font-weight: 700; line-height: 1; }
+
+    .chart-card {
+        background: white; border-radius: 12px; padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,.06);
+    }
+    .chart-card-title {
+        font-size: 12px; font-weight: 700; color: #555;
+        text-transform: uppercase; letter-spacing: .5px;
+        margin-bottom: 14px; display: flex; align-items: center; gap: 7px;
+    }
+    .chart-legend {
+        display: flex; flex-direction: column; gap: 10px;
+        justify-content: center;
+    }
+    .legend-item {
+        display: flex; align-items: center; gap: 10px; font-size: 13px;
+    }
+    .legend-dot {
+        width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0;
+    }
+    .legend-label { color: #555; flex: 1; }
+    .legend-val   { font-weight: 700; color: #2C3E50; min-width: 24px; text-align: right; }
+    .legend-pct   { font-size: 11px; color: #aaa; min-width: 36px; text-align: right; }
+
+    /* ── Table ── */
+    .table-container {
+        background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.06);
+        overflow-x: auto;
+    }
+    #machinesTable {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 1200px;
+    }
+    #machinesTable thead th {
+        font-size: 12px; color: #555; font-weight: 600;
+        padding: 14px 10px; cursor: pointer; user-select: none;
+        white-space: nowrap;
+        background: #fafafa;
+        border-bottom: 1px solid #eee;
+    }
+    #machinesTable thead th:last-child { cursor: default; }
+    #machinesTable thead th:hover:not(:last-child) { color: #2D5A27; }
+    #machinesTable thead th.sorted-asc::after  { content: ' ↑'; color: #2D5A27; }
+    #machinesTable thead th.sorted-desc::after { content: ' ↓'; color: #2D5A27; }
+    #machinesTable tbody td { padding: 12px 10px; vertical-align: middle; border-bottom: 1px solid #f0f0f0; }
+    #machinesTable tbody tr:hover { background: #f9fbf8; }
+
+    /* ── Action buttons ── */
+    .action-btn {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 32px; height: 32px; border-radius: 7px;
+        text-decoration: none; border: none; cursor: pointer;
+        transition: opacity .15s, transform .15s;
+    }
+    .action-btn:hover { opacity: .8; transform: scale(1.08); }
+    .action-btn-view   { background: #E6F1FB; color: #185FA5; }
+    .action-btn-edit   { background: #FAEEDA; color: #854F0B; }
+    .action-btn-delete { background: #FCEBEB; color: #A32D2D; }
+
+    /* ── Result count ── */
+    #resultCount {
+        font-size: 12px; color: #888; padding: 10px 14px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    /* ── Empty state ── */
+    .empty-row td {
+        text-align: center; color: #aaa;
+        padding: 80px 20px; font-size: 15px;
+    }
+    
+    /* ── Flash messages ── */
+    .flash-success {
+        background: #EAF3DE; color: #3B6D11; border: 1px solid #c0dd97;
+        padding: 12px 18px; border-radius: 8px; margin-bottom: 16px;
+        display: flex; align-items: center; gap: 10px;
+    }
+    .flash-error {
+        background: #FCEBEB; color: #A32D2D; border: 1px solid #f7c1c1;
+        padding: 12px 18px; border-radius: 8px; margin-bottom: 16px;
+        display: flex; align-items: center; gap: 10px;
+    }
+    
+    /* Info tooltip */
+    .info-badge {
+        background: #f0f0f0;
+        color: #666;
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 10px;
+        margin-left: 5px;
+        cursor: help;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+
+{# ── Page header ── #}
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:28px;">
+    <h2 style="margin:0; color:#2C3E50; font-size:22px;">Liste des Machines</h2>
+    <a href="{{ path('admin_machines_new') }}"
+       style="background:#2D5A27; color:white; padding:10px 22px; border-radius:8px;
+              text-decoration:none; display:inline-flex; align-items:center; gap:8px;
+              font-size:14px; font-weight:500;">
+        <i class="fa fa-plus"></i> Nouvelle Machine
+    </a>
+</div>
+
+{# ── Flash messages ── #}
+{% for msg in app.flashes('success') %}
+    <div class="flash-success">
+        <i class="fa fa-check-circle"></i> {{ msg }}
+    </div>
+{% endfor %}
+{% for msg in app.flashes('error') %}
+    <div class="flash-error">
+        <i class="fa fa-exclamation-circle"></i> {{ msg }}
+    </div>
+{% endfor %}
+
+{# ── Stats panel ── #}
+<div id="statsPanel">
+    <div class="stats-top-grid" id="statsGrid"></div>
+    <div class="stats-bottom">
+        <div class="chart-card">
+            <div class="chart-card-title">
+                <i class="fa fa-chart-pie"></i> Répartition par état
+            </div>
+            <canvas id="pieChart" height="200"></canvas>
+        </div>
+        <div class="chart-card">
+            <div class="chart-card-title">
+                <i class="fa fa-list"></i> Détail par état
+            </div>
+            <div class="chart-legend" id="chartLegend"></div>
+        </div>
+    </div>
+</div>
+
+{# ── Toolbar ── #}
+<div style="background:white; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.06);
+            padding:16px 18px; margin-bottom:14px;">
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <div class="search-wrap">
+            <i class="fa fa-magnifying-glass"></i>
+            <input type="text" id="searchInput"
+                   placeholder="Rechercher..."
+                   oninput="applyFilters()">
+        </div>
+
+        <div class="select-wrap">
+            <i class="fa fa-filter"></i>
+            <select id="etatFilter" onchange="applyFilters()">
+                <option value="">Tous les états</option>
+                <option value="Neuf">Neuf</option>
+                <option value="Bon">Bon</option>
+                <option value="Occasion">Occasion</option>
+                <option value="En panne">En panne</option>
+            </select>
+        </div>
+
+        <button type="button" class="tb-btn" id="sortDateAsc"
+                onclick="sortByDate('asc')" title="Date ancienne → récente">
+            <i class="fa fa-calendar"></i><i class="fa fa-arrow-up"></i> Date ↑
+        </button>
+        <button type="button" class="tb-btn" id="sortDateDesc"
+                onclick="sortByDate('desc')" title="Date récente → ancienne">
+            <i class="fa fa-calendar"></i><i class="fa fa-arrow-down"></i> Date ↓
+        </button>
+
+        <button type="button" class="tb-btn btn-reset" onclick="resetAll()">
+            <i class="fa fa-rotate-left"></i> Réinitialiser
+        </button>
+
+        <button type="button" class="tb-btn btn-blue" onclick="toggleStats()">
+            <i class="fa fa-chart-bar"></i> Statistiques
+        </button>
+    </div>
+</div>
+
+{# ── Barre alphabétique ── #}
+<div class="alpha-bar">
+    <span class="alpha-label">A – Z :</span>
+    <div id="alphaButtons"></div>
+    <span class="alpha-clear" id="alphaClear" onclick="clearAlpha()">
+        ✕ Tout afficher
+    </span>
+</div>
+
+{# ── Tableau avec tous les attributs ── #}
+<div class="table-container">
+    <div id="resultCount"></div>
+    <table id="machinesTable">
+        <thead>
+            <tr>
+                <th onclick="sortTable(0)">Nom</th>
+                <th onclick="sortTable(1)">Marque</th>
+                <th onclick="sortTable(2)">Modèle</th>
+                <th>N° Série</th>
+                <th onclick="sortTable(4)">État</th>
+                <th onclick="sortTable(5)">Kilométrage</th>
+                <th onclick="sortTable(6)">Date Achat</th>
+                <th>Dernière Visite</th>
+                <th>Km Dernière Visite</th>
+                <th>Prochaine Maintenance</th>
+                <th onclick="sortTable(10)">Propriétaire</th>
+                <th style="text-align:center; width:100px;">Actions</th>
+            </tr>
+            <tr style="background:#f5f5f5; font-size:11px;">
+                <th colspan="12" style="text-align:center; font-weight:normal; color:#888; padding:8px;">
+                    <i class="fa fa-info-circle"></i> Tous les attributs de la machine sont affichés
+                </th>
+            </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+    </table>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+    const MACHINES_DATA = {{ machinesJson|raw }};
+</script>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   État global
+═══════════════════════════════════════════════════ */
+let activeLetter = '';
+let currentSort  = { col: -1, dir: 'asc' };
+let dateSort     = 'desc';
+let statsOpen    = false;
+let pieChartInstance = null;
+
+/* ═══════════════════════════════════════════════════
+   Utilitaires
+═══════════════════════════════════════════════════ */
+function getBadge(etat) {
+    if (etat === 'Neuf' || etat === 'Bon')
+        return `<span class="badge badge-success">${etat}</span>`;
+    if (etat === 'En panne')
+        return `<span class="badge badge-danger">${etat}</span>`;
+    return `<span class="badge badge-warning">${etat}</span>`;
+}
+
+function fmtDate(d) {
+    if (!d) return '—';
+    const [y,m,day] = d.split('-');
+    return `${day}/${m}/${y}`;
+}
+
+function parseDate(d) {
+    return d ? new Date(d).getTime() : 0;
+}
+
+function escHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g,'&amp;')
+        .replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;');
+}
+
+function formatKm(km) {
+    if (km === null || km === undefined) return '—';
+    return km.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " km/h";
+}
+
+/* ═══════════════════════════════════════════════════
+   Filtrage
+═══════════════════════════════════════════════════ */
+function getFiltered() {
+    const s = document.getElementById('searchInput').value.trim().toLowerCase();
+    const e = document.getElementById('etatFilter').value;
+
+    return MACHINES_DATA.filter(r => {
+        if (activeLetter && !r.nom.toUpperCase().startsWith(activeLetter)) return false;
+        if (e && r.etat !== e) return false;
+        if (s) {
+            const hay = [
+                r.nom, r.marque, r.modele, r.serie, 
+                r.nomAgriculteur, r.kilometrage?.toString(), 
+                r.kmLastVisite?.toString()
+            ].join(' ').toLowerCase();
+            if (!hay.includes(s)) return false;
+        }
+        return true;
+    });
+}
+
+/* ═══════════════════════════════════════════════════
+   Tri
+═══════════════════════════════════════════════════ */
+function sortData(rows) {
+    rows = [...rows];
+    
+    if (!dateSort && currentSort.col === -1) {
+        rows.sort((a,b) => parseDate(b.dateAchat) - parseDate(a.dateAchat));
+        return rows;
+    }
+    
+    if (dateSort) {
+        rows.sort((a,b) =>
+            dateSort === 'asc'
+                ? parseDate(a.dateAchat) - parseDate(b.dateAchat)
+                : parseDate(b.dateAchat) - parseDate(a.dateAchat)
+        );
+        return rows;
+    }
+    
+    if (currentSort.col >= 0) {
+        const keys = ['nom', 'marque', 'modele', 'serie', 'etat', 'kilometrage', 'dateAchat', 'dateLastVisite', 'kmLastVisite', 'prochaineMaintenance', 'nomAgriculteur'];
+        const k    = keys[currentSort.col];
+        rows.sort((a,b) => {
+            if (k === 'dateAchat' || k === 'dateLastVisite' || k === 'prochaineMaintenance') {
+                const va = parseDate(a[k]), vb = parseDate(b[k]);
+                return currentSort.dir === 'asc' ? va - vb : vb - va;
+            }
+            if (k === 'kilometrage' || k === 'kmLastVisite') {
+                const va = a[k] || 0, vb = b[k] || 0;
+                return currentSort.dir === 'asc' ? va - vb : vb - va;
+            }
+            let va = (k === 'nomAgriculteur') ? (a.nomAgriculteur || '') : (a[k] || '');
+            let vb = (k === 'nomAgriculteur') ? (b.nomAgriculteur || '') : (b[k] || '');
+            return currentSort.dir === 'asc'
+                ? va.localeCompare(vb, 'fr')
+                : vb.localeCompare(va, 'fr');
+        });
+    }
+    return rows;
+}
+
+/* ═══════════════════════════════════════════════════
+   Rendu tableau avec tous les attributs
+═══════════════════════════════════════════════════ */
+function render() {
+    const filtered = sortData(getFiltered());
+    const tbody    = document.getElementById('tableBody');
+
+    document.getElementById('resultCount').textContent =
+        `${filtered.length} machine${filtered.length !== 1 ? 's' : ''} trouvée${filtered.length !== 1 ? 's' : ''}`;
+
+    if (!filtered.length) {
+        tbody.innerHTML = `<tr class="empty-row"><td colspan="12">
+            <i class="fa fa-inbox" style="font-size:28px;display:block;margin-bottom:10px;"></i>
+            Aucune machine trouvée
+         </td></tr>`;
+        renderStats([]);
+        return;
+    }
+
+    tbody.innerHTML = filtered.map(r => `
+        <tr>
+            <td style="font-weight:600; color:#2C3E50;">${escHtml(r.nom)}</td>
+            <td>${escHtml(r.marque)}</td>
+            <td>${escHtml(r.modele)}</td>
+            <td style="font-family:monospace; font-size:12px; color:#555;">${escHtml(r.serie) || '—'}</td>
+            <td>${getBadge(r.etat)}</td>
+            <td style="font-family:monospace;">${formatKm(r.kilometrage)}</td>
+            <td>${fmtDate(r.dateAchat)}</td>
+            <td>${fmtDate(r.dateLastVisite)}</td>
+            <td style="font-family:monospace;">${formatKm(r.kmLastVisite)}</td>
+            <td>${fmtDate(r.prochaineMaintenance)}</td>
+            <td style="font-size:12px;">
+                ${r.cinAgriculteur && r.cinAgriculteur !== '—' && r.nomAgriculteur && r.nomAgriculteur !== '—'
+                    ? `<span style="color:#2C3E50; font-weight:500;">${escHtml(r.nomAgriculteur)}</span>
+                       <span style="color:#888; font-size:10px; display:block; font-family:monospace;">CIN: ${r.cinAgriculteur}</span>`
+                    : `<span style="color:#999; font-style:italic;">Non assigné</span>`
+                }
+            </td>
+            <td>
+                <div style="display:flex; gap:6px; justify-content:center;">
+                    <a href="/admin/machines/${r.id}"
+                       class="action-btn action-btn-view" title="Voir">
+                        <i class="fa fa-eye"></i>
+                    </a>
+                    <a href="/admin/machines/${r.id}/edit"
+                       class="action-btn action-btn-edit" title="Modifier">
+                        <i class="fa fa-pen"></i>
+                    </a>
+                    <a href="/admin/machines/${r.id}/delete-confirm"
+                       class="action-btn action-btn-delete" title="Supprimer">
+                        <i class="fa fa-trash"></i>
+                    </a>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+
+    renderStats(filtered);
+}
+
+/* ═══════════════════════════════════════════════════
+   Statistiques avancées
+═══════════════════════════════════════════════════ */
+function calculateAdvancedStats(filtered) {
+    const total = filtered.length;
+    
+    if (total === 0) {
+        return {
+            total: 0,
+            avgAge: 0,
+            avgKilometrage: 0,
+            mostCommonBrand: null,
+            brandCount: {},
+            etatCount: {}
+        };
+    }
+    
+    const brandCount = {};
+    let totalKilometrage = 0;
+    let kmCount = 0;
+    
+    filtered.forEach(r => {
+        brandCount[r.marque] = (brandCount[r.marque] || 0) + 1;
+        if (r.kilometrage) {
+            totalKilometrage += r.kilometrage;
+            kmCount++;
+        }
+    });
+    
+    let mostCommonBrand = null;
+    let maxCount = 0;
+    for (const [brand, count] of Object.entries(brandCount)) {
+        if (count > maxCount) {
+            maxCount = count;
+            mostCommonBrand = brand;
+        }
+    }
+    
+    let totalAge = 0;
+    let ageCount = 0;
+    const today = new Date();
+    
+    filtered.forEach(r => {
+        if (r.dateAchat) {
+            const purchaseDate = new Date(r.dateAchat);
+            if (!isNaN(purchaseDate.getTime())) {
+                const age = today.getFullYear() - purchaseDate.getFullYear();
+                totalAge += age;
+                ageCount++;
+            }
+        }
+    });
+    
+    const avgAge = ageCount > 0 ? (totalAge / ageCount).toFixed(1) : 0;
+    const avgKilometrage = kmCount > 0 ? Math.round(totalKilometrage / kmCount) : 0;
+    
+    const etatCount = {};
+    filtered.forEach(r => {
+        etatCount[r.etat] = (etatCount[r.etat] || 0) + 1;
+    });
+    
+    return { total, avgAge, avgKilometrage, mostCommonBrand, brandCount, etatCount };
+}
+
+function updateAdvancedStats(stats) {
+    const statsGrid = document.getElementById('statsGrid');
+    if (!statsGrid) return;
+    
+    const total = stats.total;
+    const avgAge = stats.avgAge;
+    const avgKm = stats.avgKilometrage;
+    const mostCommonBrand = stats.mostCommonBrand || '—';
+    const brandCount = stats.brandCount;
+    const topBrand = mostCommonBrand !== '—' ? `${mostCommonBrand} (${brandCount[mostCommonBrand]})` : '—';
+    const available = (stats.etatCount['Bon'] || 0) + (stats.etatCount['Neuf'] || 0);
+    const occupancyRate = total > 0 ? Math.round(available / total * 100) : 0;
+    
+    statsGrid.innerHTML = `
+        <div class="stat-card" style="border-top:4px solid #2D5A27;">
+            <div class="stat-label"><i class="fa fa-server"></i> Total machines</div>
+            <div class="stat-number" style="color:#2C3E50;">${total}</div>
+        </div>
+        <div class="stat-card" style="border-top:4px solid #185FA5;">
+            <div class="stat-label"><i class="fa fa-calendar"></i> Âge moyen</div>
+            <div class="stat-number" style="color:#185FA5;">${avgAge} ans</div>
+        </div>
+        <div class="stat-card" style="border-top:4px solid #854F0B;">
+            <div class="stat-label"><i class="fa fa-tachometer"></i> Kilométrage moyen</div>
+            <div class="stat-number" style="font-size:24px; color:#854F0B;">${avgKm.toLocaleString()} km/h</div>
+        </div>
+        <div class="stat-card" style="border-top:4px solid #3B6D11;">
+            <div class="stat-label"><i class="fa fa-chart-line"></i> Taux disponibilité</div>
+            <div class="stat-number" style="font-size:24px; color:#3B6D11;">${occupancyRate}%</div>
+        </div>
+    `;
+}
+
+/* ═══════════════════════════════════════════════════
+   Graphique et légende
+═══════════════════════════════════════════════════ */
+const ETAT_COLORS = {
+    'Neuf':        { bg: '#2D5A27', light: '#EAF3DE', text: '#3B6D11' },
+    'Bon':         { bg: '#3B6D11', light: '#EAF3DE', text: '#3B6D11' },
+    'Occasion':    { bg: '#854F0B', light: '#FAEEDA', text: '#854F0B' },
+    'En panne':    { bg: '#A32D2D', light: '#FCEBEB', text: '#A32D2D' }
+};
+const DEFAULT_COLOR = { bg: '#888', light: '#f5f5f5', text: '#555' };
+
+function getColor(etat) {
+    return ETAT_COLORS[etat] || DEFAULT_COLOR;
+}
+
+function renderStats(filtered) {
+    const stats = calculateAdvancedStats(filtered);
+    updateAdvancedStats(stats);
+    
+    const total = stats.total;
+    const counts = stats.etatCount;
+    const labels = Object.keys(counts);
+    const values = Object.values(counts);
+    const colors = labels.map(l => getColor(l).bg);
+    
+    const ctx = document.getElementById('pieChart');
+    if (ctx) {
+        if (pieChartInstance) pieChartInstance.destroy();
+        
+        if (total === 0) {
+            ctx.getContext('2d').clearRect(0, 0, ctx.width, ctx.height);
+            pieChartInstance = null;
+        } else {
+            pieChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: colors,
+                        borderColor: '#ffffff',
+                        borderWidth: 3,
+                        hoverOffset: 8,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    cutout: '60%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(ctx) {
+                                    const pct = total > 0 ? Math.round(ctx.parsed / total * 100) : 0;
+                                    return ` ${ctx.label} : ${ctx.parsed} (${pct}%)`;
+                                }
+                            }
+                        }
+                    },
+                    animation: { animateRotate: true, duration: 600 }
+                }
+            });
+        }
+    }
+    
+    const legendEl = document.getElementById('chartLegend');
+    if (legendEl) {
+        if (total === 0) {
+            legendEl.innerHTML = `<div style="color:#aaa; font-size:13px; text-align:center; padding:20px 0;">
+                <i class="fa fa-chart-pie" style="font-size:32px; margin-bottom:10px; display:block;"></i>
+                Aucune donnée à afficher
+            </div>`;
+        } else {
+            legendEl.innerHTML = labels.map((lbl, i) => {
+                const c = getColor(lbl);
+                const pct = Math.round(values[i] / total * 100);
+                return `
+                <div class="legend-item">
+                    <div class="legend-dot" style="background:${c.bg};"></div>
+                    <span class="legend-label">${lbl}</span>
+                    <span class="legend-val">${values[i]}</span>
+                    <span class="legend-pct">${pct}%</span>
+                </div>`;
+            }).join('');
+        }
+    }
+}
+
+/* ═══════════════════════════════════════════════════
+   Barre alphabétique
+═══════════════════════════════════════════════════ */
+function buildAlphaBar() {
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    const usedLetters = new Set(MACHINES_DATA.map(r => r.nom && r.nom[0] ? r.nom[0].toUpperCase() : ''));
+    const wrap = document.getElementById('alphaButtons');
+    if (!wrap) return;
+    
+    wrap.innerHTML = letters.map(l => {
+        const has = usedLetters.has(l);
+        return `<button class="alpha-btn${has ? '' : ' alpha-disabled'}" id="alpha-${l}" onclick="${has ? `setAlpha('${l}')` : 'void(0)'}">${l}</button>`;
+    }).join('');
+}
+
+function setAlpha(l) {
+    if (activeLetter === l) { clearAlpha(); return; }
+    activeLetter = l;
+    document.querySelectorAll('.alpha-btn').forEach(b => b.classList.remove('alpha-active'));
+    const btn = document.getElementById(`alpha-${l}`);
+    if (btn) btn.classList.add('alpha-active');
+    document.getElementById('alphaClear').style.display = 'inline';
+    render();
+}
+
+function clearAlpha() {
+    activeLetter = '';
+    document.querySelectorAll('.alpha-btn').forEach(b => b.classList.remove('alpha-active'));
+    document.getElementById('alphaClear').style.display = 'none';
+    render();
+}
+
+/* ═══════════════════════════════════════════════════
+   Tri
+═══════════════════════════════════════════════════ */
+function sortTable(colIdx) {
+    dateSort = null;
+    document.getElementById('sortDateAsc').classList.remove('sort-active');
+    document.getElementById('sortDateDesc').classList.remove('sort-active');
+    
+    if (currentSort.col === colIdx) {
+        currentSort.dir = currentSort.dir === 'asc' ? 'desc' : 'asc';
+    } else {
+        currentSort = { col: colIdx, dir: 'asc' };
+    }
+    
+    document.querySelectorAll('#machinesTable thead th').forEach((th, i) => {
+        th.classList.remove('sorted-asc', 'sorted-desc');
+        if (i === colIdx) th.classList.add(currentSort.dir === 'asc' ? 'sorted-asc' : 'sorted-desc');
+    });
+    render();
+}
+
+function sortByDate(dir) {
+    dateSort = (dateSort === dir) ? null : dir;
+    currentSort = { col: -1, dir: 'asc' };
+    
+    document.querySelectorAll('#machinesTable thead th').forEach(t => t.classList.remove('sorted-asc', 'sorted-desc'));
+    document.getElementById('sortDateAsc').classList.toggle('sort-active', dateSort === 'asc');
+    document.getElementById('sortDateDesc').classList.toggle('sort-active', dateSort === 'desc');
+    render();
+}
+
+function applyFilters() { render(); }
+
+function resetAll() {
+    document.getElementById('searchInput').value = '';
+    document.getElementById('etatFilter').value = '';
+    activeLetter = '';
+    dateSort = 'desc';
+    currentSort = { col: -1, dir: 'asc' };
+    
+    document.querySelectorAll('.alpha-btn').forEach(b => b.classList.remove('alpha-active'));
+    document.getElementById('alphaClear').style.display = 'none';
+    document.getElementById('sortDateAsc').classList.remove('sort-active');
+    document.getElementById('sortDateDesc').classList.add('sort-active');
+    document.querySelectorAll('#machinesTable thead th').forEach(t => t.classList.remove('sorted-asc', 'sorted-desc'));
+    
+    if (statsOpen) toggleStats();
+    render();
+}
+
+function toggleStats() {
+    statsOpen = !statsOpen;
+    document.getElementById('statsPanel').classList.toggle('open', statsOpen);
+}
+
+/* ═══════════════════════════════════════════════════
+   Initialisation
+═══════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', function() {
+    buildAlphaBar();
+    document.getElementById('sortDateDesc').classList.add('sort-active');
+    render();
+});
+</script>
+{% endblock %}

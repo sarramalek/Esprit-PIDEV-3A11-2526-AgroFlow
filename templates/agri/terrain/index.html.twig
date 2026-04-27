@@ -1,0 +1,409 @@
+{% extends 'base_agriculteur.html.twig' %}
+{% block title %}Mes Terrains — AgroFlow{% endblock %}
+
+{% block stylesheets %}
+<style>
+.kpi-row { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-bottom:28px; }
+.kpi-card {
+    background:#fff; border-radius:12px; padding:20px 22px;
+    border:1px solid #e8e4d0; position:relative; overflow:hidden;
+}
+.kpi-card::before {
+    content:''; position:absolute; top:0; left:0;
+    width:4px; height:100%; background:#4A8C3F;
+    border-radius:4px 0 0 4px;
+}
+.kpi-card.blue::before { background:#3182ce; }
+.kpi-card.amber::before { background:#d69e2e; }
+.kpi-label { font-size:11px; font-weight:600; letter-spacing:.08em;
+             text-transform:uppercase; color:#7A8A95; margin-bottom:6px; }
+.kpi-value { font-size:26px; font-weight:700; color:#1C2B3A; line-height:1; }
+.kpi-sub { font-size:12px; color:#7A8A95; margin-top:4px; }
+.kpi-ico { position:absolute; right:18px; top:50%; transform:translateY(-50%);
+             font-size:32px; color:#4A8C3F; opacity:.08; }
+
+.action-bar { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+.action-bar h2 { font-size:20px; font-weight:700; color:#1C2B3A; }
+
+.btn-green {
+    background:#2D5A27; color:#fff; padding:10px 22px; border-radius:8px;
+    text-decoration:none; font-weight:600; font-size:13px;
+    display:inline-flex; align-items:center; gap:8px; transition:background .2s;
+}
+.btn-green:hover { background:#1B3A20; color:#fff; }
+
+.search-bar { display:flex; gap:10px; margin-bottom:18px; }
+.search-wrap { position:relative; flex:1; }
+.search-wrap input {
+    width:100%; padding:10px 14px 10px 38px;
+    border-radius:8px; border:1px solid #e8e4d0;
+    background:#fff; font-size:13px; color:#1C2B3A; outline:none;
+}
+.search-wrap input:focus { border-color:#4A8C3F; }
+.search-wrap .s-ico { position:absolute; left:12px; top:50%;
+    transform:translateY(-50%); color:#7A8A95; font-size:13px; }
+
+.filter-sel {
+    padding:10px 14px; border-radius:8px; border:1px solid #e8e4d0;
+    background:#fff; font-size:13px; color:#1C2B3A; outline:none; cursor:pointer;
+}
+
+.terrain-grid { 
+    display:grid; 
+    grid-template-columns:repeat(auto-fill,minmax(310px,1fr)); 
+    gap:18px; 
+}
+
+/* Pagination */
+.pagination-wrap { 
+    display:flex; 
+    align-items:center; 
+    justify-content:space-between; 
+    padding:20px 0; 
+    margin-top:20px; 
+    border-top:1px solid #e8e4d0; 
+    font-size:13px; 
+    flex-wrap:wrap; 
+    gap:12px; 
+}
+.pagination-info { color:#7A8A95; }
+.pagination-btns { display:flex; gap:4px; }
+.page-btn { 
+    min-width:36px; 
+    height:36px; 
+    border-radius:8px; 
+    border:1px solid #e8e4d0; 
+    background:#fff; 
+    color:#1C2B3A; 
+    font-size:13px; 
+    font-weight:600; 
+    cursor:pointer; 
+    display:inline-flex; 
+    align-items:center; 
+    justify-content:center; 
+}
+.page-btn:hover { border-color:#4A8C3F; color:#4A8C3F; }
+.page-btn.active { 
+    background:#2D5A27; 
+    color:#fff; 
+    border-color:#2D5A27; 
+}
+.page-btn:disabled { opacity:0.4; cursor:not-allowed; }
+
+.terrain-card {
+    background:#fff; border-radius:12px; border:1px solid #e8e4d0;
+    overflow:hidden; transition:box-shadow .2s, transform .2s;
+}
+.terrain-card:hover { box-shadow:0 8px 24px rgba(45,90,39,.12); transform:translateY(-2px); }
+.tc-header {
+    background:linear-gradient(135deg,#1A3A1F,#2D5A27);
+    padding:16px 18px; display:flex; justify-content:space-between; align-items:flex-start;
+}
+.tc-name { font-size:15px; font-weight:700; color:#fff; }
+.tc-loc { font-size:11px; color:rgba(255,255,255,.65); margin-top:3px; display:flex; align-items:center; gap:4px; }
+.tc-badge {
+    background:rgba(255,255,255,.15); color:#C8E6C0;
+    padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600;
+}
+.tc-body { padding:16px 18px; }
+.tc-stat-row { display:flex; gap:12px; margin-bottom:12px; }
+.tc-stat {
+    flex:1; background:#FCF8E6; border-radius:8px; padding:10px 12px; text-align:center;
+}
+.tc-stat-val { font-size:16px; font-weight:700; color:#1C2B3A; }
+.tc-stat-lbl { font-size:10px; color:#7A8A95; margin-top:2px; text-transform:uppercase; letter-spacing:.05em; }
+.ph-bar { margin-bottom:14px; }
+.ph-bar-label { display:flex; justify-content:space-between; font-size:11px; color:#7A8A95; margin-bottom:4px; }
+.ph-track { height:6px; background:#F0EAD0; border-radius:3px; }
+.ph-fill { height:100%; border-radius:3px; background:linear-gradient(90deg,#4A8C3F,#C8E6C0); }
+.tc-footer { display:flex; gap:8px; }
+.btn-sm {
+    flex:1; padding:8px; border-radius:7px; font-size:12px; font-weight:600;
+    cursor:pointer; border:none; display:inline-flex; align-items:center;
+    justify-content:center; gap:6px; text-decoration:none; transition:all .2s;
+}
+.btn-view { background:#f0fff4; color:#2D5A27; border:1px solid #C8E6C0; }
+.btn-view:hover { background:#C8E6C0; }
+.btn-edit { background:#ebf8ff; color:#2b6cb0; border:1px solid #bee3f8; }
+.btn-edit:hover { background:#bee3f8; }
+.btn-del { background:#fff5f5; color:#e53e3e; border:1px solid #fed7d7; }
+.btn-del:hover { background:#fed7d7; }
+
+.empty-state {
+    text-align:center; padding:60px 20px; background:#fff;
+    border-radius:12px; border:1px solid #e8e4d0;
+}
+.empty-state i { font-size:48px; color:#C8E6C0; margin-bottom:12px; }
+.empty-state h3 { font-size:16px; font-weight:600; color:#1C2B3A; margin-bottom:6px; }
+.empty-state p { color:#7A8A95; font-size:13px; margin-bottom:18px; }
+
+.flash-success {
+    background:#f0fff4; border:1px solid #C8E6C0; color:#276749;
+    padding:12px 18px; border-radius:8px; margin-bottom:18px;
+    display:flex; align-items:center; gap:10px; font-size:13px; font-weight:500;
+}
+.flash-error {
+    background:#fff5f5; border:1px solid #fed7d7; color:#9b2c2c;
+    padding:12px 18px; border-radius:8px; margin-bottom:18px;
+    display:flex; align-items:center; gap:10px; font-size:13px;
+}
+</style>
+{% endblock %}
+
+{% block body %}
+{% for msg in app.flashes('success') %}
+    <div class="flash-success"><i class="fa fa-circle-check"></i> {{ msg }}</div>
+{% endfor %}
+{% for msg in app.flashes('error') %}
+    <div class="flash-error"><i class="fa fa-circle-xmark"></i> {{ msg }}</div>
+{% endfor %}
+
+<div class="kpi-row">
+    <div class="kpi-card">
+        <div class="kpi-label">Mes terrains</div>
+        <div class="kpi-value">{{ totalTerrains }}</div>
+        <div class="kpi-sub">parcelles enregistrées</div>
+        <i class="fa fa-map kpi-ico"></i>
+    </div>
+    <div class="kpi-card blue">
+        <div class="kpi-label">Surface totale</div>
+        <div class="kpi-value">{{ surfaceTotale }} ha</div>
+        <div class="kpi-sub">toutes parcelles</div>
+        <i class="fa fa-ruler-combined kpi-ico" style="color:#3182ce"></i>
+    </div>
+    <div class="kpi-card amber">
+        <div class="kpi-label">pH moyen</div>
+        <div class="kpi-value">{{ pHMoyen ?? '—' }}</div>
+        <div class="kpi-sub">acidité du sol</div>
+        <i class="fa fa-flask kpi-ico" style="color:#d69e2e"></i>
+    </div>
+</div>
+
+<div class="action-bar">
+    <h2><i class="fa fa-map" style="color:#4A8C3F;margin-right:8px"></i>Mes Terrains</h2>
+    <a href="{{ path('agri_terrains_new') }}" class="btn-green">
+        <i class="fa fa-plus"></i> Ajouter un terrain
+    </a>
+</div>
+
+<div class="search-bar">
+    <div class="search-wrap">
+        <i class="fa fa-search s-ico"></i>
+        <input type="text" id="search" placeholder="Rechercher par nom ou localisation...">
+    </div>
+    <select class="filter-sel" id="filter-sol">
+        <option value="">Tous les sols</option>
+        <option>Argileux</option>
+        <option>Sableux</option>
+        <option>Limoneux</option>
+        <option>Calcaire</option>
+        <option>Humifère</option>
+    </select>
+</div>
+
+{% if terrains is empty %}
+    <div class="empty-state">
+        <i class="fa fa-map"></i>
+        <h3>Aucun terrain enregistré</h3>
+        <p>Commencez par ajouter votre première parcelle agricole.</p>
+        <a href="{{ path('agri_terrains_new') }}" class="btn-green">
+            <i class="fa fa-plus"></i> Ajouter un terrain
+        </a>
+    </div>
+{% else %}
+    <div class="terrain-grid" id="terrain-grid">
+        {% for terrain in terrains %}
+        <div class="terrain-card"
+             data-nom="{{ terrain.nomTerrain|lower }}"
+             data-loc="{{ terrain.localisation|lower }}"
+             data-sol="{{ terrain.typeSol }}">
+            <div class="tc-header">
+                <div>
+                    <div class="tc-name">{{ terrain.nomTerrain }}</div>
+                    <div class="tc-loc">
+                        <i class="fa fa-location-dot"></i>
+                        {{ terrain.localisation }}
+                    </div>
+                </div>
+                <span class="tc-badge">{{ terrain.typeSol }}</span>
+            </div>
+            <div class="tc-body">
+                <div class="tc-stat-row">
+                    <div class="tc-stat">
+                        <div class="tc-stat-val">{{ terrain.surface }} ha</div>
+                        <div class="tc-stat-lbl">Surface</div>
+                    </div>
+                    <div class="tc-stat">
+                        <div class="tc-stat-val">{{ terrain.pH ?? '—' }}</div>
+                        <div class="tc-stat-lbl">pH</div>
+                    </div>
+                    <div class="tc-stat">
+                        <div class="tc-stat-val">{{ terrain.rotations|length }}</div>
+                        <div class="tc-stat-lbl">Rotations</div>
+                    </div>
+                </div>
+                {% if terrain.pH %}
+                <div class="ph-bar">
+                    <div class="ph-bar-label">
+                        <span>Acidité (pH)</span>
+                        <span>{{ terrain.pH }}/14</span>
+                    </div>
+                    <div class="ph-track">
+                        <div class="ph-fill" style="width:{{ ((terrain.pH / 14) * 100)|round }}%"></div>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="tc-footer">
+                    <a href="{{ path('agri_terrains_show', {id: terrain.id}) }}" class="btn-sm btn-view">
+                        <i class="fa fa-eye"></i> Voir
+                    </a>
+                    <a href="{{ path('agri_terrains_edit', {id: terrain.id}) }}" class="btn-sm btn-edit">
+                        <i class="fa fa-pen"></i> Modifier
+                    </a>
+                    <a href="{{ path('agri_terrains_certificat_propriete', {id: terrain.id}) }}"
+                       class="btn-sm btn-view"
+                       target="_blank"
+                       style="background:#2D5A27; color:#fff; border:1px solid #1e3f1f;">
+                        <i class="fa fa-file-pdf"></i> PDF
+                    </a>
+                    <form method="post" action="{{ path('agri_terrains_delete', {id: terrain.id}) }}"
+                          onsubmit="return confirm('Supprimer ce terrain ?')">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete'~terrain.id) }}">
+                        <button type="submit" class="btn-sm btn-del">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {# PAGINATION #}
+    <div class="pagination-wrap">
+        <div class="pagination-info" id="paginationInfo"></div>
+        <div class="pagination-btns" id="paginationBtns"></div>
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+
+<script>
+// Variables globales
+let allCards = [];
+let filteredCards = [];
+let currentPage = 1;
+let perPage = 9;   // 9 cartes par page (idéal pour grille 3 colonnes)
+
+const searchInput = document.getElementById('search');
+const filterSol = document.getElementById('filter-sol');
+const grid = document.getElementById('terrain-grid');
+
+window.addEventListener('DOMContentLoaded', () => {
+    if (!grid) return;
+    allCards = Array.from(grid.querySelectorAll('.terrain-card'));
+    applyFilterAndPaginate();
+});
+
+// Filtrage + Pagination
+function applyFilterAndPaginate() {
+    const q = searchInput.value.toLowerCase().trim();
+    const sol = filterSol.value;
+
+    filteredCards = allCards.filter(card => {
+        const nom = card.dataset.nom || '';
+        const loc = card.dataset.loc || '';
+        const cardSol = card.dataset.sol || '';
+
+        const matchSearch = !q || nom.includes(q) || loc.includes(q);
+        const matchSol = !sol || cardSol === sol;
+
+        return matchSearch && matchSol;
+    });
+
+    currentPage = 1;
+    renderPage();
+}
+
+searchInput?.addEventListener('input', applyFilterAndPaginate);
+filterSol?.addEventListener('change', applyFilterAndPaginate);
+
+function renderPage() {
+    const total = filteredCards.length;
+    const totalPages = Math.max(1, Math.ceil(total / perPage));
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    const start = (currentPage - 1) * perPage;
+    const end = Math.min(start + perPage, total);
+
+    // Masquer toutes les cartes
+    allCards.forEach(card => card.style.display = 'none');
+
+    // Afficher seulement celles de la page courante
+    filteredCards.slice(start, end).forEach(card => {
+        card.style.display = '';
+    });
+
+    // Mise à jour info
+    const info = document.getElementById('paginationInfo');
+    if (info) {
+        info.textContent = total === 0 
+            ? 'Aucun terrain trouvé' 
+            : `${start + 1}–${end} sur ${total} terrain${total > 1 ? 's' : ''}`;
+    }
+
+    renderPaginationBtns(totalPages);
+}
+
+function renderPaginationBtns(totalPages) {
+    const wrap = document.getElementById('paginationBtns');
+    if (!wrap) return;
+    wrap.innerHTML = '';
+
+    const mkBtn = (label, page, disabled, active) => {
+        const b = document.createElement('button');
+        b.className = 'page-btn' + (active ? ' active' : '');
+        b.innerHTML = label;
+        b.disabled = disabled;
+        if (!disabled) {
+            b.addEventListener('click', () => {
+                currentPage = page;
+                renderPage();
+            });
+        }
+        return b;
+    };
+
+    // Précédent
+    wrap.appendChild(mkBtn('<i class="fa fa-chevron-left"></i>', currentPage - 1, currentPage === 1, false));
+
+    // Pages
+    let pages = [];
+    if (totalPages <= 7) {
+        for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+        pages = [1];
+        if (currentPage > 3) pages.push('…');
+        for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) pages.push(i);
+        if (currentPage < totalPages - 2) pages.push('…');
+        pages.push(totalPages);
+    }
+
+    pages.forEach(p => {
+        if (p === '…') {
+            const sp = document.createElement('span');
+            sp.textContent = '…';
+            sp.style.cssText = 'padding:0 8px; color:#7A8A95; line-height:36px;';
+            wrap.appendChild(sp);
+        } else {
+            wrap.appendChild(mkBtn(p, p, false, p === currentPage));
+        }
+    });
+
+    // Suivant
+    wrap.appendChild(mkBtn('<i class="fa fa-chevron-right"></i>', currentPage + 1, currentPage === totalPages, false));
+}
+</script>
+{% endblock %}

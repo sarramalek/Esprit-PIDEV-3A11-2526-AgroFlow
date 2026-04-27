@@ -1,0 +1,350 @@
+{# templates/machines/statistiques.html.twig #}
+{% extends 'agriculteur_dashboard.html.twig' %}
+{% block title %}Statistiques des machines — AgroFlow{% endblock %}
+
+{% block body %}
+<style>
+    :root {
+        --green-dark:  #2d5a1b;
+        --green-mid:   #3a7a22;
+        --green-light: #f0f7eb;
+        --green-border:#c8e6b0;
+        --text-dark:   #1a2e10;
+        --text-mid:    #4a6741;
+        --text-light:  #7a9b6a;
+        --shadow:      0 4px 16px rgba(45,90,27,.10);
+        --white:       #ffffff;
+        --cream:       #f8fdf4;
+    }
+    * { box-sizing: border-box; }
+
+    .stats-page { max-width: 1300px; margin: 0 auto; padding: 1.5rem; }
+
+    /* ── Header ── */
+    .page-header {
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;
+    }
+    .page-header h1 { margin: 0; font-size: 1.8rem; font-weight: 700; color: var(--text-dark); }
+
+    /* ── Buttons ── */
+    .btn {
+        display: inline-flex; align-items: center; gap: .45rem;
+        padding: .6rem 1.3rem; border-radius: 10px; font-weight: 600;
+        font-size: .88rem; text-decoration: none; cursor: pointer;
+        border: none; font-family: inherit; transition: all .18s;
+    }
+    .btn-primary   { background: var(--green-dark); color: #fff; }
+    .btn-primary:hover { background: #1f4012; transform: translateY(-1px); box-shadow: 0 3px 10px rgba(45,90,27,.25); }
+    .btn-secondary { background: var(--green-light); color: var(--green-dark); border: 1px solid var(--green-border); }
+    .btn-secondary:hover { background: #dff0d3; }
+
+    /* ── KPI cards row ── */
+    .kpi-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.2rem;
+        margin-bottom: 1.8rem;
+    }
+    .kpi-card {
+        background: var(--white);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+    .kpi-header {
+        background: var(--green-dark);
+        padding: .7rem 1.1rem .55rem;
+    }
+    .kpi-header-label {
+        font-size: .7rem; font-weight: 700; text-transform: uppercase;
+        letter-spacing: .5px; color: #b5d9a0;
+    }
+    .kpi-body { padding: .9rem 1.1rem 1rem; text-align: center; }
+    .kpi-value { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); line-height: 1; }
+    .kpi-sub   { font-size: .78rem; color: var(--text-light); margin-top: .3rem; }
+    .kpi-extra { font-size: .8rem; color: var(--text-mid); margin-top: .5rem; font-weight: 600; }
+
+    /* ── Charts grid ── */
+    .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 1.4rem;
+        margin-bottom: 1.8rem;
+    }
+    .chart-card {
+        background: var(--white);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+    .chart-card-header {
+        background: var(--green-dark);
+        padding: .75rem 1.2rem .6rem;
+        font-size: .75rem; font-weight: 700;
+        text-transform: uppercase; letter-spacing: .5px; color: #b5d9a0;
+    }
+    .chart-card-body { padding: 1.2rem; }
+    canvas { max-height: 260px; width: 100% !important; }
+
+    /* ── Maintenance tables ── */
+    .maint-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.4rem;
+        margin-bottom: 1.8rem;
+    }
+    .maint-card {
+        background: var(--white);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+    .maint-header {
+        padding: .75rem 1.2rem .6rem;
+        font-size: .75rem; font-weight: 700;
+        text-transform: uppercase; letter-spacing: .5px; color: #b5d9a0;
+    }
+    .maint-header-danger  { background: #8b1a1a; }
+    .maint-header-warning { background: #7a5700; }
+    .maint-header-ok      { background: var(--green-dark); }
+
+    .maint-body { padding: 0; }
+    .maint-row {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: .7rem 1.2rem; border-bottom: 1px solid #eef5e8; font-size: .88rem;
+    }
+    .maint-row:last-child { border-bottom: none; }
+    .maint-name  { font-weight: 600; color: var(--text-dark); }
+    .maint-date  { font-weight: 700; color: var(--green-dark); }
+    .maint-date-danger { color: #c53030; }
+    .maint-empty { text-align: center; padding: 1.4rem; color: var(--text-light); font-size: .88rem; }
+
+    /* ── State badges ── */
+    .badge { padding: .28rem .85rem; border-radius: 50px; font-size: .78rem; font-weight: 700; white-space: nowrap; }
+    .badge-neuf     { background: #d4edda; color: #155724; }
+    .badge-bon      { background: #cce5ff; color: #004085; }
+    .badge-occasion { background: #fff3cd; color: #856404; }
+    .badge-panne    { background: #f8d7da; color: #721c24; }
+
+    /* ── Etat / marque breakdown ── */
+    .breakdown-card {
+        background: var(--white);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+    .breakdown-row {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: .65rem 1.2rem; border-bottom: 1px solid #eef5e8; font-size: .88rem;
+    }
+    .breakdown-row:last-child { border-bottom: none; }
+    .breakdown-val { font-weight: 700; color: var(--green-dark); font-size: 1rem; }
+
+    @media (max-width: 768px) {
+        .stats-page { padding: 1rem; }
+        .kpi-row, .charts-grid, .maint-grid { grid-template-columns: 1fr; }
+    }
+</style>
+
+<div class="stats-page">
+
+    {# ── Header ── #}
+    <div class="page-header">
+        <h1>📊 Statistiques des machines</h1>
+        <div style="display:flex;gap:.7rem;flex-wrap:wrap;">
+            <a href="{{ path('agri_machine_statistiques_pdf') }}" class="btn btn-primary" target="_blank">
+                📄 Exporter en PDF
+            </a>
+            <a href="{{ path('agri_machines') }}" class="btn btn-secondary">
+                ← Retour aux machines
+            </a>
+        </div>
+    </div>
+
+    {# ── KPI cards ── #}
+    <div class="kpi-row">
+        <div class="kpi-card">
+            <div class="kpi-header"><span class="kpi-header-label">📦 Total</span></div>
+            <div class="kpi-body">
+                <div class="kpi-value">{{ stats.total }}</div>
+                <div class="kpi-sub">machines enregistrées</div>
+            </div>
+        </div>
+
+        <div class="kpi-card">
+            <div class="kpi-header"><span class="kpi-header-label">📊 Kilométrage total</span></div>
+            <div class="kpi-body">
+                <div class="kpi-value">{{ stats.totalKm|default(0)|number_format(0,',',' ') }}</div>
+                <div class="kpi-sub">km parcourus</div>
+                <div class="kpi-extra">Moy. {{ stats.moyenneKm|default(0)|number_format(0,',',' ') }} km / machine</div>
+            </div>
+        </div>
+
+        {# Compteur par état #}
+        {% for etat, nb in stats.parEtat %}
+            {% if loop.index <= 2 %}
+            <div class="kpi-card">
+                <div class="kpi-header"><span class="kpi-header-label">{{ etat }}</span></div>
+                <div class="kpi-body">
+                    <div class="kpi-value">{{ nb }}</div>
+                    <div class="kpi-sub">machine{{ nb > 1 ? 's' : '' }}</div>
+                    {% if etat == 'Neuf' %}     <div style="margin-top:.5rem;"><span class="badge badge-neuf">Neuf</span></div>
+                    {% elseif etat == 'Bon' %}  <div style="margin-top:.5rem;"><span class="badge badge-bon">Bon</span></div>
+                    {% elseif etat == 'Occasion' %} <div style="margin-top:.5rem;"><span class="badge badge-occasion">Occasion</span></div>
+                    {% else %}                  <div style="margin-top:.5rem;"><span class="badge badge-panne">{{ etat }}</span></div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    {# ── Graphiques ── #}
+    <div class="charts-grid">
+        <div class="chart-card">
+            <div class="chart-card-header">🔄 Répartition par état</div>
+            <div class="chart-card-body">
+                {% if etatLabels|length > 0 %}
+                    <canvas id="etatChart"></canvas>
+                {% else %}
+                    <div class="maint-empty">Aucune donnée disponible</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-card-header">🏭 Répartition par marque</div>
+            <div class="chart-card-body">
+                {% if marqueLabels|length > 0 %}
+                    <canvas id="marqueChart"></canvas>
+                {% else %}
+                    <div class="maint-empty">Aucune donnée disponible</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {# ── Breakdown détaillé état + marque ── #}
+    <div class="charts-grid">
+        <div class="breakdown-card">
+            <div class="chart-card-header">📋 Détail par état</div>
+            {% if stats.parEtat|length > 0 %}
+                {% for etat, nb in stats.parEtat %}
+                <div class="breakdown-row">
+                    {% if etat == 'Neuf' %}     <span class="badge badge-neuf">Neuf</span>
+                    {% elseif etat == 'Bon' %}  <span class="badge badge-bon">Bon</span>
+                    {% elseif etat == 'Occasion' %} <span class="badge badge-occasion">Occasion</span>
+                    {% else %}                  <span class="badge badge-panne">{{ etat }}</span>
+                    {% endif %}
+                    <span class="breakdown-val">{{ nb }} machine{{ nb > 1 ? 's' : '' }}</span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="maint-empty">Aucune donnée</div>
+            {% endif %}
+        </div>
+
+        <div class="breakdown-card">
+            <div class="chart-card-header">🏭 Détail par marque</div>
+            {% if stats.parMarque|length > 0 %}
+                {% for marque, nb in stats.parMarque %}
+                <div class="breakdown-row">
+                    <span style="font-weight:600;color:var(--text-dark);">{{ marque }}</span>
+                    <span class="breakdown-val">{{ nb }}</span>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="maint-empty">Aucune donnée</div>
+            {% endif %}
+        </div>
+    </div>
+
+    {# ── Maintenance cards ── #}
+    <div class="maint-grid">
+        <div class="maint-card">
+            <div class="maint-header maint-header-danger">⚠️ Maintenances dépassées</div>
+            <div class="maint-body">
+                {% if maintenancesDepassees|default([])|length > 0 %}
+                    {% for m in maintenancesDepassees %}
+                    <div class="maint-row">
+                        <span class="maint-name">{{ m.nom }}</span>
+                        <span class="maint-date maint-date-danger">Dép. {{ m.prochaineMaintenance|date('d/m/Y') }}</span>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="maint-empty">✅ Aucune maintenance dépassée</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="maint-card">
+            <div class="maint-header maint-header-warning">🔧 Maintenances à venir (30 j)</div>
+            <div class="maint-body">
+                {% if maintenancesAVenir|default([])|length > 0 %}
+                    {% for m in maintenancesAVenir %}
+                    <div class="maint-row">
+                        <span class="maint-name">{{ m.nom }}</span>
+                        <span class="maint-date">{{ m.prochaineMaintenance|date('d/m/Y') }}</span>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="maint-empty">✅ Aucune maintenance prévue dans 30 jours</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+{% if etatLabels|length > 0 %}
+new Chart(document.getElementById('etatChart').getContext('2d'), {
+    type: 'doughnut',
+    data: {
+        labels: {{ etatLabels|json_encode|raw }},
+        datasets: [{
+            data: {{ etatValues|json_encode|raw }},
+            backgroundColor: ['#2d5a1b','#5a9e3a','#a8d48a','#d4a373','#e9c46a','#f4a261'],
+            borderWidth: 0,
+            hoverOffset: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        cutout: '60%',
+        plugins: {
+            legend: { position: 'bottom', labels: { padding: 16, font: { size: 12 } } }
+        }
+    }
+});
+{% endif %}
+
+{% if marqueLabels|length > 0 %}
+new Chart(document.getElementById('marqueChart').getContext('2d'), {
+    type: 'bar',
+    data: {
+        labels: {{ marqueLabels|json_encode|raw }},
+        datasets: [{
+            label: 'Machines',
+            data: {{ marqueValues|json_encode|raw }},
+            backgroundColor: '#2d5a1b',
+            borderRadius: 8,
+            borderSkipped: false
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            y: { beginAtZero: true, ticks: { stepSize: 1, color: '#7a9b6a' }, grid: { color: '#eef5e8' } },
+            x: { ticks: { color: '#4a6741' }, grid: { display: false } }
+        }
+    }
+});
+{% endif %}
+</script>
+{% endblock %}

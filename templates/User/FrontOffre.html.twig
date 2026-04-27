@@ -1,0 +1,408 @@
+{% extends 'base_agriculteur.html.twig' %}
+{% block title %}Offres - AgroFlow{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .front-wrapper { padding: 35px 40px; font-family: Arial, sans-serif; background: #F4F6F9; min-height: 100vh; }
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+    .page-header h2 { margin: 0; color: #2C3E50; font-size: 24px; }
+    .page-header p { margin: 4px 0 0; color: #999; font-size: 13px; }
+    .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .offre-card { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; }
+    .offre-card:hover { transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,0,0,0.10); }
+    .offre-card.souscrite { border: 2px solid #2D5A27; }
+    .card-top { padding: 20px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; gap: 14px; }
+    .card-icon { width: 48px; height: 48px; border-radius: 12px; background: #EAF3DE; color: #2D5A27; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .card-title { font-weight: 700; color: #2C3E50; font-size: 15px; margin: 0 0 3px; }
+    .card-sub { font-size: 12px; color: #aaa; margin: 0; }
+    .card-body { padding: 16px 20px; flex: 1; }
+    .info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 13px; }
+    .info-row:last-child { margin-bottom: 0; }
+    .info-label { color: #aaa; }
+    .info-value { font-weight: 600; color: #2C3E50; }
+    .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+    .badge-green { background: #EAF3DE; color: #3B6D11; }
+    .badge-gray  { background: #f0f0f0; color: #666; }
+    .card-footer { padding: 14px 20px; border-top: 1px solid #f0f0f0; }
+    .btn-souscrire { width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; background: #2D5A27; color: white; padding: 11px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; transition: background 0.2s; text-decoration: none; }
+    .btn-souscrire:hover { background: #1e3d1a; }
+    .btn-souscrite { width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; background: #EAF3DE; color: #3B6D11; padding: 11px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; border: none; cursor: default; }
+    .stats-bar { display: flex; gap: 16px; margin-bottom: 28px; }
+    .stat-chip { background: white; border-radius: 10px; padding: 12px 20px; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); font-size: 13px; }
+    .stat-chip i { color: #2D5A27; font-size: 16px; }
+    .stat-chip strong { color: #2C3E50; font-size: 16px; }
+    .stat-chip span { color: #aaa; }
+    .prix-highlight { font-size: 22px; font-weight: 800; color: #2D5A27; }
+    .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; color: #ccc; text-align: center; background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+    .empty-state i { font-size: 50px; margin-bottom: 20px; }
+
+    {# ── Pagination ── #}
+    .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 36px; }
+    .pagination a, .pagination span {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: 38px; height: 38px; border-radius: 10px; font-size: 14px; font-weight: 600;
+        text-decoration: none; transition: all 0.2s;
+    }
+    .pagination a { background: white; color: #2C3E50; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+    .pagination a:hover { background: #2D5A27; color: white; }
+    .pagination span.active { background: #2D5A27; color: white; box-shadow: 0 2px 8px rgba(45,90,39,0.3); }
+    .pagination span.dots { background: transparent; color: #aaa; box-shadow: none; cursor: default; }
+    .pagination-info { text-align: center; margin-top: 12px; font-size: 13px; color: #aaa; }
+
+    @media (max-width: 900px) { .cards-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .cards-grid { grid-template-columns: 1fr; } .front-wrapper { padding: 20px; } }
+</style>
+{% endblock %}
+
+{% block body %}
+{# ── Alerte code promo du jour ── #}
+<div id="promoAlert" style="
+    display: flex; align-items: center; gap: 18px;
+    background: linear-gradient(135deg, #fffbe6, #fff3cc);
+    border: 2px solid #f5c518;
+    border-radius: 14px;
+    padding: 20px 28px;
+    margin-bottom: 28px;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(245,197,24,0.15);
+">
+    <div style="font-size: 36px;">🎁</div>
+    <div style="flex: 1;">
+        <div style="font-size: 12px; font-weight: 700; color: #b8860b;
+                    text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">
+            🌟 Offre du jour — valable uniquement aujourd'hui !
+        </div>
+        <div style="font-size: 18px; font-weight: 700; color: #2C3E50; margin-bottom: 6px;">
+            Bénéficiez de <span style="color: #e67e22; font-size: 22px;">{{ reduction }}% de réduction</span>
+            sur votre prochaine inscription
+        </div>
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <div style="
+                background: white;
+                border: 2px dashed #f5c518;
+                border-radius: 10px;
+                padding: 8px 18px;
+                font-family: monospace;
+                font-size: 20px;
+                font-weight: 700;
+                color: #2D5A27;
+                letter-spacing: 3px;
+                cursor: pointer;
+                user-select: all;
+            " onclick="copyPromo(this)" title="Cliquez pour copier">
+                {{ codePromo }}
+            </div>
+            <button onclick="copyPromo(document.querySelector('[onclick^=copyPromo]'))"
+                    style="background: #f5c518; border: none; border-radius: 8px;
+                           padding: 9px 18px; font-size: 13px; font-weight: 700;
+                           cursor: pointer; display: flex; align-items: center; gap: 7px;
+                           color: #2C3E50; transition: background 0.2s;"
+                    onmouseover="this.style.background='#e6b800'"
+                    onmouseout="this.style.background='#f5c518'">
+                <i class="fa fa-copy"></i> Copier
+            </button>
+            <span style="font-size: 12px; color: #aaa;" id="promoCopyMsg"></span>
+        </div>
+        <div style="font-size: 12px; color: #aaa; margin-top: 8px;">
+            <i class="fa fa-clock"></i>
+            Expire à minuit — un nouveau code sera généré demain
+        </div>
+    </div>
+
+    {# Bouton fermer #}
+    <button onclick="document.getElementById('promoAlert').style.display='none'"
+            style="position: absolute; top: 12px; right: 14px;
+                   background: none; border: none; font-size: 18px;
+                   color: #aaa; cursor: pointer; line-height: 1;"
+            title="Fermer">✕</button>
+</div>
+<div class="front-wrapper">
+
+    {# ── Header ── #}
+    <div class="page-header">
+        <div>
+            <p style="margin:0 0 4px; color:#999; font-size:13px;">
+                <i class="fa fa-home"></i> Front Office &rsaquo; <strong style="color:#2C3E50;">Offres</strong>
+            </p>
+            <h2>Offres Disponibles</h2>
+        </div>
+    </div>
+
+    {# ── Stats ── #}
+    <div class="stats-bar">
+        <div class="stat-chip">
+            <i class="fa fa-star"></i>
+            <div><strong>{{ total }}</strong><br><span>Offres disponibles</span></div>
+        </div>
+        <div class="stat-chip">
+            <i class="fa fa-crown" style="color:#2D5A27;"></i>
+            <div><strong>{{ offresSouscrites|length }}</strong><br><span>Souscrites</span></div>
+        </div>
+    </div>
+
+    {# ── Suggestion ── #}
+    {% if offreSuggereee is defined and offreSuggereee %}
+    <div style="background:linear-gradient(135deg,#f0fae8,#e6f4dc);border:2px solid #2D5A27;border-radius:14px;padding:24px 28px;margin-bottom:30px;display:flex;align-items:center;gap:24px;">
+        <div style="font-size:40px;">🌱</div>
+        <div style="flex:1;">
+            <div style="font-size:11px;font-weight:700;color:#2D5A27;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">
+                Offre recommandée pour vous
+            </div>
+            <div style="font-size:20px;font-weight:700;color:#2C3E50;margin-bottom:4px;">
+                {{ offreSuggereee.nomOffre }}
+            </div>
+            <div style="font-size:13px;color:#666;margin-bottom:8px;">
+                {{ raisonSuggestion }}
+            </div>
+            <div style="display:flex;gap:16px;align-items:center;">
+                <span style="font-size:22px;font-weight:800;color:#2D5A27;">
+                    {{ offreSuggereee.prix|number_format(2) }} TND
+                </span>
+                <span style="background:#e0f0d8;color:#2D5A27;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;">
+                    {{ offreSuggereee.dureeOffre }} jours
+                </span>
+            </div>
+        </div>
+       <form method="post" action="{{ path('app_offre_souscrire', {id: offreSuggereee.idOffres}) }}"
+      onsubmit="return confirm('Confirmer l\'inscription ?')">
+    <input type="hidden" name="code_promo" id="promoInputSuggestion" value="">
+    <button type="submit" class="btn-souscrire" style="width:auto;padding:12px 22px;"
+            onclick="document.getElementById('promoInputSuggestion').value = document.getElementById('promoGlobalInput').value">
+        <i class="fa fa-crown"></i> S'inscrire
+    </button>
+</form>
+    </div>
+    {% endif %}
+
+    {# ── Cards ── #}
+    {% if offres is empty %}
+        <div class="empty-state">
+            <i class="fa fa-star"></i>
+            <p>Aucune offre disponible pour le moment.</p>
+        </div>
+    {% else %}
+    {# ── Saisie code promo ── #}
+<div style="
+    background: white; border-radius: 12px;
+    padding: 16px 22px; margin-bottom: 22px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+">
+    <i class="fa fa-ticket" style="color: #f5c518; font-size: 18px;"></i>
+    <div style="font-size: 13px; font-weight: 600; color: #2C3E50;">
+        Code promo :
+    </div>
+    <input type="text" id="promoGlobalInput"
+           placeholder="ex: {{ codePromo }}"
+           maxlength="11"
+           style="
+               flex: 1; min-width: 160px; max-width: 220px;
+               border: 2px solid #e8e8e8; border-radius: 8px;
+               padding: 9px 14px; font-size: 14px; font-weight: 600;
+               font-family: monospace; letter-spacing: 2px;
+               text-transform: uppercase; outline: none;
+               transition: border 0.2s;
+           "
+           oninput="this.value = this.value.toUpperCase()"
+           onfocus="this.style.borderColor='#f5c518'"
+           onblur="this.style.borderColor='#e8e8e8'">
+    <button onclick="applyPromo()"
+            style="background: #2D5A27; color: white; border: none;
+                   border-radius: 8px; padding: 9px 18px;
+                   font-size: 13px; font-weight: 600; cursor: pointer;
+                   transition: background 0.2s;"
+            onmouseover="this.style.background='#1e3d1a'"
+            onmouseout="this.style.background='#2D5A27'">
+        <i class="fa fa-check"></i> Appliquer
+    </button>
+    <span id="promoStatus" style="font-size: 13px; font-weight: 600;"></span>
+</div>
+        <div class="cards-grid">
+            {% for offre in offres %}
+                {% set souscrite = offre.idOffres in offresSouscrites %}
+                <div class="offre-card {{ souscrite ? 'souscrite' : '' }}">
+
+                    <div class="card-top">
+                        <div class="card-icon">
+                            <i class="fa fa-{{ souscrite ? 'check-circle' : 'star' }}"></i>
+                        </div>
+                        <div>
+                            <p class="card-title">{{ offre.nomOffre }}</p>
+                            <p class="card-sub">Offre #{{ offre.idOffres }}</p>
+                        </div>
+                        {% if souscrite %}
+                            <span class="badge badge-green" style="margin-left:auto;">
+                                <i class="fa fa-check"></i> Souscrite
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    <div class="card-body">
+                        <div class="info-row">
+                            <span class="info-label"><i class="fa fa-money-bill"></i> Prix</span>
+                            <span class="prix-highlight">{{ offre.prix|number_format(2) }} TND</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label"><i class="fa fa-clock"></i> Durée</span>
+                            <span class="info-value">{{ offre.dureeOffre }} jours</span>
+                        </div>
+                        {% if offre.description %}
+                        <div class="info-row" style="align-items:flex-start; margin-top:8px;">
+                            <span class="info-label"><i class="fa fa-info-circle"></i> Description</span>
+                            <span class="info-value" style="text-align:right; max-width:65%; font-size:12px; color:#888;">
+                                {{ offre.description|length > 80 ? offre.description|slice(0,80) ~ '...' : offre.description }}
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="card-footer">
+                        {% if souscrite %}
+                            <div class="btn-souscrite">
+                                <i class="fa fa-check-circle"></i> Déjà souscrite
+                            </div>
+                        {% else %}
+                            <form method="post" action="{{ path('app_offre_souscrire', {id: offre.idOffres}) }}"
+      onsubmit="return confirm('Confirmer l\'inscription à l\'offre {{ offre.nomOffre }} ?')">
+    <input type="hidden" name="code_promo" class="promo-hidden-input" value="">
+    <button type="submit" class="btn-souscrire"
+            onclick="this.form.querySelector('.promo-hidden-input').value = document.getElementById('promoGlobalInput').value">
+        <i class="fa fa-crown"></i> S'inscrire
+    </button>
+</form>
+                        {% endif %}
+                    </div>
+
+                </div>
+            {% endfor %}
+        </div>
+
+        {# ── Pagination ── #}
+        {% if totalPages > 1 %}
+        <div class="pagination">
+
+            {# Précédent #}
+            {% if page > 1 %}
+                <a href="{{ path('app_offre_front', {page: page - 1}) }}">
+                    <i class="fa fa-chevron-left"></i>
+                </a>
+            {% endif %}
+
+            {# Pages #}
+            {% for p in 1..totalPages %}
+                {% if p == page %}
+                    <span class="active">{{ p }}</span>
+                {% elseif p == 1 or p == totalPages or (p >= page - 2 and p <= page + 2) %}
+                    <a href="{{ path('app_offre_front', {page: p}) }}">{{ p }}</a>
+                {% elseif p == page - 3 or p == page + 3 %}
+                    <span class="dots">…</span>
+                {% endif %}
+            {% endfor %}
+
+            {# Suivant #}
+            {% if page < totalPages %}
+                <a href="{{ path('app_offre_front', {page: page + 1}) }}">
+                    <i class="fa fa-chevron-right"></i>
+                </a>
+            {% endif %}
+
+        </div>
+        <div class="pagination-info">
+            Page {{ page }} sur {{ totalPages }} — {{ total }} offre(s) au total
+        </div>
+        {% endif %}
+
+    {% endif %}
+
+</div>
+
+{% if app.flashes('success') %}
+<div style="position:fixed; bottom:24px; right:24px; background:#2D5A27; color:white; padding:14px 22px; border-radius:10px; box-shadow:0 4px 20px rgba(0,0,0,0.2); font-size:14px; font-weight:600; z-index:9999; display:flex; align-items:center; gap:10px;">
+    <i class="fa fa-check-circle"></i>
+    {% for msg in app.flashes('success') %}{{ msg }}{% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}
+{% block javascripts %}
+<script>
+// ── Copier le code promo ──
+function copyPromo(el) {
+    const text = el.textContent.trim();
+    navigator.clipboard.writeText(text).then(() => {
+        document.getElementById('promoCopyMsg').textContent = '✓ Copié !';
+        // Auto-remplit le champ de saisie
+        const input = document.getElementById('promoGlobalInput');
+        if (input) {
+            input.value = text;
+            applyPromo();
+        }
+        setTimeout(() => {
+            document.getElementById('promoCopyMsg').textContent = '';
+        }, 2000);
+    });
+}
+
+// ── Vérifier le code saisi ──
+const PROMO_CODE      = '{{ codePromo }}';
+const PROMO_REDUCTION = {{ reduction }};
+
+function applyPromo() {
+    const input  = document.getElementById('promoGlobalInput');
+    const status = document.getElementById('promoStatus');
+    const val    = input.value.trim().toUpperCase();
+
+    if (val === '') {
+        status.textContent = '';
+        return;
+    }
+
+    if (val === PROMO_CODE) {
+        status.innerHTML = `<span style="color:#2D5A27;">
+            <i class="fa fa-check-circle"></i>
+            Code valide — ${PROMO_REDUCTION}% de réduction appliquée !
+        </span>`;
+        input.style.borderColor = '#2D5A27';
+
+        // Mettre à jour les prix affichés sur les cards
+        document.querySelectorAll('.prix-highlight').forEach(el => {
+            const original = parseFloat(el.dataset.original || el.textContent);
+            el.dataset.original = original;
+            const reduit = (original * (1 - PROMO_REDUCTION / 100)).toFixed(2);
+            el.innerHTML = `
+                <span style="text-decoration:line-through;color:#aaa;font-size:14px;">
+                    ${original.toFixed(2)} TND
+                </span>
+                <span style="color:#e67e22;"> ${reduit} TND</span>
+            `;
+        });
+    } else {
+        status.innerHTML = `<span style="color:#e74c3c;">
+            <i class="fa fa-times-circle"></i> Code invalide ou expiré
+        </span>`;
+        input.style.borderColor = '#e74c3c';
+
+        // Remettre les prix originaux
+        document.querySelectorAll('.prix-highlight').forEach(el => {
+            if (el.dataset.original) {
+                el.textContent = parseFloat(el.dataset.original).toFixed(2) + ' TND';
+            }
+        });
+    }
+}
+
+// ── Auto-remplir si code déjà copié (localStorage) ──
+document.addEventListener('DOMContentLoaded', () => {
+    // Optionnel : mémoriser le code entre les pages
+    const saved = sessionStorage.getItem('promoCode');
+    if (saved) {
+        const input = document.getElementById('promoGlobalInput');
+        if (input) { input.value = saved; applyPromo(); }
+    }
+
+    document.getElementById('promoGlobalInput')?.addEventListener('input', () => {
+        sessionStorage.setItem('promoCode', document.getElementById('promoGlobalInput').value);
+    });
+});
+</script>
+{% endblock %}

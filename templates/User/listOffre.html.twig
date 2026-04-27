@@ -1,0 +1,322 @@
+{% extends 'base_admin.html.twig' %}
+{% block title %}Offres - AgroFlow{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .page-wrapper { padding: 35px 40px; font-family: Arial, sans-serif; background: #F4F6F9; min-height: 100vh; }
+    .btn-new { background: #2D5A27; color: white; padding: 12px 24px; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; transition: background 0.3s; }
+    .btn-new:hover { background: #1e3d1a; }
+    .stats-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 16px; margin-bottom: 35px; }
+    .stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 16px; border-left: 5px solid; }
+    .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .stat-label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: .05em; margin: 0 0 4px; }
+    .stat-value { font-size: 22px; font-weight: 700; margin: 0; }
+    .search-wrapper { display: flex; justify-content: center; margin-bottom: 30px; }
+    .search-box { display: flex; align-items: center; gap: 12px; background: white; padding: 14px 24px; border-radius: 50px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); width: 100%; max-width: 600px; border: 2px solid transparent; transition: border 0.3s, box-shadow 0.3s; }
+    .search-box:focus-within { border-color: #2D5A27; box-shadow: 0 4px 20px rgba(45,90,39,0.15); }
+    .search-input { flex: 1; border: none; outline: none; font-size: 15px; color: #333; background: transparent; font-family: Arial, sans-serif; }
+    .search-input::placeholder { color: #bbb; }
+    .table-card { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); overflow: hidden; }
+    .table-card-header { padding: 20px 25px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+    .offre-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .offre-table th { padding: 14px 16px; background: #fafafa; color: #999; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; border-bottom: 1px solid #f0f0f0; }
+    .offre-table td { padding: 18px 16px; border-bottom: 1px solid #f8f8f8; vertical-align: middle; }
+    .offre-table tr:last-child td { border-bottom: none; }
+    .offre-table tbody tr:hover td { background: #FAFDF8; }
+    .th-link { display: flex; align-items: center; gap: 5px; text-decoration: none; color: #999; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; transition: color 0.2s; }
+    .th-link:hover, .th-link.active { color: #2D5A27; }
+    .action-btn { width: 32px; height: 32px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; font-size: 14px; transition: all 0.2s; border: none; cursor: pointer; background: #f5f5f5; }
+    .action-btn:hover { transform: translateY(-1px); }
+    .action-view  { color: #7f8c8d; } .action-view:hover  { background: #ecf0f1; }
+    .action-edit  { color: #3498db; } .action-edit:hover  { background: #E6F1FB; }
+    .action-delete{ color: #e74c3c; } .action-delete:hover{ background: #FCEBEB; }
+    .price-tag { font-weight: 700; color: #2D5A27; font-size: 15px; }
+    .duration-tag { display: inline-flex; align-items: center; gap: 5px; background: #E6F1FB; color: #185FA5; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .flash-success { background: #EAF3DE; color: #3B6D11; padding: 14px 20px; border-radius: 10px; margin-bottom: 25px; border-left: 4px solid #3B6D11; display: flex; align-items: center; gap: 10px; }
+    /* ── Pagination ── */
+.pagination-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 24px 20px;
+    flex-wrap: wrap;
+}
+.page-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 36px; height: 36px; padding: 0 10px;
+    border-radius: 8px;
+    font-size: 13px; font-weight: 600;
+    border: 1px solid #e8e8e8;
+    background: white; color: #2C3E50;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+.page-btn:hover    { background: #f0f0f0; color: #2D5A27; }
+.page-btn.active   { background: #2D5A27; color: white; border-color: #2D5A27; pointer-events: none; }
+.page-btn.disabled { opacity: 0.3; pointer-events: none; cursor: default; }
+.page-dots         { color: #bbb; font-size: 13px; line-height: 36px; padding: 0 4px; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="page-wrapper">
+
+    {# ── Header ── #}
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+        <div>
+            <p style="margin:0 0 4px; color:#999; font-size:13px;">
+                <i class="fa fa-home"></i> Gestion &rsaquo; <strong style="color:#2C3E50;">Offres</strong>
+            </p>
+            <h2 style="margin:0; color:#2C3E50; font-size:24px;">Liste des Offres</h2>
+        </div>
+       <div style="display:flex; gap:10px;">
+    <a href="{{ path('app_offre_export_pdf') }}" class="btn-new" style="background:#A32D2D;">
+        <i class="fa fa-file-pdf"></i> Exporter PDF
+    </a>
+    <a href="{{ path('app_offre_new') }}" class="btn-new">
+        <i class="fa fa-plus"></i> Nouvelle offre
+    </a>
+</div>
+    </div>
+
+    {# ── Flash ── #}
+    {% for message in app.flashes('success') %}
+        <div class="flash-success">
+            <i class="fa fa-check-circle" style="font-size:18px;"></i> {{ message }}
+        </div>
+    {% endfor %}
+
+    {# ── Stats ── #}
+    <div class="stats-grid">
+        <div class="stat-card" style="border-color:#2C3E50;">
+            <div class="stat-icon" style="background:#ECF0F1;"><i class="fa fa-tag" style="color:#2C3E50;"></i></div>
+            <div>
+                <p class="stat-label">Total offres</p>
+                <p class="stat-value" style="color:#2C3E50;">{{ stats.total }}</p>
+            </div>
+        </div>
+        <div class="stat-card" style="border-color:#2D5A27;">
+            <div class="stat-icon" style="background:#EAF3DE;"><i class="fa fa-money" style="color:#2D5A27;"></i></div>
+            <div>
+                <p class="stat-label">Prix moyen</p>
+                <p class="stat-value" style="color:#2D5A27;">{{ stats.avgPrix }} TND</p>
+            </div>
+        </div>
+        <div class="stat-card" style="border-color:#185FA5;">
+            <div class="stat-icon" style="background:#E6F1FB;"><i class="fa fa-arrow-down" style="color:#185FA5;"></i></div>
+            <div>
+                <p class="stat-label">Offre la moins chère</p>
+                <p class="stat-value" style="color:#185FA5; font-size:16px;">{{ stats.minCher ? stats.minCher.prix ~ ' TND' : '—' }}</p>
+            </div>
+        </div>
+        <div class="stat-card" style="border-color:#BA7517;">
+            <div class="stat-icon" style="background:#FAEEDA;"><i class="fa fa-clock-o" style="color:#BA7517;"></i></div>
+            <div>
+                <p class="stat-label">Offre la plus longue</p>
+                <p class="stat-value" style="color:#BA7517; font-size:16px;">{{ stats.maxLong ? stats.maxLong.dureeOffre ~ ' j' : '—' }}</p>
+            </div>
+        </div>
+    </div>
+
+    {# ── Recherche centrée ── #}
+    <div class="search-wrapper">
+        <div class="search-box">
+            <i class="fa fa-search" style="color:#aaa; font-size:16px;"></i>
+            <input type="text" id="searchInput" class="search-input"
+                   placeholder="Rechercher par nom ou description..."
+                   value="{{ searchTerm }}">
+            {% if searchTerm %}
+                <a href="{{ path('app_offre_list') }}" style="color:#bbb; text-decoration:none; font-size:13px;">
+                    <i class="fa fa-times-circle"></i> Effacer
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    {# ── Table ── #}
+    <div class="table-card">
+        <div class="table-card-header">
+            <h3 style="margin:0; font-size:16px; font-weight:700; color:#2C3E50;">
+                <i class="fa fa-list" style="color:#2D5A27; margin-right:8px;"></i> Offres
+            </h3>
+            <span id="resultCount" style="font-size:13px; color:#999; background:#f5f5f5; padding:4px 12px; border-radius:20px;">
+    {{ total }} offre(s) — page {{ page }}/{{ totalPages }}
+            </span>
+        </div>
+
+        <div style="overflow-x:auto; padding:0 10px 10px;">
+        <table class="offre-table" id="offreTable">
+            <thead>
+                <tr>
+                    {% set nextDir = currentDir == 'ASC' ? 'DESC' : 'ASC' %}
+                    <th>
+                        <a href="{{ path('app_offre_list', {q: searchTerm, sort: 'idOffres', direction: currentSort == 'idOffres' ? nextDir : 'ASC'}) }}"
+                           class="th-link {{ currentSort == 'idOffres' ? 'active' : '' }}">
+                            # {% if currentSort == 'idOffres' %}<i class="fa fa-sort-{{ currentDir == 'ASC' ? 'up' : 'down' }}"></i>{% else %}<i class="fa fa-sort" style="opacity:.25;"></i>{% endif %}
+                        </a>
+                    </th>
+                    <th>
+                        <a href="{{ path('app_offre_list', {q: searchTerm, sort: 'nomOffre', direction: currentSort == 'nomOffre' ? nextDir : 'ASC'}) }}"
+                           class="th-link {{ currentSort == 'nomOffre' ? 'active' : '' }}">
+                            Nom {% if currentSort == 'nomOffre' %}<i class="fa fa-sort-{{ currentDir == 'ASC' ? 'up' : 'down' }}"></i>{% else %}<i class="fa fa-sort" style="opacity:.25;"></i>{% endif %}
+                        </a>
+                    </th>
+                    <th><span class="th-link">Description</span></th>
+                    <th>
+                        <a href="{{ path('app_offre_list', {q: searchTerm, sort: 'prix', direction: currentSort == 'prix' ? nextDir : 'ASC'}) }}"
+                           class="th-link {{ currentSort == 'prix' ? 'active' : '' }}">
+                            Prix {% if currentSort == 'prix' %}<i class="fa fa-sort-{{ currentDir == 'ASC' ? 'up' : 'down' }}"></i>{% else %}<i class="fa fa-sort" style="opacity:.25;"></i>{% endif %}
+                        </a>
+                    </th>
+                    <th>
+                        <a href="{{ path('app_offre_list', {q: searchTerm, sort: 'dureeOffre', direction: currentSort == 'dureeOffre' ? nextDir : 'ASC'}) }}"
+                           class="th-link {{ currentSort == 'dureeOffre' ? 'active' : '' }}">
+                            Durée {% if currentSort == 'dureeOffre' %}<i class="fa fa-sort-{{ currentDir == 'ASC' ? 'up' : 'down' }}"></i>{% else %}<i class="fa fa-sort" style="opacity:.25;"></i>{% endif %}
+                        </a>
+                    </th>
+                    <th style="text-align:center;">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="offreBody">
+                {% for offre in offres %}
+                <tr class="offre-row"
+                    data-search="{{ offre.nomOffre|lower }} {{ offre.description|lower }}">
+                    <td style="color:#bbb; font-size:13px;">#{{ offre.idOffres }}</td>
+                    <td>
+                        <span style="font-weight:700; color:#2C3E50; font-size:15px;">{{ offre.nomOffre }}</span>
+                    </td>
+                    <td>
+                        {% if offre.description %}
+                            <span style="color:#888; font-size:13px;">
+                                {{ offre.description|slice(0,60) }}{% if offre.description|length > 60 %}...{% endif %}
+                            </span>
+                        {% else %}
+                            <span style="color:#ddd;">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <span class="price-tag">{{ offre.prix ? offre.prix|number_format(2, '.', ' ') ~ ' TND' : '—' }}</span>
+                    </td>
+                    <td>
+                        {% if offre.dureeOffre %}
+                            <span class="duration-tag">
+                                <i class="fa fa-clock-o"></i> {{ offre.dureeOffre }} jour{{ offre.dureeOffre > 1 ? 's' : '' }}
+                            </span>
+                        {% else %}
+                            <span style="color:#ddd;">—</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div style="display:flex; justify-content:center; gap:6px;">
+                            <a href="{{ path('app_offre_show', {idOffres: offre.idOffres}) }}"
+                               class="action-btn action-view" title="Voir">
+                                <i class="fa fa-eye"></i>
+                            </a>
+                            <a href="{{ path('app_offre_edit', {idOffres: offre.idOffres}) }}"
+                               class="action-btn action-edit" title="Modifier">
+                                <i class="fa fa-edit"></i>
+                            </a>
+                            <form method="post" action="{{ path('app_offre_delete', {idOffres: offre.idOffres}) }}"
+                                  style="display:inline;"
+                                  onsubmit="return confirm('Supprimer cette offre ?')">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ offre.idOffres) }}">
+                                <button type="submit" class="action-btn action-delete" title="Supprimer">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                        
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" style="padding:60px 20px; text-align:center; color:#bbb;">
+                        <i class="fa fa-inbox" style="font-size:40px; display:block; margin-bottom:15px;"></i>
+                        Aucune offre trouvée.
+                    </td>
+                </tr>
+                
+                {% endfor %}
+            </tbody>
+        </table>
+        </div>
+        {# ── Pagination ── #}
+{% if totalPages > 1 %}
+<div class="pagination-wrap">
+
+    {# Précédent #}
+    {% if page > 1 %}
+        <a href="{{ path('app_offre_list', {page: page - 1, q: searchTerm, sort: currentSort, direction: currentDir}) }}"
+           class="page-btn">
+            <i class="fa fa-chevron-left"></i>
+        </a>
+    {% else %}
+        <span class="page-btn disabled"><i class="fa fa-chevron-left"></i></span>
+    {% endif %}
+
+    {# Pages numérotées #}
+    {% for p in 1..totalPages %}
+        {% if p == 1 or p == totalPages or (p >= page - 2 and p <= page + 2) %}
+            <a href="{{ path('app_offre_list', {page: p, q: searchTerm, sort: currentSort, direction: currentDir}) }}"
+               class="page-btn {{ p == page ? 'active' : '' }}">
+                {{ p }}
+            </a>
+        {% elseif p == page - 3 or p == page + 3 %}
+            <span class="page-dots">…</span>
+        {% endif %}
+    {% endfor %}
+
+    {# Suivant #}
+    {% if page < totalPages %}
+        <a href="{{ path('app_offre_list', {page: page + 1, q: searchTerm, sort: currentSort, direction: currentDir}) }}"
+           class="page-btn">
+            <i class="fa fa-chevron-right"></i>
+        </a>
+    {% else %}
+        <span class="page-btn disabled"><i class="fa fa-chevron-right"></i></span>
+    {% endif %}
+
+</div>
+{% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+const searchInput = document.getElementById('searchInput');
+const offreBody   = document.getElementById('offreBody');
+const resultCount = document.getElementById('resultCount');
+
+searchInput.addEventListener('input', function () {
+    const query = this.value.toLowerCase().trim();
+    const rows  = offreBody.querySelectorAll('tr.offre-row');
+    let visible = 0;
+
+    rows.forEach(row => {
+        const data = row.getAttribute('data-search') || '';
+        const show = query === '' || data.includes(query);
+        row.style.display = show ? '' : 'none';
+        if (show) visible++;
+    });
+
+    resultCount.textContent = visible + ' offre(s)';
+
+    let noResult = document.getElementById('dynamicEmpty');
+    if (visible === 0) {
+        if (!noResult) {
+            noResult = document.createElement('tr');
+            noResult.id = 'dynamicEmpty';
+            noResult.innerHTML = `<td colspan="6" style="padding:60px 20px; text-align:center; color:#bbb;">
+                <i class="fa fa-search" style="font-size:40px; display:block; margin-bottom:15px;"></i>
+                <p style="font-size:15px; margin:0;">Aucun résultat pour "<strong style="color:#555;">${searchInput.value}</strong>"</p>
+            </td>`;
+            offreBody.appendChild(noResult);
+        }
+    } else {
+        if (noResult) noResult.remove();
+    }
+});
+</script>
+{% endblock %}

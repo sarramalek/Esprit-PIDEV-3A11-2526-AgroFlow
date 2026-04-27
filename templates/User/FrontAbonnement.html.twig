@@ -1,0 +1,243 @@
+{% extends 'base_agriculteur.html.twig' %}
+{% block title %}Mes Abonnements - AgroFlow{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .front-wrapper { padding: 35px 40px; font-family: Arial, sans-serif; background: #F4F6F9; min-height: 100vh; }
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+    .page-header h2 { margin: 0; color: #2C3E50; font-size: 24px; }
+    .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .abonn-card { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); overflow: hidden; transition: transform 0.2s, box-shadow 0.2s; }
+    .abonn-card:hover { transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,0,0,0.10); }
+    .card-top { padding: 20px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; gap: 14px; }
+    .card-icon { width: 48px; height: 48px; border-radius: 12px; background: #EAF3DE; color: #2D5A27; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .card-icon.expire { background: #FCEBEB; color: #A32D2D; }
+    .card-icon.bientot { background: #FAEEDA; color: #854F0B; }
+    .card-title { font-weight: 700; color: #2C3E50; font-size: 15px; margin: 0 0 3px; }
+    .card-sub { font-size: 12px; color: #aaa; margin: 0; }
+    .card-body { padding: 16px 20px; }
+    .info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 13px; }
+    .info-row:last-child { margin-bottom: 0; }
+    .info-label { color: #aaa; }
+    .info-value { font-weight: 600; color: #2C3E50; }
+    .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+    .badge-green { background: #EAF3DE; color: #3B6D11; }
+    .badge-red   { background: #FCEBEB; color: #A32D2D; }
+    .badge-amber { background: #FAEEDA; color: #854F0B; }
+    .badge-gray  { background: #f0f0f0; color: #666; }
+    .card-footer { padding: 14px 20px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; }
+    .btn-pdf { display: inline-flex; align-items: center; gap: 8px; background: #2D5A27; color: white; padding: 9px 18px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 600; transition: background 0.2s; }
+    .btn-pdf:hover { background: #1e3d1a; }
+    .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; color: #ccc; text-align: center; background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
+    .empty-state i { font-size: 50px; margin-bottom: 20px; }
+    .empty-state p { font-size: 15px; margin: 0; color: #bbb; }
+    .stats-bar { display: flex; gap: 16px; margin-bottom: 28px; }
+    .stat-chip { background: white; border-radius: 10px; padding: 12px 20px; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); font-size: 13px; }
+    .stat-chip i { color: #2D5A27; font-size: 16px; }
+    .stat-chip strong { color: #2C3E50; font-size: 16px; }
+    .stat-chip span { color: #aaa; }
+
+    /* ── Alert popup ── */
+    .alert-popup {
+        position: fixed; top: 24px; right: 24px;
+        max-width: 360px; width: 90%;
+        background: white; border-radius: 14px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        border-left: 5px solid #854F0B;
+        z-index: 88888; /* ← en dessous du dropdown profil (99999) */
+        animation: slideIn 0.4s ease;
+        overflow: hidden;
+    }
+    .alert-popup-header {
+        background: #FAEEDA; padding: 14px 18px;
+        display: flex; align-items: center; gap: 10px;
+    }
+    .alert-popup-header i { color: #854F0B; font-size: 18px; }
+    .alert-popup-header strong { color: #854F0B; font-size: 14px; }
+    .alert-popup-body { padding: 14px 18px; }
+    .alert-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f8f8f8; font-size: 13px; }
+    .alert-item:last-child { border-bottom: none; }
+    .alert-item-name { font-weight: 600; color: #2C3E50; flex: 1; }
+    .alert-item-days { font-size: 12px; font-weight: 700; color: #854F0B; background: #FAEEDA; padding: 2px 8px; border-radius: 10px; }
+    .alert-popup-footer { padding: 10px 18px; border-top: 1px solid #f0f0f0; display: flex; justify-content: flex-end; }
+    .alert-close-btn { background: #854F0B; color: white; border: none; padding: 7px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
+
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateX(40px); }
+        to   { opacity: 1; transform: translateX(0); }
+    }
+
+    @media (max-width: 900px) { .cards-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .cards-grid { grid-template-columns: 1fr; } .front-wrapper { padding: 20px; } }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="front-wrapper">
+
+    <div class="page-header">
+        <div>
+            <p style="margin:0 0 4px; color:#999; font-size:13px;">
+                <i class="fa fa-home"></i> Front Office &rsaquo; <strong style="color:#2C3E50;">Abonnements</strong>
+            </p>
+            <h2>Mes Abonnements</h2>
+        </div>
+    </div>
+
+    {% set total   = abonnements|length %}
+    {% set actifs  = abonnements|filter(a => a.situation|lower == 'actif')|length %}
+    {% set expires = abonnements|filter(a => a.estExpire)|length %}
+
+    <div class="stats-bar">
+        <div class="stat-chip">
+            <i class="fa fa-list"></i>
+            <div><strong>{{ total }}</strong><br><span>Total</span></div>
+        </div>
+        <div class="stat-chip">
+            <i class="fa fa-check-circle" style="color:#2D5A27;"></i>
+            <div><strong>{{ actifs }}</strong><br><span>Actifs</span></div>
+        </div>
+        <div class="stat-chip">
+            <i class="fa fa-times-circle" style="color:#A32D2D;"></i>
+            <div><strong>{{ expires }}</strong><br><span>Expirés</span></div>
+        </div>
+    </div>
+
+    {% if abonnements is empty %}
+        <div class="empty-state">
+            <i class="fa fa-folder-open-o"></i>
+            <p>Vous n'avez aucun abonnement pour le moment.</p>
+        </div>
+    {% else %}
+        <div class="cards-grid">
+            {% for a in abonnements %}
+                {% set iconClass  = a.estExpire ? 'expire' : (a.expireBientot ? 'bientot' : '') %}
+                {% set badgeClass = a.situation|lower == 'actif' ? 'badge-green' : (a.estExpire ? 'badge-red' : (a.situation|lower == 'suspendu' ? 'badge-amber' : 'badge-gray')) %}
+
+                <div class="abonn-card" id="card-{{ a.id }}">
+                    <div class="card-top">
+                        <div class="card-icon {{ iconClass }}">
+                            <i class="fa fa-{{ a.estExpire ? 'times-circle' : (a.expireBientot ? 'exclamation-triangle' : 'check-circle') }}"></i>
+                        </div>
+                        <div>
+                            <p class="card-title">{{ a.nomOffre }}</p>
+                            <p class="card-sub">Abonnement #{{ a.id }}</p>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="info-row">
+                            <span class="info-label"><i class="fa fa-tag"></i> Situation</span>
+                            <span class="badge {{ badgeClass }}">{{ a.situation|capitalize }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label"><i class="fa fa-money"></i> Prix</span>
+                            <span class="info-value">
+                                {% if a.promoApplied %}
+                                    <span style="text-decoration:line-through; color:#999; font-weight:500; margin-right:6px;">
+                                        {{ a.prixInitial|number_format(2) }} TND
+                                    </span>
+                                {% endif %}
+                                {{ a.prix|number_format(2) }} TND
+                                {% if a.promoApplied %}
+                                    <span class="badge badge-green" style="margin-left:6px;">-{{ a.promoPercent }}%</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label"><i class="fa fa-calendar"></i> Inscription</span>
+                            <span class="info-value">{{ a.dateInscription }}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label"><i class="fa fa-calendar-times-o"></i> Expiration</span>
+                            <span class="info-value" style="{{ a.estExpire ? 'color:#A32D2D;' : (a.expireBientot ? 'color:#854F0B;' : '') }}">
+                                {{ a.dateExpiration }}
+                                {% if a.expireBientot and not a.estExpire %}
+                                    <i class="fa fa-exclamation-triangle" style="color:#854F0B;"></i>
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label"><i class="fa fa-clock-o"></i> Expire dans</span>
+                            <span class="info-value" style="{{ a.estExpire ? 'color:#A32D2D;' : (a.expireBientot ? 'color:#854F0B; font-weight:700;' : '') }}">
+                                {% if a.estExpire %}
+                                    <i class="fa fa-times-circle"></i> Expiré
+                                {% else %}
+                                    {{ a.joursRestants }} jours
+                                {% endif %}
+                            </span>
+                        </div>
+                        {% if a.description %}
+                        <div class="info-row" style="align-items:flex-start;">
+                            <span class="info-label"><i class="fa fa-info-circle"></i> Description</span>
+                            <span class="info-value" style="text-align:right; max-width:60%; font-size:12px;">
+                                {{ a.description|length > 60 ? a.description|slice(0,60) ~ '...' : a.description }}
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="card-footer">
+                        <a href="{{ path('app_abonnement_pdf', {id: a.id}) }}" class="btn-pdf">
+                            <i class="fa fa-file-pdf-o"></i> Télécharger PDF
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+</div>
+
+{# Données pour le JS d'alerte #}
+<script>
+const abonnementsData = [
+    {% for a in abonnements %}
+    {% if a.expireBientot and not a.estExpire %}
+    { id: {{ a.id }}, nom: "{{ a.nomOffre|e('js') }}", jours: {{ a.joursRestants }} },
+    {% endif %}
+    {% endfor %}
+];
+</script>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}  {# ← CRUCIAL : conserve toggleProfilePanel() du base #}
+    <script>
+    window.addEventListener('load', function () {
+        if (!abonnementsData || abonnementsData.length === 0) return;
+
+        let items = '';
+        abonnementsData.forEach(a => {
+            items += `
+            <div class="alert-item">
+                <i class="fa fa-exclamation-triangle" style="color:#854F0B; flex-shrink:0;"></i>
+                <span class="alert-item-name">${a.nom}</span>
+                <span class="alert-item-days">dans ${a.jours} j</span>
+            </div>`;
+        });
+
+        const popup = document.createElement('div');
+        popup.className = 'alert-popup';
+        popup.id = 'alertPopup';
+        popup.innerHTML = `
+            <div class="alert-popup-header">
+                <i class="fa fa-bell"></i>
+                <strong>Abonnement(s) expirant bientôt</strong>
+            </div>
+            <div class="alert-popup-body">${items}</div>
+            <div class="alert-popup-footer">
+                <button class="alert-close-btn" onclick="document.getElementById('alertPopup').remove()">
+                    Compris
+                </button>
+            </div>`;
+
+        document.body.appendChild(popup);
+
+        setTimeout(() => {
+            const p = document.getElementById('alertPopup');
+            if (p) p.remove();
+        }, 10000);
+    });
+    </script>
+{% endblock %}

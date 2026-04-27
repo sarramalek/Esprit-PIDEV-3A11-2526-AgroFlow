@@ -1,0 +1,26 @@
+{% set inputStyle = 'width:100%; padding:12px 15px; border:2px solid #eee; border-radius:8px; font-size:14px; box-sizing:border-box; font-family:Arial,sans-serif; outline:none; transition:border 0.3s;' %}
+
+<div style="margin-bottom:20px;">
+    <label style="display:block; color:#2C3E50; font-weight:600; margin-bottom:8px; font-size:14px;">Nom de l'offre</label>
+    {{ form_widget(form.nomOffre, {'attr': {'style': inputStyle}}) }}
+    {{ form_errors(form.nomOffre) }}
+</div>
+
+<div style="margin-bottom:20px;">
+    <label style="display:block; color:#2C3E50; font-weight:600; margin-bottom:8px; font-size:14px;">Description</label>
+    {{ form_widget(form.description, {'attr': {'style': inputStyle}}) }}
+    {{ form_errors(form.description) }}
+</div>
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;">
+    <div>
+        <label style="display:block; color:#2C3E50; font-weight:600; margin-bottom:8px; font-size:14px;">Prix (TND)</label>
+        {{ form_widget(form.prix, {'attr': {'style': inputStyle}}) }}
+        {{ form_errors(form.prix) }}
+    </div>
+    <div>
+        <label style="display:block; color:#2C3E50; font-weight:600; margin-bottom:8px; font-size:14px;">Durée (jours)</label>
+        {{ form_widget(form.dureeOffre, {'attr': {'style': inputStyle}}) }}
+        {{ form_errors(form.dureeOffre) }}
+    </div>
+</div>

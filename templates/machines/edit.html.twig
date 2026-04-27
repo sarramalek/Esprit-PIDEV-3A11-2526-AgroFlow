@@ -1,0 +1,87 @@
+{# templates/machines/edit.html.twig #}
+{% extends 'agriculteur_dashboard.html.twig' %}
+{% block title %}Modifier {{ machine.nom }} — AgroFlow{% endblock %}
+
+{% block body %}
+<style>
+    :root { --green-dark:#2d5a1b; --green-border:#c8e6b0; --green-light:#f0f7eb; --shadow:0 4px 16px rgba(45,90,27,.10); }
+    * { box-sizing:border-box; }
+    .form-page { max-width:900px; margin:0 auto; padding:1.5rem; }
+    .breadcrumb { display:flex; align-items:center; gap:.5rem; font-size:.84rem; color:#7a9b6a; margin-bottom:1.2rem; }
+    .breadcrumb a { color:var(--green-dark); text-decoration:none; font-weight:600; }
+    .breadcrumb a:hover { text-decoration:underline; }
+    .page-title { font-size:1.6rem; font-weight:700; color:#1a2e10; margin:0 0 .3rem; }
+    .page-sub   { font-size:.88rem; color:#7a9b6a; margin:0 0 1.4rem; }
+    .req-star   { color:#e74c3c; }
+
+    .flash { padding:.75rem 1.1rem; border-radius:10px; margin-bottom:1rem; font-weight:500; font-size:.92rem; display:flex; align-items:center; gap:.5rem; }
+    .flash-success { background:#e6f4e0; color:#1e5c0e; border:1px solid #b4dba0; }
+    .flash-error   { background:#fdecea; color:#8b1a1a; border:1px solid #f3b8b0; }
+
+    .form-card { background:#fff; border:1px solid var(--green-border); border-radius:16px; padding:2rem; box-shadow:var(--shadow); }
+
+    /* Machine summary badge at top */
+    .machine-summary {
+        display:flex; align-items:center; gap:.8rem;
+        background:var(--green-light); border:1px solid var(--green-border);
+        border-radius:11px; padding:.7rem 1rem; margin-bottom:1.5rem;
+    }
+    .machine-summary .ms-icon { font-size:1.5rem; }
+    .machine-summary .ms-name { font-weight:700; color:#1a2e10; font-size:1rem; }
+    .machine-summary .ms-sub  { font-size:.8rem; color:#7a9b6a; }
+    .badge { padding:.25rem .8rem; border-radius:50px; font-size:.75rem; font-weight:700; margin-left:auto; }
+    .badge-neuf { background:#d4edda; color:#155724; }
+    .badge-bon  { background:#cce5ff; color:#004085; }
+    .badge-occasion { background:#fff3cd; color:#856404; }
+    .badge-panne { background:#f8d7da; color:#721c24; }
+</style>
+
+<div class="form-page">
+
+    <nav class="breadcrumb">
+        <a href="{{ path('agri_machines') }}">⚙️ Machines</a>
+        <span>›</span>
+        <a href="{{ path('agri_machine_show', {id: machine.id}) }}">{{ machine.nom }}</a>
+        <span>›</span><span>Modifier</span>
+    </nav>
+
+    <h1 class="page-title">✏️ Modifier la machine</h1>
+    <p class="page-sub">Les champs marqués d'un <span class="req-star">*</span> sont obligatoires.</p>
+
+    {# Machine summary card #}
+    {% if machine.etatM == 'Neuf' %}     {% set bc='badge-neuf' %}
+    {% elseif machine.etatM == 'Bon' %}  {% set bc='badge-bon' %}
+    {% elseif machine.etatM == 'Occasion' %} {% set bc='badge-occasion' %}
+    {% else %} {% set bc='badge-panne' %} {% endif %}
+    <div class="machine-summary">
+        <span class="ms-icon">⚙️</span>
+        <div>
+            <div class="ms-name">{{ machine.nom }}</div>
+            <div class="ms-sub">{{ machine.marque }} · {{ machine.modele }}</div>
+        </div>
+        <span class="badge {{ bc }}">{{ machine.etatM }}</span>
+    </div>
+
+    {% if form.vars.submitted and not form.vars.valid %}
+        <div class="flash flash-error">⚠️ Le formulaire contient des erreurs. Veuillez les corriger.</div>
+    {% endif %}
+    {% for label, messages in app.flashes %}
+        {% for msg in messages %}
+            <div class="flash flash-{{ label == 'success' ? 'success' : 'error' }}">{{ msg }}</div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="form-card">
+        {{ form_start(form, {attr:{novalidate:'novalidate'}}) }}
+
+            {{ include('machines/_form.html.twig') }}
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">💾 Enregistrer les modifications</button>
+                <a href="{{ path('agri_machine_show', {id: machine.id}) }}" class="btn btn-ghost">✖ Annuler</a>
+            </div>
+
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}

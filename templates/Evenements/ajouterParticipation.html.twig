@@ -1,0 +1,43 @@
+{% extends 'base_admin.html.twig' %}
+
+{% block title %}Nouvelle Participation — AGROFLOW{% endblock %}
+{% block page_title %}Ajouter une Participation{% endblock %}
+{% block breadcrumb %}Événements / Participations / Ajouter{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .af-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 30px; }
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .page-header h1 { font-size: 1.5rem; font-weight: 700; color: var(--navy); }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; border: none; text-decoration: none; }
+    .btn-outline { background: transparent; color: var(--text-muted); border: 1px solid var(--cream-dark); }
+    .btn-success { background: var(--green-accent); color: #fff; }
+    form div { margin-bottom: 1rem; }
+    label { display: block; font-size: 13px; font-weight: 600; color: var(--navy); margin-bottom: 8px; }
+    input, textarea, select { width: 100%; padding: 10px 14px; border: 1px solid var(--cream-dark); border-radius: 8px; background: var(--cream); font-size: 14px; }
+    input:focus, select:focus { border-color: var(--green-accent); background: #fff; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="page-header">
+            <div>
+                <h1><i class="fa fa-plus-circle" style="color:var(--green-accent);margin-right:8px;"></i> Nouvelle Participation</h1>
+                <p class="text-muted small">Inscrivez un participant à un événement</p>
+            </div>
+        </div>
+        <div class="af-card">
+            {{ form_start(form) }}
+                {{ form_widget(form) }}
+                <div class="mt-4 pt-3 border-top d-flex justify-content-end gap-2">
+                    <a href="{{ path('participation_index') }}" class="btn btn-outline">
+                        <i class="fa fa-xmark"></i> Annuler
+                    </a>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

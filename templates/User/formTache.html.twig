@@ -1,0 +1,42 @@
+{% set inputStyle = 'width:100%; padding:12px 15px; border:2px solid #eee; border-radius:8px; font-size:14px; box-sizing:border-box; font-family:Arial,sans-serif;' %}
+
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+<div style="margin-bottom:18px;">
+    <label style="display:block; color:#2C3E50; font-weight:600; margin-bottom:8px; font-size:14px;">Nom de la tâche</label>
+    {{ form_widget(form.nomTache, {'attr': {'style': inputStyle}}) }}
+    {{ form_errors(form.nomTache) }}
+</div>
+
+<div style="margin-bottom:18px;">
+    <label style="display:block; color:#2C3E50; font-weight:600; margin-bottom:8px; font-size:14px;">Description</label>
+    {{ form_widget(form.description, {'attr': {'style': inputStyle}}) }}
+    {{ form_errors(form.description) }}
+</div>
+
+<div style="margin-bottom:18px;">
+    <label style="display:block; color:#2C3E50; font-weight:600; margin-bottom:8px; font-size:14px;">Assigné à</label>
+    {{ form_widget(form.assignee, {'attr': {'style': inputStyle}}) }}
+    {{ form_errors(form.assignee) }}
+</div>
+
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:18px;">
+    <div>
+        <label style="display:block; color:#2C3E50; font-weight:600; margin-bottom:8px; font-size:14px;">État</label>
+        {{ form_widget(form.etat, {'attr': {'style': inputStyle}}) }}
+        {{ form_errors(form.etat) }}
+    </div>
+    <div>
+        <label style="display:block; color:#2C3E50; font-weight:600; margin-bottom:8px; font-size:14px;">Priorité</label>
+        {{ form_widget(form.priorite, {'attr': {'style': inputStyle}}) }}
+        {{ form_errors(form.priorite) }}
+    </div>
+</div>
+
+<div style="margin-bottom:18px;">
+    <label style="display:block; color:#2C3E50; font-weight:600; margin-bottom:8px; font-size:14px;">Date d'échéance</label>
+    {{ form_widget(form.dateEcheancee, {'attr': {'style': inputStyle}}) }}
+    {{ form_errors(form.dateEcheancee) }}
+</div>
+
+{{ form_end(form) }}

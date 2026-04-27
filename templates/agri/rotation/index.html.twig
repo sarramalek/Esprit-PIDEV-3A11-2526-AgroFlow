@@ -1,0 +1,510 @@
+{% extends 'base_agriculteur.html.twig' %}
+{% block title %}Mes Rotations — AgroFlow{% endblock %}
+
+{% block stylesheets %}
+<style>
+.stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px; }
+.stat-card { background:white; border-radius:14px; box-shadow:0 2px 12px rgba(0,0,0,0.07); padding:20px 24px; display:flex; align-items:center; gap:16px; }
+.stat-icon { width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+.stat-icon.green  { background:#D1FAE5; color:#065F46; }
+.stat-icon.blue   { background:#DBEAFE; color:#1D4ED8; }
+.stat-icon.red    { background:#FEE2E2; color:#DC2626; }
+.stat-icon.yellow { background:#FEF3C7; color:#92400E; }
+.stat-value { font-size:26px; font-weight:700; color:#1B3A20; }
+.stat-label { font-size:12px; color:#888; margin-top:2px; }
+
+.toolbar { display:flex; align-items:center; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
+.search-wrap { position:relative; flex:1; min-width:240px; }
+.search-wrap input { width:100%; padding:11px 16px 11px 40px; border:1.5px solid #ddd; border-radius:10px; font-size:14px; font-family:'DM Sans',sans-serif; background:white; }
+.search-wrap input:focus { outline:none; border-color:#2D5A27; }
+.search-wrap i { position:absolute; left:13px; top:50%; transform:translateY(-50%); color:#aaa; }
+.filter-select { padding:11px 14px; border:1.5px solid #ddd; border-radius:10px; font-size:14px; background:white; cursor:pointer; }
+.result-count { font-size:13px; color:#888; white-space:nowrap; }
+
+.btn-add { display:inline-flex; align-items:center; gap:8px; background:#2D5A27; color:white; padding:11px 22px; border-radius:10px; font-size:14px; font-weight:600; text-decoration:none; white-space:nowrap; }
+.btn-add:hover { background:#1B3A20; }
+.btn-pdf { display:inline-flex; align-items:center; gap:8px; background:#1D4ED8; color:white; padding:11px 22px; border-radius:10px; font-size:14px; font-weight:600; border:none; cursor:pointer; white-space:nowrap; }
+.btn-pdf:hover { background:#1E40AF; }
+.btn-suggest { display:inline-flex; align-items:center; gap:8px; background:#FFF7ED; color:#92400E; border:1px solid #FCD34D; padding:11px 22px; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; white-space:nowrap; }
+.btn-suggest:hover { background:#FEF3C7; }
+
+.card { background:white; border-radius:14px; box-shadow:0 2px 12px rgba(0,0,0,0.07); overflow:hidden; }
+.flash-success { background:#D1FAE5; color:#065F46; padding:12px 18px; border-radius:10px; margin-bottom:20px; font-size:14px; display:flex; align-items:center; gap:8px; }
+.flash-error   { background:#FEE2E2; color:#DC2626;  padding:12px 18px; border-radius:10px; margin-bottom:20px; font-size:14px; display:flex; align-items:center; gap:8px; }
+
+.data-table { width:100%; border-collapse:collapse; }
+.data-table thead th { background:#F8FFF6; padding:13px 18px; text-align:left; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:#888; border-bottom:1px solid #eee; white-space:nowrap; cursor:pointer; user-select:none; }
+.data-table thead th:hover { color:#2D5A27; }
+.data-table thead th .sort-icon { margin-left:5px; opacity:0.4; font-size:10px; }
+.data-table thead th.sort-asc .sort-icon,
+.data-table thead th.sort-desc .sort-icon { opacity:1; color:#2D5A27; }
+.data-table tbody td { padding:14px 18px; font-size:14px; border-bottom:1px solid #f5f5f5; vertical-align:middle; }
+.data-table tbody tr:last-child td { border-bottom:none; }
+.data-table tbody tr:hover { background:#FAFFF8; }
+
+.badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; }
+.badge-active   { background:#D1FAE5; color:#065F46; }
+.badge-inactive { background:#FEE2E2; color:#991B1B; }
+
+.actions { display:flex; gap:8px; align-items:center; }
+.btn-show { display:inline-flex; align-items:center; gap:5px; background:#EFF6FF; color:#2563EB; border:1px solid #BFDBFE; padding:6px 12px; border-radius:8px; font-size:13px; text-decoration:none; }
+.btn-edit { display:inline-flex; align-items:center; gap:5px; background:#f0f0f0; color:#333; border:1px solid #ddd; padding:6px 12px; border-radius:8px; font-size:13px; text-decoration:none; }
+.btn-del  { background:#FEE2E2; color:#DC2626; border:none; padding:6px 12px; border-radius:8px; font-size:13px; cursor:pointer; }
+.btn-del:hover { background:#FECACA; }
+
+.empty-state { text-align:center; padding:60px 20px; color:#aaa; }
+.no-results   { text-align:center; padding:40px; color:#aaa; display:none; }
+
+.pagination-wrap { display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-top:1px solid #eee; font-size:13px; flex-wrap:wrap; gap:12px; background:white; border-radius:0 0 14px 14px; }
+.pagination-info { color:#888; }
+.pagination-btns { display:flex; gap:4px; }
+.page-btn { min-width:36px; height:36px; border-radius:8px; border:1px solid #ddd; background:white; color:#333; font-size:13px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; }
+.page-btn:hover { border-color:#2D5A27; color:#2D5A27; }
+.page-btn.active { background:#2D5A27; color:white; border-color:#2D5A27; }
+.page-btn:disabled { opacity:0.4; cursor:not-allowed; }
+
+/* ── Modal Suggestion ── */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center; }
+.modal-overlay.active { display:flex; }
+.modal-box { background:#FFFDF5; border-radius:16px; padding:32px; width:90%; max-width:560px; max-height:85vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.2); position:relative; animation:modalIn 0.25s ease; }
+@keyframes modalIn { from{transform:translateY(20px);opacity:0} to{transform:none;opacity:1} }
+.modal-close { position:absolute; top:14px; right:16px; background:none; border:none; font-size:20px; cursor:pointer; color:#999; }
+.modal-close:hover { color:#333; }
+.modal-title { font-size:18px; font-weight:700; color:#1B3A20; margin-bottom:4px; display:flex; align-items:center; gap:10px; }
+.modal-subtitle { font-size:13px; color:#6B7280; margin-bottom:20px; }
+.modal-loading { text-align:center; padding:30px 0; color:#6B7280; font-size:14px; }
+.modal-loading i { font-size:28px; display:block; margin-bottom:10px; animation:spin 1s linear infinite; }
+@keyframes spin { to{transform:rotate(360deg)} }
+
+.sug-card { border-radius:12px; padding:16px 18px; margin-bottom:14px; border:1px solid #e8e4d0; background:#fff; }
+.sug-card-header { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.sug-rank { width:28px; height:28px; border-radius:50%; background:#2D5A27; color:white; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.sug-name { font-size:15px; font-weight:700; color:#1B3A20; }
+.sug-terrain { font-size:12px; color:#6B7280; }
+.sug-score-bar { height:8px; background:#E5E7EB; border-radius:4px; overflow:hidden; margin:6px 0 3px; }
+.sug-score-fill { height:100%; border-radius:4px; background:linear-gradient(90deg,#4A8C3F,#86EFAC); }
+.sug-score-label { font-size:12px; color:#6B7280; text-align:right; }
+.sug-tags { display:flex; gap:6px; flex-wrap:wrap; margin-top:10px; }
+.sug-tag { font-size:11px; font-weight:600; padding:3px 10px; border-radius:20px; }
+.sug-tag.green  { background:#D1FAE5; color:#065F46; }
+.sug-tag.blue   { background:#DBEAFE; color:#1D4ED8; }
+.sug-tag.orange { background:#FEF3C7; color:#92400E; }
+.sug-reason { font-size:12px; color:#374151; margin-top:8px; line-height:1.6; background:#F9FAFB; border-radius:8px; padding:8px 12px; }
+
+.sug-meteo-banner { background:#F0FDF4; border:1px solid #86EFAC; border-radius:10px; padding:12px 14px; font-size:13px; color:#065F46; margin-bottom:18px; display:flex; align-items:center; gap:10px; }
+</style>
+{% endblock %}
+
+{% block body %}
+{% for msg in app.flashes('success') %}
+<div class="flash-success"><i class="fa fa-check-circle"></i> {{ msg }}</div>
+{% endfor %}
+{% for msg in app.flashes('error') %}
+<div class="flash-error"><i class="fa fa-circle-xmark"></i> {{ msg }}</div>
+{% endfor %}
+
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-icon green"><i class="fa fa-rotate"></i></div>
+        <div><div class="stat-value">{{ total }}</div><div class="stat-label">Total rotations</div></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon blue"><i class="fa fa-circle-check"></i></div>
+        <div><div class="stat-value">{{ actifs }}</div><div class="stat-label">Actives</div></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon red"><i class="fa fa-circle-xmark"></i></div>
+        <div><div class="stat-value">{{ inactifs }}</div><div class="stat-label">Inactives</div></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon yellow"><i class="fa fa-calendar-days"></i></div>
+        <div><div class="stat-value">{{ dureeMoyenne ?? '—' }}</div><div class="stat-label">Durée moy. (jours)</div></div>
+    </div>
+</div>
+
+<div class="toolbar">
+    <div class="search-wrap">
+        <i class="fa fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" placeholder="Rechercher par terrain, plante…">
+    </div>
+    <select class="filter-select" id="filterStatus">
+        <option value="">Tous les statuts</option>
+        <option value="Actif">Actif</option>
+        <option value="Inactif">Inactif</option>
+    </select>
+    <span class="result-count" id="resultCount"></span>
+
+    <button class="btn-suggest" onclick="openSuggestion()">
+        <i class="fa fa-wand-magic-sparkles"></i> Meilleure rotation
+    </button>
+
+    <button class="btn-pdf" onclick="exportPDF()">
+        <i class="fa fa-file-pdf"></i> Exporter PDF
+    </button>
+
+    <a href="{{ path('agri_rotations_new') }}" class="btn-add">
+        <i class="fa fa-plus"></i> Nouvelle rotation
+    </a>
+</div>
+
+<div class="card">
+    {% if rotations is empty %}
+    <div class="empty-state">
+        <i class="fa fa-rotate" style="font-size:56px;opacity:0.2;display:block;margin-bottom:16px"></i>
+        <p>Aucune rotation enregistrée.</p>
+        <a href="{{ path('agri_rotations_new') }}" class="btn-add" style="margin-top:16px;display:inline-flex">
+            <i class="fa fa-plus"></i> Ajouter une rotation
+        </a>
+    </div>
+    {% else %}
+    <table class="data-table" id="rotationTable">
+        <thead>
+            <tr>
+                <th data-col="0">Terrain <i class="fa fa-sort sort-icon"></i></th>
+                <th data-col="1">Plante <i class="fa fa-sort sort-icon"></i></th>
+                <th data-col="2">Date début <i class="fa fa-sort sort-icon"></i></th>
+                <th data-col="3">Date fin <i class="fa fa-sort sort-icon"></i></th>
+                <th data-col="4">Statut <i class="fa fa-sort sort-icon"></i></th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="rotationBody">
+        {% for rotation in rotations %}
+            <tr data-terrain="{{ rotation.terrain.nomTerrain|lower }}"
+                data-plante="{{ rotation.plante.nomP|lower }}"
+                data-status="{{ rotation.status ? 'Actif' : 'Inactif' }}"
+                data-terrain-raw="{{ rotation.terrain.nomTerrain }}"
+                data-plante-raw="{{ rotation.plante.nomP }}"
+                data-debut-raw="{{ rotation.dateDebut ? rotation.dateDebut|date('d/m/Y') : '—' }}"
+                data-fin-raw="{{ rotation.dateFin ? rotation.dateFin|date('d/m/Y') : '—' }}"
+                data-status-raw="{{ rotation.status ? 'Actif' : 'Inactif' }}"
+                data-duree="{{ rotation.dateDebut and rotation.dateFin ? ((rotation.dateFin.timestamp - rotation.dateDebut.timestamp) / 86400)|round : 0 }}"
+                data-localisation="{{ rotation.terrain.localisation ?? 'Tunisie' }}"
+                data-besoin="{{ rotation.plante.besoinEau ?? 0 }}"
+                data-ph="{{ rotation.terrain.pH ?? 7 }}"
+                data-sol="{{ rotation.terrain.typeSol ?? '' }}">
+                <td><strong>{{ rotation.terrain.nomTerrain }}</strong></td>
+                <td>{{ rotation.plante.nomP }}</td>
+                <td>{{ rotation.dateDebut ? rotation.dateDebut|date('d/m/Y') : '—' }}</td>
+                <td>{{ rotation.dateFin ? rotation.dateFin|date('d/m/Y') : '—' }}</td>
+                <td>
+                    <span class="badge {{ rotation.status ? 'badge-active' : 'badge-inactive' }}">
+                        {{ rotation.status ? 'Actif' : 'Inactif' }}
+                    </span>
+                </td>
+                <td>
+                    <div class="actions">
+                        <a href="{{ path('agri_rotations_show', {id: rotation.id}) }}" class="btn-show">
+                            <i class="fa fa-eye"></i>
+                        </a>
+                        <a href="{{ path('agri_rotations_edit', {id: rotation.id}) }}" class="btn-edit">
+                            <i class="fa fa-pen"></i>
+                        </a>
+                        <form method="post" action="{{ path('agri_rotations_delete', {id: rotation.id}) }}"
+                              onsubmit="return confirm('Supprimer cette rotation ?')">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete'~rotation.id) }}">
+                            <button class="btn-del"><i class="fa fa-trash"></i></button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <div class="no-results" id="noResults">
+        <i class="fa fa-magnifying-glass" style="font-size:40px;opacity:0.2;display:block;margin-bottom:12px"></i>
+        Aucun résultat trouvé.
+    </div>
+    <div class="pagination-wrap">
+        <div class="pagination-info" id="paginationInfo"></div>
+        <div class="pagination-btns" id="paginationBtns"></div>
+    </div>
+    {% endif %}
+</div>
+
+{# ══ MODAL SUGGESTION ══ #}
+<div class="modal-overlay" id="suggestModal">
+    <div class="modal-box">
+        <button class="modal-close" onclick="document.getElementById('suggestModal').classList.remove('active')">×</button>
+        <div class="modal-title"><i class="fa fa-wand-magic-sparkles" style="color:#D97706"></i> Meilleure rotation suggérée</div>
+        <div class="modal-subtitle">Classement basé sur pH, durée, météo et besoin en eau</div>
+        <div id="suggestContent">
+            <div class="modal-loading"><i class="fa fa-spinner"></i> Analyse en cours…</div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+<script>
+let allRows = [], filteredRows = [], currentPage = 1, perPage = 10;
+
+const searchInput  = document.getElementById('searchInput');
+const filterStatus = document.getElementById('filterStatus');
+const resultCount  = document.getElementById('resultCount');
+const noResults    = document.getElementById('noResults');
+const tbody        = document.getElementById('rotationBody');
+
+window.addEventListener('DOMContentLoaded', () => {
+    if (!tbody) return;
+    allRows = Array.from(tbody.getElementsByTagName('tr'));
+    applyFilterAndPaginate();
+});
+
+function applyFilterAndPaginate() {
+    const q      = searchInput  ? searchInput.value.toLowerCase().trim() : '';
+    const status = filterStatus ? filterStatus.value : '';
+    filteredRows = allRows.filter(row => {
+        const matchSearch = !q || (row.dataset.terrain||'').includes(q) || (row.dataset.plante||'').includes(q);
+        const matchStatus = !status || (row.dataset.status||'') === status;
+        return matchSearch && matchStatus;
+    });
+    currentPage = 1;
+    renderPage();
+}
+
+if (searchInput)  searchInput.addEventListener('input',  applyFilterAndPaginate);
+if (filterStatus) filterStatus.addEventListener('change', applyFilterAndPaginate);
+
+function renderPage() {
+    if (!tbody) return;
+    const total      = filteredRows.length;
+    const totalPages = Math.max(1, Math.ceil(total / perPage));
+    if (currentPage > totalPages) currentPage = totalPages;
+    const start = (currentPage - 1) * perPage;
+    const end   = Math.min(start + perPage, total);
+    allRows.forEach(r => r.style.display = 'none');
+    filteredRows.slice(start, end).forEach(r => r.style.display = '');
+    if (resultCount) resultCount.textContent = total + ' résultat' + (total > 1 ? 's' : '');
+    if (noResults)   noResults.style.display  = total === 0 ? 'block' : 'none';
+    const info = document.getElementById('paginationInfo');
+    if (info) info.textContent = total === 0 ? 'Aucun résultat' : `${start+1}–${end} sur ${total} rotation${total>1?'s':''}`;
+    renderPaginationBtns(totalPages);
+}
+
+function renderPaginationBtns(totalPages) {
+    const wrap = document.getElementById('paginationBtns');
+    if (!wrap) return;
+    wrap.innerHTML = '';
+    const mkBtn = (label, page, disabled, active) => {
+        const b = document.createElement('button');
+        b.className = 'page-btn' + (active ? ' active' : '');
+        b.innerHTML = label;
+        b.disabled  = disabled;
+        if (!disabled) b.addEventListener('click', () => { currentPage = page; renderPage(); });
+        return b;
+    };
+    wrap.appendChild(mkBtn('<i class="fa fa-chevron-left"></i>', currentPage - 1, currentPage === 1, false));
+    let pages = [];
+    if (totalPages <= 7) { for (let i=1;i<=totalPages;i++) pages.push(i); }
+    else {
+        pages = [1];
+        if (currentPage > 3) pages.push('…');
+        for (let i=Math.max(2,currentPage-1); i<=Math.min(totalPages-1,currentPage+1); i++) pages.push(i);
+        if (currentPage < totalPages-2) pages.push('…');
+        pages.push(totalPages);
+    }
+    pages.forEach(p => {
+        if (p === '…') { const sp=document.createElement('span'); sp.textContent='…'; sp.style.cssText='padding:0 8px;color:#888;line-height:36px;'; wrap.appendChild(sp); }
+        else wrap.appendChild(mkBtn(p, p, false, p === currentPage));
+    });
+    wrap.appendChild(mkBtn('<i class="fa fa-chevron-right"></i>', currentPage + 1, currentPage === totalPages, false));
+}
+
+// Tri
+let sortCol = -1, sortAsc = true;
+document.querySelectorAll('th[data-col]').forEach(th => {
+    th.addEventListener('click', () => {
+        if (!tbody) return;
+        const col = parseInt(th.dataset.col);
+        document.querySelectorAll('th[data-col]').forEach(t => {
+            t.classList.remove('sort-asc','sort-desc');
+            const ic = t.querySelector('.sort-icon'); if (ic) ic.className='fa fa-sort sort-icon';
+        });
+        sortAsc = (sortCol === col) ? !sortAsc : true;
+        sortCol = col;
+        th.classList.add(sortAsc ? 'sort-asc' : 'sort-desc');
+        const ic = th.querySelector('.sort-icon'); if (ic) ic.className='fa fa-sort-'+(sortAsc?'up':'down')+' sort-icon';
+        filteredRows.sort((a,b)=>{
+            const av=a.cells[col]?.textContent.trim()||'', bv=b.cells[col]?.textContent.trim()||'';
+            const an=parseFloat(av.replace(/[^\d.]/g,'')), bn=parseFloat(bv.replace(/[^\d.]/g,''));
+            if (!isNaN(an)&&!isNaN(bn)) return sortAsc?an-bn:bn-an;
+            return sortAsc?av.localeCompare(bv,'fr'):bv.localeCompare(av,'fr');
+        });
+        filteredRows.forEach(r=>tbody.appendChild(r));
+        currentPage=1; renderPage();
+    });
+});
+
+// ══════════════════════════════════════════════════════
+// SUGGESTION MEILLEURE ROTATION
+// ══════════════════════════════════════════════════════
+async function openSuggestion() {
+    document.getElementById('suggestContent').innerHTML =
+        '<div class="modal-loading"><i class="fa fa-spinner"></i> Analyse en cours…</div>';
+    document.getElementById('suggestModal').classList.add('active');
+
+    // Récupérer météo actuelle (Tunisie centre)
+    let temp = 25, precip = 0, humidity = 50;
+    try {
+        const wR = await fetch('https://api.open-meteo.com/v1/forecast?latitude=33.8869&longitude=9.5375&current_weather=true&hourly=relative_humidity_2m,precipitation&forecast_days=1&timezone=Africa/Tunis');
+        const wD = await wR.json();
+        const h  = new Date().getHours();
+        temp     = wD.current_weather?.temperature ?? 25;
+        precip   = wD.hourly?.precipitation?.[h]   ?? 0;
+        humidity = wD.hourly?.relative_humidity_2m?.[h] ?? 50;
+    } catch(_) {}
+
+    // Récupérer toutes les rotations depuis le DOM
+    const rows = Array.from(document.querySelectorAll('#rotationBody tr'));
+    if (rows.length === 0) {
+        document.getElementById('suggestContent').innerHTML =
+            '<p style="text-align:center;color:#aaa">Aucune rotation disponible.</p>';
+        return;
+    }
+
+    // Scoring de chaque rotation
+    const scored = rows.map(row => {
+        const terrain   = row.dataset.terrainRaw || '—';
+        const plante    = row.dataset.planteRaw  || '—';
+        const status    = row.dataset.statusRaw  || 'Inactif';
+        const duree     = parseInt(row.dataset.duree)   || 0;
+        const besoin    = parseFloat(row.dataset.besoin) || 5;
+        const ph        = parseFloat(row.dataset.ph)     || 7;
+        const sol       = row.dataset.sol  || '';
+        const debut     = row.dataset.debutRaw || '—';
+        const fin       = row.dataset.finRaw   || '—';
+
+        let score = 0;
+        const tags   = [];
+        const raisons = [];
+
+        // ── Critère 1 : Statut actif ──
+        if (status === 'Actif') { score += 30; tags.push({t:'Actif',c:'green'}); }
+        else { score += 5; tags.push({t:'Inactif',c:'orange'}); }
+
+        // ── Critère 2 : pH optimal ──
+        if (ph >= 6.0 && ph <= 7.0)      { score += 25; tags.push({t:'pH optimal',c:'green'}); raisons.push(`pH ${ph} — optimal pour la plupart des cultures`); }
+        else if (ph >= 5.5 && ph <= 7.5) { score += 12; tags.push({t:'pH acceptable',c:'orange'}); raisons.push(`pH ${ph} — acceptable mais ajustable`); }
+        else                              { score += 3;  tags.push({t:'pH défavorable',c:'orange'}); raisons.push(`pH ${ph} — nécessite correction`); }
+
+        // ── Critère 3 : Durée de rotation saine (60–180 jours) ──
+        if (duree >= 60 && duree <= 180) { score += 20; tags.push({t:`${duree}j`,c:'blue'}); raisons.push(`Durée ${duree} jours — rotation idéale`); }
+        else if (duree > 0)              { score += 8;  tags.push({t:`${duree}j`,c:'orange'}); raisons.push(`Durée ${duree} jours — hors plage optimale`); }
+
+        // ── Critère 4 : Besoin en eau vs météo ──
+        if (precip > 5 && besoin <= 8)   { score += 15; raisons.push(`Pluie ${precip}mm — besoin en eau couvert naturellement`); tags.push({t:'Bien irrigué',c:'blue'}); }
+        else if (besoin <= 6)            { score += 10; raisons.push(`Faible besoin en eau (${besoin}L/j) — économe`); }
+        else if (besoin > 15 && temp>32) { score -= 5;  raisons.push(`Besoin ${besoin}L/j + chaleur ${temp}°C — stress hydrique`); }
+
+        // ── Critère 5 : Type de sol adapté à la météo ──
+        if (sol === 'Argileux' && humidity > 60) { score += 10; raisons.push('Sol argileux — retient bien l\'humidité'); }
+        if (sol === 'Sableux'  && temp > 30)     { score += 8;  raisons.push('Sol sableux — bon drainage par forte chaleur'); }
+        if (sol === 'Humifère')                  { score += 12; raisons.push('Sol humifère — riche en nutriments'); tags.push({t:'Sol riche',c:'green'}); }
+
+        score = Math.max(0, Math.min(100, score));
+        return { terrain, plante, status, duree, besoin, ph, sol, debut, fin, score, tags, raisons };
+    });
+
+    // Trier par score décroissant
+    scored.sort((a,b) => b.score - a.score);
+    const top3 = scored.slice(0, 3);
+
+    // Bannière météo
+    const meteoIcon = precip > 5 ? '🌧️' : temp > 32 ? '🔥' : humidity < 35 ? '💨' : '☀️';
+    const meteoTxt  = precip > 5
+        ? `Pluie actuelle (${precip}mm) — favorise les cultures à fort besoin en eau`
+        : temp > 32
+        ? `Chaleur (${temp}°C) — privilégier les cultures à faible besoin en eau`
+        : `Conditions normales (${temp}°C, ${humidity}% humidité)`;
+
+    let html = `
+        <div class="sug-meteo-banner">
+            <span style="font-size:22px">${meteoIcon}</span>
+            <div><strong>Météo prise en compte :</strong> ${meteoTxt}</div>
+        </div>`;
+
+    top3.forEach((r, i) => {
+        const tagsHtml = r.tags.map(t => `<span class="sug-tag ${t.c}">${t.t}</span>`).join('');
+        const raisonsHtml = r.raisons.length
+            ? r.raisons.map(x => `• ${x}`).join('<br>')
+            : '• Données insuffisantes pour détailler';
+
+        html += `
+        <div class="sug-card">
+            <div class="sug-card-header">
+                <div class="sug-rank">${i+1}</div>
+                <div>
+                    <div class="sug-name">🌱 ${r.plante} <span style="color:#aaa;font-weight:400">sur</span> ${r.terrain}</div>
+                    <div class="sug-terrain">pH ${r.ph} · ${r.sol || 'Sol non précisé'} · ${r.duree > 0 ? r.duree+'j' : 'Durée inconnue'}</div>
+                </div>
+                <div style="margin-left:auto;font-size:20px;font-weight:700;color:#2D5A27">${r.score}<span style="font-size:13px;color:#aaa">/100</span></div>
+            </div>
+            <div class="sug-score-bar"><div class="sug-score-fill" style="width:${r.score}%"></div></div>
+            <div class="sug-score-label">${r.score} points</div>
+            <div class="sug-tags">${tagsHtml}</div>
+            <div class="sug-reason">${raisonsHtml}</div>
+        </div>`;
+    });
+
+    if (scored.length === 0) {
+        html = '<p style="text-align:center;color:#aaa">Aucune rotation à analyser.</p>';
+    }
+
+    document.getElementById('suggestContent').innerHTML = html;
+}
+
+// Fermer modal en cliquant overlay
+document.getElementById('suggestModal').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('active');
+});
+
+// ══════════════════════════════════════════════════════
+// EXPORT PDF
+// ══════════════════════════════════════════════════════
+function exportPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
+    doc.setFillColor(45,90,39);
+    doc.rect(0,0,297,22,'F');
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(16); doc.setFont('helvetica','bold');
+    doc.text('AgroFlow — Mes Rotations', 14, 15);
+    doc.setFontSize(10);
+    doc.text('Exporté le ' + new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'}), 200, 15);
+
+    const rows = filteredRows.map(row => [
+        row.dataset.terrainRaw || '—',
+        row.dataset.planteRaw  || '—',
+        row.dataset.debutRaw   || '—',
+        row.dataset.finRaw     || '—',
+        row.dataset.statusRaw  || '—'
+    ]);
+
+    doc.autoTable({
+        head: [['Terrain','Plante','Date début','Date fin','Statut']],
+        body: rows,
+        startY: 30,
+        theme: 'striped',
+        headStyles: { fillColor:[74,140,63], textColor:255, fontStyle:'bold', fontSize:11 },
+        bodyStyles: { fontSize:10 },
+        alternateRowStyles: { fillColor:[240,255,240] },
+        margin: { left:14, right:14 }
+    });
+
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i=1;i<=pageCount;i++) {
+        doc.setPage(i);
+        doc.setFontSize(8); doc.setTextColor(150);
+        doc.text('AgroFlow — Confidentiel', 14, 200);
+        doc.text(`Page ${i} / ${pageCount}`, 260, 200);
+    }
+    doc.save('mes_rotations_agroflow_'+new Date().toISOString().slice(0,10)+'.pdf');
+}
+</script>
+{% endblock %}

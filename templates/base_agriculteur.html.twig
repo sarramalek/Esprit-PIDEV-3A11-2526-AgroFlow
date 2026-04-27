@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AgroFlow{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('assets/css/main.css') }}">
+
+    <script>
+        function cloudinaryAvatar(rawUrl, w, h) {
+            if (!rawUrl) return null;
+            var uploadPattern = /\/upload\//;
+            if (!uploadPattern.test(rawUrl)) return rawUrl;
+            var transform = 'c_fill,g_face,w_' + w + ',h_' + h + ',q_auto,f_auto/';
+            return rawUrl.replace('/upload/', '/upload/' + transform);
+        }
+
+        function initCloudinaryAvatars() {
+            document.querySelectorAll('[data-cloudinary-src]').forEach(function(el) {
+                var rawUrl = el.dataset.cloudinarySrc;
+                var w = parseInt(el.dataset.w || 52, 10);
+                var h = parseInt(el.dataset.h || 52, 10);
+                var fbId = el.dataset.fallbackId;
+                var fb = fbId ? document.getElementById(fbId) : null;
+
+                if (rawUrl && rawUrl.trim() !== '' && rawUrl !== 'null') {
+                    el.src = cloudinaryAvatar(rawUrl.trim(), w, h);
+                    el.style.display = 'block';
+                    if (fb) fb.style.display = 'none';
+                    el.onerror = function() {
+                        el.style.display = 'none';
+                        if (fb) fb.style.display = 'flex';
+                    };
+                } else {
+                    el.style.display = 'none';
+                    if (fb) fb.style.display = 'flex';
+                }
+            });
+        }
+        document.addEventListener('DOMContentLoaded', initCloudinaryAvatars);
+    </script>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', Arial, sans-serif;
+            background-color: #FCF8E6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* ══════════════════════════════════════
+           NAVBAR
+        ══════════════════════════════════════ */
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 0 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 70px;
+            isolation: isolate;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+        .header-brand img { height: 52px; }
+
+        .navmenu {
+            display: flex;
+            align-items: stretch;
+            gap: 0;
+            height: 100%;
+        }
+        .nav-item {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 0 16px;
+            height: 70px;
+            color: #2C3E50;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .nav-link i { font-size: 13px; color: #2D5A27; }
+        .nav-link:hover,
+        .nav-link.active {
+            color: #2D5A27;
+            border-bottom-color: #2D5A27;
+            background-color: #f5faf4;
+        }
+        .nav-link .chevron { font-size: 9px; opacity: 0.4; margin-left: 2px; }
+
+        .nav-item:hover .dropdown { display: block; }
+        .dropdown {
+            display: none;
+            position: absolute;
+            top: 70px;
+            left: 0;
+            min-width: 200px;
+            background: white;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            border-top: 2px solid #2D5A27;
+            z-index: 1001;
+            overflow: hidden;
+        }
+        .dropdown a {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 11px 18px;
+            color: #2C3E50;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: background 0.15s;
+        }
+        .dropdown a i { font-size: 12px; color: #2D5A27; width: 14px; text-align: center; }
+        .dropdown a:hover { background: #EAF3E6; color: #1B3A20; }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-shrink: 0;
+        }
+        .user-avatar-sm {
+            width: 34px; height: 34px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, #4A8C3F, #2D5A27);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 700; color: white;
+            flex-shrink: 0;
+        }
+
+        /* ══════════════════════════════════════
+           BOUTON IA NAVBAR
+        ══════════════════════════════════════ */
+        .ai-nav-btn {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 0 14px;
+            height: 70px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: #2C3E50;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .ai-nav-btn:hover,
+        .ai-nav-btn.active {
+            color: #2D5A27;
+            border-bottom-color: #2D5A27;
+            background-color: #f5faf4;
+        }
+        .ai-nav-btn .ai-icon-wrap {
+            width: 26px; height: 26px;
+            background: linear-gradient(135deg, #4A8C3F, #2D5A27);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .ai-nav-btn .ai-icon-wrap i { color: #fff; font-size: 11px; }
+        .ai-nav-btn .ai-pulse {
+            position: absolute;
+            top: 16px; right: 10px;
+            width: 7px; height: 7px;
+            background: #5dcaa5;
+            border-radius: 50%;
+            border: 1.5px solid white;
+            animation: ai-blink 2.5s infinite;
+        }
+        @keyframes ai-blink {
+            0%,100% { opacity: 1; transform: scale(1); }
+            50%      { opacity: .5; transform: scale(.75); }
+        }
+
+        /* ══════════════════════════════════════
+           POPUP ASSISTANT IA
+        ══════════════════════════════════════ */
+        #aiPopup {
+            display: none;
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 400px;
+            height: 580px;
+            background: #ffffff;
+            border-radius: 18px;
+            box-shadow: 0 16px 60px rgba(0,0,0,0.18), 0 2px 10px rgba(0,0,0,0.08);
+            z-index: 99998;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid #e8ede8;
+            animation: popupIn 0.25s cubic-bezier(.34,1.56,.64,1);
+        }
+        #aiPopup.open { display: flex; }
+
+        @keyframes popupIn {
+            from { opacity: 0; transform: scale(.92) translateY(16px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* Header popup */
+        .ai-popup-header {
+            background: linear-gradient(135deg, #2D5A27, #4A8C3F);
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .ai-popup-avatar {
+            width: 36px; height: 36px;
+            background: rgba(255,255,255,.15);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .ai-popup-title {
+            flex: 1;
+        }
+        .ai-popup-title strong {
+            display: block;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .ai-popup-title span {
+            color: rgba(255,255,255,.65);
+            font-size: 11px;
+        }
+        .ai-popup-actions {
+            display: flex;
+            gap: 6px;
+        }
+        .ai-popup-ico-btn {
+            width: 28px; height: 28px;
+            background: rgba(255,255,255,.12);
+            border: none;
+            border-radius: 7px;
+            color: rgba(255,255,255,.8);
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px;
+            transition: background .15s;
+        }
+        .ai-popup-ico-btn:hover { background: rgba(255,255,255,.22); color: #fff; }
+
+        /* Status bar */
+        .ai-popup-status {
+            background: #f5faf4;
+            border-bottom: 1px solid #e5ede4;
+            padding: 6px 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .ai-status-dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: #ccc;
+            flex-shrink: 0;
+            transition: background .3s;
+        }
+        .ai-status-dot.ok  { background: #5dcaa5; box-shadow: 0 0 5px #5dcaa5; }
+        .ai-status-dot.err { background: #e74c3c; }
+        .ai-status-text { font-size: 11px; color: #6b7566; }
+        .ai-status-db   { font-size: 11px; color: #aaa; margin-left: auto; }
+
+        /* Messages */
+        .ai-popup-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 14px;
+            scroll-behavior: smooth;
+        }
+        .ai-popup-messages::-webkit-scrollbar { width: 3px; }
+        .ai-popup-messages::-webkit-scrollbar-thumb { background: #ddd; border-radius: 2px; }
+
+        .ai-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            color: #aaa;
+            gap: 8px;
+        }
+        .ai-empty .ai-empty-icon { font-size: 34px; opacity: .45; }
+        .ai-empty p { font-size: 13px; line-height: 1.6; max-width: 240px; }
+        .ai-empty strong { color: #3d6e3a; font-size: 14px; display: block; margin-bottom: 4px; }
+
+        /* Chips suggestions */
+        .ai-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+        .ai-chip {
+            background: #f0f8ee;
+            border: 1px solid #c8e6c0;
+            color: #2D5A27;
+            font-size: 11px;
+            font-weight: 500;
+            padding: 5px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all .15s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .ai-chip:hover { background: #daf0d4; border-color: #4A8C3F; }
+
+        /* Bulles */
+        .ai-msg { margin-bottom: 14px; animation: msgIn .2s ease; }
+        @keyframes msgIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+        .ai-msg-user { display: flex; justify-content: flex-end; }
+        .ai-msg-user .bbl {
+            background: #2D5A27;
+            color: #fff;
+            padding: 9px 13px;
+            border-radius: 14px 14px 3px 14px;
+            max-width: 78%;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .ai-msg-bot { display: flex; gap: 8px; align-items: flex-start; }
+        .ai-msg-bot .bot-av {
+            width: 26px; height: 26px;
+            background: linear-gradient(135deg,#4A8C3F,#2D5A27);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .ai-msg-bot .bbl {
+            background: #f8f8f8;
+            border: 1px solid #eee;
+            padding: 10px 13px;
+            border-radius: 3px 14px 14px 14px;
+            max-width: 82%;
+            font-size: 13px;
+            line-height: 1.65;
+            color: #2C3E50;
+        }
+
+        /* SQL block */
+        .ai-sql {
+            margin-top: 8px;
+            background: #1a2e18;
+            border-radius: 7px;
+            overflow: hidden;
+            font-size: 11px;
+        }
+        .ai-sql-lbl { padding: 4px 10px; color: rgba(255,255,255,.4); font-family: monospace; background: rgba(255,255,255,.05); border-bottom: 1px solid rgba(255,255,255,.05); font-size: 10px; }
+        .ai-sql-code { padding: 8px 10px; color: #7ec87a; font-family: monospace; white-space: pre-wrap; word-break: break-all; line-height: 1.4; }
+
+        /* Tableau résultats */
+        .ai-tbl-wrap { margin-top: 8px; overflow-x: auto; border-radius: 7px; border: 1px solid #e8ede8; max-height: 160px; overflow-y: auto; }
+        .ai-tbl { width: 100%; border-collapse: collapse; font-size: 11px; }
+        .ai-tbl th { background: #f0faf0; color: #1f6e1c; font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 5px 8px; border-bottom: 1px solid #d6f0d0; white-space: nowrap; }
+        .ai-tbl td { padding: 5px 8px; border-bottom: 1px solid #f0f0f0; color: #2C3E50; }
+        .ai-tbl tr:last-child td { border-bottom: none; }
+        .ai-tbl tr:hover td { background: #f9fdf8; }
+        .ai-row-count { font-size: 10px; color: #aaa; margin-top: 3px; }
+
+        /* Typing dots */
+        .ai-typing { display: flex; gap: 4px; padding: 3px 0; }
+        .ai-typing span { width: 5px; height: 5px; border-radius: 50%; background: #aaa; animation: tdot 1.2s infinite; }
+        .ai-typing span:nth-child(2) { animation-delay: .2s; }
+        .ai-typing span:nth-child(3) { animation-delay: .4s; }
+        @keyframes tdot { 0%,80%,100%{transform:translateY(0);opacity:.3} 40%{transform:translateY(-4px);opacity:1} }
+
+        /* Input zone */
+        .ai-popup-input {
+            border-top: 1px solid #eee;
+            padding: 10px 12px;
+            flex-shrink: 0;
+            background: #fff;
+        }
+        .ai-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+            background: #f5f3ee;
+            border: 1.5px solid #ddd8ce;
+            border-radius: 11px;
+            padding: 7px 9px;
+            transition: border-color .2s;
+        }
+        .ai-input-row:focus-within { border-color: #4A8C3F; background: #fff; }
+        #aiChatInput {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            color: #2C3E50;
+            resize: none;
+            outline: none;
+            max-height: 80px;
+            min-height: 20px;
+            line-height: 1.45;
+        }
+        #aiChatInput::placeholder { color: #aaa; }
+        .ai-send-btn {
+            width: 30px; height: 30px;
+            background: #2D5A27;
+            border: none; border-radius: 8px;
+            color: #fff; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            transition: all .15s;
+        }
+        .ai-send-btn:hover { background: #4A8C3F; transform: scale(1.05); }
+        .ai-send-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+        .ai-input-hint { font-size: 10px; color: #bbb; text-align: center; margin-top: 5px; }
+
+        /* ══════════════════════════════════════
+           DROPDOWN PROFIL (inchangé)
+        ══════════════════════════════════════ */
+        #profileMenu { position: relative; z-index: 1001; }
+
+        #profilePanel {
+            display: none;
+            position: fixed !important;
+            top: 70px !important;
+            right: 30px !important;
+            width: 280px;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            border: 1px solid #eee;
+            overflow: hidden;
+            z-index: 99999 !important;
+        }
+
+        .agri-pf-input {
+            display: none;
+            width: 100%;
+            background: #f5f8f4;
+            border: 1px solid #c8e6c0;
+            border-radius: 6px;
+            color: #2C3E50;
+            font-size: 12px;
+            padding: 5px 8px;
+            margin-top: 3px;
+            outline: none;
+            font-family: 'DM Sans', sans-serif;
+            transition: border 0.15s;
+        }
+        .agri-pf-input:focus { border-color: #4A8C3F; background: #eef5ec; }
+
+        .agri-pf-btn {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            color: #555;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.15s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .agri-pf-btn:hover { background: #e8e8e8; color: #222; }
+        .agri-pf-btn.save { background: #eaf3de; border-color: #a3d48a; color: #2D5A27; }
+        .agri-pf-btn.save:hover { background: #d4edbc; }
+        .agri-pf-btn.cancel { background: #fdecea; border-color: #f5a7a7; color: #c0392b; }
+        .agri-pf-btn.cancel:hover { background: #fbd5d5; }
+
+        .agri-photo-upload {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 12px;
+            background: #f5faf4;
+            border: 1px dashed #c8e6c0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 11px;
+            color: #888;
+            transition: all 0.2s;
+            margin: 4px 16px 8px;
+        }
+        .agri-photo-upload:hover { background: #eaf3de; color: #2D5A27; border-color: #4A8C3F; }
+        .agri-photo-upload input { display: none; }
+
+        .agri-upload-progress { display: none; height: 3px; background: #e0e0e0; border-radius: 2px; margin: 0 16px 8px; overflow: hidden; }
+        .agri-upload-progress-bar { height: 100%; background: #4A8C3F; border-radius: 2px; width: 0%; transition: width 0.3s ease; }
+
+        .main-content { flex: 1; padding: 32px 40px; }
+    </style>
+
+    {% block stylesheets %}{% endblock %}
+</head>
+
+{% set protectedPrefixes = ['/admin', '/agriculteur', '/ouvrier'] %}
+{% set isProtected = false %}
+{% for prefix in protectedPrefixes %}
+    {% if app.request.pathInfo starts with prefix %}
+        {% set isProtected = true %}
+    {% endif %}
+{% endfor %}
+
+{% if isProtected %}
+<script>
+function checkAndRedirect() {
+    fetch('{{ path("app_check_session") }}', { credentials: 'same-origin' })
+        .then(r => {
+            if (r.status === 401 || r.redirected) {
+                window.location.replace('{{ path("app_login") }}');
+            }
+        });
+}
+window.addEventListener('pageshow', function (e) { if (e.persisted) checkAndRedirect(); });
+document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') checkAndRedirect(); });
+checkAndRedirect();
+</script>
+{% endif %}
+
+<body>
+{% include '_tts_button.html.twig' %}
+<header class="header">
+
+    <a href="{{ path('agri_home') }}" class="header-brand">
+        <img src="{{ asset('assets/img/Logo.png') }}" alt="AgroFlow">
+    </a>
+
+    <nav class="navmenu">
+
+        <div class="nav-item">
+            <a href="{{ path('agri_home') }}"
+               class="nav-link {% if app.request.get('_route') == 'agri_home' %}active{% endif %}">
+                <i class="fa fa-house"></i> Accueil
+            </a>
+        </div>
+
+            {# Animaux #}
+            <div class="nav-item">
+                <a href="{{ path('app_animaux_index') }}"
+                   class="nav-link {% if app.request.get('_route') in ['app_animaux_index','app_examens_index'] %}active{% endif %}">
+                    <i class="fa fa-paw"></i> Animaux
+                    <i class="fa fa-chevron-down chevron"></i>
+                </a>
+                <div class="dropdown">
+                    <a href="{{ path('app_animaux_index') }}"><i class="fa fa-paw"></i> Mes animaux</a>
+                    <a href="{{ path('app_examens_index') }}"><i class="fa fa-stethoscope"></i> Examens vétérinaires</a>
+                </div>
+            </div>
+
+        <div class="nav-item">
+            <a href="{{ path('agri_categories') }}"
+               class="nav-link {% if app.request.get('_route') in ['agri_categories','agri_produits'] %}active{% endif %}">
+                <i class="fa fa-boxes-stacked"></i> Stocks
+                <i class="fa fa-chevron-down chevron"></i>
+            </a>
+            <div class="dropdown">
+                <a href="{{ path('agri_categories') }}"><i class="fa fa-tags"></i> Catégories</a>
+                <a href="{{ path('agri_produits') }}"><i class="fa fa-box"></i> Produits</a>
+            </div>
+        </div>
+
+            {# Terrains #}
+             <div class="nav-item">
+            <a href="{{ path('agri_terrains') }}"
+               class="nav-link {% if app.request.get('_route') in ['agri_terrains','agri_rotations'] %}active{% endif %}">
+                <i class="fa fa-map"></i> Terrains
+                <i class="fa fa-chevron-down chevron"></i>
+            </a>
+            <div class="dropdown">
+                <a href="{{ path('agri_terrains') }}"><i class="fa fa-map"></i> Mes terrains</a>
+                <a href="{{ path('agri_plantes') }}"><i class="fa fa-seedling"></i> Mes plantes</a>
+                <a href="{{ path('agri_rotations') }}"><i class="fa fa-rotate"></i> Rotations de culture</a>
+            </div>
+        </div>
+
+        <div class="nav-item">
+            <a href="{{ path('agri_machines') }}"
+               class="nav-link {% if app.request.get('_route') starts with 'agri_machine' or app.request.get('_route') starts with 'agri_maintenances' %}active{% endif %}">
+                <i class="fa fa-tractor"></i> Matériels
+                <i class="fa fa-chevron-down chevron"></i>
+            </a>
+            <div class="dropdown">
+                <a href="{{ path('agri_machines') }}"
+                   class="{% if app.request.attributes.get('_route') starts with 'agri_machine' %}active{% endif %}">
+                    <i class="fa fa-tractor"></i> Machines
+                </a>
+                <a href="{{ path('agri_maintenances_index') }}"
+                   class="{% if app.request.attributes.get('_route') starts with 'agri_maintenances' %}active{% endif %}">
+                    <i class="fa fa-wrench"></i> Maintenances
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-item">
+            <a href="{{ path('agriculteur_evenement_index') }}"
+               class="nav-link {% if app.request.get('_route') in ['agriculteur_evenement_index','agriculteur_participation_index'] %}active{% endif %}">
+                <i class="fa fa-calendar-days"></i> Événements
+                <i class="fa fa-chevron-down chevron"></i>
+            </a>
+            <div class="dropdown">
+                <a href="{{ path('agriculteur_evenement_index') }}"
+                   class="{% if app.request.get('_route') == 'agriculteur_evenement_index' %}active{% endif %}">
+                    <i class="fa fa-calendar-days"></i> Événements
+                </a>
+                <a href="{{ path('agriculteur_participation_index') }}"
+                   class="{% if app.request.get('_route') == 'agriculteur_participation_index' %}active{% endif %}">
+                    <i class="fa fa-ticket"></i> Mes participations
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-item">
+            <a href="{{ path('app_abonnement_front') }}"
+               class="nav-link {% if app.request.get('_route') in ['app_offre_front','app_abonnement_front','app_abonnement_pdf'] %}active{% endif %}">
+                <i class="fa fa-crown"></i> Abonnement
+                <i class="fa fa-chevron-down chevron"></i>
+            </a>
+            <div class="dropdown">
+                <a href="{{ path('app_offre_front') }}"><i class="fa fa-star"></i> Offres disponibles</a>
+                <a href="{{ path('app_abonnement_front') }}"
+                   class="{% if app.request.get('_route') in ['app_abonnement_front','app_abonnement_pdf'] %}active{% endif %}">
+                    <i class="fa fa-crown"></i> Mes abonnements
+                </a>
+            </div>
+        </div>
+
+        <div class="nav-item">
+            <a href="{{ path('app_ouvrier_index') }}"
+               class="nav-link {% if app.request.get('_route') in ['app_ouvrier_index','agri_taches'] %}active{% endif %}">
+                <i class="fa fa-list-check"></i> Mes Ouvriers
+            </a>
+        </div>
+
+        {# ══ BOUTON ASSISTANT IA ══ #}
+        <div class="nav-item">
+            <button class="ai-nav-btn" id="aiNavBtn" onclick="toggleAiPopup()" title="Assistant IA Agricole">
+                <div class="ai-icon-wrap">
+                    <i class="fa fa-robot"></i>
+                </div>
+                
+                <span class="ai-pulse" id="aiNavPulse"></span>
+            </button>
+        </div>
+
+    </nav>
+
+    {# Actions droite #}
+    <div class="header-actions">
+        {% if app.user %}
+        <div id="profileMenu">
+
+            <div onclick="toggleProfilePanel()"
+                 style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:6px 12px;border-radius:10px;transition:background 0.2s;"
+                 onmouseover="this.style.background='#f5faf4'"
+                 onmouseout="this.style.background='transparent'">
+
+                <div style="position:relative;width:34px;height:34px;flex-shrink:0;">
+                    <img id="agriPhotoSmall"
+                         style="display:none;width:34px;height:34px;border-radius:9px;object-fit:cover;"
+                         data-cloudinary-src="{{ app.user.img is defined ? app.user.img : '' }}"
+                         data-w="34" data-h="34"
+                         data-fallback-id="agriAvatarSmall"
+                         src="" alt="Photo de profil">
+                    <div class="user-avatar-sm" id="agriAvatarSmall">
+                        {{ app.user.prenom|first|upper }}{{ app.user.nom|first|upper }}
+                    </div>
+                </div>
+
+                <div style="line-height:1.3;">
+                    <div id="agriNameSmall" style="font-size:13px;font-weight:600;color:#2C3E50;">
+                        {{ app.user.prenom }} {{ app.user.nom }}
+                    </div>
+                    <div style="font-size:11px;color:#aaa;">Agriculteur</div>
+                </div>
+                <i class="fa fa-chevron-down" id="profileChevron"
+                   style="font-size:9px;color:#aaa;transition:transform 0.25s;"></i>
+            </div>
+
+            <div id="profilePanel">
+
+                <div style="padding:18px 16px 14px;text-align:center;border-bottom:1px solid #f0f0f0;background:#fafdf8;">
+                    <div style="position:relative;width:52px;height:52px;margin:0 auto 10px;">
+                        <img id="agriPhotoBig"
+                             style="display:none;width:52px;height:52px;border-radius:14px;object-fit:cover;"
+                             data-cloudinary-src="{{ app.user.img is defined ? app.user.img : '' }}"
+                             data-w="52" data-h="52"
+                             data-fallback-id="agriAvatarBig"
+                             src="" alt="Photo de profil">
+                        <div id="agriAvatarBig"
+                             style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#4A8C3F,#2D5A27);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:white;">
+                            {{ app.user.prenom|first|upper }}{{ app.user.nom|first|upper }}
+                        </div>
+                    </div>
+                    <div id="agriNameBig" style="font-size:14px;font-weight:700;color:#2C3E50;">
+                        {{ app.user.prenom }} {{ app.user.nom }}
+                    </div>
+                    <div style="display:inline-flex;align-items:center;gap:5px;background:#EAF3DE;border:1px solid #c8e6c0;color:#2D5A27;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;margin-top:6px;">
+                        <span style="width:5px;height:5px;border-radius:50%;background:#6FE065;display:inline-block;"></span>
+                        Agriculteur
+                    </div>
+                </div>
+
+                <div style="display:flex;justify-content:flex-end;padding:8px 12px 4px;gap:6px;border-bottom:1px solid #f5f5f5;">
+                    <button class="agri-pf-btn" id="agriBtnEdit" onclick="agriStartEdit()">
+                        <i class="fa fa-pen" style="font-size:10px;"></i> Modifier
+                    </button>
+                    <button class="agri-pf-btn save" id="agriBtnSave" onclick="agriSubmitEdit()" style="display:none;">
+                        <i class="fa fa-check" style="font-size:10px;"></i> Enregistrer
+                    </button>
+                    <button class="agri-pf-btn cancel" id="agriBtnCancel" onclick="agriCancelEdit()" style="display:none;">
+                        <i class="fa fa-times" style="font-size:10px;"></i> Annuler
+                    </button>
+                </div>
+
+                <label class="agri-photo-upload" id="agriPhotoUploadLabel">
+                    <i class="fa fa-camera" style="font-size:12px;color:#4A8C3F;"></i>
+                    <span id="agriPhotoUploadText">Changer la photo de profil</span>
+                    <input type="file" id="agriPhotoFileInput" accept="image/*"
+                           onchange="agriUploadPhoto(this)">
+                </label>
+                <div class="agri-upload-progress" id="agriUploadProgress">
+                    <div class="agri-upload-progress-bar" id="agriUploadProgressBar"></div>
+                </div>
+
+                <form id="agriProfileForm" onsubmit="return false;">
+                    <input type="hidden" name="photo" id="agriPhotoUrl"
+                           value="{{ app.user.img is defined ? app.user.img : '' }}">
+                    <div style="padding:4px 0;">
+
+                        {% if app.user.email is defined %}
+                        <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid #f8f8f8;">
+                            <div style="width:28px;height:28px;border-radius:8px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
+                                <i class="fa fa-envelope" style="font-size:11px;color:#888;"></i>
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:0.06em;">Email</div>
+                                <div class="agri-pf-view" style="font-size:12px;color:#2C3E50;margin-top:1px;word-break:break-all;">{{ app.user.email }}</div>
+                                <input class="agri-pf-input" name="email" type="email" value="{{ app.user.email }}">
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if app.user.prenom is defined %}
+                        <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid #f8f8f8;">
+                            <div style="width:28px;height:28px;border-radius:8px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
+                                <i class="fa fa-user" style="font-size:11px;color:#888;"></i>
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:0.06em;">Prénom</div>
+                                <div class="agri-pf-view" style="font-size:12px;color:#2C3E50;margin-top:1px;">{{ app.user.prenom }}</div>
+                                <input class="agri-pf-input" name="prenom" type="text" value="{{ app.user.prenom }}">
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if app.user.nom is defined %}
+                        <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid #f8f8f8;">
+                            <div style="width:28px;height:28px;border-radius:8px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
+                                <i class="fa fa-user" style="font-size:11px;color:#888;"></i>
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:0.06em;">Nom</div>
+                                <div class="agri-pf-view" style="font-size:12px;color:#2C3E50;margin-top:1px;">{{ app.user.nom }}</div>
+                                <input class="agri-pf-input" name="nom" type="text" value="{{ app.user.nom }}">
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if app.user.cin is defined %}
+                        <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid #f8f8f8;">
+                            <div style="width:28px;height:28px;border-radius:8px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
+                                <i class="fa fa-id-card" style="font-size:11px;color:#888;"></i>
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:0.06em;">CIN</div>
+                                <div class="agri-pf-view" style="font-size:12px;color:#2C3E50;margin-top:1px;">{{ app.user.cin }}</div>
+                                <input class="agri-pf-input" name="cin" type="text" value="{{ app.user.cin }}" maxlength="8">
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if app.user.tel is defined %}
+                        <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid #f8f8f8;">
+                            <div style="width:28px;height:28px;border-radius:8px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
+                                <i class="fa fa-phone" style="font-size:11px;color:#888;"></i>
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:0.06em;">Téléphone</div>
+                                <div class="agri-pf-view" style="font-size:12px;color:#2C3E50;margin-top:1px;">{{ app.user.tel }}</div>
+                                <input class="agri-pf-input" name="tel" type="tel" value="{{ app.user.tel }}">
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if app.user.ville is defined %}
+                        <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid #f8f8f8;">
+                            <div style="width:28px;height:28px;border-radius:8px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
+                                <i class="fa fa-location-dot" style="font-size:11px;color:#888;"></i>
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:0.06em;">Ville</div>
+                                <div class="agri-pf-view" style="font-size:12px;color:#2C3E50;margin-top:1px;">{{ app.user.ville }}</div>
+                                <input class="agri-pf-input" name="ville" type="text" value="{{ app.user.ville }}">
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div style="padding:10px 16px;border-top:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;">
+                            <div>
+                                <div style="font-size:12px;font-weight:600;color:#2C3E50;">Authentification à 2 facteurs</div>
+                                <div style="font-size:11px;color:#aaa;" id="twofa-status">
+                                    {{ app.user.twoFactorEnabled ? 'Activée' : 'Désactivée' }}
+                                </div>
+                            </div>
+                            <label style="position:relative;display:inline-block;width:40px;height:22px;cursor:pointer;">
+                                <input type="checkbox" id="twofa-toggle"
+                                       {{ app.user.twoFactorEnabled ? 'checked' : '' }}
+                                       onchange="toggle2FA(this.checked)"
+                                       style="opacity:0;width:0;height:0;">
+                                <span id="twofa-track" style="position:absolute;inset:0;background:{{ app.user.twoFactorEnabled ? '#2D5A27' : '#ccc' }};border-radius:11px;transition:background 0.2s;"></span>
+                                <span id="twofa-thumb" style="position:absolute;top:3px;left:{{ app.user.twoFactorEnabled ? '21px' : '3px' }};width:16px;height:16px;background:white;border-radius:50%;transition:left 0.2s;"></span>
+                            </label>
+                        </div>
+
+                        <div id="agriPwdRow" style="display:none;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid #f8f8f8;">
+                            <div style="width:28px;height:28px;border-radius:8px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
+                                <i class="fa fa-lock" style="font-size:11px;color:#888;"></i>
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:0.06em;">Nouveau mot de passe</div>
+                                <input class="agri-pf-input" name="password" type="password"
+                                       placeholder="Laisser vide pour ne pas changer"
+                                       style="display:block;">
+                            </div>
+                        </div>
+
+                        {% if app.user.dateCreationcpt is defined %}
+                        <div style="display:flex;align-items:center;gap:10px;padding:9px 16px;">
+                            <div style="width:28px;height:28px;border-radius:8px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="fa fa-calendar" style="font-size:11px;color:#888;"></i>
+                            </div>
+                            <div>
+                                <div style="font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:0.06em;">Membre depuis</div>
+                                <div style="font-size:12px;color:#2C3E50;margin-top:1px;">{{ app.user.dateCreationcpt|date('d/m/Y') }}</div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                    </div>
+                </form>
+
+                <div style="padding:10px 12px;border-top:1px solid #f0f0f0;">
+                    <a href="{{ path('app_logout') }}"
+                       style="display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;border-radius:8px;background:rgba(220,60,60,0.08);border:1px solid rgba(220,60,60,0.15);color:#e74c3c;text-decoration:none;font-size:13px;font-weight:600;transition:all 0.2s;"
+                       onmouseover="this.style.background='rgba(220,60,60,0.15)'"
+                       onmouseout="this.style.background='rgba(220,60,60,0.08)'">
+                        <i class="fa fa-arrow-right-from-bracket"></i> Déconnexion
+                    </a>
+                </div>
+
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+</header>
+
+{# ══════════════════════════════════════════════
+   POPUP ASSISTANT IA (flottant, bottom-right)
+══════════════════════════════════════════════ #}
+<div id="aiPopup">
+
+    {# Header #}
+    <div class="ai-popup-header">
+<div class="ai-popup-avatar">
+    <i class="fa fa-robot" style="color:white;font-size:16px;"></i>
+</div>
+        <div class="ai-popup-title">
+            <strong>Flowina AI Assistant </strong>
+            <span id="aiPopupStatusLabel">Connexion…</span>
+        </div>
+        <div class="ai-popup-actions">
+            <button class="ai-popup-ico-btn" onclick="aiClearChat()" title="Effacer la conversation">
+                <i class="fa fa-rotate-left"></i>
+            </button>
+            <button class="ai-popup-ico-btn" onclick="toggleAiPopup()" title="Fermer">
+                <i class="fa fa-xmark"></i>
+            </button>
+        </div>
+    </div>
+
+    {# Status bar #}
+    <div class="ai-popup-status">
+        <span class="ai-status-dot" id="aiStatusDot"></span>
+        <span class="ai-status-text" id="aiStatusText">Initialisation…</span>
+        <span class="ai-status-db" id="aiStatusDb"></span>
+    </div>
+
+    {# Messages #}
+    <div class="ai-popup-messages" id="aiMessages">
+        <div class="ai-empty" id="aiEmpty">
+            <div class="ai-empty-icon">🌾</div>
+            <div>
+                <strong>Bonjour, agriculteur !</strong>
+                <p>Posez une question sur votre exploitation. Je consulte votre base de données en temps réel.</p>
+            </div>
+            <div class="ai-chips">
+                <button class="ai-chip" onclick="aiUseChip(this)">Mon stock actuel</button>
+                <button class="ai-chip" onclick="aiUseChip(this)">Mes cultures plantées</button>
+                <button class="ai-chip" onclick="aiUseChip(this)">Dernières récoltes</button>
+                <button class="ai-chip" onclick="aiUseChip(this)">Mes parcelles</button>
+                <button class="ai-chip" onclick="aiUseChip(this)">Produits en rupture</button>
+                <button class="ai-chip" onclick="aiUseChip(this)">Résumé exploitation</button>
+            </div>
+        </div>
+    </div>
+
+    {# Input #}
+    <div class="ai-popup-input">
+        <div class="ai-input-row">
+            <textarea id="aiChatInput" rows="1"
+                placeholder="Ex: Quel est mon stock de blé ?"
+                onkeydown="aiHandleKey(event)"
+                oninput="aiAutoResize(this)"></textarea>
+            <button class="ai-send-btn" id="aiSendBtn" onclick="aiSendMessage()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                </svg>
+            </button>
+        </div>
+        <div class="ai-input-hint">Entrée pour envoyer · Shift+Entrée pour nouvelle ligne</div>
+    </div>
+</div>
+
+<main class="main-content">
+    {% block body %}{% endblock %}
+</main>
+
+{% block javascripts %}
+<script>
+    /* ══════════════════════════════════════════════════════
+       CLOUDINARY
+    ══════════════════════════════════════════════════════ */
+    var CLOUDINARY_CLOUD_NAME    = 'dp0ily6qa';
+    var CLOUDINARY_UPLOAD_PRESET = 'agroflow';
+
+    function agriUploadPhoto(input) {
+        if (!input.files || !input.files[0]) return;
+        var file  = input.files[0];
+        var bar   = document.getElementById('agriUploadProgressBar');
+        var prog  = document.getElementById('agriUploadProgress');
+        var txt   = document.getElementById('agriPhotoUploadText');
+        var label = document.getElementById('agriPhotoUploadLabel');
+
+        prog.style.display = 'block';
+        bar.style.width = '0%';
+        txt.textContent = 'Upload en cours…';
+        label.style.pointerEvents = 'none';
+
+        var fd = new FormData();
+        fd.append('file', file);
+        fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+        fd.append('folder', 'agroflow/avatars');
+
+        var xhr = new XMLHttpRequest();
+        xhr.upload.onprogress = function(e) {
+            if (e.lengthComputable) bar.style.width = Math.round(e.loaded / e.total * 100) + '%';
+        };
+        xhr.onload = function() {
+            label.style.pointerEvents = 'auto';
+            prog.style.display = 'none';
+            if (xhr.status === 200) {
+                var res = JSON.parse(xhr.responseText);
+                var secureUrl = res.secure_url;
+                document.getElementById('agriPhotoUrl').value = secureUrl;
+                _agriUpdateAvatar('agriPhotoSmall', 'agriAvatarSmall', secureUrl, 34, 34);
+                _agriUpdateAvatar('agriPhotoBig',   'agriAvatarBig',   secureUrl, 52, 52);
+                txt.textContent = 'Photo mise à jour ✓';
+                var fd2 = new FormData();
+                fd2.append('photo', secureUrl);
+                fetch('{{ path("profile_update") }}', { method: 'POST', body: fd2, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                    .then(function(r) { return r.json(); })
+                    .then(function(json) { agriShowToast(json.success ? 'Photo sauvegardée ✓' : 'Sauvegarde échouée', !json.success); });
+            } else {
+                txt.textContent = 'Changer la photo de profil';
+                agriShowToast('Erreur lors de l\'upload', true);
+            }
+        };
+        xhr.onerror = function() { label.style.pointerEvents = 'auto'; prog.style.display = 'none'; txt.textContent = 'Changer la photo de profil'; agriShowToast('Erreur réseau', true); };
+        xhr.open('POST', 'https://api.cloudinary.com/v1_1/' + CLOUDINARY_CLOUD_NAME + '/image/upload');
+        xhr.send(fd);
+    }
+
+    function _agriUpdateAvatar(imgId, fbId, rawUrl, w, h) {
+        var img = document.getElementById(imgId);
+        var fb  = document.getElementById(fbId);
+        if (!img) return;
+        img.src = cloudinaryAvatar(rawUrl, w, h);
+        img.style.display = 'block';
+        if (fb) fb.style.display = 'none';
+        img.onerror = function() { img.style.display = 'none'; if (fb) fb.style.display = 'flex'; };
+    }
+
+    /* ══════════════════════════════════════════════════════
+       PROFIL PANEL
+    ══════════════════════════════════════════════════════ */
+    function toggleProfilePanel() {
+        var panel   = document.getElementById('profilePanel');
+        var chevron = document.getElementById('profileChevron');
+        var open    = panel.style.display === 'block';
+        panel.style.display     = open ? 'none' : 'block';
+        chevron.style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
+    }
+
+    document.addEventListener('click', function(e) {
+        var menu = document.getElementById('profileMenu');
+        if (menu && !menu.contains(e.target)) {
+            document.getElementById('profilePanel').style.display = 'none';
+            document.getElementById('profileChevron').style.transform = 'rotate(0deg)';
+        }
+        // Fermer le popup IA si clic en dehors (sauf le bouton lui-même)
+        var popup  = document.getElementById('aiPopup');
+        var navBtn = document.getElementById('aiNavBtn');
+        if (popup && popup.classList.contains('open') && !popup.contains(e.target) && !navBtn.contains(e.target)) {
+            popup.classList.remove('open');
+            navBtn.classList.remove('active');
+        }
+    });
+
+    var _agriOriginals = {};
+
+    function agriStartEdit() {
+        document.querySelectorAll('.agri-pf-input[name]').forEach(function(inp) { _agriOriginals[inp.name] = inp.value; });
+        document.querySelectorAll('.agri-pf-view').forEach(function(el) { el.style.display = 'none'; });
+        document.querySelectorAll('.agri-pf-input').forEach(function(el) { el.style.display = 'block'; });
+        document.getElementById('agriPwdRow').style.display = 'flex';
+        document.getElementById('agriPhotoUploadLabel').style.display = 'flex';
+        document.getElementById('agriPhotoUploadText').textContent = 'Changer la photo de profil';
+        document.getElementById('agriBtnEdit').style.display   = 'none';
+        document.getElementById('agriBtnSave').style.display   = 'inline-flex';
+        document.getElementById('agriBtnCancel').style.display = 'inline-flex';
+        var first = document.querySelector('.agri-pf-input[name="email"]');
+        if (first) first.focus();
+    }
+
+    function agriCancelEdit() {
+        document.querySelectorAll('.agri-pf-input[name]').forEach(function(inp) { if (_agriOriginals[inp.name] !== undefined) inp.value = _agriOriginals[inp.name]; });
+        var pwd = document.querySelector('.agri-pf-input[name="password"]');
+        if (pwd) pwd.value = '';
+        document.querySelectorAll('.agri-pf-view').forEach(function(el) { el.style.display = 'block'; });
+        document.querySelectorAll('.agri-pf-input').forEach(function(el) { el.style.display = 'none'; });
+        document.getElementById('agriPwdRow').style.display = 'none';
+        document.getElementById('agriPhotoUploadLabel').style.display = 'none';
+        document.getElementById('agriUploadProgress').style.display   = 'none';
+        document.getElementById('agriBtnEdit').style.display   = 'inline-flex';
+        document.getElementById('agriBtnSave').style.display   = 'none';
+        document.getElementById('agriBtnCancel').style.display = 'none';
+    }
+
+    function agriSubmitEdit() {
+        var emailInp = document.querySelector('.agri-pf-input[name="email"]');
+        if (emailInp && !emailInp.value.trim()) { emailInp.style.borderColor = 'rgba(220,60,60,0.7)'; emailInp.focus(); return; }
+        var btnSave = document.getElementById('agriBtnSave');
+        btnSave.disabled = true;
+        btnSave.innerHTML = '<i class="fa fa-spinner fa-spin" style="font-size:10px;"></i> Envoi…';
+        var data = new FormData(document.getElementById('agriProfileForm'));
+        fetch('{{ path("profile_update") }}', { method: 'POST', body: data, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(function(r) { return r.json(); })
+            .then(function(json) {
+                btnSave.disabled = false;
+                btnSave.innerHTML = '<i class="fa fa-check" style="font-size:10px;"></i> Enregistrer';
+                if (json.success) {
+                    document.querySelectorAll('.agri-pf-view').forEach(function(view) {
+                        var inp = view.parentElement.querySelector('.agri-pf-input');
+                        if (inp && inp.value.trim()) view.textContent = inp.value.trim();
+                    });
+                    if (json.prenom && json.nom) {
+                        var fullName = json.prenom + ' ' + json.nom;
+                        var initials = json.prenom.charAt(0).toUpperCase() + json.nom.charAt(0).toUpperCase();
+                        ['agriNameSmall','agriNameBig'].forEach(function(id) { var el = document.getElementById(id); if (el) el.textContent = fullName; });
+                        ['agriAvatarSmall','agriAvatarBig'].forEach(function(id) { var el = document.getElementById(id); if (el) el.textContent = initials; });
+                    }
+                    if (json.photo) {
+                        ['agriPhotoSmall','agriPhotoBig'].forEach(function(id) { var el = document.getElementById(id); if (el) el.dataset.cloudinarySrc = json.photo; });
+                    }
+                    agriCancelEdit();
+                    agriShowToast('Profil mis à jour avec succès');
+                } else {
+                    agriShowToast(json.error || 'Une erreur est survenue', true);
+                }
+            })
+            .catch(function() {
+                btnSave.disabled = false;
+                btnSave.innerHTML = '<i class="fa fa-check" style="font-size:10px;"></i> Enregistrer';
+                agriShowToast('Erreur réseau, veuillez réessayer.', true);
+            });
+    }
+
+    function agriShowToast(msg, isError) {
+        var existing = document.getElementById('agriToast');
+        if (existing) existing.remove();
+        var t = document.createElement('div');
+        t.id = 'agriToast';
+        t.style.cssText = ['position:fixed','bottom:24px','right:24px','z-index:99999','background:' + (isError ? 'rgba(160,30,30,0.95)' : 'rgba(30,90,35,0.95)'),'color:#fff','font-size:13px','font-weight:600','font-family:DM Sans,sans-serif','padding:12px 20px','border-radius:10px','display:flex','align-items:center','gap:9px','box-shadow:0 4px 24px rgba(0,0,0,0.2)','transition:opacity 0.4s ease','opacity:1'].join(';');
+        var icon = document.createElement('i');
+        icon.className = isError ? 'fa fa-circle-xmark' : 'fa fa-circle-check';
+        icon.style.fontSize = '14px';
+        t.appendChild(icon);
+        t.appendChild(document.createTextNode(msg));
+        document.body.appendChild(t);
+        setTimeout(function() { t.style.opacity = '0'; }, 2800);
+        setTimeout(function() { if (t.parentNode) t.remove(); }, 3300);
+    }
+
+    function toggle2FA(enabled) {
+        var track = document.getElementById('twofa-track');
+        var thumb = document.getElementById('twofa-thumb');
+        var status = document.getElementById('twofa-status');
+        var fd = new FormData();
+        fd.append('enabled', enabled ? '1' : '0');
+        fetch('{{ path("app_2fa_toggle") }}', { method: 'POST', body: fd, headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(r => r.json())
+            .then(json => {
+                if (json.success) {
+                    track.style.background = enabled ? '#2D5A27' : '#ccc';
+                    thumb.style.left       = enabled ? '21px' : '3px';
+                    status.textContent     = enabled ? 'Activée' : 'Désactivée';
+                    agriShowToast(enabled ? '2FA activée ✓' : '2FA désactivée');
+                }
+            });
+    }
+
+    /* ══════════════════════════════════════════════════════
+       ASSISTANT IA — POPUP
+    ══════════════════════════════════════════════════════ */
+    var AI_ASK_URL   = '{{ path("chat_ask") }}';
+    var AI_CLEAR_URL = '{{ path("chat_clear") }}';
+    var aiIsLoading  = false;
+    var aiFirstOpen  = true;
+
+    function toggleAiPopup() {
+        var popup  = document.getElementById('aiPopup');
+        var btn    = document.getElementById('aiNavBtn');
+        var isOpen = popup.classList.toggle('open');
+        btn.classList.toggle('active', isOpen);
+
+        // Vérifier la connexion à la première ouverture
+        if (isOpen && aiFirstOpen) {
+            aiFirstOpen = false;
+            aiCheckHealth();
+        }
+        if (isOpen) {
+            setTimeout(function() { document.getElementById('aiChatInput').focus(); }, 300);
+        }
+    }
+
+    function aiCheckHealth() {
+        var dot  = document.getElementById('aiStatusDot');
+        var txt  = document.getElementById('aiStatusText');
+        var db   = document.getElementById('aiStatusDb');
+        var lbl  = document.getElementById('aiPopupStatusLabel');
+
+        fetch('/chat/health', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.status === 'ok') {
+                    dot.className = 'ai-status-dot ok';
+                    txt.textContent = 'Connecté à MySQL';
+                    db.textContent  = data.database + ' · ' + data.tables + ' table(s)';
+                    lbl.textContent = 'En ligne · ' + data.database;
+                } else { throw new Error(data.message); }
+            })
+            .catch(function() {
+                dot.className = 'ai-status-dot err';
+                txt.textContent = 'Serveur non disponible';
+                db.textContent  = '';
+                lbl.textContent = 'Hors ligne';
+            });
+    }
+
+    function aiAutoResize(el) {
+        el.style.height = 'auto';
+        el.style.height = Math.min(el.scrollHeight, 80) + 'px';
+    }
+
+    function aiHandleKey(e) {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); aiSendMessage(); }
+    }
+
+    function aiUseChip(btn) {
+        document.getElementById('aiChatInput').value = btn.textContent.trim();
+        aiSendMessage();
+    }
+
+    function aiHideEmpty() {
+        var e = document.getElementById('aiEmpty');
+        if (e) e.remove();
+    }
+
+    function aiEsc(str) {
+        return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function aiAppendUser(text) {
+        aiHideEmpty();
+        var msgs = document.getElementById('aiMessages');
+        var el = document.createElement('div');
+        el.className = 'ai-msg ai-msg-user';
+        el.innerHTML = '<div class="bbl">' + aiEsc(text) + '</div>';
+        msgs.appendChild(el);
+        msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function aiAppendTyping() {
+        aiHideEmpty();
+        var msgs = document.getElementById('aiMessages');
+        var el = document.createElement('div');
+        el.id = 'aiTyping';
+        el.className = 'ai-msg ai-msg-bot';
+        el.innerHTML = '<div class="bot-av">🌿</div><div class="bbl"><div class="ai-typing"><span></span><span></span><span></span></div></div>';
+        msgs.appendChild(el);
+        msgs.scrollTop = msgs.scrollHeight;
+    }
+
+   function aiAppendBot(data) {
+    var msgs = document.getElementById('aiMessages');
+    var el = document.createElement('div');
+    el.className = 'ai-msg ai-msg-bot';
+
+    var html = '<div class="bbl">';
+
+    // ── Analyse textuelle uniquement ──
+    var analysis = data.analysis || '';
+    if (analysis && !analysis.trim().toUpperCase().startsWith('SELECT')) {
+        html += aiEsc(analysis).replace(/\n/g, '<br>');
+    }
+
+    // ── Erreur SQL ──
+    if (data.sql_error) {
+        html += '<div style="margin-top:6px;padding:7px 10px;background:#fff5f5;border:1px solid #fcc;border-radius:6px;font-size:11px;color:#c0392b;">⚠️ ' + aiEsc(data.sql_error) + '</div>';
+    }
+
+    // ── Aucun résultat ──
+    if (data.sql && !data.sql_error && data.results && data.results.length === 0) {
+        html += '<p style="margin-top:6px;font-size:12px;color:#888;">Aucun résultat trouvé.</p>';
+    }
+
+    html += '</div>';
+    el.innerHTML = '<div class="bot-av"><i class="fa fa-robot" style="color:white;font-size:12px;"></i></div>'
++ html;
+    msgs.appendChild(el);
+    msgs.scrollTop = msgs.scrollHeight;
+}
+
+    function aiAppendError(msg) {
+        var msgs = document.getElementById('aiMessages');
+        var el = document.createElement('div');
+        el.className = 'ai-msg ai-msg-bot';
+        el.innerHTML = '<div class="bot-av" style="background:#c0392b">⚠️</div><div class="bbl" style="background:#fff5f5;border-color:#fcc;color:#c0392b;">' + aiEsc(msg) + '</div>';
+        msgs.appendChild(el);
+        msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    async function aiSendMessage() {
+        if (aiIsLoading) return;
+        var input = document.getElementById('aiChatInput');
+        var q = input.value.trim();
+        if (!q) return;
+
+        aiIsLoading = true;
+        document.getElementById('aiSendBtn').disabled = true;
+        input.value = '';
+        input.style.height = 'auto';
+
+        aiAppendUser(q);
+        aiAppendTyping();
+
+        try {
+            var res = await fetch(AI_ASK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                body: JSON.stringify({ question: q })
+            });
+
+            document.getElementById('aiTyping')?.remove();
+
+            if (!res.ok) {
+                var err = await res.json().catch(function() { return { error: 'Erreur inconnue' }; });
+                aiAppendError(err.error || 'Erreur serveur');
+            } else {
+                aiAppendBot(await res.json());
+            }
+        } catch(e) {
+            document.getElementById('aiTyping')?.remove();
+            aiAppendError('Serveur inaccessible. Vérifiez votre connexion.');
+        }
+
+        aiIsLoading = false;
+        document.getElementById('aiSendBtn').disabled = false;
+        input.focus();
+    }
+
+    async function aiClearChat() {
+        await fetch(AI_CLEAR_URL, { method: 'POST', headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        var msgs = document.getElementById('aiMessages');
+        msgs.innerHTML = '<div class="ai-empty" id="aiEmpty"><div class="ai-empty-icon">🌾</div><div><strong>Conversation effacée</strong><p>Posez une nouvelle question.</p></div></div>';
+    }
+</script>
+{% endblock %}
+
+</body>
+</html>

@@ -1,0 +1,255 @@
+{# Formulaire maintenance — form.html.twig #}
+
+<style>
+.af-form {
+    background: #fff;
+    border-radius: 16px;
+    padding: 1.75rem;
+    box-shadow: 0 2px 18px rgba(0,0,0,.07);
+}
+.af-section-title {
+    font-size: .8rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .6px;
+    color: #7a9a7a; margin: 1.5rem 0 .75rem;
+    padding-bottom: .4rem;
+    border-bottom: 1px solid #eaf3de;
+}
+.af-section-title:first-child { margin-top: 0; }
+.af-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+}
+@media (max-width: 700px) { .af-form-grid { grid-template-columns: 1fr; } }
+.af-form-group { display: flex; flex-direction: column; gap: .5rem; }
+.af-form-group.full-width { grid-column: 1 / -1; }
+.af-form-label {
+    font-size: .8rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .5px; color: #5f7a5f;
+}
+.af-form-label .required { color: #a32d2d; margin-left: .2rem; }
+.af-input-group { position: relative; display: flex; align-items: center; }
+.af-icon {
+    position: absolute; left: .85rem; top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem; pointer-events: none; z-index: 1;
+}
+.af-control {
+    width: 100%;
+    padding: .7rem 2rem .7rem 2.5rem;
+    border: 1.5px solid #d4e8d4;
+    border-radius: 10px;
+    font-size: .9rem; color: #1a2e1a;
+    background: #f9fcf7;
+    transition: all .15s;
+    font-family: inherit; outline: none;
+}
+.af-control:focus {
+    border-color: #2d6a2d;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(45,106,45,.08);
+}
+.af-control.is-invalid { border-color: #a32d2d; background: #fff8f8; }
+select.af-control {
+    appearance: none; -webkit-appearance: none; cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a9a7a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right .8rem center;
+    padding-right: 2.2rem;
+}
+textarea.af-control {
+    padding: .75rem 1rem .75rem 2.5rem;
+    resize: vertical; min-height: 100px;
+}
+.af-error { font-size: .8rem; color: #a32d2d; margin-top: .2rem; }
+.af-char-counter {
+    font-size: .75rem; color: #7a9a7a;
+    text-align: right; margin-top: .15rem;
+}
+.af-actions {
+    display: flex; gap: .75rem; flex-wrap: wrap;
+    align-items: center; margin-top: 1.75rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid #e4edde;
+}
+.af-btn-submit {
+    display: inline-flex; align-items: center; gap: .4rem;
+    padding: .72rem 1.6rem; border-radius: 10px;
+    background: #2d6a2d; color: #fff;
+    font-size: .9rem; font-weight: 600;
+    border: none; cursor: pointer;
+    transition: background .15s;
+}
+.af-btn-submit:hover { background: #235223; }
+.af-btn-cancel {
+    display: inline-flex; align-items: center; gap: .4rem;
+    padding: .72rem 1.4rem; border-radius: 10px;
+    background: transparent; color: #5f7a5f;
+    font-size: .9rem; font-weight: 600;
+    border: 1.5px solid #d0e4cc;
+    text-decoration: none; transition: background .14s;
+}
+.af-btn-cancel:hover { background: #f2f8ee; }
+/* Priority color pills in select */
+.prio-urgente { color: #a32d2d; }
+.prio-haute   { color: #854F0B; }
+.prio-moyenne { color: #27500a; }
+.prio-faible  { color: #0c447c; }
+</style>
+
+{{ form_start(form, {attr: {class: 'af-form', id: 'maintenanceForm', novalidate: 'novalidate'}}) }}
+
+  <div class="af-section-title">📋 Informations principales</div>
+  <div class="af-form-grid">
+
+    {# Type de panne #}
+    <div class="af-form-group">
+      <label class="af-form-label">Type de panne <span class="required">*</span></label>
+      <div class="af-input-group">
+        <span class="af-icon">🔧</span>
+        {{ form_widget(form.typePanne, {attr: {class: 'af-control' ~ (form.typePanne.vars.errors|length ? ' is-invalid' : '')}}) }}
+      </div>
+      {% for error in form.typePanne.vars.errors %}
+        <span class="af-error">{{ error.message }}</span>
+      {% endfor %}
+    </div>
+
+    {# Coût #}
+    <div class="af-form-group">
+      <label class="af-form-label">Coût (DT) <span class="required">*</span></label>
+      <div class="af-input-group">
+        <span class="af-icon">💰</span>
+        {{ form_widget(form.cout, {attr: {class: 'af-control' ~ (form.cout.vars.errors|length ? ' is-invalid' : ''), placeholder: '0.00'}}) }}
+      </div>
+      {% for error in form.cout.vars.errors %}
+        <span class="af-error">{{ error.message }}</span>
+      {% endfor %}
+    </div>
+
+    {# Date #}
+    <div class="af-form-group">
+      <label class="af-form-label">Date de maintenance <span class="required">*</span></label>
+      <div class="af-input-group">
+        <span class="af-icon">📅</span>
+        {{ form_widget(form.dateMain, {attr: {class: 'af-control' ~ (form.dateMain.vars.errors|length ? ' is-invalid' : '')}}) }}
+      </div>
+      {% for error in form.dateMain.vars.errors %}
+        <span class="af-error">{{ error.message }}</span>
+      {% endfor %}
+    </div>
+
+    {# ID Machine #}
+    <div class="af-form-group">
+      <label class="af-form-label">ID Machine</label>
+      <div class="af-input-group">
+        <span class="af-icon">🚜</span>
+        {{ form_widget(form.idM, {attr: {class: 'af-control' ~ (form.idM.vars.errors|length ? ' is-invalid' : ''), placeholder: 'Ex: 42'}}) }}
+      </div>
+      {% for error in form.idM.vars.errors %}
+        <span class="af-error">{{ error.message }}</span>
+      {% endfor %}
+    </div>
+
+  </div>
+
+  <div class="af-section-title">📊 Statut & Priorité</div>
+  <div class="af-form-grid">
+
+    {# Statut #}
+    <div class="af-form-group">
+      <label class="af-form-label">Statut <span class="required">*</span></label>
+      <div class="af-input-group">
+        <span class="af-icon">🔄</span>
+        {{ form_widget(form.statut, {attr: {class: 'af-control' ~ (form.statut.vars.errors|length ? ' is-invalid' : '')}}) }}
+      </div>
+      {% for error in form.statut.vars.errors %}
+        <span class="af-error">{{ error.message }}</span>
+      {% endfor %}
+    </div>
+
+    {# Priorité #}
+    <div class="af-form-group">
+      <label class="af-form-label">Priorité <span class="required">*</span></label>
+      <div class="af-input-group">
+        <span class="af-icon">⚡</span>
+        {{ form_widget(form.priorite, {attr: {class: 'af-control' ~ (form.priorite.vars.errors|length ? ' is-invalid' : '')}}) }}
+      </div>
+      {% for error in form.priorite.vars.errors %}
+        <span class="af-error">{{ error.message }}</span>
+      {% endfor %}
+    </div>
+
+    {# Kilométrage #}
+    <div class="af-form-group">
+      <label class="af-form-label">Kilométrage (km)</label>
+      <div class="af-input-group">
+        <span class="af-icon">🛣️</span>
+        {{ form_widget(form.kilometrage, {attr: {class: 'af-control' ~ (form.kilometrage.vars.errors|length ? ' is-invalid' : '')}}) }}
+      </div>
+      {% for error in form.kilometrage.vars.errors %}
+        <span class="af-error">{{ error.message }}</span>
+      {% endfor %}
+    </div>
+
+  </div>
+
+  <div class="af-section-title">📝 Détails & Recommandations</div>
+  <div class="af-form-grid">
+
+    {# Description #}
+    <div class="af-form-group full-width">
+      <label class="af-form-label">Description</label>
+      <div class="af-input-group" style="align-items:flex-start;">
+        <span class="af-icon" style="top:1rem;transform:none;">📄</span>
+        {{ form_widget(form.description, {attr: {
+          class: 'af-control' ~ (form.description.vars.errors|length ? ' is-invalid' : ''),
+          placeholder: 'Décrivez la panne ou l\'intervention…',
+          id: 'desc_field',
+          oninput: 'updateCounter("desc_field","desc_count",1000)'
+        }}) }}
+      </div>
+      <div class="af-char-counter"><span id="desc_count">0</span> / 1000</div>
+      {% for error in form.description.vars.errors %}
+        <span class="af-error">{{ error.message }}</span>
+      {% endfor %}
+    </div>
+
+    {# Recommandation #}
+    <div class="af-form-group full-width">
+      <label class="af-form-label">Recommandation</label>
+      <div class="af-input-group" style="align-items:flex-start;">
+        <span class="af-icon" style="top:1rem;transform:none;">💡</span>
+        {{ form_widget(form.recommandation, {attr: {
+          class: 'af-control' ~ (form.recommandation.vars.errors|length ? ' is-invalid' : ''),
+          placeholder: 'Recommandations pour la prochaine intervention…',
+          id: 'reco_field',
+          oninput: 'updateCounter("reco_field","reco_count",2000)'
+        }}) }}
+      </div>
+      <div class="af-char-counter"><span id="reco_count">0</span> / 2000</div>
+      {% for error in form.recommandation.vars.errors %}
+        <span class="af-error">{{ error.message }}</span>
+      {% endfor %}
+    </div>
+
+  </div>
+
+  <div class="af-actions">
+    <button type="submit" class="af-btn-submit">{{ btn_label|default('💾 Enregistrer') }}</button>
+    <a href="{{ cancel_url|default(path('agri_maintenances_index')) }}" class="af-btn-cancel">✕ Annuler</a>
+  </div>
+
+{{ form_end(form) }}
+
+<script>
+function updateCounter(fieldId, countId, max) {
+    const len = document.getElementById(fieldId)?.value.length || 0;
+    const el = document.getElementById(countId);
+    if (el) { el.textContent = len; el.style.color = len > max * .9 ? '#a32d2d' : '#7a9a7a'; }
+}
+// Init counters on load
+document.addEventListener('DOMContentLoaded', function() {
+    updateCounter('desc_field', 'desc_count', 1000);
+    updateCounter('reco_field', 'reco_count', 2000);
+});
+</script>

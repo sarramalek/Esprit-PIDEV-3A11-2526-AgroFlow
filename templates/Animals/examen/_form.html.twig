@@ -1,0 +1,56 @@
+<style>
+    .form-group { margin-bottom: 25px; }
+    .form-label { display: block; margin-bottom: 10px; font-weight: 700; color: #2C3E50; font-size: 15px; }
+    .form-control, .form-select { width: 100%; padding: 14px 18px; border: 2px solid #E9ECEF; border-radius: 12px; font-size: 15px; outline: none; transition: all 0.3s; background: #FAFAFB; }
+    .form-control:focus, .form-select:focus { border-color: #e74c3c; background: white; box-shadow: 0 0 0 4px rgba(231, 76, 60, 0.1); }
+    
+    /* État invalide */
+    .form-control.is-invalid, .form-select.is-invalid { border-color: #e74c3c !important; background: #FFF9F9; }
+    
+    .invalid-feedback { color: #e74c3c; font-size: 13px; margin-top: 8px; font-weight: 600; }
+    .invalid-feedback ul { margin: 0; padding: 0; list-style: none; }
+
+    .btn-submit { background: #e74c3c; color: white; border: none; padding: 15px 35px; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 16px; transition: all 0.3s; display: inline-flex; align-items: center; gap: 10px; }
+    .btn-submit:hover { background: #c0392b; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(231, 76, 60, 0.2); }
+</style>
+
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        
+        <div class="form-group">
+            <label class="form-label">Animal concerné</label>
+            {{ form_widget(form.animal, {'attr': {'class': 'form-select ' ~ (form.animal.vars.valid ? '' : 'is-invalid')}}) }}
+            <div class="invalid-feedback">{{ form_errors(form.animal) }}</div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Type d'examen</label>
+            {{ form_widget(form.type_examen, {'attr': {'class': 'form-select ' ~ (form.type_examen.vars.valid ? '' : 'is-invalid')}}) }}
+            <div class="invalid-feedback">{{ form_errors(form.type_examen) }}</div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Date de l'examen</label>
+            {{ form_widget(form.date_examen, {'attr': {'class': 'form-control ' ~ (form.date_examen.vars.valid ? '' : 'is-invalid')}}) }}
+            <div class="invalid-feedback">{{ form_errors(form.date_examen) }}</div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Traitement</label>
+            {{ form_widget(form.traitement, {'attr': {'class': 'form-select ' ~ (form.traitement.vars.valid ? '' : 'is-invalid')}}) }}
+            <div class="invalid-feedback">{{ form_errors(form.traitement) }}</div>
+        </div>
+
+        <div class="form-group" style="grid-column: span 2;">
+            <label class="form-label">Diagnostic</label>
+            {{ form_widget(form.diagnostic, {'attr': {'class': 'form-select ' ~ (form.diagnostic.vars.valid ? '' : 'is-invalid')}}) }}
+            <div class="invalid-feedback">{{ form_errors(form.diagnostic) }}</div>
+        </div>
+    </div>
+
+    <div style="margin-top: 30px; text-align: right;">
+        <button class="btn-submit">
+            <i class="fa fa-save"></i> {{ button_label|default('Enregistrer le rapport') }}
+        </button>
+    </div>
+{{ form_end(form) }}

@@ -1,0 +1,154 @@
+<?php
+
+namespace App\Repository\User;
+
+use App\Entity\User\Offre;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
+
+/**
+ * @extends ServiceEntityRepository<Offre>
+ */
+class OffreRepository extends ServiceEntityRepository
+{
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, Offre::class);
+    }
+
+    // ==================== SEARCH AND SORT ====================
+    /**
+     * @return array<int, Offre>
+     */
+    public function searchAndSort(string $search, string $sort, string $direction): array
+    {
+        $qb = $this->createQueryBuilder('o');
+
+        if ($search) {
+            $qb->where(
+                $qb->expr()->orX(
+                    $qb->expr()->like('o.nomOffre', ':q'),
+                    $qb->expr()->like('o.description', ':q')
+                )
+            )->setParameter('q', '%' . $search . '%');
+        }
+
+        $qb->orderBy('o.' . $sort, $direction);
+
+        return $qb->getQuery()->getResult();
+    }
+
+    // ==================== FIND BY PRIX RANGE ====================
+    /**
+     * @return array<int, Offre>
+     */
+    public function findByPrixRange(float $min, float $max): array
+    {
+        return $this->createQueryBuilder('o')
+            ->where('o.prix BETWEEN :min AND :max')
+            ->setParameter('min', $min)
+            ->setParameter('max', $max)
+            ->orderBy('o.prix', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    // ==================== FIND MOINS CHER ====================
+    /**
+     * @return array<int, Offre>
+     */
+    public function findMoinsCher(int $limit = 3): array
+    {
+        return $this->createQueryBuilder('o')
+            ->orderBy('o.prix', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    // ==================== FIND PLUS LONG ====================
+    /**
+     * @return array<int, Offre>
+     */
+    public function findPlusLong(int $limit = 3): array
+    {
+        return $this->createQueryBuilder('o')
+            ->orderBy('o.dureeOffre', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    // ==================== COUNT ====================
+    public function countAll(): int
+    {
+        return (int) $this->createQueryBuilder('o')
+            ->select('COUNT(o.idOffres)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    // ==================== AVG PRIX ====================
+    public function avgPrix(): float
+    {
+        return (float) $this->createQueryBuilder('o')
+            ->select('AVG(o.prix)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    // ==================== SAVE ====================
+    public function save(Offre $offre, bool $flush = false): void
+    {
+        $this->getEntityManager()->persist($offre);
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    // ==================== REMOVE ====================
+    public function remove(Offre $offre, bool $flush = false): void
+    {
+        $this->getEntityManager()->remove($offre);
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+    // Compte les offres filtrées (pour la pagination)
+public function countSearched(string $search = ''): int
+{
+    $qb = $this->createQueryBuilder('o')
+        ->select('COUNT(o.idOffres)');
+
+    if ($search) {
+        $qb->where('o.nomOffre LIKE :q OR o.description LIKE :q')
+           ->setParameter('q', "%$search%");
+    }
+
+    return (int) $qb->getQuery()->getSingleScalarResult();
+}
+
+// Version paginée de searchAndSort
+/**
+ * @return array<int, Offre>
+ */
+public function searchAndSortPaginated(
+    string $search,
+    string $sort,
+    string $direction,
+    int $page,
+    int $limit
+): array {
+    $qb = $this->createQueryBuilder('o')
+        ->orderBy("o.$sort", $direction)
+        ->setFirstResult(($page - 1) * $limit)
+        ->setMaxResults($limit);
+
+    if ($search) {
+        $qb->where('o.nomOffre LIKE :q OR o.description LIKE :q')
+           ->setParameter('q', "%$search%");
+    }
+
+    return $qb->getQuery()->getResult();
+}
+}

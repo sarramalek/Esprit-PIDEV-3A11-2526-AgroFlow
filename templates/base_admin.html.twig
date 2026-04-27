@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AgroFlow Admin{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    {# ═══════════════════════════════════════════════════
+       CLOUDINARY — SDK JavaScript (transformation d'URL)
+       Remplace "your_cloud_name" par ton cloud name réel
+    ═══════════════════════════════════════════════════ #}
+    <script>
+        /**
+         * Génère une URL Cloudinary optimisée à partir d'une URL brute
+         * stockée en base (ex: https://res.cloudinary.com/cloud/image/upload/v123/avatar.jpg)
+         *
+         * @param {string} rawUrl   – URL brute issue de la BDD
+         * @param {number} w        – largeur souhaitée (px)
+         * @param {number} h        – hauteur souhaitée (px)
+         * @returns {string}        – URL transformée (crop + face-detection)
+         */
+        function cloudinaryAvatar(rawUrl, w, h) {
+            if (!rawUrl) return null;
+
+            // Détecter si c'est déjà une URL Cloudinary
+            var uploadPattern = /\/upload\//;
+            if (!uploadPattern.test(rawUrl)) return rawUrl; // URL externe, on la retourne telle quelle
+
+            // Injecter les transformations juste après "/upload/"
+            var transform = 'c_fill,g_face,w_' + w + ',h_' + h + ',q_auto,f_auto/';
+            return rawUrl.replace('/upload/', '/upload/' + transform);
+        }
+
+        /**
+         * Initialise tous les éléments <img class="cloudinary-avatar">
+         * en appliquant la transformation et en gérant le fallback initiales.
+         */
+        function initCloudinaryAvatars() {
+            document.querySelectorAll('[data-cloudinary-src]').forEach(function(el) {
+                var rawUrl = el.dataset.cloudinarySrc;
+                var w = parseInt(el.dataset.w || el.width || 52, 10);
+                var h = parseInt(el.dataset.h || el.height || 52, 10);
+                var fallback = el.dataset.fallback || '';   // initiales
+
+                if (rawUrl && rawUrl.trim() !== '' && rawUrl !== 'null') {
+                    var optimized = cloudinaryAvatar(rawUrl.trim(), w, h);
+                    el.src = optimized;
+                    el.style.display = 'block';
+
+                    // Masquer le fallback initiales s'il existe
+                    var fbEl = document.getElementById(el.dataset.fallbackId);
+                    if (fbEl) fbEl.style.display = 'none';
+
+                    // En cas d'erreur de chargement → fallback initiales
+                    el.onerror = function() {
+                        el.style.display = 'none';
+                        if (fbEl) fbEl.style.display = 'flex';
+                    };
+                } else {
+                    // Pas d'URL → afficher initiales, cacher l'img
+                    el.style.display = 'none';
+                    var fbEl2 = document.getElementById(el.dataset.fallbackId);
+                    if (fbEl2) fbEl2.style.display = 'flex';
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initCloudinaryAvatars);
+    </script>
+
+    <style>
+        :root {
+            --green-dark:   #1A3A1F;
+            --green-mid:    #2D5A27;
+            --green-accent: #4A8C3F;
+            --green-light:  #C8E6C0;
+            --cream:        #FCF8E6;
+            --cream-dark:   #F0EAD0;
+            --navy:         #1C2B3A;
+            --text-main:    #1C2B3A;
+            --text-muted:   #7A8A95;
+            --white:        #FFFFFF;
+            --sidebar-w:    260px;
+            --topbar-h:     64px;
+            --radius:       10px;
+            --shadow:       0 2px 12px rgba(0,0,0,0.08);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--cream);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ═══════════════════════════════
+           SIDEBAR
+        ═══════════════════════════════ */
+        .sidebar {
+            width: var(--sidebar-w);
+            background: var(--green-dark);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            z-index: 100;
+            overflow-y: auto;
+            overflow-x: hidden;
+            transition: width 0.3s ease;
+        }
+
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+
+        /* Brand */
+        .sidebar-brand {
+            padding: 22px 20px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            flex-shrink: 0;
+        }
+        .sidebar-brand img { height: 38px; filter: brightness(0) invert(1); }
+        .sidebar-brand-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--cream);
+            letter-spacing: -0.02em;
+        }
+        .sidebar-brand-text span { color: var(--green-light); }
+
+        /* Nav */
+        .sidebar-nav {
+            padding: 12px 0;
+            flex: 1;
+        }
+
+        .nav-section-label {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.3);
+            padding: 14px 20px 6px;
+        }
+
+        .nav-item { position: relative; }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 11px 20px;
+            color: rgba(255,255,255,0.72);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            user-select: none;
+        }
+        .nav-link:hover {
+            background: rgba(255,255,255,0.07);
+            color: var(--cream);
+            border-left-color: var(--green-light);
+        }
+        .nav-link.active {
+            background: rgba(74,140,63,0.25);
+            color: var(--cream);
+            border-left-color: var(--green-accent);
+        }
+        .nav-link .nav-icon {
+            width: 18px;
+            text-align: center;
+            font-size: 14px;
+            flex-shrink: 0;
+            opacity: 0.85;
+        }
+        .nav-link .nav-label { flex: 1; }
+        .nav-link .nav-arrow {
+            font-size: 10px;
+            transition: transform 0.25s ease;
+            opacity: 0.6;
+        }
+        .nav-item.open > .nav-link .nav-arrow {
+            transform: rotate(90deg);
+        }
+
+        .nav-sub {
+            list-style: none;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: rgba(0,0,0,0.18);
+        }
+        .nav-item.open > .nav-sub {
+            max-height: 300px;
+        }
+        .nav-sub a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 20px 9px 46px;
+            color: rgba(255,255,255,0.58);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 400;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .nav-sub a:hover {
+            color: var(--cream);
+            background: rgba(255,255,255,0.05);
+        }
+        .nav-sub a.active {
+            color: var(--green-light);
+            font-weight: 500;
+        }
+        .nav-sub a .sub-dot {
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: currentColor;
+            flex-shrink: 0;
+            opacity: 0.7;
+        }
+
+        /* Sidebar Footer */
+        .sidebar-footer {
+            padding: 14px 20px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            flex-shrink: 0;
+        }
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 6px 8px;
+            border-radius: 10px;
+            transition: background 0.2s;
+        }
+        .sidebar-user:hover { background: rgba(255,255,255,0.05); }
+
+        /* ─── Avatar wrapper ─────────────────────────────────
+           Contient soit l'<img> Cloudinary soit les initiales
+        ──────────────────────────────────────────────────── */
+        .avatar-wrap {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        /* Image Cloudinary */
+        .avatar-photo {
+            display: none;          /* caché par défaut; JS l'active si URL valide */
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        .avatar-photo.small { width: 36px; height: 36px; }
+        .avatar-photo.big   { width: 52px; height: 52px; border-radius: 14px; }
+
+        /* Fallback initiales */
+        .sidebar-avatar {
+            border-radius: 10px;
+            background: var(--green-accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: white;
+        }
+        .sidebar-avatar.small { width: 36px; height: 36px; }
+        .sidebar-avatar.big   {
+            width: 52px; height: 52px;
+            border-radius: 14px;
+            background: linear-gradient(135deg,#4A8C3F,#2D5A27);
+            font-size: 18px;
+        }
+
+        .sidebar-user-info { flex: 1; overflow: hidden; }
+        .sidebar-user-name {
+            font-size: 13px; font-weight: 600;
+            color: var(--cream);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .sidebar-user-role {
+            font-size: 11px; color: rgba(255,255,255,0.4);
+        }
+
+        /* Profile panel inputs */
+        .pf-input {
+            display: none;
+            width: 100%;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 12px;
+            padding: 5px 8px;
+            margin-top: 3px;
+            outline: none;
+            font-family: 'DM Sans', sans-serif;
+            transition: border 0.15s;
+        }
+        .pf-input:focus {
+            border-color: rgba(74,140,63,0.8);
+            background: rgba(255,255,255,0.12);
+        }
+        .pf-input.mono { font-family: 'DM Mono', monospace; }
+
+        /* Toolbar buttons */
+        .pf-btn {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.65);
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.15s;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .pf-btn:hover { background: rgba(255,255,255,0.14); color: #fff; }
+        .pf-btn.save {
+            background: rgba(74,140,63,0.3);
+            border-color: rgba(74,140,63,0.5);
+            color: #C8E6C0;
+        }
+        .pf-btn.save:hover { background: rgba(74,140,63,0.5); color: #fff; }
+        .pf-btn.cancel {
+            background: rgba(220,60,60,0.1);
+            border-color: rgba(220,60,60,0.25);
+            color: #ff9090;
+        }
+        .pf-btn.cancel:hover { background: rgba(220,60,60,0.22); }
+
+        /* Bouton upload photo */
+        .pf-photo-upload {
+            display: none;          /* visible uniquement en mode édition */
+            align-items: center;
+            gap: 8px;
+            padding: 7px 12px;
+            background: rgba(255,255,255,0.06);
+            border: 1px dashed rgba(255,255,255,0.2);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 11px;
+            color: rgba(255,255,255,0.55);
+            transition: all 0.2s;
+            margin: 4px 16px 8px;
+        }
+        .pf-photo-upload:hover { background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(74,140,63,0.5); }
+        .pf-photo-upload input { display: none; }
+
+        /* Barre de progression upload */
+        .pf-upload-progress {
+            display: none;
+            height: 3px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            margin: 0 16px 8px;
+            overflow: hidden;
+        }
+        .pf-upload-progress-bar {
+            height: 100%;
+            background: var(--green-accent);
+            border-radius: 2px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* ═══════════════════════════════
+           TOPBAR
+        ═══════════════════════════════ */
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-w);
+            right: 0;
+            height: var(--topbar-h);
+            background: var(--white);
+            border-bottom: 1px solid var(--cream-dark);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            z-index: 90;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+        }
+
+        .topbar-left { display: flex; align-items: center; gap: 16px; }
+        .topbar-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--navy);
+        }
+        .topbar-breadcrumb {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-family: 'DM Mono', monospace;
+        }
+        .topbar-breadcrumb span { color: var(--green-accent); }
+
+        .topbar-right { display: flex; align-items: center; gap: 14px; }
+
+        .topbar-btn {
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            background: var(--cream);
+            border: 1px solid var(--cream-dark);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: var(--text-muted);
+            font-size: 14px; transition: all 0.2s;
+            text-decoration: none;
+        }
+        .topbar-btn:hover { background: var(--cream-dark); color: var(--navy); }
+
+        .topbar-badge { position: relative; }
+        .topbar-badge::after {
+            content: '';
+            position: absolute;
+            top: 6px; right: 6px;
+            width: 7px; height: 7px;
+            background: #E53E3E;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        /* ═══════════════════════════════
+           MAIN CONTENT
+        ═══════════════════════════════ */
+        .main-wrapper {
+            margin-left: var(--sidebar-w);
+            margin-top: var(--topbar-h);
+            flex: 1;
+            min-height: calc(100vh - var(--topbar-h));
+            padding: 28px;
+            background: var(--cream);
+        }
+
+        /* Flash messages */
+        .flash-success {
+            background: #e8f5e2;
+            border: 1px solid #a3d48a;
+            color: #2D5A27;
+            padding: 12px 18px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .flash-error {
+            background: #fdecea;
+            border: 1px solid #f5a7a7;
+            color: #8b1a1a;
+            padding: 12px 18px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        {% block stylesheets %}{% endblock %}
+    </style>
+</head>
+
+{# Vérification session — inchangée #}
+<script>
+function checkAndRedirect() {
+    fetch('{{ path("app_check_session") }}', { credentials: 'same-origin' })
+        .then(r => {
+            if (r.status === 401 || r.redirected) {
+                window.location.replace('{{ path("app_login") }}');
+            }
+        });
+}
+window.addEventListener('pageshow', function (e) { if (e.persisted) checkAndRedirect(); });
+document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') checkAndRedirect(); });
+checkAndRedirect();
+</script>
+
+<body>
+
+<!-- ═══════ SIDEBAR ═══════ -->
+<aside class="sidebar" id="sidebar">
+
+    <div class="sidebar-brand">
+        <img src="{{ asset('assets/img/Logo.png') }}" alt="AgroFlow">
+        <div class="sidebar-brand-text">Agro<span>Flow</span></div>
+    </div>
+
+    <nav class="sidebar-nav">
+
+        <a href="{{ path('admin_dashboard') }}" class="nav-link {% if app.request.get('_route') == 'admin_dashboard' %}active{% endif %}">
+            <span class="nav-icon"><i class="fa fa-gauge-high"></i></span>
+            <span class="nav-label">Tableau de bord</span>
+        </a>
+
+        <div class="nav-section-label">Gestion</div>
+
+        <!-- Gestion Utilisateurs -->
+        <div class="nav-item {% if app.request.get('_route') in ['admin_users','admin_offres','admin_abonnements','admin_taches'] %}open{% endif %}">
+            <div class="nav-link {% if app.request.get('_route') in ['admin_users','admin_offres','admin_abonnements','admin_taches'] %}active{% endif %}"
+                 onclick="toggleMenu(this)">
+                <span class="nav-icon"><i class="fa fa-users"></i></span>
+                <span class="nav-label">Gestion Utilisateurs</span>
+                <i class="fa fa-chevron-right nav-arrow"></i>
+            </div>
+            <ul class="nav-sub">
+                <li><a href="{{ path('admin_users_list') }}" class="{% if app.request.get('_route') == 'admin_users' %}active{% endif %}">
+                    <span class="sub-dot"></span> Utilisateurs
+                </a></li>
+                <li><a href="{{ path('app_offre_list') }}" class="{% if app.request.get('_route') == 'admin_offres' %}active{% endif %}">
+                    <span class="sub-dot"></span> Offres
+                </a></li>
+                <li><a href="{{ path('admin_abonnements_index') }}" class="{% if app.request.get('_route') == 'admin_abonnements' %}active{% endif %}">
+                    <span class="sub-dot"></span> Abonnements
+                </a></li>
+            </ul>
+        </div>
+
+            <!-- Gestion Animaux -->
+            <div class="nav-item {% if app.request.get('_route') in ['admin_animaux_index','admin_animaux_new','admin_animaux_edit','admin_examens_index','admin_examens_new','admin_examens_edit'] %}open{% endif %}">
+                <div class="nav-link {% if app.request.get('_route') in ['admin_animaux_index','admin_animaux_new','admin_animaux_edit','admin_examens_index','admin_examens_new','admin_examens_edit'] %}active{% endif %}"
+                     onclick="toggleMenu(this)">
+                    <span class="nav-icon"><i class="fa fa-paw"></i></span>
+                    <span class="nav-label">Gestion Animaux</span>
+                    <i class="fa fa-chevron-right nav-arrow"></i>
+                </div>
+                <ul class="nav-sub">
+                    <li><a href="{{ path('admin_animaux_index') }}" class="{% if app.request.get('_route') in ['admin_animaux_index','admin_animaux_new','admin_animaux_edit'] %}active{% endif %}">
+                        <span class="sub-dot"></span> Animaux
+                    </a></li>
+                    <li><a href="{{ path('admin_examens_index') }}" class="{% if app.request.get('_route') in ['admin_examens_index','admin_examens_new','admin_examens_edit'] %}active{% endif %}">
+                        <span class="sub-dot"></span> Examens
+                    </a></li>
+                </ul>
+            </div>
+
+        <!-- Gestion Stocks -->
+        <div class="nav-item {% if app.request.get('_route') in ['admin_categories_index','admin_categorie_new','admin_categorie_edit','admin_stock_index','admin_stock_new','admin_stock_edit'] %}open{% endif %}">
+    <div class="nav-link {% if app.request.get('_route') in ['admin_categories_index','admin_categorie_new','admin_categorie_edit','admin_stock_index','admin_stock_new','admin_stock_edit'] %}active{% endif %}"
+         onclick="toggleMenu(this)">
+        <span class="nav-icon"><i class="fa fa-boxes-stacked"></i></span>
+        <span class="nav-label">Gestion Stocks</span>
+        <i class="fa fa-chevron-right nav-arrow"></i>
+    </div>
+    <ul class="nav-sub">
+        <li>
+            <a href="{{ path('admin_categories_index') }}" class="{% if app.request.get('_route') in ['admin_categories_index','admin_categorie_new','admin_categorie_edit'] %}active{% endif %}">
+                <span class="sub-dot"></span> Catégories
+            </a>
+        </li>
+        <li>
+            <a href="{{ path('admin_stock_index') }}" class="{% if app.request.get('_route') in ['admin_stock_index','admin_stock_new','admin_stock_edit'] %}active{% endif %}">
+                <span class="sub-dot"></span> Produits
+            </a>
+        </li>
+    </ul>
+</div>
+        <!-- Gestion Événements -->
+        <div class="nav-item {% if app.request.get('_route') in ['evenement_index','participation_index'] %}open{% endif %}">
+            <div class="nav-link {% if app.request.get('_route') in ['evenement_index','participation_index'] %}active{% endif %}"
+                 onclick="toggleMenu(this)">
+                <span class="nav-icon"><i class="fa fa-calendar-days"></i></span>
+                <span class="nav-label">Gestion Événements</span>
+                <i class="fa fa-chevron-right nav-arrow"></i>
+            </div>
+            <ul class="nav-sub">
+                <li><a href="{{ path('evenement_index') }}" class="{% if app.request.get('_route') == 'evenement_index' %}active{% endif %}">
+                    <span class="sub-dot"></span> Événements
+                </a></li>
+                <li><a href="{{ path('categorie_evenement_index') }}" class="{% if app.request.get('_route') == 'categorie_evenement_index' %}active{% endif %}">
+                    <span class="sub-dot"></span> Categories Événements
+                </a></li>
+                <li><a href="{{ path('participation_index') }}" class="{% if app.request.get('_route') == 'participation_index' %}active{% endif %}">
+                    <span class="sub-dot"></span> Participations
+                </a></li>
+            </ul>
+        </div>
+
+            <!-- Gestion Terrains -->
+        <div class="nav-item {% if app.request.get('_route') in ['admin_terrains','admin_terrains_new','admin_terrains_edit','admin_terrains_show','admin_rotations','admin_rotations_new','admin_rotations_edit','admin_plantes','admin_plantes_new','admin_plantes_edit'] %}open{% endif %}">
+            <div class="nav-link {% if app.request.get('_route') in ['admin_terrains','admin_terrains_new','admin_terrains_edit','admin_terrains_show','admin_rotations','admin_rotations_new','admin_rotations_edit','admin_plantes','admin_plantes_new','admin_plantes_edit'] %}active{% endif %}"
+                 onclick="toggleMenu(this)">
+                <span class="nav-icon"><i class="fa fa-map"></i></span>
+                <span class="nav-label">Gestion Terrains</span>
+                <i class="fa fa-chevron-right nav-arrow"></i>
+            </div>
+            <ul class="nav-sub">
+                <li>
+                    <a href="{{ path('admin_terrains') }}"
+                       class="{% if app.request.get('_route') starts with 'admin_terrains' %}active{% endif %}">
+                        <span class="sub-dot"></span> Terrains
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ path('admin_rotations') }}"
+                       class="{% if app.request.get('_route') starts with 'admin_rotations' %}active{% endif %}">
+                        <span class="sub-dot"></span> Rotations
+                    </a></li>
+                     <li>
+            <a href="{{ path('admin_plantes') }}"
+               class="{% if app.request.get('_route') starts with 'admin_plantes' %}active{% endif %}">
+                <span class="sub-dot"></span> Plantes
+            </a>
+        </li>
+                </ul>
+            </div>
+
+
+            <!-- Gestion Matériels -->
+            <div class="nav-item {% if app.request.get('_route') in ['admin_machines','admin_maintenances'] %}open{% endif %}">
+                <div class="nav-link {% if app.request.get('_route') in ['admin_machines','admin_maintenances'] %}active{% endif %}"
+                     onclick="toggleMenu(this)">
+                    <span class="nav-icon"><i class="fa fa-tractor"></i></span>
+                    <span class="nav-label">Gestion Matériels</span>
+                    <i class="fa fa-chevron-right nav-arrow"></i>
+                </div>
+                <ul class="nav-sub">
+                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_machines' %}active{% endif %}">
+                        <span class="sub-dot"></span> Machines
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ path('admin_maintenances_index') }}"
+                       class="{% if app.request.get('_route') starts with 'admin_maintenances' %}active{% endif %}">
+                        <span class="sub-dot"></span> Maintenances
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+    </nav>
+
+    <!-- ═══════ SIDEBAR FOOTER ═══════ -->
+    <div class="sidebar-footer">
+
+        <div class="sidebar-user" id="sidebarUserBtn" onclick="toggleUserPanel()">
+
+            {# ── Avatar sidebar (petit, 36×36) ──────────────────────────────
+               data-cloudinary-src  : URL brute stockée en BDD (champ photo/avatar de l'entité User)
+               data-w / data-h      : dimensions souhaitées pour Cloudinary
+               data-fallback-id     : ID du div initiales à afficher si pas d'image
+            ──────────────────────────────────────────────────────────────── #}
+            <div class="avatar-wrap">
+                <img
+                    class="avatar-photo small"
+                    id="pfPhotoSmall"
+                    alt="Photo de profil"
+data-cloudinary-src="{{ app.user and app.user.img is defined ? app.user.img : '' }}"
+                    data-w="36" data-h="36"
+                    data-fallback-id="pfAvatarSmall"
+                    src=""
+                >
+                <div class="sidebar-avatar small" id="pfAvatarSmall">
+                    {{ app.user ? (app.user.prenom|first|upper ~ app.user.nom|first|upper) : 'AD' }}
+                </div>
+            </div>
+
+            <div class="sidebar-user-info">
+                <div class="sidebar-user-name" id="pfNameSmall">
+                    {{ app.user ? (app.user.prenom ~ ' ' ~ app.user.nom) : 'Administrateur' }}
+                </div>
+                <div class="sidebar-user-role">Administrateur</div>
+            </div>
+            <i class="fa fa-chevron-up" id="userChevron"
+               style="font-size:10px; color:rgba(255,255,255,0.35); transition:transform 0.25s; flex-shrink:0;"></i>
+        </div>
+
+        <div id="userPanel" style="max-height:0; overflow:hidden; transition:max-height 0.4s ease; margin-top:0;">
+            <div style="background:rgba(0,0,0,0.25); border-radius:10px; margin-top:10px; overflow:hidden;">
+
+                <!-- En-tête avatar -->
+                <div style="padding:18px 16px 14px; text-align:center; border-bottom:1px solid rgba(255,255,255,0.07);">
+
+                    {# ── Avatar grand format (52×52) ───────────────────────── #}
+                    <div style="position:relative; width:52px; height:52px; margin:0 auto 10px;">
+                        <img
+                            class="avatar-photo big"
+                            id="pfPhotoBig"
+                            alt="Photo de profil"
+                            data-cloudinary-src="{{ app.user and app.user.photo is defined ? app.user.photo : '' }}"
+                            data-w="52" data-h="52"
+                            data-fallback-id="pfAvatarBig"
+                            src=""
+                            style="width:52px;height:52px;"
+                        >
+                        <div class="sidebar-avatar big" id="pfAvatarBig">
+                            {{ app.user ? (app.user.prenom|first|upper ~ app.user.nom|first|upper) : 'AD' }}
+                        </div>
+                    </div>
+
+                    <div id="pfNameBig" style="font-size:14px;font-weight:700;color:#fff;">
+                        {{ app.user ? (app.user.prenom ~ ' ' ~ app.user.nom) : '—' }}
+                    </div>
+                    <div style="display:inline-flex;align-items:center;gap:5px;background:rgba(74,140,63,0.25);border:1px solid rgba(74,140,63,0.35);color:#C8E6C0;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;margin-top:6px;">
+                        <span style="width:5px;height:5px;border-radius:50%;background:#6FE065;display:inline-block;"></span>
+                        Administrateur
+                    </div>
+                </div>
+
+                <!-- Barre d'outils édition -->
+                <div style="display:flex;justify-content:flex-end;padding:8px 12px 4px;gap:6px;">
+                    <button class="pf-btn" id="btnEdit" onclick="startProfileEdit()">
+                        <i class="fa fa-pen" style="font-size:10px;"></i> Modifier
+                    </button>
+                    <button class="pf-btn save" id="btnSave" onclick="submitProfileEdit()" style="display:none;">
+                        <i class="fa fa-check" style="font-size:10px;"></i> Enregistrer
+                    </button>
+                    <button class="pf-btn cancel" id="btnCancel" onclick="cancelProfileEdit()" style="display:none;">
+                        <i class="fa fa-times" style="font-size:10px;"></i> Annuler
+                    </button>
+                </div>
+
+                {# ── Bouton upload photo (visible uniquement en édition) ───── #}
+                <label class="pf-photo-upload" id="photoUploadLabel">
+                    <i class="fa fa-camera" style="font-size:12px;"></i>
+                    <span id="photoUploadText">Changer la photo de profil</span>
+                    <input type="file" id="photoFileInput" accept="image/*" onchange="uploadPhotoToCloudinary(this)">
+                </label>
+                <div class="pf-upload-progress" id="uploadProgress">
+                    <div class="pf-upload-progress-bar" id="uploadProgressBar"></div>
+                </div>
+
+                <!-- Formulaire de profil -->
+                <form id="profileForm" onsubmit="return false;">
+                    {# Champ caché pour l'URL Cloudinary mise à jour #}
+                    <input type="hidden" name="photo" id="pfPhotoUrl"
+                           value="{{ app.user and app.user.photo is defined ? app.user.photo : '' }}">
+
+                    <div style="padding:4px 0;">
+
+                        {% if app.user and app.user.email is defined %}
+                        <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">
+                            <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
+                                <i class="fa fa-envelope" style="font-size:11px;color:rgba(255,255,255,0.5);"></i>
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.06em;">Email</div>
+                                <div class="pf-view" style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:1px;word-break:break-all;">{{ app.user.email }}</div>
+                                <input class="pf-input" name="email" type="email" value="{{ app.user.email }}">
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if app.user and app.user.prenom is defined %}
+                        <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">
+                            <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
+                                <i class="fa fa-user" style="font-size:11px;color:rgba(255,255,255,0.5);"></i>
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.06em;">Prénom</div>
+                                <div class="pf-view" style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:1px;">{{ app.user.prenom }}</div>
+                                <input class="pf-input" name="prenom" type="text" value="{{ app.user.prenom }}">
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if app.user and app.user.nom is defined %}
+                        <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">
+                            <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
+                                <i class="fa fa-user" style="font-size:11px;color:rgba(255,255,255,0.5);"></i>
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.06em;">Nom</div>
+                                <div class="pf-view" style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:1px;">{{ app.user.nom }}</div>
+                                <input class="pf-input" name="nom" type="text" value="{{ app.user.nom }}">
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if app.user and app.user.cin is defined %}
+                        <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">
+                            <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
+                                <i class="fa fa-id-card" style="font-size:11px;color:rgba(255,255,255,0.5);"></i>
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.06em;">CIN</div>
+                                <div class="pf-view" style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:1px;font-family:'DM Mono',monospace;">{{ app.user.cin }}</div>
+                                <input class="pf-input mono" name="cin" type="text" value="{{ app.user.cin }}" maxlength="8">
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if app.user and app.user.tel is defined %}
+                        <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">
+                            <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
+                                <i class="fa fa-phone" style="font-size:11px;color:rgba(255,255,255,0.5);"></i>
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.06em;">Téléphone</div>
+                                <div class="pf-view" style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:1px;">{{ app.user.tel }}</div>
+                                <input class="pf-input" name="tel" type="tel" value="{{ app.user.tel }}">
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if app.user and app.user.ville is defined %}
+                        <div style="display:flex;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">
+                            <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
+                                <i class="fa fa-location-dot" style="font-size:11px;color:rgba(255,255,255,0.5);"></i>
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.06em;">Ville</div>
+                                <div class="pf-view" style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:1px;">{{ app.user.ville }}</div>
+                                <input class="pf-input" name="ville" type="text" value="{{ app.user.ville }}">
+                            </div>
+                        </div>
+                        {% endif %}
+<!-- Toggle 2FA -->
+<div style="padding:10px 16px;border-top:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;">
+    <div>
+        <div style="font-size:12px;font-weight:600;color:rgba(255,255,255,0.35);">Authentification à 2 facteurs</div>
+        <div style="font-size:11px;color:#aaa;" id="twofa-status">
+            {{ app.user.twoFactorEnabled ? 'Activée' : 'Désactivée' }}
+        </div>
+    </div>
+    <label style="position:relative;display:inline-block;width:40px;height:22px;cursor:pointer;">
+        <input type="checkbox" id="twofa-toggle"
+               {{ app.user.twoFactorEnabled ? 'checked' : '' }}
+               onchange="toggle2FA(this.checked)"
+               style="opacity:0;width:0;height:0;">
+        <span id="twofa-track" style="position:absolute;inset:0;background:{{ app.user.twoFactorEnabled ? '#2D5A27' : '#ccc' }};border-radius:11px;transition:background 0.2s;"></span>
+        <span id="twofa-thumb" style="position:absolute;top:3px;left:{{ app.user.twoFactorEnabled ? '21px' : '3px' }};width:16px;height:16px;background:white;border-radius:50%;transition:left 0.2s;"></span>
+    </label>
+</div>
+                        <div id="pwdRow" style="display:none;align-items:flex-start;gap:10px;padding:9px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">
+                            <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
+                                <i class="fa fa-lock" style="font-size:11px;color:rgba(255,255,255,0.5);"></i>
+                            </div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.06em;">Nouveau mot de passe</div>
+                                <input class="pf-input" name="password" type="password"
+                                       placeholder="Laisser vide pour ne pas changer"
+                                       style="display:block;">
+                            </div>
+                        </div>
+
+                        {% if app.user and app.user.dateCreationcpt is defined %}
+                        <div style="display:flex;align-items:center;gap:10px;padding:9px 16px;">
+                            <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="fa fa-calendar" style="font-size:11px;color:rgba(255,255,255,0.5);"></i>
+                            </div>
+                            <div>
+                                <div style="font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.06em;">Membre depuis</div>
+                                <div style="font-size:12px;color:rgba(255,255,255,0.75);margin-top:1px;">
+                                    {{ app.user.dateCreationcpt|date('d/m/Y') }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                    </div>
+                </form>
+
+                <!-- Déconnexion -->
+                <div style="padding:10px 12px;border-top:1px solid rgba(255,255,255,0.07);">
+                    <a href="{{ path('app_logout') }}"
+                       style="display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;border-radius:8px;background:rgba(220,60,60,0.1);border:1px solid rgba(220,60,60,0.2);color:#ff8080;text-decoration:none;font-size:13px;font-weight:600;transition:all 0.2s;"
+                       onmouseover="this.style.background='rgba(220,60,60,0.22)'"
+                       onmouseout="this.style.background='rgba(220,60,60,0.1)'">
+                        <i class="fa fa-arrow-right-from-bracket"></i>
+                        Déconnexion
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</aside>
+
+<!-- ═══════ TOPBAR ═══════ -->
+<header class="topbar">
+    <div class="topbar-left">
+        <div class="topbar-title">{% block page_title %}Dashboard{% endblock %}</div>
+        <div class="topbar-breadcrumb">
+            AgroFlow / <span>{% block breadcrumb %}Admin{% endblock %}</span>
+        </div>
+    </div>
+    <div class="topbar-right">
+        <a href="{{ path('app_about') }}" class="topbar-btn" title="Site public">
+            <i class="fa fa-globe"></i>
+        </a>
+        <div class="topbar-btn topbar-badge" title="Notifications">
+            <i class="fa fa-bell"></i>
+        </div>
+        <a href="{{ path('app_logout') }}" class="topbar-btn" title="Déconnexion">
+            <i class="fa fa-power-off"></i>
+        </a>
+    </div>
+</header>
+
+<!-- ═══════ CONTENT ═══════ -->
+<main class="main-wrapper">
+    {% for message in app.flashes('success') %}
+        <div class="flash-success"><i class="fa fa-circle-check"></i> {{ message }}</div>
+    {% endfor %}
+    {% for message in app.flashes('error') %}
+        <div class="flash-error"><i class="fa fa-circle-xmark"></i> {{ message }}</div>
+    {% endfor %}
+    {% block body %}{% endblock %}
+</main>
+
+<!-- ═══════ SCRIPTS ═══════ -->
+<script>
+    /* ══════════════════════════════════════════════════════
+       CLOUDINARY — Upload direct (unsigned preset)
+       ▸ Remplace VOTRE_CLOUD_NAME   par ton cloud name
+       ▸ Remplace VOTRE_UPLOAD_PRESET par ton unsigned preset
+    ══════════════════════════════════════════════════════ */
+    var CLOUDINARY_CLOUD_NAME   = 'dp0ily6qa';
+    var CLOUDINARY_UPLOAD_PRESET = 'agroflow';  // preset non signé (unsigned)
+
+    /**
+     * Upload une photo vers Cloudinary et met à jour les avatars en temps réel.
+     * Appelé quand l'utilisateur sélectionne un fichier via #photoFileInput.
+     */
+    function uploadPhotoToCloudinary(input) {
+        if (!input.files || !input.files[0]) return;
+
+        var file   = input.files[0];
+        var label  = document.getElementById('photoUploadLabel');
+        var bar    = document.getElementById('uploadProgressBar');
+        var prog   = document.getElementById('uploadProgress');
+        var txt    = document.getElementById('photoUploadText');
+
+        // Afficher la barre de progression
+        prog.style.display = 'block';
+        bar.style.width    = '0%';
+        txt.textContent    = 'Upload en cours…';
+        label.style.pointerEvents = 'none';
+
+        var formData = new FormData();
+        formData.append('file',          file);
+        formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+        formData.append('folder',        'agroflow/avatars');
+
+        var xhr = new XMLHttpRequest();
+
+        // Progression
+        xhr.upload.onprogress = function(e) {
+            if (e.lengthComputable) {
+                bar.style.width = Math.round((e.loaded / e.total) * 100) + '%';
+            }
+        };
+
+        xhr.onload = function() {
+            label.style.pointerEvents = 'auto';
+            prog.style.display = 'none';
+
+            if (xhr.status === 200) {
+                var res = JSON.parse(xhr.responseText);
+                var secureUrl = res.secure_url;
+
+                // Stocker l'URL dans le champ caché du formulaire
+                document.getElementById('pfPhotoUrl').value = secureUrl;
+
+                // Mettre à jour les deux avatars immédiatement
+                _updateAvatarPhoto('pfPhotoSmall', 'pfAvatarSmall', secureUrl, 36, 36);
+                _updateAvatarPhoto('pfPhotoBig',   'pfAvatarBig',   secureUrl, 52, 52);
+
+                txt.textContent = 'Photo mise à jour ✓';
+                showToast('Photo uploadée avec succès');
+            } else {
+                txt.textContent = 'Changer la photo de profil';
+                showToast('Erreur lors de l\'upload', true);
+            }
+        };
+
+        xhr.onerror = function() {
+            label.style.pointerEvents = 'auto';
+            prog.style.display = 'none';
+            txt.textContent = 'Changer la photo de profil';
+            showToast('Erreur réseau lors de l\'upload', true);
+        };
+
+        xhr.open('POST', 'https://api.cloudinary.com/v1_1/' + CLOUDINARY_CLOUD_NAME + '/image/upload');
+        xhr.send(formData);
+    }
+
+    /**
+     * Met à jour un avatar (img + fallback initiales) avec une URL Cloudinary.
+     */
+    function _updateAvatarPhoto(imgId, fallbackId, rawUrl, w, h) {
+        var img = document.getElementById(imgId);
+        var fb  = document.getElementById(fallbackId);
+        if (!img) return;
+
+        var optimized = cloudinaryAvatar(rawUrl, w, h);
+        img.src = optimized;
+        img.style.display = 'block';
+        if (fb) fb.style.display = 'none';
+
+        img.onerror = function() {
+            img.style.display = 'none';
+            if (fb) fb.style.display = 'flex';
+        };
+    }
+
+    /* ── Navigation sidebar ── */
+    function toggleMenu(el) {
+        var item   = el.closest('.nav-item');
+        var isOpen = item.classList.contains('open');
+        document.querySelectorAll('.nav-item.open').forEach(function(i) { i.classList.remove('open'); });
+        if (!isOpen) item.classList.add('open');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var active = document.querySelector('.nav-sub a.active');
+        if (active && active.closest('.nav-item')) active.closest('.nav-item').classList.add('open');
+    });
+
+    /* ── Panneau utilisateur ── */
+    var _userPanelOpen = false;
+
+    function toggleUserPanel() {
+        _userPanelOpen = !_userPanelOpen;
+        var panel   = document.getElementById('userPanel');
+        var chevron = document.getElementById('userChevron');
+        var btn     = document.getElementById('sidebarUserBtn');
+        panel.style.maxHeight   = _userPanelOpen ? '700px' : '0';
+        chevron.style.transform = _userPanelOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+        btn.style.background    = _userPanelOpen ? 'rgba(255,255,255,0.06)' : '';
+    }
+
+    /* ── Édition profil ── */
+    var _pfOriginals = {};
+
+    function startProfileEdit() {
+        document.querySelectorAll('.pf-input[name]').forEach(function(inp) {
+            _pfOriginals[inp.name] = inp.value;
+        });
+
+        document.querySelectorAll('.pf-view').forEach(function(el) { el.style.display = 'none'; });
+        document.querySelectorAll('.pf-input').forEach(function(el) { el.style.display = 'block'; });
+        document.getElementById('pwdRow').style.display = 'flex';
+
+        // Afficher le bouton upload photo
+        document.getElementById('photoUploadLabel').style.display = 'flex';
+        document.getElementById('photoUploadText').textContent    = 'Changer la photo de profil';
+
+        document.getElementById('btnEdit').style.display   = 'none';
+        document.getElementById('btnSave').style.display   = 'inline-flex';
+        document.getElementById('btnCancel').style.display = 'inline-flex';
+
+        document.getElementById('userPanel').style.maxHeight = '900px';
+
+        var first = document.querySelector('.pf-input[name="email"]');
+        if (first) first.focus();
+    }
+
+    function cancelProfileEdit() {
+        document.querySelectorAll('.pf-input[name]').forEach(function(inp) {
+            if (_pfOriginals[inp.name] !== undefined) inp.value = _pfOriginals[inp.name];
+        });
+        var pwd = document.querySelector('.pf-input[name="password"]');
+        if (pwd) pwd.value = '';
+
+        document.querySelectorAll('.pf-view').forEach(function(el) { el.style.display = 'block'; });
+        document.querySelectorAll('.pf-input').forEach(function(el) { el.style.display = 'none'; });
+        document.getElementById('pwdRow').style.display         = 'none';
+        document.getElementById('photoUploadLabel').style.display = 'none';
+        document.getElementById('uploadProgress').style.display   = 'none';
+
+        document.getElementById('btnEdit').style.display   = 'inline-flex';
+        document.getElementById('btnSave').style.display   = 'none';
+        document.getElementById('btnCancel').style.display = 'none';
+    }
+
+    function submitProfileEdit() {
+        var emailInp = document.querySelector('.pf-input[name="email"]');
+        if (emailInp && !emailInp.value.trim()) {
+            emailInp.style.borderColor = 'rgba(220,60,60,0.7)';
+            emailInp.focus();
+            return;
+        }
+
+        var btnSave = document.getElementById('btnSave');
+        btnSave.disabled = true;
+        btnSave.innerHTML = '<i class="fa fa-spinner fa-spin" style="font-size:10px;"></i> Envoi…';
+
+        var form = document.getElementById('profileForm');
+        var data = new FormData(form);
+
+        fetch('{{ path('profile_update') }}', {
+            method: 'POST',
+            body: data,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(json) {
+            btnSave.disabled = false;
+            btnSave.innerHTML = '<i class="fa fa-check" style="font-size:10px;"></i> Enregistrer';
+
+            if (json.success) {
+                // Mise à jour des labels texte
+                document.querySelectorAll('.pf-view').forEach(function(view) {
+                    var inp = view.parentElement.querySelector('.pf-input');
+                    if (inp && inp.value.trim()) view.textContent = inp.value.trim();
+                });
+
+                // Mise à jour nom + initiales
+                if (json.prenom && json.nom) {
+                    var fullName = json.prenom + ' ' + json.nom;
+                    var initials = json.prenom.charAt(0).toUpperCase() + json.nom.charAt(0).toUpperCase();
+
+                    var nameSmall   = document.getElementById('pfNameSmall');
+                    var nameBig     = document.getElementById('pfNameBig');
+                    var avatarSmall = document.getElementById('pfAvatarSmall');
+                    var avatarBig   = document.getElementById('pfAvatarBig');
+
+                    if (nameSmall)   nameSmall.textContent   = fullName;
+                    if (nameBig)     nameBig.textContent     = fullName;
+                    if (avatarSmall) avatarSmall.textContent = initials;
+                    if (avatarBig)   avatarBig.textContent   = initials;
+                }
+
+                // Si une nouvelle photo Cloudinary a été envoyée, mettre à jour data-cloudinary-src
+                if (json.photo) {
+                    ['pfPhotoSmall','pfPhotoBig'].forEach(function(id) {
+                        var el = document.getElementById(id);
+                        if (el) el.dataset.cloudinarySrc = json.photo;
+                    });
+                }
+
+                cancelProfileEdit();
+                showToast('Profil mis à jour avec succès');
+            } else {
+                showToast(json.error || 'Une erreur est survenue', true);
+            }
+        })
+        .catch(function() {
+            btnSave.disabled = false;
+            btnSave.innerHTML = '<i class="fa fa-check" style="font-size:10px;"></i> Enregistrer';
+            showToast('Erreur réseau, veuillez réessayer.', true);
+        });
+    }
+
+    /* ── Toast notification ── */
+    function showToast(msg, isError) {
+        var existing = document.getElementById('pfToast');
+        if (existing) existing.remove();
+
+        var t = document.createElement('div');
+        t.id = 'pfToast';
+        t.style.cssText = [
+            'position:fixed','bottom:24px','right:24px','z-index:9999',
+            'background:' + (isError ? 'rgba(160,30,30,0.95)' : 'rgba(30,90,35,0.95)'),
+            'color:#fff','font-size:13px','font-weight:600',
+            'font-family:DM Sans,sans-serif','padding:12px 20px',
+            'border-radius:10px','display:flex','align-items:center',
+            'gap:9px','box-shadow:0 4px 24px rgba(0,0,0,0.25)',
+            'transition:opacity 0.4s ease','opacity:1'
+        ].join(';');
+
+        var icon = document.createElement('i');
+        icon.className = isError ? 'fa fa-circle-xmark' : 'fa fa-circle-check';
+        icon.style.fontSize = '14px';
+        t.appendChild(icon);
+        t.appendChild(document.createTextNode(msg));
+        document.body.appendChild(t);
+
+        setTimeout(function() { t.style.opacity = '0'; }, 2800);
+        setTimeout(function() { if (t.parentNode) t.remove(); }, 3300);
+    }
+
+    function toggle2FA(enabled) {
+    var track = document.getElementById('twofa-track');
+    var thumb = document.getElementById('twofa-thumb');
+    var status = document.getElementById('twofa-status');
+
+    var fd = new FormData();
+    fd.append('enabled', enabled ? '1' : '0');
+
+    fetch('{{ path("app_2fa_toggle") }}', {
+        method: 'POST',
+        body: fd,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => r.json())
+    .then(json => {
+        if (json.success) {
+            track.style.background = enabled ? '#2D5A27' : '#ccc';
+            thumb.style.left       = enabled ? '21px' : '3px';
+            status.textContent     = enabled ? 'Activée' : 'Désactivée';
+            agriShowToast(enabled ? '2FA activée ✓' : '2FA désactivée');
+        }
+    });
+}
+</script>
+
+{% block javascripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,329 @@
+{% extends 'base_admin.html.twig' %}
+{% block title %}{{ terrain.nomTerrain }} — AgroFlow{% endblock %}
+{% block page_title %}Détail du terrain{% endblock %}
+{% block breadcrumb %}Terrains / {{ terrain.nomTerrain }}{% endblock %}
+
+{% block stylesheets %}
+<style>
+.actions-top { display:flex; gap:10px; margin-bottom:24px; flex-wrap:wrap; }
+.btn-back { display:inline-flex; align-items:center; gap:8px; background:var(--cream-dark); color:var(--navy); padding:9px 18px; border-radius:var(--radius); font-size:14px; font-weight:500; text-decoration:none; }
+.btn-edit-top { display:inline-flex; align-items:center; gap:8px; background:var(--green-accent); color:white; padding:9px 18px; border-radius:var(--radius); font-size:14px; font-weight:500; text-decoration:none; }
+.btn-meteo { display:inline-flex; align-items:center; gap:8px; background:#F0FDF4; color:#166534; border:1px solid #86EFAC; padding:9px 18px; border-radius:var(--radius); font-size:14px; font-weight:500; cursor:pointer; }
+.btn-meteo:hover { background:#DCFCE7; }
+.btn-analyse { display:inline-flex; align-items:center; gap:8px; background:#FFF7ED; color:#92400E; border:1px solid #FCD34D; padding:9px 18px; border-radius:var(--radius); font-size:14px; font-weight:500; cursor:pointer; }
+.btn-analyse:hover { background:#FEF3C7; }
+.detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.detail-card { background:var(--white); border-radius:var(--radius); box-shadow:var(--shadow); padding:28px; }
+.detail-card h3 { font-size:16px; font-weight:700; color:var(--navy); margin-bottom:20px; padding-bottom:12px; border-bottom:2px solid var(--green-light); display:flex; align-items:center; gap:8px; }
+.detail-row { display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid var(--cream-dark); font-size:14px; }
+.detail-row:last-child { border-bottom:none; }
+.detail-label { color:var(--text-muted); font-weight:500; }
+.detail-value { font-weight:600; color:var(--navy); }
+.badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; }
+.badge-active { background:#D1FAE5; color:#065F46; }
+.badge-inactive { background:#FEE2E2; color:#991B1B; }
+.badge-soil { background:#FEF3C7; color:#92400E; }
+.rotation-table { width:100%; border-collapse:collapse; margin-top:8px; }
+.rotation-table th { background:var(--cream); padding:10px 14px; text-align:left; font-size:12px; font-weight:600; text-transform:uppercase; color:var(--text-muted); }
+.rotation-table td { padding:11px 14px; font-size:13px; border-top:1px solid var(--cream-dark); }
+
+/* ── Modals ── */
+.modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center; }
+.modal-overlay.active { display:flex; }
+.modal-box { background:#FFFDF5; border-radius:16px; padding:32px; width:90%; max-width:480px; box-shadow:0 20px 60px rgba(0,0,0,0.2); position:relative; font-family:'DM Sans',sans-serif; animation:modalIn 0.25s ease; }
+@keyframes modalIn { from{transform:translateY(20px);opacity:0} to{transform:none;opacity:1} }
+.modal-close { position:absolute; top:14px; right:16px; background:none; border:none; font-size:20px; cursor:pointer; color:#999; }
+.modal-close:hover { color:#333; }
+.modal-title { font-size:18px; font-weight:700; color:#1B3A20; margin-bottom:4px; display:flex; align-items:center; gap:10px; }
+.modal-subtitle { font-size:13px; color:#6B7280; margin-bottom:20px; }
+.modal-loading { text-align:center; padding:30px 0; color:#6B7280; font-size:14px; }
+.modal-loading i { font-size:28px; display:block; margin-bottom:10px; animation:spin 1s linear infinite; }
+@keyframes spin { to{transform:rotate(360deg)} }
+.meteo-main { font-size:32px; font-weight:700; color:#1B3A20; margin:12px 0 4px; }
+.meteo-desc { font-size:14px; color:#6B7280; margin-bottom:20px; }
+.meteo-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px; }
+.meteo-item { background:#F0FDF4; border-radius:10px; padding:12px 14px; }
+.meteo-item-label { font-size:11px; color:#6B7280; font-weight:600; text-transform:uppercase; }
+.meteo-item-val { font-size:18px; font-weight:700; color:#1B3A20; margin-top:2px; }
+.meteo-coords { font-size:12px; color:#9CA3AF; background:#F9FAFB; border-radius:8px; padding:8px 12px; }
+.meteo-reco { background:#D1FAE5; border-radius:10px; padding:12px 14px; font-size:13px; color:#065F46; font-weight:500; margin-top:12px; }
+.analyse-score-wrap { text-align:center; margin:16px 0 20px; }
+.analyse-score-bar { height:14px; background:#E5E7EB; border-radius:7px; overflow:hidden; margin:8px 0 4px; }
+.analyse-score-fill { height:100%; border-radius:7px; transition:width 0.8s ease; }
+.analyse-score-num { font-size:28px; font-weight:700; color:#1B3A20; }
+.analyse-score-label { font-size:13px; color:#6B7280; }
+.analyse-detail { background:#FAFAFA; border-radius:10px; padding:14px; font-size:13px; color:#374151; margin-bottom:14px; line-height:1.6; }
+.analyse-reco { border-radius:10px; padding:14px; font-size:13px; line-height:1.6; }
+.analyse-reco.good   { background:#D1FAE5; color:#065F46; }
+.analyse-reco.medium { background:#FEF3C7; color:#92400E; }
+.analyse-reco.bad    { background:#FEE2E2; color:#991B1B; }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="actions-top">
+    <a href="{{ path('admin_terrains') }}" class="btn-back"><i class="fa fa-arrow-left"></i> Retour</a>
+    <a href="{{ path('admin_terrains_edit', {id: terrain.id}) }}" class="btn-edit-top"><i class="fa fa-pen"></i> Modifier</a>
+    <button class="btn-meteo"
+        onclick="openMeteo('{{ terrain.localisation }}', '{{ terrain.nomTerrain }}')">
+        <i class="fa fa-cloud-sun"></i> Météo
+    </button>
+    <button class="btn-analyse"
+        onclick="openAnalyse('{{ terrain.nomTerrain }}', '{{ terrain.typeSol }}', {{ terrain.pH ?? 0 }}, {{ terrain.surface ?? 0 }}, '{{ terrain.localisation }}')">
+        <i class="fa fa-seedling"></i> Analyse
+    </button>
+</div>
+
+<div class="detail-grid">
+    <div class="detail-card">
+        <h3><i class="fa fa-map" style="color:var(--green-accent)"></i> Informations</h3>
+        <div class="detail-row">
+            <span class="detail-label">Nom</span>
+            <span class="detail-value">{{ terrain.nomTerrain }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Propriétaire</span>
+            <span class="detail-value">
+                {% if terrain.cin and cinToName[terrain.cin] is defined %}
+                    {{ cinToName[terrain.cin] }}
+                    <span class="cin-code" style="font-size:11px; margin-left:6px">{{ terrain.cin }}</span>
+                {% elseif terrain.cin %}
+                    <span class="cin-code">{{ terrain.cin }}</span>
+                {% else %}
+                    <span style="color:var(--text-muted)">—</span>
+                {% endif %}
+            </span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Surface</span>
+            <span class="detail-value">{{ terrain.surface }} ha</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Type de sol</span>
+            <span class="detail-value"><span class="badge badge-soil">{{ terrain.typeSol }}</span></span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Localisation</span>
+            <span class="detail-value">{{ terrain.localisation }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">pH</span>
+            <span class="detail-value">{{ terrain.pH ?? '—' }}</span>
+        </div>
+    </div>
+
+    <div class="detail-card" style="grid-column: 1 / -1;">
+        <h3><i class="fa fa-rotate" style="color:var(--green-accent)"></i> Rotations associées</h3>
+        {% if terrain.rotations is empty %}
+            <p style="color:var(--text-muted);text-align:center;padding:24px">Aucune rotation.</p>
+        {% else %}
+        <table class="rotation-table">
+            <thead>
+                <tr>
+                    <th>Plante</th>
+                    <th>Variété</th>
+                    <th>Date début</th>
+                    <th>Date fin</th>
+                    <th>Statut</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for r in terrain.rotations %}
+                <tr>
+                    <td>{{ r.plante.nomP }}</td>
+                    <td>{{ r.plante.variete ?? '—' }}</td>
+                    <td>{{ r.dateDebut|date('d/m/Y') }}</td>
+                    <td>{{ r.dateFin|date('d/m/Y') }}</td>
+                    <td><span class="badge {{ r.status ? 'badge-active' : 'badge-inactive' }}">{{ r.status ? 'Actif' : 'Inactif' }}</span></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+</div>
+
+{# ══ MODAL MÉTÉO ══ #}
+<div class="modal-overlay" id="meteoModal">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal('meteoModal')">×</button>
+        <div class="modal-title"><i class="fa fa-cloud-sun" style="color:#F59E0B"></i> <span id="meteoTitle">Météo</span></div>
+        <div class="modal-subtitle" id="meteoSubtitle"></div>
+        <div id="meteoContent">
+            <div class="modal-loading"><i class="fa fa-spinner"></i> Chargement…</div>
+        </div>
+    </div>
+</div>
+
+{# ══ MODAL ANALYSE ══ #}
+<div class="modal-overlay" id="analyseModal">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal('analyseModal')">×</button>
+        <div class="modal-title"><i class="fa fa-seedling" style="color:#4A8C3F"></i> <span id="analyseTitle">Analyse du Terrain</span></div>
+        <div class="modal-subtitle" id="analyseSubtitle"></div>
+        <div id="analyseContent">
+            <div class="modal-loading"><i class="fa fa-spinner"></i> Analyse en cours…</div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+<script>
+// ══════════════════════════════════════════════════════
+// MODAL HELPERS
+// ══════════════════════════════════════════════════════
+function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('active'); });
+});
+
+// ══════════════════════════════════════════════════════
+// MÉTÉO — Nominatim (géocodage) + Open-Meteo (météo) — sans clé API
+// ══════════════════════════════════════════════════════
+async function openMeteo(localisation, nom) {
+    document.getElementById('meteoTitle').textContent    = 'Météo — ' + nom;
+    document.getElementById('meteoSubtitle').textContent = localisation;
+    document.getElementById('meteoContent').innerHTML    = '<div class="modal-loading"><i class="fa fa-spinner"></i> Chargement…</div>';
+    document.getElementById('meteoModal').classList.add('active');
+
+    try {
+        const geoResp = await fetch(
+            `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(localisation + ', Tunisie')}&format=json&limit=1`,
+            { headers: { 'Accept-Language': 'fr' } }
+        );
+        const geoData = await geoResp.json();
+        let lat = 33.8869, lon = 9.5375, displayName = localisation + ', Tunisie (approx.)';
+        if (geoData.length > 0) {
+            lat = parseFloat(geoData[0].lat);
+            lon = parseFloat(geoData[0].lon);
+            displayName = geoData[0].display_name;
+        }
+
+        const wResp = await fetch(
+            `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}` +
+            `&current_weather=true&hourly=relative_humidity_2m,precipitation,windspeed_10m&forecast_days=1&timezone=Africa/Tunis`
+        );
+        const wData = await wResp.json();
+        const cw = wData.current_weather;
+        const h  = new Date().getHours();
+        const humidity = wData.hourly?.relative_humidity_2m?.[h] ?? '—';
+        const precip   = wData.hourly?.precipitation?.[h] ?? 0;
+
+        const wcode = cw.weathercode;
+        let icon = '☀️', desc = 'Ciel dégagé';
+        if (wcode >= 1  && wcode <= 3)  { icon = '⛅';  desc = 'Partiellement nuageux'; }
+        if (wcode >= 45 && wcode <= 48) { icon = '🌫️'; desc = 'Brouillard'; }
+        if (wcode >= 51 && wcode <= 67) { icon = '🌧️'; desc = 'Pluie'; }
+        if (wcode >= 71 && wcode <= 77) { icon = '❄️';  desc = 'Neige'; }
+        if (wcode >= 80 && wcode <= 82) { icon = '🌦️'; desc = 'Averses'; }
+        if (wcode >= 95)                { icon = '⛈️';  desc = 'Orage'; }
+
+        let reco = '💧 Conditions normales — Arrosage standard selon vos plantes.';
+        if (precip > 5)          reco = "🌧️ Pluie prévue — Arrosage inutile aujourd'hui.";
+        if (precip > 20)         reco = '⚠️ Fortes précipitations — Surveiller le drainage.';
+        if (cw.temperature > 35) reco = '🔥 Forte chaleur — Arroser tôt le matin ou en soirée.';
+        if (humidity < 30)       reco = "💨 Faible humidité — Augmenter la fréquence d'arrosage.";
+
+        document.getElementById('meteoContent').innerHTML = `
+            <div style="font-size:40px;text-align:center;margin-bottom:4px">${icon}</div>
+            <div class="meteo-main" style="text-align:center">${cw.temperature} °C</div>
+            <div class="meteo-desc" style="text-align:center">${desc}</div>
+            <div class="meteo-grid">
+                <div class="meteo-item"><div class="meteo-item-label">💧 Humidité</div><div class="meteo-item-val">${humidity} %</div></div>
+                <div class="meteo-item"><div class="meteo-item-label">💨 Vent</div><div class="meteo-item-val">${cw.windspeed} km/h</div></div>
+                <div class="meteo-item"><div class="meteo-item-label">🌧️ Précipitations</div><div class="meteo-item-val">${precip} mm</div></div>
+                <div class="meteo-item"><div class="meteo-item-label">📍 Coordonnées</div><div class="meteo-item-val" style="font-size:13px">${lat.toFixed(4)}, ${lon.toFixed(4)}</div></div>
+            </div>
+            <div class="meteo-coords">📍 ${displayName}</div>
+            <div class="meteo-reco">${reco}</div>`;
+    } catch (e) {
+        document.getElementById('meteoContent').innerHTML = '<p style="color:#DC2626;text-align:center">Erreur météo. Vérifiez votre connexion.</p>';
+    }
+}
+
+// ══════════════════════════════════════════════════════
+// ANALYSE TERRAIN — logique interne + Open-Meteo pour arrosage
+// ══════════════════════════════════════════════════════
+async function openAnalyse(nom, typeSol, ph, surface, localisation) {
+    document.getElementById('analyseTitle').textContent    = 'Analyse — ' + nom;
+    document.getElementById('analyseSubtitle').textContent = localisation;
+    document.getElementById('analyseContent').innerHTML    = '<div class="modal-loading"><i class="fa fa-spinner"></i> Analyse en cours…</div>';
+    document.getElementById('analyseModal').classList.add('active');
+
+    let score = 50, details = [];
+
+    const phScore = calculerScorePH(ph);
+    score += phScore.pts;
+    details.push(`pH (${ph}) : ${phScore.label}`);
+
+    if (surface >= 1 && surface <= 100) { score += 10; details.push(`Surface : ${surface} ha — Idéale`); }
+    else if (surface > 100)             { score += 5;  details.push(`Surface : ${surface} ha — Grande`); }
+    else                                { score -= 5;  details.push(`Surface : ${surface} ha — Petite`); }
+
+    const rec = getRecommandations(typeSol, ph);
+    details.push(`Type sol : ${typeSol}`);
+    score = Math.max(0, Math.min(100, score));
+
+    let scoreLabel, scoreClass, scoreColor;
+    if (score >= 75)      { scoreLabel = '🌿 Excellent — Terrain très cultivable';                scoreClass = 'good';   scoreColor = '#16A34A'; }
+    else if (score >= 50) { scoreLabel = '⚙️ Moyen — Terrain cultivable avec améliorations';     scoreClass = 'medium'; scoreColor = '#D97706'; }
+    else                  { scoreLabel = '⚠️ Faible — Terrain nécessite des corrections';         scoreClass = 'bad';    scoreColor = '#DC2626'; }
+
+    let arrosageReco = '💧 Arrosage standard recommandé.';
+    try {
+        const geoR = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(localisation + ', Tunisie')}&format=json&limit=1`);
+        const geoD = await geoR.json();
+        if (geoD.length > 0) {
+            const wR = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${geoD[0].lat}&longitude=${geoD[0].lon}&current_weather=true&hourly=precipitation&forecast_days=1&timezone=Africa/Tunis`);
+            const wD = await wR.json();
+            const precip = wD.hourly?.precipitation?.[new Date().getHours()] ?? 0;
+            const temp   = wD.current_weather?.temperature ?? 20;
+            if (precip > 5)   arrosageReco = "🌧️ Pluie détectée — Pas d'arrosage nécessaire.";
+            else if (temp > 35) arrosageReco = '🔥 Chaleur élevée — Arroser tôt le matin ou après 18h.';
+            else                arrosageReco = '💧 Conditions normales — Arrosage standard.';
+        }
+    } catch (_) {}
+
+    document.getElementById('analyseContent').innerHTML = `
+        <div class="analyse-score-wrap">
+            <div class="analyse-score-num">${score} <span style="font-size:16px;color:#9CA3AF">/ 100</span></div>
+            <div class="analyse-score-bar"><div class="analyse-score-fill" style="width:${score}%;background:${scoreColor}"></div></div>
+            <div class="analyse-score-label">${scoreLabel}</div>
+        </div>
+        <div class="analyse-detail">${details.map(d => `• ${d}`).join('<br>')}</div>
+        <div class="analyse-reco ${scoreClass}">
+            <strong>🌱 Recommandation de Plantes (pH = ${ph})</strong><br>
+            ${rec.contexte}<br>
+            ✔️ <strong>Recommandées :</strong> ${rec.bon.join(', ')}<br>
+            ✖️ <strong>Éviter :</strong> ${rec.eviter.join(', ')}<br><br>
+            🚿 <strong>Arrosage :</strong> ${arrosageReco}
+        </div>`;
+}
+
+function calculerScorePH(ph) {
+    if (ph >= 6.0 && ph <= 7.0) return { pts: 25,  label: 'Optimal ✅' };
+    if (ph >= 5.5 && ph < 6.0)  return { pts: 15,  label: 'Légèrement acide ⚠️' };
+    if (ph > 7.0  && ph <= 7.5) return { pts: 15,  label: 'Légèrement basique ⚠️' };
+    if (ph > 7.5  && ph <= 8.0) return { pts: 5,   label: 'Basique — à corriger ⚠️' };
+    if (ph < 5.5)               return { pts: -10, label: 'Trop acide ❌' };
+    return                             { pts: -5,  label: 'Trop basique ❌' };
+}
+
+function getRecommandations(typeSol, ph) {
+    let bon = [], eviter = [], contexte = '';
+    if (ph < 5.5)       { contexte = '🔴 Sol très acide';          bon = ['Myrtille','Pomme de terre','Seigle'];              eviter = ['Luzerne','Betterave','Asperge']; }
+    else if (ph <= 6.5) { contexte = '🟡 Sol légèrement acide';    bon = ['Tomate','Maïs','Carotte','Haricot','Fraise'];       eviter = ['Luzerne','Betterave sucrière']; }
+    else if (ph <= 7.0) { contexte = '🟢 Sol neutre (idéal)';      bon = ['Blé','Maïs','Tomate','Laitue','Carotte','Chou'];    eviter = ['Myrtille','Azalée']; }
+    else if (ph <= 7.5) { contexte = '🟡 Sol légèrement basique';  bon = ['Asperge','Chou','Betterave','Epinard','Céleri'];     eviter = ['Pomme de terre','Tomate','Fraise']; }
+    else                { contexte = '🔴 Sol basique';              bon = ['Luzerne','Orge','Datte'];                          eviter = ['Pomme de terre','Tomate','Fraise','Maïs']; }
+
+    if (typeSol === 'Sableux')   { bon.push('Melon','Pastèque');                       contexte += ' — Sol sableux (drainage rapide)'; }
+    else if (typeSol === 'Argileux') { bon.push('Riz','Blé'); eviter.push('Carotte (déformation)'); contexte += ' — Sol argileux (rétention eau)'; }
+    else if (typeSol === 'Humifère') { bon.push('Légumes feuilles','Framboise');        contexte += ' — Sol humifère (riche)'; }
+
+    return { bon, eviter, contexte };
+}
+</script>
+{% endblock %}

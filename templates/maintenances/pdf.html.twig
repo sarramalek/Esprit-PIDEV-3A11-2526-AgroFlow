@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Maintenances — Export PDF</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 13px;
+      color: #1a2e1a;
+      padding: 2.5rem;
+      background: #fff;
+    }
+
+    /* ── Header ── */
+    .pdf-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 2rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 2.5px solid #2d6a2d;
+    }
+    .pdf-header__logo {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #2d6a2d;
+      letter-spacing: -.02em;
+    }
+    .pdf-header__logo span { color: #7ac47a; }
+    .pdf-header__meta {
+      text-align: right;
+      font-size: .78rem;
+      color: #6b8c6b;
+      line-height: 1.6;
+    }
+    .pdf-header__meta strong { color: #1a2e1a; }
+
+    /* ── Title block ── */
+    .pdf-title {
+      margin-bottom: 1.5rem;
+    }
+    .pdf-title h1 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #1a2e1a;
+      margin-bottom: .3rem;
+    }
+    .pdf-title p {
+      font-size: .82rem;
+      color: #6b8c6b;
+    }
+
+    /* ── Stats summary ── */
+    .pdf-stats {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 1.75rem;
+      flex-wrap: wrap;
+    }
+    .pdf-stat {
+      background: #f7faf4;
+      border: 1.5px solid #d4e8d4;
+      border-radius: 10px;
+      padding: .7rem 1.2rem;
+      min-width: 130px;
+    }
+    .pdf-stat__label {
+      font-size: .68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      color: #7a9a7a;
+      margin-bottom: .2rem;
+    }
+    .pdf-stat__value {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #1a2e1a;
+    }
+
+    /* ── Table ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .85rem;
+    }
+    thead tr {
+      background: #2d6a2d;
+    }
+    th {
+      padding: .65rem .9rem;
+      text-align: left;
+      font-size: .7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .7px;
+      color: #fff;
+      white-space: nowrap;
+    }
+    tbody tr:nth-child(even) { background: #f7faf4; }
+    tbody tr:nth-child(odd)  { background: #fff; }
+    tbody tr:last-child td   { border-bottom: 2px solid #2d6a2d; }
+    td {
+      padding: .6rem .9rem;
+      border-bottom: 1px solid #e4edde;
+      vertical-align: middle;
+    }
+
+    /* ── Badges ── */
+    .badge {
+      display: inline-block;
+      padding: .2rem .7rem;
+      border-radius: 50px;
+      font-size: .72rem;
+      font-weight: 600;
+    }
+    .badge--mecanique    { background: #e1f5ee; color: #085041; }
+    .badge--electrique   { background: #faeeda; color: #633806; }
+    .badge--hydraulique  { background: #eaf3de; color: #27500a; }
+    .badge--logicielle   { background: #e6f1fb; color: #0c447c; }
+    .badge--transmission { background: #ede8fa; color: #4a1d8c; }
+    .badge--moteur       { background: #fde8e8; color: #a32d2d; }
+    .badge--vidange      { background: #fff8e1; color: #7b5200; }
+    .badge--revision     { background: #e8f4fd; color: #1a5276; }
+    .badge--pneumatique  { background: #ddeeff; color: #0a3d6b; }
+    .badge--default      { background: #f1efe8; color: #2c2c2a; }
+
+    .td-cost { font-weight: 700; color: #1a5c1a; }
+    .td-date { color: #5f7a5f; }
+    .td-mat  { color: #2d6a2d; font-weight: 700; }
+
+    /* ── Footer ── */
+    .pdf-footer {
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e4edde;
+      font-size: .75rem;
+      color: #9aaa9a;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    @media print {
+      body { padding: 1.5cm; }
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body onload="window.print()">
+
+  <!-- Header -->
+  <div class="pdf-header">
+    <div class="pdf-header__logo">Agro<span>Flow</span></div>
+    <div class="pdf-header__meta">
+      <strong>Rapport Maintenances</strong><br>
+      Exporté le {{ "now"|date("d/m/Y") }} à {{ "now"|date("H:i") }}<br>
+      {{ maintenances|length }} enregistrement(s)
+    </div>
+  </div>
+
+  <!-- Title -->
+  <div class="pdf-title">
+    <h1>🔧 Liste des Maintenances</h1>
+    <p>Récapitulatif complet des interventions de maintenance des matériels agricoles</p>
+  </div>
+
+  <!-- Stats -->
+  {% set totalCout = 0 %}
+  {% for m in maintenances %}
+    {% set totalCout = totalCout + m.cout %}
+  {% endfor %}
+
+  <div class="pdf-stats">
+    <div class="pdf-stat">
+      <div class="pdf-stat__label">Total interventions</div>
+      <div class="pdf-stat__value">{{ maintenances|length }}</div>
+    </div>
+    <div class="pdf-stat">
+      <div class="pdf-stat__label">Coût total</div>
+      <div class="pdf-stat__value">{{ totalCout|number_format(0, ',', ' ') }} DT</div>
+    </div>
+    {% if maintenances|length > 0 %}
+    <div class="pdf-stat">
+      <div class="pdf-stat__label">Coût moyen</div>
+      <div class="pdf-stat__value">{{ (totalCout / maintenances|length)|number_format(0, ',', ' ') }} DT</div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Table -->
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Type de panne</th>
+        <th>Coût (DT)</th>
+        <th>Date</th>
+        <th>Description</th>
+        <th>ID Matériel</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in maintenances %}
+        {% set tl = m.typePanne|default('autre')|lower
+            |replace({'é':'e','è':'e','ê':'e','à':'a','&':'',' ':''}) %}
+        {% set validBadges = [
+            'mecanique','electrique','hydraulique','logicielle',
+            'transmission','moteur','vidange','revision','pneumatique'
+        ] %}
+        {% set bc = tl in validBadges ? tl : 'default' %}
+        <tr>
+          <td style="color:#9aaa9a; font-size:.8rem;">{{ loop.index }}</td>
+          <td><span class="badge badge--{{ bc }}">{{ m.typePanne|default('—')|capitalize }}</span></td>
+          <td class="td-cost">{{ m.cout|number_format(2, ',', ' ') }} DT</td>
+          <td class="td-date">{{ m.dateMain ? m.dateMain|date('d/m/Y') : '—' }}</td>
+          <td style="color:#4a6a4a; font-size:.82rem; max-width:200px;">
+            {{ m.description|default('—')|slice(0, 60) }}{% if m.description|length > 60 %}…{% endif %}
+          </td>
+          <td class="td-mat">{{ m.idM.m ? '#'~m.idM.id : '—' }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Footer -->
+  <div class="pdf-footer">
+    <span>AgroFlow — Gestion agricole intelligente</span>
+    <span>Document généré automatiquement</span>
+  </div>
+
+</body>
+</html>

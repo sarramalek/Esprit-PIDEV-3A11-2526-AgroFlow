@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}AgroFlow{% endblock %}</title>
+        
+        {% block stylesheets %}
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+            <link rel="stylesheet" href="{{ asset('assets/css/main.css') }}">
+            <style>
+                body {
+                    margin: 0;
+                    padding: 0;
+                    background-color: #FCF8E6; /* Jaune Pâle */
+                    display: flex;
+                    flex-direction: column;
+                    min-height: 100vh;
+                    font-family: Arial, sans-serif;
+                }
+                
+                /* Navbar Haut */
+                .navbar-tech {
+                    background-color: #2C3E50; /* Bleu Tech */
+                    color: white;
+                    padding: 15px 30px;
+                    display: flex;
+                    align-items: center;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                    z-index: 10;
+                }
+                .navbar-tech .brand {
+                    font-size: 1.5rem;
+                    font-weight: bold;
+                    color: white;
+                    text-decoration: none;
+                }
+
+                /* Container Principal */
+                .main-container {
+                    display: flex;
+                    flex: 1;
+                }
+
+                /* Sidebar Gauche */
+                .sidebar-nature {
+                    background-color: #2D5A27; /* Vert Nature */
+                    width: 250px;
+                    padding: 20px 0;
+                    color: white;
+                    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+                }
+                .sidebar-nature ul {
+                    list-style: none;
+                    margin: 0;
+                    padding: 0;
+                }
+                .sidebar-nature li {
+                    margin: 0;
+                }
+                .sidebar-nature a {
+                    color: #FCF8E6; /* Jaune Pâle pour le texte pour un bon contraste */
+                    display: block;
+                    padding: 15px 25px;
+                    text-decoration: none;
+                    font-size: 1.1rem;
+                    border-left: 4px solid transparent;
+                    transition: all 0.3s ease;
+                }
+                .sidebar-nature a:hover {
+                    background-color: rgba(255, 255, 255, 0.1);
+                    border-left: 4px solid #FCF8E6;
+                }
+
+                /* Contenu Central */
+                .content-area {
+                    flex: 1;
+                    padding: 30px;
+                    background-color: #FCF8E6; /* Jaune Pâle */
+                }
+                /* Style ajouté pour le hover du menu */
+                .navmenu a:hover {
+                    color: #2D5A27 !important;
+                }
+            </style>
+        {% endblock %}
+
+        {% block javascripts %}
+        {% endblock %}
+    </head>
+    
+    <body class="index-page">
+        {% include '_tts_button.html.twig' %}
+        <!-- Navbar -->
+        <header id="header" class="header" style="position: sticky; top: 0; z-index: 1000; background-color: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 15px 30px; display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <a href="/" style="display: flex; align-items: center; text-decoration: none; gap: 10px;">
+                    <img src="{{ asset('assets/img/Logo.png') }}" alt="Logo" style="height: 60px;">
+                </a>
+            </div>
+            
+            <nav id="navmenu" class="navmenu" style="display: flex; gap: 30px; align-items: center;">
+                <a href="/" style="color: #2C3E50; text-decoration: none; font-weight: 600; font-size: 15px; transition: color 0.3s;">Accueil</a>
+                <a href="/#services" style="color: #2C3E50; text-decoration: none; font-weight: 600; font-size: 15px; transition: color 0.3s;">Services</a>
+                <a href="/#posts" style="color: #2C3E50; text-decoration: none; font-weight: 600; font-size: 15px; transition: color 0.3s;">Publications</a>
+                <a href="/#testimonials" style="color: #2C3E50; text-decoration: none; font-weight: 600; font-size: 15px; transition: color 0.3s;">Avis</a>
+                <a href="/#ads" style="color: #2C3E50; text-decoration: none; font-weight: 600; font-size: 15px; transition: color 0.3s;">Tutos & Partenaires</a>
+                <a href="{{ path('app_about') }}" style="color: #2C3E50; text-decoration: none; font-weight: 600; font-size: 15px; transition: color 0.3s;">Notre Équipe</a>
+            </nav>
+            
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <a href="{{ path('app_login') }}" style="color: #2C3E50; text-decoration: none; font-weight: 600; font-size: 15px;">Connexion</a>
+                <a href="{{ path('app_register') }}" style="background-color: #2D5A27; color: white; padding: 10px 25px; border-radius: 5px; text-decoration: none; font-weight: 600; font-size: 15px; transition: background 0.3s;">S'inscrire</a>
+            </div>
+        </header>
+
+        <div class="main-container">
+            <!-- Sidebar -->
+            <aside class="sidebar-nature" style="display: none;">
+                <nav>
+                    <ul>
+                        <li><a href="{{ path('app_animaux_index') }}">Nos Animaux</a></li>
+                        <li><a href="{{ path('app_examens_index') }}">Examens</a></li>
+                        
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- Contenu central -->
+            <main class="content-area" style="flex: 1; padding: 0;">
+                {% block body %}
+                    <!-- Le contenu spécifique à la page va s'afficher ici -->
+                {% endblock %}
+            </main>
+        </div>
+
+    </body>
+</html>

@@ -1,0 +1,260 @@
+{# Ce fichier est conçu pour être injecté dans une modal via render(controller) #}
+
+<style>
+    .agro-popup-container {
+        font-family: 'DM Sans', sans-serif;
+        padding: 10px;
+    }
+    .agro-grid { 
+        display: grid; 
+        grid-template-columns: 1fr 1fr; 
+        gap: 20px; 
+    }
+    .full-width { grid-column: span 2; }
+    
+    .form-group label { 
+        display: block; 
+        font-size: 11px; 
+        color: #6C757D; 
+        font-weight: 700; 
+        text-transform: uppercase; 
+        margin-bottom: 5px; 
+        letter-spacing: 0.5px;
+    }
+    
+    .form-control-modern { 
+        width: 100%; 
+        padding: 12px 15px; 
+        border: 1px solid #E2E8F0; 
+        border-radius: 10px; 
+        background: #F8FAFC; 
+        transition: all 0.3s ease; 
+        box-sizing: border-box;
+    }
+    
+    .form-control-modern:focus { 
+        border-color: #2D5A27; 
+        background: white; 
+        outline: none; 
+        box-shadow: 0 0 0 3px rgba(45, 90, 39, 0.1); 
+    }
+
+    .validation-msg { font-size: 11px; font-weight: 700; }
+    
+    .field-icon-wrapper { position: relative; }
+    .field-icon { 
+        position: absolute; 
+        left: 12px; 
+        top: 50%; 
+        transform: translateY(-50%); 
+        color: #ADB5BD; 
+        font-size: 14px; 
+        pointer-events: none;
+    }
+    .has-icon .form-control-modern { padding-left: 38px; }
+
+    .modal-actions {
+        margin-top: 25px; 
+        display: flex; 
+        justify-content: flex-end; 
+        gap: 12px; 
+        border-top: 1px solid #F1F1F1; 
+        padding-top: 20px;
+    }
+    
+    .btn-save-popup { 
+        background: #2D5A27; 
+        color: white; 
+        border: none; 
+        padding: 12px 25px; 
+        border-radius: 10px; 
+        font-weight: 700; 
+        cursor: pointer; 
+        transition: 0.2s;
+    }
+    .btn-save-popup:hover { background: #1e3d1a; transform: translateY(-1px); }
+    
+    .btn-cancel-popup { 
+        background: #F1F5F9; 
+        color: #64748B; 
+        border: none; 
+        padding: 12px 25px; 
+        border-radius: 10px; 
+        font-weight: 700; 
+        cursor: pointer; 
+    }
+</style>
+
+<div class="agro-popup-container">
+    {{ form_start(form, {'attr': {'id': 'ajax-add-product-form'}}) }}
+        <div class="agro-grid">
+            
+            {# NOM #}
+            <div class="form-group full-width">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    {{ form_label(form.nom) }}
+                    <span id="msg-nom-ajax" class="validation-msg"></span>
+                </div>
+                {{ form_widget(form.nom, {'attr': {'class': 'form-control-modern', 'placeholder': 'Ex: Engrais Azoté NPK'}}) }}
+            </div>
+
+            {# CATEGORIE #}
+            <div class="form-group">
+                {{ form_label(form.categorie) }}
+                {{ form_widget(form.categorie, {'attr': {'class': 'form-control-modern'}}) }}
+            </div>
+
+            {# DEVISE & PRIX ACHAT #}
+            <div class="form-group">
+                {{ form_label(form.devise) }}
+                {{ form_widget(form.devise, {'attr': {'class': 'form-control-modern'}}) }}
+            </div>
+
+            <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    {{ form_label(form.prix_achat_devise) }}
+                    <span id="msg-prix-achat-ajax" class="validation-msg"></span>
+                </div>
+                <div class="field-icon-wrapper has-icon">
+                    <i class="fa fa-wallet field-icon"></i>
+                    {{ form_widget(form.prix_achat_devise, {'attr': {'class': 'form-control-modern', 'placeholder': 'Prix original'}}) }}
+                </div>
+            </div>
+
+            {# PRIX FINAL TND #}
+            <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    {{ form_label(form.prix_unitaire) }}
+                    <span id="msg-prix-ajax" class="validation-msg"></span>
+                </div>
+                <div class="field-icon-wrapper has-icon">
+                    <i class="fa fa-calculator field-icon"></i>
+                    {{ form_widget(form.prix_unitaire, {'attr': {'class': 'form-control-modern', 'placeholder': 'Automatique si devise choisie', 'readonly': 'readonly', 'style': 'background:#eef2f7;'}}) }}
+                </div>
+                <small style="font-size: 10px; color: #7f8c8d; font-style: italic;">* Sera calculé automatiquement via API</small>
+            </div>
+
+            {# UNITE #}
+            <div class="form-group">
+                {{ form_label(form.unite_mesure) }}
+                {{ form_widget(form.unite_mesure, {'attr': {'class': 'form-control-modern'}}) }}
+            </div>
+
+            {# STOCK #}
+            <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    {{ form_label(form.quantite_en_stock) }}
+                    <span id="msg-stock-ajax" class="validation-msg"></span>
+                </div>
+                <div class="field-icon-wrapper has-icon">
+                    <i class="fa fa-box field-icon"></i>
+                    {{ form_widget(form.quantite_en_stock, {'attr': {'class': 'form-control-modern'}}) }}
+                </div>
+            </div>
+
+            {# SEUIL #}
+            <div class="form-group full-width">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    {{ form_label(form.seuil_alerte) }}
+                    <span id="msg-seuil-ajax" class="validation-msg"></span>
+                </div>
+                <div class="field-icon-wrapper has-icon">
+                    <i class="fa fa-bell field-icon"></i>
+                    {{ form_widget(form.seuil_alerte, {'attr': {'class': 'form-control-modern'}}) }}
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-actions">
+            <button type="button" onclick="closeAddProductModal()" class="btn-cancel-popup">Annuler</button>
+            <button type="submit" class="btn-save-popup">
+                <i class="fa fa-check"></i> Enregistrer le produit
+            </button>
+        </div>
+    {{ form_end(form) }}
+</div>
+
+<script>
+(function() {
+    const form = document.getElementById('ajax-add-product-form');
+    
+    const validations = [
+        {
+            input: form.querySelector('[name*="[nom]"]'),
+            msg: document.getElementById('msg-nom-ajax'),
+            check: (val) => {
+                if (val.length === 0) return { text: "Requis", color: "#dc3545" };
+                if (val.length < 3) return { text: "Trop court", color: "#fd7e14" };
+                return { text: "Valide ✓", color: "#2D5A27" };
+            }
+        },
+        {
+            input: form.querySelector('[name*="[prix_achat_devise]"]'),
+            msg: document.getElementById('msg-prix-achat-ajax'),
+            check: (val) => {
+                if (val !== "" && parseFloat(val) <= 0) return { text: "Prix > 0", color: "#dc3545" };
+                return { text: "", color: "#2D5A27" };
+            }
+        },
+        {
+            input: form.querySelector('[name*="[quantite_en_stock]"]'),
+            msg: document.getElementById('msg-stock-ajax'),
+            check: (val) => {
+                if (val === "" || parseFloat(val) < 0) return { text: "Min 0", color: "#dc3545" };
+                return { text: "Valide ✓", color: "#2D5A27" };
+            }
+        },
+        {
+            input: form.querySelector('[name*="[seuil_alerte]"]'),
+            msg: document.getElementById('msg-seuil-ajax'),
+            check: (val) => {
+                if (val === "" || parseFloat(val) < 0) return { text: "Min 0", color: "#dc3545" };
+                return { text: "Valide ✓", color: "#2D5A27" };
+            }
+        }
+    ];
+
+    // Logique de conversion en temps réel (Aperçu)
+    const deviseSelect = form.querySelector('[name*="[devise]"]');
+    const prixAchatInput = form.querySelector('[name*="[prix_achat_devise]"]');
+    const prixUnitaireInput = form.querySelector('[name*="[prix_unitaire]"]');
+    
+    const rates = { 'EUR': 3.385, 'USD': 3.120, 'GBP': 3.920, 'DZD': 0.023, 'MAD': 0.312, 'TND': 1 };
+
+    function updatePreview() {
+        const amount = parseFloat(prixAchatInput.value) || 0;
+        const currency = deviseSelect.value;
+        
+        if (currency === 'TND') {
+            prixUnitaireInput.value = amount.toFixed(3);
+            prixUnitaireInput.style.background = "#f8fafc";
+            prixUnitaireInput.readOnly = false;
+        } else {
+            const estimation = amount * (rates[currency] || 1);
+            prixUnitaireInput.value = estimation.toFixed(3);
+            prixUnitaireInput.style.background = "#eef2f7";
+            prixUnitaireInput.readOnly = true;
+        }
+    }
+
+    if (deviseSelect && prixAchatInput) {
+        deviseSelect.addEventListener('change', updatePreview);
+        prixAchatInput.addEventListener('input', updatePreview);
+    }
+
+    function validateField(v) {
+        if (!v.input) return;
+        const result = v.check(v.input.value.trim());
+        v.msg.textContent = result.text;
+        v.msg.style.color = result.color;
+        v.input.style.borderColor = result.color;
+    }
+
+    validations.forEach(v => {
+        if (v.input) {
+            v.input.addEventListener('input', () => validateField(v));
+            validateField(v);
+        }
+    });
+})();
+</script>

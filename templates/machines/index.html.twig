@@ -1,0 +1,607 @@
+{# templates/machines/index.html.twig #}
+{% extends 'agriculteur_dashboard.html.twig' %}
+{% block title %}Mes Machines — AgroFlow{% endblock %}
+
+{% block body %}
+<style>
+    :root {
+        --green-dark:  #2d5a1b;
+        --green-mid:   #3a7a22;
+        --green-light: #f0f7eb;
+        --green-border:#c8e6b0;
+        --text-dark:   #1a2e10;
+        --text-mid:    #4a6741;
+        --text-light:  #7a9b6a;
+        --white:       #ffffff;
+        --cream:       #f8fdf4;
+        --shadow:      0 4px 16px rgba(45,90,27,0.10);
+    }
+
+    * { box-sizing: border-box; }
+
+    .page-wrap { max-width: 1400px; margin: 0 auto; padding: 1.5rem; }
+
+    .flash { padding: .75rem 1.1rem; border-radius: 10px; margin-bottom: 1rem; font-weight: 500; font-size: .92rem; }
+    .flash-success { background: #e6f4e0; color: #1e5c0e; border: 1px solid #b4dba0; }
+    .flash-error   { background: #fdecea; color: #8b1a1a; border: 1px solid #f3b8b0; }
+
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.8rem; flex-wrap: wrap; gap: 1rem; }
+    .page-header h1 { margin: 0; font-size: 1.8rem; font-weight: 700; color: var(--text-dark); }
+
+    .btn { display: inline-flex; align-items: center; gap: .45rem; padding: .6rem 1.3rem; border-radius: 10px; font-weight: 600; font-size: .88rem; text-decoration: none; cursor: pointer; border: none; font-family: inherit; transition: all .18s; }
+    .btn-primary   { background: var(--green-dark); color: #fff; }
+    .btn-primary:hover { background: #1f4012; transform: translateY(-1px); box-shadow: 0 3px 10px rgba(45,90,27,.25); }
+    .btn-secondary { background: var(--green-light); color: var(--green-dark); border: 1px solid var(--green-border); }
+    .btn-secondary:hover { background: #dff0d3; }
+
+    .filters-bar { background: var(--white); border-radius: 14px; box-shadow: var(--shadow); padding: 1.2rem 1.5rem; margin-bottom: 1.6rem; }
+    .filters-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: .8rem; margin-bottom: .8rem; }
+    .f-group { display: flex; flex-direction: column; gap: .3rem; }
+    .f-group label { font-size: .72rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: .5px; }
+    .f-group input, .f-group select { padding: .65rem .85rem; border: 1.5px solid var(--green-border); border-radius: 9px; font-size: .88rem; background: var(--cream); outline: none; font-family: inherit; transition: border-color .18s; }
+    .f-group input:focus, .f-group select:focus { border-color: var(--green-dark); }
+    .filters-actions { display: flex; gap: .7rem; justify-content: flex-end; }
+
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 1.4rem; }
+
+    .machine-card {
+        background: var(--white);
+        border-radius: 18px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        transition: transform .2s, box-shadow .2s;
+        display: flex;
+        flex-direction: column;
+    }
+    .machine-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(45,90,27,.15); }
+
+    .card-header {
+        background: var(--green-dark);
+        padding: 1.1rem 1.3rem .95rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: .5rem;
+    }
+    .card-header-left { flex: 1; min-width: 0; }
+    .card-title { margin: 0 0 .2rem 0; font-size: 1.08rem; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-subtitle { font-size: .82rem; color: #b5d9a0; display: flex; align-items: center; gap: .3rem; }
+
+    .badge { padding: .28rem .85rem; border-radius: 50px; font-size: .78rem; font-weight: 700; white-space: nowrap; }
+    .badge-neuf     { background: #d4edda; color: #155724; }
+    .badge-bon      { background: #cce5ff; color: #004085; }
+    .badge-occasion { background: #fff3cd; color: #856404; }
+    .badge-panne    { background: #f8d7da; color: #721c24; }
+
+    .card-stats { display: flex; border-bottom: 1px solid #eef5e8; }
+    .stat-item { flex: 1; padding: .85rem .5rem; text-align: center; border-right: 1px solid #eef5e8; }
+    .stat-item:last-child { border-right: none; }
+    .stat-value { font-size: 1.18rem; font-weight: 700; color: var(--text-dark); line-height: 1; }
+    .stat-label { font-size: .66rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--text-light); margin-top: .2rem; }
+
+    .maintenance-alert { margin: .6rem 1rem 0; padding: .5rem .75rem; border-radius: 8px; font-size: .78rem; font-weight: 500; }
+    .alert-overdue { background: #fdecea; color: #8b1a1a; border: 1px solid #f3b8b0; }
+    .alert-soon    { background: #fff8e6; color: #7a5700; border: 1px solid #f0d88a; }
+
+    .card-actions { padding: .85rem 1rem; display: flex; gap: .5rem; align-items: center; margin-top: auto; }
+    .action-btn {
+        display: inline-flex; align-items: center; gap: .3rem;
+        padding: .45rem .95rem; border-radius: 20px; font-size: .8rem; font-weight: 600;
+        text-decoration: none; transition: all .16s; border: 1.5px solid transparent;
+        cursor: pointer; white-space: nowrap; background: none; font-family: inherit;
+    }
+    .btn-view   { background: #f0f7eb; color: var(--green-dark); border-color: var(--green-border); }
+    .btn-view:hover   { background: #dff0d3; }
+    .btn-edit   { background: #fff8ee; color: #b96b00; border-color: #ffd9a0; }
+    .btn-edit:hover   { background: #ffecd1; border-color: #f0bb70; }
+    .btn-info    { background: #e8f0fe; color: #1a73e8; border-color: #b9d3f8; }
+    .btn-info:hover    { background: #d2e3fc; border-color: #8ab5f0; }
+    .btn-delete { background: #fdf0f0; color: #c53030; border-color: #f5c6cb; padding: .45rem .6rem; }
+    .btn-delete:hover { background: #fde0e0; }
+    .form-inline { display: contents; }
+
+    .empty-state { text-align: center; padding: 4rem 2rem; color: var(--text-light); font-size: 1rem; line-height: 2; }
+    .result-count { text-align: right; color: var(--text-light); font-size: .82rem; margin-top: 1rem; }
+
+    .modal {
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.6);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .modal-content {
+        background-color: var(--white, #ffffff);
+        border-radius: 20px;
+        max-width: 700px;
+        width: 90%;
+        max-height: 85vh;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        animation: modalSlideIn 0.3s ease-out;
+    }
+    
+    @keyframes modalSlideIn {
+        from { transform: translateY(-50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .modal-header {
+        padding: 1.2rem 1.5rem;
+        background: linear-gradient(135deg, var(--green-dark, #2d5a1b) 0%, #1f4012 100%);
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid var(--green-border, #c8e6b0);
+    }
+    
+    .modal-header h2 { margin: 0; font-size: 1.2rem; font-weight: 600; }
+    
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 2rem;
+        cursor: pointer;
+        color: white;
+        padding: 0;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: background 0.2s;
+    }
+    .modal-close:hover { background: rgba(255,255,255,0.2); }
+    
+    .modal-body { padding: 1.5rem; max-height: 60vh; overflow-y: auto; }
+    
+    .modal-footer {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid var(--green-border, #c8e6b0);
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.8rem;
+    }
+    
+    .wiki-content { display: flex; flex-direction: column; gap: 1rem; }
+    .wiki-image { text-align: center; margin-bottom: 1rem; }
+    .wiki-image img { max-width: 100%; max-height: 250px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); object-fit: contain; }
+    .wiki-title { font-size: 1.4rem; font-weight: 700; color: var(--green-dark, #2d5a1b); margin-bottom: 0.5rem; }
+    .wiki-description { line-height: 1.6; color: #333; font-size: 0.95rem; }
+    .wiki-error { text-align: center; padding: 2rem; color: #c0392b; }
+    .wiki-error svg { margin-bottom: 1rem; }
+    .loading-spinner { text-align: center; padding: 3rem; }
+    .spinner {
+        border: 3px solid var(--green-border, #c8e6b0);
+        border-top: 3px solid var(--green-dark, #2d5a1b);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 1rem;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    
+    .search-suggestions {
+        margin-top: 1rem;
+        padding: 1rem;
+        background: #f5f5f5;
+        border-radius: 10px;
+        text-align: left;
+    }
+    .search-suggestions strong { display: block; margin-bottom: 0.8rem; color: var(--text-dark); }
+    .suggestion-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .suggestion-btn {
+        padding: 0.4rem 0.8rem;
+        background: var(--green-light, #f0f7eb);
+        border: 1px solid var(--green-border, #c8e6b0);
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        transition: all 0.2s;
+    }
+    .suggestion-btn:hover { background: var(--green-dark, #2d5a1b); color: white; }
+</style>
+
+<div class="page-wrap">
+
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="flash flash-{{ label == 'success' ? 'success' : 'error' }}">{{ message }}</div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="page-header">
+        <h1>⚙️ Mes Machines</h1>
+        <div style="display:flex;gap:.7rem;">
+            <a href="{{ path('agri_machine_new') }}" class="btn btn-primary">➕ Ajouter</a>
+            <a href="{{ path('agri_machine_statistiques') }}" class="btn btn-secondary">📊 Statistiques</a>
+        </div>
+    </div>
+
+    <div class="filters-bar">
+        <div class="filters-grid">
+            <div class="f-group">
+                <label>🔍 Recherche</label>
+                <input type="text" id="filter-search" placeholder="Nom, marque, modèle..." value="{{ app.request.query.get('search','') }}">
+            </div>
+            <div class="f-group">
+                <label>📊 État</label>
+                <select id="filter-etat">
+                    <option value="">Tous les états</option>
+                    {% for opt in ['Neuf','Bon','Occasion','En panne'] %}
+                        <option value="{{ opt }}" {{ app.request.query.get('etat','') == opt ? 'selected' : '' }}>{{ opt }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="f-group">
+                <label>📋 Trier par</label>
+                <select id="filter-sortBy">
+                    <option value="dateAchat"   {{ app.request.query.get('sortBy','dateAchat') == 'dateAchat'   ? 'selected':'' }}>📅 Date d'achat</option>
+                    <option value="marque"      {{ app.request.query.get('sortBy','dateAchat') == 'marque'      ? 'selected':'' }}>🏭 Marque</option>
+                    <option value="kilometrage" {{ app.request.query.get('sortBy','dateAchat') == 'kilometrage' ? 'selected':'' }}>📊 Kilométrage</option>
+                </select>
+            </div>
+            <div class="f-group">
+                <label>⬆⬇ Ordre</label>
+                <select id="filter-sortDir">
+                    <option value="DESC" {{ app.request.query.get('sortDir','DESC') == 'DESC' ? 'selected':'' }}>↓ Décroissant</option>
+                    <option value="ASC"  {{ app.request.query.get('sortDir','DESC') == 'ASC'  ? 'selected':'' }}>↑ Croissant</option>
+                </select>
+            </div>
+        </div>
+        <div class="filters-actions">
+            <button type="button" class="btn btn-primary" onclick="applyFilters()">🔎 Filtrer</button>
+            <button type="button" class="btn btn-secondary" onclick="resetFilters()">⟳ Réinitialiser</button>
+        </div>
+    </div>
+
+    {% if machines is empty %}
+        <div class="empty-state">
+            🤷 Aucune machine trouvée.<br>
+            <a href="{{ path('agri_machine_new') }}" style="color:var(--green-dark);display:inline-block;margin-top:.5rem;">➕ Ajouter votre première machine</a>
+        </div>
+    {% else %}
+        <div class="cards-grid" id="cards-grid">
+            {% for machine in machines %}
+                {% if machine.etatM == 'Neuf' %}     {% set bc = 'badge-neuf' %}
+                {% elseif machine.etatM == 'Bon' %}  {% set bc = 'badge-bon' %}
+                {% elseif machine.etatM == 'Occasion' %} {% set bc = 'badge-occasion' %}
+                {% else %} {% set bc = 'badge-panne' %}
+                {% endif %}
+
+                {% set today = date() %}
+                {% set alertClass = '' %}
+                {% set alertMsg   = '' %}
+                {% if machine.prochaineMaintenance %}
+                    {% if machine.prochaineMaintenance < today %}
+                        {% set alertClass = 'alert-overdue' %}
+                        {% set alertMsg   = '🔴 Maintenance dépassée !' %}
+                    {% elseif machine.prochaineMaintenance <= date('+30 days') %}
+                        {% set alertClass = 'alert-soon' %}
+                        {% set alertMsg   = '⚠️ Maintenance le ' ~ machine.prochaineMaintenance|date('d/m/Y') %}
+                    {% endif %}
+                {% endif %}
+
+                <div class="machine-card"
+                     data-nom="{{ machine.nom|lower }}"
+                     data-marque="{{ machine.marque|lower }}"
+                     data-modele="{{ machine.modele|lower }}"
+                     data-serie="{{ machine.numeroSerie ? machine.numeroSerie|lower : '' }}"
+                     data-etat="{{ machine.etatM }}"
+                     data-date="{{ machine.dateAchat ? machine.dateAchat|date('Y-m-d') : '' }}"
+                     data-km="{{ machine.kilometrage }}">
+
+                    <div class="card-header">
+                        <div class="card-header-left">
+                            <div class="card-title">{{ machine.nom }}</div>
+                            <div class="card-subtitle">📍 {{ machine.marque }} · {{ machine.modele }}</div>
+                        </div>
+                        <span class="badge {{ bc }}">{{ machine.etatM }}</span>
+                    </div>
+
+                    {% if alertClass %}
+                        <div class="maintenance-alert {{ alertClass }}">{{ alertMsg }}</div>
+                    {% endif %}
+
+                    <div class="card-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">{{ machine.kilometrage|number_format(0,',',' ') }}</div>
+                            <div class="stat-label">KM</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">{{ machine.dateAchat ? machine.dateAchat|date('Y') : '—' }}</div>
+                            <div class="stat-label">ACHAT</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">{{ machine.prochaineMaintenance ? machine.prochaineMaintenance|date('m/Y') : '—' }}</div>
+                            <div class="stat-label">MAINTENANCE</div>
+                        </div>
+                    </div>
+
+                    <div class="card-actions">
+                        <a href="{{ path('agri_machine_show', {id: machine.id}) }}" class="action-btn btn-view">👁 Voir</a>
+                        <a href="{{ path('agri_machine_edit', {id: machine.id}) }}" class="action-btn btn-edit">✏️ Modifier</a>
+                        <button type="button" class="action-btn btn-info" onclick="openWikipediaModal('{{ machine.nom|e('js') }}', '{{ machine.marque|e('js') }}', '{{ machine.modele|e('js') }}')">
+                            ℹ️ Info
+                        </button>
+                        <div style="margin-left:auto;">
+                            <form method="post" action="{{ path('agri_machine_delete', {id: machine.id}) }}" class="form-inline"
+                                  onsubmit="return confirm('⚠️ Supprimer « {{ machine.nom }} » ?\nCette action est irréversible.');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete_machine_' ~ machine.id) }}">
+                                <button type="submit" class="action-btn btn-delete" title="Supprimer">
+                                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="result-count">
+            📊 <span id="count-visible">{{ machines|length }}</span> / {{ machines|length }} machine(s)
+        </div>
+    {% endif %}
+
+</div>
+
+{# MODALE WIKIPEDIA #}
+<div id="wikipediaModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle">📖 Informations Wikipedia</h2>
+            <button class="modal-close" onclick="closeWikipediaModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="modalContent">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p>Recherche sur Wikipedia...</p>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeWikipediaModal()">Fermer</button>
+            <a id="wikipediaLink" href="#" target="_blank" class="btn btn-primary" style="display:none;">🌐 Voir sur Wikipedia</a>
+        </div>
+    </div>
+</div>
+
+<script>
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function openWikipediaModal(nom, marque, modele) {
+    const modal = document.getElementById('wikipediaModal');
+    const modalContent = document.getElementById('modalContent');
+    const modalTitle = document.getElementById('modalTitle');
+    const wikipediaLink = document.getElementById('wikipediaLink');
+    
+    modal.style.display = 'flex';
+    modalContent.innerHTML = `
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Recherche sur Wikipedia...</p>
+        </div>
+    `;
+    wikipediaLink.style.display = 'none';
+    modalTitle.innerHTML = `🔍 Recherche : ${escapeHtml(nom)}`;
+    
+    fetch('{{ path('agri_wikipedia_search') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({ 
+            nom: nom,
+            marque: marque,
+            modele: modele
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.exists && !data.error) {
+            let imageHtml = '';
+            if (data.image) {
+                imageHtml = `<div class="wiki-image"><img src="${escapeHtml(data.image)}" alt="${escapeHtml(data.title)}" onerror="this.style.display='none'"></div>`;
+            }
+            modalContent.innerHTML = `
+                <div class="wiki-content">
+                    ${imageHtml}
+                    <div class="wiki-title">📖 ${escapeHtml(data.title)}</div>
+                    <div class="wiki-description">${escapeHtml(data.description)}</div>
+                </div>
+            `;
+            wikipediaLink.href = data.url;
+            wikipediaLink.style.display = 'inline-flex';
+            modalTitle.innerHTML = `📖 ${escapeHtml(data.title)}`;
+        } else {
+            let suggestionsHtml = '';
+            if (data.suggestions && data.suggestions.length > 0) {
+                suggestionsHtml = `
+                    <div class="search-suggestions">
+                        <strong>🔍 Suggestions de recherche :</strong>
+                        <div class="suggestion-buttons">
+                            ${data.suggestions.map(s => `<button class="suggestion-btn" onclick="searchWikipedia('${s.replace(/'/g, "\\'")}')">${escapeHtml(s)}</button>`).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            modalContent.innerHTML = `
+                <div class="wiki-error">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c0392b" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <circle cx="12" cy="16" r="1"/>
+                    </svg>
+                    <p><strong>Aucun résultat trouvé</strong></p>
+                    <p>Recherche effectuée pour : <strong>${escapeHtml(nom)}</strong></p>
+                    ${suggestionsHtml}
+                </div>
+            `;
+            wikipediaLink.style.display = 'none';
+        }
+    })
+    .catch(error => {
+        console.error('Erreur:', error);
+        modalContent.innerHTML = `
+            <div class="wiki-error">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c0392b" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <circle cx="12" cy="16" r="1"/>
+                </svg>
+                <p><strong>Erreur de connexion</strong></p>
+                <p>Impossible de contacter Wikipedia. Vérifiez votre connexion internet.</p>
+            </div>
+        `;
+        wikipediaLink.style.display = 'none';
+    });
+}
+
+function searchWikipedia(query) {
+    const modalContent = document.getElementById('modalContent');
+    const modalTitle = document.getElementById('modalTitle');
+    const wikipediaLink = document.getElementById('wikipediaLink');
+    
+    modalContent.innerHTML = `
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Recherche de "${escapeHtml(query)}" sur Wikipedia...</p>
+        </div>
+    `;
+    wikipediaLink.style.display = 'none';
+    modalTitle.innerHTML = `🔍 Recherche : ${escapeHtml(query)}`;
+    
+    fetch('{{ path('agri_wikipedia_search') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({ query: query })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.exists && !data.error) {
+            let imageHtml = '';
+            if (data.image) {
+                imageHtml = `<div class="wiki-image"><img src="${escapeHtml(data.image)}" alt="${escapeHtml(data.title)}" onerror="this.style.display='none'"></div>`;
+            }
+            modalContent.innerHTML = `
+                <div class="wiki-content">
+                    ${imageHtml}
+                    <div class="wiki-title">📖 ${escapeHtml(data.title)}</div>
+                    <div class="wiki-description">${escapeHtml(data.description)}</div>
+                </div>
+            `;
+            wikipediaLink.href = data.url;
+            wikipediaLink.style.display = 'inline-flex';
+            modalTitle.innerHTML = `📖 ${escapeHtml(data.title)}`;
+        } else {
+            modalContent.innerHTML = `
+                <div class="wiki-error">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c0392b" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="8" x2="12" y2="12"/>
+                        <circle cx="12" cy="16" r="1"/>
+                    </svg>
+                    <p><strong>Aucun résultat trouvé</strong></p>
+                    <p>${escapeHtml(data.error || 'Aucune information disponible')}</p>
+                </div>
+            `;
+            wikipediaLink.style.display = 'none';
+        }
+    })
+    .catch(error => {
+        modalContent.innerHTML = `<div class="wiki-error"><p><strong>Erreur</strong></p><p>Impossible de contacter Wikipedia.</p></div>`;
+        wikipediaLink.style.display = 'none';
+    });
+}
+
+function closeWikipediaModal() {
+    document.getElementById('wikipediaModal').style.display = 'none';
+}
+
+document.addEventListener('click', function(event) {
+    const modal = document.getElementById('wikipediaModal');
+    if (event.target === modal) closeWikipediaModal();
+});
+
+document.addEventListener('keydown', function(event) {
+    const modal = document.getElementById('wikipediaModal');
+    if (event.key === 'Escape' && modal.style.display === 'flex') closeWikipediaModal();
+});
+
+// Filtres et tri
+(function(){
+    const grid = document.getElementById('cards-grid');
+    if (!grid) return;
+    const allCards = Array.from(grid.querySelectorAll('.machine-card'));
+
+    function applyFilters(){
+        const search  = document.getElementById('filter-search').value.trim().toLowerCase();
+        const etat    = document.getElementById('filter-etat').value;
+        const sortBy  = document.getElementById('filter-sortBy').value;
+        const sortDir = document.getElementById('filter-sortDir').value;
+        let visible = 0;
+
+        allCards.forEach(c => {
+            const matchS = !search || c.dataset.nom.includes(search) || c.dataset.marque.includes(search) || c.dataset.modele.includes(search) || c.dataset.serie.includes(search);
+            const matchE = !etat  || c.dataset.etat === etat;
+            c.style.display = matchS && matchE ? '' : 'none';
+            if (matchS && matchE) visible++;
+        });
+
+        const shown = allCards.filter(c => c.style.display !== 'none');
+        shown.sort((a,b)=>{
+            if (sortBy === 'kilometrage') {
+                const d = (parseInt(a.dataset.km)||0) - (parseInt(b.dataset.km)||0);
+                return sortDir === 'ASC' ? d : -d;
+            }
+            const key = sortBy === 'marque' ? 'marque' : 'date';
+            const va = a.dataset[key]||'', vb = b.dataset[key]||'';
+            if (va < vb) return sortDir === 'ASC' ? -1 : 1;
+            if (va > vb) return sortDir === 'ASC' ? 1 : -1;
+            return 0;
+        });
+        shown.forEach(c => grid.appendChild(c));
+
+        const cnt = document.getElementById('count-visible');
+        if (cnt) cnt.textContent = visible;
+    }
+
+    function resetFilters(){
+        document.getElementById('filter-search').value = '';
+        document.getElementById('filter-etat').value = '';
+        document.getElementById('filter-sortBy').value = 'dateAchat';
+        document.getElementById('filter-sortDir').value = 'DESC';
+        applyFilters();
+    }
+
+    ['filter-search','filter-etat','filter-sortBy','filter-sortDir'].forEach(id=>{
+        const el = document.getElementById(id);
+        if(el) el.addEventListener(id==='filter-search'?'input':'change', applyFilters);
+    });
+
+    window.applyFilters = applyFilters;
+    window.resetFilters = resetFilters;
+    applyFilters();
+})();
+</script>
+{% endblock %}

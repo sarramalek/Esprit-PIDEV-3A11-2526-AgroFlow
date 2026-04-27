@@ -1,0 +1,311 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inscription - AgroFlow{% endblock %}
+
+{% block stylesheets %}
+<style>
+    .role-selector { display: flex; gap: 16px; margin-bottom: 24px; }
+    .role-card input[type="radio"] { display: none; }
+    .role-card label {
+        display: flex; flex-direction: column; align-items: center;
+        justify-content: center; gap: 10px; flex: 1; padding: 20px;
+        border: 2px solid #eee; border-radius: 12px; cursor: pointer;
+        transition: all 0.25s; color: #555; font-weight: 600; font-size: 15px;
+    }
+    .role-card label i { font-size: 32px; color: #aaa; transition: color 0.25s; }
+    .role-card input[type="radio"]:checked + label { border-color: #2D5A27; background-color: #f0f7ee; color: #2D5A27; }
+    .role-card input[type="radio"]:checked + label i { color: #2D5A27; }
+    .role-card label:hover { border-color: #2D5A27; color: #2D5A27; }
+    .role-card label:hover i { color: #2D5A27; }
+    .field-row { display: flex; gap: 16px; }
+    .field-row > div { flex: 1; }
+    .form-input {
+        width: 100%; padding: 12px 15px; border: 2px solid #eee;
+        border-radius: 8px; font-size: 15px; box-sizing: border-box;
+        transition: border-color 0.3s; outline: none; font-family: inherit;
+    }
+    .form-input:focus { border-color: #2D5A27; }
+    .form-label { display: block; color: #2C3E50; font-weight: 600; margin-bottom: 8px; font-size: 14px; }
+    .field-group { margin-bottom: 20px; }
+    .submit-btn {
+        width: 100%; background-color: #2D5A27; color: white; padding: 14px;
+        border: none; border-radius: 8px; font-size: 16px; font-weight: 600;
+        cursor: pointer; transition: background-color 0.3s; margin-top: 8px;
+    }
+    .submit-btn:hover { background-color: #1e3d1a; }
+
+    /* ── Employeur / Terrain ── */
+    .dynamic-group { display: none; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-6px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    .field-icon-label {
+        display: flex; align-items: center; gap: 8px;
+        color: #2C3E50; font-weight: 600; margin-bottom: 8px; font-size: 14px;
+    }
+    .field-icon-label i { color: #2D5A27; }
+    select.form-input:disabled { background: #f5f5f5; color: #aaa; cursor: not-allowed; }
+
+    /* Loading spinner */
+    .loading-text {
+        font-size: 13px; color: #888; margin-top: 6px;
+        display: none; align-items: center; gap: 6px;
+    }
+    .loading-text.visible { display: flex; }
+    .spinner {
+        width: 14px; height: 14px; border: 2px solid #ddd;
+        border-top-color: #2D5A27; border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+{% endblock %}
+{% block body %}
+<section style="min-height:100vh;display:flex;align-items:center;justify-content:center;background-color:#FCF8E6;padding:40px 0;">
+    <div style="background:white;padding:50px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.1);width:100%;max-width:560px;">
+
+        <div style="text-align:center;margin-bottom:30px;">
+            <img src="{{ asset('assets/img/Logo.png') }}" alt="Logo" style="height:60px;margin-bottom:15px;">
+            <h2 style="color:#2C3E50;font-family:'Marcellus',serif;margin:0;">Créer un compte</h2>
+            <p style="color:#666;margin-top:6px;">Rejoignez AgroFlow</p>
+        </div>
+
+        <form method="post" action="{{ path('app_register') }}" novalidate>
+            {{ form_widget(registrationForm._token) }}
+
+            {# ── CIN ── #}
+            <div class="field-group">
+                <label class="form-label" for="{{ registrationForm.cin.vars.id }}">Numéro CIN</label>
+                {{ form_widget(registrationForm.cin, {'attr': {'class': 'form-input'}}) }}
+                {{ form_errors(registrationForm.cin) }}
+            </div>
+
+            {# ── Date de naissance ── #}
+            <div class="field-group">
+                <label class="form-label" for="{{ registrationForm.dateNaiss.vars.id }}">Date de naissance</label>
+                {{ form_widget(registrationForm.dateNaiss, {'attr': {'class': 'form-input'}}) }}
+                {{ form_errors(registrationForm.dateNaiss) }}
+            </div>
+
+            {# ── Nom & Prénom ── #}
+            <div class="field-row field-group">
+                <div>
+                    <label class="form-label" for="{{ registrationForm.nom.vars.id }}">Nom</label>
+                    {{ form_widget(registrationForm.nom, {'attr': {'class': 'form-input'}}) }}
+                    {{ form_errors(registrationForm.nom) }}
+                </div>
+                <div>
+                    <label class="form-label" for="{{ registrationForm.prenom.vars.id }}">Prénom</label>
+                    {{ form_widget(registrationForm.prenom, {'attr': {'class': 'form-input'}}) }}
+                    {{ form_errors(registrationForm.prenom) }}
+                </div>
+            </div>
+
+            {# ── Email ── #}
+            <div class="field-group">
+                <label class="form-label" for="{{ registrationForm.email.vars.id }}">Email</label>
+                {{ form_widget(registrationForm.email, {'attr': {'class': 'form-input'}}) }}
+                {{ form_errors(registrationForm.email) }}
+            </div>
+
+            {# ── Ville & Quartier ── #}
+            <div class="field-row field-group">
+                <div>
+                    <label class="form-label" for="{{ registrationForm.ville.vars.id }}">Ville</label>
+                    {{ form_widget(registrationForm.ville, {'attr': {'class': 'form-input', 'id': 'ville-select'}}) }}
+                    {{ form_errors(registrationForm.ville) }}
+                </div>
+                <div>
+                    <label class="form-label">Quartier</label>
+                    <input type="hidden" id="adresse-hidden" name="registration_form[adresse]" value="">
+                    <select id="adresse-select" class="form-input" disabled>
+                        <option value="">-- Choisissez d'abord une ville --</option>
+                    </select>
+                    {{ form_errors(registrationForm.adresse) }}
+                </div>
+            </div>
+
+            {# ── Mot de passe ── #}
+            <div class="field-group">
+                <label class="form-label" for="{{ registrationForm.plainPassword.vars.id }}">Mot de passe</label>
+                {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'form-input'}}) }}
+                {{ form_errors(registrationForm.plainPassword) }}
+            </div>
+
+            <button type="submit" class="submit-btn">S'inscrire</button>
+        </form>
+
+        <p style="text-align:center;margin-top:20px;color:#666;">
+            Déjà un compte ?
+            <a href="{{ path('app_login') }}" style="color:#2D5A27;font-weight:600;">Se connecter</a>
+        </p>
+    </div>
+</section>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const villesAdresses = {
+        "Tunis":    ["Centre-ville","La Marsa","Le Bardo","Carthage","Ariana","La Goulette","Sidi Bou Saïd","Menzah"],
+        "Sfax":     ["Centre-ville","Sakiet Ezzit","Sakiet Eddaier","Thyna","El Ain","Chihia"],
+        "Sousse":   ["Centre-ville","Hammam Sousse","Akouda","Kalaa Kebira","Msaken","Kantaoui"],
+        "Nabeul":   ["Centre-ville","Hammamet","Kelibia","Korba","Menzel Temime","Dar Chaabane"],
+        "Bizerte":  ["Centre-ville","Menzel Bourguiba","Mateur","Ras Jebel","Zarzouna","Utique"],
+        "Gabès":    ["Centre-ville","Mareth","El Hamma","Matmata","Chenini","Ghannouch"],
+        "Kairouan": ["Centre-ville","Sbikha","Haffouz","El Alaa","Nasrallah","Oueslatia"],
+        "Monastir": ["Centre-ville","Ksar Hellal","Moknine","Jemmal","Sahline","Bembla"],
+        "Gafsa":    ["Centre-ville","Metlaoui","El Ksar","Redeyef","Moulares","Sened"],
+        "Médenine": ["Centre-ville","Djerba","Zarzis","Ben Gardane","Beni Khedache","Sidi Makhlouf"],
+    };
+
+    const villeSelect   = document.getElementById('registration_form_ville');
+    const adresseSelect = document.getElementById('adresse-select');
+    const adresseHidden = document.getElementById('adresse-hidden');
+
+    function updateAdresses(ville) {
+        adresseSelect.innerHTML = '<option value="">-- Choisissez un quartier --</option>';
+        if (ville && villesAdresses[ville]) {
+            villesAdresses[ville].forEach(quartier => {
+                const opt = new Option(quartier, quartier);
+                adresseSelect.appendChild(opt);
+            });
+            adresseSelect.disabled = false;
+        } else {
+            adresseSelect.disabled = true;
+        }
+    }
+
+    adresseSelect.addEventListener('change', () => adresseHidden.value = adresseSelect.value);
+    villeSelect.addEventListener('change', () => {
+        updateAdresses(villeSelect.value);
+        adresseHidden.value = '';
+    });
+    updateAdresses(villeSelect.value);
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    // ==================== Villes / Quartiers ====================
+    const villesAdresses = {
+        "Tunis":    ["Centre-ville","La Marsa","Le Bardo","Carthage","Ariana","La Goulette","Sidi Bou Saïd","Menzah"],
+        "Sfax":     ["Centre-ville","Sakiet Ezzit","Sakiet Eddaier","Thyna","El Ain","Chihia"],
+        "Sousse":   ["Centre-ville","Hammam Sousse","Akouda","Kalaa Kebira","Msaken","Kantaoui"],
+        "Nabeul":   ["Centre-ville","Hammamet","Kelibia","Korba","Menzel Temime","Dar Chaabane"],
+        "Bizerte":  ["Centre-ville","Menzel Bourguiba","Mateur","Ras Jebel","Zarzouna","Utique"],
+        "Gabès":    ["Centre-ville","Mareth","El Hamma","Matmata","Chenini","Ghannouch"],
+        "Kairouan": ["Centre-ville","Sbikha","Haffouz","El Alaa","Nasrallah","Oueslatia"],
+        "Monastir": ["Centre-ville","Ksar Hellal","Moknine","Jemmal","Sahline","Bembla"],
+        "Gafsa":    ["Centre-ville","Metlaoui","El Ksar","Redeyef","Moulares","Sened"],
+        "Médenine": ["Centre-ville","Djerba","Zarzis","Ben Gardane","Beni Khedache","Sidi Makhlouf"],
+    };
+
+    const villeSelect   = document.getElementById('registration_form_ville');
+    const adresseSelect = document.getElementById('adresse-select');
+    const adresseHidden = document.getElementById('adresse-hidden');
+
+    function updateAdresses(ville) {
+        adresseSelect.innerHTML = '<option value="">-- Choisissez un quartier --</option>';
+        if (ville && villesAdresses[ville]) {
+            villesAdresses[ville].forEach(quartier => {
+                const opt = new Option(quartier, quartier);
+                adresseSelect.appendChild(opt);
+            });
+            adresseSelect.disabled = false;
+        } else {
+            adresseSelect.disabled = true;
+        }
+    }
+
+    adresseSelect.addEventListener('change', () => adresseHidden.value = adresseSelect.value);
+    villeSelect.addEventListener('change', () => {
+        updateAdresses(villeSelect.value);
+        adresseHidden.value = '';
+    });
+    updateAdresses(villeSelect.value);
+
+    // ==================== Gestion Rôle ====================
+    const employeurGroup  = document.getElementById('employeur-group');
+    const terrainGroup    = document.getElementById('terrain-group');
+
+    // ✅ Cibler par le name Symfony — fiable peu importe l'id généré
+    const employeurSelect = document.querySelector('select[name="registration_form[employeur]"]');
+    const terrainVisual   = document.getElementById('terrain-select-visual');
+    const terrainHidden   = document.querySelector('input[name="registration_form[terrain]"]');
+    const terrainLoading  = document.getElementById('terrain-loading');
+    const roleRadios      = document.querySelectorAll('input[type="radio"][name="registration_form[role]"]');
+
+    function getSelectedRole() {
+        let selected = null;
+        roleRadios.forEach(r => { if (r.checked) selected = r.value; });
+        return selected;
+    }
+
+    function toggleRoleFields() {
+        const isOuvrier = getSelectedRole() === '1';
+
+        if (isOuvrier) {
+            employeurGroup.style.display = 'block';
+            terrainGroup.style.display   = 'block';
+        } else {
+            employeurGroup.style.display = 'none';
+            terrainGroup.style.display   = 'none';
+            employeurSelect.value        = '';
+            terrainHidden.value          = '';
+            terrainVisual.innerHTML      = '<option value="">-- Choisissez d\'abord un agriculteur --</option>';
+            terrainVisual.disabled       = true;
+        }
+    }
+
+    roleRadios.forEach(r => r.addEventListener('change', toggleRoleFields));
+
+    // ==================== Chargement des terrains ====================
+    employeurSelect.addEventListener('change', function () {
+        // ✅ La valeur est le CIN (string) grâce à choice_value => getCin()
+        const cinAgriculteur = this.value;
+
+        console.log('CIN agriculteur sélectionné :', cinAgriculteur); // debug
+
+        terrainHidden.value     = '';
+        terrainVisual.innerHTML = '<option value="">-- Choisissez un terrain --</option>';
+        terrainVisual.disabled  = true;
+
+        if (!cinAgriculteur) return;
+
+        terrainLoading.classList.add('visible');
+
+        fetch(`/api/terrains/${cinAgriculteur}`)
+            .then(r => {
+                if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                return r.json();
+            })
+            .then(terrains => {
+                terrainLoading.classList.remove('visible');
+                console.log('Terrains reçus :', terrains); // debug
+
+                if (terrains.length === 0) {
+                    terrainVisual.innerHTML = '<option value="">Aucun terrain disponible</option>';
+                } else {
+                    terrains.forEach(t => {
+                        const opt = new Option(t.nom, t.id);
+                        terrainVisual.appendChild(opt);
+                    });
+                    terrainVisual.disabled = false;
+                }
+            })
+            .catch(err => {
+                terrainLoading.classList.remove('visible');
+                terrainVisual.innerHTML = `<option value="">Erreur: ${err.message}</option>`;
+                console.error('Erreur fetch terrains:', err);
+            });
+    });
+
+    terrainVisual.addEventListener('change', () => {
+        terrainHidden.value = terrainVisual.value;
+    });
+
+    toggleRoleFields();
+});
+</script>
+{% endblock %}
