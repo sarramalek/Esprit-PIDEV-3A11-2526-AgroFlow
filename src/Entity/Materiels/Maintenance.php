@@ -28,8 +28,8 @@ class Maintenance
     private ?string $description = null;
 
     #[ORM\ManyToOne(targetEntity: Machine::class)]
-#[ORM\JoinColumn(name: 'idM', referencedColumnName: 'idM', nullable: true)]
-private ?Machine $idM = null;
+    #[ORM\JoinColumn(name: 'idM', referencedColumnName: 'id', nullable: true)]
+    private ?Machine $idM = null;
 
     #[ORM\Column(name: 'statut', type: 'string', columnDefinition: "ENUM('en_cours','termine','planifie')", options: ['default' => 'planifie'])]
     private ?string $statut = 'planifie';

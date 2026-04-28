@@ -90,7 +90,7 @@ return array(
     'Svg\\' => array($vendorDir . '/dompdf/php-svg-lib/src/Svg'),
     'Stof\\DoctrineExtensionsBundle\\' => array($vendorDir . '/stof/doctrine-extensions-bundle/src'),
     'StellaMaris\\Clock\\' => array($vendorDir . '/stella-maris/clock/src'),
-    'Scheb\\TwoFactorBundle\\' => array($vendorDir . '/scheb/2fa-totp', $vendorDir . '/scheb/2fa-google-authenticator', $vendorDir . '/scheb/2fa-bundle'),
+    'Scheb\\TwoFactorBundle\\' => array($vendorDir . '/scheb/2fa-totp', $vendorDir . '/scheb/2fa-google-authenticator', $vendorDir . '/scheb/2fa-backup-code', $vendorDir . '/scheb/2fa-bundle'),
     'Sabberworm\\CSS\\' => array($vendorDir . '/sabberworm/php-css-parser/src'),
     'Psr\\SimpleCache\\' => array($vendorDir . '/psr/simple-cache/src'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log/src'),

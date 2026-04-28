@@ -21,12 +21,15 @@ class Abonnement
     #[ORM\Column(name: 'id_offre', type: Types::INTEGER)]
     private int $idOffre;
 #[ORM\Column(type: 'date', nullable: true)]
-private ?\DateTime $dateInscription = null;
+private ?\DateTimeInterface $dateInscription = null;
 
 #[ORM\Column(type: 'date', nullable: true)]
-private ?\DateTime $dateExpiration = null;
+private ?\DateTimeInterface $dateExpiration = null;
     #[ORM\Column(name: 'situation', type: Types::STRING, length: 9)]
     private string $situation;
+
+    #[ORM\Column(name: 'prix_paye', type: Types::FLOAT, nullable: true)]
+    private ?float $prixPaye = null;
 
     // --- Getters & Setters ---
 
@@ -57,7 +60,7 @@ private ?\DateTime $dateExpiration = null;
         return $this;
     }
 
-    public function getDateInscription(): \DateTimeInterface
+    public function getDateInscription(): ?\DateTimeInterface
     {
         return $this->dateInscription;
     }
@@ -68,7 +71,7 @@ private ?\DateTime $dateExpiration = null;
         return $this;
     }
 
-    public function getDateExpiration(): \DateTimeInterface
+    public function getDateExpiration(): ?\DateTimeInterface
     {
         return $this->dateExpiration;
     }
@@ -87,6 +90,17 @@ private ?\DateTime $dateExpiration = null;
     public function setSituation(string $situation): static
     {
         $this->situation = $situation;
+        return $this;
+    }
+
+    public function getPrixPaye(): ?float
+    {
+        return $this->prixPaye;
+    }
+
+    public function setPrixPaye(?float $prixPaye): static
+    {
+        $this->prixPaye = $prixPaye;
         return $this;
     }
 }

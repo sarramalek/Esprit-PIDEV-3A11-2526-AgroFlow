@@ -14,7 +14,7 @@ class Machine
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    #[ORM\Column(name: 'idM', type: 'integer')]
+    #[ORM\Column(name: 'id', type: 'integer')]
     private ?int $id = null;
 
     /**
@@ -40,16 +40,16 @@ class Machine
     #[Assert\Length(min: 1, max: 255)]
     private ?string $modele = null;
 
-    #[ORM\Column(name: 'numeroSerie', type: 'string', length: 255, nullable: true)]
+    #[ORM\Column(name: 'numero_serie', type: 'string', length: 255)]
     #[Assert\Length(max: 255)]
     private ?string $numeroSerie = null;
 
-    #[ORM\Column(name: 'etatM', type: 'string', length: 255)]
+    #[ORM\Column(name: 'etat_m', type: 'string', length: 255)]
     #[Assert\NotBlank(message: "L'état est obligatoire")]
     #[Assert\Choice(choices: ['Neuf', 'Bon', 'Occasion', 'En panne'], message: 'État invalide')]
     private ?string $etatM = null;
 
-    #[ORM\Column(name: 'dateAchat', type: Types::DATE_MUTABLE, nullable: true)]
+    #[ORM\Column(name: 'date_achat', type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $dateAchat = null;
 
     #[ORM\Column(name: 'kilometrage', type: 'integer')]

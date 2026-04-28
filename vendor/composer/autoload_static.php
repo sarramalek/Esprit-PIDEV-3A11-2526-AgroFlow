@@ -663,7 +663,8 @@ class ComposerStaticInit392c2fee464d64f3ee9e8c2f1c58f9b4
         array (
             0 => __DIR__ . '/..' . '/scheb/2fa-totp',
             1 => __DIR__ . '/..' . '/scheb/2fa-google-authenticator',
-            2 => __DIR__ . '/..' . '/scheb/2fa-bundle',
+            2 => __DIR__ . '/..' . '/scheb/2fa-backup-code',
+            3 => __DIR__ . '/..' . '/scheb/2fa-bundle',
         ),
         'Sabberworm\\CSS\\' => 
         array (
