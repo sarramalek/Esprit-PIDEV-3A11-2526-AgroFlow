@@ -384,7 +384,8 @@
           <td><div class="actions"><a href="{{ path('agri_maintenances_show', {id: m.idMain}) }}" class="act-btn act-btn--view">👁</a><a href="{{ path('agri_maintenances_edit', {id: m.idMain}) }}" class="act-btn act-btn--edit">✏️</a><a href="javascript:void(0)" class="act-btn act-btn--magic" onclick="openAIPrompt({{ m.idMain }}, '{{ typePanne2|e('js') }}', '{{ priorite2|e('js') }}', '{{ kilometrage2|default(0) }}', '{{ machineName2|e('js') }}', '{{ statut2|e('js') }}', '{{ cout2 }}', '{{ description2|e('js')|slice(0,100) }}')">🤖 IA</a><form method="post" action="{{ path('agri_maintenances_delete', {id: m.idMain}) }}" onsubmit="return confirm('Supprimer ?')" style="display:inline;margin:0;"><input type="hidden" name="_token" value="{{ csrf_token('delete_maintenance_' ~ m.idMain) }}"><button type="submit" class="act-btn act-btn--del">🗑</button></form></div></td>
         </tr>
       {% endfor %}
-    </tbody></table><div id="noResultsTable" style="display:none;text-align:center;padding:3rem;color:#7a9a7a;">🔍 Aucun résultat.</div></div>
+    </tbody>}</div>
+    <div id="noResultsTable" style="display:none;text-align:center;padding:3rem;color:#7a9a7a;">🔍 Aucun résultat.</div>
   </div>
   {% endif %}
 </div>

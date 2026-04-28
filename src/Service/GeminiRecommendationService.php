@@ -24,6 +24,9 @@ class GeminiRecommendationService
         HttpClientInterface $httpClient,
         MaintenanceRepository $maintenanceRepo
     ) {
+        if (empty($apiKey)) {
+            throw new \InvalidArgumentException('Gemini API key is required');
+        }
         $this->apiKey = $apiKey;
         $this->model = $model;
         $this->logger = $logger;
@@ -56,6 +59,28 @@ class GeminiRecommendationService
     }
 
     /**
+     * Génère une réponse personnalisée via Gemini
+     */
+    public function generateCustomResponse(string $prompt): string
+    {
+        try {
+            $response = $this->callGeminiApi($prompt);
+            $text = $this->extractTextFromResponse($response);
+            $text = trim(strip_tags($text));
+            
+            if (strlen($text) > 1000) {
+                $text = substr($text, 0, 997) . '...';
+            }
+            
+            return $text ?: "Je n'ai pas pu générer de réponse pour cette demande.";
+            
+        } catch (\Exception $e) {
+            $this->logger->error('Gemini custom prompt error: ' . $e->getMessage());
+            return "Désolé, une erreur est survenue lors de la génération de la réponse.";
+        }
+    }
+
+    /**
      * Prédit les pannes futures pour une machine
      */
     public function predictFailure(Machine $machine): array
@@ -75,7 +100,7 @@ class GeminiRecommendationService
         // Compter les fréquences des types de panne
         $frequences = [];
         foreach ($maintenances as $m) {
-            $type = $m->getTypePanne();
+            $type = $m->getTypePanne() ?? 'Non spécifié';
             $frequences[$type] = ($frequences[$type] ?? 0) + 1;
         }
         
@@ -131,10 +156,10 @@ class GeminiRecommendationService
         
         // Calcul du score
         $score = 100;
-        $score -= min(30, $totalCost / 100);  // -30 max pour coût élevé
-        $score -= min(40, $urgentCount * 10); // -40 max pour urgences
-        $score -= min(20, $daysSinceLast / 10); // -20 max pour ancienneté
-        $score -= min(20, count($maintenances) * 2); // -2 par maintenance
+        $score -= min(30, $totalCost / 100);
+        $score -= min(40, $urgentCount * 10);
+        $score -= min(20, $daysSinceLast / 10);
+        $score -= min(20, count($maintenances) * 2);
         
         $score = max(0, min(100, round($score)));
         
@@ -174,40 +199,48 @@ class GeminiRecommendationService
     public function generateSmartAlerts(Machine $machine): array
     {
         $alerts = [];
-        $healthScore = $this->calculateHealthScore($machine);
-        $prediction = $this->predictFailure($machine);
         
-        // Alerte critique
-        if ($healthScore['score'] < 40) {
-            $alerts[] = [
-                'type' => 'critique',
-                'message' => sprintf("🚨 Machine %s en état critique (score: %d/100)", 
-                    $machine->getNom(), $healthScore['score']),
-                'actions' => $prediction['recommandations'],
-                'urgence' => 'immediate'
-            ];
-        }
-        
-        // Alerte risque de panne élevé
-        if ($prediction['risque_panne'] === 'élevé') {
-            $alerts[] = [
-                'type' => 'warning',
-                'message' => sprintf("⚠️ Risque élevé de panne %s sur %s (probabilité: %d%%)",
-                    $prediction['type_panne_probable'], $machine->getNom(), $prediction['probabilite']),
-                'actions' => ['Planifier une intervention préventive'],
-                'urgence' => 'programmee'
-            ];
-        }
-        
-        // Alerte maintenance overdue
-        $daysSince = $healthScore['details']['jours_sans_maintenance'] ?? 365;
-        if ($daysSince > 180) {
-            $alerts[] = [
-                'type' => 'warning',
-                'message' => sprintf("📅 Plus de %d jours sans maintenance pour %s", $daysSince, $machine->getNom()),
-                'actions' => ['Effectuer une maintenance complète'],
-                'urgence' => 'haute'
-            ];
+        try {
+            $healthScore = $this->calculateHealthScore($machine);
+            $prediction = $this->predictFailure($machine);
+            
+            // Alerte critique
+            if ($healthScore['score'] < 40) {
+                $alerts[] = [
+                    'icon' => '🚨',
+                    'title' => 'État critique',
+                    'message' => sprintf("Machine %s en état critique (score: %d/100)", 
+                        $machine->getNom(), $healthScore['score']),
+                    'priority' => 'urgente',
+                    'action' => 'Intervention immédiate'
+                ];
+            }
+            
+            // Alerte risque de panne élevé
+            if ($prediction['risque_panne'] === 'élevé') {
+                $alerts[] = [
+                    'icon' => '⚠️',
+                    'title' => 'Risque de panne élevé',
+                    'message' => sprintf("Risque élevé de panne %s sur %s (probabilité: %d%%)",
+                        $prediction['type_panne_probable'], $machine->getNom(), $prediction['probabilite']),
+                    'priority' => 'haute',
+                    'action' => 'Planifier intervention préventive'
+                ];
+            }
+            
+            // Alerte maintenance overdue
+            $daysSince = $healthScore['details']['jours_sans_maintenance'] ?? 365;
+            if ($daysSince > 180) {
+                $alerts[] = [
+                    'icon' => '📅',
+                    'title' => 'Maintenance dépassée',
+                    'message' => sprintf("Plus de %d jours sans maintenance pour %s", $daysSince, $machine->getNom()),
+                    'priority' => 'haute',
+                    'action' => 'Effectuer maintenance complète'
+                ];
+            }
+        } catch (\Exception $e) {
+            $this->logger->warning('Failed to generate smart alerts: ' . $e->getMessage());
         }
         
         return $alerts;
@@ -304,7 +337,9 @@ class GeminiRecommendationService
             'contents' => [['parts' => [['text' => $prompt]]]],
             'generationConfig' => [
                 'temperature' => 0.3,
-                'maxOutputTokens' => 150,
+                'maxOutputTokens' => 500,
+                'topP' => 0.95,
+                'topK' => 40,
             ]
         ];
 
@@ -327,9 +362,9 @@ class GeminiRecommendationService
 
     private function buildPrompt(Maintenance $m): string
     {
-        $type = $m->getTypePanne();
-        $statut = $m->getStatut();
-        $priorite = $m->getPriorite();
+        $type = $m->getTypePanne() ?? 'Non spécifié';
+        $statut = $m->getStatut() ?? 'planifie';
+        $priorite = $m->getPriorite() ?? 'moyenne';
         $km = $m->getKilometrage();
         $description = $m->getDescription();
         
@@ -355,7 +390,7 @@ class GeminiRecommendationService
 
     private function getFallbackRecommendation(Maintenance $m): string
     {
-        $type = strtolower($m->getTypePanne());
+        $type = strtolower($m->getTypePanne() ?? '');
         $priorite = $m->getPriorite();
         $km = $m->getKilometrage();
         

@@ -1,0 +1,531 @@
+{% extends 'base_admin.html.twig' %}
+
+{% block title %}WikiPannes - Base de connaissances — AgroFlow{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: #f5f2ec; color: #1a1a18; }
+
+    .wiki-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 32px 28px;
+    }
+
+    /* Header */
+    .wiki-header {
+        background: linear-gradient(135deg, #1d3d17 0%, #2d5a1b 100%);
+        border-radius: 24px;
+        padding: 40px 48px;
+        margin-bottom: 32px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+    .wiki-header::before {
+        content: "📚";
+        position: absolute;
+        right: -20px;
+        bottom: -20px;
+        font-size: 180px;
+        opacity: 0.1;
+        pointer-events: none;
+    }
+    .wiki-header h1 {
+        font-size: 36px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    .wiki-header p {
+        font-size: 16px;
+        opacity: 0.9;
+        max-width: 600px;
+    }
+
+    /* Search Bar */
+    .search-section {
+        background: white;
+        border-radius: 20px;
+        padding: 24px;
+        margin-bottom: 32px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .search-form {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    .search-input-wrapper {
+        flex: 1;
+        position: relative;
+    }
+    .search-input {
+        width: 100%;
+        padding: 14px 20px;
+        border: 2px solid #ece7dd;
+        border-radius: 14px;
+        font-size: 15px;
+        font-family: 'DM Sans', sans-serif;
+        transition: all 0.2s;
+        background: #fafaf7;
+    }
+    .search-input:focus {
+        outline: none;
+        border-color: #2d5a1b;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(45,90,27,0.1);
+    }
+    .search-btn {
+        background: #1d3d17;
+        color: white;
+        border: none;
+        border-radius: 14px;
+        padding: 14px 32px;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .search-btn:hover {
+        background: #2d5a1b;
+        transform: translateY(-2px);
+    }
+    .random-btn {
+        background: white;
+        color: #1d3d17;
+        border: 2px solid #1d3d17;
+        border-radius: 14px;
+        padding: 12px 24px;
+        font-size: 15px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .random-btn:hover {
+        background: #e8f5e9;
+        transform: translateY(-2px);
+    }
+    .back-btn {
+        background: rgba(255,255,255,0.2);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 10px 20px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 20px;
+    }
+    .back-btn:hover {
+        background: rgba(255,255,255,0.3);
+    }
+
+    /* Auto-completion */
+    .autocomplete-list {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #ece7dd;
+        border-radius: 12px;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 1000;
+        display: none;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .autocomplete-item {
+        padding: 10px 16px;
+        cursor: pointer;
+        transition: background 0.15s;
+        font-size: 14px;
+    }
+    .autocomplete-item:hover {
+        background: #f5f2ec;
+    }
+
+    /* Content Grid */
+    .wiki-content {
+        display: grid;
+        grid-template-columns: 1fr 1.5fr;
+        gap: 32px;
+    }
+
+    /* Image Section */
+    .image-section {
+        background: white;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        position: sticky;
+        top: 20px;
+        height: fit-content;
+    }
+    .image-container {
+        aspect-ratio: 1;
+        background: linear-gradient(135deg, #f5f2ec 0%, #ece7dd 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+    .image-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .image-fallback {
+        font-size: 120px;
+        opacity: 0.5;
+    }
+    .image-caption {
+        padding: 16px 24px;
+        background: #fafaf7;
+        border-top: 1px solid #ece7dd;
+        font-size: 13px;
+        color: #6b6b64;
+        text-align: center;
+    }
+    .wikipedia-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 20px;
+        background: #f5f2ec;
+        border-radius: 12px;
+        text-decoration: none;
+        color: #1d3d17;
+        font-weight: 500;
+        font-size: 14px;
+        transition: all 0.2s;
+        margin-top: 16px;
+        width: 100%;
+        justify-content: center;
+    }
+    .wikipedia-link:hover {
+        background: #e8f5e9;
+        transform: translateY(-2px);
+    }
+
+    /* Info Section */
+    .info-section {
+        background: white;
+        border-radius: 24px;
+        padding: 32px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    .panne-title {
+        font-size: 28px;
+        font-weight: 600;
+        color: #1d3d17;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 3px solid #e8f5e9;
+    }
+    .description-box {
+        background: #fafaf7;
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 24px;
+        border-left: 4px solid #2d5a1b;
+    }
+    .description-box p {
+        color: #3d3d38;
+        line-height: 1.6;
+        font-size: 15px;
+    }
+    .info-grid {
+        display: grid;
+        gap: 24px;
+        margin-bottom: 24px;
+    }
+    .info-card {
+        background: #fafaf7;
+        border-radius: 16px;
+        padding: 20px;
+    }
+    .info-card h3 {
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #2d5a1b;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .info-card ul {
+        list-style: none;
+        padding-left: 0;
+    }
+    .info-card li {
+        padding: 8px 0;
+        border-bottom: 1px solid #ece7dd;
+        font-size: 14px;
+        color: #3d3d38;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    .info-card li:last-child {
+        border-bottom: none;
+    }
+    .info-card li::before {
+        content: "▹";
+        color: #2d5a1b;
+        font-weight: bold;
+    }
+    .meta-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        margin-top: 16px;
+    }
+    .meta-item {
+        background: #f5f2ec;
+        border-radius: 12px;
+        padding: 16px;
+        text-align: center;
+    }
+    .meta-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #9e9d95;
+        margin-bottom: 6px;
+        display: block;
+    }
+    .meta-value {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1d3d17;
+    }
+    .difficulty-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    .difficulty-debutant { background: #e8f5e9; color: #2e7d32; }
+    .difficulty-intermediaire { background: #fff3e0; color: #e65100; }
+    .difficulty-expert { background: #ffebee; color: #c62828; }
+
+    @media (max-width: 1024px) {
+        .wiki-content { grid-template-columns: 1fr; }
+        .image-section { position: relative; top: 0; }
+        .wiki-header { padding: 32px 24px; }
+        .wiki-header h1 { font-size: 28px; }
+    }
+    @media (max-width: 768px) {
+        .wiki-container { padding: 20px 16px; }
+        .search-form { flex-direction: column; }
+        .search-btn, .random-btn { width: 100%; justify-content: center; }
+        .meta-row { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="wiki-container">
+    
+    <!-- Header -->
+    <div class="wiki-header">
+        <h1>
+            <span>🔧</span>
+            WikiPannes
+        </h1>
+        <p>Base de connaissances collaborative sur les pannes de matériel agricole et industriel</p>
+        <a href="{{ path('admin_maintenances_index') }}" class="back-btn">
+            ← Retour aux maintenances
+        </a>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-section">
+        <form method="get" action="{{ path('admin_maintenances_wiki_pannes') }}" class="search-form" id="wikiSearchForm">
+            <div class="search-input-wrapper">
+                <input 
+                    type="text" 
+                    name="q" 
+                    id="searchInput"
+                    class="search-input" 
+                    value="{{ search }}"
+                    placeholder="Rechercher un type de panne... (ex: Moteur, Hydraulique, Électrique, Vidange...)"
+                    autocomplete="off"
+                >
+                <div class="autocomplete-list" id="autocompleteList"></div>
+            </div>
+            <button type="submit" class="search-btn">
+                🔍 Rechercher
+            </button>
+            <a href="{{ path('admin_maintenances_wiki_pannes') }}" class="random-btn">
+                🎲 Aléatoire
+            </a>
+        </form>
+    </div>
+
+    <!-- Content -->
+    <div class="wiki-content">
+        
+        <!-- Image Section -->
+        <div class="image-section">
+            <div class="image-container">
+                {% if panneInfo.image_url %}
+                    <img src="{{ panneInfo.image_url }}" alt="{{ panneInfo.titre }}" loading="lazy" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'image-fallback\'>{{ panneInfo.image_fallback|default('🔧') }}</div>'">
+                {% else %}
+                    <div class="image-fallback">{{ panneInfo.image_fallback|default('🔧') }}</div>
+                {% endif %}
+            </div>
+            <div class="image-caption">
+                Illustration - {{ panneInfo.titre }}
+            </div>
+            <a href="{{ wikipediaUrl }}" target="_blank" rel="noopener noreferrer" class="wikipedia-link">
+                🌐 Voir l'article complet sur Wikipedia
+                <span>→</span>
+            </a>
+        </div>
+
+        <!-- Info Section -->
+        <div class="info-section">
+            <h1 class="panne-title">{{ panneInfo.titre }}</h1>
+            
+            <div class="description-box">
+                <p>{{ panneInfo.description }}</p>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>⚠️ Causes possibles</h3>
+                    <ul>
+                        {% for cause in panneInfo.causes %}
+                            <li>{{ cause }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="info-card">
+                    <h3>🔍 Symptômes</h3>
+                    <ul>
+                        {% for symptome in panneInfo.symptomes %}
+                            <li>{{ symptome }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="info-card">
+                    <h3>✅ Solutions recommandées</h3>
+                    <ul>
+                        {% for solution in panneInfo.solutions %}
+                            <li>{{ solution }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
+            <div class="meta-row">
+                <div class="meta-item">
+                    <span class="meta-label">🛠️ Outils nécessaires</span>
+                    <span class="meta-value" style="font-size: 13px;">{{ panneInfo.outils }}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">⏱️ Temps estimé</span>
+                    <span class="meta-value">{{ panneInfo.temps }}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">📊 Difficulté</span>
+                    <span class="difficulty-badge difficulty-{{ panneInfo.difficulte|lower|replace({'é':'e', 'è':'e'}) }}">
+                        {{ panneInfo.difficulte }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Auto-completion avec les types de panne exacts de l'application
+const panneTypes = [
+    "Électrique",
+    "Mécanique", 
+    "Hydraulique",
+    "Pneumatique",
+    "Moteur",
+    "Transmission",
+    "Vidange & filtres",
+    "Logicielle",
+    "Autre"
+];
+
+const searchInput = document.getElementById('searchInput');
+const autocompleteList = document.getElementById('autocompleteList');
+
+searchInput.addEventListener('input', function() {
+    const value = this.value.toLowerCase();
+    if (value.length < 2) {
+        autocompleteList.style.display = 'none';
+        return;
+    }
+    
+    const matches = panneTypes.filter(type => 
+        type.toLowerCase().includes(value)
+    ).slice(0, 8);
+    
+    if (matches.length > 0) {
+        autocompleteList.innerHTML = matches.map(match => 
+            `<div class="autocomplete-item">${match}</div>`
+        ).join('');
+        autocompleteList.style.display = 'block';
+        
+        // Add click handlers
+        document.querySelectorAll('.autocomplete-item').forEach(item => {
+            item.addEventListener('click', function() {
+                searchInput.value = this.textContent;
+                autocompleteList.style.display = 'none';
+                document.getElementById('wikiSearchForm').submit();
+            });
+        });
+    } else {
+        autocompleteList.style.display = 'none';
+    }
+});
+
+// Hide autocomplete on click outside
+document.addEventListener('click', function(e) {
+    if (!searchInput.contains(e.target) && !autocompleteList.contains(e.target)) {
+        autocompleteList.style.display = 'none';
+    }
+});
+
+// Submit on Enter
+searchInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        document.getElementById('wikiSearchForm').submit();
+    }
+});
+</script>
+{% endblock %}

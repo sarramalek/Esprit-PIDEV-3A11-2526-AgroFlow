@@ -1084,7 +1084,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.5N.TVUE"/>
+      <argument type="service" id=".service_locator.DqNkb0R"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -4190,7 +4190,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.5N.TVUE"/>
+      <argument type="service" id=".service_locator.DqNkb0R"/>
     </service>
     <service id="debug.log_processor" class="Symfony\Bridge\Monolog\Processor\DebugProcessor">
       <tag name="kernel.reset" method="reset"/>
@@ -9246,6 +9246,13 @@
         <argument key="machineRepo" type="service_closure" id="App\Repository\Materiels\MachineRepository"/>
       </argument>
     </service>
+    <service id=".service_locator.p6JsI.h" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="geminiService" type="service_closure" id="App\Service\GeminiRecommendationService"/>
+        <argument key="repo" type="service_closure" id="App\Repository\Materiels\MaintenanceRepository"/>
+      </argument>
+    </service>
     <service id=".service_locator..2t9Uf5" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -9265,13 +9272,6 @@
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
-        <argument key="repo" type="service_closure" id="App\Repository\Materiels\MaintenanceRepository"/>
-      </argument>
-    </service>
-    <service id=".service_locator.p6JsI.h" class="Symfony\Component\DependencyInjection\ServiceLocator">
-      <tag name="container.service_locator"/>
-      <argument type="collection">
-        <argument key="geminiService" type="service_closure" id="App\Service\GeminiRecommendationService"/>
         <argument key="repo" type="service_closure" id="App\Repository\Materiels\MaintenanceRepository"/>
       </argument>
     </service>
@@ -9989,7 +9989,7 @@
         <argument key="visionService" type="service_closure" id="App\Service\SmartVisionService"/>
       </argument>
     </service>
-    <service id=".service_locator.5N.TVUE" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.DqNkb0R" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Controller\AdminDashboardController::index" type="service_closure" id=".service_locator.qni5W9T"/>
@@ -13234,7 +13234,7 @@
     <service id="Knp\Component\Pager\ArgumentAccess\ArgumentAccessInterface" alias="Knp\Component\Pager\ArgumentAccess\RequestArgumentAccess"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.w7.f4fT" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.5N.TVUE"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.DqNkb0R"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id=".Psr\Log\LoggerInterface $request.logger" alias="monolog.logger.request"/>
@@ -13277,9 +13277,9 @@
     <service id=".service_locator.gobRZbS" alias=".service_locator.pgExxvC"/>
     <service id=".service_locator.YzMa5l5" alias=".service_locator.yxq7DSB"/>
     <service id=".service_locator.StWl8qp" alias=".service_locator.MS0TZYx"/>
+    <service id=".service_locator.rTC8XR9" alias=".service_locator.p6JsI.h"/>
     <service id=".service_locator.GVciNJE" alias=".service_locator..zXqV8G"/>
     <service id=".service_locator.Ye5OOWs" alias=".service_locator.cZxzGoz"/>
-    <service id=".service_locator.rTC8XR9" alias=".service_locator.p6JsI.h"/>
     <service id=".service_locator.s4yyZIP" alias=".service_locator.ST3E3fc"/>
     <service id=".service_locator.9oeEJ1g" alias=".service_locator.LxtmzYH"/>
     <service id=".service_locator.ontUAUs" alias=".service_locator.wH4nX8g"/>
@@ -13323,7 +13323,7 @@
     <service id=".service_locator.wDI7hJ0" alias=".service_locator..1lCTzi"/>
     <service id=".service_locator.8J1nalj" alias=".service_locator.SsD9eLO"/>
     <service id=".service_locator.wo826zD" alias=".service_locator.f4l_PHz"/>
-    <service id=".service_locator.2iWj4D_" alias=".service_locator.5N.TVUE"/>
+    <service id=".service_locator.2iWj4D_" alias=".service_locator.DqNkb0R"/>
     <service id=".service_locator.BFrsqsn" alias=".service_locator.F9PKc.7"/>
     <service id=".service_locator.oIHygA7" alias=".service_locator.xOkKGYY"/>
     <service id=".service_locator.3ijAwyK" alias=".service_locator.vtjw4Bs"/>
@@ -13360,10 +13360,10 @@
     <service id=".service_locator.lfmVyU9" alias=".service_locator.b5YG.FV"/>
     <service id=".service_locator.1ZKBlru" alias=".service_locator.yxq7DSB"/>
     <service id=".service_locator.mVNsgkk" alias=".service_locator.MS0TZYx"/>
+    <service id=".service_locator.UHJ7oeV" alias=".service_locator.p6JsI.h"/>
     <service id=".service_locator.fkH.F9G" alias=".service_locator..2t9Uf5"/>
     <service id=".service_locator.9vMarpz" alias=".service_locator..zXqV8G"/>
     <service id=".service_locator.ufBeM6b" alias=".service_locator.cZxzGoz"/>
-    <service id=".service_locator.UHJ7oeV" alias=".service_locator.p6JsI.h"/>
     <service id=".service_locator.JaeoPJi" alias=".service_locator.79ed2Qj"/>
     <service id=".service_locator.NLwAC4N" alias=".service_locator.qf5FuHx"/>
     <service id=".service_locator.rygYQwp" alias=".service_locator.iH9_4VJ"/>

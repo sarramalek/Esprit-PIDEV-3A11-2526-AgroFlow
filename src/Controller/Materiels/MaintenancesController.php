@@ -24,9 +24,6 @@ class MaintenancesController extends AbstractController
         $this->alertService = $alertService;
     }
 
-    // ────────────────────────────────────────────────────────
-    // INDEX
-    // ────────────────────────────────────────────────────────
     #[Route('', name: 'agri_maintenances_index', methods: ['GET'])]
     public function index(Request $request, MaintenanceRepository $repo): Response
     {
@@ -59,23 +56,16 @@ class MaintenancesController extends AbstractController
         ]);
     }
 
-    // ────────────────────────────────────────────────────────
-    // CREATE
-    // ────────────────────────────────────────────────────────
     #[Route('/new', name: 'agri_maintenances_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         $maintenance = new Maintenance();
         
-        // Générer une recommandation IA par défaut
-        $defaultReco = $this->generateAIRecommendation('', 'moyenne', null, 'planifie', '');
-        $maintenance->setRecommandation($defaultReco);
-        
         $form = $this->createForm(MaintenanceType::class, $maintenance);
         $form->handleRequest($request);
         
         if ($form->isSubmitted() && $form->isValid()) {
-            // Générer la recommandation IA automatiquement
+            // Générer la recommandation IA
             $typePanne = $maintenance->getTypePanne();
             $priorite = $maintenance->getPriorite();
             $kilometrage = $maintenance->getKilometrage();
@@ -93,9 +83,6 @@ class MaintenancesController extends AbstractController
         return $this->render('maintenances/new.html.twig', ['form' => $form->createView()]);
     }
 
-    // ────────────────────────────────────────────────────────
-    // EXPORT EXCEL
-    // ────────────────────────────────────────────────────────
     #[Route('/export/excel', name: 'agri_maintenances_export_excel', methods: ['GET'])]
     public function exportExcel(MaintenanceRepository $repo): StreamedResponse
     {
@@ -135,9 +122,6 @@ class MaintenancesController extends AbstractController
         return $response;
     }
 
-    // ────────────────────────────────────────────────────────
-    // EXPORT PDF
-    // ────────────────────────────────────────────────────────
     #[Route('/export/pdf', name: 'agri_maintenances_export_pdf', methods: ['GET'])]
     public function exportPdf(MaintenanceRepository $repo): Response
     {
@@ -148,9 +132,6 @@ class MaintenancesController extends AbstractController
         ]);
     }
 
-    // ────────────────────────────────────────────────────────
-    // API : GÉNÉRATION RECOMMANDATION IA (pour AJAX dans formulaire)
-    // ────────────────────────────────────────────────────────
     #[Route('/api/generate-recommendation', name: 'agri_maintenances_api_generate_reco', methods: ['POST'])]
     public function generateRecommendationAPI(Request $request): JsonResponse
     {
@@ -172,16 +153,12 @@ class MaintenancesController extends AbstractController
         }
     }
 
-    // ────────────────────────────────────────────────────────
-    // API : CALENDRIER COMPLET (TOUTES LES MAINTENANCES)
-    // ────────────────────────────────────────────────────────
     #[Route('/api/calendar/all-events', name: 'agri_maintenances_api_calendar_events', methods: ['GET'])]
     public function getAllCalendarEvents(MaintenanceRepository $repo): JsonResponse
     {
         try {
-            $maintenances = $repo->findAll();
+            $maintenances = $repo->findAllOrderedByDate();
             $events = [];
-            $now = new \DateTime();
 
             foreach ($maintenances as $m) {
                 $dateMain = $m->getDateMain();
@@ -224,9 +201,6 @@ class MaintenancesController extends AbstractController
         }
     }
 
-    // ────────────────────────────────────────────────────────
-    // API : DÉTAIL MAINTENANCE AVEC RECOMMANDATION IA
-    // ────────────────────────────────────────────────────────
     #[Route('/api/maintenance/{id}/detail', name: 'agri_maintenances_api_detail', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function getMaintenanceDetail(int $id, MaintenanceRepository $repo): JsonResponse
     {
@@ -249,7 +223,6 @@ class MaintenancesController extends AbstractController
             $daysSince = $dateMain ? $now->diff($dateMain)->days : null;
             $yearsSince = $dateMain ? $now->diff($dateMain)->y : 0;
 
-            // Générer la recommandation IA dynamique
             $iaRecommendation = $this->generateDynamicAIRecommendation(
                 $machineName, $type, $priorite, $statut, $km, $cout, $description, $daysSince, $yearsSince
             );
@@ -276,9 +249,6 @@ class MaintenancesController extends AbstractController
         }
     }
 
-    // ────────────────────────────────────────────────────────
-    // API : SUGGESTION AUTOMATIQUE IA
-    // ────────────────────────────────────────────────────────
     #[Route('/api/ai-suggest-maintenance/{id}', name: 'agri_maintenances_api_ai_suggest', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function aiSuggestMaintenance(int $id, MaintenanceRepository $repo): JsonResponse
     {
@@ -311,9 +281,6 @@ class MaintenancesController extends AbstractController
         }
     }
 
-    // ────────────────────────────────────────────────────────
-    // API : PROMPT LIBRE IA
-    // ────────────────────────────────────────────────────────
     #[Route('/api/generate-custom-prompt/{id}', name: 'agri_maintenances_api_custom_prompt', methods: ['POST'], requirements: ['id' => '\d+'])]
     public function generateCustomPrompt(int $id, Request $request, MaintenanceRepository $repo): JsonResponse
     {
@@ -337,9 +304,6 @@ class MaintenancesController extends AbstractController
         }
     }
 
-    // ────────────────────────────────────────────────────────
-    // API : DURÉE DE VIE IA
-    // ────────────────────────────────────────────────────────
     #[Route('/api/lifetime/{id}', name: 'agri_maintenances_api_lifetime', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function generateLifetime(int $id, MaintenanceRepository $repo): JsonResponse
     {
@@ -382,9 +346,6 @@ class MaintenancesController extends AbstractController
         }
     }
 
-    // ────────────────────────────────────────────────────────
-    // SHOW
-    // ────────────────────────────────────────────────────────
     #[Route('/{id}', name: 'agri_maintenances_show', methods: ['GET'], requirements: ['id' => '\d+'])]
     public function show(int $id, MaintenanceRepository $repo): Response
     {
@@ -393,9 +354,6 @@ class MaintenancesController extends AbstractController
         return $this->render('maintenances/show.html.twig', ['maintenance' => $maintenance]);
     }
 
-    // ────────────────────────────────────────────────────────
-    // EDIT
-    // ────────────────────────────────────────────────────────
     #[Route('/{id}/edit', name: 'agri_maintenances_edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
     public function edit(Request $request, Maintenance $maintenance, EntityManagerInterface $em): Response
     {
@@ -403,7 +361,6 @@ class MaintenancesController extends AbstractController
         $form->handleRequest($request);
         
         if ($form->isSubmitted() && $form->isValid()) {
-            // Regénérer la recommandation IA automatiquement
             $typePanne = $maintenance->getTypePanne();
             $priorite = $maintenance->getPriorite();
             $kilometrage = $maintenance->getKilometrage();
@@ -420,9 +377,6 @@ class MaintenancesController extends AbstractController
         return $this->render('maintenances/edit.html.twig', ['form' => $form->createView(), 'maintenance' => $maintenance]);
     }
 
-    // ────────────────────────────────────────────────────────
-    // DELETE
-    // ────────────────────────────────────────────────────────
     #[Route('/{id}/delete', name: 'agri_maintenances_delete', methods: ['POST'], requirements: ['id' => '\d+'])]
     public function delete(Request $request, Maintenance $maintenance, EntityManagerInterface $em): Response
     {
@@ -460,15 +414,11 @@ class MaintenancesController extends AbstractController
         return 'Machine non définie';
     }
 
-    // ────────────────────────────────────────────────────────
-    // GÉNÉRATION RECOMMANDATION IA (POUR STOCKAGE EN BASE)
-    // ────────────────────────────────────────────────────────
     private function generateAIRecommendation(string $typePanne, string $priorite, ?int $kilometrage, string $statut, ?string $description): string
     {
         $recommendation = "";
         $km = $kilometrage ?? 0;
         
-        // 1. Analyse de la priorité
         if ($priorite === 'urgente') {
             $recommendation .= "🚨 INTERVENTION URGENTE REQUISE !\n";
             $recommendation .= "• Ne pas utiliser la machine avant réparation complète\n";
@@ -488,7 +438,6 @@ class MaintenancesController extends AbstractController
             $recommendation .= "• Inspections périodiques standards\n\n";
         }
         
-        // 2. Analyse du kilométrage
         if ($km >= 15000) {
             $recommendation .= "📊 KILOMÉTRAGE CRITIQUE ({$km} km) :\n";
             $recommendation .= "• Révision majeure OBLIGATOIRE immédiate\n";
@@ -504,10 +453,8 @@ class MaintenancesController extends AbstractController
             $recommendation .= "• Vérification des niveaux et courroies\n\n";
         }
         
-        // 3. Recommandation spécifique au type de panne
         $recommendation .= $this->getTypeSpecificReco($typePanne, $priorite);
         
-        // 4. Analyse de la description
         if (!empty($description)) {
             $descLower = strtolower($description);
             if (str_contains($descLower, 'fuite')) {
@@ -521,14 +468,12 @@ class MaintenancesController extends AbstractController
             }
         }
         
-        // 5. Recommandations de sécurité
         $recommendation .= "\n⚠️ RECOMMANDATIONS DE SÉCURITÉ :\n";
         $recommendation .= "• Port des EPI obligatoires\n";
         $recommendation .= "• Couper le moteur avant intervention\n";
         $recommendation .= "• Déconnecter la batterie (pôle négatif)\n";
         $recommendation .= "• Extincteur à portée de main\n\n";
         
-        // 6. Maintenance préventive
         $recommendation .= "📋 MAINTENANCE PRÉVENTIVE :\n";
         if ($km > 0) {
             $nextKm = ceil(($km + 1) / 5000) * 5000;
@@ -556,9 +501,6 @@ class MaintenancesController extends AbstractController
         };
     }
 
-    // ────────────────────────────────────────────────────────
-    // GÉNÉRATION RECOMMANDATION IA DYNAMIQUE (POUR POPUP CALENDRIER)
-    // ────────────────────────────────────────────────────────
     private function generateDynamicAIRecommendation(string $machineName, string $type, string $priorite, string $statut, int $km, float $cout, string $description, ?int $daysSince, int $yearsSince): array
     {
         $recommendations = [];
@@ -616,9 +558,6 @@ class MaintenancesController extends AbstractController
         ];
     }
 
-    // ────────────────────────────────────────────────────────
-    // COULEURS POUR CALENDRIER
-    // ────────────────────────────────────────────────────────
     private function getEventColor(string $priorite, string $statut): string
     {
         if ($priorite === 'urgente') return '#e74a3b';
@@ -717,13 +656,13 @@ class MaintenancesController extends AbstractController
         $type = $m->getTypePanne() ?? '';
 
         $typeSpecificMap = [
-            'Moteur' => ['icon' => '🔧', 'title' => 'Panne Moteur détectée', 'message' => "Vérifier la compression et les niveaux d'huile.", 'action' => 'Diagnostic moteur'],
-            'Électricité' => ['icon' => '⚡', 'title' => 'Problème électrique', 'message' => "Tester la batterie et l'alternateur.", 'action' => 'Diagnostic électrique'],
-            'Hydraulique' => ['icon' => '💧', 'title' => 'Défaillance hydraulique', 'message' => "Contrôler le niveau de fluide.", 'action' => 'Inspection hydraulique'],
+            'Moteur' => ['icon' => '🔧', 'title' => 'Panne Moteur détectée', 'message' => "Vérifier la compression et les niveaux d'huile.", 'action' => 'Diagnostic moteur', 'priority' => $state['priority'] === 'urgente' ? 'urgente' : 'moyenne'],
+            'Électricité' => ['icon' => '⚡', 'title' => 'Problème électrique', 'message' => "Tester la batterie et l'alternateur.", 'action' => 'Diagnostic électrique', 'priority' => $state['priority'] === 'urgente' ? 'urgente' : 'moyenne'],
+            'Hydraulique' => ['icon' => '💧', 'title' => 'Défaillance hydraulique', 'message' => "Contrôler le niveau de fluide.", 'action' => 'Inspection hydraulique', 'priority' => $state['priority'] === 'urgente' ? 'urgente' : 'moyenne'],
         ];
 
         if (isset($typeSpecificMap[$type])) {
-            $suggestions[] = array_merge($typeSpecificMap[$type], ['priority' => $state['priority'] === 'urgente' ? 'urgente' : 'moyenne']);
+            $suggestions[] = $typeSpecificMap[$type];
         }
 
         if ($daysSince !== null && $daysSince > ($frequency['recommendedInterval'] ?? 90)) {
@@ -806,10 +745,10 @@ class MaintenancesController extends AbstractController
         $nom = $this->getMachineName($maintenance);
         $promptLc = strtolower($prompt);
 
-        if (str_contains($promptLc, 'vérif')) {
+        if (str_contains($promptLc, 'vérif') || str_contains($promptLc, 'verif')) {
             return "📋 Vérifications pour {$nom} :\n1. Inspection visuelle\n2. Test démarrage\n3. Contrôle niveaux\n" . ($prio === 'urgente' ? "\n⚠️ URGENT" : '');
         }
-        if (str_contains($promptLc, 'coût')) {
+        if (str_contains($promptLc, 'coût') || str_contains($promptLc, 'cout')) {
             return "💰 Estimation pour {$nom} :\n- Pièces : 100-500 DT\n- Main d'œuvre : 50-120 DT/h";
         }
         return "📋 Recommandation pour {$nom} :\n1. Diagnostic complet\n2. Préparer les pièces\n3. Intervenir\n" . ($prio === 'urgente' ? "\n⚠️ ACTION IMMÉDIATE" : "");
@@ -824,7 +763,7 @@ class MaintenancesController extends AbstractController
         elseif ($km >= 5000) $recs[] = "Vidange moteur requise";
 
         usort($composants, fn($a, $b) => $b['usure'] - $a['usure']);
-        if ($composants[0]['usure'] > 70) {
+        if (!empty($composants) && $composants[0]['usure'] > 70) {
             $recs[] = "Composant critique : {$composants[0]['nom']} ({$composants[0]['usure']}%)";
         }
         return array_slice($recs, 0, 5);

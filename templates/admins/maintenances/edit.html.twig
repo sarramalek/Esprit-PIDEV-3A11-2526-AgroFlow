@@ -85,6 +85,28 @@
         margin-top: 6px;
     }
 
+    .btn-wiki {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #f5f2ec;
+        color: #1d3d17;
+        border: 1px solid #d8d1c1;
+        border-radius: 20px;
+        padding: 6px 14px;
+        font-size: 12px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.18s;
+        margin-left: 12px;
+    }
+    .btn-wiki:hover {
+        background: #1d3d17;
+        color: white;
+        border-color: #1d3d17;
+        transform: translateY(-1px);
+    }
+
     .form-group { margin-bottom: 20px; }
     .form-label {
         display: block;
@@ -302,6 +324,12 @@
                 {# Section Identification #}
                 <div class="section-title">
                     <i class="bi bi-tag-fill"></i> Identification
+                    {% if maintenance.typePanne %}
+                        <a href="{{ path('admin_maintenances_wiki_pannes', {q: maintenance.typePanne}) }}" 
+                           class="btn-wiki" target="_blank">
+                            <i class="bi bi-wikipedia"></i> Wikipedia
+                        </a>
+                    {% endif %}
                 </div>
 
                 <div class="form-group">
@@ -461,9 +489,8 @@
                     <div class="select-wrap">
                         <select name="idM" id="idM" class="form-select">
                             <option value="">— Aucun matériel —</option>
-                            {% for machine in machines %}{{ maintenance.idM and maintenance.idM.id == machine.id ? 'selected' : '' }}
-
-                                <option value="{{ machine.id }}" >
+                            {% for machine in machines %}
+                                <option value="{{ machine.id }}" {{ maintenance.idM == machine.id ? 'selected' : '' }}>
                                     {{ machine.nom }} (ID : {{ machine.id }})
                                 </option>
                             {% endfor %}
