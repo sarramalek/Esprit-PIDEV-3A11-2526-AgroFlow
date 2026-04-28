@@ -599,21 +599,26 @@ checkAndRedirect();
         </div>
 
             <!-- Gestion Terrains -->
-            <div class="nav-item {% if app.request.get('_route') in ['admin_terrains','admin_rotations'] %}open{% endif %}">
-                <div class="nav-link {% if app.request.get('_route') in ['admin_terrains','admin_rotations'] %}active{% endif %}"
-                     onclick="toggleMenu(this)">
-                    <span class="nav-icon"><i class="fa fa-map"></i></span>
-                    <span class="nav-label">Gestion Terrains</span>
-                    <i class="fa fa-chevron-right nav-arrow"></i>
-                </div>
-                <ul class="nav-sub">
-                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_terrains' %}active{% endif %}">
+        <div class="nav-item {% if app.request.get('_route') in ['admin_terrains','admin_terrains_new','admin_terrains_edit','admin_terrains_show','admin_rotations','admin_rotations_new','admin_rotations_edit','admin_plantes','admin_plantes_new','admin_plantes_edit'] %}open{% endif %}">
+            <div class="nav-link {% if app.request.get('_route') in ['admin_terrains','admin_terrains_new','admin_terrains_edit','admin_terrains_show','admin_rotations','admin_rotations_new','admin_rotations_edit','admin_plantes','admin_plantes_new','admin_plantes_edit'] %}active{% endif %}"
+                 onclick="toggleMenu(this)">
+                <span class="nav-icon"><i class="fa fa-map"></i></span>
+                <span class="nav-label">Gestion Terrains</span>
+                <i class="fa fa-chevron-right nav-arrow"></i>
+            </div>
+            <ul class="nav-sub">
+                <li>
+                    <a href="{{ path('admin_terrains') }}"
+                       class="{% if app.request.get('_route') starts with 'admin_terrains' %}active{% endif %}">
                         <span class="sub-dot"></span> Terrains
-                    </a></li>
-                    <li><a href="#" class="{% if app.request.get('_route') == 'admin_rotations' %}active{% endif %}">
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ path('admin_rotations') }}"
+                       class="{% if app.request.get('_route') starts with 'admin_rotations' %}active{% endif %}">
                         <span class="sub-dot"></span> Rotations
                     </a></li>
-                    <li>
+                     <li>
             <a href="{{ path('admin_plantes') }}"
                class="{% if app.request.get('_route') starts with 'admin_plantes' %}active{% endif %}">
                 <span class="sub-dot"></span> Plantes
@@ -621,7 +626,6 @@ checkAndRedirect();
         </li>
                 </ul>
             </div>
-
             <!-- Gestion Matériels -->
             <div class="nav-item {% if app.request.get('_route') in ['admin_machines','admin_maintenances'] %}open{% endif %}">
                 <div class="nav-link {% if app.request.get('_route') in ['admin_machines','admin_maintenances'] %}active{% endif %}"
