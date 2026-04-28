@@ -3,8 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\User\User;
-use App\Form\RegistrationFormType;
-use App\Form\LoginFormType;
+use App\Form\auth\RegistrationFormType;
+use App\Form\auth\LoginFormType;
 use App\Repository\User\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
