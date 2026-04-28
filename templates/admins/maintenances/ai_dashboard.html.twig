@@ -114,7 +114,7 @@
     .alert-list { list-style: none; }
     .alert-item { padding: 14px; border-radius: 10px; margin-bottom: 10px; display: flex; gap: 12px; align-items: flex-start; transition: all 0.15s; }
     .alert-item:hover { transform: translateX(4px); }
-    .alert-critical { background: #ffebee; border-left: 3px solid #c62828; }
+    .alert-critique { background: #ffebee; border-left: 3px solid #c62828; }
     .alert-warning { background: #fff8e1; border-left: 3px solid #ff9800; }
     .alert-info { background: #e3f2fd; border-left: 3px solid #2196f3; }
     .alert-icon { font-size: 20px; }
@@ -127,20 +127,21 @@
     .priority-table th, .priority-table td { padding: 12px; text-align: left; border-bottom: 1px solid #ece7dd; }
     .priority-table th { font-size: 11px; font-weight: 600; text-transform: uppercase; color: #9e9d95; }
     .priority-table tr:hover { background: #fafaf7; }
-    .priority-critical { color: #c62828; font-weight: 600; }
-    .priority-high { color: #e65100; font-weight: 600; }
-    .priority-normal { color: #2d5a1b; }
+    .priority-critique { color: #c62828; font-weight: 600; }
+    .priority-haute { color: #e65100; font-weight: 600; }
+    .priority-moyenne { color: #2d5a1b; }
 
     /* Planning */
     .schedule-grid { display: flex; flex-direction: column; gap: 12px; }
-    .schedule-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: #fafaf7; border-radius: 10px; transition: all 0.15s; }
+    .schedule-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; background: #fafaf7; border-radius: 10px; transition: all 0.15s; flex-wrap: wrap; gap: 10px; }
     .schedule-item:hover { transform: translateX(4px); background: #f5f2ec; }
     .schedule-date { font-family: 'DM Mono', monospace; font-size: 12px; color: #1d3d17; font-weight: 600; display: flex; align-items: center; gap: 6px; }
     .schedule-machine { font-weight: 500; display: flex; align-items: center; gap: 6px; }
     .schedule-urgency { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
-    .urgency-critical { background: #ffebee; color: #c62828; }
-    .urgency-high { background: #fff3e0; color: #e65100; }
-    .urgency-normal { background: #e8f5e9; color: #2d5a1b; }
+    .urgency-critique { background: #ffebee; color: #c62828; }
+    .urgency-haute { background: #fff3e0; color: #e65100; }
+    .urgency-moyenne { background: #e8f5e9; color: #2d5a1b; }
+    .urgency-faible { background: #f5f5f5; color: #616161; }
 
     /* Empty state */
     .empty-state { text-align: center; padding: 60px 20px; }
@@ -154,6 +155,7 @@
         .page-header { flex-direction: column; align-items: flex-start; }
         .priority-table { font-size: 12px; }
         .priority-table th, .priority-table td { padding: 8px; }
+        .schedule-item { flex-direction: column; align-items: flex-start; }
     }
 </style>
 {% endblock %}
@@ -240,12 +242,18 @@
                         <span><i class="bi bi-calendar"></i> Dernière: {{ score.details.derniere_maintenance ?? 'Jamais' }}</span>
                     </div>
                 </div>
+            {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-database-x"></i>
+                    <h3>Aucune machine trouvée</h3>
+                    <p>Ajoutez des machines pour commencer l'analyse.</p>
+                </div>
             {% endfor %}
         </div>
     </div>
 
     {# Alertes intelligentes #}
-    {% if alerts is not empty %}
+    {% if alerts is defined and alerts is not empty %}
     <div class="section">
         <div class="section-title">
             <i class="bi bi-bell-fill" style="color: #ff9800;"></i>
@@ -253,21 +261,24 @@
         </div>
         <ul class="alert-list">
             {% for alert in alerts %}
-                <li class="alert-item alert-{{ alert.type }}">
+                <li class="alert-item alert-{{ alert.type|default('info') }}">
                     <div class="alert-icon">
-                        {% if alert.type == 'critique' %}
+                        {% set alertType = alert.type|default('info') %}
+                        {% if alertType == 'critique' %}
                             <i class="bi bi-x-octagon-fill" style="color: #c62828;"></i>
-                        {% elseif alert.type == 'warning' %}
+                        {% elseif alertType == 'warning' %}
                             <i class="bi bi-exclamation-triangle-fill" style="color: #ff9800;"></i>
                         {% else %}
                             <i class="bi bi-info-circle-fill" style="color: #2196f3;"></i>
                         {% endif %}
                     </div>
                     <div class="alert-content">
-                        <div class="alert-message">{{ alert.message }}</div>
+                        <div class="alert-message">{{ alert.message|default('Alerte non spécifiée') }}</div>
+                        {% if alert.actions is defined and alert.actions is not empty %}
                         <div class="alert-action">
                             <i class="bi bi-check2-square"></i> Actions: {{ alert.actions|join(', ') }}
                         </div>
+                        {% endif %}
                     </div>
                 </li>
             {% endfor %}
@@ -281,7 +292,7 @@
             <i class="bi bi-sort-numeric-down"></i>
             Priorités d'intervention
         </div>
-        {% if priorities is not empty %}
+        {% if priorities is defined and priorities is not empty %}
         <table class="priority-table">
             <thead>
                 <tr>
@@ -295,29 +306,34 @@
             <tbody>
                 {% for priority in priorities|slice(0, 10) %}
                     <tr>
-                        <td><strong>{{ priority.machine_nom }}</strong></td>
-                        <td>{{ priority.priority_score }}%</td>
-                        <td class="priority-{{ priority.niveau_urgence|lower }}">
-                            {% if priority.niveau_urgence == 'CRITIQUE' %}
-                                <i class="bi bi-exclamation-octagon"></i> {{ priority.niveau_urgence }}
-                            {% elseif priority.niveau_urgence == 'HAUTE' %}
-                                <i class="bi bi-arrow-up-circle"></i> {{ priority.niveau_urgence }}
+                        <td><strong>{{ priority.machine_nom|default('Machine inconnue') }}</strong></td>
+                        <td>{{ priority.priority_score|default(0) }}%</td>
+                        <td class="priority-{{ priority.niveau_urgence|lower|default('moyenne') }}">
+                            {% set niveau = priority.niveau_urgence|default('MOYENNE') %}
+                            {% if niveau == 'CRITIQUE' %}
+                                <i class="bi bi-exclamation-octagon"></i> {{ niveau }}
+                            {% elseif niveau == 'HAUTE' %}
+                                <i class="bi bi-arrow-up-circle"></i> {{ niveau }}
                             {% else %}
-                                <i class="bi bi-arrow-right-circle"></i> {{ priority.niveau_urgence }}
+                                <i class="bi bi-arrow-right-circle"></i> {{ niveau }}
                             {% endif %}
                         </td>
                         <td>
-                            {% if priority.risque_panne == 'élevé' %}
+                            {% set risque = priority.risque_panne|default('faible') %}
+                            {% if risque == 'élevé' %}
                                 <i class="bi bi-arrow-up-circle" style="color: #c62828;"></i> ÉLEVÉ
-                            {% elseif priority.risque_panne == 'moyen' %}
+                            {% elseif risque == 'moyen' %}
                                 <i class="bi bi-arrow-right-circle" style="color: #ff9800;"></i> MOYEN
                             {% else %}
                                 <i class="bi bi-arrow-down-circle" style="color: #4caf50;"></i> FAIBLE
                             {% endif %}
                         </td>
                         <td style="font-size: 12px;">
-                            {% for action in priority.actions_recommandees|slice(0, 2) %}
+                            {% set actions = priority.actions_recommandees|default([]) %}
+                            {% for action in actions|slice(0, 2) %}
                                 <span><i class="bi bi-dot"></i> {{ action }}</span>
+                            {% else %}
+                                <span><i class="bi bi-dot"></i> Maintenance préventive</span>
                             {% endfor %}
                         </td>
                     </tr>
@@ -339,27 +355,30 @@
             <i class="bi bi-calendar-check"></i>
             Planning optimisé (30 jours)
         </div>
-        {% if schedule is not empty %}
+        {% if schedule is defined and schedule is not empty %}
         <div class="schedule-grid">
             {% for item in schedule %}
                 <div class="schedule-item">
                     <div class="schedule-date">
-                        <i class="bi bi-calendar"></i> {{ item.date_planifiee }}
+                        <i class="bi bi-calendar"></i> {{ item.date_planifiee|default('Date non définie') }}
                     </div>
                     <div class="schedule-machine">
-                        <i class="bi bi-truck"></i> {{ item.machine_nom }}
+                        <i class="bi bi-truck"></i> {{ item.machine_nom|default('Machine inconnue') }}
                     </div>
-                    <span class="schedule-urgency urgency-{{ item.urgence|lower }}">
-                        {% if item.urgence == 'CRITIQUE' %}
-                            <i class="bi bi-exclamation-octagon"></i> {{ item.urgence }}
-                        {% elseif item.urgence == 'HAUTE' %}
-                            <i class="bi bi-arrow-up-circle"></i> {{ item.urgence }}
+                    <span class="schedule-urgency urgency-{{ item.urgence|lower|default('moyenne') }}">
+                        {% set urgence = item.urgence|default('MOYENNE') %}
+                        {% if urgence == 'CRITIQUE' %}
+                            <i class="bi bi-exclamation-octagon"></i> {{ urgence }}
+                        {% elseif urgence == 'HAUTE' %}
+                            <i class="bi bi-arrow-up-circle"></i> {{ urgence }}
+                        {% elseif urgence == 'MOYENNE' %}
+                            <i class="bi bi-arrow-right-circle"></i> {{ urgence }}
                         {% else %}
-                            <i class="bi bi-arrow-right-circle"></i> {{ item.urgence }}
+                            <i class="bi bi-arrow-down-circle"></i> {{ urgence }}
                         {% endif %}
                     </span>
                     <div style="font-size: 11px; color: #6b6b64;">
-                        <i class="bi bi-clock"></i> {{ item.duree_estimee_heures }}h
+                        <i class="bi bi-clock"></i> {{ item.duree_estimee_heures|default(2) }}h
                     </div>
                 </div>
             {% endfor %}

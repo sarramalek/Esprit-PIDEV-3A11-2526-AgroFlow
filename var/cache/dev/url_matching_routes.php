@@ -19,8 +19,8 @@ return [
         '/about' => [[['_route' => 'app_about', '_controller' => 'App\\Controller\\AboutController::index'], null, null, null, false, false, null]],
         '/DashboardAdmin' => [[['_route' => 'admin_dashboard', '_controller' => 'App\\Controller\\AdminDashboardController::index'], null, null, null, false, false, null]],
         '/profile/update' => [[['_route' => 'profile_update', '_controller' => 'App\\Controller\\AdminDashboardController::profileUpdate'], null, ['POST' => 0], null, false, false, null]],
-        '/admin/machines' => [[['_route' => 'admin_machines_index', '_controller' => 'App\\Controller\\AdminMateriels\\MachineAdminController::index'], null, ['GET' => 0], null, false, false, null]],
-        '/admin/machines/new' => [[['_route' => 'admin_machines_new', '_controller' => 'App\\Controller\\AdminMateriels\\MachineAdminController::new'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        '/admin/materiels/machines' => [[['_route' => 'admin_machines_index', '_controller' => 'App\\Controller\\AdminMateriels\\MachineAdminController::index'], null, ['GET' => 0], null, false, false, null]],
+        '/admin/materiels/machines/new' => [[['_route' => 'admin_machines_new', '_controller' => 'App\\Controller\\AdminMateriels\\MachineAdminController::new'], null, ['GET' => 0, 'POST' => 1], null, false, false, null]],
         '/admin/materiels/maintenances' => [[['_route' => 'admin_maintenances_index', '_controller' => 'App\\Controller\\AdminMateriels\\MaintenanceAdminController::index'], null, ['GET' => 0], null, false, false, null]],
         '/admin/materiels/maintenances/statistiques/bar' => [[['_route' => 'admin_maintenances_stats_bar', '_controller' => 'App\\Controller\\AdminMateriels\\MaintenanceAdminController::statsBar'], null, ['GET' => 0], null, false, false, null]],
         '/admin/materiels/maintenances/historique' => [[['_route' => 'admin_maintenances_history', '_controller' => 'App\\Controller\\AdminMateriels\\MaintenanceAdminController::history'], null, ['GET' => 0], null, false, false, null]],
@@ -176,18 +176,18 @@ return [
                 .')'
                 .'|/a(?'
                     .'|dmin/(?'
-                        .'|ma(?'
+                        .'|materiels/ma(?'
                             .'|chines/([^/]++)(?'
-                                .'|(*:238)'
+                                .'|(*:248)'
                                 .'|/(?'
-                                    .'|edit(*:254)'
+                                    .'|edit(*:264)'
                                     .'|delete(?'
-                                        .'|(*:271)'
-                                        .'|\\-confirm(*:288)'
+                                        .'|(*:281)'
+                                        .'|\\-confirm(*:298)'
                                     .')'
                                 .')'
                             .')'
-                            .'|teriels/maintenances/(?'
+                            .'|intenances/(?'
                                 .'|ai/(?'
                                     .'|predict/([^/]++)(*:345)'
                                     .'|analyze/([^/]++)(*:369)'
@@ -463,12 +463,12 @@ return [
         168 => [[['_route' => '_profiler_exception', '_controller' => 'web_profiler.controller.exception_panel::body'], ['token'], null, null, false, false, null]],
         181 => [[['_route' => '_profiler_exception_css', '_controller' => 'web_profiler.controller.exception_panel::stylesheet'], ['token'], null, null, false, false, null]],
         191 => [[['_route' => '_profiler', '_controller' => 'web_profiler.controller.profiler::panelAction'], ['token'], null, null, false, true, null]],
-        238 => [[['_route' => 'admin_machines_show', '_controller' => 'App\\Controller\\AdminMateriels\\MachineAdminController::show'], ['id'], ['GET' => 0], null, false, true, null]],
-        254 => [[['_route' => 'admin_machines_edit', '_controller' => 'App\\Controller\\AdminMateriels\\MachineAdminController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
-        271 => [[['_route' => 'admin_machines_delete', '_controller' => 'App\\Controller\\AdminMateriels\\MachineAdminController::delete'], ['id'], ['POST' => 0], null, false, false, null]],
-        288 => [[['_route' => 'admin_machines_delete_confirm', '_controller' => 'App\\Controller\\AdminMateriels\\MachineAdminController::deleteConfirm'], ['id'], ['GET' => 0], null, false, false, null]],
+        248 => [[['_route' => 'admin_machines_show', '_controller' => 'App\\Controller\\AdminMateriels\\MachineAdminController::show'], ['id'], ['GET' => 0], null, false, true, null]],
+        264 => [[['_route' => 'admin_machines_edit', '_controller' => 'App\\Controller\\AdminMateriels\\MachineAdminController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
+        281 => [[['_route' => 'admin_machines_delete', '_controller' => 'App\\Controller\\AdminMateriels\\MachineAdminController::delete'], ['id'], ['POST' => 0], null, false, false, null]],
+        298 => [[['_route' => 'admin_machines_delete_confirm', '_controller' => 'App\\Controller\\AdminMateriels\\MachineAdminController::deleteConfirm'], ['id'], ['GET' => 0], null, false, false, null]],
         345 => [[['_route' => 'admin_maintenances_ai_predict', '_controller' => 'App\\Controller\\AdminMateriels\\MaintenanceAdminController::apiPredictMachine'], ['id'], ['GET' => 0], null, false, true, null]],
-        369 => [[['_route' => 'admin_maintenances_ai_analyze', '_controller' => 'App\\Controller\\AdminMateriels\\MaintenanceAdminController::aiAnalyzeMaintenance'], ['id'], ['GET' => 0], null, false, true, null]],
+        369 => [[['_route' => 'admin_maintenances_ai_analyze', '_controller' => 'App\\Controller\\AdminMateriels\\MaintenanceAdminController::apiAnalyze'], ['id'], ['GET' => 0], null, false, true, null]],
         383 => [[['_route' => 'admin_maintenances_show', '_controller' => 'App\\Controller\\AdminMateriels\\MaintenanceAdminController::show'], ['id'], ['GET' => 0], null, false, true, null]],
         401 => [[['_route' => 'admin_maintenances_edit', '_controller' => 'App\\Controller\\AdminMateriels\\MaintenanceAdminController::edit'], ['id'], ['GET' => 0, 'POST' => 1], null, false, false, null]],
         421 => [[['_route' => 'admin_maintenances_delete', '_controller' => 'App\\Controller\\AdminMateriels\\MaintenanceAdminController::delete'], ['id'], ['POST' => 0], null, false, false, null]],

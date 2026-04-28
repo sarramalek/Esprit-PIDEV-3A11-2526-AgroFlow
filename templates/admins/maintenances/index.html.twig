@@ -401,6 +401,81 @@
         font-size: 15px;
     }
 
+    /* ===== PAGINATION STYLES ===== */
+    .pagination-container {
+        margin-top: 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        background: white;
+        border: 1px solid #ece7dd;
+        border-radius: 16px;
+        padding: 16px 20px;
+    }
+    .pagination {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+    .pagination button, .pagination .page-link {
+        background: white;
+        border: 1.5px solid #d8d1c1;
+        color: #3d3d38;
+        padding: 8px 14px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 13px;
+        font-family: 'DM Sans', sans-serif;
+        font-weight: 500;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .pagination button:hover:not(:disabled),
+    .pagination .page-link:hover:not(.disabled) {
+        background: #1d3d17;
+        border-color: #1d3d17;
+        color: white;
+        transform: translateY(-1px);
+    }
+    .pagination button.active,
+    .pagination .page-link.active {
+        background: #1d3d17;
+        border-color: #1d3d17;
+        color: white;
+        cursor: default;
+        pointer-events: none;
+    }
+    .pagination button:disabled,
+    .pagination .page-link.disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        transform: none;
+        pointer-events: none;
+    }
+    .pagination-info {
+        font-size: 13px;
+        color: #6b6b64;
+        background: #f5f2ec;
+        padding: 8px 16px;
+        border-radius: 10px;
+        font-family: 'DM Mono', monospace;
+    }
+    .items-per-page {
+        padding: 8px 12px;
+        border: 1.5px solid #d8d1c1;
+        border-radius: 10px;
+        background: white;
+        font-family: 'DM Sans', sans-serif;
+        font-size: 13px;
+        cursor: pointer;
+    }
+
     .empty-state {
         text-align: center;
         padding: 64px 20px;
@@ -478,6 +553,9 @@
         .filter-group { width: 100%; }
         .page-header { flex-direction: column; align-items: flex-start; }
         .header-buttons { width: 100%; justify-content: flex-start; }
+        .pagination-container { flex-direction: column; align-items: center; }
+        .pagination { justify-content: center; }
+        .pagination-info { text-align: center; }
     }
 </style>
 {% endblock %}
@@ -524,7 +602,7 @@
     <div class="kpi-grid">
         <div class="kpi-card">
             <div class="kpi-label">📊 Interventions</div>
-            <div class="kpi-value">{{ maintenances|length }}</div>
+            <div class="kpi-value">{{ pagination.totalItems|default(maintenances|length) }}</div>
             <div class="kpi-sub">enregistrées</div>
         </div>
         <div class="kpi-card">
@@ -546,17 +624,17 @@
 
     {# Barre de filtres #}
     <div class="filter-bar">
-        <form method="get" action="{{ path('admin_maintenances_index') }}" class="filter-form">
+        <form method="get" action="{{ path('admin_maintenances_index') }}" class="filter-form" id="filterForm">
             <div class="filter-group">
                 <div class="filter-label">🔍 Recherche</div>
-                <input type="text" name="search" class="filter-input" value="{{ search }}" placeholder="Type, description, matériel…">
+                <input type="text" name="search" class="filter-input" value="{{ app.request.query.get('search') }}" placeholder="Type, description, matériel…">
             </div>
             <div class="filter-group">
                 <div class="filter-label">🏷️ Type de panne</div>
                 <select name="type" class="filter-select">
                     <option value="">— Tous les types —</option>
                     {% for type in types %}
-                        <option value="{{ type }}" {{ selectedType == type ? 'selected' : '' }}>{{ type }}</option>
+                        <option value="{{ type }}" {{ app.request.query.get('type') == type ? 'selected' : '' }}>{{ type }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -584,7 +662,7 @@
                 <select name="idM" class="filter-select">
                     <option value="">— Tous —</option>
                     {% for machine in machines %}
-                        <option value="{{ machine.id }}" {{ selectedIdM == machine.id ? 'selected' : '' }}>{{ machine.nom }}</option>
+                        <option value="{{ machine.id }}" {{ app.request.query.get('idM') == machine.id ? 'selected' : '' }}>{{ machine.nom }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -592,8 +670,17 @@
                 <div class="filter-label">💰 Tri par coût</div>
                 <select name="coutFilter" class="filter-select">
                     <option value="">— Par défaut —</option>
-                    <option value="asc"  {{ coutFilter == 'asc'  ? 'selected' : '' }}>📈 Croissant</option>
-                    <option value="desc" {{ coutFilter == 'desc' ? 'selected' : '' }}>📉 Décroissant</option>
+                    <option value="asc"  {{ app.request.query.get('coutFilter') == 'asc'  ? 'selected' : '' }}>📈 Croissant</option>
+                    <option value="desc" {{ app.request.query.get('coutFilter') == 'desc' ? 'selected' : '' }}>📉 Décroissant</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <div class="filter-label">📄 Éléments par page</div>
+                <select name="limit" class="filter-select" onchange="this.form.submit()">
+                    <option value="10" {{ app.request.query.get('limit') == 10 ? 'selected' : '' }}>10 par page</option>
+                    <option value="25" {{ app.request.query.get('limit') == 25 ? 'selected' : '' }}>25 par page</option>
+                    <option value="50" {{ app.request.query.get('limit') == 50 ? 'selected' : '' }}>50 par page</option>
+                    <option value="100" {{ app.request.query.get('limit') == 100 ? 'selected' : '' }}>100 par page</option>
                 </select>
             </div>
             <div class="filter-actions">
@@ -607,7 +694,7 @@
     <div class="result-summary">
         <div class="result-badge">
             <span class="result-dot"></span>
-            📋 {{ maintenances|length }} maintenance{{ maintenances|length != 1 ? 's' : '' }} trouvée{{ maintenances|length != 1 ? 's' : '' }}
+            📋 {{ pagination.totalItems|default(maintenances|length) }} maintenance{{ pagination.totalItems|default(maintenances|length) != 1 ? 's' : '' }} trouvée{{ pagination.totalItems|default(maintenances|length) != 1 ? 's' : '' }}
         </div>
     </div>
 
@@ -630,33 +717,31 @@
             <tbody>
                 {% for m in maintenances %}
                 <tr>
-                    <td>
-                        <div class="type-cell">
-                            <span class="type-badge
-                                {% if m.typePanne == 'Moteur' %}type-moteur
-                                {% elseif m.typePanne == 'Hydraulique' %}type-hydraulique
-                                {% elseif m.typePanne in ['Électrique','Electricité'] %}type-electrique
-                                {% elseif m.typePanne == 'Mécanique' %}type-mecanique
-                                {% elseif m.typePanne == 'Pneumatique' %}type-pneumatique
-                                {% elseif m.typePanne == 'Transmission' %}type-transmission
-                                {% elseif m.typePanne == 'Vidange & filtres' %}type-vidange
-                                {% elseif m.typePanne == 'Logicielle' %}type-logicielle
-                                {% else %}type-autre{% endif %}">
-                                {% if m.typePanne == 'Moteur' %}🔧
-                                {% elseif m.typePanne == 'Hydraulique' %}💧
-                                {% elseif m.typePanne in ['Électrique','Electricité'] %}⚡
-                                {% elseif m.typePanne == 'Transmission' %}🔄
-                                {% else %}🔨{% endif %}
-                                {{ m.typePanne }}
-                            </span>
-                            <a href="{{ path('admin_maintenances_wiki_pannes', {q: m.typePanne}) }}" 
-                               class="btn-wiki wiki-tooltip" 
-                               target="_blank"
-                               title="Rechercher sur Wikipedia">
-                                <span>📖</span>
-                                <span class="tooltip-text">Rechercher "{{ m.typePanne }}" sur Wikipedia</span>
-                            </a>
-                        </div>
+                    <td class="type-cell">
+                        <span class="type-badge
+                            {% if m.typePanne == 'Moteur' %}type-moteur
+                            {% elseif m.typePanne == 'Hydraulique' %}type-hydraulique
+                            {% elseif m.typePanne in ['Électrique','Electricité'] %}type-electrique
+                            {% elseif m.typePanne == 'Mécanique' %}type-mecanique
+                            {% elseif m.typePanne == 'Pneumatique' %}type-pneumatique
+                            {% elseif m.typePanne == 'Transmission' %}type-transmission
+                            {% elseif m.typePanne == 'Vidange & filtres' %}type-vidange
+                            {% elseif m.typePanne == 'Logicielle' %}type-logicielle
+                            {% else %}type-autre{% endif %}">
+                            {% if m.typePanne == 'Moteur' %}🔧
+                            {% elseif m.typePanne == 'Hydraulique' %}💧
+                            {% elseif m.typePanne in ['Électrique','Electricité'] %}⚡
+                            {% elseif m.typePanne == 'Transmission' %}🔄
+                            {% else %}🔨{% endif %}
+                            {{ m.typePanne }}
+                        </span>
+                        <a href="{{ path('admin_maintenances_wiki_pannes', {q: m.typePanne}) }}" 
+                           class="btn-wiki wiki-tooltip" 
+                           target="_blank"
+                           title="Rechercher sur Wikipedia">
+                            <span>📖</span>
+                            <span class="tooltip-text">Rechercher "{{ m.typePanne }}" sur Wikipedia</span>
+                        </a>
                     </td>
                     <td>
                         {% if m.nom %}
@@ -755,16 +840,107 @@
         {% endif %}
     </div>
 
+    {# ===== PAGINATION COMPLÈTE ===== #}
+    {% if pagination is defined and pagination.totalPages is defined and pagination.totalPages > 1 %}
+    <div class="pagination-container">
+        <div class="pagination">
+            {# Première page #}
+            {% if pagination.currentPage > 1 %}
+                <a href="{{ path('admin_maintenances_index', app.request.query.all|merge({page: 1})) }}" 
+                   class="page-link">
+                    «« Première
+                </a>
+            {% else %}
+                <span class="page-link disabled">«« Première</span>
+            {% endif %}
+
+            {# Page précédente #}
+            {% if pagination.currentPage > 1 %}
+                <a href="{{ path('admin_maintenances_index', app.request.query.all|merge({page: pagination.currentPage - 1})) }}" 
+                   class="page-link">
+                    ‹ Précédent
+                </a>
+            {% else %}
+                <span class="page-link disabled">‹ Précédent</span>
+            {% endif %}
+
+            {# Numéros de page #}
+            {% set startPage = max(1, pagination.currentPage - 2) %}
+            {% set endPage = min(pagination.totalPages, pagination.currentPage + 2) %}
+            
+            {% if startPage > 1 %}
+                <a href="{{ path('admin_maintenances_index', app.request.query.all|merge({page: 1})) }}" 
+                   class="page-link">1</a>
+                {% if startPage > 2 %}<span class="page-link disabled">...</span>{% endif %}
+            {% endif %}
+
+            {% for page in startPage..endPage %}
+                {% if page == pagination.currentPage %}
+                    <span class="page-link active">{{ page }}</span>
+                {% else %}
+                    <a href="{{ path('admin_maintenances_index', app.request.query.all|merge({page: page})) }}" 
+                       class="page-link">{{ page }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if endPage < pagination.totalPages %}
+                {% if endPage < pagination.totalPages - 1 %}<span class="page-link disabled">...</span>{% endif %}
+                <a href="{{ path('admin_maintenances_index', app.request.query.all|merge({page: pagination.totalPages})) }}" 
+                   class="page-link">{{ pagination.totalPages }}</a>
+            {% endif %}
+
+            {# Page suivante #}
+            {% if pagination.currentPage < pagination.totalPages %}
+                <a href="{{ path('admin_maintenances_index', app.request.query.all|merge({page: pagination.currentPage + 1})) }}" 
+                   class="page-link">
+                    Suivant ›
+                </a>
+            {% else %}
+                <span class="page-link disabled">Suivant ›</span>
+            {% endif %}
+
+            {# Dernière page #}
+            {% if pagination.currentPage < pagination.totalPages %}
+                <a href="{{ path('admin_maintenances_index', app.request.query.all|merge({page: pagination.totalPages})) }}" 
+                   class="page-link">
+                    Dernière »»
+                </a>
+            {% else %}
+                <span class="page-link disabled">Dernière »»</span>
+            {% endif %}
+        </div>
+
+        <div class="pagination-info">
+            Page {{ pagination.currentPage }} / {{ pagination.totalPages }}
+            ({{ pagination.totalItems }} élément{{ pagination.totalItems != 1 ? 's' : '' }})
+        </div>
+    </div>
+    {% endif %}
+
 </div>
 {% endblock %}
 
 {% block javascripts %}
 {{ parent() }}
 <script>
-    // Optionnel: JavaScript pour améliorer l'expérience
     document.addEventListener('DOMContentLoaded', function() {
-        // Ajouter un effet de confirmation avant suppression (déjà géré par confirm)
-        console.log('Page des maintenances chargée');
+        console.log('Page des maintenances chargée avec pagination');
+        
+        // Conservation des paramètres de filtre lors du changement de page
+        const paginationLinks = document.querySelectorAll('.pagination .page-link');
+        paginationLinks.forEach(link => {
+            if (!link.classList.contains('disabled') && link.getAttribute('href')) {
+                console.log('Lien de pagination prêt:', link.getAttribute('href'));
+            }
+        });
+        
+        // Soumission automatique du formulaire de filtre lors du changement de select
+        const filterSelects = document.querySelectorAll('.filter-select');
+        filterSelects.forEach(select => {
+            select.addEventListener('change', function() {
+                document.getElementById('filterForm').submit();
+            });
+        });
     });
 </script>
 {% endblock %}
