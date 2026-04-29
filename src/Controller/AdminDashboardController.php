@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\User\User;
 use App\Repository\User\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -74,6 +75,9 @@ public function profileUpdate(Request $request, EntityManagerInterface $em, User
  
 
     $user = $this->getUser();
+    if (!$user instanceof User) {
+        return new JsonResponse(['success' => false], Response::HTTP_UNAUTHORIZED);
+    }
 
     if ($email = $request->request->get('email')) {
         $user->setEmail(trim($email));
@@ -85,7 +89,7 @@ public function profileUpdate(Request $request, EntityManagerInterface $em, User
         $user->setNom(trim($nom));
     }
     if ($cin = $request->request->get('cin')) {
-        $user->setCin(trim($cin));
+        $user->setCin((int) trim($cin));
     }
     if ($tel = $request->request->get('tel')) {
         $user->setTel(trim($tel));
@@ -100,8 +104,6 @@ public function profileUpdate(Request $request, EntityManagerInterface $em, User
 if ($photo) {
     $user->setImg($photo);
 }
-$em->flush();
-
     $em->flush();
 
     return new JsonResponse([

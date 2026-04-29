@@ -10,10 +10,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use App\Service\TwoFactorCodeSender;
+use App\Service\SmsService;
+use Symfony\Component\Mailer\MailerInterface;
 
 
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -33,8 +36,9 @@ public function login(
     UserPasswordHasherInterface $hasher
 ): Response {
     // Si déjà connecté normalement → rediriger
-    if ($this->getUser() && !$session->get('2fa_pending_user_id')) {
-        return $this->redirectByRole($this->getUser());
+    $currentUser = $this->getUser();
+    if ($currentUser instanceof User && !$session->get('2fa_pending_user_id')) {
+        return $this->redirectByRole($currentUser);
     }
 
     $error        = $authenticationUtils->getLastAuthenticationError();
@@ -138,6 +142,10 @@ public function twoFactorVerify(
         } else {
             // Code valide → connecter l'utilisateur manuellement
             $user = $userRepo->find($userId);
+            if (!$user instanceof User) {
+                $session->remove('2fa_pending_user_id');
+                return $this->redirectToRoute('app_login');
+            }
             $session->remove('2fa_pending_user_id');
             $session->remove('2fa_code');
             $session->remove('2fa_expires_at');
@@ -165,6 +173,9 @@ public function twoFactorResend(
     if (!$userId) return $this->redirectToRoute('app_login');
 
     $user = $userRepo->find($userId);
+    if (!$user instanceof User) {
+        return $this->redirectToRoute('app_login');
+    }
     $sender->send($user, $session);
     $this->addFlash('success', 'Nouveau code envoyé.');
     return $this->redirectToRoute('app_2fa_verify');
@@ -176,7 +187,7 @@ public function toggle2fa(
     EntityManagerInterface $em
 ): Response {
     $user = $this->getUser();
-    if (!$user) return $this->json(['success' => false], 401);
+    if (!$user instanceof User) return $this->json(['success' => false], 401);
 
     $enabled = (int) $request->request->get('enabled', 0);
     $user->setTwoFactorEnabled($enabled ? 1 : 0);
@@ -234,15 +245,13 @@ public function banni(
 
     // Invalider la session
     $session = $requestStack->getSession();
-    if ($session) {
-        $session->invalidate();
-    }
+    $session->invalidate();
 
     return $this->render('auth/banni.html.twig');
 }
 
     // ==================== REDIRECTION PAR ROLE ====================
-    private function redirectByRole($user): Response
+    private function redirectByRole(User $user): Response
     {
         return match((int)$user->getRole()) {
             0       => $this->redirectToRoute('app_bann'),
@@ -303,7 +312,7 @@ public function request(
         } elseif ($canal === 'sms' && !$user->getTel()) {
             $error = 'Aucun numéro de téléphone associé à ce compte.';
         } else {
-            $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+            $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
             $session->set('reset_code',       $code);
             $session->set('reset_email',      $email);
@@ -526,7 +535,7 @@ public function request(
             return $this->redirectToRoute('app_reset_password');
         }
 
-        $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
         $session->set('reset_code',       $code);
         $session->set('reset_expires_at', time() + 600);
 if ($canal === 'sms') {
@@ -540,27 +549,25 @@ if ($canal === 'sms') {
     // ── Tentative 1 : Twilio ──
     
     // ── Tentative 2 : Vonage (fallback) ──
-    if (!$smsSent) {
-        try {
-            $vonage = new \Vonage\Client(
-                new \Vonage\Client\Credentials\Basic(
-                    $_ENV['VONAGE_API_KEY'],
-                    $_ENV['VONAGE_API_SECRET']
-                )
-            );
-            $response = $vonage->sms()->send(
-                new \Vonage\SMS\Message\SMS(
-                    $tel,
-                    $_ENV['VONAGE_FROM'],
-                    "AgroFlow – Votre code : $code (valable 10 min)"
-                )
-            );
-            if ($response->current()->getStatus() === 0) {
-                $smsSent = true;
-            }
-        } catch (\Exception $vonageEx) {
-            $smsSent = false;
+    try {
+        $vonage = new \Vonage\Client(
+            new \Vonage\Client\Credentials\Basic(
+                $_ENV['VONAGE_API_KEY'],
+                $_ENV['VONAGE_API_SECRET']
+            )
+        );
+        $response = $vonage->sms()->send(
+            new \Vonage\SMS\Message\SMS(
+                $tel,
+                $_ENV['VONAGE_FROM'],
+                "AgroFlow – Votre code : $code (valable 10 min)"
+            )
+        );
+        if ($response->current()->getStatus() === 0) {
+            $smsSent = true;
         }
+    } catch (\Exception $vonageEx) {
+        $smsSent = false;
     }
 
     if (!$smsSent) {

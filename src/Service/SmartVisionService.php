@@ -26,6 +26,9 @@ class SmartVisionService
      * @param string $mimeType Le type mime de l'image
      * @return array Tableau associatif contenant 'nom' et 'categorie'
      */
+    /**
+     * @return array{nom:string|null, categorie:string|null}
+     */
     public function analyzeImage(string $base64Image, string $mimeType = 'image/jpeg'): array
     {
         if (empty($this->geminiKey)) {

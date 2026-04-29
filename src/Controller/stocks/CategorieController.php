@@ -2,6 +2,7 @@
 
 namespace App\Controller\stocks;
 
+use App\Entity\User\User;
 use App\Entity\stocks\Categorie;
 use App\Entity\stocks\MouvementStock;
 use App\Form\stocks\CategorieType;
@@ -19,6 +20,9 @@ class CategorieController extends AbstractController
     public function index(Request $request, CategorieRepository $repository, EntityManagerInterface $em): Response
     {
         $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException('Vous devez être connecté.');
+        }
         $search = $request->query->get('q');
 
         // Correction : Utilisation de la propriété PHP dateCreation
@@ -113,8 +117,10 @@ class CategorieController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $categorie = new Categorie();
-        // On définit l'agriculteur automatiquement
-        $categorie->setAgriculteur($this->getUser());
+        $user = $this->getUser();
+        if ($user instanceof User) {
+            $categorie->setAgriculteur($user);
+        }
 
         $form = $this->createForm(CategorieType::class, $categorie);
         $form->handleRequest($request);

@@ -143,7 +143,7 @@ class TacheFrontController extends AbstractController
 
         // Désassigner de l'ancien terrain si nécessaire
         $ancienTerrain = $ouvrier->getTerrain();
-        if ($ancienTerrain && $ancienTerrain->getIdTerrain() !== $idTerrain) {
+        if ($ancienTerrain && $ancienTerrain->getId() !== $idTerrain) {
             $ancienTerrain->removeOuvrier($ouvrier);
         }
 
@@ -241,13 +241,16 @@ class TacheFrontController extends AbstractController
 
         foreach ($tachesNonAssignees as $tache) {
             $debut = new \DateTime();
-            $fin   = $tache->getDateEcheancee() ?? (new \DateTime())->modify('+7 days');
+            $echeance = $tache->getDateEcheancee();
+            $fin = $echeance instanceof \DateTime
+                ? $echeance
+                : ($echeance !== null ? \DateTime::createFromInterface($echeance) : (new \DateTime())->modify('+7 days'));
 
             // Chercher un ouvrier disponible parmi les terrains de l'agriculteur
             $ouvrierAssigne = false;
 
             foreach ($terrains as $terrain) {
-                $ouvriers = $userRepo->findOuvriersByTerrain($terrain->getIdTerrain());
+                $ouvriers = $userRepo->findOuvriersByTerrain($terrain->getId());
                 shuffle($ouvriers);
 
                 foreach ($ouvriers as $ouvrier) {

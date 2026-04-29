@@ -11,19 +11,24 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: "mouvement_stock")]
 class MouvementStock
 {
+    public function __construct()
+    {
+        $this->dateMouvement = new \DateTimeImmutable();
+    }
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(name: "id")]
     private ?int $id = null;
 
     #[ORM\Column(length: 20)]
-    private ?string $type = null; // ENTREE ou SORTIE
+    private string $type = ''; // ENTREE ou SORTIE
 
     #[ORM\Column]
-    private ?float $quantite = null;
+    private float $quantite = 0.0;
 
     #[ORM\Column(name: "date_mouvement")]
-    private ?\DateTimeImmutable $dateMouvement = null;
+    private \DateTimeImmutable $dateMouvement;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $motif = null;
@@ -33,18 +38,18 @@ class MouvementStock
     // referencedColumnName = nom de la clé primaire dans la table article (id_article selon ton entité Article)
     #[ORM\ManyToOne(targetEntity: Article::class, inversedBy: 'mouvements')]
     #[ORM\JoinColumn(name: "article_id", referencedColumnName: "id_article", nullable: false)]
-    private ?Article $article = null;
+    private Article $article;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: "id_user", referencedColumnName: "cin", nullable: false)]
-    private ?User $user = null;
+    private User $user;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getType(): ?string
+    public function getType(): string
     {
         return $this->type;
     }
@@ -54,7 +59,7 @@ class MouvementStock
         return $this;
     }
 
-    public function getQuantite(): ?float
+    public function getQuantite(): float
     {
         return $this->quantite;
     }
@@ -64,7 +69,7 @@ class MouvementStock
         return $this;
     }
 
-    public function getDateMouvement(): ?\DateTimeImmutable
+    public function getDateMouvement(): \DateTimeImmutable
     {
         return $this->dateMouvement;
     }
@@ -84,21 +89,21 @@ class MouvementStock
         return $this;
     }
 
-    public function getArticle(): ?Article
+    public function getArticle(): Article
     {
         return $this->article;
     }
-    public function setArticle(?Article $article): self
+    public function setArticle(Article $article): self
     {
         $this->article = $article;
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getUser(): User
     {
         return $this->user;
     }
-    public function setUser(?User $user): self
+    public function setUser(User $user): self
     {
         $this->user = $user;
         return $this;

@@ -7,7 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<CategorieEvenement>
+ * @extends ServiceEntityRepository<categorieevenement>
  */
 class categorieevenementRepository extends ServiceEntityRepository
 {
@@ -31,6 +31,9 @@ class categorieevenementRepository extends ServiceEntityRepository
 
     /**
      * Recherche par nom — équivalent du filtre de recherche JavaFX
+     */
+    /**
+     * @return array<int, categorieevenement>
      */
     public function findByNom(string $terme): array
     {

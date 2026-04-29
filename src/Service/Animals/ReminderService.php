@@ -4,23 +4,22 @@ namespace App\Service\Animals;
 
 use App\Entity\Animals\Examen;
 use App\Repository\Animals\ExamenRepository;
-use Doctrine\ORM\EntityManagerInterface;
 
 class ReminderService
 {
-    private EntityManagerInterface $entityManager;
     private ExamenRepository $examenRepository;
 
     public function __construct(
-        EntityManagerInterface $entityManager,
         ExamenRepository $examenRepository
     ) {
-        $this->entityManager = $entityManager;
         $this->examenRepository = $examenRepository;
     }
 
     /**
      * Récupère tous les examens avec des rappels actifs
+     */
+    /**
+     * @return array<int, Examen>
      */
     public function getActiveReminders(): array
     {
@@ -32,6 +31,9 @@ class ReminderService
 
     /**
      * Récupère les rappels qui arrivent bientôt (< 7 jours)
+     */
+    /**
+     * @return array<int, Examen>
      */
     public function getUpcomingReminders(int $days = 7): array
     {
@@ -62,6 +64,9 @@ class ReminderService
     /**
      * Récupère les rappels en retard
      */
+    /**
+     * @return array<int, Examen>
+     */
     public function getOverdueReminders(): array
     {
         $allExamens = $this->examenRepository->findAll();
@@ -91,6 +96,9 @@ class ReminderService
 
     /**
      * Génère un rapport des rappels
+     */
+    /**
+     * @return array{upcoming:array<int, Examen>, overdue:array<int, Examen>, total_active:int}
      */
     public function generateReminderReport(): array
     {

@@ -67,6 +67,8 @@ class OpenFoodFactsService
 
     /**
      * Récupère les suggestions alimentaires pour une espèce donnée
+     *
+     * @return array<int, array{name: string, brand: string, image: string|null}>
      */
     public function getFoodSuggestionsForSpecies(string $espece, int $pageSize = 3): array
     {
@@ -99,6 +101,9 @@ class OpenFoodFactsService
         }
     }
 
+    /**
+     * @return array<int, array{name: string, brand: string, image: string|null}>
+     */
     private function fetchProductsFromApi(string $searchTerms, int $pageSize, string $espece = ''): array
     {
         try {
@@ -142,12 +147,19 @@ class OpenFoodFactsService
         }
     }
 
+    /**
+     * @return array<int, array{name: string, brand: string, image: string|null}>
+     */
     private function getFallbackProducts(string $espece, int $pageSize): array
     {
         $fallback = self::FALLBACK_PRODUCTS[$espece] ?? self::FALLBACK_PRODUCTS['Chien'];
         return array_slice($fallback, 0, $pageSize);
     }
 
+    /**
+     * @param array<string, mixed> $product
+     * @return array{name: string, brand: string, image: string|null}|null
+     */
     private function filterProductData(array $product): ?array
     {
         if (!isset($product['product_name'])) {
@@ -155,7 +167,7 @@ class OpenFoodFactsService
         }
 
         $filteredProduct = [
-            'name' => $product['product_name'] ?? 'Produit sans nom',
+            'name' => (string) $product['product_name'],
             'brand' => $product['brands'] ?? 'Marque non spécifiée',
             'image' => null,
         ];

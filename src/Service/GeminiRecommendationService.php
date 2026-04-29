@@ -58,6 +58,9 @@ class GeminiRecommendationService
     /**
      * Prédit les pannes futures pour une machine
      */
+    /**
+     * @return array{risque_panne:string, probabilite:int|float, delai_estime:string, type_panne_probable:string, recommandations:array<int, string>}
+     */
     public function predictFailure(Machine $machine): array
     {
         $maintenances = $this->maintenanceRepo->findBy(['idM' => $machine->getId()]);
@@ -85,13 +88,12 @@ class GeminiRecommendationService
         $probability = min(95, round(($frequences[$predictedType] / count($maintenances)) * 100));
         
         // Calculer le délai estimé
-        $dates = array_filter(array_map(fn($m) => $m->getDateMain(), $maintenances));
+        $dates = array_values(array_filter(array_map(fn($m) => $m->getDateMain(), $maintenances)));
+        usort($dates, fn(\DateTimeInterface $a, \DateTimeInterface $b) => $a <=> $b);
         if (!empty($dates)) {
             $intervals = [];
             for ($i = 1; $i < count($dates); $i++) {
-                if ($dates[$i] && $dates[$i-1]) {
-                    $intervals[] = $dates[$i-1]->diff($dates[$i])->days;
-                }
+                $intervals[] = $dates[$i - 1]->diff($dates[$i])->days;
             }
             $avgInterval = !empty($intervals) ? array_sum($intervals) / count($intervals) : 90;
             $delai = round($avgInterval / 30) . ' mois';
@@ -113,21 +115,36 @@ class GeminiRecommendationService
     /**
      * Calcule le score de santé d'une machine (0-100)
      */
+    /**
+     * @return array{score:int, niveau:string, couleur:string, details:array{total_maintenances:int, urgences:int, cout_total:float, derniere_maintenance:string, jours_sans_maintenance:int}}
+     */
     public function calculateHealthScore(Machine $machine): array
     {
         $maintenances = $this->maintenanceRepo->findBy(['idM' => $machine->getId()]);
         
         if (empty($maintenances)) {
-            return ['score' => 100, 'niveau' => 'excellent', 'couleur' => '#4caf50', 'details' => []];
+            return [
+                'score' => 100,
+                'niveau' => 'excellent',
+                'couleur' => '#4caf50',
+                'details' => [
+                    'total_maintenances' => 0,
+                    'urgences' => 0,
+                    'cout_total' => 0.0,
+                    'derniere_maintenance' => 'Jamais',
+                    'jours_sans_maintenance' => 365,
+                ],
+            ];
         }
         
         $totalCost = array_sum(array_map(fn($m) => $m->getCout(), $maintenances));
         $urgentCount = count(array_filter($maintenances, fn($m) => $m->getPriorite() === 'urgente'));
         
         // Dernière maintenance
-        $lastMaintenance = $maintenances[0] ?? null;
-        $daysSinceLast = $lastMaintenance?->getDateMain() ? 
-            (new \DateTime())->diff($lastMaintenance->getDateMain())->days : 365;
+        $lastMaintenance = $maintenances[0];
+        $daysSinceLast = $lastMaintenance->getDateMain()
+            ? (new \DateTime())->diff($lastMaintenance->getDateMain())->days
+            : 365;
         
         // Calcul du score
         $score = 100;
@@ -162,7 +179,7 @@ class GeminiRecommendationService
                 'total_maintenances' => count($maintenances),
                 'urgences' => $urgentCount,
                 'cout_total' => round($totalCost, 2),
-                'derniere_maintenance' => $lastMaintenance?->getDateMain()?->format('d/m/Y') ?? 'Jamais',
+                'derniere_maintenance' => $lastMaintenance->getDateMain() ? $lastMaintenance->getDateMain()->format('d/m/Y') : 'Jamais',
                 'jours_sans_maintenance' => $daysSinceLast
             ]
         ];
@@ -170,6 +187,9 @@ class GeminiRecommendationService
 
     /**
      * Génère des alertes intelligentes
+     */
+    /**
+     * @return array<int, array{type:string, message:string, actions:array<int, string>, urgence:string}>
      */
     public function generateSmartAlerts(Machine $machine): array
     {
@@ -200,7 +220,7 @@ class GeminiRecommendationService
         }
         
         // Alerte maintenance overdue
-        $daysSince = $healthScore['details']['jours_sans_maintenance'] ?? 365;
+        $daysSince = $healthScore['details']['jours_sans_maintenance'];
         if ($daysSince > 180) {
             $alerts[] = [
                 'type' => 'warning',
@@ -215,6 +235,9 @@ class GeminiRecommendationService
 
     /**
      * Priorise les interventions sur toutes les machines
+     *
+     * @param array<int, Machine> $machines
+     * @return array<int, array<string, mixed>>
      */
     public function prioritizeInterventions(array $machines): array
     {
@@ -255,6 +278,9 @@ class GeminiRecommendationService
 
     /**
      * Génère un planning optimisé
+     *
+     * @param array<int, array<string, mixed>> $priorities
+     * @return array<int, array<string, mixed>>
      */
     public function generateOptimizedSchedule(array $priorities, int $daysHorizon = 30): array
     {
@@ -292,6 +318,9 @@ class GeminiRecommendationService
     // MÉTHODES PRIVÉES
     // ─────────────────────────────────────────────────────────────────────────
 
+    /**
+     * @return array<string, mixed>
+     */
     private function callGeminiApi(string $prompt): array
     {
         $url = sprintf(
@@ -320,6 +349,9 @@ class GeminiRecommendationService
         return $response->toArray();
     }
 
+    /**
+     * @param array<string, mixed> $response
+     */
     private function extractTextFromResponse(array $response): string
     {
         return $response['candidates'][0]['content']['parts'][0]['text'] ?? '';
@@ -388,6 +420,9 @@ class GeminiRecommendationService
         return "🔍 Surveillance périodique recommandée pour {$m->getTypePanne()}";
     }
 
+    /**
+     * @return array<int, string>
+     */
     private function getPredictionRecommendations(string $type, string $risque): array
     {
         $recommendations = [

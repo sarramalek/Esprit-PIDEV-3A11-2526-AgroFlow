@@ -2,6 +2,7 @@
 
 namespace App\Controller\stocks;
 
+use App\Entity\User\User;
 use App\Entity\stocks\Article;
 use App\Entity\stocks\MouvementStock;
 use App\Form\stocks\ArticleType;
@@ -16,7 +17,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 #[Route('/agriculteur/stocks')]
 class ArticleController extends AbstractController
@@ -42,7 +42,11 @@ class ArticleController extends AbstractController
                 $this->addFlash('success', 'Le produit a ete ajoute avec succes.');
             }
 
-            $newArticle->setUser($user);
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException('Vous devez être connecté.');
+        }
+        $newArticle->setUser($user);
             $entityManager->persist($newArticle);
             $entityManager->flush();
 
@@ -52,9 +56,16 @@ class ArticleController extends AbstractController
         return $this->renderIndexPage($request, $articleRepository, $catRepo, $form);
     }
 
-    private function renderIndexPage(Request $request, ArticleRepository $articleRepository, CategorieRepository $catRepo, $form = null, array $extra = []): Response
+    /**
+     * @param \Symfony\Component\Form\FormInterface<mixed>|null $form
+     * @param array<string, mixed> $extra
+     */
+    private function renderIndexPage(Request $request, ArticleRepository $articleRepository, CategorieRepository $catRepo, ?\Symfony\Component\Form\FormInterface $form = null, array $extra = []): Response
     {
         $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException('Vous devez être connecté.');
+        }
         $searchTerm = $request->query->get('search');
         $categoryId = $request->query->get('category');
         $sortBy = $request->query->get('sort', 'nom');
@@ -70,7 +81,7 @@ class ArticleController extends AbstractController
                 $alerteCount++;
             }
             $prix = $art->getPrixUnitaire() ?? 0;
-            $quantite = $art->getQuantiteEnStock() ?? 0;
+            $quantite = $art->getQuantiteEnStock();
             $valeurTotaleStock += ($quantite * $prix);
         }
 
@@ -109,7 +120,10 @@ class ArticleController extends AbstractController
                 $article->setPrixUnitaire($prixTnd);
             }
 
-            $article->setUser($user);
+            $user = $this->getUser();
+            if ($user instanceof User) {
+                $article->setUser($user);
+            }
             $entityManager->persist($article);
             $entityManager->flush();
 
@@ -185,10 +199,14 @@ class ArticleController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException('Vous devez être connecté.');
+        }
         $mouvement = new MouvementStock();
         $mouvement->setArticle($article);
         $mouvement->setDateMouvement(new \DateTimeImmutable());
-        $mouvement->setUser($this->getUser());
+        $mouvement->setUser($user);
 
         $type = $request->request->get('type');
         $quantite = floatval($request->request->get('quantite'));
@@ -219,15 +237,15 @@ class ArticleController extends AbstractController
                 }
 
                 // Notification Telegram
-                $telegramChatId = ($article->getUser() ? $article->getUser()->getTelegramChatId() : null) ?? $_ENV['TELEGRAM_CHAT_ID'] ?? null;
+                $telegramChatId = ($article->getUser() instanceof User ? $article->getUser()->getTelegramChatId() : null) ?? $_ENV['TELEGRAM_CHAT_ID'] ?? null;
                 if ($telegramChatId) {
                     $message = sprintf(
                         "Alerte de stock critique !\n\nArticle: %s\nStock actuel: %d %s\nSeuil d'alerte: %d %s",
                         $article->getNom(),
                         $nouveauStock,
-                        $article->getUniteMesure() ?? 'unités',
+                        $article->getUniteMesure(),
                         $article->getSeuilAlerte(),
-                        $article->getUniteMesure() ?? 'unités'
+                        $article->getUniteMesure()
                     );
                     $telegramService->notifier($message, $telegramChatId);
                 }
@@ -246,14 +264,8 @@ class ArticleController extends AbstractController
     }
 
     // ── QR Code ───────────────────────────────────────────────────────────────
-#[Route('/{id}/qr-code', name: 'article_qr_code', methods: ['GET'])]
     public function generateQRCode(Article $article, QRCodeService $qrCodeService): Response
     {
-        // Vérification simple de l'article
-        if (!$article) {
-            return new Response('Article non trouvé', 404);
-        }
-
         return $qrCodeService->generateQRCodeResponseForArticle($article);
     }
 

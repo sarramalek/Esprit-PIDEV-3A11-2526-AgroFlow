@@ -46,6 +46,9 @@ class SmsService
      * Envoie le code par SMS.
      * Twilio en priorité, Vonage en fallback si limite atteinte.
      */
+    /**
+     * @return array{success:bool, channel:string, code:string}
+     */
     public function sendVerificationCode(string $phone): array
     {
         $code = $this->generateCode();
@@ -80,6 +83,9 @@ class SmsService
 
     /**
      * Fallback : envoi via Vonage
+     */
+    /**
+     * @return array{success:bool, channel:string, code:string}
      */
     private function sendViaVonage(string $phone, string $code): array
     {

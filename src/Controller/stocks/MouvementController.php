@@ -125,9 +125,9 @@ class MouvementController extends AbstractController
                         "Alerte de stock critique !\n\nArticle: %s\nStock actuel: %d %s\nSeuil d'alerte: %d %s",
                         $article->getNom(),
                         $nouveauStock,
-                        $article->getUniteMesure() ?? 'unités',
+                        $article->getUniteMesure(),
                         $article->getSeuilAlerte(),
-                        $article->getUniteMesure() ?? 'unités'
+                        $article->getUniteMesure()
                     );
                     $telegramService->notifier($message, $telegramChatId);
                 }

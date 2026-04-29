@@ -38,12 +38,19 @@ class AbonnementFrontController extends AbstractController
 
         $abonnements = $abonnRepo->findByCin($cin);
 
-        $data = array_map(function($a) use ($offreRepo) {
+        $dailyReduction = $this->getDailyPromoReduction();
+
+        $data = array_map(function($a) use ($offreRepo, $dailyReduction) {
             $offre = $offreRepo->find($a->getIdOffre());
             $now   = new \DateTime('today');
             $exp   = $a->getDateExpiration();
             $diff  = $now->diff($exp);
             $joursRestants = $exp > $now ? $diff->days : 0;
+            $prixOffre = (float) ($offre?->getPrix() ?? 0);
+            $prixPaye = $a->getPrixPaye();
+            $prixAffiche = $prixPaye ?? round($prixOffre * (1 - $dailyReduction / 100), 2);
+            $promoApplied = $prixOffre > 0 && $prixAffiche < $prixOffre;
+            $promoPercent = $promoApplied ? (int) round((1 - ($prixAffiche / $prixOffre)) * 100) : 0;
 
             return [
                 'id'              => $a->getIdAbonn(),
@@ -57,7 +64,10 @@ class AbonnementFrontController extends AbstractController
                 'joursRestants'   => $joursRestants,
                 'nomOffre'        => $offre?->getNomOffre() ?? '—',
                 'description'     => $offre?->getDescription() ?? '—',
-                'prix'            => $offre?->getPrix() ?? 0,
+                'prix'            => $prixAffiche,
+                'prixInitial'     => $prixOffre,
+                'promoApplied'    => $promoApplied,
+                'promoPercent'    => $promoPercent,
                 'duree'           => $offre?->getDureeOffre() ?? 0,
             ];
         }, $abonnements);
@@ -65,6 +75,17 @@ class AbonnementFrontController extends AbstractController
         return $this->render('User/FrontAbonnement.html.twig', [
             'abonnements' => $data,
         ]);
+    }
+
+    private function getDailyPromoReduction(): int
+    {
+        $seed = (int) (new \DateTime('today'))->format('Ymd');
+        mt_srand($seed);
+        for ($i = 0; $i < 6; $i++) {
+            mt_rand(0, 31);
+        }
+        $reductions = [10, 15, 20, 25, 30];
+        return $reductions[mt_rand(0, count($reductions) - 1)];
     }
 
     #[Route('/front/pdf/{id}', name: 'app_abonnement_pdf', methods: ['GET'])]
@@ -134,7 +155,7 @@ class AbonnementFrontController extends AbstractController
                 <div class="section-title">Offre Souscrite</div>
                 <div class="row"><span class="label">Nom de l\'offre</span><span class="value">' . ($offre?->getNomOffre() ?? '—') . '</span></div>
                 <div class="row"><span class="label">Description</span><span class="value">' . ($offre?->getDescription() ?? '—') . '</span></div>
-                <div class="row"><span class="label">Prix</span><span class="value">' . number_format($offre?->getPrix() ?? 0, 2) . ' TND</span></div>
+                <div class="row"><span class="label">Prix</span><span class="value">' . number_format($abonnement->getPrixPaye() ?? ($offre?->getPrix() ?? 0), 2) . ' TND</span></div>
                 <div class="row"><span class="label">Durée</span><span class="value">' . ($offre?->getDureeOffre() ?? '—') . ' jours</span></div>
             </div>
             <div class="footer">

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\User\User;
 use App\Service\AiAssistantService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -46,7 +47,7 @@ public function ask(Request $request, SessionInterface $session): JsonResponse
 
     // Récupérer le CIN de l'utilisateur connecté
     $user = $this->getUser();
-    $cin  = $user?->getCin();
+    $cin  = $user instanceof User ? (string) $user->getCin() : null;
 
     $history = $session->get('chat_history', []);
 

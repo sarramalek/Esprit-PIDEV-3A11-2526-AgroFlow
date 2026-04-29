@@ -22,6 +22,8 @@ class WikipediaService
 
     /**
      * Recherche une page Wikipedia et retourne le résumé
+     *
+     * @return array{title: string, extract: string, image: string|null, url: string}|null
      */
     public function searchPage(string $query): ?array
     {
@@ -59,6 +61,8 @@ class WikipediaService
 
     /**
      * Suggestions rapides médicales basées sur des termes courants
+     *
+     * @return array<int, array{label: string, keyword: string}>
      */
     public function getQuickSuggestions(string $diagnostic = '', string $traitement = ''): array
     {

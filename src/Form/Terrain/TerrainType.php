@@ -15,6 +15,9 @@ use Symfony\Component\Validator\Constraints\Positive;
 use Symfony\Component\Validator\Constraints\LessThan;
 use Symfony\Component\Validator\Constraints\Range;
 
+/**
+ * @extends AbstractType<Terrain>
+ */
 class TerrainType extends AbstractType
 {
     public function __construct(private UserRepository $userRepository) {}

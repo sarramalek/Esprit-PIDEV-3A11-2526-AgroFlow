@@ -6,6 +6,9 @@ use App\Entity\User\Offre;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<Offre>
+ */
 class OffreRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -14,6 +17,9 @@ class OffreRepository extends ServiceEntityRepository
     }
 
     // ==================== SEARCH AND SORT ====================
+    /**
+     * @return array<int, Offre>
+     */
     public function searchAndSort(string $search, string $sort, string $direction): array
     {
         $qb = $this->createQueryBuilder('o');
@@ -33,6 +39,9 @@ class OffreRepository extends ServiceEntityRepository
     }
 
     // ==================== FIND BY PRIX RANGE ====================
+    /**
+     * @return array<int, Offre>
+     */
     public function findByPrixRange(float $min, float $max): array
     {
         return $this->createQueryBuilder('o')
@@ -45,6 +54,9 @@ class OffreRepository extends ServiceEntityRepository
     }
 
     // ==================== FIND MOINS CHER ====================
+    /**
+     * @return array<int, Offre>
+     */
     public function findMoinsCher(int $limit = 3): array
     {
         return $this->createQueryBuilder('o')
@@ -55,6 +67,9 @@ class OffreRepository extends ServiceEntityRepository
     }
 
     // ==================== FIND PLUS LONG ====================
+    /**
+     * @return array<int, Offre>
+     */
     public function findPlusLong(int $limit = 3): array
     {
         return $this->createQueryBuilder('o')
@@ -114,6 +129,9 @@ public function countSearched(string $search = ''): int
 }
 
 // Version paginée de searchAndSort
+/**
+ * @return array<int, Offre>
+ */
 public function searchAndSortPaginated(
     string $search,
     string $sort,

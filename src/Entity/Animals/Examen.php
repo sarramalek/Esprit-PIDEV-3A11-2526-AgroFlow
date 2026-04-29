@@ -48,7 +48,7 @@ class Examen
     #[ORM\ManyToOne(targetEntity: Animaux::class, inversedBy: 'examen')]
     #[ORM\JoinColumn(name: 'id_animal', referencedColumnName: 'id', nullable: false)]
     #[Assert\NotNull(message: "L'examen doit être relié à un animal.")]
-    private ?Animaux $animal = null;
+    private Animaux $animal;
 
     // --- GETTERS ET SETTERS ---
 
@@ -101,12 +101,12 @@ class Examen
         return $this;
     }
 
-    public function getAnimal(): ?Animaux
+    public function getAnimal(): Animaux
     {
         return $this->animal;
     }
 
-    public function setAnimal(?Animaux $animal): static
+    public function setAnimal(Animaux $animal): static
     {
         $this->animal = $animal;
         return $this;
@@ -203,6 +203,9 @@ class Examen
         }
 
         $nextDate = clone $this->date_examen;
+        if (!$nextDate instanceof \DateTime) {
+            return null; // or handle however you prefer, but DateTimeInterface doesn't have modify
+        }
 
         if (str_contains(strtolower($this->diagnostic), 'rage')) {
             $nextDate->modify('+1 year');

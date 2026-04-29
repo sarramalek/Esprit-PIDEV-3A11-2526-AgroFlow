@@ -2,6 +2,7 @@
 
 namespace App\Security;
 
+use App\Entity\User\User;
 use App\Repository\User\UserRepository;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -46,7 +47,12 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
         TokenInterface $token,
         string         $firewallName
     ): Response {
-        $user    = $token->getUser();
+        $user = $token->getUser();
+        
+        if (!$user instanceof User) {
+            return new RedirectResponse($this->router->generate('app_login'));
+        }
+
         $session = $request->getSession();
 
         // ── Compte banni ──
@@ -61,7 +67,7 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
         if ($user->getTwoFactorEnabled()) {
 
             // Générer le code OTP
-            $code = str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+            $code = str_pad((string)random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
             // Stocker en session
             $session->set('2fa_pending_user_id', $user->getCin());
@@ -69,7 +75,9 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
             $session->set('2fa_expires_at',      time() + 300); // 5 min
 
             // ── Envoyer le code par email ──
-            $this->sendCodeByEmail($user->getEmail(), $code);
+            if ($user->getEmail()) {
+                $this->sendCodeByEmail($user->getEmail(), $code);
+            }
 
             // ── Envoyer aussi par SMS si numéro présent ──
             if ($user->getTel()) {
@@ -111,7 +119,7 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
     // ──────────────────────────────────────────────
     // Helpers privés
     // ──────────────────────────────────────────────
-    private function getRouteByRole($user): string
+    private function getRouteByRole(User $user): string
     {
         return match((int) $user->getRole()) {
             0       => 'app_bann',

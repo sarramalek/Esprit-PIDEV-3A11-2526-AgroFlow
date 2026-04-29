@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Form;
+namespace App\Form\Evenements;
 
 use App\Entity\Evenements\Participation;
 use Symfony\Component\Form\AbstractType;
@@ -9,6 +9,9 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @extends AbstractType<Participation>
+ */
 class ModifierParticipationUserType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

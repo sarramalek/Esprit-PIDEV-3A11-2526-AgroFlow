@@ -7,6 +7,9 @@ use App\Entity\Materiels\Machine;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<Machine>
+ */
 class MachineRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -17,6 +20,10 @@ class MachineRepository extends ServiceEntityRepository
     // =========================================================================
     // Recherche filtrée pour l'index
     // =========================================================================
+    /**
+     * @param array<string, mixed> $filters
+     * @return array<int, Machine>
+     */
     public function search(array $filters = []): array
     {
         $cin = isset($filters['cin']) ? (int) $filters['cin'] : 0;
@@ -69,6 +76,9 @@ class MachineRepository extends ServiceEntityRepository
     // =========================================================================
     // Statistiques globales (admin)
     // =========================================================================
+    /**
+     * @return array{total:int, parEtat:array<string,int>, parMarque:array<string,int>, statsKm:mixed}
+     */
     public function getStatistiques(): array
     {
         $total = (int) $this->createQueryBuilder('m')
@@ -116,6 +126,9 @@ class MachineRepository extends ServiceEntityRepository
     // =========================================================================
     // Machines d'un agriculteur par CIN
     // =========================================================================
+    /**
+     * @return array<int, Machine>
+     */
     public function findByCin(int $cin): array
     {
         return $this->createQueryBuilder('m')
@@ -132,6 +145,9 @@ class MachineRepository extends ServiceEntityRepository
     // =========================================================================
     // Machines dont la prochaine maintenance arrive bientôt
     // =========================================================================
+    /**
+     * @return array<int, Machine>
+     */
     public function findMachinesWithMaintenanceSoon(\DateTimeInterface $dateLimit): array
     {
         return $this->createQueryBuilder('m')

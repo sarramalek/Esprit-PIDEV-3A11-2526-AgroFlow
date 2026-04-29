@@ -21,9 +21,7 @@ class LocaleController extends AbstractController
         }
 
         $session = $request->getSession();
-        if ($session) {
-            $session->set('_locale', $locale);
-        }
+        $session->set('_locale', $locale);
 
         $response = new RedirectResponse($request->headers->get('referer', $this->generateUrl('agri_home')));
         $response->headers->setCookie(new Cookie('locale', $locale, new \DateTime('+1 year')));

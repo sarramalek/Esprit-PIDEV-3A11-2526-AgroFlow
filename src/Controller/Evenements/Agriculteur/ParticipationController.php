@@ -3,7 +3,8 @@
 namespace App\Controller\Evenements\Agriculteur;
 
 use App\Entity\Evenements\Participation;
-use App\Form\ModifierParticipationUserType;
+use App\Entity\User\User;
+use App\Form\Evenements\ModifierParticipationUserType;
 use App\Repository\Evenements\ParticipationRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,6 +21,10 @@ class ParticipationController extends AbstractController
     public function index(Request $request, ParticipationRepository $repo): Response
     {
         $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
+
         $search          = $request->query->get('search', '');
         $dateInscription = $request->query->get('dateInscription', '');
         $statut          = $request->query->get('statut', '');
@@ -56,6 +61,9 @@ class ParticipationController extends AbstractController
     {
         $participation = $repo->find($id);
         $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
 
         if (!$participation || $participation->getUtilisateur()->getCin() !== $user->getCin()) {
             throw $this->createNotFoundException('Participation introuvable.');
@@ -86,6 +94,9 @@ class ParticipationController extends AbstractController
     {
         $participation = $repo->find($id);
         $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException();
+        }
 
         if (!$participation || $participation->getUtilisateur()->getCin() !== $user->getCin()) {
             throw $this->createNotFoundException('Participation introuvable.');

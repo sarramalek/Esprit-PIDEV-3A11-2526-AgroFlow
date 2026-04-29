@@ -44,18 +44,15 @@ class OuvrierDashboardController extends AbstractController
     return $em->getRepository(User::class)->find($terrain->getCin());
 }
 
-    private function getCategorieAgriculteurCin(mixed $agriculteur): ?int
-    {
-        if ($agriculteur === null) return null;
-        if (is_object($agriculteur) && method_exists($agriculteur, 'getCin')) {
-            return (int)$agriculteur->getCin();
-        }
-        return (int)$agriculteur;
-    }
+
 
     #[Route('/', name: 'home')]
     public function index(): Response
     {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            return $this->redirectToRoute('app_login');
+        }
         return $this->render('home_ouvrier.html.twig', []);
     }
 
@@ -112,7 +109,7 @@ public function produits(Request $request, ArticleRepository $articleRepo, Categ
         if ($category) {
             $catAgriculteur = $category->getAgriculteur();
             // getAgriculteur() peut retourner un int (CIN) ou un objet User
-            $catCin = is_object($catAgriculteur) ? (int)$catAgriculteur->getCin() : (int)$catAgriculteur;
+            $catCin = $catAgriculteur->getCin();
 
             if ($catCin !== (int)$agriculteur->getCin()) {
                 $category = null;
@@ -156,7 +153,7 @@ public function produits(Request $request, ArticleRepository $articleRepo, Categ
         $user = $this->getUser();
         $agriculteur = $this->resolveAgriculteur($user, $em);
 
-        if (!$agriculteur || $article->getUser()?->getCin() !== $agriculteur->getCin()) {
+        if (!$agriculteur || $article->getUser()->getCin() !== $agriculteur->getCin()) {
             throw $this->createAccessDeniedException('Accès refusé à cet article.');
         }
 
@@ -173,7 +170,7 @@ public function produits(Request $request, ArticleRepository $articleRepo, Categ
         $user = $this->getUser();
         $agriculteur = $this->resolveAgriculteur($user, $em);
 
-        if (!$agriculteur || $article->getUser()?->getCin() !== $agriculteur->getCin()) {
+        if (!$agriculteur || $article->getUser()->getCin() !== $agriculteur->getCin()) {
             throw $this->createAccessDeniedException('Accès refusé à cet article.');
         }
 
@@ -183,7 +180,7 @@ public function produits(Request $request, ArticleRepository $articleRepo, Categ
             return $this->redirectToRoute('ouvrier_produits');
         }
 
-        $stockActuel = $article->getQuantiteEnStock() ?? 0;
+        $stockActuel = $article->getQuantiteEnStock();
         if ($stockActuel < $quantite) {
             $this->addFlash('danger', 'Stock insuffisant pour « ' . $article->getNom() . ' ».');
             return $this->redirectToRoute('ouvrier_produits');
@@ -220,7 +217,7 @@ public function produits(Request $request, ArticleRepository $articleRepo, Categ
         $user = $this->getUser();
         $agriculteur = $this->resolveAgriculteur($user, $em);
 
-        if (!$agriculteur || $article->getUser()?->getCin() !== $agriculteur->getCin()) {
+        if (!$agriculteur || $article->getUser()->getCin() !== $agriculteur->getCin()) {
             return new JsonResponse(['success' => false, 'message' => 'Accès refusé.'], Response::HTTP_FORBIDDEN);
         }
 
@@ -238,7 +235,7 @@ public function produits(Request $request, ArticleRepository $articleRepo, Categ
                 'id'       => $mouvement->getId(),
                 'type'     => $mouvement->getType(),
                 'quantite' => $mouvement->getQuantite(),
-                'date'     => $mouvement->getDateMouvement()?->format('d/m/Y H:i') ?? '',
+                'date'     => $mouvement->getDateMouvement()->format('d/m/Y H:i'),
                 'motif'    => (string)$mouvement->getMotif(),
             ];
         }, $mouvements);
@@ -254,8 +251,8 @@ public function produits(Request $request, ArticleRepository $articleRepo, Categ
         $agriculteur = $this->resolveAgriculteur($user, $em);
 
         if (!$agriculteur
-            || $mouvement->getUser()?->getCin() !== $user->getCin()
-            || $mouvement->getArticle()?->getUser()?->getCin() !== $agriculteur->getCin()
+            || $mouvement->getUser()->getCin() !== $user->getCin()
+            || $mouvement->getArticle()->getUser()->getCin() !== $agriculteur->getCin()
         ) {
             return new JsonResponse(['success' => false, 'message' => 'Accès refusé.'], Response::HTTP_FORBIDDEN);
         }
@@ -266,17 +263,17 @@ public function produits(Request $request, ArticleRepository $articleRepo, Categ
         }
 
         $article = $mouvement->getArticle();
-        $ancienneQuantite = $mouvement->getQuantite() ?? 0;
+        $ancienneQuantite = $mouvement->getQuantite();
         $delta = $quantite - $ancienneQuantite;
 
         if ($mouvement->getType() === 'SORTIE') {
-            $nouveauStock = ($article->getQuantiteEnStock() ?? 0) - $delta;
+            $nouveauStock = $article->getQuantiteEnStock() - $delta;
             if ($nouveauStock < 0) {
                 return new JsonResponse(['success' => false, 'message' => 'Stock insuffisant pour cette modification.']);
             }
             $article->setQuantiteEnStock($nouveauStock);
         } else {
-            $article->setQuantiteEnStock(($article->getQuantiteEnStock() ?? 0) + $delta);
+            $article->setQuantiteEnStock($article->getQuantiteEnStock() + $delta);
         }
 
         $mouvement->setQuantite($quantite);
@@ -330,7 +327,7 @@ public function produits(Request $request, ArticleRepository $articleRepo, Categ
             'message' => 'Profil mis à jour avec succès.',
             'prenom'  => $user->getPrenom(),
             'nom'     => $user->getNom(),
-            'photo'   => $user->getImg() ?? '',
+            'photo'   => $user->getImg(),
         ]);
     }
 

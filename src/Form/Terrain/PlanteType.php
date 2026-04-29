@@ -13,6 +13,9 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\Positive;
 use Symfony\Component\Validator\Constraints\Range;
 
+/**
+ * @extends AbstractType<Plante>
+ */
 class PlanteType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

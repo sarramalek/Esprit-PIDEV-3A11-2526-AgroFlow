@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit829069408db23a98e7ff42beee238b6b
+class ComposerStaticInit392c2fee464d64f3ee9e8c2f1c58f9b4
 {
     public static $files = array (
         '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
@@ -22,7 +22,7 @@ class ComposerStaticInit829069408db23a98e7ff42beee238b6b
         'f598d06aa772fa33d905e87be6398fb1' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/bootstrap.php',
         '9d2b9fc6db0f153a0a149fefb182415e' => __DIR__ . '/..' . '/symfony/polyfill-php84/bootstrap.php',
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
-        'e39a8b23c42d4e1452234d762b03835a' => __DIR__ . '/..' . '/ramsey/uuid/src/functions.php',
+        '9b38cf48e83f5d8f60375221cd213eee' => __DIR__ . '/..' . '/phpstan/phpstan/bootstrap.php',
         '72243e5536b63e298acb6476f01f1aff' => __DIR__ . '/..' . '/thecodingmachine/safe/lib/special_cases.php',
         '3f648889e687f31c52f949ba8a9d0873' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/apache.php',
         'eeb4581d958421a4244aaa4167c6a575' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/apcu.php',
@@ -222,13 +222,9 @@ class ComposerStaticInit829069408db23a98e7ff42beee238b6b
             'Symfony\\Bridge\\Doctrine\\' => 24,
             'Svg\\' => 4,
             'Stof\\DoctrineExtensionsBundle\\' => 30,
+            'StellaMaris\\Clock\\' => 18,
             'Scheb\\TwoFactorBundle\\' => 22,
             'Sabberworm\\CSS\\' => 15,
-        ),
-        'R' => 
-        array (
-            'Ramsey\\Uuid\\' => 12,
-            'Ramsey\\Collection\\' => 18,
         ),
         'P' => 
         array (
@@ -245,6 +241,8 @@ class ComposerStaticInit829069408db23a98e7ff42beee238b6b
             'PhpOffice\\PhpSpreadsheet\\' => 25,
             'ParagonIE\\ConstantTime\\' => 23,
             'PHPStan\\PhpDocParser\\' => 21,
+            'PHPStan\\ExtensionInstaller\\' => 27,
+            'PHPStan\\' => 8,
             'PHPMailer\\PHPMailer\\' => 20,
         ),
         'O' => 
@@ -260,6 +258,7 @@ class ComposerStaticInit829069408db23a98e7ff42beee238b6b
         'L' => 
         array (
             'Lcobucci\\JWT\\' => 13,
+            'Lcobucci\\Clock\\' => 15,
             'Laminas\\Diactoros\\' => 18,
         ),
         'K' => 
@@ -312,7 +311,6 @@ class ComposerStaticInit829069408db23a98e7ff42beee238b6b
         ),
         'B' => 
         array (
-            'Brick\\Math\\' => 11,
             'BaconQrCode\\' => 12,
         ),
         'A' => 
@@ -345,7 +343,6 @@ class ComposerStaticInit829069408db23a98e7ff42beee238b6b
         'Vonage\\' => 
         array (
             0 => __DIR__ . '/..' . '/vonage/client-core/src',
-            1 => __DIR__ . '/..' . '/vonage/jwt/src',
         ),
         'Twilio\\' => 
         array (
@@ -659,23 +656,20 @@ class ComposerStaticInit829069408db23a98e7ff42beee238b6b
         array (
             0 => __DIR__ . '/..' . '/stof/doctrine-extensions-bundle/src',
         ),
+        'StellaMaris\\Clock\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/stella-maris/clock/src',
+        ),
         'Scheb\\TwoFactorBundle\\' => 
         array (
             0 => __DIR__ . '/..' . '/scheb/2fa-totp',
             1 => __DIR__ . '/..' . '/scheb/2fa-google-authenticator',
-            2 => __DIR__ . '/..' . '/scheb/2fa-bundle',
+            2 => __DIR__ . '/..' . '/scheb/2fa-backup-code',
+            3 => __DIR__ . '/..' . '/scheb/2fa-bundle',
         ),
         'Sabberworm\\CSS\\' => 
         array (
             0 => __DIR__ . '/..' . '/sabberworm/php-css-parser/src',
-        ),
-        'Ramsey\\Uuid\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/ramsey/uuid/src',
-        ),
-        'Ramsey\\Collection\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/ramsey/collection/src',
         ),
         'Psr\\SimpleCache\\' => 
         array (
@@ -730,6 +724,15 @@ class ComposerStaticInit829069408db23a98e7ff42beee238b6b
         array (
             0 => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src',
         ),
+        'PHPStan\\ExtensionInstaller\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpstan/extension-installer/src',
+        ),
+        'PHPStan\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpstan/phpstan-symfony/src',
+            1 => __DIR__ . '/..' . '/phpstan/phpstan-doctrine/src',
+        ),
         'PHPMailer\\PHPMailer\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
@@ -753,6 +756,10 @@ class ComposerStaticInit829069408db23a98e7ff42beee238b6b
         'Lcobucci\\JWT\\' => 
         array (
             0 => __DIR__ . '/..' . '/lcobucci/jwt/src',
+        ),
+        'Lcobucci\\Clock\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/lcobucci/clock/src',
         ),
         'Laminas\\Diactoros\\' => 
         array (
@@ -804,7 +811,7 @@ class ComposerStaticInit829069408db23a98e7ff42beee238b6b
         ),
         'Doctrine\\Persistence\\' => 
         array (
-            0 => __DIR__ . '/..' . '/doctrine/persistence/src/Persistence',
+            0 => __DIR__ . '/..' . '/doctrine/persistence/src',
         ),
         'Doctrine\\ORM\\' => 
         array (
@@ -878,10 +885,6 @@ class ComposerStaticInit829069408db23a98e7ff42beee238b6b
         'Complex\\' => 
         array (
             0 => __DIR__ . '/..' . '/markbaker/complex/classes/src',
-        ),
-        'Brick\\Math\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/brick/math/src',
         ),
         'BaconQrCode\\' => 
         array (
@@ -1648,9 +1651,9 @@ class ComposerStaticInit829069408db23a98e7ff42beee238b6b
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit829069408db23a98e7ff42beee238b6b::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit829069408db23a98e7ff42beee238b6b::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit829069408db23a98e7ff42beee238b6b::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit392c2fee464d64f3ee9e8c2f1c58f9b4::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit392c2fee464d64f3ee9e8c2f1c58f9b4::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit392c2fee464d64f3ee9e8c2f1c58f9b4::$classMap;
 
         }, null, ClassLoader::class);
     }

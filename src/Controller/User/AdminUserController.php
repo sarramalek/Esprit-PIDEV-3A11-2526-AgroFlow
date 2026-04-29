@@ -191,17 +191,9 @@ public function show(User $user, TerrainRepository $terrainRepo): Response
         $options->set('defaultFont', 'Arial');
         $dompdf = new \Dompdf\Dompdf($options);
 
-        $roleLabel = match((int)$user->getRole()) {
-            2 => 'Agriculteur',
-            0 => 'Banni',
-            default => 'Inconnu',
-        };
-
-        $roleColor = match((int)$user->getRole()) {
-            2 => '#065F46',
-            0 => '#991B1B',
-            default => '#666',
-        };
+        $role = (int) $user->getRole();
+        $roleLabel = $role === 2 ? 'Agriculteur' : 'Banni';
+        $roleColor = $role === 2 ? '#065F46' : '#991B1B';
 
         $html = '
         <!DOCTYPE html>
@@ -297,11 +289,8 @@ public function show(User $user, TerrainRepository $terrainRepo): Response
         }
 
         foreach ($users as $row => $user) {
-            $roleLabel = match((int)$user->getRole()) {
-                2 => 'Agriculteur',
-                0 => 'Banni',
-                default => 'Inconnu',
-            };
+            $role = (int) $user->getRole();
+            $roleLabel = $role === 2 ? 'Agriculteur' : 'Banni';
             $r = $row + 2;
             $sheet->setCellValue("A$r", $user->getCin());
             $sheet->setCellValue("B$r", $user->getNom());

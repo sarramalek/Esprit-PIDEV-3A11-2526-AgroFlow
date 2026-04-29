@@ -19,6 +19,8 @@ class ExamenRepository extends ServiceEntityRepository
 
     /**
      * Recherche avancée d'examens, filtrée par utilisateur si nécessaire.
+     * 
+     * @return array<int, Examen>
      */
     public function searchExamen(?string $term, ?string $sortBy = 'id', ?string $direction = 'DESC', ?string $type = null, ?User $user = null): array
     {
@@ -54,6 +56,8 @@ class ExamenRepository extends ServiceEntityRepository
 
     /**
      * Créer un QueryBuilder pour la pagination des examens
+     * 
+     * @return \Doctrine\ORM\QueryBuilder
      */
     public function createQueryBuilderForSearch(?string $term, ?string $sortBy = 'id', ?string $direction = 'DESC', ?string $type = null, ?User $user = null)
     {
@@ -90,6 +94,9 @@ class ExamenRepository extends ServiceEntityRepository
 
     /**
      * Recherche avancée d'examens pour l'admin (en filtrant par ID).
+     * 
+     * @param int[] $ids
+     * @return array<int, Examen>
      */
     public function searchExamenAdmin(?string $term, ?string $sortBy = 'id', ?string $direction = 'DESC', ?string $type = null, array $ids = []): array
     {
@@ -126,6 +133,8 @@ class ExamenRepository extends ServiceEntityRepository
 
     /**
      * Statistiques par type d'examen, filtrées par utilisateur.
+     * 
+     * @return array<int, array{type: string, total: int}>
      */
     public function countByType(?User $user = null): array
     {
@@ -143,6 +152,8 @@ class ExamenRepository extends ServiceEntityRepository
     }
     /**
      * Analyse la fragilité par espèce pour un utilisateur (pourcentage d'animaux malades).
+     * 
+     * @return array<int, array{espece: string, total: int, malades: int, percent: float}>
      */
     public function getFragilityData(User $user): array
     {
@@ -174,7 +185,7 @@ class ExamenRepository extends ServiceEntityRepository
         // 2. Formater le résultat final
         $result = [];
         foreach ($speciesStats as $espece => $data) {
-            $percent = $data['total'] > 0 ? round(($data['problematic'] / $data['total']) * 100) : 0;
+            $percent = round(($data['problematic'] / $data['total']) * 100);
             $result[] = [
                 'espece' => $espece,
                 'total' => $data['total'],

@@ -155,6 +155,7 @@ public function souscrire(
     $abonnement->setDateInscription($dateDebut);
     $abonnement->setDateExpiration($dateFin);
     $abonnement->setSituation('actif');
+    $abonnement->setPrixPaye((float) $prix);
 
     $em->persist($abonnement);
     $em->flush();

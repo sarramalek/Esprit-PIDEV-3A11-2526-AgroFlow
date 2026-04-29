@@ -4,16 +4,13 @@ namespace App\Service;
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
-use Twig\Environment;
 
 class PdfService
 {
-    private $twig;
-    private $domPdf;
+    private Dompdf $domPdf;
 
-    public function __construct(Environment $twig)
+    public function __construct()
     {
-        $this->twig = $twig;
         $this->domPdf = new Dompdf();
 
         $pdfOptions = new Options();
@@ -23,7 +20,7 @@ class PdfService
         $this->domPdf->setOptions($pdfOptions);
     }
 
-    public function generateBinaryPdf($html)
+    public function generateBinaryPdf(string $html): ?string
     {
         $this->domPdf->loadHtml($html);
         $this->domPdf->render();

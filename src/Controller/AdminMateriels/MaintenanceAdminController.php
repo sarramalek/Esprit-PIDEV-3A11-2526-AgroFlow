@@ -454,7 +454,7 @@ class MaintenanceAdminController extends AbstractController
                 $idMInt = (int) $idM;
                 $machine = $machineRepo->find($idMInt);
                 if ($machine) {
-                    $maintenance->setIdM($idMInt);
+                    $maintenance->setIdM($machine);
                     $maintenance->setNom($machine->getNom());
                 } else {
                     $errors['idM'] = 'La machine sélectionnée n\'existe pas.';
@@ -619,7 +619,7 @@ class MaintenanceAdminController extends AbstractController
                 $idMInt = (int) $idM;
                 $machine = $machineRepo->find($idMInt);
                 if ($machine) {
-                    $maintenance->setIdM($idMInt);
+                    $maintenance->setIdM($machine);
                     $maintenance->setNom($machine->getNom());
                 } else {
                     $errors['idM'] = 'La machine sélectionnée n\'existe pas.';
@@ -704,6 +704,9 @@ public function aiAnalyzeMaintenance(
 
 /**
  * Génère une analyse détaillée basée sur le type de panne
+ */
+/**
+ * @return array{description:string, next_maintenance:string, actions:array<int, string>, tips:string}
  */
 private function generateDetailedAnalysis(Maintenance $m): array
 {

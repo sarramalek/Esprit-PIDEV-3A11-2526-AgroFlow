@@ -7,9 +7,8 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class TelegramService
 {
-    private $httpClient;
-    private $token;
-    private $chatId;
+    private HttpClientInterface $httpClient;
+    private string $token;
 
     public function __construct(
         HttpClientInterface $httpClient,

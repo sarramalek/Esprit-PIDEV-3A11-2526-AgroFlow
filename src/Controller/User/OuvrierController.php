@@ -115,8 +115,8 @@ class OuvrierController extends AbstractController
                 ? $animauxRepo->searchDashboard(null, 'id', 'DESC', $agriculteur)
                 : [];
             $terrains     = $terrainRepo->findByAgriculteur($agriculteurCin);
-            $plantes      = $plantesRepo->findByAgriculteur($agriculteurCin);
-            $maintenances = $maintenanceRepo->findByAgriculteurCin($agriculteurCin);
+            $plantes      = $plantesRepo->findByAgriculteur((string) $agriculteurCin);
+            $maintenances = $maintenanceRepo->findByAgriculteurCin((string) $agriculteurCin);
         }
 
         $tachesData = array_map(function ($t) use (
@@ -186,15 +186,11 @@ class OuvrierController extends AbstractController
             return $this->json(['success' => false, 'message' => 'Transition non autorisée'], 400);
         }
 
-        $etat = match($statut) {
-            'en_cours' => 'en cours',
-            'terminee' => 'terminée',
-            'a_faire'  => 'à faire',
-            default    => null,
-        };
-
-        if (!$etat) {
-            return $this->json(['success' => false, 'message' => 'Statut invalide'], 400);
+        $etat = null;
+        if ($statut === 'en_cours') {
+            $etat = 'en cours';
+        } elseif ($statut === 'terminee') {
+            $etat = 'terminée';
         }
 
         $tache->setEtat($etat);
@@ -244,6 +240,12 @@ class OuvrierController extends AbstractController
     }
 
     // ── Résolution URL détail ─────────────────────────────────────────────────
+    /**
+     * @param array<int, \App\Entity\Animals\Animaux> $animaux
+     * @param array<int, \App\Entity\Terrain\Terrain> $terrains
+     * @param array<int, \App\Entity\Terrain\Plante> $plantes
+     * @param array<int, \App\Entity\Materiels\Maintenance> $maintenances
+     */
     private function resolveDetailUrl(
         ?string $categorie,
         string  $texte,
@@ -287,7 +289,7 @@ class OuvrierController extends AbstractController
             case 'terrain':
                 if ($isPlante) {
                     foreach ($plantes as $plante) {
-                        $nomPlante = strtolower($plante->getNomP() ?? '');
+                        $nomPlante = strtolower($plante->getNomP());
                         if ($nomPlante && str_contains($texte, $nomPlante)) {
                             return $this->generateUrl('agri_plantes_show', ['id' => $plante->getId()]);
                         }

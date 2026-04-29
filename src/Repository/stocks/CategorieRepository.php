@@ -18,6 +18,9 @@ class CategorieRepository extends ServiceEntityRepository
 
     /**
      * Récupère les catégories d'un agriculteur spécifique
+     * 
+     * @param mixed $user
+     * @return array<int, Categorie>
      */
     public function findByAgriculteur($user)
     {
@@ -31,6 +34,8 @@ class CategorieRepository extends ServiceEntityRepository
 
     /**
      * Trouve les catégories créées par des utilisateurs ayant un rôle spécifique
+     * 
+     * @return array<int, Categorie>
      */
     public function findByUserRole(int $role): array
     {
@@ -43,6 +48,10 @@ class CategorieRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @param mixed $admin
+     * @return array<int, Categorie>
+     */
     public function findByAdminCin($admin): array
     {
         return $this->createQueryBuilder('c')

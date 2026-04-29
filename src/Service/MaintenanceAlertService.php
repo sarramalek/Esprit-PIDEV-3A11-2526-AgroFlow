@@ -22,6 +22,8 @@ class MaintenanceAlertService
     /**
      * Calcule le statut d'alerte d'une maintenance
      * Retourne : 'overdue' (dépassé), 'warning' (proche), 'ok' (dans les temps)
+     *
+     * @return array{status: string, message: string, class: string, days?: int}
      */
     public function getAlertStatus(Maintenance $maintenance): array
     {
@@ -61,6 +63,8 @@ class MaintenanceAlertService
 
     /**
      * Génère une description enrichie + recommandations via API (Gemini ou fallback)
+     *
+     * @return array{description: string, recommandation: string, criticite: int, raw: string|null}
      */
     public function generateEnhancedContent(Maintenance $maintenance): array
     {

@@ -107,8 +107,6 @@ class MachineAdminController extends AbstractController
                 if ($agriculteur) {
                     $machine->setAgriculteur($agriculteur);
                 }
-            } else {
-                $machine->setAgriculteur(null);
             }
             
             $this->hydrateMachine($machine, $request);
@@ -173,6 +171,9 @@ class MachineAdminController extends AbstractController
     /* ════════════════════════════════════════════
        VALIDATION CÔTÉ SERVEUR
     ════════════════════════════════════════════ */
+    /**
+     * @return array<int, string>
+     */
     private function validateMachine(Machine $machine, Request $request): array
     {
         $errors = [];
@@ -227,22 +228,18 @@ class MachineAdminController extends AbstractController
 
         // Kilométrage
         $kilometrage = $machine->getKilometrage();
-        if ($kilometrage === null) {
-            $errors[] = 'Le kilométrage est obligatoire.';
-        } elseif ($kilometrage < 0) {
+        if ($kilometrage < 0) {
             $errors[] = 'Le kilométrage ne peut pas être négatif.';
         }
 
         // Kilométrage dernière visite
         $kmLastVisite = $machine->getKmLastVisite();
-        if ($kmLastVisite === null) {
-            $errors[] = 'Le kilométrage de dernière visite est obligatoire.';
-        } elseif ($kmLastVisite < 0) {
+        if ($kmLastVisite < 0) {
             $errors[] = 'Le kilométrage de dernière visite ne peut pas être négatif.';
         }
 
         // Vérification cohérence des kilométrages
-        if ($kilometrage !== null && $kmLastVisite !== null && $kmLastVisite > $kilometrage) {
+        if ($kmLastVisite > $kilometrage) {
             $errors[] = 'Le kilométrage de dernière visite ne peut pas être supérieur au kilométrage actuel.';
         }
 
@@ -294,6 +291,9 @@ class MachineAdminController extends AbstractController
     /**
      * Récupère la liste des agriculteurs (role = 2)
      */
+    /**
+     * @return array<int, User>
+     */
     private function getAgriculteurs(EntityManagerInterface $em): array
     {
         return $em->getRepository(User::class)->findBy(['role' => 2]);
@@ -320,7 +320,7 @@ class MachineAdminController extends AbstractController
         
         // Dates
         $dateAchatStr = $request->request->get('dateAchat');
-        if ($dateAchatStr && $dateAchatStr !== '') {
+        if ($dateAchatStr) {
             try {
                 $machine->setDateAchat(new \DateTime($dateAchatStr));
             } catch (\Exception) {
@@ -331,7 +331,7 @@ class MachineAdminController extends AbstractController
         }
         
         $dateLastVisiteStr = $request->request->get('dateLastVisite');
-        if ($dateLastVisiteStr && $dateLastVisiteStr !== '') {
+        if ($dateLastVisiteStr) {
             try {
                 $machine->setDateLastVisite(new \DateTime($dateLastVisiteStr));
             } catch (\Exception) {
@@ -342,7 +342,7 @@ class MachineAdminController extends AbstractController
         }
         
         $prochaineMaintenanceStr = $request->request->get('prochaineMaintenance');
-        if ($prochaineMaintenanceStr && $prochaineMaintenanceStr !== '') {
+        if ($prochaineMaintenanceStr) {
             try {
                 $machine->setProchaineMaintenance(new \DateTime($prochaineMaintenanceStr));
             } catch (\Exception) {
@@ -355,6 +355,9 @@ class MachineAdminController extends AbstractController
 
     /**
      * Sérialise les machines pour le DataTable
+     */
+    /**
+     * @param array<int, Machine> $machines
      */
     private function serializeMachines(array $machines): string
     {

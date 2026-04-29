@@ -73,17 +73,9 @@ class AbonnementController extends AbstractController
 
     // ── 3. Flash uniquement si quelque chose a changé ────────────────────
     if ($countUpdated > 0 || $countPurged > 0) {
-        $session->getFlashBag()->add('abonnement_updated', $countUpdated);
-        $session->getFlashBag()->add('abonnement_purged',  $countPurged);
+        $this->addFlash('abonnement_updated', (string) $countUpdated);
+        $this->addFlash('abonnement_purged', (string) $countPurged);
     }
-}
-// ── NO-CACHE : empêche le retour navigateur après logout ─────────────────
-private function noCacheResponse(Response $response): Response
-{
-    $response->headers->set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
-    $response->headers->set('Pragma', 'no-cache');
-    $response->headers->set('Expires', '0');
-    return $response;
 }
     // ── LIST ──────────────────────────────────────────────────────────────────
 #[Route('', name: '_index', methods: ['GET'])]

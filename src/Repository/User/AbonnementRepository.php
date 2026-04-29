@@ -6,6 +6,9 @@ use App\Entity\User\Abonnement;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<Abonnement>
+ */
 class AbonnementRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -15,6 +18,9 @@ class AbonnementRepository extends ServiceEntityRepository
 
     /**
      * Retourne tous les abonnements actifs (situation = 'actif')
+     */
+    /**
+     * @return array<int, Abonnement>
      */
     public function findActifs(): array
     {
@@ -29,6 +35,9 @@ class AbonnementRepository extends ServiceEntityRepository
     /**
      * Retourne les abonnements d'un utilisateur par son CIN
      */
+    /**
+     * @return array<int, Abonnement>
+     */
     public function findByCin(int $cin): array
     {
         return $this->createQueryBuilder('a')
@@ -42,6 +51,9 @@ class AbonnementRepository extends ServiceEntityRepository
     /**
      * Retourne les abonnements liés à une offre
      */
+    /**
+     * @return array<int, Abonnement>
+     */
     public function findByOffre(int $idOffre): array
     {
         return $this->createQueryBuilder('a')
@@ -53,6 +65,9 @@ class AbonnementRepository extends ServiceEntityRepository
 
     /**
      * Retourne les abonnements expirés (date_expiration < aujourd'hui)
+     */
+    /**
+     * @return array<int, Abonnement>
      */
     public function findExpires(): array
     {

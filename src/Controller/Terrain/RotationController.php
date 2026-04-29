@@ -2,6 +2,7 @@
 namespace App\Controller\Terrain;
 
 use App\Entity\Terrain\Rotation;
+use App\Entity\User\User;
 use App\Form\Terrain\RotationType;
 use App\Repository\Terrain\RotationRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -109,6 +110,9 @@ class RotationController extends AbstractController
     public function agriIndex(Request $req, RotationRepository $repo): Response
     {
         $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException('Vous devez être connecté.');
+        }
         $cin  = $user->getCin();
 
         $q         = $req->query->get('q', '');
@@ -142,9 +146,13 @@ class RotationController extends AbstractController
     #[Route('/agri/rotations/new', name: 'agri_rotations_new', methods: ['GET','POST'])]
     public function agriNew(Request $req, EntityManagerInterface $em): Response
     {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException('Vous devez être connecté.');
+        }
         $rotation = new Rotation();
         $form     = $this->createForm(RotationType::class, $rotation, [
-            'user_cin' => $this->getUser()->getCin(),
+            'user_cin' => $user->getCin(),
         ]);
         $form->handleRequest($req);
 
@@ -165,8 +173,12 @@ class RotationController extends AbstractController
     #[Route('/agri/rotations/{id}/edit', name: 'agri_rotations_edit', methods: ['GET','POST'])]
     public function agriEdit(Rotation $rotation, Request $req, EntityManagerInterface $em): Response
     {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException('Vous devez être connecté.');
+        }
         $form = $this->createForm(RotationType::class, $rotation, [
-            'user_cin' => $this->getUser()->getCin(),
+            'user_cin' => $user->getCin(),
         ]);
         $form->handleRequest($req);
 

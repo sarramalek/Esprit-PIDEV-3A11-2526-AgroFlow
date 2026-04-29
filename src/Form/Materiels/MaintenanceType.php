@@ -15,6 +15,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 use App\Entity\Materiels\Machine;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
+/**
+ * @extends AbstractType<Maintenance>
+ */
 class MaintenanceType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

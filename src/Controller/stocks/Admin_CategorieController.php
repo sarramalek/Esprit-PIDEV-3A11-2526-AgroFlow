@@ -63,8 +63,7 @@ $categorie->setAgriculteur($currentUser);
     {
         /** @var User|null $currentUser */
         $currentUser = $this->getUser();
-        $agriculteur = $categorie->getAgriculteur();
-        $agriculteurCin = $agriculteur instanceof User ? $agriculteur->getCin() : (int)$agriculteur;
+        $agriculteurCin = $categorie->getAgriculteur()->getCin();
         if (!$currentUser || !\in_array('ROLE_ADMIN', $currentUser->getRoles(), true)) {
             throw $this->createAccessDeniedException();
         }
@@ -96,7 +95,7 @@ $categorie->setAgriculteur($currentUser);
         if (!$currentUser || !\in_array('ROLE_ADMIN', $currentUser->getRoles(), true)) {
             throw $this->createAccessDeniedException();
         }
-        if ((int)($categorie->getAgriculteur() ?? 0) !== (int)$currentUser->getCin()) {
+        if ($categorie->getAgriculteur()->getCin() !== $currentUser->getCin()) {
             throw $this->createAccessDeniedException('Vous ne pouvez supprimer que vos propres catégories.');
         }
 

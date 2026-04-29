@@ -164,11 +164,10 @@ class AdminStockController extends AbstractController
         $mouvement->setQuantite($quantite);
         $mouvement->setMotif($motif);
         $mouvement->setDateMouvement(new \DateTimeImmutable());
-        $mouvement->setUser($this->getUser());
-        
-        // Marquage de l'admin
-        if ($this->getUser()) {
-            $mouvement->setIdAdmin($this->getUser()->getCin());
+        $currentUser = $this->getUser();
+        if ($currentUser instanceof User) {
+            $mouvement->setUser($currentUser);
+            $mouvement->setIdAdmin($currentUser->getCin());
         }
 
         $em->persist($mouvement);

@@ -3,6 +3,7 @@
 namespace App\Controller\Animals;
 
 use App\Entity\Animals\Animaux;
+use App\Entity\User\User;
 use App\Form\Animals\AnimauxType;
 use App\Repository\Animals\AnimauxRepository;
 use App\Service\PdfService;
@@ -30,7 +31,7 @@ final class AnimauxController extends AbstractController
         $limit = 5; // Nombre d'animaux par page
 
         // Admin voit tout, Agriculteur voit les siens
-        $filterUser = $this->isGranted('ROLE_ADMIN') ? null : $user;
+        $filterUser = $this->isGranted('ROLE_ADMIN') ? null : ($user instanceof User ? $user : null);
         
         // Requête sans pagination d'abord pour obtenir tous les résultats
         $query = $animauxRepository->createQueryBuilderForSearch($searchTerm, $sortBy, $direction, $filterUser);
@@ -67,7 +68,7 @@ final class AnimauxController extends AbstractController
     public function stats(AnimauxRepository $animauxRepository): Response
     {
         $user = $this->getUser();
-        $filterUser = $this->isGranted('ROLE_ADMIN') ? null : $user;
+        $filterUser = $this->isGranted('ROLE_ADMIN') ? null : ($user instanceof User ? $user : null);
         $stats = $animauxRepository->countByEspece($filterUser);
 
         return $this->render('Animals/animaux/stats.html.twig', [
@@ -84,8 +85,13 @@ final class AnimauxController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $user = $this->getUser();
+            if (!$user instanceof User) {
+                throw $this->createAccessDeniedException("Utilisateur invalide.");
+            }
+
             // Associer l'animal à l'utilisateur connecté
-            $animaux->setUser($this->getUser());
+            $animaux->setUser($user);
             
             $entityManager->persist($animaux);
             $entityManager->flush();

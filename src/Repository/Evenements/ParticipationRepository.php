@@ -6,6 +6,9 @@ use App\Entity\Evenements\Participation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<Participation>
+ */
 class ParticipationRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -15,6 +18,8 @@ class ParticipationRepository extends ServiceEntityRepository
 
     /**
      * Récupère toutes les participations avec les relations
+     * 
+     * @return array<int, Participation>
      */
     public function findAll(): array
     {
@@ -29,6 +34,8 @@ class ParticipationRepository extends ServiceEntityRepository
 
     /**
      * Filtre les participations selon les critères
+     * 
+     * @return array<int, Participation>
      */
     public function findByFilters(
         ?string $search = null,
@@ -96,7 +103,7 @@ class ParticipationRepository extends ServiceEntityRepository
 
     public function countAll(): int
     {
-        return $this->createQueryBuilder('p')
+        return (int) $this->createQueryBuilder('p')
             ->select('COUNT(p.idParticipation)')
             ->getQuery()
             ->getSingleScalarResult();

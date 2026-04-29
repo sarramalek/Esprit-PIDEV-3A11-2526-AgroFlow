@@ -20,7 +20,7 @@ final class ReminderController extends AbstractController
         // Filtrer les rappels pour l'utilisateur actuel
         $allReminders = $reminderService->getActiveReminders();
         $userReminders = array_filter($allReminders, function($examen) use ($user) {
-            return $examen->getAnimal() && $examen->getAnimal()->getUser() === $user;
+            return $examen->getAnimal()->getUser() === $user;
         });
 
         $upcomingReminders = array_filter($userReminders, function($examen) {
@@ -29,7 +29,7 @@ final class ReminderController extends AbstractController
 
         $overdueReminders = $reminderService->getOverdueReminders();
         $userOverdueReminders = array_filter($overdueReminders, function($examen) use ($user) {
-            return $examen->getAnimal() && $examen->getAnimal()->getUser() === $user;
+            return $examen->getAnimal()->getUser() === $user;
         });
 
         return $this->render('Animals/reminders/dashboard.html.twig', [

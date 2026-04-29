@@ -24,10 +24,10 @@ class GrokService
      *
      * @param string $question      Question de l'utilisateur
      * @param string $schema        Schéma de la base (généré par DatabaseReaderService)
-     * @param array  $history       Historique [{role, content}, ...]
+     * @param array<int, array{role: string, content: string}> $history Historique [{role, content}, ...]
      * @return array{sql:string|null, analysis:string, summary:string}
      */
-   public function ask(string $question, string $schema, array $history = [], ?string $userCin = null): array
+    public function ask(string $question, string $schema, array $history = [], ?string $userCin = null): array
 {
     $systemPrompt = $this->buildSystemPrompt($schema, $userCin);
 
@@ -40,6 +40,9 @@ class GrokService
 }
     /**
      * Affine la réponse après avoir exécuté la requête SQL et récupéré les résultats.
+     *
+     * @param array<int, mixed> $results
+     * @return array{analysis: string, summary: string}
      */
     public function refineWithResults(
     string $originalAnalysis,
@@ -87,7 +90,7 @@ private function buildSystemPrompt(string $schema, ?string $userCin = null): str
     $schema = implode("\n", $lines);
 
     preg_match_all('/TABLE:\s*(\w+)/i', $schema, $matches);
-    $tableNames = implode(', ', $matches[1] ?? []);
+    $tableNames = implode(', ', $matches[1]);
 
     if (strlen($schema) > 10000) {
         $schema = substr($schema, 0, 10000) . "\n...(tronqué)";
@@ -126,7 +129,11 @@ Si pas de SQL nécessaire :
 {"sql":null,"analysis":"Réponse en français","summary":"Résumé court"}
 PROMPT;
 }
-private function callApi(string $system, array $messages, int $maxTokens = 400): string
+
+    /**
+     * @param array<int, array{role: string, content: string}> $messages
+     */
+    private function callApi(string $system, array $messages, int $maxTokens = 400): string
 {
     for ($attempt = 1; $attempt <= 3; $attempt++) {
         try {
@@ -171,6 +178,9 @@ private function callApi(string $system, array $messages, int $maxTokens = 400):
     throw new \RuntimeException('Limite de tentatives atteinte');
 }
 
+    /**
+     * @return array{sql:string|null, analysis:string, summary:string}
+     */
     private function parseResponse(string $raw): array
 {
     $clean = preg_replace('/```json|```/i', '', $raw);

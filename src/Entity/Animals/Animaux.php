@@ -25,7 +25,7 @@ class Animaux
         pattern: "/^[a-zA-ZÀ-ÿ\s\-]+$/u",
         message: "Le nom ne doit contenir que des lettres."
     )]
-    private ?string $nom = null;
+    private string $nom = '';
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Veuillez sélectionner une espèce.")]
@@ -33,7 +33,7 @@ class Animaux
         choices: ["Chien", "Chat", "Vache", "Chèvre", "Mouton", "Cheval"],
         message: "L'espèce sélectionnée n'est pas valide."
     )]
-    private ?string $espece = null;
+    private string $espece = '';
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Assert\NotBlank(message: "La date de naissance est requise.")] 
@@ -42,18 +42,19 @@ class Animaux
         value: "today", 
         message: "La date de naissance ne peut pas être dans le futur."
     )]
-    private ?\DateTimeInterface $date_naissance = null;
+    private \DateTimeInterface $date_naissance;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Le sexe est obligatoire.")]
     #[Assert\Choice(choices: ["MALE", "FEMELLE"], message: "Le sexe doit être MALE ou FEMELLE.")]
-    private ?string $sexe = null;
+    private string $sexe = '';
 
     #[ORM\Column(nullable: true)]
     #[Assert\Positive(message: "Le poids doit être un nombre positif.")] 
     #[Assert\Type(type: "numeric", message: "Le poids doit être un nombre valide.")]
     private ?float $poids = null;
 
+    /** @var Collection<int, Examen> */
     #[ORM\OneToMany(mappedBy: 'animal', targetEntity: Examen::class, orphanRemoval: true)]
     private Collection $examen;
 
@@ -64,6 +65,7 @@ class Animaux
     public function __construct()
     {
         $this->examen = new ArrayCollection();
+        $this->date_naissance = new \DateTime();
     }
 
     // --- GETTERS ET SETTERS ---
@@ -78,7 +80,7 @@ class Animaux
         return $this->nom;
     }
 
-    public function setNom(?string $nom): static
+    public function setNom(string $nom): static
     {
         $this->nom = $nom;
         return $this;
@@ -89,7 +91,7 @@ class Animaux
         return $this->espece;
     }
 
-    public function setEspece(?string $espece): static
+    public function setEspece(string $espece): static
     {
         $this->espece = $espece;
         return $this;
@@ -100,7 +102,7 @@ class Animaux
         return $this->date_naissance;
     }
 
-    public function setDateNaissance(?\DateTimeInterface $date_naissance): static
+    public function setDateNaissance(\DateTimeInterface $date_naissance): static
     {
         $this->date_naissance = $date_naissance;
         return $this;
@@ -111,7 +113,7 @@ class Animaux
         return $this->sexe;
     }
 
-    public function setSexe(?string $sexe): static
+    public function setSexe(string $sexe): static
     {
         $this->sexe = $sexe;
         return $this;

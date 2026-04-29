@@ -2,6 +2,7 @@
 namespace App\Controller\Terrain;
 
 use App\Entity\Terrain\Terrain;
+use App\Entity\User\User;
 use App\Form\Terrain\AgriTerrainType;
 use App\Repository\Terrain\TerrainRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,7 +22,11 @@ class AgriTerrainController extends AbstractController
     #[Route('', name: '', methods: ['GET'])]
     public function index(TerrainRepository $repo): Response
     {
-        $cin      = $this->getUser()->getCin();
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException('Vous devez être connecté.');
+        }
+        $cin      = $user->getCin();
         $terrains = $repo->findBy(['cin' => $cin]);
 
         $totalTerrains = count($terrains);
@@ -49,8 +54,12 @@ class AgriTerrainController extends AbstractController
     #[Route('/new', name: '_new', methods: ['GET', 'POST'])]
     public function new(Request $req, EntityManagerInterface $em): Response
     {
+        $user = $this->getUser();
+        if (!$user instanceof User) {
+            throw $this->createAccessDeniedException('Vous devez être connecté.');
+        }
         $terrain = new Terrain();
-        $terrain->setCin($this->getUser()->getCin()); // CIN injecté automatiquement
+        $terrain->setCin($user->getCin()); // CIN injecté automatiquement
 
         $form = $this->createForm(AgriTerrainType::class, $terrain);
         $form->handleRequest($req);

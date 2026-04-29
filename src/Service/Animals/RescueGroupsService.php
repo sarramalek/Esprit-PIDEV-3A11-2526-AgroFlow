@@ -120,6 +120,8 @@ class RescueGroupsService
 
     /**
      * Obtenir les données encyclopédie pour une espèce spécifique
+     *
+     * @return array{title: string, description: string, icon: string, color: string, temperament: string, lifespan: string, needs: array<int, string>}|null
      */
     public function getEncyclopediaForSpecies(string $espece): ?array
     {
@@ -128,6 +130,8 @@ class RescueGroupsService
 
     /**
      * Obtenir toutes les encyclopédies
+     *
+     * @return array<string, array{title: string, description: string, icon: string, color: string, temperament: string, lifespan: string, needs: array<int, string>}>
      */
     public function getAllEncyclopedias(): array
     {
@@ -136,6 +140,8 @@ class RescueGroupsService
 
     /**
      * Obtenir données enrichies avec cache (placeholder pour future intégration API)
+     *
+     * @return array{title: string, description: string, icon: string, color: string, temperament: string, lifespan: string, needs: array<int, string>}|null
      */
     public function getEnrichedEncyclopedia(string $espece): ?array
     {
