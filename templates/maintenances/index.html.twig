@@ -140,10 +140,10 @@
 
 /* ========== PAGINATION ========== */
 .pagination-wrap { display:flex; justify-content:center; align-items:center; gap:.5rem; margin-top:1.5rem; flex-wrap:wrap; }
-.pg-btn { display:inline-flex; align-items:center; justify-content:center; min-width:36px; height:36px; padding:0 .6rem; border-radius:9px; font-size:.85rem; font-weight:600; cursor:pointer; border:1.5px solid #d4e8d4; background:#fff; color:#2d6a2d; transition:all .13s; }
+.pg-btn { display:inline-flex; align-items:center; justify-content:center; min-width:42px; height:42px; padding:0 .8rem; border-radius:10px; font-size:.95rem; font-weight:700; cursor:pointer; border:1.5px solid #d4e8d4; background:#fff; color:#2d6a2d; transition:all .13s; }
 .pg-btn:hover:not(:disabled) { background:#eaf3de; border-color:#2d6a2d; }
-.pg-btn.active { background:#2d6a2d; color:#fff; border-color:#2d6a2d; cursor:default; }
-.pg-btn:disabled { opacity:.4; cursor:not-allowed; background:#f5f5f5; }
+.pg-btn.active { background:#2d6a2d; color:#fff; border-color:#2d6a2d; box-shadow:0 2px 8px rgba(45,90,27,.25); }
+.pg-btn:disabled { cursor:not-allowed; opacity:.65; background:#fff; color:#2d6a2d; }
 .pg-info { font-size:.82rem; color:#7a9a7a; padding:0 .5rem; }
 .pg-size-select { padding:.35rem .7rem; border:1.5px solid #d4e8d4; border-radius:8px; font-size:.82rem; color:#1a2e1a; background:#f9fcf7; outline:none; cursor:pointer; }
 .pg-size-select:focus { border-color:#2d6a2d; }
@@ -495,9 +495,6 @@
     <div class="pagination-wrap" id="paginationTable"></div>
   </div>
 
-  <div class="pagination-wrap" style="margin-top:1.2rem;">
-    {{ knp_pagination_render(maintenancesPagination, 'pagination/custom_pagination.html.twig') }}
-  </div>
   {% endif %}
 </div>
 
@@ -814,8 +811,25 @@ function renderPaginatedTable() {
 // ================================================================
 function renderPaginationBar(wrap, page, pages, perPage, total, onPage, onPerPage) {
     if (!wrap) return;
-    // Pagination désormais gérée par KnpPaginatorBundle côté serveur.
-    wrap.innerHTML = '';
+    if (pages <= 1) {
+        wrap.innerHTML = '';
+        return;
+    }
+
+    const canPrev = page > 1;
+    const canNext = page < pages;
+
+    wrap.innerHTML = `
+        <button type="button" class="pg-btn ${canNext ? 'active' : ''}" ${!canNext ? 'disabled' : ''} data-page="${page + 1}">1</button>
+        <button type="button" class="pg-btn ${canPrev ? 'active' : ''}" ${!canPrev ? 'disabled' : ''} data-page="${page - 1}">0</button>
+    `;
+
+    wrap.querySelectorAll('button[data-page]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const target = parseInt(btn.getAttribute('data-page') || '1', 10);
+            if (!Number.isNaN(target)) onPage(target);
+        });
+    });
 }
 
 // ================================================================
