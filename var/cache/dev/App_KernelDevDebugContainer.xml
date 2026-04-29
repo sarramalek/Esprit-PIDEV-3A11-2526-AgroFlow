@@ -1084,7 +1084,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.NNIh.p."/>
+      <argument type="service" id=".service_locator.LulQ9Nl"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -4190,7 +4190,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.NNIh.p."/>
+      <argument type="service" id=".service_locator.LulQ9Nl"/>
     </service>
     <service id="debug.log_processor" class="Symfony\Bridge\Monolog\Processor\DebugProcessor">
       <tag name="kernel.reset" method="reset"/>
@@ -9533,11 +9533,19 @@
         <argument key="participationRepo" type="service_closure" id="App\Repository\Evenements\ParticipationRepository"/>
       </argument>
     </service>
-    <service id=".service_locator._.8m7iI" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.urbcnz6" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
+        <argument key="paginator" type="service_closure" id="knp_paginator"/>
         <argument key="repo" type="service_closure" id="App\Repository\Materiels\MachineRepository"/>
         <argument key="userRepo" type="service_closure" id="App\Repository\User\UserRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.yIz27C2" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="paginator" type="service_closure" id="knp_paginator"/>
+        <argument key="repo" type="service_closure" id="App\Repository\Materiels\MaintenanceRepository"/>
       </argument>
     </service>
     <service id=".service_locator.kLp2YUI" class="Symfony\Component\DependencyInjection\ServiceLocator">
@@ -10004,7 +10012,7 @@
         <argument key="visionService" type="service_closure" id="App\Service\SmartVisionService"/>
       </argument>
     </service>
-    <service id=".service_locator.NNIh.p." class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.LulQ9Nl" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Controller\AdminDashboardController::index" type="service_closure" id=".service_locator.qni5W9T"/>
@@ -10094,7 +10102,7 @@
         <argument key="App\Controller\Evenements\ParticipationController::supprimer" type="service_closure" id=".service_locator.csIWZan"/>
         <argument key="App\Controller\Materiels\MachineController::machineDelete" type="service_closure" id=".service_locator.pt54IVS"/>
         <argument key="App\Controller\Materiels\MachineController::machineEdit" type="service_closure" id=".service_locator.pt54IVS"/>
-        <argument key="App\Controller\Materiels\MachineController::machineIndex" type="service_closure" id=".service_locator._.8m7iI"/>
+        <argument key="App\Controller\Materiels\MachineController::machineIndex" type="service_closure" id=".service_locator.urbcnz6"/>
         <argument key="App\Controller\Materiels\MachineController::machineNew" type="service_closure" id=".service_locator.2oEUwKR"/>
         <argument key="App\Controller\Materiels\MachineController::machineShow" type="service_closure" id=".service_locator.6xRxq88"/>
         <argument key="App\Controller\Materiels\MachineController::machineStatistiques" type="service_closure" id=".service_locator.2E5fScC"/>
@@ -10112,7 +10120,7 @@
         <argument key="App\Controller\Materiels\MaintenancesController::getIntelligentRecommendation" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\Materiels\MaintenancesController::getReminderDates" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\Materiels\MaintenancesController::getReminderDetail" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\Materiels\MaintenancesController::index" type="service_closure" id=".service_locator.b5YG.FV"/>
+        <argument key="App\Controller\Materiels\MaintenancesController::index" type="service_closure" id=".service_locator.yIz27C2"/>
         <argument key="App\Controller\Materiels\MaintenancesController::new" type="service_closure" id=".service_locator.9kKwU2t"/>
         <argument key="App\Controller\Materiels\MaintenancesController::show" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\OuvrierDashboardController::articleShow" type="service_closure" id=".service_locator.mvGX7gD"/>
@@ -10331,7 +10339,7 @@
         <argument key="App\Controller\Evenements\ParticipationController:supprimer" type="service_closure" id=".service_locator.csIWZan"/>
         <argument key="App\Controller\Materiels\MachineController:machineDelete" type="service_closure" id=".service_locator.pt54IVS"/>
         <argument key="App\Controller\Materiels\MachineController:machineEdit" type="service_closure" id=".service_locator.pt54IVS"/>
-        <argument key="App\Controller\Materiels\MachineController:machineIndex" type="service_closure" id=".service_locator._.8m7iI"/>
+        <argument key="App\Controller\Materiels\MachineController:machineIndex" type="service_closure" id=".service_locator.urbcnz6"/>
         <argument key="App\Controller\Materiels\MachineController:machineNew" type="service_closure" id=".service_locator.2oEUwKR"/>
         <argument key="App\Controller\Materiels\MachineController:machineShow" type="service_closure" id=".service_locator.6xRxq88"/>
         <argument key="App\Controller\Materiels\MachineController:machineStatistiques" type="service_closure" id=".service_locator.2E5fScC"/>
@@ -10349,7 +10357,7 @@
         <argument key="App\Controller\Materiels\MaintenancesController:getIntelligentRecommendation" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\Materiels\MaintenancesController:getReminderDates" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\Materiels\MaintenancesController:getReminderDetail" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\Materiels\MaintenancesController:index" type="service_closure" id=".service_locator.b5YG.FV"/>
+        <argument key="App\Controller\Materiels\MaintenancesController:index" type="service_closure" id=".service_locator.yIz27C2"/>
         <argument key="App\Controller\Materiels\MaintenancesController:new" type="service_closure" id=".service_locator.9kKwU2t"/>
         <argument key="App\Controller\Materiels\MaintenancesController:show" type="service_closure" id=".service_locator.b5YG.FV"/>
         <argument key="App\Controller\OuvrierDashboardController:articleShow" type="service_closure" id=".service_locator.mvGX7gD"/>
@@ -13259,7 +13267,7 @@
     <service id="Knp\Component\Pager\ArgumentAccess\ArgumentAccessInterface" alias="Knp\Component\Pager\ArgumentAccess\RequestArgumentAccess"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.w7.f4fT" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.NNIh.p."/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.LulQ9Nl"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id=".Psr\Log\LoggerInterface $request.logger" alias="monolog.logger.request"/>
@@ -13318,6 +13326,8 @@
     <service id=".service_locator.v1HWWk7" alias=".service_locator.TvXqsTL"/>
     <service id=".service_locator.sEaJncE" alias=".service_locator.cBE01og"/>
     <service id=".service_locator.Dq589Yi" alias=".service_locator.VGXccJ4"/>
+    <service id=".service_locator.7_xbnC_" alias=".service_locator.urbcnz6"/>
+    <service id=".service_locator.l7GMwHD" alias=".service_locator.yIz27C2"/>
     <service id=".service_locator.XvTo7NF" alias=".service_locator.kLp2YUI"/>
     <service id=".service_locator.LNnsniP" alias=".service_locator.zWKqscT"/>
     <service id=".service_locator.rEJYkrL" alias=".service_locator.6vfABg_"/>
@@ -13349,7 +13359,7 @@
     <service id=".service_locator.wDI7hJ0" alias=".service_locator..1lCTzi"/>
     <service id=".service_locator.8J1nalj" alias=".service_locator.SsD9eLO"/>
     <service id=".service_locator.wo826zD" alias=".service_locator.f4l_PHz"/>
-    <service id=".service_locator.BSsHSr7" alias=".service_locator.NNIh.p."/>
+    <service id=".service_locator.P3yoAnH" alias=".service_locator.LulQ9Nl"/>
     <service id=".service_locator.BFrsqsn" alias=".service_locator.F9PKc.7"/>
     <service id=".service_locator.oIHygA7" alias=".service_locator.xOkKGYY"/>
     <service id=".service_locator.3ijAwyK" alias=".service_locator.vtjw4Bs"/>
@@ -13426,7 +13436,8 @@
     <service id=".service_locator.eQ296SW" alias=".service_locator.o6sN0hZ"/>
     <service id=".service_locator.pKyWZ4m" alias=".service_locator.md0EV5q"/>
     <service id=".service_locator.b9UTYfn" alias=".service_locator.VGXccJ4"/>
-    <service id=".service_locator.b3SM2he" alias=".service_locator._.8m7iI"/>
+    <service id=".service_locator.Hl7WHVy" alias=".service_locator.urbcnz6"/>
+    <service id=".service_locator.SFL.Q2y" alias=".service_locator.yIz27C2"/>
     <service id=".service_locator.JG4uyKr" alias=".service_locator.kLp2YUI"/>
     <service id=".service_locator.LnYNlH_" alias=".service_locator.FL1_dBi"/>
     <service id=".service_locator.yYBe_KY" alias=".service_locator.RS.51pb"/>

@@ -109,23 +109,37 @@
     }
     .pagination-buttons {
         display: flex;
-        gap: 1rem;
+        gap: .6rem;
         align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
     }
     .pagination-btn {
-        padding: 0.7rem 1.3rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.55rem 0.9rem;
         border-radius: 10px;
         font-weight: bold;
         border: none;
-        min-width: 55px;
-        font-size: 1rem;
+        min-width: 42px;
+        font-size: .9rem;
         cursor: pointer;
         transition: all 0.2s;
+        text-decoration: none;
     }
     .pagination-btn-active {
         background: var(--green-dark);
         color: white;
         box-shadow: 0 2px 8px rgba(45,90,27,0.3);
+    }
+    .pagination-btn-neutral {
+        background: #f2f7ee;
+        color: var(--green-dark);
+        border: 1px solid var(--green-border);
+    }
+    .pagination-btn-neutral:hover {
+        background: #e6f2dc;
     }
     .pagination-btn-active:hover {
         background: #1f4012;
@@ -136,6 +150,83 @@
         color: #999;
         cursor: not-allowed;
         opacity: 0.6;
+        pointer-events: none;
+    }
+    .pagination-ellipsis {
+        color: var(--text-light);
+        font-weight: 700;
+        padding: 0 .15rem;
+    }
+    .pagination-container .pagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: .45rem;
+        flex-wrap: wrap;
+    }
+    .pagination-container .pagination span,
+    .pagination-container .pagination a {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+        height: 40px;
+        padding: 0 .75rem;
+        border-radius: 10px;
+        border: 1px solid var(--green-border);
+        text-decoration: none;
+        font-weight: 700;
+        font-size: .9rem;
+    }
+    .pagination-container .pagination a {
+        color: var(--green-dark);
+        background: #f2f7ee;
+    }
+    .pagination-container .pagination a:hover {
+        background: #e6f2dc;
+    }
+    .pagination-container .pagination .current {
+        background: var(--green-dark);
+        color: #fff;
+        border-color: var(--green-dark);
+    }
+    .pagination-container .pagination .disabled {
+        background: #e0e0e0;
+        color: #999;
+        border-color: #d0d0d0;
+    }
+    .af-pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: .45rem;
+        flex-wrap: wrap;
+    }
+    .af-page {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+        height: 40px;
+        padding: 0 .75rem;
+        border-radius: 10px;
+        border: 1px solid var(--green-border);
+        background: #f2f7ee;
+        color: var(--green-dark);
+        text-decoration: none;
+        font-weight: 700;
+        font-size: .9rem;
+    }
+    .af-page:hover { background: #e6f2dc; }
+    .af-current {
+        background: var(--green-dark);
+        color: #fff;
+        border-color: var(--green-dark);
+    }
+    .af-disabled {
+        background: #e0e0e0;
+        color: #999;
+        border-color: #d0d0d0;
     }
     .pagination-status {
         text-align: center;
@@ -220,15 +311,17 @@
         </div>
     </div>
 
+    {% set machinesList = machinesPagination is defined ? machinesPagination : machines %}
+
     {# ── Grille de cartes ── #}
-    {% if machines|length == 0 %}
+    {% if machinesList|length == 0 %}
         <div class="empty-state">
             🤷 Aucune machine trouvée.<br>
             <a href="{{ path('agri_machine_new') }}" style="color:var(--green-dark);display:inline-block;margin-top:.5rem;">➕ Ajouter votre première machine</a>
         </div>
     {% else %}
         <div class="cards-grid">
-            {% for machine in machines %}
+            {% for machine in machinesList %}
 
                 {% if machine.etatM == 'Neuf' %}         {% set bc = 'badge-neuf' %}
                 {% elseif machine.etatM == 'Bon' %}      {% set bc = 'badge-bon' %}
@@ -300,36 +393,15 @@
             {% endfor %}
         </div>
 
-        {# ── Pagination à 2 boutons (0 inactif, 1 actif) ── #}
-        <div class="pagination-container">
-            <div class="pagination-buttons">
-                {# Bouton 0 - INACTIF (gris) #}
-                <button disabled class="pagination-btn pagination-btn-inactive">
-                    0
-                </button>
-                
-                {# Bouton 1 - ACTIF (vert) #}
-                <button class="pagination-btn pagination-btn-active">
-                    1
-                </button>
+        {% if machinesPagination is defined %}
+            <div class="pagination-container">
+                {{ knp_pagination_render(machinesPagination, 'pagination/custom_pagination.html.twig') }}
             </div>
-        </div>
-
-        {# Indicateur d'état #}
-        <div class="pagination-status">
-            <div class="status-item">
-                <span class="status-dot status-dot-inactive"></span>
-                <span>0 : Aucun événement / Inactif</span>
-            </div>
-            <div class="status-item">
-                <span class="status-dot status-dot-active"></span>
-                <span>1 : Maintenances planifiées (actif)</span>
-            </div>
-        </div>
+        {% endif %}
 
         {# ── Compteur ── #}
         <div class="result-count">
-            📊 {{ machines|length }} machine(s) trouvée(s)
+            📊 {{ machinesPagination is defined ? machinesPagination.getTotalItemCount : machinesList|length }} machine(s) trouvée(s)
         </div>
 
     {% endif %}

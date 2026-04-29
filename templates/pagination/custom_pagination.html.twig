@@ -1,0 +1,23 @@
+{% if pageCount > 1 %}
+<div class="af-pagination">
+    {% if previous is defined %}
+        <a class="af-page af-nav" href="{{ path(route, query|merge({ (pageParameterName): previous })) }}">‹</a>
+    {% else %}
+        <span class="af-page af-nav af-disabled">‹</span>
+    {% endif %}
+
+    {% for page in pagesInRange %}
+        {% if page != current %}
+            <a class="af-page" href="{{ path(route, query|merge({ (pageParameterName): page })) }}">{{ page }}</a>
+        {% else %}
+            <span class="af-page af-current">{{ page }}</span>
+        {% endif %}
+    {% endfor %}
+
+    {% if next is defined %}
+        <a class="af-page af-nav" href="{{ path(route, query|merge({ (pageParameterName): next })) }}">›</a>
+    {% else %}
+        <span class="af-page af-nav af-disabled">›</span>
+    {% endif %}
+</div>
+{% endif %}

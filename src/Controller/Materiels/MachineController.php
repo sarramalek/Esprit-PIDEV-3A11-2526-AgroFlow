@@ -8,6 +8,7 @@ use App\Form\Materiels\MachineType;
 use App\Repository\Materiels\MachineRepository;
 use App\Repository\User\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,7 +31,8 @@ final class MachineController extends AbstractController
     public function machineIndex(
         Request           $request,
         MachineRepository $repo,
-        UserRepository    $userRepo
+        UserRepository    $userRepo,
+        PaginatorInterface $paginator
     ): Response {
         $user = $this->getFullUser($userRepo);
 
@@ -39,7 +41,7 @@ final class MachineController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        // search() retourne un array — plus besoin de PaginatorInterface
+        // search() retourne un array
         $machines = $repo->search([
             'cin'     => $user->getCin(),
             'search'  => trim((string) $request->query->get('search',  '')),
@@ -48,8 +50,15 @@ final class MachineController extends AbstractController
             'sortDir' => $request->query->get('sortDir', 'DESC'),
         ]);
 
+        $pagination = $paginator->paginate(
+            $machines,
+            $request->query->getInt('page', 1),
+            9
+        );
+
         return $this->render('machines/index.html.twig', [
-            'machines' => $machines,
+            'machines' => $pagination,
+            'machinesPagination' => $pagination,
         ]);
     }
 

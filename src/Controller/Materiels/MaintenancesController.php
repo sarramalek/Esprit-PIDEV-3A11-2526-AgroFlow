@@ -7,6 +7,7 @@ use App\Form\Materiels\MaintenanceType;
 use App\Repository\Materiels\MaintenanceRepository;
 use App\Service\MaintenanceAlertService;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,7 +38,7 @@ class MaintenancesController extends AbstractController
     // INDEX
     // ────────────────────────────────────────────────────────
     #[Route('', name: 'agri_maintenances_index', methods: ['GET'])]
-    public function index(Request $request, MaintenanceRepository $repo): Response
+    public function index(Request $request, MaintenanceRepository $repo, PaginatorInterface $paginator): Response
     {
         $search = $request->query->get('search', '');
         $type   = $request->query->get('type', '');
@@ -45,9 +46,14 @@ class MaintenancesController extends AbstractController
         $dir    = $request->query->get('dir', 'DESC');
 
         $maintenances = $repo->searchWithMaterielName($search, $type, $sort, $dir);
+        $pagination = $paginator->paginate(
+            $maintenances,
+            $request->query->getInt('page', 1),
+            10
+        );
 
         $maintenancesWithAlerts = [];
-        foreach ($maintenances as $m) {
+        foreach ($pagination->getItems() as $m) {
             $maintenancesWithAlerts[] = [
                 'maintenance' => $m,
                 'alert'       => $this->alertService->getAlertStatus($m),
@@ -60,6 +66,7 @@ class MaintenancesController extends AbstractController
             'type'            => $type,
             'sort'            => $sort,
             'dir'             => $dir,
+            'maintenancesPagination' => $pagination,
             'countByType'     => $repo->countByTypePanne(),
             'coutByMonth'     => $repo->getCoutByMonth(),
             'totalCout'       => $repo->getTotalCout(),
