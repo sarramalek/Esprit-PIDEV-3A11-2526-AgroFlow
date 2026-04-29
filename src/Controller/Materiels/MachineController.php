@@ -23,7 +23,8 @@ final class MachineController extends AbstractController
         if (!$sessionUser) {
             return null;
         }
-        return $userRepo->findOneBy(['email' => $sessionUser->getUserIdentifier()]);
+        $user = $userRepo->findOneBy(['email' => $sessionUser->getUserIdentifier()]);
+        return $user instanceof User ? $user : null;
     }
 
     // ── Liste (sans pagination) ──────────────────────────────────────────────

@@ -30,13 +30,13 @@ class Maintenance
     private ?int $idM = null;
 
     #[ORM\Column(name: 'statut', type: 'string', columnDefinition: "ENUM('en_cours','termine','planifie')", options: ['default' => 'planifie'])]
-    private ?string $statut = 'planifie';
+    private string $statut = 'planifie';
 
     #[ORM\Column(name: 'recommandation', type: 'text', nullable: true)]
     private ?string $recommandation = null;
 
     #[ORM\Column(name: 'priorite', type: 'string', columnDefinition: "ENUM('faible','moyenne','haute','urgente')", options: ['default' => 'moyenne'])]
-    private ?string $priorite = 'moyenne';
+    private string $priorite = 'moyenne';
 
     #[ORM\Column(name: 'kilometrage', type: 'integer', nullable: true)]
     private ?int $kilometrage = null;
@@ -117,7 +117,7 @@ class Maintenance
         return $this;
     }
 
-    public function getStatut(): ?string
+    public function getStatut(): string
     {
         return $this->statut;
     }
@@ -139,7 +139,7 @@ class Maintenance
         return $this;
     }
 
-    public function getPriorite(): ?string
+    public function getPriorite(): string
     {
         return $this->priorite;
     }

@@ -10,6 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -161,13 +162,16 @@ class MachineType extends AbstractType
     }
 
     // Validation personnalisée pour la date de dernière visite
-    public function validateDateLastVisite($value, ExecutionContextInterface $context)
+    public function validateDateLastVisite(?\DateTimeInterface $value, ExecutionContextInterface $context): void
     {
         if ($value === null) {
             return;
         }
 
         $form = $context->getRoot();
+        if (!$form instanceof FormInterface) {
+            return;
+        }
         $dateAchat = $form->get('dateAchat')->getData();
 
         if ($value > new \DateTime('today')) {
@@ -175,20 +179,23 @@ class MachineType extends AbstractType
                 ->addViolation();
         }
 
-        if ($dateAchat && $value < $dateAchat) {
+        if ($dateAchat instanceof \DateTimeInterface && $value < $dateAchat) {
             $context->buildViolation('La date de dernière visite ne peut pas être antérieure à la date d\'achat')
                 ->addViolation();
         }
     }
 
     // Validation personnalisée pour la prochaine maintenance
-    public function validateProchaineMaintenance($value, ExecutionContextInterface $context)
+    public function validateProchaineMaintenance(?\DateTimeInterface $value, ExecutionContextInterface $context): void
     {
         if ($value === null) {
             return;
         }
 
         $form = $context->getRoot();
+        if (!$form instanceof FormInterface) {
+            return;
+        }
         $dateLastVisite = $form->get('dateLastVisite')->getData();
         $dateAchat = $form->get('dateAchat')->getData();
 
@@ -197,19 +204,19 @@ class MachineType extends AbstractType
                 ->addViolation();
         }
 
-        if ($dateLastVisite && $value <= $dateLastVisite) {
+        if ($dateLastVisite instanceof \DateTimeInterface && $value <= $dateLastVisite) {
             $context->buildViolation('La date de prochaine maintenance doit être postérieure à la dernière visite')
                 ->addViolation();
         }
 
-        if ($dateAchat && $value <= $dateAchat) {
+        if ($dateAchat instanceof \DateTimeInterface && $value <= $dateAchat) {
             $context->buildViolation('La date de prochaine maintenance doit être postérieure à la date d\'achat')
                 ->addViolation();
         }
     }
 
     // Validation croisée entre kilométrage et kmLastVisite
-    public function validateKmVisite($value, ExecutionContextInterface $context)
+    public function validateKmVisite(mixed $value, ExecutionContextInterface $context): void
     {
         $object = $context->getObject();
         

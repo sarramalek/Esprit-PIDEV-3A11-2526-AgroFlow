@@ -16,7 +16,7 @@ if (!\class_exists(App_KernelDevDebugContainer::class, false)) {
 
 return new \ContainerGRCQMgw\App_KernelDevDebugContainer([
     'container.build_hash' => 'GRCQMgw',
-    'container.build_id' => 'dc505d2a',
-    'container.build_time' => 1777465778,
+    'container.build_id' => 'b106cd61',
+    'container.build_time' => 1777469112,
     'container.runtime_mode' => \in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) ? 'web=0' : 'web=1',
 ], __DIR__.\DIRECTORY_SEPARATOR.'ContainerGRCQMgw');

@@ -15,7 +15,7 @@ class Machine
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     #[ORM\Column(name: 'idM', type: 'integer')]
-    private ?int $id = null;
+    private int $id;
 
     /**
      * La relation ManyToOne gère la colonne `cin` en base.
@@ -70,9 +70,15 @@ class Machine
 
     // ==================== Getters & Setters ====================
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
+    }
+
+    public function setId(int $id): static
+    {
+        $this->id = $id;
+        return $this;
     }
 
     // ── Relation Agriculteur ──────────────────────────────────────────────────

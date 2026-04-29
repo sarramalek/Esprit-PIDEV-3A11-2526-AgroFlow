@@ -40,10 +40,10 @@ class MaintenancesController extends AbstractController
     #[Route('', name: 'agri_maintenances_index', methods: ['GET'])]
     public function index(Request $request, MaintenanceRepository $repo, PaginatorInterface $paginator): Response
     {
-        $search = $request->query->get('search', '');
-        $type   = $request->query->get('type', '');
-        $sort   = $request->query->get('sort', 'dateMain');
-        $dir    = $request->query->get('dir', 'DESC');
+        $search = (string) $request->query->get('search', '');
+        $type   = (string) $request->query->get('type', '');
+        $sort   = (string) $request->query->get('sort', 'dateMain');
+        $dir    = (string) $request->query->get('dir', 'DESC');
 
         $maintenances = $repo->searchWithMaterielName($search, $type, $sort, $dir);
         $pagination = $paginator->paginate(
@@ -54,6 +54,9 @@ class MaintenancesController extends AbstractController
 
         $maintenancesWithAlerts = [];
         foreach ($pagination->getItems() as $m) {
+            if (!$m instanceof Maintenance) {
+                continue;
+            }
             $maintenancesWithAlerts[] = [
                 'maintenance' => $m,
                 'alert'       => $this->alertService->getAlertStatus($m),
@@ -102,6 +105,9 @@ class MaintenancesController extends AbstractController
         $maintenances = $repo->findAllOrderedByDate();
         $response = new StreamedResponse(function () use ($maintenances) {
             $handle = fopen('php://output', 'w+');
+            if ($handle === false) {
+                return;
+            }
             fwrite($handle, "\xEF\xBB\xBF");
             fputcsv($handle, ['AGROFLOW — Rapport Maintenances'], ';');
             fputcsv($handle, ['Exporté le : ' . (new \DateTime())->format('d/m/Y H:i')], ';');
@@ -113,17 +119,17 @@ class MaintenancesController extends AbstractController
                 fputcsv($handle, [
                     $idx++,
                     $m->getTypePanne(),
-                    number_format($m->getCout(), 2, ',', ' '),
+                    number_format($m->getCout() ?? 0.0, 2, ',', ' '),
                     $m->getDateMain()?->format('d/m/Y') ?? '',
-                    $m->getStatut() ?? '',
-                    $m->getPriorite() ?? '',
+                    $m->getStatut(),
+                    $m->getPriorite(),
                     $m->getKilometrage() ?? '',
                     $m->getDescription() ?? '',
                     $m->getRecommandation() ?? '',
                     $m->getIdM() ? '#' . $m->getIdM() : '',
                     $this->getMachineName($m),
                 ], ';');
-                $total += $m->getCout();
+                $total += $m->getCout() ?? 0.0;
             }
             fputcsv($handle, [], ';');
             fputcsv($handle, ['', 'TOTAL', number_format($total, 2, ',', ' ') . ' DT'], ';');
@@ -372,8 +378,8 @@ class MaintenancesController extends AbstractController
             }
 
             $km = $maintenance->getKilometrage() ?? 0;
-            $priorite = $maintenance->getPriorite() ?? 'moyenne';
-            $statut = $maintenance->getStatut() ?? 'planifie';
+            $priorite = $maintenance->getPriorite();
+            $statut = $maintenance->getStatut();
             $typePanne = $maintenance->getTypePanne() ?? 'Générale';
             $machineName = $this->getMachineName($maintenance);
             
@@ -420,8 +426,9 @@ class MaintenancesController extends AbstractController
                 return $this->json(['success' => false, 'error' => 'Maintenance non trouvée'], 404);
             }
 
-            $data   = json_decode($request->getContent(), true);
-            $prompt = trim($data['prompt'] ?? '');
+            $dataRaw = json_decode($request->getContent(), true);
+            $data = is_array($dataRaw) ? $dataRaw : [];
+            $prompt = trim(isset($data['prompt']) && is_string($data['prompt']) ? $data['prompt'] : '');
             if (!$prompt) {
                 return $this->json(['success' => false, 'error' => 'Prompt vide'], 400);
             }
@@ -448,7 +455,7 @@ class MaintenancesController extends AbstractController
             }
 
             $km    = $maintenance->getKilometrage() ?? 0;
-            $prio  = $maintenance->getPriorite() ?? 'moyenne';
+            $prio  = $maintenance->getPriorite();
             $type  = $maintenance->getTypePanne() ?? 'Général';
             $maxKm = 20000;
 
@@ -505,30 +512,34 @@ class MaintenancesController extends AbstractController
     public function generateSchedule(Request $request, MaintenanceRepository $repo): JsonResponse
     {
         try {
-            $data        = json_decode($request->getContent(), true);
+            $dataRaw     = json_decode($request->getContent(), true);
+            $data        = is_array($dataRaw) ? $dataRaw : [];
             $maintenance = null;
 
-            if (isset($data['maintenanceId'])) {
+            if (isset($data['maintenanceId']) && is_numeric($data['maintenanceId'])) {
                 $maintenance = $this->findMaintenance((int) $data['maintenanceId'], $repo);
                 if (!$maintenance) {
                     return $this->json(['success' => false, 'error' => 'Maintenance non trouvée'], 404);
                 }
             }
 
-            $options = $data['options'] ?? ['intervention','prevention','pieces','optimisation','securite','controle'];
+            $optionsRaw = $data['options'] ?? ['intervention','prevention','pieces','optimisation','securite','controle'];
+            $options = is_array($optionsRaw)
+                ? array_values(array_filter($optionsRaw, static fn ($opt): bool => is_string($opt)))
+                : ['intervention','prevention','pieces','optimisation','securite','controle'];
 
             $machineData = [
-                'type'           => $maintenance ? $maintenance->getTypePanne()    : ($data['typePanne']    ?? 'Non spécifié'),
-                'priorite'       => $maintenance ? $maintenance->getPriorite()     : ($data['priorite']     ?? 'moyenne'),
-                'statut'         => $maintenance ? $maintenance->getStatut()       : ($data['statut']       ?? 'planifie'),
-                'kilometrage'    => $maintenance ? $maintenance->getKilometrage()  : ($data['kilometrage']  ?? null),
-                'nom'            => $maintenance ? $this->getMachineName($maintenance) : ($data['nomMachine'] ?? 'Machine non spécifiée'),
-                'description'    => $maintenance ? $maintenance->getDescription()  : ($data['description']  ?? ''),
-                'recommandation' => $maintenance ? $maintenance->getRecommandation(): ($data['recommandation'] ?? ''),
-                'cout'           => $maintenance ? $maintenance->getCout()         : ($data['cout']         ?? 0),
+                'type'           => $maintenance ? ($maintenance->getTypePanne() ?? 'Non spécifié') : (isset($data['typePanne']) && is_string($data['typePanne']) ? $data['typePanne'] : 'Non spécifié'),
+                'priorite'       => $maintenance ? $maintenance->getPriorite() : (isset($data['priorite']) && is_string($data['priorite']) ? $data['priorite'] : 'moyenne'),
+                'statut'         => $maintenance ? $maintenance->getStatut() : (isset($data['statut']) && is_string($data['statut']) ? $data['statut'] : 'planifie'),
+                'kilometrage'    => $maintenance ? ($maintenance->getKilometrage() ?? 0) : (isset($data['kilometrage']) && is_numeric($data['kilometrage']) ? (int) $data['kilometrage'] : 0),
+                'nom'            => $maintenance ? $this->getMachineName($maintenance) : (isset($data['nomMachine']) && is_string($data['nomMachine']) ? $data['nomMachine'] : 'Machine non spécifiée'),
+                'description'    => $maintenance ? ($maintenance->getDescription() ?? '') : (isset($data['description']) && is_string($data['description']) ? $data['description'] : ''),
+                'recommandation' => $maintenance ? ($maintenance->getRecommandation() ?? '') : (isset($data['recommandation']) && is_string($data['recommandation']) ? $data['recommandation'] : ''),
+                'cout'           => $maintenance ? ($maintenance->getCout() ?? 0.0) : (isset($data['cout']) && is_numeric($data['cout']) ? (float) $data['cout'] : 0.0),
                 'dateMain'       => $maintenance && $maintenance->getDateMain()
                                         ? $maintenance->getDateMain()->format('Y-m-d')
-                                        : ($data['dateMain'] ?? null),
+                                        : (isset($data['dateMain']) && is_string($data['dateMain']) ? $data['dateMain'] : null),
             ];
 
             $interventions = $this->calculateRecommendedInterventions($machineData);
@@ -585,7 +596,8 @@ class MaintenancesController extends AbstractController
     #[Route('/{id}/delete', name: 'agri_maintenances_delete', methods: ['POST'], requirements: ['id' => '\d+'])]
     public function delete(Request $request, Maintenance $maintenance, EntityManagerInterface $em): Response
     {
-        if ($this->isCsrfTokenValid('delete_maintenance_' . $maintenance->getIdMain(), $request->request->get('_token'))) {
+        $token = $request->request->get('_token');
+        if ($this->isCsrfTokenValid('delete_maintenance_' . $maintenance->getIdMain(), is_string($token) ? $token : null)) {
             $em->remove($maintenance);
             $em->flush();
             $this->addFlash('success', 'Maintenance supprimée avec succès.');
@@ -606,38 +618,56 @@ class MaintenancesController extends AbstractController
             if ($m) return $m;
         } catch (\Throwable $e) {
         }
-        return $repo->findOneBy(['idMain' => $id]);
+        $fallback = $repo->findOneBy(['idMain' => $id]);
+        return $fallback instanceof Maintenance ? $fallback : null;
     }
 
     private function getMachineName(Maintenance $m): string
     {
-        if (method_exists($m, 'getNomMateriel') && $m->getNomMateriel()) {
+        if ($m->getNomMateriel()) {
             return $m->getNomMateriel();
         }
-        if (method_exists($m, 'getNom') && $m->getNom()) {
+        if ($m->getNom()) {
             return $m->getNom();
         }
         return 'Machine non définie';
     }
 
+    /**
+     * @return list<Maintenance>
+     */
     private function getMachineHistory(Maintenance $maintenance, MaintenanceRepository $repo): array
     {
-        if (method_exists($maintenance, 'getIdM') && $maintenance->getIdM()) {
+        if ($maintenance->getIdM()) {
             try {
-                return $repo->findBy(['idM' => $maintenance->getIdM()], ['dateMain' => 'DESC']);
+                /** @var list<Maintenance> $history */
+                $history = $repo->findBy(['idM' => $maintenance->getIdM()], ['dateMain' => 'DESC']);
+                return $history;
             } catch (\Throwable $e) {
             }
         }
         $nom = $this->getMachineName($maintenance);
         if ($nom !== 'Machine non définie') {
             try {
-                return $repo->findBy(['nom' => $nom], ['dateMain' => 'DESC']);
+                /** @var list<Maintenance> $history */
+                $history = $repo->findBy(['nom' => $nom], ['dateMain' => 'DESC']);
+                return $history;
             } catch (\Throwable $e) {
             }
         }
         return [$maintenance];
     }
 
+    /**
+     * @param list<Maintenance> $history
+     * @return array{
+     *   hasHistory:bool,
+     *   totalMaintenances:int,
+     *   averageInterval:int|null,
+     *   frequency:string,
+     *   recommendedInterval:int
+     * }
+     */
     private function analyzeMaintenanceFrequency(array $history): array
     {
         $count = count($history);
@@ -656,11 +686,14 @@ class MaintenancesController extends AbstractController
             $d1 = $history[$i]->getDateMain();
             $d2 = $history[$i + 1]->getDateMain();
             if ($d1 && $d2) {
-                $totalInterval += abs($d1->diff($d2)->days);
+                $days = $d1->diff($d2)->days;
+                if ($days !== false) {
+                    $totalInterval += abs($days);
+                }
             }
         }
 
-        $avgInterval = $count > 1 ? round($totalInterval / ($count - 1)) : 0;
+        $avgInterval = (int) round($totalInterval / ($count - 1));
         $frequency   = match(true) {
             $avgInterval <= 30  => 'très fréquente',
             $avgInterval <= 90  => 'fréquente',
@@ -677,12 +710,28 @@ class MaintenancesController extends AbstractController
         ];
     }
 
+    /**
+     * @return array{
+     *   km:int,
+     *   kmStatus:string,
+     *   type:?string,
+     *   priority:string,
+     *   status:string,
+     *   daysSinceLastMaintenance:int|null,
+     *   healthScore:int
+     * }
+     */
     private function analyzeMachineState(Maintenance $m): array
     {
         $km       = $m->getKilometrage() ?? 0;
-        $prio     = $m->getPriorite() ?? 'moyenne';
-        $statut   = $m->getStatut() ?? 'planifie';
+        $prio     = $m->getPriorite();
+        $statut   = $m->getStatut();
         $lastDate = $m->getDateMain();
+        $daysSince = null;
+        if ($lastDate !== null) {
+            $d = (new \DateTime())->diff($lastDate)->days;
+            $daysSince = $d !== false ? $d : null;
+        }
 
         return [
             'km'                        => $km,
@@ -690,7 +739,7 @@ class MaintenancesController extends AbstractController
             'type'                      => $m->getTypePanne(),
             'priority'                  => $prio,
             'status'                    => $statut,
-            'daysSinceLastMaintenance'  => $lastDate ? (new \DateTime())->diff($lastDate)->days : null,
+            'daysSinceLastMaintenance'  => $daysSince,
             'healthScore'               => $this->calculateHealthScore($km, $prio, $statut),
         ];
     }
@@ -715,6 +764,25 @@ class MaintenancesController extends AbstractController
         return max(0, min(100, $score));
     }
 
+    /**
+     * @param array{
+     *   hasHistory:bool,
+     *   totalMaintenances:int,
+     *   averageInterval:int|null,
+     *   frequency:string,
+     *   recommendedInterval:int
+     * } $frequency
+     * @param array{
+     *   km:int,
+     *   kmStatus:string,
+     *   type:?string,
+     *   priority:string,
+     *   status:string,
+     *   daysSinceLastMaintenance:int|null,
+     *   healthScore:int
+     * } $state
+     * @return list<array{type:string,icon:string,title:string,message:string,priority:string,action:string}>
+     */
     private function generateAISuggestions(Maintenance $m, array $frequency, array $state): array
     {
         $suggestions = [];
@@ -722,12 +790,12 @@ class MaintenancesController extends AbstractController
         $km          = $state['km'];
         $daysSince   = $state['daysSinceLastMaintenance'];
 
-        if ($daysSince !== null && $daysSince > ($frequency['recommendedInterval'] ?? 90)) {
+        if ($daysSince !== null && $daysSince > $frequency['recommendedInterval']) {
             $suggestions[] = [
                 'type'     => 'time_overdue',
                 'icon'     => '⏰',
                 'title'    => 'Maintenance dépassée',
-                'message'  => "La dernière maintenance de {$machineName} date de {$daysSince} jours. L'intervalle recommandé est de " . ($frequency['recommendedInterval'] ?? 90) . " jours.",
+                'message'  => "La dernière maintenance de {$machineName} date de {$daysSince} jours. L'intervalle recommandé est de " . $frequency['recommendedInterval'] . " jours.",
                 'priority' => 'haute',
                 'action'   => 'Planifier immédiatement',
             ];
@@ -744,7 +812,7 @@ class MaintenancesController extends AbstractController
             ];
         }
 
-        if ($frequency['hasHistory'] && ($frequency['averageInterval'] ?? 0) > 0) {
+        if ($frequency['hasHistory'] && $frequency['averageInterval'] !== null && $frequency['averageInterval'] > 0) {
             $trend = $frequency['averageInterval'] < 60 ? 'maintenances rapprochées' : 'maintenances espacées';
             $suggestions[] = [
                 'type'     => 'frequency_analysis',
@@ -781,7 +849,7 @@ class MaintenancesController extends AbstractController
                 'type'     => 'preventive',
                 'icon'     => '✅',
                 'title'    => 'Maintenance préventive',
-                'message'  => "{$machineName} semble en bon état. Une inspection préventive dans " . ($frequency['recommendedInterval'] ?? 90) . " jours est recommandée.",
+                'message'  => "{$machineName} semble en bon état. Une inspection préventive dans " . $frequency['recommendedInterval'] . " jours est recommandée.",
                 'priority' => 'basse',
                 'action'   => 'Planifier plus tard',
             ];
@@ -790,15 +858,18 @@ class MaintenancesController extends AbstractController
         return $suggestions;
     }
 
+    /**
+     * @param array{recommendedInterval:int} $frequency
+     */
     private function calculateNextRecommendedDate(Maintenance $m, array $frequency): ?\DateTime
     {
         $lastDate = $m->getDateMain();
         if (!$lastDate) return null;
 
-        $interval  = clone $lastDate;
-        $daysToAdd = $frequency['recommendedInterval'] ?? 90;
+        $interval  = \DateTime::createFromInterface($lastDate);
+        $daysToAdd = $frequency['recommendedInterval'];
         $km        = $m->getKilometrage() ?? 0;
-        $prio      = $m->getPriorite() ?? 'moyenne';
+        $prio      = $m->getPriorite();
 
         if ($km > 10000) $daysToAdd = max(30, $daysToAdd - 30);
         elseif ($km > 5000) $daysToAdd = max(60, $daysToAdd - 15);
@@ -809,11 +880,20 @@ class MaintenancesController extends AbstractController
         return $interval->modify("+{$daysToAdd} days");
     }
 
+    /**
+     * @param array{recommendedInterval:int} $frequency
+     * @param array{
+     *   km:int,
+     *   priority:string,
+     *   daysSinceLastMaintenance:int|null,
+     *   healthScore:int
+     * } $state
+     */
     private function calculateUrgencyScore(Maintenance $m, array $frequency, array $state): int
     {
         $score      = 0;
         $daysSince  = $state['daysSinceLastMaintenance'] ?? 0;
-        $recommended= $frequency['recommendedInterval'] ?? 90;
+        $recommended= $frequency['recommendedInterval'];
 
         if ($daysSince > $recommended) {
             $score += min(40, (int) round(($daysSince - $recommended) / max(1, $recommended) * 40));
@@ -837,6 +917,7 @@ class MaintenancesController extends AbstractController
         };
     }
 
+    /** @return list<string> */
     private function getRecommendedActions(int $score, Maintenance $m): array
     {
         $actions     = [];
@@ -871,7 +952,7 @@ class MaintenancesController extends AbstractController
     private function buildLocalPromptResponse(string $prompt, Maintenance $maintenance): string
     {
         $type      = $maintenance->getTypePanne() ?? 'générale';
-        $prio      = $maintenance->getPriorite() ?? 'moyenne';
+        $prio      = $maintenance->getPriorite();
         $km        = $maintenance->getKilometrage() ?? 0;
         $nom       = $this->getMachineName($maintenance);
         $promptLc  = strtolower($prompt);
@@ -973,6 +1054,10 @@ class MaintenancesController extends AbstractController
                 : "📅 PLANIFICATION : Planifier l'intervention dans les meilleurs délais.");
     }
 
+    /**
+     * @param list<array{nom:string,usure:int|float}> $composants
+     * @return list<string>
+     */
     private function buildLifetimeRecommendations(string $type, string $prio, int $km, array $composants): array
     {
         $recs = [];
@@ -982,8 +1067,11 @@ class MaintenancesController extends AbstractController
         if ($km >= 10000) $recs[] = "Révision générale conseillée — contrôle complet de tous les systèmes.";
         if ($km >= 15000) $recs[] = "Inspection approfondie de la transmission et du moteur (kilométrage critique).";
 
-        usort($composants, fn($a, $b) => $b['usure'] - $a['usure']);
-        if ($composants[0]['usure'] > 70) {
+        usort(
+            $composants,
+            static fn (array $a, array $b): int => $b['usure'] <=> $a['usure']
+        );
+        if ($composants !== [] && $composants[0]['usure'] > 70) {
             $recs[] = "Composant critique : {$composants[0]['nom']} ({$composants[0]['usure']}% d'usure) — prévoir remplacement.";
         }
         $recs[] = "Effectuer des inspections visuelles quotidiennes et noter toute anomalie.";
@@ -991,6 +1079,10 @@ class MaintenancesController extends AbstractController
         return array_slice($recs, 0, 5);
     }
 
+    /**
+     * @param array{kilometrage?:int,type?:string,priorite?:string} $d
+     * @return list<array{name:string,reason?:string,priority:string}>
+     */
     private function calculateRecommendedInterventions(array $d): array
     {
         $interventions = [];
@@ -1021,13 +1113,19 @@ class MaintenancesController extends AbstractController
         return $interventions;
     }
 
+    /**
+     * @param array{nom:string,type:string,priorite:string,kilometrage?:int,dateMain?:string|null,cout:float|int} $d
+     * @param list<string> $options
+     * @param list<array{name:string,reason?:string,priority:string}> $interventions
+     */
     private function generateSchedulePlan(array $d, array $options, array $interventions): string
     {
         $plan  = "# 📋 PLAN DE MAINTENANCE\n\n## Récapitulatif\n";
         $plan .= "- Machine : {$d['nom']}\n";
         $plan .= "- Type : {$d['type']}\n";
         $plan .= "- Priorité : " . ucfirst($d['priorite']) . "\n";
-        $plan .= "- Kilométrage : " . ($d['kilometrage'] ? $d['kilometrage'] . ' km' : 'Non renseigné') . "\n";
+        $km = $d['kilometrage'] ?? 0;
+        $plan .= "- Kilométrage : " . ($km > 0 ? $km . ' km' : 'Non renseigné') . "\n";
         $plan .= "- Date prévue : " . ($d['dateMain'] ?? 'Non renseignée') . "\n";
         $plan .= "- Coût estimé : " . number_format($d['cout'], 2, ',', ' ') . " DT\n\n";
 
@@ -1044,7 +1142,7 @@ class MaintenancesController extends AbstractController
         if (in_array('prevention', $options)) {
             $days = match($d['priorite']) { 'urgente' => 30, 'haute' => 60, 'moyenne' => 90, default => 180 };
             $plan .= "## 📅 PLANNING PRÉVENTIF\n- Prochaine maintenance : dans {$days} jours\n";
-            if ($d['kilometrage'] > 0) {
+            if ($km > 0) {
                 $plan .= "- Prochaine vidange : tous les 5 000 km\n- Révision générale : tous les 10 000 km\n";
             }
             $plan .= "- Contrôle hebdomadaire : niveaux, pression pneus, éclairage\n- Contrôle mensuel : courroies, filtres, batterie\n\n";
@@ -1071,7 +1169,7 @@ class MaintenancesController extends AbstractController
 
         $score  = 100;
         $score -= match($d['priorite']) { 'urgente' => 30, 'haute' => 20, 'moyenne' => 10, default => 0 };
-        $score -= match(true) { ($d['kilometrage'] ?? 0) > 15000 => 25, ($d['kilometrage'] ?? 0) > 10000 => 15, default => 0 };
+        $score -= match(true) { $km > 15000 => 25, $km > 10000 => 15, default => 0 };
 
         $plan .= "## 📊 SCORE DE SANTÉ : " . max(0, $score) . "/100\n\n";
         $plan .= "## 💡 RECOMMANDATIONS\n1. Suivre rigoureusement le planning d'entretien\n"
@@ -1086,6 +1184,7 @@ class MaintenancesController extends AbstractController
     // ────────────────────────────────────────────────────────
     // HELPERS POUR LE CALENDRIER DES RAPPELS
     // ────────────────────────────────────────────────────────
+    /** @return list<string> */
     private function generateReminderRecommendations(Maintenance $m, int $yearsSince): array
     {
         $recommendations = [];
@@ -1117,6 +1216,9 @@ class MaintenancesController extends AbstractController
         return $recommendations;
     }
 
+    /**
+     * @return array{score:int,level:string,color:string,label:string}
+     */
     private function calculateReminderUrgence(Maintenance $m, int $yearsSince): array
     {
         $priorite = $m->getPriorite();
@@ -1178,9 +1280,9 @@ class MaintenancesController extends AbstractController
         
         if ($yearsSince >= 1) {
             if ($monthsSince > 0) {
-                return "🔔 RAPPEL ANNUEL : {$machineName} n'a pas eu de maintenance depuis {$yearsSince} an" . ($yearsSince > 1 ? 's' : '') . " et {$monthsSince} mois. Une visite de maintenance est recommandée.";
+                return "🔔 RAPPEL ANNUEL : {$machineName} n'a pas eu de maintenance depuis {$yearsSince} an et {$monthsSince} mois. Une visite de maintenance est recommandée.";
             }
-            return "🔔 RAPPEL ANNUEL : {$machineName} n'a pas eu de maintenance depuis {$yearsSince} an" . ($yearsSince > 1 ? 's' : '') . ". Une visite de maintenance est recommandée.";
+            return "🔔 RAPPEL ANNUEL : {$machineName} n'a pas eu de maintenance depuis {$yearsSince} an. Une visite de maintenance est recommandée.";
         }
         
         return "📅 {$machineName} a un rappel de visite ou maintenance programmée.";
@@ -1262,6 +1364,7 @@ class MaintenancesController extends AbstractController
         return "🔔 RECOMMANDATION IA - Sur la base des données actuelles et des cas similaires, il est fortement recommandé d'adopter un cycle de maintenance préventive tous les 5000 km afin de réduire les risques futurs et optimiser la durée de vie de {$machineName}.";
     }
     
+    /** @return list<string> */
     private function getIntelligentInterpretation(int $km, string $priorite, string $statut, string $riskLevel): array
     {
         $interpretation = [];
@@ -1300,6 +1403,7 @@ class MaintenancesController extends AbstractController
         return $interpretation;
     }
     
+    /** @return list<string> */
     private function getIntelligentActions(string $priorite, string $statut, int $km, int $nextKm): array
     {
         $actions = [];
@@ -1333,6 +1437,7 @@ class MaintenancesController extends AbstractController
         return $actions;
     }
     
+    /** @return list<string> */
     private function getAdditionalTips(string $typePanne, int $km, string $priorite): array
     {
         $tips = [];
