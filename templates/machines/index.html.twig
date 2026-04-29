@@ -100,6 +100,69 @@
 
     .empty-state { text-align: center; padding: 4rem 2rem; color: var(--text-light); font-size: 1rem; line-height: 2; }
     .result-count { text-align: center; color: var(--text-light); font-size: .82rem; margin-top: 1.2rem; }
+
+    /* Styles pour la pagination */
+    .pagination-container {
+        margin-top: 2rem;
+        display: flex;
+        justify-content: center;
+    }
+    .pagination-buttons {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+    .pagination-btn {
+        padding: 0.7rem 1.3rem;
+        border-radius: 10px;
+        font-weight: bold;
+        border: none;
+        min-width: 55px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .pagination-btn-active {
+        background: var(--green-dark);
+        color: white;
+        box-shadow: 0 2px 8px rgba(45,90,27,0.3);
+    }
+    .pagination-btn-active:hover {
+        background: #1f4012;
+        transform: translateY(-2px);
+    }
+    .pagination-btn-inactive {
+        background: #e0e0e0;
+        color: #999;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+    .pagination-status {
+        text-align: center;
+        margin-top: 1rem;
+        color: var(--text-light);
+        font-size: 0.85rem;
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+    }
+    .status-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .status-dot {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+    .status-dot-active {
+        background: var(--green-dark);
+    }
+    .status-dot-inactive {
+        background: #e0e0e0;
+    }
 </style>
 
 <div class="page-wrap">
@@ -235,6 +298,33 @@
                 </div>
 
             {% endfor %}
+        </div>
+
+        {# ── Pagination à 2 boutons (0 inactif, 1 actif) ── #}
+        <div class="pagination-container">
+            <div class="pagination-buttons">
+                {# Bouton 0 - INACTIF (gris) #}
+                <button disabled class="pagination-btn pagination-btn-inactive">
+                    0
+                </button>
+                
+                {# Bouton 1 - ACTIF (vert) #}
+                <button class="pagination-btn pagination-btn-active">
+                    1
+                </button>
+            </div>
+        </div>
+
+        {# Indicateur d'état #}
+        <div class="pagination-status">
+            <div class="status-item">
+                <span class="status-dot status-dot-inactive"></span>
+                <span>0 : Aucun événement / Inactif</span>
+            </div>
+            <div class="status-item">
+                <span class="status-dot status-dot-active"></span>
+                <span>1 : Maintenances planifiées (actif)</span>
+            </div>
         </div>
 
         {# ── Compteur ── #}

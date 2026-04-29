@@ -2,6 +2,7 @@
 {% block title %}Maintenances — AgroFlow{% endblock %}
 {% block body %}
 <style>
+/* ========== BASE ========== */
 *, *::before, *::after { box-sizing: border-box; }
 .mp { max-width: 1400px; margin: 0 auto; padding: 2rem 1.75rem; font-family: 'Segoe UI', system-ui, sans-serif; }
 .bc { display:flex; align-items:center; gap:.4rem; font-size:.82rem; color:#5f7a5f; margin-bottom:1.5rem; }
@@ -21,10 +22,16 @@
 .btn--stats:hover,.btn--stats.active { background:#CECBF6; border-color:#7F77DD; }
 .btn--view-toggle { background:#fff; color:#5f7a5f; border:1.5px solid #d4e8d4; font-size:.82rem; padding:.55rem .9rem; border-radius:10px; cursor:pointer; }
 .btn--view-toggle.active { background:#eaf3de; color:#2d6a2d; border-color:#2d6a2d; }
-.btn--calendar { background:#fff; color:#2d6a2d; border:1.5px solid #b3d4b3; font-size:.82rem; padding:.55rem .9rem; border-radius:10px; cursor:pointer; }
-.btn--calendar:hover { background:#eaf3de; }
+.btn--calendar { background:#fff; color:#a32d2d; border:1.5px solid #f7c1c1; font-size:.82rem; padding:.55rem .9rem; border-radius:10px; cursor:pointer; transition:all .15s; }
+.btn--calendar:hover { background:#fcebeb; }
 .btn--red-outline { background:#fff; color:#a32d2d; border:1.5px solid #f7c1c1; font-size:.82rem; padding:.55rem 1rem; border-radius:10px; cursor:pointer; }
 .btn--red-outline:hover { background:#fcebeb; }
+.btn--ia-pro { background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:#fff; border:none; }
+.btn--ia-pro:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(102,126,234,0.4); }
+.btn--google { background:#fff; color:#4285f4; border:1.5px solid #4285f4; }
+.btn--google:hover { background:#4285f4; color:#fff; }
+
+/* ========== ALERTS ========== */
 .alert { display:flex; align-items:center; justify-content:space-between; padding:.8rem 1.1rem; border-radius:10px; font-size:.9rem; font-weight:500; margin-bottom:1rem; border-left:4px solid; }
 .alert--success { background:#eaf3de; color:#27500a; border-color:#3b6d11; }
 .alert--danger  { background:#fcebeb; color:#501313; border-color:#a32d2d; }
@@ -33,55 +40,7 @@
 .alert__close { background:none; border:none; cursor:pointer; font-size:1.1rem; opacity:.6; }
 .alert__close:hover { opacity:1; }
 
-/* Modal IA */
-.modal { display:none; position:fixed; z-index:10000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.5); }
-.modal.show { display:flex; align-items:center; justify-content:center; }
-.modal-content { background:#fff; border-radius:20px; width:92%; max-width:680px; box-shadow:0 20px 60px rgba(0,0,0,0.25); animation:slideIn .25s; overflow:hidden; }
-@keyframes slideIn { from { transform:translateY(-40px); opacity:0; } to { transform:translateY(0); opacity:1; } }
-.modal-hdr { padding:1rem 1.5rem; background:#2d6a2d; display:flex; justify-content:space-between; align-items:center; }
-.modal-hdr h3 { margin:0; color:#EAF3DE; font-size:15px; font-weight:600; display:flex; align-items:center; gap:8px; }
-.modal-hdr .badge-ia { background:#EAF3DE; color:#27500A; font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; }
-.modal-close-btn { background:none; border:none; color:#C0DD97; font-size:22px; cursor:pointer; line-height:1; padding:0 4px; }
-.modal-close-btn:hover { color:#fff; }
-.modal-machine-bar { padding:.6rem 1.25rem; background:#f7faf4; border-bottom:1px solid #e4edde; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-.modal-machine-pill { background:#EAF3DE; color:#27500A; font-size:12px; font-weight:600; padding:3px 10px; border-radius:20px; white-space:nowrap; }
-.modal-machine-info { font-size:12px; color:#6b8c6b; }
-.modal-machine-info strong { color:#1a2e1a; font-weight:600; }
-.modal-tabs { display:flex; border-bottom:1px solid #e4edde; background:#f7faf4; }
-.modal-tab { flex:1; padding:.6rem .5rem; font-size:12px; font-weight:600; color:#6b8c6b; cursor:pointer; border:none; background:none; border-bottom:2px solid transparent; transition:all .15s; white-space:nowrap; }
-.modal-tab.active { color:#2d6a2d; border-bottom-color:#2d6a2d; background:#fff; }
-.modal-tab:hover:not(.active) { background:#fff; color:#1a2e1a; }
-.modal-panel { display:none; padding:1.1rem 1.25rem; max-height:500px; overflow-y:auto; }
-.modal-panel.active { display:block; }
-.modal-field-label { font-size:11px; font-weight:700; color:#7a9a7a; margin-bottom:6px; text-transform:uppercase; letter-spacing:.5px; }
-.modal-chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:.9rem; }
-.modal-chip { background:#f7faf4; border:1px solid #d4e8d4; color:#5f7a5f; font-size:12px; padding:4px 10px; border-radius:20px; cursor:pointer; transition:all .15s; }
-.modal-chip:hover,.modal-chip.sel { background:#EAF3DE; border-color:#97C459; color:#27500A; }
-.modal-textarea { width:100%; padding:.65rem .9rem; border:1px solid #d4e8d4; border-radius:10px; font-size:13px; font-family:inherit; resize:vertical; min-height:80px; outline:none; }
-.modal-textarea:focus { border-color:#2d6a2d; box-shadow:0 0 0 3px rgba(45,106,45,.1); }
-.modal-result-box { background:#f7faf4; border:1px solid #e4edde; border-radius:10px; padding:.9rem 1rem; font-size:13px; color:#1a2e1a; line-height:1.7; white-space:pre-wrap; max-height:230px; overflow-y:auto; margin-top:.6rem; }
-.modal-section-title { font-size:11px; font-weight:700; color:#7a9a7a; text-transform:uppercase; letter-spacing:.5px; margin-bottom:.4rem; margin-top:.6rem; }
-.modal-alert-info { padding:.55rem .85rem; border-radius:10px; font-size:12px; margin-bottom:.75rem; display:flex; align-items:center; gap:8px; background:#EAF3DE; color:#27500A; border-left:3px solid #3B6D11; }
-.modal-score-row { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:.75rem; }
-.modal-score-card { background:#f7faf4; border:1px solid #e4edde; border-radius:10px; padding:.6rem .75rem; text-align:center; }
-.modal-score-val { font-size:20px; font-weight:700; color:#2d6a2d; }
-.modal-score-lbl { font-size:10px; color:#7a9a7a; text-transform:uppercase; letter-spacing:.4px; margin-top:2px; }
-.modal-progress-bar { height:4px; background:#e4edde; border-radius:2px; overflow:hidden; margin-top:.4rem; }
-.modal-progress-fill { height:100%; background:#2d6a2d; border-radius:2px; transition:width .5s; }
-.modal-life-bars { display:flex; flex-direction:column; gap:8px; margin-bottom:.75rem; }
-.modal-life-bar-row { display:grid; grid-template-columns:110px 1fr 40px; align-items:center; gap:8px; font-size:12px; }
-.modal-life-bar-label { color:#7a9a7a; text-align:right; }
-.modal-life-bar-track { height:8px; background:#e4edde; border-radius:4px; overflow:hidden; }
-.modal-life-bar-fill { height:100%; border-radius:4px; transition:width .5s; }
-.modal-footer { padding:.75rem 1.25rem; border-top:1px solid #e4edde; display:flex; align-items:center; justify-content:space-between; background:#f7faf4; }
-
-/* Loader */
-.modal-loader { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem; gap:.75rem; }
-.modal-loader__spinner { width:32px; height:32px; border:3px solid #e4edde; border-top-color:#2d6a2d; border-radius:50%; animation:spin .7s linear infinite; }
-.modal-loader__text { font-size:13px; color:#7a9a7a; }
-@keyframes spin { to { transform:rotate(360deg); } }
-
-/* Stats panel */
+/* ========== STATS PANEL ========== */
 .charts-panel { display:none; background:#fff; border-radius:16px; border:1.5px solid #CECBF6; border-left:4px solid #534AB7; padding:1.5rem; margin-bottom:1.5rem; box-shadow:0 2px 14px rgba(83,74,183,.08); }
 .charts-panel.is-open { display:block; }
 .charts-panel__header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; padding-bottom:.9rem; border-bottom:1px solid #EEEDFE; }
@@ -90,26 +49,17 @@
 .charts-panel__close:hover { color:#3C3489; }
 .panel-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-bottom:1.5rem; }
 .pstat { border-radius:12px; padding:.9rem 1.1rem; }
-.pstat--purple { background:#EEEDFE; }
-.pstat--green  { background:#EAF3DE; }
-.pstat--teal   { background:#E1F5EE; }
-.pstat--amber  { background:#FAEEDA; }
+.pstat--purple{background:#EEEDFE;}.pstat--green{background:#EAF3DE;}.pstat--teal{background:#E1F5EE;}.pstat--amber{background:#FAEEDA;}
 .pstat__label { font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.6px; margin-bottom:.25rem; }
-.pstat--purple .pstat__label { color:#534AB7; }
-.pstat--green  .pstat__label { color:#3B6D11; }
-.pstat--teal   .pstat__label { color:#0F6E56; }
-.pstat--amber  .pstat__label { color:#854F0B; }
+.pstat--purple .pstat__label{color:#534AB7;}.pstat--green .pstat__label{color:#3B6D11;}.pstat--teal .pstat__label{color:#0F6E56;}.pstat--amber .pstat__label{color:#854F0B;}
 .pstat__value { font-size:1.5rem; font-weight:800; }
-.pstat--purple .pstat__value { color:#26215C; }
-.pstat--green  .pstat__value { color:#173404; }
-.pstat--teal   .pstat__value { color:#04342C; font-size:1.1rem; margin-top:.2rem; }
-.pstat--amber  .pstat__value { color:#412402; }
-.charts-row { display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; }
-@media(max-width:700px){ .charts-row { grid-template-columns:1fr; } }
-.chart-card { background:#f9f7ff; border-radius:12px; padding:1.1rem 1.25rem; border:1px solid #EEEDFE; }
+.pstat--purple .pstat__value{color:#26215C;}.pstat--green .pstat__value{color:#173404;}.pstat--teal .pstat__value{color:#04342C;font-size:1.1rem;margin-top:.2rem;}.pstat--amber .pstat__value{color:#412402;}
+.charts-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+@media(max-width:700px){.charts-row{grid-template-columns:1fr;}}
+.chart-card { background:#f9f7ff; border-radius:12px; padding:1rem; border:1px solid #EEEDFE; }
 .chart-card h3 { margin:0 0 1rem; font-size:.875rem; font-weight:700; color:#3C3489; }
 
-/* Toolbar */
+/* ========== TOOLBAR ========== */
 .toolbar { display:flex; gap:.75rem; flex-wrap:wrap; margin-bottom:1.25rem; align-items:center; background:#fff; border-radius:14px; padding:.85rem 1.1rem; box-shadow:0 2px 12px rgba(0,0,0,.06); border:1.5px solid #eaf3de; }
 .toolbar__search { position:relative; flex:1; min-width:220px; }
 .toolbar__search-icon { position:absolute; left:.8rem; top:50%; transform:translateY(-50%); pointer-events:none; color:#7a9a7a; display:flex; align-items:center; }
@@ -121,33 +71,22 @@
 .toolbar__search-clear:hover { color:#a32d2d; }
 .toolbar__select-wrap { position:relative; display:flex; align-items:center; }
 .toolbar__select-icon { position:absolute; left:.7rem; top:50%; transform:translateY(-50%); pointer-events:none; color:#7a9a7a; display:flex; align-items:center; z-index:1; }
-.toolbar select { padding:.55rem .9rem .55rem 2.2rem; border:1.5px solid #d4e8d4; border-radius:9px; font-size:.875rem; color:#1a2e1a; background:#f9fcf7; outline:none; height:40px; cursor:pointer; transition:border-color .15s; -webkit-appearance:none; appearance:none; padding-right:2rem; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a9a7a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right .6rem center; }
+.toolbar select { padding:.55rem .9rem .55rem 2.2rem; border:1.5px solid #d4e8d4; border-radius:9px; font-size:.875rem; color:#1a2e1a; background:#f9fcf7; outline:none; height:40px; cursor:pointer; transition:border-color .15s; appearance:none; padding-right:2rem; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a9a7a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right .6rem center; }
 .toolbar select:focus { border-color:#2d6a2d; background-color:#fff; }
 .toolbar__sep { width:1px; height:26px; background:#d4e8d4; flex-shrink:0; }
 
-/* Badges */
+/* ========== BADGES ========== */
 .badge { display:inline-block; padding:.28rem .85rem; border-radius:50px; font-size:.78rem; font-weight:600; white-space:nowrap; }
-.badge--mecanique   { background:#e1f5ee; color:#085041; }
-.badge--electrique  { background:#faeeda; color:#633806; }
-.badge--hydraulique { background:#eaf3de; color:#27500a; }
-.badge--logicielle  { background:#e6f1fb; color:#0c447c; }
-.badge--transmission{ background:#ede8fa; color:#4a1d8c; }
-.badge--moteur      { background:#fde8e8; color:#a32d2d; }
-.badge--vidange     { background:#fff8e1; color:#7b5200; }
-.badge--revision    { background:#e8f4fd; color:#1a5276; }
-.badge--pneumatique { background:#ddeeff; color:#0a3d6b; }
-.badge--autre,.badge--default { background:#f1efe8; color:#2c2c2a; }
+.badge--mecanique{background:#e1f5ee;color:#085041;}.badge--electrique{background:#faeeda;color:#633806;}.badge--hydraulique{background:#eaf3de;color:#27500a;}
+.badge--logicielle{background:#e6f1fb;color:#0c447c;}.badge--transmission{background:#ede8fa;color:#4a1d8c;}.badge--moteur{background:#fde8e8;color:#a32d2d;}
+.badge--vidange{background:#fff8e1;color:#7b5200;}.badge--revision{background:#e8f4fd;color:#1a5276;}.badge--pneumatique{background:#ddeeff;color:#0a3d6b;}
+.badge--autre,.badge--default{background:#f1efe8;color:#2c2c2a;}
 .statut-badge { display:inline-flex; align-items:center; gap:4px; padding:.2rem .7rem; border-radius:50px; font-size:.76rem; font-weight:600; white-space:nowrap; }
-.statut--planifie { background:#e6f1fb; color:#0c447c; }
-.statut--en_cours  { background:#fff8e1; color:#7b5200; }
-.statut--termine   { background:#e1f5ee; color:#085041; }
+.statut--planifie{background:#e6f1fb;color:#0c447c;}.statut--en_cours{background:#fff8e1;color:#7b5200;}.statut--termine{background:#e1f5ee;color:#085041;}
 .prio-badge { display:inline-flex; align-items:center; gap:4px; padding:.2rem .7rem; border-radius:50px; font-size:.76rem; font-weight:700; white-space:nowrap; }
-.prio--faible  { background:#e6f1fb; color:#0c447c; }
-.prio--moyenne { background:#eaf3de; color:#27500a; }
-.prio--haute   { background:#faeeda; color:#854F0B; }
-.prio--urgente { background:#fde8e8; color:#a32d2d; }
+.prio--faible{background:#e6f1fb;color:#0c447c;}.prio--moyenne{background:#eaf3de;color:#27500a;}.prio--haute{background:#faeeda;color:#854F0B;}.prio--urgente{background:#fde8e8;color:#a32d2d;}
 
-/* Table */
+/* ========== TABLE ========== */
 .maint-card { background:#fff; border-radius:16px; box-shadow:0 2px 18px rgba(0,0,0,.07); overflow-x:auto; }
 .maint-table { width:100%; border-collapse:collapse; font-size:.88rem; min-width:1000px; }
 .maint-table thead tr { background:#f7faf4; border-bottom:1.5px solid #e4edde; }
@@ -163,26 +102,24 @@
 .td-desc { color:#4a6a4a; font-size:.87rem; max-width:180px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .actions { display:flex; align-items:center; gap:.35rem; flex-wrap:wrap; }
 .act-btn { display:inline-flex; align-items:center; gap:.3rem; padding:.3rem .7rem; border-radius:8px; font-size:.78rem; font-weight:600; text-decoration:none; cursor:pointer; border:1.5px solid; background:#fff; transition:all .13s; white-space:nowrap; }
-.act-btn--view  { border-color:#b3d4b3; color:#2d6a2d; } .act-btn--view:hover  { background:#eaf3de; }
-.act-btn--edit  { border-color:#f5c4b3; color:#993c1d; } .act-btn--edit:hover  { background:#faece7; }
-.act-btn--del   { border-color:#f7c1c1; color:#a32d2d; } .act-btn--del:hover   { background:#fcebeb; }
-.act-btn--magic { border-color:#b3d4b3; color:#2d6a2d; } .act-btn--magic:hover { background:#eaf3de; }
+.act-btn--view{border-color:#b3d4b3;color:#2d6a2d;}.act-btn--view:hover{background:#eaf3de;}
+.act-btn--edit{border-color:#f5c4b3;color:#993c1d;}.act-btn--edit:hover{background:#faece7;}
+.act-btn--del{border-color:#f7c1c1;color:#a32d2d;}.act-btn--del:hover{background:#fcebeb;}
+.act-btn--ia-pro { background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:#fff; border:none; }
+.act-btn--ia-pro:hover { transform:translateY(-1px); }
 
-/* Cards */
+/* ========== CARDS ========== */
 .cards-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:1.1rem; }
 .maint-card-item { background:#fff; border-radius:16px; box-shadow:0 2px 14px rgba(0,0,0,.08); overflow:hidden; transition:box-shadow .2s,transform .15s; display:flex; flex-direction:column; }
 .maint-card-item:hover { box-shadow:0 6px 28px rgba(0,0,0,.13); transform:translateY(-2px); }
 .mci-header { padding:1.1rem 1.2rem .9rem; display:flex; justify-content:space-between; align-items:flex-start; background:#2d6a2d; color:#fff; }
-.mci-header.h--planifie { background:#0c447c; }
-.mci-header.h--en_cours { background:#7b5200; }
-.mci-header.h--termine  { background:#2d6a2d; }
-.mci-header.h--urgente  { background:#a32d2d; }
+.mci-header.h--planifie{background:#0c447c;}.mci-header.h--en_cours{background:#7b5200;}.mci-header.h--termine{background:#2d6a2d;}.mci-header.h--urgente{background:#a32d2d;}
 .mci-title { font-size:1rem; font-weight:700; margin-bottom:.15rem; }
 .mci-sub { font-size:.78rem; opacity:.85; display:flex; align-items:center; gap:.35rem; }
 .mci-status-pill { background:rgba(255,255,255,.22); border-radius:20px; padding:.2rem .75rem; font-size:.78rem; font-weight:700; color:#fff; white-space:nowrap; border:1.5px solid rgba(255,255,255,.4); }
 .mci-alert { background:#fffbe6; border-left:4px solid #f5a623; padding:.55rem 1rem; font-size:.8rem; font-weight:600; color:#7b4f00; display:flex; align-items:center; gap:.4rem; }
-.mci-alert.alert-danger  { background:#fcebeb; border-left-color:#a32d2d; color:#501313; }
-.mci-alert.alert-warning { background:#fff3cd; border-left-color:#ffc107; color:#856404; }
+.mci-alert.alert-danger{background:#fcebeb;border-left-color:#a32d2d;color:#501313;}
+.mci-alert.alert-warning{background:#fff3cd;border-left-color:#ffc107;color:#856404;}
 .mci-stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:0; border-bottom:1px solid #f0f4ef; }
 .mci-stat { padding:.75rem .6rem; text-align:center; border-right:1px solid #f0f4ef; }
 .mci-stat:last-child { border-right:none; }
@@ -194,64 +131,66 @@
 .mci-desc { font-size:.8rem; color:#5a7a5a; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
 .mci-actions { display:grid; grid-template-columns:1fr 1fr auto; gap:.4rem; padding:.75rem 1rem; border-top:1px solid #f0f4ef; background:#fafcf8; }
 .mci-btn { display:inline-flex; align-items:center; justify-content:center; gap:.3rem; padding:.42rem .6rem; border-radius:9px; font-size:.78rem; font-weight:600; text-decoration:none; cursor:pointer; border:1.5px solid; background:#fff; transition:all .13s; white-space:nowrap; }
-.mci-btn--view  { border-color:#b3d4b3; color:#2d6a2d; } .mci-btn--view:hover  { background:#eaf3de; }
-.mci-btn--edit  { border-color:#f5c4b3; color:#993c1d; } .mci-btn--edit:hover  { background:#faece7; }
-.mci-btn--magic { border-color:#b3d4b3; color:#2d6a2d; } .mci-btn--magic:hover { background:#eaf3de; }
-.mci-btn--del   { border-color:#f7c1c1; color:#a32d2d; } .mci-btn--del:hover   { background:#fcebeb; }
+.mci-btn--view{border-color:#b3d4b3;color:#2d6a2d;}.mci-btn--view:hover{background:#eaf3de;}
+.mci-btn--edit{border-color:#f5c4b3;color:#993c1d;}.mci-btn--edit:hover{background:#faece7;}
+.mci-btn--del{border-color:#f7c1c1;color:#a32d2d;}.mci-btn--del:hover{background:#fcebeb;}
+.mci-btn--ia-pro { background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:#fff; border:none; }
+.mci-btn--ia-pro:hover { transform:translateY(-1px); }
 .empty { text-align:center; padding:4rem 2rem; background:#fff; border-radius:16px; border:1.5px dashed #c8dac8; }
-.loading-spinner { display:inline-block; width:13px; height:13px; border:2px solid rgba(255,255,255,.3); border-radius:50%; border-top-color:#fff; animation:spin .6s linear infinite; }
 
-/* Suggestion cards */
-.suggestion-card { background:#fff; border-radius:10px; padding:12px; margin-bottom:12px; box-shadow:0 1px 3px rgba(0,0,0,0.1); }
-.suggestion-card__header { display:flex; align-items:center; gap:10px; margin-bottom:6px; }
-.suggestion-card__icon { font-size:20px; }
-.suggestion-card__title { font-weight:700; flex:1; }
-.suggestion-card__badge { margin-left:auto; color:white; padding:2px 8px; border-radius:12px; font-size:10px; font-weight:600; }
-.suggestion-card__msg { margin:8px 0; font-size:13px; color:#2c3e50; }
-.suggestion-card__btn { font-size:11px; padding:4px 12px; }
+/* ========== PAGINATION ========== */
+.pagination-wrap { display:flex; justify-content:center; align-items:center; gap:.5rem; margin-top:1.5rem; flex-wrap:wrap; }
+.pg-btn { display:inline-flex; align-items:center; justify-content:center; min-width:36px; height:36px; padding:0 .6rem; border-radius:9px; font-size:.85rem; font-weight:600; cursor:pointer; border:1.5px solid #d4e8d4; background:#fff; color:#2d6a2d; transition:all .13s; }
+.pg-btn:hover:not(:disabled) { background:#eaf3de; border-color:#2d6a2d; }
+.pg-btn.active { background:#2d6a2d; color:#fff; border-color:#2d6a2d; cursor:default; }
+.pg-btn:disabled { opacity:.4; cursor:not-allowed; background:#f5f5f5; }
+.pg-info { font-size:.82rem; color:#7a9a7a; padding:0 .5rem; }
+.pg-size-select { padding:.35rem .7rem; border:1.5px solid #d4e8d4; border-radius:8px; font-size:.82rem; color:#1a2e1a; background:#f9fcf7; outline:none; cursor:pointer; }
+.pg-size-select:focus { border-color:#2d6a2d; }
 
-/* FullCalendar */
-.fc { font-family:'Segoe UI',system-ui,sans-serif; }
-.fc-toolbar-title { font-size:1.2rem; font-weight:700; color:#1a2e1a; }
-.fc-button-primary { background-color:#2d6a2d !important; border-color:#235223 !important; }
-.fc-button-primary:hover { background-color:#235223 !important; }
-.fc-daygrid-day-number { color:#1a2e1a; }
-.fc-event { cursor:pointer; border-radius:6px; font-size:.8rem; font-weight:500; }
-
-/* Popup detail maintenance */
+/* ========== MODALES ========== */
+.modal-loader { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem; gap:.75rem; }
+.modal-loader__spinner { width:32px; height:32px; border:3px solid #e4edde; border-top-color:#2d6a2d; border-radius:50%; animation:spin .7s linear infinite; }
+.modal-loader__text { font-size:13px; color:#7a9a7a; }
 .reminder-popup { display:none; position:fixed; z-index:10050; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); justify-content:center; align-items:center; }
 .reminder-popup.show { display:flex; }
-.reminder-popup-content { background:#fff; border-radius:24px; width:90%; max-width:550px; max-height:85vh; overflow-y:auto; animation:popupSlideIn .3s ease-out; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); }
-@keyframes popupSlideIn { from { opacity:0; transform:translateY(-30px) scale(.95); } to { opacity:1; transform:translateY(0) scale(1); } }
-.reminder-popup-header { background:linear-gradient(135deg,#2d6a2d 0%,#1a4d1a 100%); padding:1.25rem 1.5rem; color:#fff; display:flex; justify-content:space-between; align-items:center; border-radius:24px 24px 0 0; }
+.reminder-popup-content { background:white; border-radius:24px; width:90%; max-width:550px; max-height:85vh; overflow-y:auto; animation:popupSlideIn 0.3s ease-out; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); }
+.reminder-popup-header { background:linear-gradient(135deg, #e74a3b 0%, #c0392b 100%); padding:1.25rem 1.5rem; color:white; display:flex; justify-content:space-between; align-items:center; border-radius:24px 24px 0 0; }
 .reminder-popup-header h3 { margin:0; font-size:1.2rem; display:flex; align-items:center; gap:10px; }
-.reminder-popup-close { background:rgba(255,255,255,.2); border:none; color:#fff; width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:1.2rem; display:flex; align-items:center; justify-content:center; }
+.reminder-popup-close { background:rgba(255,255,255,0.2); border:none; color:white; width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:1.2rem; display:flex; align-items:center; justify-content:center; transition:background .15s; }
+.reminder-popup-close:hover { background:rgba(255,255,255,0.35); }
 .reminder-popup-body { padding:1.5rem; }
 .reminder-message-box { background:#fef3e8; border-left:4px solid #e74a3b; padding:1rem; border-radius:12px; margin-bottom:1.5rem; }
 .reminder-message-text { font-size:1rem; font-weight:700; color:#a32d2d; margin-bottom:8px; }
 .reminder-detail-row { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #e4edde; }
-.reminder-detail-label { font-weight:600; color:#7a9a7a; font-size:.8rem; }
+.reminder-detail-label { font-weight:600; color:#7a9a7a; font-size:0.8rem; }
 .reminder-detail-value { font-weight:500; color:#1a2e1a; }
+
+/* ========== NOTE DU JOUR ========== */
+.day-note-dot { width:7px; height:7px; background:#2d6a2d; border-radius:50%; display:inline-block; margin-left:3px; vertical-align:middle; }
+.fc-day-note-indicator { position:absolute; bottom:3px; right:4px; width:8px; height:8px; background:#2d6a2d; border-radius:50%; }
+
+@keyframes spin { to { transform:rotate(360deg); } }
+@keyframes popupSlideIn { from { opacity:0; transform:translateY(-30px) scale(0.95); } to { opacity:1; transform:translateY(0) scale(1); } }
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
 </style>
 
-{# PAGE PRINCIPALE #}
 <div class="mp">
-
   <nav class="bc">
-    <a href="#">Matériels</a>
+    <a href="{{ path('agri_maintenances_index') }}">Maintenances</a>
     <span class="bc__sep">›</span>
-    <span>Maintenances</span>
+    <span>Liste</span>
   </nav>
 
   <div class="mh">
     <div>
       <h1>🔧 Maintenances</h1>
-      <p>{{ maintenancesWithAlerts|length }} maintenance(s) · Total : <strong>{{ totalCout|number_format(2, ',', ' ') }} DT</strong></p>
+      <p>{{ maintenancesWithAlerts|length }} maintenance(s) · Total : <strong>{{ totalCout|number_format(2,',',' ') }} DT</strong></p>
     </div>
     <div class="mh__right">
       <button type="button" class="btn btn--view-toggle active" id="viewCards" onclick="setView('cards')">⊞ Cartes</button>
       <button type="button" class="btn btn--view-toggle" id="viewTable" onclick="setView('table')">☰ Tableau</button>
-      <button type="button" class="btn btn--calendar" id="openCalendarBtn" onclick="openReminderCalendar()">📅 Calendrier des maintenances</button>
+      <button type="button" class="btn btn--calendar" id="openCalendarBtn">📅 Rappels annuels</button>
       <button type="button" class="btn btn--stats" id="statsToggle" onclick="toggleStats()">📊 Stats</button>
       <a href="{{ path('agri_maintenances_export_pdf') }}" target="_blank" class="btn btn--outline">📄 PDF</a>
       <a href="{{ path('agri_maintenances_export_excel') }}" class="btn btn--outline">📥 Excel</a>
@@ -259,16 +198,13 @@
     </div>
   </div>
 
-  {% for flashType, flashMessages in app.flashes %}
-    {% for msg in flashMessages %}
-      <div class="alert alert--{{ flashType }}">
-        <span>{{ msg }}</span>
-        <button class="alert__close" onclick="this.parentElement.remove()">✕</button>
-      </div>
+  {% for type, messages in app.flashes %}
+    {% for msg in messages %}
+      <div class="alert alert--{{ type }}"><span>{{ msg }}</span><button class="alert__close" onclick="this.parentElement.remove()">✕</button></div>
     {% endfor %}
   {% endfor %}
 
-  {# Stats Panel #}
+  {# ══ STATS PANEL ══ #}
   <div class="charts-panel" id="chartsPanel">
     <div class="charts-panel__header">
       <p class="charts-panel__title">📊 Statistiques des maintenances</p>
@@ -276,13 +212,14 @@
     </div>
     <div class="panel-stats">
       <div class="pstat pstat--purple"><div class="pstat__label">Total</div><div class="pstat__value">{{ maintenancesWithAlerts|length }}</div></div>
-      <div class="pstat pstat--green"><div class="pstat__label">Coût total</div><div class="pstat__value">{{ totalCout|number_format(0, ',', ' ') }} DT</div></div>
-      {% if countByType is defined and countByType is not empty %}
+      <div class="pstat pstat--green"><div class="pstat__label">Coût total</div><div class="pstat__value">{{ totalCout|number_format(0,',',' ') }} DT</div></div>
+      {% if countByType is defined and countByType|length > 0 %}
         <div class="pstat pstat--teal"><div class="pstat__label">Type dominant</div><div class="pstat__value">{{ countByType[0].type|capitalize }}</div></div>
-      {% else %}
-        <div class="pstat pstat--teal"><div class="pstat__label">Type dominant</div><div class="pstat__value">—</div></div>
       {% endif %}
-      <div class="pstat pstat--amber"><div class="pstat__label">Coût moyen</div><div class="pstat__value">{% if maintenancesWithAlerts|length > 0 %}{{ (totalCout / maintenancesWithAlerts|length)|number_format(0, ',', ' ') }} DT{% else %}0 DT{% endif %}</div></div>
+      <div class="pstat pstat--amber">
+        <div class="pstat__label">Coût moyen</div>
+        <div class="pstat__value">{% if maintenancesWithAlerts|length > 0 %}{{ (totalCout / maintenancesWithAlerts|length)|number_format(0,',',' ') }} DT{% else %}0 DT{% endif %}</div>
+      </div>
     </div>
     <div class="charts-row">
       <div class="chart-card"><h3>📊 Répartition par type</h3><canvas id="barChart" height="200"></canvas></div>
@@ -290,204 +227,1099 @@
     </div>
   </div>
 
-  {# Toolbar #}
+  {# ══ TOOLBAR ══ #}
   <div class="toolbar">
     <div class="toolbar__search">
       <span class="toolbar__search-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
       <input type="text" id="searchInput" placeholder="Rechercher (type, description, machine…)" oninput="onSearchInput(this)">
-      <button class="toolbar__search-clear" id="clearSearch" onclick="clearSearch()">✕</button>
+      <button class="toolbar__search-clear" id="clearSearch" onclick="clearSearch()" title="Effacer">✕</button>
     </div>
     <div class="toolbar__sep"></div>
     <div class="toolbar__select-wrap">
       <span class="toolbar__select-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></span>
-      <select id="typeFilter" onchange="filterItems()"><option value="">Tous les types</option>{% if countByType is defined and countByType is not empty %}{% for row in countByType %}<option value="{{ row.type|lower }}">{{ row.type }} ({{ row.total }})</option>{% endfor %}{% endif %}</select>
+      <select id="typeFilter" onchange="filterItems()">
+        <option value="">Tous les types</option>
+        {% if countByType is defined and countByType is not empty %}
+          {% for row in countByType %}<option value="{{ row.type|lower }}">{{ row.type }} ({{ row.total }})</option>{% endfor %}
+        {% endif %}
+      </select>
     </div>
-    <div class="toolbar__select-wrap"><span class="toolbar__select-icon">🔄</span><select id="statutFilter" onchange="filterItems()"><option value="">Tous les statuts</option><option value="planifie">📅 Planifié</option><option value="en_cours">⚙️ En cours</option><option value="termine">✅ Terminé</option></select></div>
-    <div class="toolbar__select-wrap"><span class="toolbar__select-icon">⚡</span><select id="prioriteFilter" onchange="filterItems()"><option value="">Toutes priorités</option><option value="urgente">🔴 Urgente</option><option value="haute">🟠 Haute</option><option value="moyenne">🟢 Moyenne</option><option value="faible">🔵 Faible</option></select></div>
-    <div class="toolbar__select-wrap"><select id="sortFilter" onchange="filterItems()"><option value="date">Trier par date</option><option value="cout">Trier par coût</option><option value="type">Trier par type</option><option value="priorite">Trier par priorité</option><option value="statut">Trier par statut</option><option value="km">Trier par km</option></select></div>
-    <div class="toolbar__select-wrap"><select id="dirFilter" onchange="filterItems()"><option value="desc">Décroissant</option><option value="asc">Croissant</option></select></div>
+    <div class="toolbar__select-wrap">
+      <span class="toolbar__select-icon">🔄</span>
+      <select id="statutFilter" onchange="filterItems()">
+        <option value="">Tous les statuts</option>
+        <option value="planifie">📅 Planifié</option>
+        <option value="en_cours">⚙️ En cours</option>
+        <option value="termine">✅ Terminé</option>
+      </select>
+    </div>
+    <div class="toolbar__select-wrap">
+      <span class="toolbar__select-icon">⚡</span>
+      <select id="prioriteFilter" onchange="filterItems()">
+        <option value="">Toutes priorités</option>
+        <option value="urgente">🔴 Urgente</option>
+        <option value="haute">🟠 Haute</option>
+        <option value="moyenne">🟢 Moyenne</option>
+        <option value="faible">🔵 Faible</option>
+      </select>
+    </div>
+    <div class="toolbar__select-wrap">
+      <select id="sortFilter" onchange="filterItems()">
+        <option value="date">Trier par date</option>
+        <option value="cout">Trier par coût</option>
+        <option value="type">Trier par type</option>
+        <option value="priorite">Trier par priorité</option>
+        <option value="statut">Trier par statut</option>
+        <option value="km">Trier par km</option>
+      </select>
+    </div>
+    <div class="toolbar__select-wrap">
+      <select id="dirFilter" onchange="filterItems()">
+        <option value="desc">Décroissant</option>
+        <option value="asc">Croissant</option>
+      </select>
+    </div>
     <button type="button" class="btn btn--red-outline" id="resetBtn" onclick="resetFilters()" style="display:none;">✕ Réinitialiser</button>
   </div>
 
   {% if maintenancesWithAlerts is empty %}
-    <div class="empty"><p style="font-size:2.5rem;margin:0 0 .5rem;">🔧</p><p style="color:#6b8c6b;margin:0 0 1.5rem;">Aucune maintenance enregistrée.</p><a href="{{ path('agri_maintenances_new') }}" class="btn btn--green">Ajouter une maintenance</a></div>
+    <div class="empty">
+      <p style="font-size:2.5rem; margin:0 0 .5rem;">🔧</p>
+      <p style="color:#6b8c6b; margin:0 0 1.5rem;">Aucune maintenance enregistrée.</p>
+      <a href="{{ path('agri_maintenances_new') }}" class="btn btn--green">Ajouter une maintenance</a>
+    </div>
   {% else %}
 
-  {# VUE CARTES #}
+  {# ══ CARD VIEW ══ #}
   <div id="viewCardsContainer">
     <div class="cards-grid" id="cardsGrid">
       {% for item in maintenancesWithAlerts %}
         {% set m = item.maintenance %}
         {% set alert = item.alert %}
-        {% set machineName = (m.nomMateriel is defined and m.nomMateriel is not null and m.nomMateriel != '') ? m.nomMateriel : ((m.nom is defined and m.nom is not null and m.nom != '') ? m.nom : 'Machine non définie') %}
-        {% set typePanne = m.typePanne is defined and m.typePanne is not null ? m.typePanne : '' %}
-        {% set priorite = m.priorite is defined and m.priorite is not null ? m.priorite : 'moyenne' %}
-        {% set statut = m.statut is defined and m.statut is not null ? m.statut : 'planifie' %}
-        {% set cout = m.cout is defined and m.cout is not null ? m.cout : 0 %}
-        {% set kilometrage = m.kilometrage is defined and m.kilometrage is not null ? m.kilometrage : null %}
-        {% set description = m.description is defined and m.description is not null ? m.description : '' %}
-        {% set recommandation = m.recommandation is defined and m.recommandation is not null ? m.recommandation : '' %}
         {% set typeMap = {'Mécanique':'mecanique','Électricité':'electrique','Hydraulique':'hydraulique','Logicielle':'logicielle','Transmission':'transmission','Moteur':'moteur','Vidange & filtres':'vidange','Révision générale':'revision','Pneumatique':'pneumatique'} %}
-        {% set bc = typeMap[typePanne]|default('default') %}
-        {% set prioOrder = {'faible':1,'moyenne':2,'haute':3,'urgente':4} %}
+        {% set bc = typeMap[m.typePanne]|default('default') %}
         {% set prioLabels = {'faible':'🔵 Faible','moyenne':'🟢 Moyenne','haute':'🟠 Haute','urgente':'🔴 Urgente'} %}
-        {% set statLabels = {'planifie':'📅 Planifié','en_cours':'⚙️ En cours','termine':'✅ Terminé'} %}
-        {% set headerCls = priorite == 'urgente' ? 'h--urgente' : 'h--' ~ statut %}
+        {% set statutLabels = {'planifie':'📅 Planifié','en_cours':'⚙️ En cours','termine':'✅ Terminé'} %}
+        {% set prioOrder = {'faible':1,'moyenne':2,'haute':3,'urgente':4} %}
+        {% set headerCls = m.priorite == 'urgente' ? 'h--urgente' : 'h--' ~ (m.statut|default('planifie')) %}
+        {% set machineName = m.nomMateriel is defined and m.nomMateriel is not null ? m.nomMateriel : (m.nom is defined and m.nom is not null ? m.nom : 'Machine non définie') %}
 
-        <div class="maint-card-item" data-id="{{ m.idMain }}" data-type="{{ typePanne|lower }}" data-desc="{{ description|lower }}" data-cout="{{ cout }}" data-date="{{ m.dateMain is defined and m.dateMain is not null ? m.dateMain|date('Y-m-d') : '0000-00-00' }}" data-statut="{{ statut }}" data-priorite="{{ priorite }}" data-prio-order="{{ prioOrder[priorite]|default(2) }}" data-km="{{ kilometrage|default(0) }}" data-nom="{{ machineName|lower }}">
+        <div class="maint-card-item"
+             data-id="{{ m.idMain }}"
+             data-type="{{ m.typePanne|default('')|lower }}"
+             data-desc="{{ m.description|default('')|lower }}"
+             data-cout="{{ m.cout|default(0) }}"
+             data-date="{{ m.dateMain ? m.dateMain|date('Y-m-d') : '0000-00-00' }}"
+             data-statut="{{ m.statut|default('planifie') }}"
+             data-priorite="{{ m.priorite|default('moyenne') }}"
+             data-prio-order="{{ prioOrder[m.priorite]|default(2) }}"
+             data-km="{{ m.kilometrage|default(0) }}"
+             data-nom="{{ machineName|lower }}">
+
           <div class="mci-header {{ headerCls }}">
-            <div><div class="mci-title">{{ machineName }}</div><div class="mci-sub"><span>📍</span><span>{{ typePanne|default('—') }}</span>{% if m.idM is defined and m.idM is not null %}&nbsp;·&nbsp;#{{ m.idM }}{% endif %}</div></div>
-            <div class="mci-status-pill">{% if priorite == 'urgente' %}🔴 Urgente{% elseif statut == 'termine' %}✅ Terminé{% elseif statut == 'en_cours' %}⚙️ En cours{% else %}📅 Planifié{% endif %}</div>
+            <div>
+              <div class="mci-title">{{ machineName }}</div>
+              <div class="mci-sub"><span>📍</span><span>{{ m.typePanne|default('—') }}</span>{% if m.idM %}&nbsp;·&nbsp;#{{ m.idM }}{% endif %}</div>
+            </div>
+            <div class="mci-status-pill">
+              {% if m.priorite == 'urgente' %}🔴 Urgente
+              {% elseif m.statut == 'termine' %}✅ Terminé
+              {% elseif m.statut == 'en_cours' %}⚙️ En cours
+              {% else %}📅 Planifié{% endif %}
+            </div>
           </div>
-          {% if alert is defined and alert.status is defined %}
-            {% if alert.status == 'overdue' %}<div class="mci-alert alert-danger">⚠️ {{ alert.message }}</div>{% elseif alert.status == 'warning' %}<div class="mci-alert alert-warning">⏰ {{ alert.message }}</div>{% elseif m.dateMain is defined and m.dateMain is not null %}<div class="mci-alert" style="background:#f0faf7;border-left-color:#0F6E56;color:#085041;">📅 Maintenance le {{ m.dateMain|date('d/m/Y') }}</div>{% endif %}
+
+          {% if alert.status == 'overdue' %}<div class="mci-alert alert-danger">⚠️ {{ alert.message }}</div>
+          {% elseif alert.status == 'warning' %}<div class="mci-alert alert-warning">⏰ {{ alert.message }}</div>
+          {% elseif m.dateMain %}<div class="mci-alert" style="background:#f0faf7;border-left-color:#0F6E56;color:#085041;">📅 Maintenance le {{ m.dateMain|date('d/m/Y') }}</div>
           {% endif %}
-          <div class="mci-stats"><div class="mci-stat"><div class="mci-stat__val">{{ kilometrage is not null ? kilometrage|number_format(0, ' ', ' ') : '—' }}</div><div class="mci-stat__lbl">KM</div></div><div class="mci-stat"><div class="mci-stat__val">{{ m.dateMain is defined and m.dateMain is not null ? m.dateMain|date('Y') : '—' }}</div><div class="mci-stat__lbl">ANNÉE</div></div><div class="mci-stat"><div class="mci-stat__val" style="font-size:.9rem;">{{ cout|number_format(0, ' ', ' ') }} DT</div><div class="mci-stat__lbl">COÛT</div></div></div>
-          <div class="mci-body"><div class="mci-row"><span class="mci-row-label">Type</span><span class="badge badge--{{ bc }}">{{ typePanne|default('—') }}</span></div><div class="mci-row"><span class="mci-row-label">Priorité</span><span class="prio-badge prio--{{ priorite }}">{{ prioLabels[priorite]|default('—') }}</span></div><div class="mci-row"><span class="mci-row-label">Statut</span><span class="statut-badge statut--{{ statut }}">{{ statLabels[statut]|default('—') }}</span></div><div class="mci-row"><span class="mci-row-label">Coût</span><strong>{{ cout|number_format(2, ',', ' ') }} DT</strong></div>{% if description %}<div class="mci-desc" title="{{ description }}">{{ description }}</div>{% endif %}{% if recommandation %}<div class="mci-row" style="margin-top:4px;"><span class="mci-row-label">💡 Reco</span><span style="font-size:.75rem;color:#2d6a2d;">{{ recommandation|slice(0,60) }}{{ recommandation|length > 60 ? '…' : '' }}</span></div>{% endif %}</div>
+
+          <div class="mci-stats">
+            <div class="mci-stat"><div class="mci-stat__val">{{ m.kilometrage is not null ? m.kilometrage|number_format(0,' ',' ') : '—' }}</div><div class="mci-stat__lbl">KM</div></div>
+            <div class="mci-stat"><div class="mci-stat__val">{{ m.dateMain ? m.dateMain|date('Y') : '—' }}</div><div class="mci-stat__lbl">ANNÉE</div></div>
+            <div class="mci-stat"><div class="mci-stat__val" style="font-size:.9rem;">{{ m.cout|number_format(0,' ',' ') }} DT</div><div class="mci-stat__lbl">COÛT</div></div>
+          </div>
+
+          <div class="mci-body">
+            <div class="mci-row"><span class="mci-row-label">Type</span><span class="badge badge--{{ bc }}">{{ m.typePanne|default('—') }}</span></div>
+            <div class="mci-row"><span class="mci-row-label">Priorité</span><span class="prio-badge prio--{{ m.priorite|default('moyenne') }}">{{ prioLabels[m.priorite]|default('—') }}</span></div>
+            <div class="mci-row"><span class="mci-row-label">Statut</span><span class="statut-badge statut--{{ m.statut|default('planifie') }}">{{ statutLabels[m.statut]|default('—') }}</span></div>
+            <div class="mci-row"><span class="mci-row-label">Coût</span><strong>{{ m.cout|number_format(2,',',' ') }} DT</strong></div>
+            {% if m.description %}<div class="mci-desc" title="{{ m.description }}">{{ m.description }}</div>{% endif %}
+            {% if m.recommandation %}
+              <div class="mci-row" style="margin-top:4px;"><span class="mci-row-label">💡 Reco IA</span><span style="font-size:.75rem;color:#2d6a2d;">{{ m.recommandation|slice(0,80) }}{{ m.recommandation|length > 80 ? '…' : '' }}</span></div>
+            {% endif %}
+          </div>
+
           <div class="mci-actions">
             <a href="{{ path('agri_maintenances_show', {id: m.idMain}) }}" class="mci-btn mci-btn--view">👁 Voir</a>
             <a href="{{ path('agri_maintenances_edit', {id: m.idMain}) }}" class="mci-btn mci-btn--edit">✏️ Edit</a>
-            <a href="javascript:void(0)" class="mci-btn mci-btn--magic" onclick="openAIPrompt({{ m.idMain }}, '{{ typePanne|e('js') }}', '{{ priorite|e('js') }}', '{{ kilometrage|default(0) }}', '{{ machineName|e('js') }}', '{{ statut|e('js') }}', '{{ cout }}', '{{ description|e('js')|slice(0,100) }}')">🤖 IA</a>
-            <form method="post" action="{{ path('agri_maintenances_delete', {id: m.idMain}) }}" onsubmit="return confirm('⚠️ Supprimer cette maintenance ?')" style="margin:0;"><input type="hidden" name="_token" value="{{ csrf_token('delete_maintenance_' ~ m.idMain) }}"><button type="submit" class="mci-btn mci-btn--del" title="Supprimer">🗑</button></form>
+            <a href="javascript:void(0)" class="mci-btn mci-btn--ia-pro"
+               onclick="generateAndShowAIRecommendation({{ m.idMain }}, '{{ m.typePanne|e('js') }}', '{{ m.priorite|e('js') }}', '{{ m.kilometrage|default(0) }}', '{{ machineName|e('js') }}', '{{ m.statut|e('js') }}', '{{ m.cout|default(0) }}', '{{ m.description|default('')|e('js') }}')">🧠 IA Pro</a>
+            <form method="post" action="{{ path('agri_maintenances_delete', {id: m.idMain}) }}" onsubmit="return confirm('⚠️ Supprimer cette maintenance ?')" style="margin:0;">
+              <input type="hidden" name="_token" value="{{ csrf_token('delete_maintenance_' ~ m.idMain) }}">
+              <button type="submit" class="mci-btn mci-btn--del" title="Supprimer">🗑</button>
+            </form>
           </div>
         </div>
       {% endfor %}
     </div>
     <div id="noResultsCards" style="display:none;text-align:center;padding:3rem;color:#7a9a7a;">🔍 Aucun résultat.</div>
+    {# ══ PAGINATION CARTES (2 boutons) ══ #}
+    <div class="pagination-wrap" id="paginationCards"></div>
   </div>
 
-  {# VUE TABLEAU #}
+  {# ══ TABLE VIEW ══ #}
   <div id="viewTableContainer" style="display:none;">
-    <div class="maint-card"><table class="maint-table"><thead><tr><th>Type</th><th>Coût (DT)</th><th>Date</th><th>Statut</th><th>Priorité</th><th>Km</th><th>Alerte</th><th>Machine</th><th>Description</th><th>Actions</th></tr></thead><tbody id="maintBody">
-      {% for item in maintenancesWithAlerts %}
-        {% set m = item.maintenance %}
-        {% set alert = item.alert %}
-        {% set machineName2 = (m.nomMateriel is defined and m.nomMateriel is not null and m.nomMateriel != '') ? m.nomMateriel : ((m.nom is defined and m.nom is not null and m.nom != '') ? m.nom : 'Machine non définie') %}
-        {% set typePanne2 = m.typePanne is defined and m.typePanne is not null ? m.typePanne : '' %}
-        {% set priorite2 = m.priorite is defined and m.priorite is not null ? m.priorite : 'moyenne' %}
-        {% set statut2 = m.statut is defined and m.statut is not null ? m.statut : 'planifie' %}
-        {% set cout2 = m.cout is defined and m.cout is not null ? m.cout : 0 %}
-        {% set kilometrage2 = m.kilometrage is defined and m.kilometrage is not null ? m.kilometrage : null %}
-        {% set description2 = m.description is defined and m.description is not null ? m.description : '' %}
-        {% set typeMap2 = {'Mécanique':'mecanique','Électricité':'electrique','Hydraulique':'hydraulique','Logicielle':'logicielle','Transmission':'transmission','Moteur':'moteur','Vidange & filtres':'vidange','Révision générale':'revision','Pneumatique':'pneumatique'} %}
-        {% set bc2 = typeMap2[typePanne2]|default('default') %}
-        <tr data-id="{{ m.idMain }}" data-type="{{ typePanne2|lower }}" data-desc="{{ description2|lower }}" data-cout="{{ cout2 }}" data-date="{{ m.dateMain is defined and m.dateMain is not null ? m.dateMain|date('Y-m-d') : '0000-00-00' }}" data-statut="{{ statut2 }}" data-priorite="{{ priorite2 }}" data-prio-order="{{ {'faible':1,'moyenne':2,'haute':3,'urgente':4}[priorite2]|default(2) }}" data-km="{{ kilometrage2|default(0) }}" data-nom="{{ machineName2|lower }}">
-          <td><span class="badge badge--{{ bc2 }}">{{ typePanne2|default('—') }}</span></td>
-          <td class="td-cost">{{ cout2|number_format(2, ',', ' ') }} DT</td>
-          <td class="td-date">{{ m.dateMain is defined and m.dateMain is not null ? m.dateMain|date('d/m/Y') : '—' }}</td>
-          <td><span class="statut-badge statut--{{ statut2 }}">{{ {'planifie':'📅 Planifié','en_cours':'⚙️ En cours','termine':'✅ Terminé'}[statut2]|default('—') }}</span></td>
-          <td><span class="prio-badge prio--{{ priorite2 }}">{{ {'faible':'🔵 Faible','moyenne':'🟢 Moyenne','haute':'🟠 Haute','urgente':'🔴 Urgente'}[priorite2]|default('—') }}</span></td>
-          <td style="font-size:.85rem;">{{ kilometrage2 is not null ? kilometrage2 ~ ' km' : '—' }}</td>
-          <td>{% if alert is defined and alert.status is defined %}{% if alert.status == 'overdue' %}<span style="color:#a32d2d;font-weight:600;">⚠️ {{ alert.message|default('') }}</span>{% elseif alert.status == 'warning' %}<span style="color:#856404;">⏰ {{ alert.message|default('') }}</span>{% elseif alert.status == 'ok' %}<span style="color:#27500a;">✅ {{ alert.message|default('') }}</span>{% else %}<span style="color:#7a9a7a;">📅 {{ alert.message|default('') }}</span>{% endif %}{% else %}<span style="color:#7a9a7a;">—</span>{% endif %}</td>
-          <td>{% if m.idM is defined and m.idM is not null and machineName2 != 'Machine non définie' %}<div class="machine-badge">🚜 #{{ m.idM }}</div><div class="machine-name" style="margin-top:4px;">{{ machineName2 }}</div>{% elseif m.idM is defined and m.idM is not null %}<div class="machine-badge">🚜 #{{ m.idM }}</div>{% else %}<span class="machine-badge machine-badge--none">—</span>{% endif %}</td>
-          <td class="td-desc" title="{{ description2 }}">{{ description2|slice(0,40) }}{{ description2|length > 40 ? '…' : '' }}</td>
-          <td><div class="actions"><a href="{{ path('agri_maintenances_show', {id: m.idMain}) }}" class="act-btn act-btn--view">👁</a><a href="{{ path('agri_maintenances_edit', {id: m.idMain}) }}" class="act-btn act-btn--edit">✏️</a><a href="javascript:void(0)" class="act-btn act-btn--magic" onclick="openAIPrompt({{ m.idMain }}, '{{ typePanne2|e('js') }}', '{{ priorite2|e('js') }}', '{{ kilometrage2|default(0) }}', '{{ machineName2|e('js') }}', '{{ statut2|e('js') }}', '{{ cout2 }}', '{{ description2|e('js')|slice(0,100) }}')">🤖 IA</a><form method="post" action="{{ path('agri_maintenances_delete', {id: m.idMain}) }}" onsubmit="return confirm('Supprimer ?')" style="display:inline;margin:0;"><input type="hidden" name="_token" value="{{ csrf_token('delete_maintenance_' ~ m.idMain) }}"><button type="submit" class="act-btn act-btn--del">🗑</button></form></div></td>
-        </tr>
-      {% endfor %}
-    </tbody>}</div>
-    <div id="noResultsTable" style="display:none;text-align:center;padding:3rem;color:#7a9a7a;">🔍 Aucun résultat.</div>
+    <div class="maint-card">
+      <table class="maint-table">
+        <thead>
+          <tr>
+            <th>Type</th><th>Coût (DT)</th><th>Date</th><th>Statut</th>
+            <th>Priorité</th><th>Km</th><th>Alerte</th><th>Machine</th>
+            <th>Description</th><th>Reco IA</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="maintBody">
+          {% for item in maintenancesWithAlerts %}
+            {% set m = item.maintenance %}
+            {% set alert = item.alert %}
+            {% set typeMap2 = {'Mécanique':'mecanique','Électricité':'electrique','Hydraulique':'hydraulique','Logicielle':'logicielle','Transmission':'transmission','Moteur':'moteur','Vidange & filtres':'vidange','Révision générale':'revision','Pneumatique':'pneumatique'} %}
+            {% set bc2 = typeMap2[m.typePanne]|default('default') %}
+            {% set machineName2 = m.nomMateriel is defined and m.nomMateriel is not null ? m.nomMateriel : (m.nom is defined and m.nom is not null ? m.nom : '') %}
+            <tr data-id="{{ m.idMain }}"
+                data-type="{{ m.typePanne|default('')|lower }}"
+                data-desc="{{ m.description|default('')|lower }}"
+                data-cout="{{ m.cout|default(0) }}"
+                data-date="{{ m.dateMain ? m.dateMain|date('Y-m-d') : '0000-00-00' }}"
+                data-statut="{{ m.statut|default('planifie') }}"
+                data-priorite="{{ m.priorite|default('moyenne') }}"
+                data-prio-order="{{ {'faible':1,'moyenne':2,'haute':3,'urgente':4}[m.priorite]|default(2) }}"
+                data-km="{{ m.kilometrage|default(0) }}"
+                data-nom="{{ machineName2|lower }}">
+              <td><span class="badge badge--{{ bc2 }}">{{ m.typePanne|default('—') }}</span></td>
+              <td class="td-cost">{{ m.cout|number_format(2,',',' ') }} DT</td>
+              <td class="td-date">{{ m.dateMain ? m.dateMain|date('d/m/Y') : '—' }}</td>
+              <td><span class="statut-badge statut--{{ m.statut|default('planifie') }}">{{ {'planifie':'📅 Planifié','en_cours':'⚙️ En cours','termine':'✅ Terminé'}[m.statut]|default('—') }}</span></td>
+              <td><span class="prio-badge prio--{{ m.priorite|default('moyenne') }}">{{ {'faible':'🔵 Faible','moyenne':'🟢 Moyenne','haute':'🟠 Haute','urgente':'🔴 Urgente'}[m.priorite]|default('—') }}</span></td>
+              <td style="font-size:.85rem;">{{ m.kilometrage is not null ? m.kilometrage ~ ' km' : '—' }}</td>
+              <td>
+                {% if alert.status == 'overdue' %}<span style="color:#a32d2d;font-weight:600;">⚠️ {{ alert.message|slice(0,30) }}</span>
+                {% elseif alert.status == 'warning' %}<span style="color:#856404;">⏰ {{ alert.message|slice(0,30) }}</span>
+                {% elseif alert.status == 'ok' %}<span style="color:#27500a;">✅ {{ alert.message|slice(0,30) }}</span>
+                {% else %}<span style="color:#7a9a7a;">📅 {{ alert.message|slice(0,30) }}</span>{% endif %}
+                </td>
+              <td>
+                {% if m.idM and machineName2 %}
+                  <div class="machine-badge">🚜 #{{ m.idM }}</div>
+                  <div class="machine-name" style="margin-top:4px;">{{ machineName2 }}</div>
+                {% elseif m.idM %}
+                  <div class="machine-badge">🚜 #{{ m.idM }}</div>
+                {% else %}
+                  <span class="machine-badge machine-badge--none">—</span>
+                {% endif %}
+                </td>
+              <td class="td-desc" title="{{ m.description|default('') }}">{{ m.description|default('—')|slice(0,35) }}{{ m.description|length > 35 ? '…' : '' }}</td>
+              <td style="font-size:.75rem;color:#2d6a2d;max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="{{ m.recommandation|default('') }}">
+                {{ m.recommandation|default('—')|slice(0,40) }}{{ m.recommandation|length > 40 ? '…' : '' }}
+                </td>
+              <td>
+                <div class="actions">
+                  <a href="{{ path('agri_maintenances_show', {id: m.idMain}) }}" class="act-btn act-btn--view">👁</a>
+                  <a href="{{ path('agri_maintenances_edit', {id: m.idMain}) }}" class="act-btn act-btn--edit">✏️</a>
+                  <a href="javascript:void(0)" class="act-btn act-btn--ia-pro"
+                     onclick="generateAndShowAIRecommendation({{ m.idMain }}, '{{ m.typePanne|e('js') }}', '{{ m.priorite|e('js') }}', '{{ m.kilometrage|default(0) }}', '{{ machineName2|e('js') }}', '{{ m.statut|e('js') }}', '{{ m.cout|default(0) }}', '{{ m.description|default('')|e('js') }}')">🧠 IA Pro</a>
+                  <form method="post" action="{{ path('agri_maintenances_delete', {id: m.idMain}) }}" onsubmit="return confirm('Supprimer ?')" style="display:inline;margin:0;">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete_maintenance_' ~ m.idMain) }}">
+                    <button type="submit" class="act-btn act-btn--del">🗑</button>
+                  </form>
+                </div>
+                </td>
+              </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div id="noResultsTable" style="display:none;text-align:center;padding:3rem;color:#7a9a7a;">🔍 Aucun résultat.</div>
+    </div>
+    {# ══ PAGINATION TABLEAU (2 boutons) ══ #}
+    <div class="pagination-wrap" id="paginationTable"></div>
   </div>
   {% endif %}
 </div>
 
-{# MODALE CALENDRIER #}
-<div id="reminderCalendarModal" class="modal" style="display:none;z-index:10002;">
-  <div class="modal-content" style="max-width:1200px;width:95%;">
-    <div class="modal-hdr" style="background:linear-gradient(135deg,#2d6a2d 0%,#1a4d1a 100%);">
-      <h3 style="color:#fff;">📅 Calendrier des maintenances</h3>
-      <button class="modal-close-btn" onclick="closeReminderCalendar()">×</button>
+{# ══ MODALES (inchangées) ══ #}
+<div id="reminderCalendarModal" style="display:none;position:fixed;z-index:10002;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);justify-content:center;align-items:flex-start;overflow-y:auto;padding:2rem 1rem;">
+  <div style="background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 25px 50px rgba(0,0,0,0.25);animation:popupSlideIn 0.3s ease-out;width:95%;max-width:1100px;margin:auto;">
+    <div style="background:linear-gradient(135deg,#e74a3b 0%,#c0392b 100%);padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;">
+      <h3 style="margin:0;font-size:1rem;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Calendrier des rappels annuels
+        <span style="display:inline-block;padding:.2rem .7rem;border-radius:50px;font-size:.75rem;font-weight:700;background:#fff;color:#a32d2d;white-space:nowrap;">🔔 Maintenance préventive</span>
+      </h3>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <button class="btn btn--google" onclick="exportAllRemindersToGoogleCalendar()">📤 Exporter vers Google</button>
+        <button onclick="analyzeAllRemindersWithAI()"
+                style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;padding:.5rem 1rem;border-radius:10px;font-size:.8rem;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:.3rem;">
+          🧠 IA Pro - Analyse globale
+        </button>
+        <button id="closeCalendarBtn"
+                style="background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.5);color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1.3rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s;line-height:1;"
+                title="Fermer" onclick="closeReminderCalendar()">×</button>
+      </div>
     </div>
     <div style="padding:20px;background:#f9fcf7;">
-      <div style="margin-bottom:15px;background:#fff;border-radius:12px;padding:12px 20px;display:flex;flex-wrap:wrap;gap:15px;">
-        <div style="display:flex;align-items:center;gap:5px;"><div style="width:16px;height:16px;background:#e74a3b;border-radius:4px;"></div><span>🔴 Urgent</span></div>
-        <div style="display:flex;align-items:center;gap:5px;"><div style="width:16px;height:16px;background:#e67e22;border-radius:4px;"></div><span>🟠 Haute priorité</span></div>
-        <div style="display:flex;align-items:center;gap:5px;"><div style="width:16px;height:16px;background:#f39c12;border-radius:4px;"></div><span>🟡 En cours</span></div>
-        <div style="display:flex;align-items:center;gap:5px;"><div style="width:16px;height:16px;background:#3498db;border-radius:4px;"></div><span>🔵 Priorité moyenne</span></div>
-        <div style="display:flex;align-items:center;gap:5px;"><div style="width:16px;height:16px;background:#27ae60;border-radius:4px;"></div><span>✅ Terminé</span></div>
-        <div style="display:flex;align-items:center;gap:5px;"><div style="width:16px;height:16px;background:#95a5a6;border-radius:4px;"></div><span>⚪ Priorité faible</span></div>
+      <div style="margin-bottom:15px;background:#fff;border-radius:12px;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;box-shadow:0 1px 6px rgba(0,0,0,.05);">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="width:12px;height:12px;background:#e74a3b;border-radius:50%;display:inline-block;flex-shrink:0;"></span>
+          <span style="font-size:13px;color:#5f7a5f;">Dates surlignées = machines nécessitant maintenance · <strong style="color:#2d6a2d;">Cliquez sur un jour pour ajouter une note</strong></span>
+        </div>
+        <div style="display:flex;gap:15px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:5px;"><div style="width:12px;height:12px;background:#e74a3b;border-radius:50%;flex-shrink:0;"></div><span style="font-size:11px;color:#5f7a5f;">Rappel annuel (1+ an)</span></div>
+          <div style="display:flex;align-items:center;gap:5px;"><div style="width:12px;height:12px;background:#a32d2d;border-radius:50%;flex-shrink:0;"></div><span style="font-size:11px;color:#5f7a5f;">Urgent</span></div>
+          <div style="display:flex;align-items:center;gap:5px;"><div style="width:12px;height:12px;background:#2d6a2d;border-radius:50%;flex-shrink:0;"></div><span style="font-size:11px;color:#5f7a5f;">Note personnelle</span></div>
+        </div>
       </div>
       <div id="reminderCalendar"></div>
     </div>
   </div>
 </div>
 
-{# POPUP DÉTAIL MAINTENANCE #}
 <div id="reminderDetailPopup" class="reminder-popup">
   <div class="reminder-popup-content">
-    <div class="reminder-popup-header"><h3><span>🧠</span> Détail maintenance + Recommandation IA</h3><button class="reminder-popup-close" onclick="closeReminderDetailPopup()">×</button></div>
-    <div class="reminder-popup-body" id="reminderDetailBody"><div class="modal-loader">Chargement...</div></div>
+    <div class="reminder-popup-header">
+      <h3><span>🧠</span> Analyse IA intelligente</h3>
+      <button class="reminder-popup-close" onclick="closeReminderDetailPopup()">×</button>
+    </div>
+    <div class="reminder-popup-body" id="reminderDetailBody">
+      <div class="modal-loader">
+        <div class="modal-loader__spinner"></div>
+        <div class="modal-loader__text">Chargement...</div>
+      </div>
+    </div>
   </div>
 </div>
 
-{# MODALE IA STANDARD #}
-<div id="aiModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-hdr"><h3>Assistant IA — Maintenance<span class="badge-ia">AgroFlow AI</span></h3><button class="modal-close-btn" onclick="closeAIModal()">×</button></div>
-    <div class="modal-machine-bar"><span class="modal-machine-pill" id="aiMachinePill">—</span><span class="modal-machine-info" id="aiMachineInfo"></span></div>
-    <div class="modal-tabs"><button class="modal-tab active" id="aitab-prompt" onclick="switchAITab('prompt')">💬 Prompt libre</button><button class="modal-tab" id="aitab-life" onclick="switchAITab('life')">⏳ Durée de vie</button><button class="modal-tab" id="aitab-suggest" onclick="switchAITab('suggest')">🤖 Suggestion auto</button></div>
-    <div id="aipanel-prompt" class="modal-panel active"><div class="modal-field-label">Suggestions rapides</div><div class="modal-chips"><span class="modal-chip" onclick="setAISug(this,'Quelles vérifications étape par étape pour cette panne ?')">Vérifications</span><span class="modal-chip" onclick="setAISug(this,'Quelles pièces contrôler et remplacer en priorité ?')">Pièces</span><span class="modal-chip" onclick="setAISug(this,'Précautions de sécurité pour cette intervention')">Sécurité</span><span class="modal-chip" onclick="setAISug(this,'Temps estimé et outils nécessaires')">Temps & outils</span><span class="modal-chip" onclick="setAISug(this,'Coût estimé et pièces détachées recommandées')">Estimation coût</span></div><div class="modal-field-label">Votre demande</div><textarea id="aiPromptTxt" class="modal-textarea" rows="3" placeholder="Ex: Décris les étapes pour réparer cette panne…"></textarea><div id="aiPromptRes" style="display:none;"><div class="modal-section-title">Réponse générée</div><div class="modal-result-box" id="aiPromptResTxt"></div></div></div>
-    <div id="aipanel-life" class="modal-panel"><div class="modal-alert-info">Prévision basée sur le kilométrage, le type de panne et la priorité</div><div class="modal-score-row"><div class="modal-score-card"><div class="modal-score-val" id="aiLifeScore">—</div><div class="modal-score-lbl">Vie restante</div><div class="modal-progress-bar"><div class="modal-progress-fill" id="aiLifeBar" style="width:0%"></div></div></div><div class="modal-score-card"><div class="modal-score-val" id="aiLifeYears">—</div><div class="modal-score-lbl">Années est.</div></div><div class="modal-score-card"><div class="modal-score-val" id="aiLifeRisk">—</div><div class="modal-score-lbl">Risque panne</div></div></div><div class="modal-field-label">Usure par composant</div><div id="aiLifeBars" class="modal-life-bars"></div><div id="aiLifeRes" style="display:none;"><div class="modal-section-title">Recommandations</div><div class="modal-result-box" id="aiLifeResTxt"></div></div></div>
-    <div id="aipanel-suggest" class="modal-panel"><div class="modal-alert-info" style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border-left-color:#fff;">Analyse intelligente basée sur l'historique, la fréquence et l'état de la machine</div><div class="modal-score-row" style="margin-bottom:1rem;"><div class="modal-score-card"><div class="modal-score-val" id="suggestUrgencyScore">—</div><div class="modal-score-lbl">Urgence</div><div class="modal-progress-bar"><div class="modal-progress-fill" id="suggestUrgencyBar" style="width:0%;background:#e74a3b;"></div></div></div><div class="modal-score-card"><div class="modal-score-val" id="suggestNextDate" style="font-size:14px;">—</div><div class="modal-score-lbl">Prochaine recommandée</div></div><div class="modal-score-card"><div class="modal-score-val" id="suggestHealthScore">—</div><div class="modal-score-lbl">Santé machine</div></div></div><div id="suggestionsList"><div class="modal-loader" id="suggestLoader"><div class="modal-loader__spinner"></div><div class="modal-loader__text">Prêt — cliquez sur "Générer" ou ouvrez l'onglet pour analyser</div></div></div><div class="modal-section-title">🎯 Actions recommandées</div><div class="modal-result-box" id="suggestActions" style="background:#f0faf7;min-height:48px;"></div></div>
-    <div class="modal-footer"><span style="font-size:12px;color:#6b8c6b;" id="aiFooterMsg">Prêt</span><div style="display:flex;gap:8px;"><button class="btn btn--outline" style="font-size:.82rem;padding:.45rem .9rem;" onclick="resetAITab()">Réinitialiser</button><button class="btn btn--green" style="font-size:.82rem;padding:.45rem 1.1rem;" id="aiGenBtn" onclick="generateAI()">Générer</button></div></div>
+<div id="dayNoteModal" style="display:none;position:fixed;z-index:10060;inset:0;background:rgba(0,0,0,.55);justify-content:center;align-items:center;">
+  <div style="background:#fff;border-radius:20px;width:90%;max-width:480px;overflow:hidden;animation:popupSlideIn .25s ease-out;box-shadow:0 25px 50px rgba(0,0,0,.25);">
+    <div style="background:#1a2e1a;padding:1rem 1.4rem;display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-size:15px;font-weight:700;color:#fff;">📝 Note du jour</div>
+        <div style="font-size:11px;color:#8aaa8a;margin-top:2px;" id="dayNoteLabel"></div>
+      </div>
+      <button onclick="closeDayNoteModal()" style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>
+    </div>
+    <div style="padding:1.2rem 1.4rem;">
+      <div style="margin-bottom:.9rem;">
+        <label style="display:block;font-size:11px;font-weight:700;color:#7a9a7a;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">Note / Observation</label>
+        <textarea id="dayNoteText" rows="4" placeholder="Ex : Révision tracteur prévue, pièces commandées, technicien contacté…"
+          style="width:100%;padding:9px 11px;border:1.5px solid #d4e8d4;border-radius:9px;font-size:13px;font-family:inherit;color:#1a2e1a;resize:vertical;outline:none;transition:border-color .15s;"
+          onfocus="this.style.borderColor='#2d6a2d'" onblur="this.style.borderColor='#d4e8d4'"></textarea>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.9rem;">
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:#7a9a7a;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">Type</label>
+          <select id="dayNoteType" style="width:100%;padding:8px 10px;border:1.5px solid #d4e8d4;border-radius:8px;font-size:13px;color:#1a2e1a;background:#fff;outline:none;">
+            <option value="Maintenance">🔧 Maintenance</option>
+            <option value="Inspection">🔍 Inspection</option>
+            <option value="Vidange">🛢 Vidange</option>
+            <option value="Révision">⚙️ Révision</option>
+            <option value="Réparation">🛠 Réparation</option>
+            <option value="Autre">📌 Autre</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:#7a9a7a;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">Priorité</label>
+          <select id="dayNotePriorite" style="width:100%;padding:8px 10px;border:1.5px solid #d4e8d4;border-radius:8px;font-size:13px;color:#1a2e1a;background:#fff;outline:none;">
+            <option value="faible">🔵 Faible</option>
+            <option value="moyenne">🟢 Moyenne</option>
+            <option value="haute">🟠 Haute</option>
+            <option value="urgente">🔴 Urgente</option>
+          </select>
+        </div>
+      </div>
+      <div id="dayNoteOtherDates" style="display:none;margin-bottom:.75rem;">
+        <div style="font-size:11px;font-weight:700;color:#7a9a7a;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">Autres notes récentes</div>
+        <div id="dayNoteOtherList" style="max-height:120px;overflow-y:auto;border:1px solid #e4edde;border-radius:8px;padding:4px 0;"></div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;padding:.9rem 1.4rem;border-top:1px solid #e4edde;background:#fafcf8;">
+      <button id="dayNoteDeleteBtn" onclick="deleteDayNote()"
+        style="display:none;background:none;border:1.5px solid #f7c1c1;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:600;cursor:pointer;color:#a32d2d;margin-right:auto;"
+        onmouseover="this.style.background='#fcebeb'" onmouseout="this.style.background='none'">🗑 Supprimer</button>
+      <button onclick="closeDayNoteModal()"
+        style="background:none;border:1.5px solid #d4e8d4;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;color:#1a2e1a;"
+        onmouseover="this.style.background='#f7faf4'" onmouseout="this.style.background='none'">Annuler</button>
+      <button onclick="saveDayNote()"
+        style="background:#2d6a2d;color:#fff;border:none;border-radius:8px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer;"
+        onmouseover="this.style.background='#235223'" onmouseout="this.style.background='#2d6a2d'">💾 Enregistrer</button>
+    </div>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 <script>
+// ================================================================
+// VARIABLES GLOBALES
+// ================================================================
 let currentView = localStorage.getItem('maintView') || 'cards';
-function setView(v) { currentView = v; localStorage.setItem('maintView', v); document.getElementById('viewCardsContainer').style.display = v === 'cards' ? '' : 'none'; document.getElementById('viewTableContainer').style.display = v === 'table' ? '' : 'none'; document.getElementById('viewCards').classList.toggle('active', v === 'cards'); document.getElementById('viewTable').classList.toggle('active', v === 'table'); filterItems(); }
-setView(currentView);
+let reminderCalendar = null;
+let reminderEvents   = [];
+let allRemindersData = [];
 
-function toggleStats() { document.getElementById('chartsPanel').classList.toggle('is-open'); document.getElementById('statsToggle').classList.toggle('active'); }
+// ── Pagination ──
+let pgCards = { page:1, perPage:6,  items:[] };
+let pgTable = { page:1, perPage:10, items:[] };
 
-function filterItems() {
-    const search = (document.getElementById('searchInput').value || '').toLowerCase();
-    const type = (document.getElementById('typeFilter').value || '').toLowerCase();
-    const statut = (document.getElementById('statutFilter').value || '').toLowerCase();
-    const prio = (document.getElementById('prioriteFilter').value || '').toLowerCase();
-    const sort = document.getElementById('sortFilter').value;
-    const dir = document.getElementById('dirFilter').value;
-    document.getElementById('resetBtn').style.display = (search || type || statut || prio) ? 'inline-flex' : 'none';
-    function matches(el) { return (!search || (el.dataset.type||'').toLowerCase().includes(search) || (el.dataset.desc||'').toLowerCase().includes(search) || (el.dataset.nom||'').toLowerCase().includes(search)) && (!type || (el.dataset.type||'').toLowerCase().includes(type)) && (!statut || (el.dataset.statut||'').toLowerCase() === statut) && (!prio || (el.dataset.priorite||'').toLowerCase() === prio); }
-    const cardsGrid = document.getElementById('cardsGrid');
-    if(cardsGrid){ const cards = Array.from(cardsGrid.children); cards.forEach(c=>{c.style.display=matches(c)?'':'none';}); const vis=cards.filter(c=>c.style.display!=='none'); sortItems(vis,sort,dir,cardsGrid); document.getElementById('noResultsCards').style.display=vis.length===0?'block':'none'; }
-    const tbody=document.getElementById('maintBody');
-    if(tbody){ const rows=Array.from(tbody.querySelectorAll('tr')); rows.forEach(tr=>{tr.style.display=matches(tr)?'':'none';}); const vis=rows.filter(r=>r.style.display!=='none'); sortItems(vis,sort,dir,tbody); document.getElementById('noResultsTable').style.display=vis.length===0?'block':'none'; }
+// ── Notes par jour ──
+let dayNotes = {};
+try { dayNotes = JSON.parse(localStorage.getItem('agro_day_notes') || '{}'); } catch(e){}
+let _currentNoteDate = null;
+
+// ================================================================
+// VUE TOGGLE
+// ================================================================
+function setView(v) {
+    currentView = v;
+    localStorage.setItem('maintView', v);
+    document.getElementById('viewCardsContainer').style.display = v === 'cards' ? 'block' : 'none';
+    document.getElementById('viewTableContainer').style.display = v === 'table'  ? 'block' : 'none';
+    document.getElementById('viewCards')?.classList.toggle('active', v === 'cards');
+    document.getElementById('viewTable')?.classList.toggle('active', v === 'table');
+    filterItems();
 }
-function sortItems(items,sort,dir,container){ items.sort((a,b)=>{ let va,vb; switch(sort){ case'cout':va=parseFloat(a.dataset.cout||0);vb=parseFloat(b.dataset.cout||0);break; case'type':va=a.dataset.type||'';vb=b.dataset.type||'';break; case'statut':va=a.dataset.statut||'';vb=b.dataset.statut||'';break; case'priorite':va=parseInt(a.dataset.prioOrder||2);vb=parseInt(b.dataset.prioOrder||2);break; case'km':va=parseInt(a.dataset.km||0);vb=parseInt(b.dataset.km||0);break; default:va=a.dataset.date||'';vb=b.dataset.date||''; } if(va<vb) return dir==='asc'?-1:1; if(va>vb) return dir==='asc'?1:-1; return 0; }); items.forEach(el=>container.appendChild(el)); }
-function onSearchInput(input){ document.getElementById('clearSearch').classList.toggle('visible',input.value.length>0); filterItems(); }
-function clearSearch(){ const inp=document.getElementById('searchInput'); inp.value=''; inp.focus(); document.getElementById('clearSearch').classList.remove('visible'); filterItems(); }
-function resetFilters(){ document.getElementById('searchInput').value=''; document.getElementById('clearSearch').classList.remove('visible'); ['typeFilter','statutFilter','prioriteFilter','sortFilter','dirFilter'].forEach(id=>{const el=document.getElementById(id);if(el)el.selectedIndex=0;}); filterItems(); }
 
-let reminderCalendar=null, calendarEvents=[];
-async function openReminderCalendar(){ document.getElementById('reminderCalendarModal').style.display='flex'; if(!reminderCalendar) await initFullCalendar(); else reminderCalendar.refetchEvents(); }
-function closeReminderCalendar(){ document.getElementById('reminderCalendarModal').style.display='none'; }
-async function initFullCalendar(){ reminderCalendar=new FullCalendar.Calendar(document.getElementById('reminderCalendar'),{initialView:'dayGridMonth',locale:'fr',headerToolbar:{left:'prev,next today',center:'title',right:'dayGridMonth,dayGridWeek,listMonth'},buttonText:{today:"Aujourd'hui",month:'Mois',week:'Semaine',listMonth:'Liste'},height:600,events:loadAllMaintenanceEvents,eventDidMount(info){info.el.style.cursor='pointer';info.el.style.backgroundColor=info.event.backgroundColor;info.el.style.borderColor=info.event.borderColor;info.el.style.borderRadius='6px';info.el.title=info.event.title;},eventClick(info){showMaintenanceDetail(info.event.id);}}); reminderCalendar.render(); }
-async function loadAllMaintenanceEvents(fetchInfo,successCallback,failureCallback){ try{ const resp=await fetch('{{ path('agri_maintenances_api_calendar_events') }}'); if(!resp.ok)throw new Error('Erreur HTTP '+resp.status); const data=await resp.json(); if(!data.success)throw new Error(data.error||'Erreur inconnue'); calendarEvents=data.events.map(ev=>({id:ev.id,title:ev.title,start:ev.start,allDay:true,backgroundColor:ev.backgroundColor,borderColor:ev.borderColor,textColor:ev.textColor,extendedProps:ev.extendedProps})); successCallback(calendarEvents); }catch(err){console.error(err);failureCallback(err);} }
-async function showMaintenanceDetail(maintenanceId){ const modal=document.getElementById('reminderDetailPopup'); const body=document.getElementById('reminderDetailBody'); modal.style.display='flex'; body.innerHTML='<div class="modal-loader"><div class="modal-loader__spinner"></div><div class="modal-loader__text">Chargement des détails et génération de la recommandation IA...</div></div>'; try{ const resp=await fetch('/agriculteur/maintenances/api/maintenance/'+maintenanceId+'/detail'); const data=await resp.json(); if(data.success){ const ia=data.iaRecommendation||{}; const urgencyColor=data.urgencyLevel?.color||'#2d6a2d'; body.innerHTML=`<div class="reminder-message-box" style="border-left-color:${urgencyColor}"><div class="reminder-message-text">${escapeHtml(data.machineName)}</div><div style="font-size:12px;color:#7a9a7a;">Maintenance du : ${data.dateMain||'Date non définie'}</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px;"><div style="background:#f0faf7;border-radius:10px;padding:8px;text-align:center;"><div style="font-size:10px;color:#7a9a7a;">🔧 Type</div><div style="font-weight:700;">${escapeHtml(data.type||'—')}</div></div><div style="background:#f0faf7;border-radius:10px;padding:8px;text-align:center;"><div style="font-size:10px;color:#7a9a7a;">⚠️ Priorité</div><div style="font-weight:700;">${escapeHtml(data.priorite||'—')}</div></div><div style="background:#f0faf7;border-radius:10px;padding:8px;text-align:center;"><div style="font-size:10px;color:#7a9a7a;">📊 Statut</div><div style="font-weight:700;">${escapeHtml(data.statut||'—')}</div></div><div style="background:#f0faf7;border-radius:10px;padding:8px;text-align:center;"><div style="font-size:10px;color:#7a9a7a;">💰 Coût</div><div style="font-weight:700;">${data.cout?data.cout.toLocaleString()+' DT':'—'}</div></div><div style="background:#f0faf7;border-radius:10px;padding:8px;text-align:center;"><div style="font-size:10px;color:#7a9a7a;">📊 Kilométrage</div><div style="font-weight:700;">${data.km?data.km.toLocaleString()+' km':'—'}</div></div><div style="background:#f0faf7;border-radius:10px;padding:8px;text-align:center;"><div style="font-size:10px;color:#7a9a7a;">⏰ Dernière maintenance</div><div style="font-weight:700;">${data.daysSince?data.daysSince+' jours':'—'}</div></div></div>${data.description?`<div style="background:#f7faf4;border-radius:10px;padding:10px;margin-bottom:15px;"><div style="font-weight:600;margin-bottom:5px;">📝 Description</div><div style="font-size:13px;">${escapeHtml(data.description)}</div></div>`:''}<div style="background:linear-gradient(135deg,#667eea15 0%,#764ba215 100%);border-radius:12px;padding:15px;margin-bottom:15px;border-left:4px solid #667eea;"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;"><span style="font-size:20px;">🧠</span><span style="font-weight:700;color:#3C3489;">RECOMMANDATION IA</span></div>${ia.summary?`<div style="background:#fff;border-radius:8px;padding:10px;margin-bottom:10px;font-weight:600;color:#2d6a2d;">${escapeHtml(ia.summary)}</div>`:''}${ia.priorityMessage?`<div style="margin-bottom:10px;">${escapeHtml(ia.priorityMessage)}</div>`:''}${ia.recommendations&&ia.recommendations.length>0?`<div style="margin-bottom:10px;"><div style="font-weight:600;margin-bottom:5px;">📌 Recommandations :</div><ul style="margin:0;padding-left:20px;">${ia.recommendations.map(r=>`<li style="margin:5px 0;font-size:13px;">${escapeHtml(r)}</li>`).join('')}</ul></div>`:''}${ia.actions&&ia.actions.length>0?`<div><div style="font-weight:600;margin-bottom:5px;">✅ Actions à planifier :</div><ul style="margin:0;padding-left:20px;">${ia.actions.map(a=>`<li style="margin:5px 0;font-size:13px;">${escapeHtml(a)}</li>`).join('')}</ul></div>`:''}</div><div style="display:flex;gap:10px;margin-top:15px;"><a href="/agriculteur/maintenances/${data.id}" class="btn btn--green" style="flex:1;text-align:center;">👁 Voir détails complets</a><a href="/agriculteur/maintenances/${data.id}/edit" class="btn btn--outline" style="flex:1;text-align:center;">✏️ Modifier</a><button class="btn btn--calendar" onclick="exportMaintenanceToGoogleCalendar(${data.id},'${escapeHtml(data.machineName)}','${data.dateMain||''}')">📤 Google</button></div>`; } else body.innerHTML=`<div style="color:#a32d2d;text-align:center;">❌ ${escapeHtml(data.error)}</div>`; }catch(err){ body.innerHTML=`<div style="color:#a32d2d;text-align:center;">❌ Erreur réseau : ${escapeHtml(err.message)}</div>`; } }
-function closeReminderDetailPopup(){ document.getElementById('reminderDetailPopup').style.display='none'; }
-function exportMaintenanceToGoogleCalendar(id,machineName,dateMain){ let startDate=(dateMain&&dateMain!=='null'&&dateMain!=='')?new Date(dateMain):new Date(); if(isNaN(startDate.getTime()))startDate=new Date(); const endDate=new Date(startDate); endDate.setDate(startDate.getDate()+1); const fmt=d=>{const y=d.getFullYear();const m=String(d.getMonth()+1).padStart(2,'0');const day=String(d.getDate()).padStart(2,'0');return `${y}${m}${day}`;}; const title=encodeURIComponent(`Maintenance : ${machineName}`); const details=encodeURIComponent(`🔧 MAINTENANCE AGRICOLE\n\nMachine : ${machineName}\nDate : ${dateMain||'À définir'}\n\nRecommandations IA :\n• Inspection générale\n• Vidange moteur et filtres\n• Contrôle des niveaux\n• Vérification courroies\n• Pression des pneus\n\nGénéré par AgroFlow IA`); const url=`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${fmt(startDate)}/${fmt(endDate)}&details=${details}&sf=true&output=xml`; window.open(url,'_blank'); showNotification(`📤 Maintenance "${machineName}" exportée vers Google Calendar`,'success'); }
-function escapeHtml(str){ if(!str)return ''; return String(str).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
-function showNotification(message,type){ const n=document.createElement('div'); n.className='alert alert--'+type; n.style.cssText='position:fixed;bottom:20px;right:20px;z-index:9999;max-width:350px;animation:slideIn .25s;'; n.innerHTML=`<span>${message}</span><button class="alert__close" onclick="this.parentElement.remove()">✕</button>`; document.body.appendChild(n); setTimeout(()=>n.remove(),5000); }
+// ================================================================
+// STATS PANEL
+// ================================================================
+function toggleStats() {
+    document.getElementById('chartsPanel')?.classList.toggle('is-open');
+    document.getElementById('statsToggle')?.classList.toggle('active');
+}
 
-let aiActiveTab='prompt', aiMachineData={}, suggestionsLoaded=false;
-function openAIPrompt(id,type,priorite,km,nom,statut,cout,description){ aiMachineData={id,type:type||'—',priorite:priorite||'moyenne',km:parseInt(km)||0,nom:nom||'Machine',statut:statut||'planifie',cout:parseFloat(cout)||0,description:description||''}; suggestionsLoaded=false; document.getElementById('aiMachinePill').textContent=nom||'Machine'; document.getElementById('aiMachineInfo').innerHTML=`Panne <strong>${type||'—'}</strong> · priorité <strong>${priorite||'—'}</strong> · ${km||0} km`; document.getElementById('aiModal').classList.add('show'); switchAITab('prompt'); renderAILifeLocal(); resetSuggestTab(); }
-function closeAIModal(){ document.getElementById('aiModal').classList.remove('show'); }
-function switchAITab(t){ aiActiveTab=t; ['prompt','life','suggest'].forEach(tab=>{ document.getElementById('aitab-'+tab)?.classList.toggle('active',tab===t); const panel=document.getElementById('aipanel-'+tab); if(panel) panel.style.display=tab===t?'block':'none'; }); if(t==='suggest'&&aiMachineData.id&&!suggestionsLoaded) loadAISuggestions(); }
-function setAISug(chip,txt){ document.querySelectorAll('.modal-chip').forEach(c=>c.classList.remove('sel')); chip.classList.add('sel'); document.getElementById('aiPromptTxt').value=txt; }
-function renderAILifeLocal(){ const km=aiMachineData.km||0; const maxKm=20000; const penalte=({urgente:25,haute:15,moyenne:8,faible:3})[aiMachineData.priorite]||8; const vie=Math.max(0,Math.min(100,Math.round((maxKm-km)/maxKm*100))-penalte); const ans=Math.max(0,(maxKm-km)/3000).toFixed(1); const risque=(aiMachineData.priorite==='urgente'||km>15000)?'Élevé':(aiMachineData.priorite==='haute'||km>10000)?'Moyen':'Faible'; document.getElementById('aiLifeScore').textContent=vie+'%'; document.getElementById('aiLifeBar').style.width=vie+'%'; document.getElementById('aiLifeYears').textContent=ans+' ans'; document.getElementById('aiLifeRisk').textContent=risque; const composants=[{nom:'Moteur',usure:Math.min(100,Math.round(km/200)),color:'#A32D2D'},{nom:'Transmission',usure:Math.min(100,Math.round(km/300)),color:'#854F0B'},{nom:'Hydraulique',usure:Math.min(100,Math.round(km/400)),color:'#0C447C'},{nom:'Électricité',usure:Math.min(100,Math.round(km/600)),color:'#3B6D11'},{nom:'Pneumatique',usure:Math.min(100,Math.round(km/250)),color:'#4a1d8c'}]; const bars=document.getElementById('aiLifeBars'); bars.innerHTML=''; composants.forEach(c=>{const row=document.createElement('div');row.className='modal-life-bar-row';row.innerHTML=`<div class="modal-life-bar-label">${c.nom}</div><div class="modal-life-bar-track"><div class="modal-life-bar-fill" style="width:${c.usure}%;background:${c.color}"></div></div><div style="font-size:11px;font-weight:600;color:#1a2e1a;">${c.usure}%</div>`;bars.appendChild(row);}); }
-async function loadAISuggestions(){ if(!aiMachineData.id){showSuggestError('Aucune maintenance sélectionnée.');return;} setAIStatus('Analyse en cours…'); document.getElementById('suggestionsList').innerHTML=`<div class="modal-loader"><div class="modal-loader__spinner"></div><div class="modal-loader__text">Analyse de la machine en cours…</div></div>`; try{ const resp=await fetch(`/agriculteur/maintenances/api/ai-suggest-maintenance/${aiMachineData.id}`,{headers:{'Accept':'application/json','X-Requested-With':'XMLHttpRequest'}}); if(!resp.ok)throw new Error('HTTP '+resp.status); const data=await resp.json(); if(!data.success)throw new Error(data.error||'Erreur serveur'); suggestionsLoaded=true; const score=data.urgencyScore??0; document.getElementById('suggestUrgencyScore').textContent=score+'%'; document.getElementById('suggestUrgencyBar').style.width=score+'%'; document.getElementById('suggestUrgencyBar').style.background=score>=70?'#e74a3b':score>=50?'#e67e22':score>=30?'#f39c12':'#27ae60'; document.getElementById('suggestNextDate').textContent=data.nextRecommendedDate||'N/A'; const hs=data.currentState?.healthScore; document.getElementById('suggestHealthScore').textContent=hs!=null?hs+'/100':'—'; const pColors={urgente:'#a32d2d',haute:'#e67e22',moyenne:'#f39c12',basse:'#27ae60'}; const container=document.getElementById('suggestionsList'); container.innerHTML=''; (data.suggestions||[]).forEach(sug=>{const color=pColors[sug.priority]||'#7f8c8d';const card=document.createElement('div');card.className='suggestion-card';card.style.borderLeft=`4px solid ${color}`;card.innerHTML=`<div class="suggestion-card__header"><span class="suggestion-card__icon">${sug.icon||'🔧'}</span><strong class="suggestion-card__title" style="color:${color};">${escapeHtml(sug.title||'')}</strong><span class="suggestion-card__badge" style="background:${color};">${escapeHtml(sug.priority||'')}</span></div><p class="suggestion-card__msg">${escapeHtml(sug.message||'')}</p><button class="btn btn--outline suggestion-card__btn" onclick="applySuggestionAction('${(sug.action||'').replace(/'/g,"\\'")}',${aiMachineData.id})">${escapeHtml(sug.action||'Voir')}</button>`;container.appendChild(card);}); if(!data.suggestions?.length) container.innerHTML='<div style="text-align:center;padding:1.5rem;color:#7a9a7a;">✅ Aucune suggestion urgente — machine en bon état.</div>'; document.getElementById('suggestActions').innerHTML=(data.recommendedActions||[]).map((a,i)=>`${i+1}. ${escapeHtml(a)}`).join('<br>'); setAIStatus('Analyse terminée ✓'); }catch(err){showSuggestError(err.message);} }
-function showSuggestError(msg){ suggestionsLoaded=false; document.getElementById('suggestionsList').innerHTML=`<div style="background:#fcebeb;border:1px solid #f7c1c1;border-radius:10px;padding:1rem;text-align:center;color:#501313;"><div style="font-size:24px;margin-bottom:8px;">❌</div><div style="font-weight:600;margin-bottom:4px;">Erreur d'analyse</div><div style="font-size:12px;color:#7a9a7a;">${escapeHtml(msg)}</div><button class="btn btn--outline" style="margin-top:10px;font-size:.8rem;" onclick="loadAISuggestions()">🔄 Réessayer</button></div>`; setAIStatus('Erreur — '+msg.substring(0,60)); }
-function applySuggestionAction(action,id){ const act=action.toLowerCase(); if(act.includes('planifier')||act.includes('programmer')||act.includes('intervenir')) window.location.href=`/agriculteur/maintenances/${id}/edit`; else if(act.includes('contacter')) showNotification('📞 Service technique notifié','info'); else if(act.includes('consulter')||act.includes('voir')) window.location.href=`/agriculteur/maintenances/${id}`; else showNotification('📝 '+action,'info'); }
-function resetSuggestTab(){ document.getElementById('suggestUrgencyScore').textContent='—'; document.getElementById('suggestUrgencyBar').style.width='0%'; document.getElementById('suggestNextDate').textContent='—'; document.getElementById('suggestHealthScore').textContent='—'; document.getElementById('suggestActions').innerHTML=''; document.getElementById('suggestionsList').innerHTML=`<div class="modal-loader"><div class="modal-loader__spinner"></div><div class="modal-loader__text">Prêt — cliquez sur "Générer" pour analyser</div></div>`; }
-function setAIStatus(m){ document.getElementById('aiFooterMsg').textContent=m; }
-function setAILoading(on){ const btn=document.getElementById('aiGenBtn'); btn.disabled=on; btn.innerHTML=on?'<span class="loading-spinner"></span> Génération…':'Générer'; }
-async function generateAI(){ setAILoading(true); try{ if(aiActiveTab==='prompt') await aiRunPrompt(); else if(aiActiveTab==='life') await aiRunLife(); else if(aiActiveTab==='suggest'){ suggestionsLoaded=false; await loadAISuggestions(); } }catch(e){ setAIStatus('Erreur : '+e.message); showNotification('❌ Erreur : '+e.message,'danger'); } setAILoading(false); }
-async function aiRunPrompt(){ const prompt=document.getElementById('aiPromptTxt').value.trim(); if(!prompt){setAIStatus('Entrez une demande');return;} setAIStatus('Appel API…'); const res=await fetch(`/agriculteur/maintenances/api/generate-custom-prompt/${aiMachineData.id}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})}); if(!res.ok)throw new Error('HTTP '+res.status); const data=await res.json(); if(data.success){ document.getElementById('aiPromptResTxt').textContent=data.response; document.getElementById('aiPromptRes').style.display='block'; setAIStatus('Réponse générée ✓'); }else{ setAIStatus('Erreur serveur'); showNotification('❌ '+(data.error||'Erreur'),'danger'); } }
-async function aiRunLife(){ setAIStatus('Analyse durée de vie…'); const res=await fetch(`/agriculteur/maintenances/api/lifetime/${aiMachineData.id}`); if(!res.ok)throw new Error('HTTP '+res.status); const data=await res.json(); if(!data.success)throw new Error('Erreur analyse durée de vie'); document.getElementById('aiLifeScore').textContent=data.vieRestante+'%'; document.getElementById('aiLifeBar').style.width=data.vieRestante+'%'; document.getElementById('aiLifeYears').textContent=data.anneesEstimees+' ans'; document.getElementById('aiLifeRisk').textContent=data.risquePanne; if(data.composants?.length){ const colors=['#A32D2D','#854F0B','#0C447C','#3B6D11','#4a1d8c']; const bars=document.getElementById('aiLifeBars'); bars.innerHTML=''; data.composants.forEach((c,i)=>{const row=document.createElement('div');row.className='modal-life-bar-row';row.innerHTML=`<div class="modal-life-bar-label">${escapeHtml(c.nom)}</div><div class="modal-life-bar-track"><div class="modal-life-bar-fill" style="width:${c.usure}%;background:${colors[i%colors.length]}"></div></div><div style="font-size:11px;font-weight:600;color:#1a2e1a;">${c.usure}%</div>`;bars.appendChild(row);}); } document.getElementById('aiLifeResTxt').textContent=(data.recommandations||[]).map((r,i)=>`${i+1}. ${r}`).join('\n'); document.getElementById('aiLifeRes').style.display='block'; setAIStatus('Analyse terminée ✓'); }
-function resetAITab(){ ['aiPromptRes','aiLifeRes'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';}); document.getElementById('aiPromptTxt').value=''; document.querySelectorAll('.modal-chip').forEach(c=>c.classList.remove('sel')); renderAILifeLocal(); suggestionsLoaded=false; resetSuggestTab(); setAIStatus('Réinitialisé'); }
-document.getElementById('aiModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeAIModal();}); document.getElementById('reminderCalendarModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeReminderCalendar();}); document.getElementById('reminderDetailPopup').addEventListener('click',e=>{if(e.target===e.currentTarget)closeReminderDetailPopup();});
-document.addEventListener('DOMContentLoaded',function(){ const countByType={{ countByType is defined ? countByType|json_encode|raw : '[]' }}; const coutByMonth={{ coutByMonth is defined ? coutByMonth|json_encode|raw : '[]' }}; if(document.getElementById('barChart')&&countByType?.length){ new Chart(document.getElementById('barChart'),{type:'bar',data:{labels:countByType.map(r=>r.type),datasets:[{label:'Nombre',data:countByType.map(r=>r.total),backgroundColor:['#2d6a2d','#0F6E56','#854F0B','#a32d2d','#0c447c','#7b5200','#1a5276','#4a1d8c','#534AB7','#2c2c2a']}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}}); } if(document.getElementById('lineChart')&&coutByMonth?.length){ new Chart(document.getElementById('lineChart'),{type:'line',data:{labels:coutByMonth.map(r=>r.mois),datasets:[{label:'Coût (DT)',data:coutByMonth.map(r=>r.total),borderColor:'#2d6a2d',backgroundColor:'rgba(45,106,45,.1)',borderWidth:2,tension:.4,fill:true,pointRadius:4}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}}); } });
+// ================================================================
+// FILTRES
+// ================================================================
+function filterItems() {
+    const search = (document.getElementById('searchInput')?.value || '').toLowerCase();
+    const type   = (document.getElementById('typeFilter')?.value || '').toLowerCase();
+    const statut = (document.getElementById('statutFilter')?.value || '').toLowerCase();
+    const prio   = (document.getElementById('prioriteFilter')?.value || '').toLowerCase();
+    const sort   = document.getElementById('sortFilter')?.value || 'date';
+    const dir    = document.getElementById('dirFilter')?.value || 'desc';
+
+    const resetBtn = document.getElementById('resetBtn');
+    if (resetBtn) resetBtn.style.display = (search || type || statut || prio) ? 'inline-flex' : 'none';
+
+    function matches(el) {
+        if (!el || !el.dataset) return false;
+        return (!search || (el.dataset.type||'').includes(search) || (el.dataset.desc||'').includes(search) || (el.dataset.nom||'').includes(search))
+            && (!type   || (el.dataset.type||'').includes(type))
+            && (!statut || (el.dataset.statut||'') === statut)
+            && (!prio   || (el.dataset.priorite||'') === prio);
+    }
+
+    // ── Cartes ──
+    const cardsGrid = document.getElementById('cardsGrid');
+    if (cardsGrid) {
+        const allCards = Array.from(cardsGrid.children).filter(c => !c.id);
+        const matched  = allCards.filter(c => matches(c));
+        sortItems(matched, sort, dir);
+        pgCards.items = matched;
+        pgCards.page  = 1;
+        renderPaginatedCards();
+    }
+
+    // ── Tableau ──
+    const tbody = document.getElementById('maintBody');
+    if (tbody) {
+        const allRows = Array.from(tbody.querySelectorAll('tr'));
+        const matched  = allRows.filter(r => matches(r));
+        sortItems(matched, sort, dir);
+        pgTable.items = matched;
+        pgTable.page  = 1;
+        renderPaginatedTable();
+    }
+}
+
+function sortItems(items, sort, dir) {
+    items.sort((a, b) => {
+        let va, vb;
+        switch (sort) {
+            case 'cout':     va = parseFloat(a.dataset.cout||0);    vb = parseFloat(b.dataset.cout||0);    break;
+            case 'type':     va = a.dataset.type||'';               vb = b.dataset.type||'';               break;
+            case 'statut':   va = a.dataset.statut||'';             vb = b.dataset.statut||'';             break;
+            case 'priorite': va = parseInt(a.dataset.prioOrder||2); vb = parseInt(b.dataset.prioOrder||2); break;
+            case 'km':       va = parseInt(a.dataset.km||0);        vb = parseInt(b.dataset.km||0);        break;
+            default:         va = a.dataset.date||'';               vb = b.dataset.date||'';
+        }
+        if (va < vb) return dir === 'asc' ? -1 : 1;
+        if (va > vb) return dir === 'asc' ?  1 : -1;
+        return 0;
+    });
+}
+
+function onSearchInput(input) {
+    document.getElementById('clearSearch')?.classList.toggle('visible', input.value.length > 0);
+    filterItems();
+}
+
+function clearSearch() {
+    const input = document.getElementById('searchInput');
+    if (input) { input.value = ''; input.focus(); }
+    document.getElementById('clearSearch')?.classList.remove('visible');
+    filterItems();
+}
+
+function resetFilters() {
+    const si = document.getElementById('searchInput');
+    if (si) si.value = '';
+    document.getElementById('clearSearch')?.classList.remove('visible');
+    ['typeFilter','statutFilter','prioriteFilter','sortFilter','dirFilter'].forEach(id => {
+        const el = document.getElementById(id); if (el) el.selectedIndex = 0;
+    });
+    filterItems();
+}
+
+// ================================================================
+// PAGINATION — CARTES
+// ================================================================
+function renderPaginatedCards() {
+    const grid   = document.getElementById('cardsGrid');
+    const noRes  = document.getElementById('noResultsCards');
+    const pgWrap = document.getElementById('paginationCards');
+    if (!grid) return;
+
+    // Masquer tous les éléments
+    const allOriginal = Array.from(grid.children).filter(c => !c.id);
+    allOriginal.forEach(c => c.style.display = 'none');
+
+    const items   = pgCards.items;
+    const total   = items.length;
+    const perPage = pgCards.perPage;
+    const pages   = Math.ceil(total / perPage);
+    pgCards.page  = Math.min(pgCards.page, pages || 1);
+    const start   = (pgCards.page - 1) * perPage;
+    const end     = start + perPage;
+
+    if (total === 0) {
+        if (noRes) noRes.style.display = 'block';
+        if (pgWrap) pgWrap.innerHTML = '';
+        return;
+    }
+    if (noRes) noRes.style.display = 'none';
+
+    // Afficher les items de la page courante
+    items.slice(start, end).forEach(c => c.style.display = '');
+
+    renderPaginationBar(pgWrap, pgCards.page, pages, perPage, total, (p) => {
+        pgCards.page = p; renderPaginatedCards();
+    }, (pp) => {
+        pgCards.perPage = pp; pgCards.page = 1; renderPaginatedCards();
+    });
+}
+
+// ================================================================
+// PAGINATION — TABLEAU
+// ================================================================
+function renderPaginatedTable() {
+    const tbody  = document.getElementById('maintBody');
+    const noRes  = document.getElementById('noResultsTable');
+    const pgWrap = document.getElementById('paginationTable');
+    if (!tbody) return;
+
+    // Masquer toutes les lignes
+    Array.from(tbody.querySelectorAll('tr')).forEach(r => r.style.display = 'none');
+
+    const items   = pgTable.items;
+    const total   = items.length;
+    const perPage = pgTable.perPage;
+    const pages   = Math.ceil(total / perPage);
+    pgTable.page  = Math.min(pgTable.page, pages || 1);
+    const start   = (pgTable.page - 1) * perPage;
+    const end     = start + perPage;
+
+    if (total === 0) {
+        if (noRes) noRes.style.display = 'block';
+        if (pgWrap) pgWrap.innerHTML = '';
+        return;
+    }
+    if (noRes) noRes.style.display = 'none';
+
+    items.slice(start, end).forEach(r => r.style.display = '');
+
+    renderPaginationBar(pgWrap, pgTable.page, pages, perPage, total, (p) => {
+        pgTable.page = p; renderPaginatedTable();
+    }, (pp) => {
+        pgTable.perPage = pp; pgTable.page = 1; renderPaginatedTable();
+    });
+}
+
+// ================================================================
+// PAGINATION — BARRE DE CONTRÔLE (2 BOUTONS : 0 inactif, 1 actif)
+// ================================================================
+function renderPaginationBar(wrap, page, pages, perPage, total, onPage, onPerPage) {
+    if (!wrap) return;
+    
+    // Afficher uniquement 2 boutons: 0 (inactif/gris) et 1 (actif/vert)
+    wrap.innerHTML = `
+        <div style="display:flex; gap:1rem; align-items:center;">
+            <button class="pg-btn" disabled style="background:#e0e0e0; color:#999; opacity:0.6; cursor:not-allowed;">
+                0
+            </button>
+            <button class="pg-btn active" style="background:#2d6a2d; color:#fff; border-color:#2d6a2d;">
+                1
+            </button>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.5rem; margin-left:1rem;">
+            <span class="pg-info">${total} élément(s)</span>
+            <select class="pg-size-select" onchange="(${onPerPage})(parseInt(this.value))" title="Éléments par page">
+                ${[6,9,12,18,24,36,48].map(n => `<option value="${n}" ${n === perPage ? 'selected' : ''}>${n} / page</option>`).join('')}
+            </select>
+        </div>
+        <div class="pagination-status" style="display:flex; gap:1.5rem; margin-left:1rem;">
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+                <span style="display:inline-block; width:12px; height:12px; background:#e0e0e0; border-radius:50%;"></span>
+                <span style="font-size:0.85rem; color:#7a9a7a;">0 : Aucun événement / Inactif</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+                <span style="display:inline-block; width:12px; height:12px; background:#2d6a2d; border-radius:50%;"></span>
+                <span style="font-size:0.85rem; color:#7a9a7a;">1 : Maintenances planifiées (actif)</span>
+            </div>
+        </div>
+    `;
+}
+
+// ================================================================
+// NOTES PAR JOUR — SAUVEGARDE
+// ================================================================
+function saveDayNotes() {
+    try { localStorage.setItem('agro_day_notes', JSON.stringify(dayNotes)); } catch(e){}
+}
+
+function openDayNoteModal(dateStr) {
+    _currentNoteDate = dateStr;
+    const existing   = dayNotes[dateStr] || {};
+
+    const d         = new Date(dateStr + 'T12:00:00');
+    const monthsFR  = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+    const daysFR    = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+    const dayLabel  = `${daysFR[d.getDay()]} ${d.getDate()} ${monthsFR[d.getMonth()]} ${d.getFullYear()}`;
+
+    document.getElementById('dayNoteLabel').textContent    = dayLabel;
+    document.getElementById('dayNoteText').value           = existing.text || '';
+    document.getElementById('dayNoteType').value           = existing.type || 'Maintenance';
+    document.getElementById('dayNotePriorite').value       = existing.priorite || 'moyenne';
+    document.getElementById('dayNoteDeleteBtn').style.display = existing.text ? 'inline-block' : 'none';
+
+    const others = Object.entries(dayNotes)
+        .filter(([k, v]) => k !== dateStr && v.text)
+        .sort(([a], [b]) => b.localeCompare(a))
+        .slice(0, 4);
+
+    const otherWrap = document.getElementById('dayNoteOtherDates');
+    const otherList = document.getElementById('dayNoteOtherList');
+    if (others.length > 0) {
+        otherWrap.style.display = 'block';
+        otherList.innerHTML = others.map(([k, v]) => {
+            const od = new Date(k + 'T12:00:00');
+            const prioColors = { urgente:'#a32d2d', haute:'#854F0B', moyenne:'#27500a', faible:'#0c447c' };
+            return `<div onclick="openDayNoteModal('${k}')"
+                style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;cursor:pointer;border-bottom:1px solid #f0f4ef;font-size:12px;transition:background .1s;"
+                onmouseover="this.style.background='#f7faf4'" onmouseout="this.style.background=''">
+                <span style="color:#1a2e1a;font-weight:500;">${od.getDate()} ${monthsFR[od.getMonth()]} ${od.getFullYear()}</span>
+                <span style="color:#7a9a7a;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(v.text.slice(0,40))}${v.text.length>40?'…':''}</span>
+                <span style="background:${prioColors[v.priorite]||'#27500a'};color:#fff;padding:1px 7px;border-radius:20px;font-size:10px;">${v.type||''}</span>
+            </div>`;
+        }).join('');
+    } else {
+        otherWrap.style.display = 'none';
+    }
+
+    const modal = document.getElementById('dayNoteModal');
+    modal.style.display = 'flex';
+    setTimeout(() => document.getElementById('dayNoteText').focus(), 80);
+}
+
+function closeDayNoteModal() {
+    document.getElementById('dayNoteModal').style.display = 'none';
+    _currentNoteDate = null;
+}
+
+function saveDayNote() {
+    if (!_currentNoteDate) return;
+    const text     = document.getElementById('dayNoteText').value.trim();
+    const type     = document.getElementById('dayNoteType').value;
+    const priorite = document.getElementById('dayNotePriorite').value;
+
+    if (!text) {
+        const ta = document.getElementById('dayNoteText');
+        ta.style.borderColor = '#a32d2d';
+        ta.focus();
+        setTimeout(() => ta.style.borderColor = '#d4e8d4', 1500);
+        return;
+    }
+
+    dayNotes[_currentNoteDate] = { text, type, priorite, updatedAt: new Date().toISOString() };
+    saveDayNotes();
+    closeDayNoteModal();
+
+    if (reminderCalendar) {
+        reminderCalendar.refetchEvents();
+        addNoteEventToCalendar(_currentNoteDate, text, type, priorite);
+    }
+    showNotification('📝 Note enregistrée pour le ' + _currentNoteDate, 'success');
+}
+
+function deleteDayNote() {
+    if (!_currentNoteDate || !confirm('Supprimer cette note ?')) return;
+    delete dayNotes[_currentNoteDate];
+    saveDayNotes();
+    closeDayNoteModal();
+    if (reminderCalendar) reminderCalendar.refetchEvents();
+    showNotification('🗑 Note supprimée', 'info');
+}
+
+function addNoteEventToCalendar(dateStr, text, type, priorite) {
+    if (!reminderCalendar) return;
+    const prioColors = { urgente:'#a32d2d', haute:'#854F0B', moyenne:'#2d6a2d', faible:'#0c447c' };
+    const existing = reminderCalendar.getEventById('note_' + dateStr);
+    if (existing) existing.remove();
+    reminderCalendar.addEvent({
+        id: 'note_' + dateStr,
+        title: '📝 ' + (text.slice(0, 25) + (text.length > 25 ? '…' : '')),
+        start: dateStr,
+        allDay: true,
+        backgroundColor: prioColors[priorite] || '#2d6a2d',
+        borderColor:     prioColors[priorite] || '#2d6a2d',
+        textColor: '#fff',
+        extendedProps: { isNote: true, noteText: text, noteType: type, notePriorite: priorite }
+    });
+}
+
+// ================================================================
+// CALENDRIER — INIT ET EVENTS
+// ================================================================
+function openReminderCalendar() {
+    const modal = document.getElementById('reminderCalendarModal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    if (!reminderCalendar) {
+        setTimeout(initReminderCalendar, 50);
+    } else {
+        reminderCalendar.refetchEvents();
+    }
+}
+
+function closeReminderCalendar() {
+    const modal = document.getElementById('reminderCalendarModal');
+    if (modal) modal.style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+async function initReminderCalendar() {
+    const calendarEl = document.getElementById('reminderCalendar');
+    if (!calendarEl) return;
+    if (typeof FullCalendar === 'undefined') { setTimeout(initReminderCalendar, 300); return; }
+
+    reminderCalendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'fr',
+        headerToolbar: {
+            left:   'prev,next today',
+            center: 'title',
+            right:  'dayGridMonth,dayGridWeek'
+        },
+        buttonText: { today: "Aujourd'hui", month: 'Mois', week: 'Semaine' },
+        height: 500,
+        selectable: true,
+        dateClick: function(info) {
+            openDayNoteModal(info.dateStr);
+        },
+        events: loadReminderEvents,
+        eventDidMount: function(info) {
+            info.el.style.cursor        = 'pointer';
+            info.el.style.borderRadius  = '6px';
+            info.el.style.padding       = '2px 4px';
+            info.el.title = info.event.extendedProps?.isNote
+                ? '📝 ' + (info.event.extendedProps.noteText || '')
+                : (info.event.extendedProps?.message || 'Cliquer pour voir les détails');
+        },
+        eventClick: function(info) {
+            if (info.event.extendedProps?.isNote) {
+                openDayNoteModal(info.event.startStr);
+            } else {
+                showReminderDetail(info.event.id);
+            }
+        },
+        dayCellDidMount: function(info) {
+            const dateStr    = info.date.toISOString().split('T')[0];
+            const hasReminder = reminderEvents.some(r => r.start === dateStr);
+            const hasNote     = dayNotes[dateStr]?.text;
+            if (hasReminder) {
+                info.el.style.background  = 'linear-gradient(135deg, #fff5f5 0%, #fcebeb 100%)';
+                info.el.style.borderLeft  = '3px solid #e74a3b';
+            }
+            if (hasNote) {
+                const dot = document.createElement('div');
+                dot.style.cssText = 'position:absolute;bottom:3px;right:4px;width:7px;height:7px;background:#2d6a2d;border-radius:50%;';
+                info.el.style.position = 'relative';
+                info.el.appendChild(dot);
+            }
+        }
+    });
+
+    reminderCalendar.render();
+
+    Object.entries(dayNotes).forEach(([dateStr, note]) => {
+        if (note.text) addNoteEventToCalendar(dateStr, note.text, note.type, note.priorite);
+    });
+}
+
+async function loadReminderEvents(fetchInfo, successCallback, failureCallback) {
+    try {
+        const response = await fetch('{{ path('agri_maintenances_api_reminder_dates') }}');
+        if (!response.ok) throw new Error('Erreur ' + response.status);
+        const data = await response.json();
+        if (data.success) {
+            allRemindersData = data.reminders;
+            reminderEvents   = data.reminders.map(r => {
+                r.aiRecommendation = generateLocalAIRecommendation(r);
+                return {
+                    id:    r.id,
+                    title: r.machineName,
+                    start: r.date,
+                    allDay: true,
+                    backgroundColor: r.priorite === 'urgente' ? '#a32d2d' : '#e74a3b',
+                    borderColor:     r.priorite === 'urgente' ? '#8b0000' : '#c0392b',
+                    textColor: '#ffffff',
+                    extendedProps: {
+                        isNote: false, message: r.message, machineName: r.machineName,
+                        type: r.type, priorite: r.priorite, yearsSince: r.yearsSince,
+                        monthsSince: r.monthsSince, ageText: r.ageText, km: r.km,
+                        cout: r.cout, description: r.description, dateMain: r.date,
+                        aiRecommendation: r.aiRecommendation
+                    }
+                };
+            });
+            successCallback(reminderEvents);
+
+            Object.entries(dayNotes).forEach(([dateStr, note]) => {
+                if (note.text) addNoteEventToCalendar(dateStr, note.text, note.type, note.priorite);
+            });
+        } else {
+            failureCallback(data.error || 'Erreur inconnue');
+        }
+    } catch (error) {
+        console.error('Erreur chargement rappels:', error);
+        failureCallback(error);
+    }
+}
+
+function generateLocalAIRecommendation(reminder) {
+    const km         = reminder.km || 0;
+    const priorite   = reminder.priorite || 'moyenne';
+    const yearsSince = reminder.yearsSince || 0;
+    const type       = reminder.type || 'Générale';
+    let rec = '';
+
+    if (priorite === 'urgente')      rec += "🚨 URGENCE - Intervention immédiate requise !\n\n";
+    else if (yearsSince >= 2)        rec += "⚠️ CRITIQUE - Plus de 2 ans sans maintenance. Révision majeure obligatoire !\n\n";
+    else if (yearsSince >= 1)        rec += "🔔 RAPPEL ANNUEL - Maintenance préventive recommandée.\n\n";
+
+    if (km >= 15000) {
+        rec += `📊 Kilométrage CRITIQUE (${km.toLocaleString()} km) :\n• Révision majeure OBLIGATOIRE\n• Vidange complète + tous les filtres\n• Contrôle exhaustif moteur et transmission\n\n`;
+    } else if (km >= 10000) {
+        rec += `📊 Kilométrage ÉLEVÉ (${km.toLocaleString()} km) :\n• Révision générale conseillée\n• Vidange moteur et changement filtres\n\n`;
+    } else if (km >= 5000) {
+        rec += `📊 Kilométrage INTERMÉDIAIRE (${km.toLocaleString()} km) :\n• Vidange et entretien courant requis\n• Vérification des niveaux et courroies\n\n`;
+    }
+
+    const typeRecs = {
+        'Moteur':       "🔧 PANNE MOTEUR :\n• Vérifier la compression\n• Contrôler les niveaux d'huile\n• Inspecter les injecteurs\n\n",
+        'Électricité':  "⚡ PANNE ÉLECTRIQUE :\n• Tester batterie et alternateur\n• Vérifier les fusibles\n• Diagnostic OBD\n\n",
+        'Hydraulique':  "💧 PANNE HYDRAULIQUE :\n• Contrôler le niveau de fluide\n• Inspecter les flexibles\n• Rechercher les fuites\n\n",
+        'Transmission': "⚙️ TRANSMISSION :\n• Vérifier niveaux huile boîte\n• Contrôler les courroies\n• Tester l'embrayage\n\n",
+    };
+    if (typeRecs[type]) rec += typeRecs[type];
+
+    rec += "⚠️ SÉCURITÉ :\n• Port des EPI obligatoires\n• Couper le moteur avant intervention\n• Déconnecter la batterie (pôle négatif)\n• Extincteur à portée de main\n\n";
+    rec += "📋 MAINTENANCE PRÉVENTIVE :\n";
+    if (km > 0) {
+        const nextKm = Math.ceil((km + 1) / 5000) * 5000;
+        rec += `• Prochaine vidange : tous les 5000 km (${(nextKm - km).toLocaleString()} km restants)\n`;
+    }
+    rec += "• Contrôle hebdomadaire : niveaux, pression pneus\n• Tenir à jour le carnet de maintenance\n";
+    return rec;
+}
+
+async function generateAndShowAIRecommendation(id, type, priorite, km, nom, statut, cout, description) {
+    const reminder = {
+        id, machineName: nom || 'Machine non définie', type, priorite,
+        km: parseInt(km) || 0, statut,
+        cout: parseFloat(cout) || 0,
+        date: new Date().toISOString().split('T')[0],
+        yearsSince: 1,
+        ageText: priorite === 'urgente' ? 'URGENT - Intervention immédiate' : 'Maintenance planifiée'
+    };
+    reminder.aiRecommendation = generateLocalAIRecommendation(reminder);
+    showReminderDetailWithData(reminder);
+}
+
+function showReminderDetailWithData(reminder) {
+    const modal = document.getElementById('reminderDetailPopup');
+    const body  = document.getElementById('reminderDetailBody');
+    if (!modal || !body) return;
+    modal.style.display = 'flex';
+
+    const riskColors = { critique:'#a32d2d', élevé:'#e67e22', modéré:'#f39c12', faible:'#2d6a2d' };
+    const riskLabels = { critique:'🔴 CRITIQUE', élevé:'🟠 ÉLEVÉ', modéré:'🟡 MODÉRÉ', faible:'🟢 FAIBLE' };
+    const prioLabels = { urgente:'🔴 Urgente', haute:'🟠 Haute', moyenne:'🟢 Moyenne', faible:'🔵 Faible' };
+
+    let riskLevel = 'faible', riskScore = 0;
+    if (reminder.priorite === 'urgente') { riskLevel = 'critique'; riskScore = 85; }
+    else if (reminder.km > 15000)        { riskLevel = 'élevé';   riskScore = 70; }
+    else if (reminder.km > 10000)        { riskLevel = 'modéré';  riskScore = 50; }
+    else if (reminder.km > 5000)         { riskLevel = 'modéré';  riskScore = 35; }
+
+    body.innerHTML = `
+        <div class="reminder-message-box" style="border-left-color:${riskColors[riskLevel]}">
+            <div class="reminder-message-text">🤖 RECOMMANDATION IA — ${escapeHtml(reminder.machineName)}</div>
+            <div style="font-size:12px;color:#7a9a7a;">Générée par intelligence artificielle AgroFlow</div>
+        </div>
+        <div style="background:#f0faf7;border-radius:12px;padding:12px;margin-bottom:15px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+                <span style="font-weight:600;font-size:13px;">📊 État de la maintenance</span>
+                <span style="background:${riskColors[riskLevel]};color:white;padding:2px 10px;border-radius:20px;font-size:11px;">${riskLabels[riskLevel]} (${riskScore}%)</span>
+            </div>
+            <div class="reminder-detail-row"><span class="reminder-detail-label">🚜 Machine</span><span class="reminder-detail-value"><strong>${escapeHtml(reminder.machineName)}</strong></span></div>
+            <div class="reminder-detail-row"><span class="reminder-detail-label">🔧 Type</span><span class="reminder-detail-value">${escapeHtml(reminder.type||'—')}</span></div>
+            <div class="reminder-detail-row"><span class="reminder-detail-label">⚠️ Priorité</span><span class="reminder-detail-value">${prioLabels[reminder.priorite]||reminder.priorite}</span></div>
+            <div class="reminder-detail-row"><span class="reminder-detail-label">📊 Kilométrage</span><span class="reminder-detail-value">${(reminder.km||0).toLocaleString()} km</span></div>
+            ${reminder.cout ? `<div class="reminder-detail-row"><span class="reminder-detail-label">💰 Coût</span><span class="reminder-detail-value">${parseFloat(reminder.cout).toLocaleString()} DT</span></div>` : ''}
+        </div>
+        <div style="background:#eaf3de;border-radius:12px;padding:12px;margin-bottom:15px;">
+            <div style="font-weight:700;color:#2d6a2d;margin-bottom:8px;">📋 RECOMMANDATIONS IA DÉTAILLÉES</div>
+            <div style="white-space:pre-wrap;font-size:12px;line-height:1.6;">${escapeHtml(reminder.aiRecommendation)}</div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:15px;flex-wrap:wrap;">
+            <a href="/agriculteur/maintenances/${reminder.id}" class="btn btn--green" style="flex:1;text-align:center;">👁 Voir détails</a>
+            <a href="/agriculteur/maintenances/${reminder.id}/edit" class="btn btn--outline" style="flex:1;text-align:center;">✏️ Planifier</a>
+            <button class="btn btn--google" style="flex:1;text-align:center;"
+                onclick="exportSingleReminderToGoogleCalendar(${reminder.id},'${escapeHtml(reminder.machineName)}','${reminder.date}','${escapeHtml(reminder.type||'')}','${reminder.priorite}',${reminder.km||0})">
+                📤 Google
+            </button>
+        </div>`;
+}
+
+function exportToGoogleCalendar(title, startDate, endDate, description) {
+    const fmt = d => `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+    const url  = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${fmt(startDate)}/${fmt(endDate)}&details=${encodeURIComponent(description)}&sf=true&output=xml`;
+    window.open(url, '_blank');
+    showNotification('📤 Événement exporté vers Google Calendar', 'success');
+}
+
+function exportReminderToGoogleCalendar(reminder) {
+    let startDate = new Date(reminder.date);
+    if (isNaN(startDate.getTime())) startDate = new Date();
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 1);
+    const desc = `🔔 RAPPEL DE MAINTENANCE\nMachine: ${reminder.machineName}\nType: ${reminder.type||'Maintenance préventive'}\nPriorité: ${reminder.priorite}\nKilométrage: ${reminder.km?reminder.km.toLocaleString()+' km':'Non renseigné'}\n\n✅ Vérifications recommandées par l'IA:\n• Inspection générale\n• Vidange moteur et filtres\n• Contrôle des niveaux\n• Vérification courroies\n• Pression des pneus\n\nGénéré par AgroFlow IA`;
+    exportToGoogleCalendar('Maintenance préventive: ' + reminder.machineName, startDate, endDate, desc);
+}
+
+function exportSingleReminderToGoogleCalendar(id, machineName, dateMain, type, priorite, km) {
+    exportReminderToGoogleCalendar({ id, machineName, date: dateMain, type, priorite, km });
+}
+
+function exportAllRemindersToGoogleCalendar() {
+    if (!allRemindersData || allRemindersData.length === 0) { showNotification('Aucun rappel à exporter', 'warning'); return; }
+    exportReminderToGoogleCalendar(allRemindersData[0]);
+    showNotification(`📤 ${allRemindersData.length} rappel(s) — Le premier exporté vers Google Calendar`, 'info');
+}
+
+async function showReminderDetail(maintenanceId) {
+    const modal = document.getElementById('reminderDetailPopup');
+    const body  = document.getElementById('reminderDetailBody');
+    if (!modal || !body) return;
+    modal.style.display = 'flex';
+    body.innerHTML = '<div class="modal-loader"><div class="modal-loader__spinner"></div><div class="modal-loader__text">Chargement des détails...</div></div>';
+
+    try {
+        const response = await fetch('/agriculteur/maintenances/api/calendar/reminder-detail/' + maintenanceId);
+        const data = await response.json();
+        if (data.success) {
+            if (!data.aiRecommendation) {
+                data.aiRecommendation = generateLocalAIRecommendation({
+                    id: data.id, machineName: data.machineName, type: data.type,
+                    priorite: data.priorite, km: data.km || 0, statut: data.statut,
+                    date: data.dateMain, yearsSince: data.yearsSince || 0
+                });
+            }
+            const riskColors = { critique:'#a32d2d', élevé:'#e67e22', moyen:'#f39c12', faible:'#2d6a2d' };
+            body.innerHTML = `
+                <div class="reminder-message-box">
+                    <div class="reminder-message-text">${escapeHtml(data.message)}</div>
+                    <div style="font-size:12px;color:#7a9a7a;">Dernière maintenance : ${data.dateMain||'Date inconnue'}</div>
+                </div>
+                <div class="reminder-detail-row"><span class="reminder-detail-label">🚜 Machine</span><span class="reminder-detail-value"><strong>${escapeHtml(data.machineName)}</strong></span></div>
+                <div class="reminder-detail-row"><span class="reminder-detail-label">🔧 Type</span><span class="reminder-detail-value">${escapeHtml(data.type||'—')}</span></div>
+                <div class="reminder-detail-row">
+                    <span class="reminder-detail-label">🎯 Urgence</span>
+                    <span class="reminder-detail-value">
+                        <span style="background:${riskColors[data.urgenceLevel?.level]||'#2d6a2d'};color:white;padding:2px 10px;border-radius:20px;font-size:11px;">${escapeHtml(data.urgenceLevel?.label||'Normal')}</span>
+                    </span>
+                </div>
+                <div class="reminder-detail-row"><span class="reminder-detail-label">⏰ Temps écoulé</span><span class="reminder-detail-value">${data.yearsSince>0?`${data.yearsSince} an${data.yearsSince>1?'s':''}${data.monthsSince>0?` et ${data.monthsSince} mois`:''}`:'Maintenance récente'}</span></div>
+                <div class="reminder-detail-row"><span class="reminder-detail-label">💰 Coût estimé</span><span class="reminder-detail-value">${data.cout?data.cout.toLocaleString()+' DT':'—'}</span></div>
+                <div class="reminder-detail-row"><span class="reminder-detail-label">📊 Kilométrage</span><span class="reminder-detail-value">${data.km?data.km.toLocaleString()+' km':'—'}</span></div>
+                ${data.description?`<div class="reminder-detail-row"><span class="reminder-detail-label">📝 Description</span><span class="reminder-detail-value">${escapeHtml(data.description)}</span></div>`:''}
+                <div style="background:#eaf3de;border-radius:12px;padding:12px;margin:15px 0;">
+                    <div style="font-weight:700;color:#2d6a2d;margin-bottom:8px;">🤖 RECOMMANDATIONS IA</div>
+                    <div style="white-space:pre-wrap;font-size:12px;line-height:1.6;">${escapeHtml(data.aiRecommendation)}</div>
+                </div>
+                <div style="display:flex;gap:10px;margin-top:15px;flex-wrap:wrap;">
+                    <a href="/agriculteur/maintenances/${data.id}" class="btn btn--green" style="flex:1;text-align:center;">👁 Voir détails</a>
+                    <a href="/agriculteur/maintenances/${data.id}/edit" class="btn btn--outline" style="flex:1;text-align:center;">✏️ Planifier</a>
+                    <button class="btn btn--google" style="flex:1;text-align:center;"
+                        onclick="exportSingleReminderToGoogleCalendar(${data.id},'${escapeHtml(data.machineName)}','${data.dateMain}','${escapeHtml(data.type||'')}','${data.priorite}',${data.km||0})">
+                        📤 Google
+                    </button>
+                </div>`;
+        } else {
+            body.innerHTML = `<div style="color:#a32d2d;text-align:center;padding:1rem;">❌ Erreur : ${escapeHtml(data.error)}</div>`;
+        }
+    } catch (error) {
+        body.innerHTML = `<div style="color:#a32d2d;text-align:center;padding:1rem;">❌ Erreur réseau : ${escapeHtml(error.message)}</div>`;
+    }
+}
+
+function closeReminderDetailPopup() {
+    const modal = document.getElementById('reminderDetailPopup');
+    if (modal) modal.style.display = 'none';
+}
+
+async function analyzeAllRemindersWithAI() {
+    const modal = document.getElementById('reminderDetailPopup');
+    const body  = document.getElementById('reminderDetailBody');
+    if (!modal || !body) return;
+    modal.style.display = 'flex';
+    body.innerHTML = '<div class="modal-loader"><div class="modal-loader__spinner"></div><div class="modal-loader__text">Analyse globale en cours...</div></div>';
+
+    try {
+        const response = await fetch('{{ path('agri_maintenances_api_reminder_dates') }}');
+        const data = await response.json();
+
+        if (data.success && data.reminders && data.reminders.length > 0) {
+            const reminders   = data.reminders;
+            const urgentCount = reminders.filter(r => r.priorite === 'urgente').length;
+            const highCount   = reminders.filter(r => r.priorite === 'haute').length;
+            const totalCost   = reminders.reduce((s, r) => s + (parseFloat(r.cout)||0), 0);
+            const avgKm       = reminders.reduce((s, r) => s + (parseFloat(r.km)||0), 0) / reminders.length;
+
+            let ga = "📊 ANALYSE IA GLOBALE\n\n🔍 Synthèse de la flotte :\n";
+            ga += `• ${reminders.length} machine(s) nécessitent une attention\n`;
+            if (urgentCount > 0) ga += `• 🔴 ${urgentCount} intervention(s) URGENTE(s) immédiate(s)\n`;
+            if (highCount > 0)   ga += `• 🟠 ${highCount} maintenance(s) haute priorité sous 48h\n`;
+            ga += `• 📊 Kilométrage moyen : ${Math.round(avgKm).toLocaleString()} km\n`;
+            ga += `• 💰 Coût total estimé : ${Math.round(totalCost).toLocaleString()} DT\n\n`;
+            ga += "💡 RECOMMANDATIONS STRATÉGIQUES :\n";
+            if (urgentCount > 0) ga += "1. Priorité ABSOLUE aux interventions urgentes\n";
+            if (avgKm > 10000)   ga += "2. Révisions générales pour machines à haut kilométrage\n";
+            ga += "3. Établir un calendrier de maintenance préventive\n";
+            ga += "4. Former les opérateurs aux inspections quotidiennes\n";
+
+            body.innerHTML = `
+                <div class="reminder-message-box" style="border-left-color:#667eea">
+                    <div class="reminder-message-text">🤖 ANALYSE IA — Synthèse globale</div>
+                    <div style="font-size:12px;color:#7a9a7a;">${reminders.length} machine(s) avec rappel(s)</div>
+                </div>
+                <div style="background:#eaf3de;border-radius:12px;padding:15px;margin-bottom:15px;">
+                    <div style="white-space:pre-wrap;font-size:13px;line-height:1.6;">${escapeHtml(ga)}</div>
+                </div>
+                <div style="margin-bottom:15px;">
+                    <div style="font-weight:700;color:#2d6a2d;margin-bottom:8px;">📋 Machines concernées</div>
+                    <div style="background:#f7faf4;border-radius:12px;padding:12px;max-height:280px;overflow-y:auto;">
+                        ${reminders.map(r => `
+                            <div class="reminder-detail-row" style="cursor:pointer;" onclick="showReminderDetail(${r.id})">
+                                <span class="reminder-detail-label">${escapeHtml(r.machineName)}</span>
+                                <span class="reminder-detail-value">${r.date} — ${r.priorite==='urgente'?'🔴 Urgent':'📅 Rappel annuel'}</span>
+                            </div>`).join('')}
+                    </div>
+                </div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                    <button class="btn btn--green" style="flex:1;text-align:center;" onclick="closeReminderDetailPopup();openReminderCalendar();">📅 Voir calendrier</button>
+                    <button class="btn btn--google" style="flex:1;text-align:center;" onclick="exportAllRemindersToGoogleCalendar()">📤 Exporter Google</button>
+                </div>`;
+        } else {
+            body.innerHTML = `<div style="color:#27500a;text-align:center;padding:1rem;">✅ Aucun rappel de maintenance à afficher</div>`;
+        }
+    } catch (error) {
+        body.innerHTML = `<div style="color:#a32d2d;text-align:center;padding:1rem;">❌ Erreur : ${escapeHtml(error.message)}</div>`;
+    }
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+function showNotification(message, type) {
+    const n = document.createElement('div');
+    n.className = `alert alert--${type}`;
+    n.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:99999;max-width:380px;box-shadow:0 4px 18px rgba(0,0,0,.15);animation:fadeIn .2s ease;';
+    n.innerHTML = `<span>${escapeHtml(message)}</span><button class="alert__close" onclick="this.parentElement.remove()">✕</button>`;
+    document.body.appendChild(n);
+    setTimeout(() => n?.remove(), 5000);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    setView(currentView);
+
+    document.getElementById('openCalendarBtn')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        openReminderCalendar();
+    });
+
+    document.getElementById('reminderCalendarModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeReminderCalendar();
+    });
+    document.getElementById('reminderDetailPopup')?.addEventListener('click', function(e) {
+        if (e.target === this) closeReminderDetailPopup();
+    });
+    document.getElementById('dayNoteModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeDayNoteModal();
+    });
+
+    const countByType = {{ countByType|json_encode|raw }};
+    const coutByMonth = {{ coutByMonth|json_encode|raw }};
+
+    const barCanvas = document.getElementById('barChart');
+    if (barCanvas && countByType && countByType.length) {
+        new Chart(barCanvas, {
+            type: 'bar',
+            data: {
+                labels: countByType.map(r => r.type),
+                datasets: [{ label:'Nombre', data:countByType.map(r => r.total),
+                    backgroundColor:['#2d6a2d','#0F6E56','#854F0B','#a32d2d','#0c447c','#7b5200','#1a5276','#4a1d8c','#534AB7','#2c2c2a'] }]
+            },
+            options: { responsive:true, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ stepSize:1 } } } }
+        });
+    }
+
+    const lineCanvas = document.getElementById('lineChart');
+    if (lineCanvas && coutByMonth && coutByMonth.length) {
+        new Chart(lineCanvas, {
+            type: 'line',
+            data: {
+                labels: coutByMonth.map(r => r.mois),
+                datasets: [{ label:'Coût (DT)', data:coutByMonth.map(r => r.total),
+                    borderColor:'#2d6a2d', backgroundColor:'rgba(45,106,45,.1)', borderWidth:2, tension:.4, fill:true, pointRadius:4 }]
+            },
+            options: { responsive:true, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true } } }
+        });
+    }
+});
 </script>
 {% endblock %}
