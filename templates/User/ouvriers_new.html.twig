@@ -112,3 +112,8 @@ input:focus, select:focus { border-color: var(--vert); outline: none; }
 </div>
 </div>
 {% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+{% include '_speech_to_text_form.html.twig' with { cancel_path: path('app_ouvrier_index') } %}
+{% endblock %}

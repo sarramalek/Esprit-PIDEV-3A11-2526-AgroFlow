@@ -28,3 +28,8 @@
     </div>
 </div>
 {% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+{% include '_speech_to_text_form.html.twig' with { cancel_path: path('admin_abonnements_index') } %}
+{% endblock %}

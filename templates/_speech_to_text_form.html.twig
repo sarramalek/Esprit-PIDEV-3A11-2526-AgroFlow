@@ -1,0 +1,229 @@
+<style>
+    [data-stt-active="1"] {
+        border-color: #2D5A27 !important;
+        box-shadow: 0 0 0 3px rgba(45, 90, 39, 0.18) !important;
+    }
+
+    label[data-stt-active-label="1"]::after {
+        content: " *";
+        color: #2D5A27;
+        font-weight: 700;
+    }
+
+    #stt-status-msg {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        z-index: 99999;
+        background: rgba(28, 43, 58, 0.92);
+        color: #fff;
+        border-radius: 10px;
+        padding: 8px 10px;
+        font-size: 12px;
+        max-width: 260px;
+        display: none;
+    }
+</style>
+
+<div id="stt-status-msg"></div>
+
+<script>
+   (function () {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const sttStatusMsg = document.getElementById('stt-status-msg');
+    const cancelUrl = {{ cancel_path|json_encode|raw }};
+    let recognition = null;
+    let activeField = null;
+    let isListening = false;
+    let sttEnabled = true;
+
+    function showStatus(message, isError) {
+        if (!sttStatusMsg) return;
+        sttStatusMsg.style.display = 'block';
+        sttStatusMsg.style.background = isError ? 'rgba(180, 35, 24, 0.94)' : 'rgba(28, 43, 58, 0.92)';
+        sttStatusMsg.textContent = message;
+        window.clearTimeout(showStatus._timerId);
+        showStatus._timerId = window.setTimeout(function () {
+            sttStatusMsg.style.display = 'none';
+        }, 2500);
+    }
+
+    function isWritableField(element) {
+        if (!element) return false;
+        if (element.tagName === 'TEXTAREA') return !element.readOnly && !element.disabled;
+        if (element.tagName !== 'INPUT') return false;
+        const type = (element.type || 'text').toLowerCase();
+        const supportedTypes = ['text', 'search', 'email', 'tel', 'url', 'number'];
+        return supportedTypes.includes(type) && !element.readOnly && !element.disabled;
+    }
+
+    function startListening() {
+        if (!sttEnabled || isListening || !activeField || !isWritableField(activeField)) return;
+        if (!recognition) {
+            showStatus('STT non supporté par ce navigateur.', true);
+            return;
+        }
+        try {
+            recognition.start();
+            isListening = true;
+            showStatus('Écoute active...');
+        } catch (e) {
+            showStatus('Impossible de démarrer le micro.', true);
+        }
+    }
+
+    function stopListening() {
+        if (!isListening) return;
+        recognition.stop();
+        isListening = false;
+    }
+
+    function findFieldLabel(field) {
+        if (!field) return null;
+        if (field.id) {
+            const explicitLabel = document.querySelector('label[for="' + field.id + '"]');
+            if (explicitLabel) return explicitLabel;
+        }
+        const wrapper = field.closest('.form-group, div');
+        if (!wrapper) return null;
+        return wrapper.querySelector('label');
+    }
+
+    function clearActiveIndicator() {
+        const previous = document.querySelector('[data-stt-active="1"]');
+        if (previous) previous.removeAttribute('data-stt-active');
+        const previousLabel = document.querySelector('label[data-stt-active-label="1"]');
+        if (previousLabel) previousLabel.removeAttribute('data-stt-active-label');
+    }
+
+    function markActiveField(field) {
+        clearActiveIndicator();
+        if (!field) return;
+        field.setAttribute('data-stt-active', '1');
+        const label = findFieldLabel(field);
+        if (label) label.setAttribute('data-stt-active-label', '1');
+    }
+
+    document.addEventListener('focusin', function (event) {
+        if (isWritableField(event.target)) {
+            activeField = event.target;
+            markActiveField(activeField);
+            startListening();
+        }
+    });
+
+    document.addEventListener('click', function (event) {
+        if (isWritableField(event.target)) {
+            activeField = event.target;
+            markActiveField(activeField);
+            startListening();
+            return;
+        }
+        if (!event.target.closest || !event.target.closest('#stt-toggle-btn')) {
+            activeField = null;
+            clearActiveIndicator();
+            stopListening();
+        }
+    });
+
+    if (!SpeechRecognition) {
+        showStatus('Ce navigateur ne supporte pas la dictée vocale.', true);
+        return;
+    }
+
+    recognition = new SpeechRecognition();
+    recognition.lang = 'fr-FR';
+    recognition.interimResults = true;
+    recognition.continuous = false; // ← false pour éviter les répétitions
+
+    // Stocke le transcript en cours pour mise à jour live dans le champ
+    let currentSessionTranscript = '';
+
+    recognition.onresult = function (event) {
+        let interimTranscript = '';
+        let finalTranscript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            const result = event.results[i];
+            if (result.isFinal) {
+                finalTranscript += result[0].transcript;
+            } else {
+                interimTranscript += result[0].transcript;
+            }
+        }
+
+        // On prend le final s'il existe, sinon l'intérimaire
+        const transcript = (finalTranscript || interimTranscript).trim();
+        if (!transcript) return;
+
+        // Détecter commande "retour"
+        if (transcript.toLowerCase().includes('retour')) {
+            window.location.href = cancelUrl;
+            return;
+        }
+
+        let targetField = null;
+        if (activeField && isWritableField(activeField)) {
+            targetField = activeField;
+        } else if (isWritableField(document.activeElement)) {
+            targetField = document.activeElement;
+            activeField = targetField;
+            markActiveField(activeField);
+        }
+
+        if (!targetField) {
+            showStatus('Aucun champ sélectionné.', true);
+            return;
+        }
+
+        try {
+            targetField.focus();
+
+            if (targetField.tagName === 'INPUT' && (targetField.type || 'text').toLowerCase() === 'number') {
+                const numeric = transcript.replace(/[^\d.,-]/g, '').replace(',', '.');
+                if (numeric) {
+                    targetField.value = numeric;
+                    targetField.dispatchEvent(new Event('input', { bubbles: true }));
+                    targetField.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+                return;
+            }
+
+            // Remplace le contenu de la session en cours (pas de concaténation)
+            currentSessionTranscript = transcript;
+            targetField.value = currentSessionTranscript;
+            targetField.dispatchEvent(new Event('input', { bubbles: true }));
+            targetField.dispatchEvent(new Event('change', { bubbles: true }));
+
+            showStatus('Texte : ' + transcript.slice(0, 28) + (transcript.length > 28 ? '...' : ''));
+        } catch (e) {
+            showStatus('Échec insertion texte.', true);
+        }
+    };
+
+    recognition.onend = function () {
+        isListening = false;
+        // Réinitialise la session pour la prochaine écoute sur ce champ
+        currentSessionTranscript = '';
+        // Relance uniquement si le champ est toujours actif
+        if (sttEnabled && activeField && isWritableField(activeField) && document.activeElement === activeField) {
+            startListening();
+        }
+    };
+
+    recognition.onerror = function (event) {
+        isListening = false;
+        if (event && event.error === 'not-allowed') {
+            showStatus('Permission micro refusée.', true);
+            return;
+        }
+        if (event && event.error === 'no-speech') {
+            showStatus('Aucune voix détectée.', true);
+            return;
+        }
+        showStatus('Erreur micro : ' + (event && event.error ? event.error : 'inconnue'), true);
+    };
+
+    window.addEventListener('beforeunload', stopListening);
+})();
+</script>
