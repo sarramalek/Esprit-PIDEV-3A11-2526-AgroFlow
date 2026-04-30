@@ -38,7 +38,7 @@ class MaintenanceAdminController extends AbstractController
         $idM        = $request->query->get('idM', '');
         $statut     = $request->query->get('statut', '');
         $priorite   = $request->query->get('priorite', '');
-        
+
         if ($coutFilter === 'asc') {
             $sort = 'cout'; $dir = 'ASC';
         } elseif ($coutFilter === 'desc') {
@@ -48,36 +48,36 @@ class MaintenanceAdminController extends AbstractController
         $maintenances = $repo->searchWithMaterielName($search, $type, $sort, $dir, $idM, $statut, $priorite);
         $types        = array_column($repo->countByTypePanne(), 'type');
         $machines     = $machineRepo->findAll();
-        
+
         $page = max(1, $request->query->getInt('page', 1));
         $limit = $request->query->getInt('limit', 10);
         $allowedLimits = [10, 25, 50, 100];
         if (!in_array($limit, $allowedLimits)) {
             $limit = 10;
         }
-        
+
         $pagination = $paginator->paginate($maintenances, $page, $limit);
         $paginatedMaintenances = $pagination->getItems();
-        
+
         $pageTotalCout = 0;
         foreach ($paginatedMaintenances as $m) {
             $pageTotalCout += (float) $m->getCout();
         }
 
         return $this->render('admins/maintenances/index.html.twig', [
-            'pagination'   => $pagination,
-            'maintenances' => $paginatedMaintenances,
-            'types'        => $types,
-            'totalCout'    => $pageTotalCout,
-            'search'       => $search,
-            'selectedType' => $type,
-            'selectedIdM'  => $idM,
-            'selectedStatut' => $statut,
+            'pagination'       => $pagination,
+            'maintenances'     => $paginatedMaintenances,
+            'types'            => $types,
+            'totalCout'        => $pageTotalCout,
+            'search'           => $search,
+            'selectedType'     => $type,
+            'selectedIdM'      => $idM,
+            'selectedStatut'   => $statut,
             'selectedPriorite' => $priorite,
-            'sort'         => $sort,
-            'dir'          => $dir,
-            'coutFilter'   => $coutFilter,
-            'machines'     => $machines,
+            'sort'             => $sort,
+            'dir'              => $dir,
+            'coutFilter'       => $coutFilter,
+            'machines'         => $machines,
         ]);
     }
 
@@ -145,16 +145,21 @@ class MaintenanceAdminController extends AbstractController
                     $maintenance->setRecommandation($recommendation);
                     $logger->info('IA Gemini recommendation generated', [
                         'maintenance_id' => $maintenance->getIdMain(),
-                        'type' => $maintenance->getTypePanne()
+                        'type'           => $maintenance->getTypePanne(),
                     ]);
                 }
             } catch (\Exception $e) {
                 $logger->error('Failed to generate Gemini recommendation', [
                     'maintenance_id' => $maintenance->getIdMain(),
-                    'error' => $e->getMessage()
+                    'error'          => $e->getMessage(),
                 ]);
                 $maintenance->setRecommandation($this->getFallbackRecommendation($maintenance));
             }
+        }
+
+        // Sauvegarder les modifications si nécessaire
+        if (!empty($maintenances)) {
+            $repo->saveAll($maintenances);
         }
 
         $grouped = [];
@@ -165,24 +170,24 @@ class MaintenanceAdminController extends AbstractController
         }
         krsort($grouped);
 
-        $totalCout = array_sum(array_map(fn(Maintenance $m) => (float) $m->getCout(), $maintenances));
-        $years = array_unique(array_filter(array_map(fn(Maintenance $m) => $m->getDateMain()?->format('Y'), $maintenances)));
+        $totalCout     = array_sum(array_map(fn(Maintenance $m) => (float) $m->getCout(), $maintenances));
+        $years         = array_unique(array_filter(array_map(fn(Maintenance $m) => $m->getDateMain()?->format('Y'), $maintenances)));
         rsort($years);
 
-        $machines = $machineRepo->findAll();
+        $machines      = $machineRepo->findAll();
         $urgentesCount = count(array_filter($maintenances, fn($m) => $m->getPriorite() === 'urgente'));
 
         return $this->render('admins/maintenances/history.html.twig', [
-            'grouped' => $grouped,
-            'totalCout' => $totalCout,
-            'machines' => $machines,
-            'years' => $years,
-            'selectedIdM' => $idM,
-            'selectedStatut' => $statut,
+            'grouped'          => $grouped,
+            'totalCout'        => $totalCout,
+            'machines'         => $machines,
+            'years'            => $years,
+            'selectedIdM'      => $idM,
+            'selectedStatut'   => $statut,
             'selectedPriorite' => $priorite,
-            'selectedYear' => $year,
-            'totalCount' => count($maintenances),
-            'urgentesCount' => $urgentesCount,
+            'selectedYear'     => $year,
+            'totalCount'       => count($maintenances),
+            'urgentesCount'    => $urgentesCount,
         ]);
     }
 
@@ -194,12 +199,11 @@ class MaintenanceAdminController extends AbstractController
         MachineRepository $machineRepo,
         GeminiRecommendationService $geminiService
     ): Response {
-        $machines = $machineRepo->findAll();
-        
+        $machines    = $machineRepo->findAll();
         $healthScores = [];
-        $allAlerts = [];
+        $allAlerts   = [];
         $predictions = [];
-        
+
         foreach ($machines as $machine) {
             $healthScores[$machine->getId()] = $geminiService->calculateHealthScore($machine);
             $alerts = $geminiService->generateSmartAlerts($machine);
@@ -208,28 +212,27 @@ class MaintenanceAdminController extends AbstractController
                     $alert['type'] = 'info';
                 }
             }
-            $allAlerts = array_merge($allAlerts, $alerts);
+            $allAlerts   = array_merge($allAlerts, $alerts);
             $predictions[$machine->getId()] = $geminiService->predictFailure($machine);
         }
-        
-        $priorities = $geminiService->prioritizeInterventions($machines);
-        $schedule = $geminiService->generateOptimizedSchedule($priorities, 30);
-        
-        $avgHealthScore = !empty($healthScores) ? array_sum(array_column($healthScores, 'score')) / count($healthScores) : 0;
-        $criticalAlerts = count(array_filter($allAlerts, fn($a) => ($a['type'] ?? 'info') === 'critique'));
+
+        $priorities      = $geminiService->prioritizeInterventions($machines);
+        $schedule        = $geminiService->generateOptimizedSchedule($priorities, 30);
+        $avgHealthScore  = !empty($healthScores) ? array_sum(array_column($healthScores, 'score')) / count($healthScores) : 0;
+        $criticalAlerts  = count(array_filter($allAlerts, fn($a) => ($a['type'] ?? 'info') === 'critique'));
         $highRiskMachines = count(array_filter($predictions, fn($p) => ($p['risque_panne'] ?? 'faible') === 'élevé'));
-        
+
         return $this->render('admins/maintenances/ai_dashboard.html.twig', [
-            'machines' => $machines,
-            'healthScores' => $healthScores,
-            'alerts' => $allAlerts,
-            'predictions' => $predictions,
-            'priorities' => $priorities,
-            'schedule' => $schedule,
-            'avgHealthScore' => round($avgHealthScore),
-            'criticalAlerts' => $criticalAlerts,
-            'highRiskMachines' => $highRiskMachines,
-            'totalMachines' => count($machines)
+            'machines'        => $machines,
+            'healthScores'    => $healthScores,
+            'alerts'          => $allAlerts,
+            'predictions'     => $predictions,
+            'priorities'      => $priorities,
+            'schedule'        => $schedule,
+            'avgHealthScore'  => round($avgHealthScore),
+            'criticalAlerts'  => $criticalAlerts,
+            'highRiskMachines'=> $highRiskMachines,
+            'totalMachines'   => count($machines),
         ]);
     }
 
@@ -246,20 +249,12 @@ class MaintenanceAdminController extends AbstractController
         if (!$machine) {
             return $this->json(['error' => 'Machine non trouvée'], 404);
         }
-        
-        $prediction = $geminiService->predictFailure($machine);
-        $healthScore = $geminiService->calculateHealthScore($machine);
-        $alerts = $geminiService->generateSmartAlerts($machine);
-        
+
         return $this->json([
-            'machine' => [
-                'id' => $machine->getId(),
-                'nom' => $machine->getNom(),
-                'marque' => $machine->getMarque()
-            ],
-            'health_score' => $healthScore,
-            'prediction' => $prediction,
-            'alerts' => $alerts
+            'machine'     => ['id' => $machine->getId(), 'nom' => $machine->getNom(), 'marque' => $machine->getMarque()],
+            'health_score'=> $geminiService->calculateHealthScore($machine),
+            'prediction'  => $geminiService->predictFailure($machine),
+            'alerts'      => $geminiService->generateSmartAlerts($machine),
         ]);
     }
 
@@ -271,15 +266,15 @@ class MaintenanceAdminController extends AbstractController
         MachineRepository $machineRepo,
         GeminiRecommendationService $geminiService
     ): JsonResponse {
-        $machines = $machineRepo->findAll();
+        $machines   = $machineRepo->findAll();
         $priorities = $geminiService->prioritizeInterventions($machines);
-        $schedule = $geminiService->generateOptimizedSchedule($priorities, 30);
-        
+        $schedule   = $geminiService->generateOptimizedSchedule($priorities, 30);
+
         return $this->json([
-            'total_machines' => count($machines),
+            'total_machines'           => count($machines),
             'interventions_planifiees' => count($schedule),
-            'priorities' => $priorities,
-            'planning' => $schedule
+            'priorities'               => $priorities,
+            'planning'                 => $schedule,
         ]);
     }
 
@@ -291,19 +286,18 @@ class MaintenanceAdminController extends AbstractController
         MachineRepository $machineRepo,
         GeminiRecommendationService $geminiService
     ): JsonResponse {
-        $machines = $machineRepo->findAll();
+        $machines  = $machineRepo->findAll();
         $allAlerts = [];
-        
+
         foreach ($machines as $machine) {
-            $alerts = $geminiService->generateSmartAlerts($machine);
-            $allAlerts = array_merge($allAlerts, $alerts);
+            $allAlerts = array_merge($allAlerts, $geminiService->generateSmartAlerts($machine));
         }
-        
+
         return $this->json([
-            'total_alerts' => count($allAlerts),
-            'critical_alerts' => count(array_filter($allAlerts, fn($a) => ($a['type'] ?? 'info') === 'critique')),
+            'total_alerts'   => count($allAlerts),
+            'critical_alerts'=> count(array_filter($allAlerts, fn($a) => ($a['type'] ?? 'info') === 'critique')),
             'warning_alerts' => count(array_filter($allAlerts, fn($a) => ($a['type'] ?? 'info') === 'warning')),
-            'alerts' => $allAlerts
+            'alerts'         => $allAlerts,
         ]);
     }
 
@@ -318,74 +312,32 @@ class MaintenanceAdminController extends AbstractController
         LoggerInterface $logger
     ): JsonResponse {
         $maintenance = $maintenanceRepo->find($id);
-        
+
         if (!$maintenance) {
             return $this->json(['error' => 'Maintenance non trouvée'], 404);
         }
-        
+
         try {
             $recommendation = $geminiService->generateRecommendation($maintenance);
-            $analysis = [
-                'recommendation' => $recommendation,
-                'type_panne' => $maintenance->getTypePanne(),
-                'priorite' => $maintenance->getPriorite(),
+
+            return $this->json([
+                'recommendation'   => $recommendation,
+                'type_panne'       => $maintenance->getTypePanne(),
+                'priorite'         => $maintenance->getPriorite(),
                 'date_maintenance' => $maintenance->getDateMain()?->format('Y-m-d'),
-                'cout' => $maintenance->getCout()
-            ];
-            
-            return $this->json($analysis);
-            
+                'cout'             => $maintenance->getCout(),
+            ]);
         } catch (\Exception $e) {
             $logger->error('Failed to generate AI analysis', [
                 'maintenance_id' => $maintenance->getIdMain(),
-                'error' => $e->getMessage()
+                'error'          => $e->getMessage(),
             ]);
-            
+
             return $this->json([
-                'error' => 'Erreur lors de l\'analyse IA',
-                'fallback_recommendation' => $this->getFallbackRecommendation($maintenance)
+                'error'                  => 'Erreur lors de l\'analyse IA',
+                'fallback_recommendation'=> $this->getFallbackRecommendation($maintenance),
             ], 500);
         }
-    }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // WIKIPANES - Base de connaissances des pannes
-    // ─────────────────────────────────────────────────────────────────────────
-    #[Route('/wiki-pannes', name: 'wiki_pannes', methods: ['GET'])]
-    public function wikiPannes(Request $request): Response
-    {
-        $search = $request->query->get('q', '');
-        $panneInfo = null;
-        
-        $pannesDatabase = $this->getPannesDatabase();
-        
-        if (!empty($search)) {
-            $searchLower = strtolower(trim($search));
-            foreach ($pannesDatabase as $panne) {
-                if (str_contains(strtolower($panne['titre']), $searchLower) ||
-                    str_contains(strtolower($panne['synonymes'] ?? ''), $searchLower)) {
-                    $panneInfo = $panne;
-                    break;
-                }
-            }
-            
-            if (!$panneInfo) {
-                $panneInfo = $this->getGenericPanneInfo($search);
-            }
-        } else {
-            $randomKey = array_rand($pannesDatabase);
-            $panneInfo = $pannesDatabase[$randomKey];
-        }
-        
-        $wikipediaUrl = $this->generateWikipediaUrl($search ?: $panneInfo['titre']);
-        $panneTypes = array_column($pannesDatabase, 'titre');
-        
-        return $this->render('admins/maintenances/wiki_pannes.html.twig', [
-            'panneInfo' => $panneInfo,
-            'search' => $search,
-            'wikipediaUrl' => $wikipediaUrl,
-            'panneTypes' => $panneTypes
-        ]);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -409,22 +361,28 @@ class MaintenanceAdminController extends AbstractController
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // NEW - Créer une nouvelle maintenance
+    // NEW - Créer une nouvelle maintenance (CORRIGÉ - KILOMÉTRAGE OBLIGATOIRE)
     // ─────────────────────────────────────────────────────────────────────────
     #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
     public function new(
         Request $request,
         EntityManagerInterface $em,
-        MachineRepository $machineRepo
+        MachineRepository $machineRepo,
+        GeminiRecommendationService $geminiService,
+        LoggerInterface $logger
     ): Response {
         $maintenance = new Maintenance();
-        $machines = $machineRepo->findAll();
-        $errors = [];
+        $machines    = $machineRepo->findAll();
+        $errors      = [];
 
+        // Valeurs par défaut
         $maintenance->setStatut('planifie');
         $maintenance->setPriorite('moyenne');
+        $maintenance->setRecommandation('Aucune recommandation spécifique pour le moment.');
+        $maintenance->setKilometrage(0); // IMPORTANT: Valeur par défaut pour éviter NULL
 
         if ($request->isMethod('POST')) {
+            // Type de panne
             $typePanne = trim($request->request->get('typePanne', ''));
             if (empty($typePanne)) {
                 $errors['typePanne'] = 'Le type de panne est obligatoire.';
@@ -432,6 +390,7 @@ class MaintenanceAdminController extends AbstractController
                 $maintenance->setTypePanne($typePanne);
             }
 
+            // Coût
             $cout = $request->request->get('cout');
             if ($cout === null || $cout === '') {
                 $errors['cout'] = 'Le coût est obligatoire.';
@@ -439,64 +398,90 @@ class MaintenanceAdminController extends AbstractController
                 $coutFloat = (float) $cout;
                 if ($coutFloat <= 0) {
                     $errors['cout'] = 'Le coût doit être supérieur à 0.';
+                } elseif ($coutFloat > 999999.99) {
+                    $errors['cout'] = 'Le coût ne peut pas dépasser 999 999,99 DT.';
                 } else {
                     $maintenance->setCout($coutFloat);
                 }
             }
 
+            // Date
             $dateStr = $request->request->get('dateMain');
             if (empty($dateStr)) {
                 $errors['dateMain'] = 'La date de maintenance est obligatoire.';
             } else {
                 try {
                     $date = new \DateTime($dateStr);
-                    $maintenance->setDateMain($date);
+                    $today = new \DateTime();
+                    if ($date > $today) {
+                        $errors['dateMain'] = 'La date ne peut pas être dans le futur.';
+                    } else {
+                        $maintenance->setDateMain($date);
+                    }
                 } catch (\Exception $e) {
                     $errors['dateMain'] = 'Format de date invalide.';
                 }
             }
 
+            // Description
             $description = trim($request->request->get('description', ''));
-            if (!empty($description)) {
-                if (strlen($description) > 1000) {
-                    $errors['description'] = 'La description ne peut pas dépasser 1000 caractères.';
-                } else {
-                    $maintenance->setDescription($description);
-                }
+            if (empty($description)) {
+                $errors['description'] = 'La description est obligatoire.';
+            } elseif (strlen($description) < 5) {
+                $errors['description'] = 'La description doit contenir au moins 5 caractères.';
+            } elseif (strlen($description) > 1000) {
+                $errors['description'] = 'La description ne peut pas dépasser 1000 caractères.';
+            } else {
+                $maintenance->setDescription($description);
             }
 
+            // Statut
             $statut = $request->request->get('statut', 'planifie');
-            $allowedStatuts = ['planifie', 'en_cours', 'termine'];
-            if (!in_array($statut, $allowedStatuts)) {
+            if (!in_array($statut, ['planifie', 'en_cours', 'termine'])) {
                 $errors['statut'] = 'Statut invalide.';
             } else {
                 $maintenance->setStatut($statut);
             }
 
+            // Priorité
             $priorite = $request->request->get('priorite', 'moyenne');
-            $allowedPriorites = ['faible', 'moyenne', 'haute', 'urgente'];
-            if (!in_array($priorite, $allowedPriorites)) {
+            if (!in_array($priorite, ['faible', 'moyenne', 'haute', 'urgente'])) {
                 $errors['priorite'] = 'Priorité invalide.';
             } else {
                 $maintenance->setPriorite($priorite);
             }
 
+            // KILOMÉTRAGE - OBLIGATOIRE (correction)
             $kilometrage = $request->request->get('kilometrage');
-            if (!empty($kilometrage)) {
+            if ($kilometrage === null || $kilometrage === '') {
+                $errors['kilometrage'] = 'Le kilométrage est obligatoire.';
+            } else {
                 $kmInt = (int) $kilometrage;
                 if ($kmInt < 0) {
                     $errors['kilometrage'] = 'Le kilométrage doit être positif ou nul.';
+                } elseif ($kmInt > 9999999) {
+                    $errors['kilometrage'] = 'Le kilométrage ne peut pas dépasser 9 999 999 km.';
                 } else {
                     $maintenance->setKilometrage($kmInt);
                 }
             }
 
+            // Recommandation (optionnelle)
+            $recommandation = trim($request->request->get('recommandation', ''));
+            if (!empty($recommandation)) {
+                if (strlen($recommandation) > 2000) {
+                    $errors['recommandation'] = 'La recommandation ne peut pas dépasser 2000 caractères.';
+                } else {
+                    $maintenance->setRecommandation($recommandation);
+                }
+            }
+
+            // Matériel associé (optionnel)
             $idM = $request->request->get('idM');
             if (!empty($idM)) {
-                $idMInt = (int) $idM;
-                $machine = $machineRepo->find($idMInt);
+                $machine = $machineRepo->find((int) $idM);
                 if ($machine) {
-                    $maintenance->setIdM($idMInt);
+                    $maintenance->setIdM((int) $idM);
                     $maintenance->setNom($machine->getNom());
                 } else {
                     $errors['idM'] = 'La machine sélectionnée n\'existe pas.';
@@ -504,9 +489,25 @@ class MaintenanceAdminController extends AbstractController
             }
 
             if (empty($errors)) {
+                // Générer une recommandation IA si non fournie
+                if (empty($recommandation)) {
+                    try {
+                        $aiRecommendation = $geminiService->generateRecommendation($maintenance);
+                        $maintenance->setRecommandation($aiRecommendation);
+                        $logger->info('AI recommendation generated for new maintenance', [
+                            'maintenance_type' => $typePanne
+                        ]);
+                    } catch (\Exception $e) {
+                        $logger->warning('Could not generate AI recommendation, using fallback', [
+                            'error' => $e->getMessage()
+                        ]);
+                        $maintenance->setRecommandation($this->getFallbackRecommendation($maintenance));
+                    }
+                }
+
                 $em->persist($maintenance);
                 $em->flush();
-                $this->addFlash('success', 'Maintenance ajoutée avec succès.');
+                $this->addFlash('success', '✅ Maintenance ajoutée avec succès.');
                 return $this->redirectToRoute('admin_maintenances_index');
             } else {
                 foreach ($errors as $error) {
@@ -540,7 +541,7 @@ class MaintenanceAdminController extends AbstractController
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // EDIT - Modifier une maintenance
+    // EDIT - Modifier une maintenance (CORRIGÉ - KILOMÉTRAGE OBLIGATOIRE)
     // ─────────────────────────────────────────────────────────────────────────
     #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
     public function edit(
@@ -548,7 +549,9 @@ class MaintenanceAdminController extends AbstractController
         Request $request,
         MaintenanceRepository $repo,
         MachineRepository $machineRepo,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        GeminiRecommendationService $geminiService,
+        LoggerInterface $logger
     ): Response {
         $maintenance = $repo->find($id);
         if (!$maintenance) {
@@ -556,10 +559,21 @@ class MaintenanceAdminController extends AbstractController
             return $this->redirectToRoute('admin_maintenances_index');
         }
 
+        // S'assurer que la recommandation n'est pas null
+        if (empty($maintenance->getRecommandation())) {
+            $maintenance->setRecommandation($this->getFallbackRecommendation($maintenance));
+        }
+
+        // S'assurer que le kilométrage n'est pas null
+        if ($maintenance->getKilometrage() === null) {
+            $maintenance->setKilometrage(0);
+        }
+
         $machines = $machineRepo->findAll();
-        $errors = [];
+        $errors   = [];
 
         if ($request->isMethod('POST')) {
+            // Type de panne
             $typePanne = trim($request->request->get('typePanne', ''));
             if (empty($typePanne)) {
                 $errors['typePanne'] = 'Le type de panne est obligatoire.';
@@ -567,6 +581,7 @@ class MaintenanceAdminController extends AbstractController
                 $maintenance->setTypePanne($typePanne);
             }
 
+            // Coût
             $cout = $request->request->get('cout');
             if ($cout === null || $cout === '') {
                 $errors['cout'] = 'Le coût est obligatoire.';
@@ -574,68 +589,99 @@ class MaintenanceAdminController extends AbstractController
                 $coutFloat = (float) $cout;
                 if ($coutFloat <= 0) {
                     $errors['cout'] = 'Le coût doit être supérieur à 0.';
+                } elseif ($coutFloat > 999999.99) {
+                    $errors['cout'] = 'Le coût ne peut pas dépasser 999 999,99 DT.';
                 } else {
                     $maintenance->setCout($coutFloat);
                 }
             }
 
+            // Date
             $dateStr = $request->request->get('dateMain');
             if (empty($dateStr)) {
                 $errors['dateMain'] = 'La date de maintenance est obligatoire.';
             } else {
                 try {
                     $date = new \DateTime($dateStr);
-                    $maintenance->setDateMain($date);
+                    $today = new \DateTime();
+                    if ($date > $today) {
+                        $errors['dateMain'] = 'La date ne peut pas être dans le futur.';
+                    } else {
+                        $maintenance->setDateMain($date);
+                    }
                 } catch (\Exception $e) {
                     $errors['dateMain'] = 'Format de date invalide.';
                 }
             }
 
+            // Description
             $description = trim($request->request->get('description', ''));
             if (!empty($description)) {
-                if (strlen($description) > 1000) {
+                if (strlen($description) < 5) {
+                    $errors['description'] = 'La description doit contenir au moins 5 caractères.';
+                } elseif (strlen($description) > 1000) {
                     $errors['description'] = 'La description ne peut pas dépasser 1000 caractères.';
                 } else {
                     $maintenance->setDescription($description);
                 }
             } else {
-                $maintenance->setDescription(null);
+                $errors['description'] = 'La description est obligatoire.';
             }
 
+            // Statut
             $statut = $request->request->get('statut', 'planifie');
-            $allowedStatuts = ['planifie', 'en_cours', 'termine'];
-            if (!in_array($statut, $allowedStatuts)) {
+            if (!in_array($statut, ['planifie', 'en_cours', 'termine'])) {
                 $errors['statut'] = 'Statut invalide.';
             } else {
                 $maintenance->setStatut($statut);
             }
 
+            // Priorité
             $priorite = $request->request->get('priorite', 'moyenne');
-            $allowedPriorites = ['faible', 'moyenne', 'haute', 'urgente'];
-            if (!in_array($priorite, $allowedPriorites)) {
+            if (!in_array($priorite, ['faible', 'moyenne', 'haute', 'urgente'])) {
                 $errors['priorite'] = 'Priorité invalide.';
             } else {
                 $maintenance->setPriorite($priorite);
             }
 
+            // KILOMÉTRAGE - OBLIGATOIRE (correction)
             $kilometrage = $request->request->get('kilometrage');
-            if (!empty($kilometrage)) {
+            if ($kilometrage === null || $kilometrage === '') {
+                $errors['kilometrage'] = 'Le kilométrage est obligatoire.';
+            } else {
                 $kmInt = (int) $kilometrage;
                 if ($kmInt < 0) {
                     $errors['kilometrage'] = 'Le kilométrage doit être positif ou nul.';
+                } elseif ($kmInt > 9999999) {
+                    $errors['kilometrage'] = 'Le kilométrage ne peut pas dépasser 9 999 999 km.';
                 } else {
                     $maintenance->setKilometrage($kmInt);
                 }
-            } else {
-                $maintenance->setKilometrage(null);
             }
 
+            // Recommandation (optionnelle)
+            $recommandation = trim($request->request->get('recommandation', ''));
+            if (!empty($recommandation)) {
+                if (strlen($recommandation) > 2000) {
+                    $errors['recommandation'] = 'La recommandation ne peut pas dépasser 2000 caractères.';
+                } else {
+                    $maintenance->setRecommandation($recommandation);
+                }
+            } elseif (empty($recommandation) && empty($maintenance->getRecommandation())) {
+                try {
+                    $aiRecommendation = $geminiService->generateRecommendation($maintenance);
+                    $maintenance->setRecommandation($aiRecommendation);
+                } catch (\Exception $e) {
+                    $maintenance->setRecommandation($this->getFallbackRecommendation($maintenance));
+                }
+            }
+
+            // Matériel associé (optionnel)
             $idM = $request->request->get('idM');
             if (!empty($idM)) {
-                $idMInt = (int) $idM;
-                $machine = $machineRepo->find($idMInt);
+                $machine = $machineRepo->find((int) $idM);
                 if ($machine) {
-                    $maintenance->setIdM($idMInt);
+                    $maintenance->setIdM((int) $idM);
                     $maintenance->setNom($machine->getNom());
                 } else {
                     $errors['idM'] = 'La machine sélectionnée n\'existe pas.';
@@ -647,7 +693,7 @@ class MaintenanceAdminController extends AbstractController
 
             if (empty($errors)) {
                 $em->flush();
-                $this->addFlash('success', 'Maintenance mise à jour avec succès.');
+                $this->addFlash('success', '✅ Maintenance mise à jour avec succès.');
                 return $this->redirectToRoute('admin_maintenances_index');
             } else {
                 foreach ($errors as $error) {
@@ -682,7 +728,7 @@ class MaintenanceAdminController extends AbstractController
         if ($this->isCsrfTokenValid('delete_maintenance_' . $id, $request->request->get('_token'))) {
             $em->remove($maintenance);
             $em->flush();
-            $this->addFlash('success', 'Maintenance supprimée avec succès.');
+            $this->addFlash('success', '✅ Maintenance supprimée avec succès.');
         } else {
             $this->addFlash('error', 'Token CSRF invalide.');
         }
@@ -694,84 +740,28 @@ class MaintenanceAdminController extends AbstractController
     // PRIVATE METHODS
     // ─────────────────────────────────────────────────────────────────────────
 
-    private function getPannesDatabase(): array
-    {
-        return [
-            [
-                'titre' => 'Électrique',
-                'synonymes' => 'electricite, batterie, alternateur',
-                'description' => 'Pannes liées au système électrique.',
-                'causes' => ['Batterie déchargée', 'Alternateur défectueux'],
-                'symptomes' => ['Impossible de démarrer', 'Voyants faibles'],
-                'solutions' => ['Tester la batterie', 'Vérifier l\'alternateur'],
-                'outils' => 'Multimètre',
-                'temps' => '1 à 3 heures',
-                'difficulte' => 'Intermédiaire',
-                'image_url' => '',
-                'image_fallback' => '⚡'
-            ],
-            [
-                'titre' => 'Mécanique',
-                'synonymes' => 'mecanique, usure',
-                'description' => 'Pannes mécaniques générales.',
-                'causes' => ['Usure des pièces', 'Manque de lubrification'],
-                'symptomes' => ['Bruits anormaux', 'Vibrations'],
-                'solutions' => ['Identifier la pièce usée', 'Remplacer'],
-                'outils' => 'Jeu de clés',
-                'temps' => '2 à 8 heures',
-                'difficulte' => 'Expert',
-                'image_url' => '',
-                'image_fallback' => '🔧'
-            ]
-        ];
-    }
-
-    private function getGenericPanneInfo(string $search): array
-    {
-        return [
-            'titre' => ucfirst($search) . ' - Panne non répertoriée',
-            'synonymes' => '',
-            'description' => 'Cette panne n\'est pas encore dans notre base.',
-            'causes' => ['Information non disponible'],
-            'symptomes' => ['À déterminer'],
-            'solutions' => ['Consulter un technicien'],
-            'outils' => 'Diagnostic professionnel',
-            'temps' => 'Variable',
-            'difficulte' => 'Expert',
-            'image_url' => '',
-            'image_fallback' => '❓'
-        ];
-    }
-
-    private function generateWikipediaUrl(string $search): string
-    {
-        $query = strtolower(trim($search));
-        $encoded = urlencode($query);
-        return "https://fr.wikipedia.org/wiki/{$encoded}";
-    }
-
     private function getFallbackRecommendation(Maintenance $m): string
     {
-        $type = strtolower($m->getTypePanne());
+        $type     = strtolower($m->getTypePanne());
         $priorite = $m->getPriorite();
-        
+
         $fallbacks = [
             'électrique' => '⚡ Contrôle préventif du circuit électrique recommandé',
-            'mécanique' => '🔧 Inspection mécanique générale recommandée',
-            'hydraulique' => '💧 Vérification du circuit hydraulique',
-            'moteur' => '🔩 Révision moteur recommandée',
+            'mécanique'  => '🔧 Inspection mécanique générale recommandée',
+            'hydraulique'=> '💧 Vérification du circuit hydraulique',
+            'moteur'     => '🔩 Révision moteur recommandée',
         ];
-        
+
         foreach ($fallbacks as $key => $message) {
             if (str_contains($type, $key)) {
                 return $message;
             }
         }
-        
+
         if ($priorite === 'urgente') {
             return "⚠️ Intervention immédiate requise pour {$m->getTypePanne()}";
         }
-        
+
         return "🔍 Surveillance périodique recommandée pour {$m->getTypePanne()}";
     }
 }

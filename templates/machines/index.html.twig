@@ -107,141 +107,70 @@
         display: flex;
         justify-content: center;
     }
+    .pagination-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
     .pagination-buttons {
         display: flex;
-        gap: .6rem;
+        gap: .8rem;
         align-items: center;
-        flex-wrap: wrap;
         justify-content: center;
+        flex-wrap: wrap;
     }
-    .pagination-btn {
+    .page-btn {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 0.55rem 0.9rem;
+        min-width: 48px;
+        padding: 0.6rem 1.2rem;
         border-radius: 10px;
-        font-weight: bold;
-        border: none;
-        min-width: 42px;
-        font-size: .9rem;
+        font-weight: 700;
+        font-size: 1rem;
         cursor: pointer;
         transition: all 0.2s;
         text-decoration: none;
+        border: 2px solid transparent;
     }
-    .pagination-btn-active {
+    .page-btn-active {
         background: var(--green-dark);
         color: white;
         box-shadow: 0 2px 8px rgba(45,90,27,0.3);
+        border-color: var(--green-dark);
     }
-    .pagination-btn-neutral {
+    .page-btn-inactive {
         background: #f2f7ee;
-        color: var(--green-dark);
-        border: 1px solid var(--green-border);
+        color: var(--text-light);
+        border: 2px solid var(--green-border);
+        cursor: not-allowed;
+        opacity: 0.6;
     }
-    .pagination-btn-neutral:hover {
-        background: #e6f2dc;
+    .page-btn-inactive:hover {
+        transform: none;
+        background: #f2f7ee;
     }
-    .pagination-btn-active:hover {
+    .page-btn-active:hover {
         background: #1f4012;
         transform: translateY(-2px);
     }
-    .pagination-btn-inactive {
-        background: #ffffff;
-        color: var(--green-dark);
-        border: 1px solid var(--green-border);
-        cursor: not-allowed;
-        opacity: 0.65;
-        pointer-events: none;
-    }
-    .pagination-ellipsis {
-        color: var(--text-light);
-        font-weight: 700;
-        padding: 0 .15rem;
-    }
-    .pagination-container .pagination {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: .45rem;
-        flex-wrap: wrap;
-    }
-    .pagination-container .pagination span,
-    .pagination-container .pagination a {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 40px;
-        height: 40px;
-        padding: 0 .75rem;
-        border-radius: 10px;
-        border: 1px solid var(--green-border);
-        text-decoration: none;
-        font-weight: 700;
-        font-size: .9rem;
-    }
-    .pagination-container .pagination a {
-        color: var(--green-dark);
-        background: #f2f7ee;
-    }
-    .pagination-container .pagination a:hover {
-        background: #e6f2dc;
-    }
-    .pagination-container .pagination .current {
-        background: var(--green-dark);
-        color: #fff;
-        border-color: var(--green-dark);
-    }
-    .pagination-container .pagination .disabled {
-        background: #e0e0e0;
-        color: #999;
-        border-color: #d0d0d0;
-    }
-    .af-pagination {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: .45rem;
-        flex-wrap: wrap;
-    }
-    .af-page {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 40px;
-        height: 40px;
-        padding: 0 .75rem;
-        border-radius: 10px;
-        border: 1px solid var(--green-border);
-        background: #f2f7ee;
-        color: var(--green-dark);
-        text-decoration: none;
-        font-weight: 700;
-        font-size: .9rem;
-    }
-    .af-page:hover { background: #e6f2dc; }
-    .af-current {
-        background: var(--green-dark);
-        color: #fff;
-        border-color: var(--green-dark);
-    }
-    .af-disabled {
-        background: #e0e0e0;
-        color: #999;
-        border-color: #d0d0d0;
-    }
     .pagination-status {
-        text-align: center;
-        margin-top: 1rem;
-        color: var(--text-light);
-        font-size: 0.85rem;
         display: flex;
+        gap: 1.5rem;
         justify-content: center;
-        gap: 2rem;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        background: var(--cream);
+        border-radius: 50px;
+        border: 1px solid var(--green-border);
     }
     .status-item {
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        font-size: 0.85rem;
+        font-weight: 600;
     }
     .status-dot {
         display: inline-block;
@@ -251,9 +180,21 @@
     }
     .status-dot-active {
         background: var(--green-dark);
+        box-shadow: 0 0 0 2px rgba(45,90,27,0.2);
     }
     .status-dot-inactive {
         background: #e0e0e0;
+    }
+    .status-text-active {
+        color: var(--green-dark);
+    }
+    .status-text-inactive {
+        color: var(--text-light);
+    }
+    .page-number {
+        font-weight: 700;
+        margin: 0 0.5rem;
+        color: var(--text-dark);
     }
 </style>
 
@@ -394,20 +335,46 @@
             {% endfor %}
         </div>
 
+        {# ── Pagination avec boutons 0 (inactif) et 1 (actif) ── #}
         {% if machinesPagination is defined and machinesPagination.pageCount > 1 %}
             <div class="pagination-container">
-                <div class="pagination-buttons">
-                    {% set currentPage = machinesPagination.getCurrentPageNumber %}
-                    {% set prevPage = currentPage > 1 ? currentPage - 1 : 1 %}
-                    {% set nextPage = currentPage < machinesPagination.pageCount ? currentPage + 1 : machinesPagination.pageCount %}
-                    <a
-                        href="{{ path('agri_machines', app.request.query.all|merge({page: nextPage})) }}"
-                        class="pagination-btn {{ currentPage < machinesPagination.pageCount ? 'pagination-btn-active' : 'pagination-btn-inactive' }}"
-                    >1</a>
-                    <a
-                        href="{{ path('agri_machines', app.request.query.all|merge({page: prevPage})) }}"
-                        class="pagination-btn {{ currentPage > 1 ? 'pagination-btn-active' : 'pagination-btn-inactive' }}"
-                    >0</a>
+                <div class="pagination-wrapper">
+                    <div class="pagination-buttons">
+                        {# Bouton 0 (INACTIF) - représente la page précédente #}
+                        {% set prevPage = machinesPagination.getCurrentPageNumber > 1 ? machinesPagination.getCurrentPageNumber - 1 : 1 %}
+                        {% set isPrevActive = machinesPagination.getCurrentPageNumber > 1 %}
+                        
+                        <a href="{{ isPrevActive ? path('agri_machines', app.request.query.all|merge({page: prevPage})) : 'javascript:void(0)' }}" 
+                           class="page-btn {{ isPrevActive ? 'page-btn-active' : 'page-btn-inactive' }}"
+                           {% if not isPrevActive %} onclick="return false;" {% endif %}>
+                            ⬅️ 0
+                        </a>
+
+                        {# Affichage du numéro de page actuel #}
+                        <span class="page-number">Page {{ machinesPagination.getCurrentPageNumber }} / {{ machinesPagination.pageCount }}</span>
+
+                        {# Bouton 1 (ACTIF) - représente la page suivante #}
+                        {% set nextPage = machinesPagination.getCurrentPageNumber < machinesPagination.pageCount ? machinesPagination.getCurrentPageNumber + 1 : machinesPagination.pageCount %}
+                        {% set isNextActive = machinesPagination.getCurrentPageNumber < machinesPagination.pageCount %}
+                        
+                        <a href="{{ isNextActive ? path('agri_machines', app.request.query.all|merge({page: nextPage})) : 'javascript:void(0)' }}" 
+                           class="page-btn {{ isNextActive ? 'page-btn-active' : 'page-btn-inactive' }}"
+                           {% if not isNextActive %} onclick="return false;" {% endif %}>
+                            1 ➡️
+                        </a>
+                    </div>
+
+                    {# Légende des statuts #}
+                    <div class="pagination-status">
+                        <div class="status-item">
+                            <span class="status-dot status-dot-inactive"></span>
+                            <span class="status-text-inactive">0 = Inactif (page précédente non disponible)</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-dot status-dot-active"></span>
+                            <span class="status-text-active">1 = Actif (page suivante disponible)</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         {% endif %}

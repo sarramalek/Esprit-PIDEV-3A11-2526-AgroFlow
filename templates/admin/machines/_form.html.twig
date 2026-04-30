@@ -1,11 +1,11 @@
 {# admin/machines/_form.html.twig #}
 
 {% if errors is defined and errors|length > 0 %}
-    <div style="margin-bottom: 24px; padding: 14px 18px; background:#FCEBEB; border-left:4px solid #A32D2D; border-radius:8px;">
-        <div style="font-weight:600; color:#A32D2D; margin-bottom:8px;">
+    <div class="error-banner" style="margin-bottom: 24px; padding: 14px 18px; background:#FCEBEB; border-left:4px solid #dc2626; border-radius:8px;">
+        <div style="font-weight:600; color:#991b1b; margin-bottom:8px;">
             <i class="fa fa-circle-exclamation"></i> Veuillez corriger les erreurs suivantes :
         </div>
-        <ul style="margin:0; padding-left:20px; color:#A32D2D; font-size:13px;">
+        <ul style="margin:0; padding-left:20px; color:#991b1b; font-size:13px;">
             {% for error in errors %}
                 <li>{{ error }}</li>
             {% endfor %}
@@ -16,13 +16,13 @@
 <div style="display: flex; flex-direction: column; gap: 20px;">
     
     <!-- Sélection agriculteur -->
-    <div>
+    <div class="form-group">
         <label style="display:block; margin-bottom:6px; font-weight:600; color:#2C3E50; font-size:13px;">
             <span style="color:#e53e3e;">*</span> Propriétaire (Agriculteur)
         </label>
-        <select name="agriculteur" required
+        <select name="agriculteur" id="agriculteur" required
                 style="width:100%; padding:12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:14px;
-                       background:white; transition:border .2s;">
+                       background:white; transition:border .2s; cursor:pointer;">
             <option value="">-- Sélectionnez un agriculteur --</option>
             {% for agriculteur in agriculteurs %}
                 <option value="{{ agriculteur.cin }}"
@@ -31,109 +31,621 @@
                 </option>
             {% endfor %}
         </select>
+        <div id="agriculteurError" class="error-message" style="color:#dc2626; font-size:11px; margin-top:5px; display:none;">
+            <i class="fa fa-exclamation-circle"></i> <span></span>
+        </div>
     </div>
 
     <!-- Nom -->
-    <div>
+    <div class="form-group">
         <label style="display:block; margin-bottom:6px; font-weight:600; color:#2C3E50; font-size:13px;">
             <span style="color:#e53e3e;">*</span> Nom de la machine
         </label>
-        <input type="text" name="nom" value="{{ machine.nom }}" required
-               style="width:100%; padding:12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:14px;"
+        <input type="text" name="nom" id="nom" value="{{ machine.nom }}" required maxlength="100"
+               style="width:100%; padding:12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:14px;
+                      transition: all 0.2s;"
                placeholder="Ex: Tracteur Fendt 724">
+        <div id="nomError" class="error-message" style="color:#dc2626; font-size:11px; margin-top:5px; display:none;">
+            <i class="fa fa-exclamation-circle"></i> <span></span>
+        </div>
+        <div style="font-size:11px; color:#888; margin-top:4px;">
+            <i class="fa fa-info-circle"></i> Minimum 2 caractères, maximum 100
+        </div>
     </div>
 
     <!-- Marque -->
-    <div>
+    <div class="form-group">
         <label style="display:block; margin-bottom:6px; font-weight:600; color:#2C3E50; font-size:13px;">
             <span style="color:#e53e3e;">*</span> Marque
         </label>
-        <input type="text" name="marque" value="{{ machine.marque }}" required
-               style="width:100%; padding:12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:14px;"
+        <input type="text" name="marque" id="marque" value="{{ machine.marque }}" required maxlength="100"
+               style="width:100%; padding:12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:14px;
+                      transition: all 0.2s;"
                placeholder="Ex: John Deere, Fendt, Massey Ferguson...">
+        <div id="marqueError" class="error-message" style="color:#dc2626; font-size:11px; margin-top:5px; display:none;">
+            <i class="fa fa-exclamation-circle"></i> <span></span>
+        </div>
+        <div style="font-size:11px; color:#888; margin-top:4px;">
+            <i class="fa fa-info-circle"></i> Minimum 2 caractères, maximum 100
+        </div>
     </div>
 
     <!-- Modèle -->
-    <div>
+    <div class="form-group">
         <label style="display:block; margin-bottom:6px; font-weight:600; color:#2C3E50; font-size:13px;">
             <span style="color:#e53e3e;">*</span> Modèle
         </label>
-        <input type="text" name="modele" value="{{ machine.modele }}" required
-               style="width:100%; padding:12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:14px;"
+        <input type="text" name="modele" id="modele" value="{{ machine.modele }}" required maxlength="100"
+               style="width:100%; padding:12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:14px;
+                      transition: all 0.2s;"
                placeholder="Ex: 724, 6155R, 8R...">
+        <div id="modeleError" class="error-message" style="color:#dc2626; font-size:11px; margin-top:5px; display:none;">
+            <i class="fa fa-exclamation-circle"></i> <span></span>
+        </div>
+        <div style="font-size:11px; color:#888; margin-top:4px;">
+            <i class="fa fa-info-circle"></i> Maximum 100 caractères
+        </div>
     </div>
 
     <!-- Numéro de série (optionnel) -->
-    <div>
+    <div class="form-group">
         <label style="display:block; margin-bottom:6px; font-weight:600; color:#2C3E50; font-size:13px;">
             Numéro de série
         </label>
-        <input type="text" name="numeroSerie" value="{{ machine.numeroSerie }}"
-               style="width:100%; padding:12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:14px;"
+        <input type="text" name="numeroSerie" id="numeroSerie" value="{{ machine.numeroSerie }}" maxlength="100"
+               style="width:100%; padding:12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:14px;
+                      transition: all 0.2s;"
                placeholder="Optionnel - Ex: SN-2024-001">
+        <div id="serieError" class="error-message" style="color:#dc2626; font-size:11px; margin-top:5px; display:none;">
+            <i class="fa fa-exclamation-circle"></i> <span></span>
+        </div>
+        <div style="font-size:11px; color:#888; margin-top:4px;">
+            <i class="fa fa-info-circle"></i> Optionnel - Caractères alphanumériques uniquement
+        </div>
     </div>
 
     <!-- État -->
-    <div>
+    <div class="form-group">
         <label style="display:block; margin-bottom:6px; font-weight:600; color:#2C3E50; font-size:13px;">
             <span style="color:#e53e3e;">*</span> État
         </label>
-        <select name="etatM" required style="width:100%; padding:12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:14px;">
+        <select name="etatM" id="etatM" required 
+                style="width:100%; padding:12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:14px;
+                       background:white; cursor:pointer; transition: all 0.2s;">
             <option value="">-- Sélectionnez un état --</option>
-            {% for etat in ['Neuf', 'Bon', 'Occasion', 'En panne'] %}
-                <option value="{{ etat }}" {% if machine.etatM == etat %}selected{% endif %}>
-                    {{ etat }}
-                </option>
-            {% endfor %}
+            <option value="Neuf" {% if machine.etatM == 'Neuf' %}selected{% endif %}>🌟 Neuf</option>
+            <option value="Bon" {% if machine.etatM == 'Bon' %}selected{% endif %}>👍 Bon</option>
+            <option value="Occasion" {% if machine.etatM == 'Occasion' %}selected{% endif %}>🔄 Occasion</option>
+            <option value="En panne" {% if machine.etatM == 'En panne' %}selected{% endif %}>⚠️ En panne</option>
+            <option value="En maintenance" {% if machine.etatM == 'En maintenance' %}selected{% endif %}>🔧 En maintenance</option>
+            <option value="Hors service" {% if machine.etatM == 'Hors service' %}selected{% endif %}>❌ Hors service</option>
         </select>
+        <div id="etatError" class="error-message" style="color:#dc2626; font-size:11px; margin-top:5px; display:none;">
+            <i class="fa fa-exclamation-circle"></i> <span>Veuillez sélectionner un état</span>
+        </div>
     </div>
 
     <!-- Kilométrage -->
-    <div>
+    <div class="form-group">
         <label style="display:block; margin-bottom:6px; font-weight:600; color:#2C3E50; font-size:13px;">
             <span style="color:#e53e3e;">*</span> Kilométrage (heures/km)
         </label>
-        <input type="number" name="kilometrage" value="{{ machine.kilometrage }}" required min="0"
-               style="width:100%; padding:12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:14px;">
+        <input type="number" name="kilometrage" id="kilometrage" value="{{ machine.kilometrage }}" required 
+               min="0" max="9999999" step="1"
+               style="width:100%; padding:12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:14px;
+                      transition: all 0.2s;">
+        <div id="kmError" class="error-message" style="color:#dc2626; font-size:11px; margin-top:5px; display:none;">
+            <i class="fa fa-exclamation-circle"></i> <span></span>
+        </div>
+        <div style="font-size:11px; color:#888; margin-top:4px;">
+            <i class="fa fa-info-circle"></i> Minimum 0, maximum 9 999 999 km
+        </div>
     </div>
 
     <!-- Kilométrage dernière visite -->
-    <div>
+    <div class="form-group">
         <label style="display:block; margin-bottom:6px; font-weight:600; color:#2C3E50; font-size:13px;">
             <span style="color:#e53e3e;">*</span> Kilométrage lors de la dernière visite
         </label>
-        <input type="number" name="kmLastVisite" value="{{ machine.kmLastVisite }}" required min="0"
-               style="width:100%; padding:12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:14px;">
+        <input type="number" name="kmLastVisite" id="kmLastVisite" value="{{ machine.kmLastVisite }}" required 
+               min="0" max="9999999" step="1"
+               style="width:100%; padding:12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:14px;
+                      transition: all 0.2s;">
+        <div id="kmLastError" class="error-message" style="color:#dc2626; font-size:11px; margin-top:5px; display:none;">
+            <i class="fa fa-exclamation-circle"></i> <span></span>
+        </div>
+        <div style="font-size:11px; color:#888; margin-top:4px;">
+            <i class="fa fa-info-circle"></i> Doit être ≤ kilométrage actuel
+        </div>
     </div>
 
     <!-- Date d'achat -->
-    <div>
+    <div class="form-group">
         <label style="display:block; margin-bottom:6px; font-weight:600; color:#2C3E50; font-size:13px;">
             Date d'achat
         </label>
-        <input type="date" name="dateAchat" value="{{ machine.dateAchat ? machine.dateAchat|date('Y-m-d') : '' }}"
-               style="width:100%; padding:12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:14px;">
+        <input type="date" name="dateAchat" id="dateAchat" 
+               value="{{ machine.dateAchat ? machine.dateAchat|date('Y-m-d') : '' }}"
+               style="width:100%; padding:12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:14px;
+                      transition: all 0.2s;">
+        <div id="dateAchatError" class="error-message" style="color:#dc2626; font-size:11px; margin-top:5px; display:none;">
+            <i class="fa fa-exclamation-circle"></i> <span></span>
+        </div>
+        <div style="font-size:11px; color:#888; margin-top:4px;">
+            <i class="fa fa-info-circle"></i> Optionnelle - Ne peut pas être dans le futur
+        </div>
     </div>
 
     <!-- Date dernière visite -->
-    <div>
+    <div class="form-group">
         <label style="display:block; margin-bottom:6px; font-weight:600; color:#2C3E50; font-size:13px;">
             Date de dernière visite
         </label>
-        <input type="date" name="dateLastVisite" value="{{ machine.dateLastVisite ? machine.dateLastVisite|date('Y-m-d') : '' }}"
-               style="width:100%; padding:12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:14px;">
+        <input type="date" name="dateLastVisite" id="dateLastVisite" 
+               value="{{ machine.dateLastVisite ? machine.dateLastVisite|date('Y-m-d') : '' }}"
+               style="width:100%; padding:12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:14px;
+                      transition: all 0.2s;">
+        <div id="dateLastError" class="error-message" style="color:#dc2626; font-size:11px; margin-top:5px; display:none;">
+            <i class="fa fa-exclamation-circle"></i> <span></span>
+        </div>
+        <div style="font-size:11px; color:#888; margin-top:4px;">
+            <i class="fa fa-info-circle"></i> Optionnelle - Doit être ≥ date d'achat
+        </div>
     </div>
 
     <!-- Prochaine maintenance -->
-    <div>
+    <div class="form-group">
         <label style="display:block; margin-bottom:6px; font-weight:600; color:#2C3E50; font-size:13px;">
             Prochaine maintenance
         </label>
-        <input type="date" name="prochaineMaintenance" value="{{ machine.prochaineMaintenance ? machine.prochaineMaintenance|date('Y-m-d') : '' }}"
-               style="width:100%; padding:12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:14px;">
+        <input type="date" name="prochaineMaintenance" id="prochaineMaintenance" 
+               value="{{ machine.prochaineMaintenance ? machine.prochaineMaintenance|date('Y-m-d') : '' }}"
+               style="width:100%; padding:12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:14px;
+                      transition: all 0.2s;">
+        <div id="prochainError" class="error-message" style="color:#dc2626; font-size:11px; margin-top:5px; display:none;">
+            <i class="fa fa-exclamation-circle"></i> <span></span>
+        </div>
+        <div style="font-size:11px; color:#888; margin-top:4px;">
+            <i class="fa fa-info-circle"></i> Optionnelle - Recommandée pour le suivi
+        </div>
     </div>
 
-    <div style="font-size:12px; color:#888; margin-top:-8px;">
+    <div style="font-size:12px; color:#888; margin-top:-8px; padding-top:10px; border-top:1px solid #e2e8f0;">
         <i class="fa fa-info-circle"></i> Les champs marqués <span style="color:#e53e3e;">*</span> sont obligatoires
     </div>
 </div>
+
+<style>
+    .form-group input:focus, .form-group select:focus {
+        outline: none;
+        border-color: #2D5A27 !important;
+        box-shadow: 0 0 0 3px rgba(45, 90, 39, 0.1);
+    }
+    
+    .form-group input.is-valid, .form-group select.is-valid {
+        border-color: #16a34a !important;
+        background-color: #f0fdf4 !important;
+    }
+    
+    .form-group input.is-invalid, .form-group select.is-invalid {
+        border-color: #dc2626 !important;
+        background-color: #fef2f2 !important;
+    }
+    
+    .error-message {
+        display: none;
+        align-items: center;
+        gap: 4px;
+    }
+    
+    .error-message.visible {
+        display: flex;
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-4px); }
+        75% { transform: translateX(4px); }
+    }
+    
+    .is-invalid.shake {
+        animation: shake 0.2s ease-in-out 0s 2;
+    }
+</style>
+
+<script>
+(function() {
+    // Récupérer tous les éléments du formulaire
+    const agriculteurEl = document.getElementById('agriculteur');
+    const nomEl = document.getElementById('nom');
+    const marqueEl = document.getElementById('marque');
+    const modeleEl = document.getElementById('modele');
+    const serieEl = document.getElementById('numeroSerie');
+    const etatEl = document.getElementById('etatM');
+    const kmEl = document.getElementById('kilometrage');
+    const kmLastEl = document.getElementById('kmLastVisite');
+    const dateAchatEl = document.getElementById('dateAchat');
+    const dateLastEl = document.getElementById('dateLastVisite');
+    const prochainEl = document.getElementById('prochaineMaintenance');
+    
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Fonctions utilitaires
+    function valid(el) {
+        if (el) {
+            el.classList.remove('is-invalid');
+            el.classList.add('is-valid');
+            el.classList.remove('shake');
+        }
+    }
+    
+    function invalid(el) {
+        if (el) {
+            el.classList.remove('is-valid');
+            el.classList.add('is-invalid');
+            el.classList.add('shake');
+            setTimeout(() => { if (el) el.classList.remove('shake'); }, 300);
+        }
+    }
+    
+    function showError(errorId, message) {
+        const errorDiv = document.getElementById(errorId);
+        if (errorDiv) {
+            const span = errorDiv.querySelector('span');
+            if (span) span.textContent = message;
+            errorDiv.classList.add('visible');
+        }
+    }
+    
+    function hideError(errorId) {
+        const errorDiv = document.getElementById(errorId);
+        if (errorDiv) errorDiv.classList.remove('visible');
+    }
+    
+    // 1. Validation de l'agriculteur
+    function validateAgriculteur() {
+        if (!agriculteurEl.value) {
+            invalid(agriculteurEl);
+            showError('agriculteurError', 'Veuillez sélectionner un agriculteur.');
+            return false;
+        }
+        valid(agriculteurEl);
+        hideError('agriculteurError');
+        return true;
+    }
+    
+    // 2. Validation du nom
+    function validateNom() {
+        const value = nomEl.value.trim();
+        if (value === '') {
+            invalid(nomEl);
+            showError('nomError', 'Le nom est obligatoire.');
+            return false;
+        }
+        if (value.length < 2) {
+            invalid(nomEl);
+            showError('nomError', 'Le nom doit contenir au moins 2 caractères.');
+            return false;
+        }
+        if (value.length > 100) {
+            invalid(nomEl);
+            showError('nomError', 'Le nom ne peut pas dépasser 100 caractères.');
+            return false;
+        }
+        if (!/^[a-zA-Z0-9\s\-_\'àáâãäåçèéêëìíîïðòóôõöùúûüýÿ]+$/u.test(value)) {
+            invalid(nomEl);
+            showError('nomError', 'Caractères non autorisés.');
+            return false;
+        }
+        valid(nomEl);
+        hideError('nomError');
+        return true;
+    }
+    
+    // 3. Validation de la marque
+    function validateMarque() {
+        const value = marqueEl.value.trim();
+        if (value === '') {
+            invalid(marqueEl);
+            showError('marqueError', 'La marque est obligatoire.');
+            return false;
+        }
+        if (value.length < 2) {
+            invalid(marqueEl);
+            showError('marqueError', 'La marque doit contenir au moins 2 caractères.');
+            return false;
+        }
+        if (value.length > 100) {
+            invalid(marqueEl);
+            showError('marqueError', 'La marque ne peut pas dépasser 100 caractères.');
+            return false;
+        }
+        if (!/^[a-zA-Z0-9\s\-_\'àáâãäåçèéêëìíîïðòóôõöùúûüýÿ]+$/u.test(value)) {
+            invalid(marqueEl);
+            showError('marqueError', 'Caractères non autorisés.');
+            return false;
+        }
+        valid(marqueEl);
+        hideError('marqueError');
+        return true;
+    }
+    
+    // 4. Validation du modèle
+    function validateModele() {
+        const value = modeleEl.value.trim();
+        if (value === '') {
+            invalid(modeleEl);
+            showError('modeleError', 'Le modèle est obligatoire.');
+            return false;
+        }
+        if (value.length > 100) {
+            invalid(modeleEl);
+            showError('modeleError', 'Le modèle ne peut pas dépasser 100 caractères.');
+            return false;
+        }
+        valid(modeleEl);
+        hideError('modeleError');
+        return true;
+    }
+    
+    // 5. Validation du numéro de série
+    function validateSerie() {
+        const value = serieEl.value.trim();
+        if (value !== '') {
+            if (value.length > 100) {
+                invalid(serieEl);
+                showError('serieError', 'Le numéro de série ne peut pas dépasser 100 caractères.');
+                return false;
+            }
+            if (!/^[a-zA-Z0-9\-_\s]+$/.test(value)) {
+                invalid(serieEl);
+                showError('serieError', 'Caractères non autorisés (lettres, chiffres, tirets, underscore).');
+                return false;
+            }
+        }
+        valid(serieEl);
+        hideError('serieError');
+        return true;
+    }
+    
+    // 6. Validation de l'état
+    function validateEtat() {
+        const value = etatEl.value;
+        const allowed = ['Neuf', 'Bon', 'Occasion', 'En panne', 'En maintenance', 'Hors service'];
+        if (!value || !allowed.includes(value)) {
+            invalid(etatEl);
+            showError('etatError', 'Veuillez sélectionner un état valide.');
+            return false;
+        }
+        valid(etatEl);
+        hideError('etatError');
+        return true;
+    }
+    
+    // 7. Validation du kilométrage
+    function validateKilometrage() {
+        const value = kmEl.value;
+        if (value === '' || value === null) {
+            invalid(kmEl);
+            showError('kmError', 'Le kilométrage est obligatoire.');
+            return false;
+        }
+        const numValue = parseInt(value);
+        if (isNaN(numValue)) {
+            invalid(kmEl);
+            showError('kmError', 'Veuillez entrer un nombre valide.');
+            return false;
+        }
+        if (numValue < 0) {
+            invalid(kmEl);
+            showError('kmError', 'Le kilométrage ne peut pas être négatif.');
+            return false;
+        }
+        if (numValue > 9999999) {
+            invalid(kmEl);
+            showError('kmError', 'Le kilométrage ne peut pas dépasser 9 999 999 km.');
+            return false;
+        }
+        valid(kmEl);
+        hideError('kmError');
+        return true;
+    }
+    
+    // 8. Validation du kilométrage dernière visite
+    function validateKmLastVisite() {
+        const value = kmLastEl.value;
+        const kmValue = parseInt(kmEl.value);
+        
+        if (value === '' || value === null) {
+            invalid(kmLastEl);
+            showError('kmLastError', 'Le kilométrage de dernière visite est obligatoire.');
+            return false;
+        }
+        const numValue = parseInt(value);
+        if (isNaN(numValue)) {
+            invalid(kmLastEl);
+            showError('kmLastError', 'Veuillez entrer un nombre valide.');
+            return false;
+        }
+        if (numValue < 0) {
+            invalid(kmLastEl);
+            showError('kmLastError', 'Le kilométrage de dernière visite ne peut pas être négatif.');
+            return false;
+        }
+        if (numValue > 9999999) {
+            invalid(kmLastEl);
+            showError('kmLastError', 'Le kilométrage ne peut pas dépasser 9 999 999 km.');
+            return false;
+        }
+        if (!isNaN(kmValue) && numValue > kmValue) {
+            invalid(kmLastEl);
+            showError('kmLastError', 'Le kilométrage de dernière visite ne peut pas dépasser le kilométrage actuel.');
+            return false;
+        }
+        valid(kmLastEl);
+        hideError('kmLastError');
+        return true;
+    }
+    
+    // 9. Validation date d'achat
+    function validateDateAchat() {
+        const value = dateAchatEl.value;
+        if (value) {
+            if (value > today) {
+                invalid(dateAchatEl);
+                showError('dateAchatError', 'La date d\'achat ne peut pas être dans le futur.');
+                return false;
+            }
+            const dateObj = new Date(value);
+            const minDate = new Date();
+            minDate.setFullYear(minDate.getFullYear() - 100);
+            if (dateObj < minDate) {
+                invalid(dateAchatEl);
+                showError('dateAchatError', 'Date trop ancienne (plus de 100 ans).');
+                return false;
+            }
+        }
+        valid(dateAchatEl);
+        hideError('dateAchatError');
+        return true;
+    }
+    
+    // 10. Validation date dernière visite
+    function validateDateLastVisite() {
+        const value = dateLastEl.value;
+        const dateAchat = dateAchatEl.value;
+        if (value) {
+            if (value > today) {
+                invalid(dateLastEl);
+                showError('dateLastError', 'La date de dernière visite ne peut pas être dans le futur.');
+                return false;
+            }
+            if (dateAchat && value < dateAchat) {
+                invalid(dateLastEl);
+                showError('dateLastError', 'La date de dernière visite ne peut pas être antérieure à la date d\'achat.');
+                return false;
+            }
+        }
+        valid(dateLastEl);
+        hideError('dateLastError');
+        return true;
+    }
+    
+    // 11. Validation prochaine maintenance
+    function validateProchaineMaintenance() {
+        const value = prochainEl.value;
+        const dateLast = dateLastEl.value;
+        const dateAchat = dateAchatEl.value;
+        if (value) {
+            const valDate = new Date(value);
+            const oneMonthAgo = new Date();
+            oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+            if (valDate < oneMonthAgo && valDate < new Date()) {
+                invalid(prochainEl);
+                showError('prochainError', 'La date ne peut pas être dans le passé lointain.');
+                return false;
+            }
+            if (dateLast && value < dateLast) {
+                invalid(prochainEl);
+                showError('prochainError', 'La date de prochaine maintenance ne peut pas être antérieure à la dernière visite.');
+                return false;
+            }
+            if (dateAchat && value < dateAchat) {
+                invalid(prochainEl);
+                showError('prochainError', 'La date de prochaine maintenance ne peut pas être antérieure à la date d\'achat.');
+                return false;
+            }
+        }
+        valid(prochainEl);
+        hideError('prochainError');
+        return true;
+    }
+    
+    // Attacher les événements
+    if (agriculteurEl) {
+        agriculteurEl.addEventListener('change', validateAgriculteur);
+        agriculteurEl.addEventListener('blur', validateAgriculteur);
+    }
+    
+    if (nomEl) {
+        nomEl.addEventListener('input', validateNom);
+        nomEl.addEventListener('blur', validateNom);
+    }
+    
+    if (marqueEl) {
+        marqueEl.addEventListener('input', validateMarque);
+        marqueEl.addEventListener('blur', validateMarque);
+    }
+    
+    if (modeleEl) {
+        modeleEl.addEventListener('input', validateModele);
+        modeleEl.addEventListener('blur', validateModele);
+    }
+    
+    if (serieEl) {
+        serieEl.addEventListener('input', validateSerie);
+        serieEl.addEventListener('blur', validateSerie);
+    }
+    
+    if (etatEl) {
+        etatEl.addEventListener('change', validateEtat);
+        etatEl.addEventListener('blur', validateEtat);
+    }
+    
+    if (kmEl) {
+        kmEl.addEventListener('input', function() {
+            validateKilometrage();
+            if (kmLastEl && kmLastEl.value) validateKmLastVisite();
+        });
+        kmEl.addEventListener('blur', validateKilometrage);
+    }
+    
+    if (kmLastEl) {
+        kmLastEl.addEventListener('input', validateKmLastVisite);
+        kmLastEl.addEventListener('blur', validateKmLastVisite);
+    }
+    
+    if (dateAchatEl) {
+        dateAchatEl.addEventListener('change', function() {
+            validateDateAchat();
+            if (dateLastEl && dateLastEl.value) validateDateLastVisite();
+            if (prochainEl && prochainEl.value) validateProchaineMaintenance();
+        });
+    }
+    
+    if (dateLastEl) {
+        dateLastEl.addEventListener('change', function() {
+            validateDateLastVisite();
+            if (prochainEl && prochainEl.value) validateProchaineMaintenance();
+        });
+    }
+    
+    if (prochainEl) {
+        prochainEl.addEventListener('change', validateProchaineMaintenance);
+    }
+    
+    // Validation avant soumission du formulaire
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const isValid = validateAgriculteur() && validateNom() && validateMarque() && 
+                           validateModele() && validateSerie() && validateEtat() && 
+                           validateKilometrage() && validateKmLastVisite() && 
+                           validateDateAchat() && validateDateLastVisite() && 
+                           validateProchaineMaintenance();
+            
+            if (!isValid) {
+                e.preventDefault();
+                const firstError = document.querySelector('.is-invalid');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        });
+    }
+    
+    // Initial validation sur les champs obligatoires
+    if (kmEl && kmEl.value === '') kmEl.value = '0';
+    if (kmLastEl && kmLastEl.value === '') kmLastEl.value = '0';
+})();
+</script>

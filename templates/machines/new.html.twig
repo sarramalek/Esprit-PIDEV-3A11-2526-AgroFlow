@@ -19,6 +19,18 @@
     .flash-error   { background:#fdecea; color:#8b1a1a; border:1px solid #f3b8b0; }
 
     .form-card { background:#fff; border:1px solid var(--green-border); border-radius:16px; padding:2rem; box-shadow:var(--shadow); }
+    
+    .btn { display:inline-flex; align-items:center; gap:.5rem; padding:.7rem 1.5rem; border-radius:10px; font-weight:600; font-size:.9rem; text-decoration:none; cursor:pointer; border:none; font-family:inherit; transition:all .18s; }
+    .btn-primary { background:var(--green-dark); color:#fff; }
+    .btn-primary:hover { background:#1f4012; transform:translateY(-1px); box-shadow:0 3px 10px rgba(45,90,27,.25); }
+    
+    .form-actions {
+        display: flex;
+        justify-content: center;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--green-border);
+    }
 </style>
 
 <div class="form-page">
@@ -45,10 +57,7 @@
 
             {{ include('machines/_form.html.twig') }}
 
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">💾 Enregistrer la machine</button>
-                <a href="{{ path('agri_machines') }}" class="btn btn-ghost">✖ Annuler</a>
-            </div>
+          
 
         {{ form_end(form) }}
     </div>
