@@ -52,6 +52,27 @@
         box-shadow: var(--shadow);
         z-index: 5;
         min-width: 420px;
+        transition: all 0.3s ease;
+    }
+    
+    /* Mode plein écran pour la carte uniquement */
+    .map-section.fullscreen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 9999;
+        min-width: 100vw;
+        width: 100vw;
+        height: 100vh;
+        border-right: none;
+        border-radius: 0;
+    }
+    
+    /* Masquer le chat quand la carte est en plein écran */
+    .chat-section.hidden {
+        display: none;
     }
     
     /* SECTION CHAT (DROITE) */
@@ -61,6 +82,7 @@
         flex-direction: column;
         background: #ffffff;
         min-width: 400px;
+        transition: all 0.3s ease;
     }
     
     /* HEADERS COMMUNS */
@@ -128,7 +150,7 @@
         box-shadow: 0 0 0 3px rgba(46,125,50,0.1);
     }
     
-    /* SECTION TOUTES LES PANNES */
+    /* SECTION PANNES */
     .all-pannes {
         padding: 12px 20px;
         background: white;
@@ -209,6 +231,7 @@
         height: 100%;
     }
     
+    /* Contrôles de la carte */
     .map-controls {
         position: absolute;
         top: 15px;
@@ -216,6 +239,7 @@
         z-index: 1000;
         display: flex;
         gap: 10px;
+        flex-direction: column;
     }
     
     .map-btn {
@@ -238,6 +262,59 @@
         background: var(--green);
         color: white;
         transform: scale(1.02);
+    }
+    
+    /* Bouton plein écran */
+    .fullscreen-btn {
+        background: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 25px;
+        cursor: pointer;
+        box-shadow: var(--shadow);
+        font-size: 13px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+        color: var(--green-dark);
+    }
+    
+    .fullscreen-btn:hover {
+        background: var(--green);
+        color: white;
+        transform: scale(1.02);
+    }
+    
+    /* Bouton quitter plein écran (flottant) */
+    .exit-fullscreen-btn {
+        position: fixed;
+        top: 80px;
+        right: 25px;
+        background: #dc2626;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 30px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 600;
+        display: none;
+        align-items: center;
+        gap: 8px;
+        z-index: 10000;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .exit-fullscreen-btn:hover {
+        background: var(--green-dark);
+        transform: scale(1.02);
+    }
+    
+    .exit-fullscreen-btn.show {
+        display: flex;
     }
     
     .radius-control {
@@ -742,7 +819,7 @@
 <div class="dashboard">
     
     <!-- SECTION CARTE (GAUCHE) -->
-    <div class="map-section">
+    <div class="map-section" id="map-section">
         <div class="section-header">
             <span class="icon">🗺️</span>
             <h2>Ateliers & Magasins à proximité</h2>
@@ -776,6 +853,9 @@
                 <button class="map-btn" id="locate-btn">
                     <span>📍</span> Ma position
                 </button>
+                <button class="fullscreen-btn" id="fullscreen-btn">
+                    <span>🗺️</span> Plein écran
+                </button>
             </div>
             <div class="radius-control">
                 <label>Rayon de recherche</label>
@@ -792,7 +872,7 @@
     </div>
     
     <!-- SECTION CHAT (DROITE) -->
-    <div class="chat-section">
+    <div class="chat-section" id="chat-section">
         <div class="section-header">
             <span class="icon">🤖</span>
             <h2>Assistant IA - Diagnostic</h2>
@@ -834,6 +914,11 @@
     <span>◀</span> Retour
 </button>
 
+<!-- BOUTON QUITTER PLEIN ÉCRAN -->
+<button class="exit-fullscreen-btn" id="exit-fullscreen-btn" onclick="exitFullscreenMap()">
+    <span>✖</span> Quitter plein écran
+</button>
+
 <div class="toast" id="toast"></div>
 {% endblock %}
 
@@ -869,6 +954,7 @@ let selectedMachineId = null;
 let selectedMachineName = null;
 let isSending = false;
 let typingIndicator = null;
+let isFullscreen = false;
 
 // Couleurs par type
 const typeColors = {
@@ -892,6 +978,53 @@ function goBack() {
     } else {
         window.location.href = '{{ path('app_home') }}';
     }
+}
+
+//========== FONCTIONS PLEIN ÉCRAN ==========
+function toggleFullscreenMap() {
+    const mapSection = document.getElementById('map-section');
+    const chatSection = document.getElementById('chat-section');
+    const exitBtn = document.getElementById('exit-fullscreen-btn');
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
+    
+    if (!isFullscreen) {
+        // Activer le mode plein écran
+        mapSection.classList.add('fullscreen');
+        chatSection.classList.add('hidden');
+        exitBtn.classList.add('show');
+        fullscreenBtn.innerHTML = '<span>🗺️</span> Quitter';
+        isFullscreen = true;
+        
+        // Redimensionner la carte après l'animation
+        setTimeout(() => {
+            map.invalidateSize();
+        }, 350);
+        
+        showToast('🗺️ Carte en mode plein écran');
+    } else {
+        exitFullscreenMap();
+    }
+}
+
+function exitFullscreenMap() {
+    const mapSection = document.getElementById('map-section');
+    const chatSection = document.getElementById('chat-section');
+    const exitBtn = document.getElementById('exit-fullscreen-btn');
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
+    
+    // Désactiver le mode plein écran
+    mapSection.classList.remove('fullscreen');
+    chatSection.classList.remove('hidden');
+    exitBtn.classList.remove('show');
+    fullscreenBtn.innerHTML = '<span>🗺️</span> Plein écran';
+    isFullscreen = false;
+    
+    // Redimensionner la carte après l'animation
+    setTimeout(() => {
+        map.invalidateSize();
+    }, 350);
+    
+    showToast('🗺️ Mode normal');
 }
 
 //========== GÉNÉRATION DES PANNES ==========
@@ -965,6 +1098,16 @@ function initEventListeners() {
     
     // Géolocalisation
     document.getElementById('locate-btn').addEventListener('click', locateUser);
+    
+    // Plein écran
+    document.getElementById('fullscreen-btn').addEventListener('click', toggleFullscreenMap);
+    
+    // Échap pour quitter le plein écran
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && isFullscreen) {
+            exitFullscreenMap();
+        }
+    });
     
     // Rayon
     const radiusSlider = document.getElementById('radius-slider');
@@ -1187,7 +1330,6 @@ async function sendMessage() {
 function getFallbackResponse(message) {
     const msgLower = message.toLowerCase();
     
-    // Transmission
     if (msgLower.includes('transmission') || msgLower.includes('boite') || msgLower.includes('vitesse') || msgLower.includes('embrayage')) {
         return `🔍 **DIAGNOSTIC : Problème de transmission**
 
@@ -1216,7 +1358,6 @@ function getFallbackResponse(message) {
 ⚠️ **URGENCE** : Moyenne — Planifier sous 7 jours`;
     }
     
-    // Moteur / Bruit
     if (msgLower.includes('moteur') || msgLower.includes('bruit')) {
         return `🔍 **DIAGNOSTIC : Bruit anormal du moteur**
 
@@ -1240,7 +1381,6 @@ function getFallbackResponse(message) {
 ⚠️ **URGENCE** : Haute — Intervention sous 48h`;
     }
     
-    // Hydraulique
     if (msgLower.includes('hydraulique') || msgLower.includes('relevage')) {
         return `🔍 **DIAGNOSTIC : Problème hydraulique**
 
@@ -1264,7 +1404,6 @@ function getFallbackResponse(message) {
 ⚠️ **URGENCE** : Haute — Intervention sous 72h`;
     }
     
-    // Fumée
     if (msgLower.includes('fumée') || msgLower.includes('fumee')) {
         return `🔍 **DIAGNOSTIC : Fumée excessive**
 
@@ -1288,7 +1427,6 @@ function getFallbackResponse(message) {
 ⚠️ **URGENCE** : Haute selon la couleur de la fumée`;
     }
     
-    // Démarrage
     if (msgLower.includes('démarre') || msgLower.includes('demarre')) {
         return `🔍 **DIAGNOSTIC : Problème de démarrage**
 
@@ -1312,7 +1450,6 @@ function getFallbackResponse(message) {
 ⚠️ **URGENCE** : Haute — Le tracteur ne peut pas fonctionner`;
     }
     
-    // Perte de puissance
     if (msgLower.includes('perte de puissance') || msgLower.includes('manque de puissance')) {
         return `🔍 **DIAGNOSTIC : Perte de puissance**
 
@@ -1336,7 +1473,6 @@ function getFallbackResponse(message) {
 ⚠️ **URGENCE** : Moyenne — Planifier rapidement`;
     }
     
-    // Surchauffe
     if (msgLower.includes('surchauffe') || msgLower.includes('chauffe') || msgLower.includes('température')) {
         return `🔍 **DIAGNOSTIC : Surchauffe moteur**
 
