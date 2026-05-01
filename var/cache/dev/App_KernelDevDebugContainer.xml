@@ -9,8 +9,8 @@
     <parameter key="kernel.runtime_mode.cli">%env(not:default:kernel.runtime_mode.web:)%</parameter>
     <parameter key="kernel.runtime_mode.worker">%env(bool:default::key:worker:default:kernel.runtime_mode:)%</parameter>
     <parameter key="kernel.debug">true</parameter>
-    <parameter key="kernel.build_dir">D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev</parameter>
-    <parameter key="kernel.cache_dir">D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev</parameter>
+    <parameter key="kernel.build_dir">D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev</parameter>
+    <parameter key="kernel.cache_dir">D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev</parameter>
     <parameter key="kernel.logs_dir">D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\log</parameter>
     <parameter key="kernel.bundles" type="collection">
       <parameter key="FrameworkBundle">Symfony\Bundle\FrameworkBundle\FrameworkBundle</parameter>
@@ -98,6 +98,9 @@
     <parameter key="gemini_api_key">%env(default::GEMINI_API_KEY)%</parameter>
     <parameter key="gemini_model">%env(default:gemini_model_default:GEMINI_MODEL)%</parameter>
     <parameter key="EXCHANGERATE_API_KEY">%env(EXCHANGERATE_API_KEY)%</parameter>
+    <parameter key="mapbox_access_token">%env(MAPBOX_ACCESS_TOKEN)%</parameter>
+    <parameter key="default_lat">%env(DEFAULT_LAT)%</parameter>
+    <parameter key="default_lng">%env(DEFAULT_LNG)%</parameter>
     <parameter key="event_dispatcher.event_aliases" type="collection">
       <parameter key="Symfony\Component\Console\Event\ConsoleCommandEvent">console.command</parameter>
       <parameter key="Symfony\Component\Console\Event\ConsoleErrorEvent">console.error</parameter>
@@ -135,15 +138,15 @@
     <parameter key="translator.logging">false</parameter>
     <parameter key="translator.default_path">D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow/translations</parameter>
     <parameter key="debug.error_handler.throw_at">-1</parameter>
-    <parameter key="debug.container.dump">D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/App_KernelDevDebugContainer.xml</parameter>
+    <parameter key="debug.container.dump">D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/App_KernelDevDebugContainer.xml</parameter>
     <parameter key="router.request_context.host">localhost</parameter>
     <parameter key="router.request_context.scheme">http</parameter>
     <parameter key="router.request_context.base_url"></parameter>
     <parameter key="router.resource">kernel::loadRoutes</parameter>
-    <parameter key="router.cache_dir">D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev</parameter>
+    <parameter key="router.cache_dir">D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev</parameter>
     <parameter key="request_listener.http_port">80</parameter>
     <parameter key="request_listener.https_port">443</parameter>
-    <parameter key="serializer.mapping.cache.file">D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/serialization.php</parameter>
+    <parameter key="serializer.mapping.cache.file">D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/serialization.php</parameter>
     <parameter key="cache.prefix.seed">_D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow.App_KernelDevDebugContainer</parameter>
     <parameter key="session.metadata.storage_key">_sf2_meta</parameter>
     <parameter key="session.storage.options" type="collection">
@@ -158,11 +161,11 @@
     <parameter key="session.metadata.update_threshold">0</parameter>
     <parameter key="form.type_extension.csrf.enabled">true</parameter>
     <parameter key="form.type_extension.csrf.field_name">_token</parameter>
-    <parameter key="validator.mapping.cache.file">D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/validation.php</parameter>
+    <parameter key="validator.mapping.cache.file">D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/validation.php</parameter>
     <parameter key="validator.translation_domain">validators</parameter>
     <parameter key="profiler_listener.only_exceptions">false</parameter>
     <parameter key="profiler_listener.only_main_requests">false</parameter>
-    <parameter key="profiler.storage.dsn">file:D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/profiler</parameter>
+    <parameter key="profiler.storage.dsn">file:D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/profiler</parameter>
     <parameter key="doctrine.dbal.configuration.class">Doctrine\DBAL\Configuration</parameter>
     <parameter key="doctrine.data_collector.class">Doctrine\Bundle\DoctrineBundle\DataCollector\DoctrineDataCollector</parameter>
     <parameter key="doctrine.dbal.connection.event_manager.class">Symfony\Bridge\Doctrine\ContainerAwareEventManager</parameter>
@@ -229,7 +232,7 @@
     <parameter key="doctrine.orm.auto_generate_proxy_classes">true</parameter>
     <parameter key="doctrine.orm.enable_lazy_ghost_objects">true</parameter>
     <parameter key="doctrine.orm.enable_native_lazy_objects">false</parameter>
-    <parameter key="doctrine.orm.proxy_dir">D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/doctrine/orm/Proxies</parameter>
+    <parameter key="doctrine.orm.proxy_dir">D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/doctrine/orm/Proxies</parameter>
     <parameter key="doctrine.orm.proxy_namespace">Proxies</parameter>
     <parameter key="doctrine.migrations.preferred_em">null</parameter>
     <parameter key="doctrine.migrations.preferred_connection">null</parameter>
@@ -574,6 +577,17 @@
         <argument type="service" id=".service_locator.Ccg8tS2.App\Controller\LocaleController"/>
       </call>
     </service>
+    <service id="App\Controller\Materiels\ChatbotController" class="App\Controller\Materiels\ChatbotController" public="true" autowire="true" autoconfigure="true">
+      <tag name="controller.service_arguments"/>
+      <tag name="container.service_subscriber"/>
+      <argument type="service" id="App\Service\GeneralChatbotService"/>
+      <argument type="service" id="App\Repository\Materiels\MachineRepository"/>
+      <argument type="service" id=".debug.http_client"/>
+      <argument>%env(GEMINI_API_KEY)%</argument>
+      <call method="setContainer">
+        <argument type="service" id=".service_locator.Ccg8tS2.App\Controller\Materiels\ChatbotController"/>
+      </call>
+    </service>
     <service id="App\Controller\Materiels\MachineController" class="App\Controller\Materiels\MachineController" public="true" autowire="true" autoconfigure="true">
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
@@ -585,6 +599,8 @@
       <tag name="controller.service_arguments"/>
       <tag name="container.service_subscriber"/>
       <argument type="service" id="App\Service\MaintenanceAlertService"/>
+      <argument type="service" id="App\Service\MaintenanceChatbotService"/>
+      <argument type="service" id="App\Service\GeminiRecommendationService"/>
       <call method="setContainer">
         <argument type="service" id=".service_locator.Ccg8tS2.App\Controller\Materiels\MaintenancesController"/>
       </call>
@@ -1007,6 +1023,11 @@
       <argument type="service" id=".debug.http_client"/>
       <argument type="service" id="App\Repository\Materiels\MaintenanceRepository"/>
     </service>
+    <service id="App\Service\GeneralChatbotService" class="App\Service\GeneralChatbotService" autowire="true" autoconfigure="true">
+      <argument type="service" id=".debug.http_client"/>
+      <argument type="service" id="App\Service\MaintenanceChatbotService"/>
+      <argument>%env(GEMINI_API_KEY)%</argument>
+    </service>
     <service id="App\Service\GrokService" class="App\Service\GrokService" autowire="true" autoconfigure="true">
       <argument type="service" id=".debug.http_client"/>
       <argument type="service" id="monolog.logger"/>
@@ -1019,6 +1040,12 @@
       <argument type="service" id=".debug.http_client"/>
       <argument>%env(default::GEMINI_API_KEY)%</argument>
       <argument type="service" id="monolog.logger"/>
+    </service>
+    <service id="App\Service\MaintenanceChatbotService" class="App\Service\MaintenanceChatbotService" autowire="true" autoconfigure="true">
+      <argument type="service" id=".debug.http_client"/>
+      <argument type="service" id="App\Repository\Materiels\MaintenanceRepository"/>
+      <argument type="service" id="App\Repository\Materiels\MachineRepository"/>
+      <argument>%env(GEMINI_API_KEY)%</argument>
     </service>
     <service id="App\Service\PdfService" class="App\Service\PdfService" autowire="true" autoconfigure="true">
       <argument type="service" id="twig"/>
@@ -1057,6 +1084,9 @@
       <argument>%env(TELEGRAM_TOKEN)%</argument>
     </service>
     <service id="App\Service\TwoFactorCodeSender" class="App\Service\TwoFactorCodeSender" autowire="true" autoconfigure="true"/>
+    <service id="App\Service\WebSearchService" class="App\Service\WebSearchService" autowire="true" autoconfigure="true">
+      <tag name="container.error" message="Invalid service &quot;App\Service\WebSearchService&quot;: class &quot;App\Service\WebSearchService&quot; does not exist."/>
+    </service>
     <service id="argument_metadata_factory" class="Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadataFactory"/>
     <service id="argument_resolver.backed_enum_resolver" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueResolver">
       <tag priority="100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\BackedEnumValueResolver">controller.argument_value_resolver</tag>
@@ -1084,7 +1114,7 @@
     </service>
     <service id="argument_resolver.service" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">
       <tag priority="-50" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\ServiceValueResolver">controller.argument_value_resolver</tag>
-      <argument type="service" id=".service_locator.gtFaV1X"/>
+      <argument type="service" id=".service_locator.bPPEyAx"/>
     </service>
     <service id="argument_resolver.default" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">
       <tag priority="-100" name="Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver">controller.argument_value_resolver</tag>
@@ -1167,7 +1197,7 @@
       </argument>
     </service>
     <service id="http_cache.store" class="Symfony\Component\HttpKernel\HttpCache\Store">
-      <argument>D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/http_cache</argument>
+      <argument>D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/http_cache</argument>
     </service>
     <service id="url_helper" class="Symfony\Component\HttpFoundation\UrlHelper">
       <argument type="service" id="request_stack"/>
@@ -1177,7 +1207,7 @@
       <tag name="container.no_preload"/>
       <argument type="tagged_iterator" tag="kernel.cache_warmer"/>
       <argument>true</argument>
-      <argument>D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/App_KernelDevDebugContainerDeprecations.log</argument>
+      <argument>D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/App_KernelDevDebugContainerDeprecations.log</argument>
     </service>
     <service id="cache_clearer" class="Symfony\Component\HttpKernel\CacheClearer\ChainCacheClearer">
       <argument type="tagged_iterator" tag="kernel.cache_clearer"/>
@@ -2202,7 +2232,7 @@
       <argument></argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
+      <argument>D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -2221,7 +2251,7 @@
       <tag name="monolog.logger" channel="cache"/>
       <argument></argument>
       <argument>0</argument>
-      <argument>D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/app</argument>
+      <argument>D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/app</argument>
       <argument type="service" id="cache.default_marshaller" on-invalid="ignore"/>
       <call method="setLogger">
         <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
@@ -2390,7 +2420,7 @@
     <service id="asset_mapper.cached_mapped_asset_factory" class="Symfony\Component\AssetMapper\Factory\CachedMappedAssetFactory">
       <tag name="container.decorator" id="asset_mapper.mapped_asset_factory" inner="asset_mapper.cached_mapped_asset_factory.inner"/>
       <argument type="service" id="asset_mapper.cached_mapped_asset_factory.inner"/>
-      <argument>D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/asset_mapper</argument>
+      <argument>D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/asset_mapper</argument>
       <argument>true</argument>
     </service>
     <service id="asset_mapper.repository" class="Symfony\Component\AssetMapper\AssetMapperRepository">
@@ -2765,7 +2795,7 @@
         </argument>
       </argument>
       <argument type="collection">
-        <argument key="cache_dir">D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/translations</argument>
+        <argument key="cache_dir">D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/translations</argument>
         <argument key="debug">true</argument>
         <argument key="resource_files" type="collection">
           <argument key="af" type="collection">
@@ -4190,7 +4220,7 @@
     </service>
     <service id="argument_resolver.not_tagged_controller" class="Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver">
       <tag name="controller.argument_value_resolver" priority="-200"/>
-      <argument type="service" id=".service_locator.gtFaV1X"/>
+      <argument type="service" id=".service_locator.bPPEyAx"/>
     </service>
     <service id="debug.log_processor" class="Symfony\Bridge\Monolog\Processor\DebugProcessor">
       <tag name="kernel.reset" method="reset"/>
@@ -4293,7 +4323,7 @@
       <argument type="service" id=".service_locator.b.mdbP7.router.default"/>
       <argument>kernel::loadRoutes</argument>
       <argument type="collection">
-        <argument key="cache_dir">D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev</argument>
+        <argument key="cache_dir">D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev</argument>
         <argument key="debug">true</argument>
         <argument key="generator_class">Symfony\Component\Routing\Generator\CompiledUrlGenerator</argument>
         <argument key="generator_dumper_class">Symfony\Component\Routing\Generator\Dumper\CompiledUrlGeneratorDumper</argument>
@@ -4472,10 +4502,10 @@
           </service>
         </argument>
       </argument>
-      <argument>D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/serialization.php</argument>
+      <argument>D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/serialization.php</argument>
     </service>
     <service id="serializer.mapping.cache.symfony" class="Psr\Cache\CacheItemPoolInterface">
-      <argument>D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/serialization.php</argument>
+      <argument>D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/serialization.php</argument>
       <argument type="service" id="cache.serializer"/>
       <factory class="Symfony\Component\Cache\Adapter\PhpArrayAdapter" method="create"/>
     </service>
@@ -4613,7 +4643,7 @@
       <argument>true</argument>
     </service>
     <service id="session.storage.factory.mock_file" class="Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorageFactory">
-      <argument>D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/sessions</argument>
+      <argument>D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/sessions</argument>
       <argument>MOCKSESSID</argument>
       <argument type="service">
         <service class="Symfony\Component\HttpFoundation\Session\Storage\MetadataBag">
@@ -4819,10 +4849,10 @@
     <service id="validator.mapping.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\ValidatorCacheWarmer">
       <tag name="kernel.cache_warmer"/>
       <argument type="service" id="validator.builder"/>
-      <argument>D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/validation.php</argument>
+      <argument>D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/validation.php</argument>
     </service>
     <service id="validator.mapping.cache.adapter" class="Symfony\Component\Cache\Adapter\PhpArrayAdapter" constructor="create">
-      <argument>D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/validation.php</argument>
+      <argument>D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/validation.php</argument>
       <argument type="service" id="cache.validator"/>
     </service>
     <service id="validator.validator_factory" class="Symfony\Component\Validator\ContainerConstraintValidatorFactory">
@@ -5506,7 +5536,7 @@
       </call>
     </service>
     <service id="profiler.storage" class="Symfony\Component\HttpKernel\Profiler\FileProfilerStorage">
-      <argument>file:D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/profiler</argument>
+      <argument>file:D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/profiler</argument>
     </service>
     <service id="profiler_listener" class="Symfony\Component\HttpKernel\EventListener\ProfilerListener">
       <tag name="kernel.event_subscriber"/>
@@ -5571,7 +5601,7 @@
       <tag name="monolog.logger" channel="profiler"/>
       <tag name="data_collector" template="@WebProfiler/Collector/logger.html.twig" id="logger" priority="300"/>
       <argument type="service" id="monolog.logger.profiler" on-invalid="ignore"/>
-      <argument>D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/App_KernelDevDebugContainer</argument>
+      <argument>D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/App_KernelDevDebugContainer</argument>
       <argument type="service" id=".virtual_request_stack" on-invalid="ignore"/>
     </service>
     <service id="data_collector.time" class="Symfony\Component\HttpKernel\DataCollector\TimeDataCollector">
@@ -6217,7 +6247,7 @@
         <argument type="service" id=".doctrine.orm.default_metadata_driver"/>
       </call>
       <call method="setProxyDir">
-        <argument>D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/doctrine/orm/Proxies</argument>
+        <argument>D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/doctrine/orm/Proxies</argument>
       </call>
       <call method="setProxyNamespace">
         <argument>Proxies</argument>
@@ -6637,7 +6667,7 @@
       <argument type="service" id="twig.loader.native_filesystem"/>
       <argument type="collection">
         <argument key="autoescape">name</argument>
-        <argument key="cache">D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/twig</argument>
+        <argument key="cache">D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/twig</argument>
         <argument key="charset">UTF-8</argument>
         <argument key="debug">true</argument>
         <argument key="strict_variables">true</argument>
@@ -8592,6 +8622,9 @@
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\LocaleController" class="App\Controller\LocaleController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\LocaleController" class="App\Controller\LocaleController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\LocaleController" class="App\Controller\LocaleController" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Materiels\ChatbotController" class="App\Controller\Materiels\ChatbotController" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Materiels\ChatbotController" class="App\Controller\Materiels\ChatbotController" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.App\Controller\Materiels\ChatbotController" class="App\Controller\Materiels\ChatbotController" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Contracts\Service\ServiceSubscriberInterface.0.App\Controller\Materiels\MachineController" class="App\Controller\Materiels\MachineController" autowire="true" abstract="true"/>
     <service id=".instanceof.Symfony\Bundle\FrameworkBundle\Controller\AbstractController.0.App\Controller\Materiels\MachineController" class="App\Controller\Materiels\MachineController" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Controller\Materiels\MachineController" class="App\Controller\Materiels\MachineController" autowire="true" autoconfigure="true" abstract="true"/>
@@ -9545,18 +9578,54 @@
         <argument key="userRepo" type="service_closure" id="App\Repository\User\UserRepository"/>
       </argument>
     </service>
-    <service id=".service_locator.yIz27C2" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator._.8m7iI" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
-        <argument key="paginator" type="service_closure" id="knp_paginator"/>
-        <argument key="repo" type="service_closure" id="App\Repository\Materiels\MaintenanceRepository"/>
+        <argument key="repo" type="service_closure" id="App\Repository\Materiels\MachineRepository"/>
+        <argument key="userRepo" type="service_closure" id="App\Repository\User\UserRepository"/>
       </argument>
     </service>
-    <service id=".service_locator.kLp2YUI" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.B5ivxPI" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="machine" type="service_closure" id=".errored..service_locator.B5ivxPI.App\Entity\Materiels\Machine"/>
+        <argument key="userRepo" type="service_closure" id="App\Repository\User\UserRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.JXL9rIl" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="em" type="service_closure" id="doctrine.orm.default_entity_manager"/>
-        <argument key="maintenance" type="service_closure" id=".errored..service_locator.kLp2YUI.App\Entity\Materiels\Maintenance"/>
+        <argument key="machine" type="service_closure" id=".errored..service_locator.JXL9rIl.App\Entity\Materiels\Machine"/>
+        <argument key="userRepo" type="service_closure" id="App\Repository\User\UserRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.a4S3t4n" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="paginator" type="service_closure" id="knp_paginator"/>
+        <argument key="repository" type="service_closure" id="App\Repository\Materiels\MaintenanceRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.gP9tAk1" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="repository" type="service_closure" id="App\Repository\Materiels\MaintenanceRepository"/>
+      </argument>
+    </service>
+    <service id=".service_locator.hBSwCYJ" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="maintenance" type="service_closure" id=".errored..service_locator.hBSwCYJ.App\Entity\Materiels\Maintenance"/>
+      </argument>
+    </service>
+    <service id=".service_locator.BND6xNB" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator"/>
+      <argument type="collection">
+        <argument key="entityManager" type="service_closure" id="doctrine.orm.default_entity_manager"/>
+        <argument key="repository" type="service_closure" id="App\Repository\Materiels\MaintenanceRepository"/>
       </argument>
     </service>
     <service id=".service_locator.FL1_dBi" class="Symfony\Component\DependencyInjection\ServiceLocator">
@@ -10016,7 +10085,7 @@
         <argument key="visionService" type="service_closure" id="App\Service\SmartVisionService"/>
       </argument>
     </service>
-    <service id=".service_locator.gtFaV1X" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.bPPEyAx" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="App\Controller\AdminDashboardController::index" type="service_closure" id=".service_locator.qni5W9T"/>
@@ -10104,29 +10173,26 @@
         <argument key="App\Controller\Evenements\ParticipationController::index" type="service_closure" id=".service_locator.F7gwLgd"/>
         <argument key="App\Controller\Evenements\ParticipationController::modifier" type="service_closure" id=".service_locator.csIWZan"/>
         <argument key="App\Controller\Evenements\ParticipationController::supprimer" type="service_closure" id=".service_locator.csIWZan"/>
-        <argument key="App\Controller\Materiels\MachineController::machineDelete" type="service_closure" id=".service_locator.pt54IVS"/>
-        <argument key="App\Controller\Materiels\MachineController::machineEdit" type="service_closure" id=".service_locator.pt54IVS"/>
+        <argument key="App\Controller\Materiels\MachineController::exportPDF" type="service_closure" id=".service_locator._.8m7iI"/>
+        <argument key="App\Controller\Materiels\MachineController::machineDelete" type="service_closure" id=".service_locator.JXL9rIl"/>
+        <argument key="App\Controller\Materiels\MachineController::machineEdit" type="service_closure" id=".service_locator.JXL9rIl"/>
         <argument key="App\Controller\Materiels\MachineController::machineIndex" type="service_closure" id=".service_locator.urbcnz6"/>
         <argument key="App\Controller\Materiels\MachineController::machineNew" type="service_closure" id=".service_locator.2oEUwKR"/>
-        <argument key="App\Controller\Materiels\MachineController::machineShow" type="service_closure" id=".service_locator.6xRxq88"/>
-        <argument key="App\Controller\Materiels\MachineController::machineStatistiques" type="service_closure" id=".service_locator.2E5fScC"/>
-        <argument key="App\Controller\Materiels\MaintenancesController::aiSuggestMaintenance" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\Materiels\MaintenancesController::apiSchedule" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\Materiels\MaintenancesController::calendarRemindersPage" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\Materiels\MaintenancesController::delete" type="service_closure" id=".service_locator.kLp2YUI"/>
-        <argument key="App\Controller\Materiels\MaintenancesController::edit" type="service_closure" id=".service_locator.kLp2YUI"/>
-        <argument key="App\Controller\Materiels\MaintenancesController::exportExcel" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\Materiels\MaintenancesController::exportPdf" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\Materiels\MaintenancesController::generateCustomPrompt" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\Materiels\MaintenancesController::generateLifetime" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\Materiels\MaintenancesController::generateSchedule" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\Materiels\MaintenancesController::getCalendarReminders" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\Materiels\MaintenancesController::getIntelligentRecommendation" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\Materiels\MaintenancesController::getReminderDates" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\Materiels\MaintenancesController::getReminderDetail" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\Materiels\MaintenancesController::index" type="service_closure" id=".service_locator.yIz27C2"/>
-        <argument key="App\Controller\Materiels\MaintenancesController::new" type="service_closure" id=".service_locator.9kKwU2t"/>
-        <argument key="App\Controller\Materiels\MaintenancesController::show" type="service_closure" id=".service_locator.b5YG.FV"/>
+        <argument key="App\Controller\Materiels\MachineController::machineShow" type="service_closure" id=".service_locator.B5ivxPI"/>
+        <argument key="App\Controller\Materiels\MachineController::machineStatistiques" type="service_closure" id=".service_locator._.8m7iI"/>
+        <argument key="App\Controller\Materiels\MaintenancesController::calendarRemindersPage" type="service_closure" id=".service_locator.gP9tAk1"/>
+        <argument key="App\Controller\Materiels\MaintenancesController::delete" type="service_closure" id=".service_locator.hBSwCYJ"/>
+        <argument key="App\Controller\Materiels\MaintenancesController::edit" type="service_closure" id=".service_locator.hBSwCYJ"/>
+        <argument key="App\Controller\Materiels\MaintenancesController::exportExcel" type="service_closure" id=".service_locator.gP9tAk1"/>
+        <argument key="App\Controller\Materiels\MaintenancesController::exportPdf" type="service_closure" id=".service_locator.gP9tAk1"/>
+        <argument key="App\Controller\Materiels\MaintenancesController::generateRecommendation" type="service_closure" id=".service_locator.BND6xNB"/>
+        <argument key="App\Controller\Materiels\MaintenancesController::getAlerts" type="service_closure" id=".service_locator.gP9tAk1"/>
+        <argument key="App\Controller\Materiels\MaintenancesController::getAllAlertsSummary" type="service_closure" id=".service_locator.gP9tAk1"/>
+        <argument key="App\Controller\Materiels\MaintenancesController::getReminderDates" type="service_closure" id=".service_locator.gP9tAk1"/>
+        <argument key="App\Controller\Materiels\MaintenancesController::getReminderDetail" type="service_closure" id=".service_locator.gP9tAk1"/>
+        <argument key="App\Controller\Materiels\MaintenancesController::index" type="service_closure" id=".service_locator.a4S3t4n"/>
+        <argument key="App\Controller\Materiels\MaintenancesController::new" type="service_closure" id=".service_locator.CsMkqUa"/>
+        <argument key="App\Controller\Materiels\MaintenancesController::show" type="service_closure" id=".service_locator.gP9tAk1"/>
         <argument key="App\Controller\OuvrierDashboardController::articleShow" type="service_closure" id=".service_locator.mvGX7gD"/>
         <argument key="App\Controller\OuvrierDashboardController::categories" type="service_closure" id=".service_locator.FL1_dBi"/>
         <argument key="App\Controller\OuvrierDashboardController::modifierMouvement" type="service_closure" id=".service_locator.6vfABg_"/>
@@ -10341,29 +10407,26 @@
         <argument key="App\Controller\Evenements\ParticipationController:index" type="service_closure" id=".service_locator.F7gwLgd"/>
         <argument key="App\Controller\Evenements\ParticipationController:modifier" type="service_closure" id=".service_locator.csIWZan"/>
         <argument key="App\Controller\Evenements\ParticipationController:supprimer" type="service_closure" id=".service_locator.csIWZan"/>
-        <argument key="App\Controller\Materiels\MachineController:machineDelete" type="service_closure" id=".service_locator.pt54IVS"/>
-        <argument key="App\Controller\Materiels\MachineController:machineEdit" type="service_closure" id=".service_locator.pt54IVS"/>
+        <argument key="App\Controller\Materiels\MachineController:exportPDF" type="service_closure" id=".service_locator._.8m7iI"/>
+        <argument key="App\Controller\Materiels\MachineController:machineDelete" type="service_closure" id=".service_locator.JXL9rIl"/>
+        <argument key="App\Controller\Materiels\MachineController:machineEdit" type="service_closure" id=".service_locator.JXL9rIl"/>
         <argument key="App\Controller\Materiels\MachineController:machineIndex" type="service_closure" id=".service_locator.urbcnz6"/>
         <argument key="App\Controller\Materiels\MachineController:machineNew" type="service_closure" id=".service_locator.2oEUwKR"/>
-        <argument key="App\Controller\Materiels\MachineController:machineShow" type="service_closure" id=".service_locator.6xRxq88"/>
-        <argument key="App\Controller\Materiels\MachineController:machineStatistiques" type="service_closure" id=".service_locator.2E5fScC"/>
-        <argument key="App\Controller\Materiels\MaintenancesController:aiSuggestMaintenance" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\Materiels\MaintenancesController:apiSchedule" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\Materiels\MaintenancesController:calendarRemindersPage" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\Materiels\MaintenancesController:delete" type="service_closure" id=".service_locator.kLp2YUI"/>
-        <argument key="App\Controller\Materiels\MaintenancesController:edit" type="service_closure" id=".service_locator.kLp2YUI"/>
-        <argument key="App\Controller\Materiels\MaintenancesController:exportExcel" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\Materiels\MaintenancesController:exportPdf" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\Materiels\MaintenancesController:generateCustomPrompt" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\Materiels\MaintenancesController:generateLifetime" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\Materiels\MaintenancesController:generateSchedule" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\Materiels\MaintenancesController:getCalendarReminders" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\Materiels\MaintenancesController:getIntelligentRecommendation" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\Materiels\MaintenancesController:getReminderDates" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\Materiels\MaintenancesController:getReminderDetail" type="service_closure" id=".service_locator.b5YG.FV"/>
-        <argument key="App\Controller\Materiels\MaintenancesController:index" type="service_closure" id=".service_locator.yIz27C2"/>
-        <argument key="App\Controller\Materiels\MaintenancesController:new" type="service_closure" id=".service_locator.9kKwU2t"/>
-        <argument key="App\Controller\Materiels\MaintenancesController:show" type="service_closure" id=".service_locator.b5YG.FV"/>
+        <argument key="App\Controller\Materiels\MachineController:machineShow" type="service_closure" id=".service_locator.B5ivxPI"/>
+        <argument key="App\Controller\Materiels\MachineController:machineStatistiques" type="service_closure" id=".service_locator._.8m7iI"/>
+        <argument key="App\Controller\Materiels\MaintenancesController:calendarRemindersPage" type="service_closure" id=".service_locator.gP9tAk1"/>
+        <argument key="App\Controller\Materiels\MaintenancesController:delete" type="service_closure" id=".service_locator.hBSwCYJ"/>
+        <argument key="App\Controller\Materiels\MaintenancesController:edit" type="service_closure" id=".service_locator.hBSwCYJ"/>
+        <argument key="App\Controller\Materiels\MaintenancesController:exportExcel" type="service_closure" id=".service_locator.gP9tAk1"/>
+        <argument key="App\Controller\Materiels\MaintenancesController:exportPdf" type="service_closure" id=".service_locator.gP9tAk1"/>
+        <argument key="App\Controller\Materiels\MaintenancesController:generateRecommendation" type="service_closure" id=".service_locator.BND6xNB"/>
+        <argument key="App\Controller\Materiels\MaintenancesController:getAlerts" type="service_closure" id=".service_locator.gP9tAk1"/>
+        <argument key="App\Controller\Materiels\MaintenancesController:getAllAlertsSummary" type="service_closure" id=".service_locator.gP9tAk1"/>
+        <argument key="App\Controller\Materiels\MaintenancesController:getReminderDates" type="service_closure" id=".service_locator.gP9tAk1"/>
+        <argument key="App\Controller\Materiels\MaintenancesController:getReminderDetail" type="service_closure" id=".service_locator.gP9tAk1"/>
+        <argument key="App\Controller\Materiels\MaintenancesController:index" type="service_closure" id=".service_locator.a4S3t4n"/>
+        <argument key="App\Controller\Materiels\MaintenancesController:new" type="service_closure" id=".service_locator.CsMkqUa"/>
+        <argument key="App\Controller\Materiels\MaintenancesController:show" type="service_closure" id=".service_locator.gP9tAk1"/>
         <argument key="App\Controller\OuvrierDashboardController:articleShow" type="service_closure" id=".service_locator.mvGX7gD"/>
         <argument key="App\Controller\OuvrierDashboardController:categories" type="service_closure" id=".service_locator.FL1_dBi"/>
         <argument key="App\Controller\OuvrierDashboardController:modifierMouvement" type="service_closure" id=".service_locator.6vfABg_"/>
@@ -11334,6 +11397,12 @@
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.Ccg8tS2" method="withContext"/>
     </service>
+    <service id=".service_locator.Ccg8tS2.App\Controller\Materiels\ChatbotController" class="Symfony\Component\DependencyInjection\ServiceLocator">
+      <tag name="container.service_locator_context" id="App\Controller\Materiels\ChatbotController"/>
+      <argument>App\Controller\Materiels\ChatbotController</argument>
+      <argument type="service" id="service_container"/>
+      <factory service=".service_locator.Ccg8tS2" method="withContext"/>
+    </service>
     <service id=".service_locator.Ccg8tS2.App\Controller\Materiels\MachineController" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="App\Controller\Materiels\MachineController"/>
       <argument>App\Controller\Materiels\MachineController</argument>
@@ -11697,6 +11766,7 @@
           <argument>App\Controller\Evenements\ParticipationController</argument>
           <argument>App\Controller\HomeController</argument>
           <argument>App\Controller\LocaleController</argument>
+          <argument>App\Controller\Materiels\ChatbotController</argument>
           <argument>App\Controller\Materiels\MachineController</argument>
           <argument>App\Controller\Materiels\MaintenancesController</argument>
           <argument>App\Controller\OuvrierDashboardController</argument>
@@ -11959,8 +12029,14 @@
     <service id=".errored..service_locator.wH4nX8g.App\Entity\Animals\Examen" class="App\Entity\Animals\Examen">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.wH4nX8g&quot;: it needs an instance of &quot;App\Entity\Animals\Examen&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
     </service>
-    <service id=".errored..service_locator.kLp2YUI.App\Entity\Materiels\Maintenance" class="App\Entity\Materiels\Maintenance">
-      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.kLp2YUI&quot;: it needs an instance of &quot;App\Entity\Materiels\Maintenance&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
+    <service id=".errored..service_locator.B5ivxPI.App\Entity\Materiels\Machine" class="App\Entity\Materiels\Machine">
+      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.B5ivxPI&quot;: it needs an instance of &quot;App\Entity\Materiels\Machine&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
+    </service>
+    <service id=".errored..service_locator.JXL9rIl.App\Entity\Materiels\Machine" class="App\Entity\Materiels\Machine">
+      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.JXL9rIl&quot;: it needs an instance of &quot;App\Entity\Materiels\Machine&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
+    </service>
+    <service id=".errored..service_locator.hBSwCYJ.App\Entity\Materiels\Maintenance" class="App\Entity\Materiels\Maintenance">
+      <tag name="container.error" message="Cannot autowire service &quot;.service_locator.hBSwCYJ&quot;: it needs an instance of &quot;App\Entity\Materiels\Maintenance&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
     </service>
     <service id=".errored..service_locator.mvGX7gD.App\Entity\stocks\Article" class="App\Entity\stocks\Article">
       <tag name="container.error" message="Cannot autowire service &quot;.service_locator.mvGX7gD&quot;: it needs an instance of &quot;App\Entity\stocks\Article&quot; but this type has been excluded in &quot;config/services.yaml&quot;."/>
@@ -12990,7 +13066,7 @@
     <service id="cache.app.recorder_inner" class="Symfony\Component\Cache\Adapter\FilesystemAdapter">
       <argument>Ya05JvFIau</argument>
       <argument>0</argument>
-      <argument>D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/app</argument>
+      <argument>D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/app</argument>
       <argument type="service" id="cache.default_marshaller" on-invalid="ignore"/>
       <call method="setLogger">
         <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
@@ -13000,7 +13076,7 @@
       <argument>OA92CJ4QIF</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
+      <argument>D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -13008,7 +13084,7 @@
       <argument>kbptcKCium</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
+      <argument>D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -13016,7 +13092,7 @@
       <argument>PaCYr7kjeg</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
+      <argument>D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -13024,7 +13100,7 @@
       <argument>fxrziDn2He</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
+      <argument>D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -13032,7 +13108,7 @@
       <argument>6hxWiAobWX</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
+      <argument>D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -13040,14 +13116,14 @@
       <argument>XckY7-p9XN</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
+      <argument>D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
     <service id="cache.messenger.restart_workers_signal.recorder_inner" class="Symfony\Component\Cache\Adapter\FilesystemAdapter">
       <argument>xDh6G-nZgD</argument>
       <argument>0</argument>
-      <argument>D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/app</argument>
+      <argument>D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/app</argument>
       <argument type="service" id="cache.default_marshaller" on-invalid="ignore"/>
       <call method="setLogger">
         <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
@@ -13057,7 +13133,7 @@
       <argument>ubzU7AwSVl</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
+      <argument>D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -13067,7 +13143,7 @@
       <argument>tt4HjZbYCg</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
+      <argument>D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -13075,7 +13151,7 @@
       <argument>2Xmj4GrEez</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>D:\matInteg\Esprit-PIDEV-3A11-2526-AgroFlow\var\cache\dev/pools/system</argument>
+      <argument>D:/matInteg/Esprit-PIDEV-3A11-2526-AgroFlow/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -13271,7 +13347,7 @@
     <service id="Knp\Component\Pager\ArgumentAccess\ArgumentAccessInterface" alias="Knp\Component\Pager\ArgumentAccess\RequestArgumentAccess"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.w7.f4fT" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
-    <service id="argument_resolver.controller_locator" alias=".service_locator.gtFaV1X"/>
+    <service id="argument_resolver.controller_locator" alias=".service_locator.bPPEyAx"/>
     <service id="doctrine.id_generator_locator" alias=".service_locator.KLVvNIq"/>
     <service id="twig.loader" alias="twig.loader.native_filesystem"/>
     <service id=".Psr\Log\LoggerInterface $request.logger" alias="monolog.logger.request"/>
@@ -13332,8 +13408,10 @@
     <service id=".service_locator.sEaJncE" alias=".service_locator.cBE01og"/>
     <service id=".service_locator.Dq589Yi" alias=".service_locator.VGXccJ4"/>
     <service id=".service_locator.7_xbnC_" alias=".service_locator.urbcnz6"/>
-    <service id=".service_locator.l7GMwHD" alias=".service_locator.yIz27C2"/>
-    <service id=".service_locator.XvTo7NF" alias=".service_locator.kLp2YUI"/>
+    <service id=".service_locator.L_LOffn" alias=".service_locator.JXL9rIl"/>
+    <service id=".service_locator..5cihkS" alias=".service_locator.a4S3t4n"/>
+    <service id=".service_locator.tKr2nwb" alias=".service_locator.hBSwCYJ"/>
+    <service id=".service_locator.0qQ.KGu" alias=".service_locator.BND6xNB"/>
     <service id=".service_locator.LNnsniP" alias=".service_locator.zWKqscT"/>
     <service id=".service_locator.rEJYkrL" alias=".service_locator.6vfABg_"/>
     <service id=".service_locator.9_5m.zA" alias=".service_locator.yjHtSb5"/>
@@ -13364,12 +13442,12 @@
     <service id=".service_locator.wDI7hJ0" alias=".service_locator..1lCTzi"/>
     <service id=".service_locator.8J1nalj" alias=".service_locator.SsD9eLO"/>
     <service id=".service_locator.wo826zD" alias=".service_locator.f4l_PHz"/>
-    <service id=".service_locator.9RmXrNV" alias=".service_locator.gtFaV1X"/>
+    <service id=".service_locator.6ySy2oW" alias=".service_locator.bPPEyAx"/>
     <service id=".service_locator.BFrsqsn" alias=".service_locator.F9PKc.7"/>
     <service id=".service_locator.oIHygA7" alias=".service_locator.xOkKGYY"/>
     <service id=".service_locator.3ijAwyK" alias=".service_locator.vtjw4Bs"/>
     <service id=".service_locator.O24_MAy" alias=".service_locator.yY.p4P7"/>
-    <service id=".service_locator.isyh0k3" alias=".service_locator.Ccg8tS2"/>
+    <service id=".service_locator.yNAh0nd" alias=".service_locator.Ccg8tS2"/>
     <service id="validator" alias="debug.validator"/>
     <service id="http_client" alias=".debug.http_client"/>
     <service id=".debug.http_client.inner" alias="http_client.uri_template"/>
@@ -13442,8 +13520,13 @@
     <service id=".service_locator.pKyWZ4m" alias=".service_locator.md0EV5q"/>
     <service id=".service_locator.b9UTYfn" alias=".service_locator.VGXccJ4"/>
     <service id=".service_locator.Hl7WHVy" alias=".service_locator.urbcnz6"/>
-    <service id=".service_locator.SFL.Q2y" alias=".service_locator.yIz27C2"/>
-    <service id=".service_locator.JG4uyKr" alias=".service_locator.kLp2YUI"/>
+    <service id=".service_locator.b3SM2he" alias=".service_locator._.8m7iI"/>
+    <service id=".service_locator.5s55BzF" alias=".service_locator.B5ivxPI"/>
+    <service id=".service_locator.XHe2yvB" alias=".service_locator.JXL9rIl"/>
+    <service id=".service_locator.wVAAdM2" alias=".service_locator.a4S3t4n"/>
+    <service id=".service_locator.QpGQ59L" alias=".service_locator.gP9tAk1"/>
+    <service id=".service_locator.iGv7AMI" alias=".service_locator.hBSwCYJ"/>
+    <service id=".service_locator._FeHp.v" alias=".service_locator.BND6xNB"/>
     <service id=".service_locator.LnYNlH_" alias=".service_locator.FL1_dBi"/>
     <service id=".service_locator.yYBe_KY" alias=".service_locator.RS.51pb"/>
     <service id=".service_locator.sUmDViS" alias=".service_locator.mvGX7gD"/>
@@ -13508,7 +13591,7 @@
     <service id=".service_locator.SoFxSjl" alias=".service_locator.uURT18R"/>
     <service id=".service_locator.Odyyg4J" alias=".service_locator.zy9Sz.w"/>
     <service id=".service_locator.18YFTzl" alias=".service_locator.f4l_PHz"/>
-    <service id=".service_locator.uBXxleh" alias=".service_locator.Ccg8tS2"/>
+    <service id=".service_locator.T6H2AdN" alias=".service_locator.Ccg8tS2"/>
     <service id=".service_locator.dGUCsbe" alias=".service_locator.oR77BOj"/>
     <service id=".service_locator._kIAbz1" alias=".service_locator.TpoC7U9"/>
     <service id=".service_locator.hnz5ZNh" alias=".service_locator.0TACwl3"/>

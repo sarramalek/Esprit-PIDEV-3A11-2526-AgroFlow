@@ -1,123 +1,419 @@
 {# templates/machines/index.html.twig #}
 {% extends 'agriculteur_dashboard.html.twig' %}
-{% block title %}Mes Machines — AgroFlow{% endblock %}
+
+{% block title %}Mes Machines - AgroFlow{% endblock %}
 
 {% block body %}
 <style>
     :root {
-        --green-dark:  #2d5a1b;
-        --green-mid:   #3a7a22;
+        --green-dark: #2d5a1b;
         --green-light: #f0f7eb;
-        --green-border:#c8e6b0;
-        --text-dark:   #1a2e10;
-        --text-mid:    #4a6741;
-        --text-light:  #7a9b6a;
-        --white:       #ffffff;
-        --cream:       #f8fdf4;
-        --shadow:      0 4px 16px rgba(45,90,27,0.10);
+        --success: #28a745;
+        --warning: #ffc107;
+        --danger: #dc3545;
+        --info: #17a2b8;
     }
 
-    * { box-sizing: border-box; }
-
-    .page-wrap { max-width: 1400px; margin: 0 auto; padding: 1.5rem; }
-
-    .flash { padding: .75rem 1.1rem; border-radius: 10px; margin-bottom: 1rem; font-weight: 500; font-size: .92rem; }
-    .flash-success { background: #e6f4e0; color: #1e5c0e; border: 1px solid #b4dba0; }
-    .flash-error   { background: #fdecea; color: #8b1a1a; border: 1px solid #f3b8b0; }
-
-    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.8rem; flex-wrap: wrap; gap: 1rem; }
-    .page-header h1 { margin: 0; font-size: 1.8rem; font-weight: 700; color: var(--text-dark); }
-
-    .btn { display: inline-flex; align-items: center; gap: .45rem; padding: .6rem 1.3rem; border-radius: 10px; font-weight: 600; font-size: .88rem; text-decoration: none; cursor: pointer; border: none; font-family: inherit; transition: all .18s; }
-    .btn-primary   { background: var(--green-dark); color: #fff; }
-    .btn-primary:hover { background: #1f4012; transform: translateY(-1px); box-shadow: 0 3px 10px rgba(45,90,27,.25); }
-    .btn-secondary { background: var(--green-light); color: var(--green-dark); border: 1px solid var(--green-border); }
-    .btn-secondary:hover { background: #dff0d3; }
-
-    .filters-bar { background: var(--white); border-radius: 14px; box-shadow: var(--shadow); padding: 1.2rem 1.5rem; margin-bottom: 1.6rem; }
-    .filters-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: .8rem; margin-bottom: .8rem; }
-    .f-group { display: flex; flex-direction: column; gap: .3rem; }
-    .f-group label { font-size: .72rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: .5px; }
-    .f-group input, .f-group select { padding: .65rem .85rem; border: 1.5px solid var(--green-border); border-radius: 9px; font-size: .88rem; background: var(--cream); outline: none; font-family: inherit; transition: border-color .18s; }
-    .f-group input:focus, .f-group select:focus { border-color: var(--green-dark); }
-    .filters-actions { display: flex; gap: .7rem; justify-content: flex-end; }
-
-    .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 1.4rem; }
-
-    .machine-card {
-        background: var(--white);
-        border-radius: 18px;
-        box-shadow: var(--shadow);
-        overflow: hidden;
-        transition: transform .2s, box-shadow .2s;
-        display: flex;
-        flex-direction: column;
+    * {
+        box-sizing: border-box;
     }
-    .machine-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(45,90,27,.15); }
 
-    .card-header {
-        background: var(--green-dark);
-        padding: 1.1rem 1.3rem .95rem;
+    .page-wrap {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 1.5rem;
+    }
+
+    /* Flash messages */
+    .flash {
+        padding: 0.75rem 1.1rem;
+        border-radius: 10px;
+        margin-bottom: 1rem;
+        font-weight: 500;
+    }
+    .flash-success {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    .flash-error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    /* Header */
+    .page-header {
         display: flex;
         justify-content: space-between;
-        align-items: flex-start;
-        gap: .5rem;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 1rem;
     }
-    .card-header-left { flex: 1; min-width: 0; }
-    .card-title    { margin: 0 0 .2rem 0; font-size: 1.08rem; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .card-subtitle { font-size: .82rem; color: #b5d9a0; display: flex; align-items: center; gap: .3rem; }
+    .page-header h1 {
+        margin: 0;
+        font-size: 1.8rem;
+        color: var(--green-dark);
+    }
 
-    .badge          { padding: .28rem .85rem; border-radius: 50px; font-size: .78rem; font-weight: 700; white-space: nowrap; }
-    .badge-neuf     { background: #d4edda; color: #155724; }
-    .badge-bon      { background: #cce5ff; color: #004085; }
-    .badge-occasion { background: #fff3cd; color: #856404; }
-    .badge-panne    { background: #f8d7da; color: #721c24; }
+    /* Boutons */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.6rem 1.3rem;
+        border-radius: 10px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s;
+        cursor: pointer;
+        border: none;
+        font-family: inherit;
+    }
+    .btn-primary {
+        background: var(--green-dark);
+        color: white;
+    }
+    .btn-primary:hover {
+        background: #1f4012;
+        transform: translateY(-2px);
+    }
+    .btn-secondary {
+        background: var(--green-light);
+        color: var(--green-dark);
+        border: 1px solid #c8e6b0;
+    }
+    .btn-secondary:hover {
+        background: #dff0d3;
+    }
+    .btn-pdf {
+        background: #dc3545;
+        color: white;
+    }
+    .btn-pdf:hover {
+        background: #c82333;
+    }
 
-    .card-stats { display: flex; border-bottom: 1px solid #eef5e8; }
-    .stat-item { flex: 1; padding: .85rem .5rem; text-align: center; border-right: 1px solid #eef5e8; }
-    .stat-item:last-child { border-right: none; }
-    .stat-value { font-size: 1.18rem; font-weight: 700; color: var(--text-dark); line-height: 1; }
-    .stat-label { font-size: .66rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--text-light); margin-top: .2rem; }
+    /* Filtres */
+    .filters-bar {
+        background: white;
+        border-radius: 14px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        padding: 1.2rem 1.5rem;
+        margin-bottom: 1.6rem;
+    }
+    .filters-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 0.8rem;
+        margin-bottom: 0.8rem;
+    }
+    .f-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+    .f-group label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #666;
+        text-transform: uppercase;
+    }
+    .f-group input, .f-group select {
+        padding: 0.65rem 0.85rem;
+        border: 1.5px solid #c8e6b0;
+        border-radius: 9px;
+        font-size: 0.88rem;
+        background: #f8fdf4;
+        outline: none;
+    }
+    .f-group input:focus, .f-group select:focus {
+        border-color: var(--green-dark);
+    }
+    .filters-actions {
+        display: flex;
+        gap: 0.7rem;
+        justify-content: flex-end;
+    }
 
-    .maintenance-alert { margin: .6rem 1rem 0; padding: .5rem .75rem; border-radius: 8px; font-size: .78rem; font-weight: 500; }
-    .alert-overdue { background: #fdecea; color: #8b1a1a; border: 1px solid #f3b8b0; }
-    .alert-soon    { background: #fff8e6; color: #7a5700; border: 1px solid #f0d88a; }
+    /* Grille des cartes */
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1.5rem;
+    }
 
-    .card-actions { padding: .85rem 1rem; display: flex; gap: .5rem; align-items: center; margin-top: auto; }
+    /* Carte machine */
+    .machine-card {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .machine-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+
+    /* Badges pour l'état */
+    .badge-etat {
+        display: inline-block;
+        padding: 6px 14px;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .badge-etat:hover {
+        transform: scale(1.05);
+        filter: brightness(0.95);
+    }
+    .badge-neuf {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: white;
+    }
+    .badge-bon {
+        background: linear-gradient(135deg, #17a2b8, #6f42c1);
+        color: white;
+    }
+    .badge-occasion {
+        background: linear-gradient(135deg, #ffc107, #fd7e14);
+        color: white;
+    }
+    .badge-panne {
+        background: linear-gradient(135deg, #dc3545, #e83e8c);
+        color: white;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    /* Modal/Popup pour l'état */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.6);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(3px);
+    }
+    .modal-content {
+        background: white;
+        border-radius: 24px;
+        padding: 0;
+        max-width: 450px;
+        width: 90%;
+        animation: slideIn 0.3s ease;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    @keyframes slideIn {
+        from {
+            transform: translateY(-50px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+    .modal-header {
+        padding: 20px;
+        text-align: center;
+        color: white;
+    }
+    .modal-header-neuf { background: linear-gradient(135deg, #28a745, #20c997); }
+    .modal-header-bon { background: linear-gradient(135deg, #17a2b8, #6f42c1); }
+    .modal-header-occasion { background: linear-gradient(135deg, #ffc107, #fd7e14); }
+    .modal-header-panne { background: linear-gradient(135deg, #dc3545, #e83e8c); }
+    
+    .modal-icon {
+        font-size: 64px;
+        margin-bottom: 10px;
+    }
+    .modal-title {
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    .modal-subtitle {
+        font-size: 14px;
+        opacity: 0.9;
+    }
+    .modal-body {
+        padding: 20px;
+    }
+    .etat-description {
+        color: #555;
+        line-height: 1.6;
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+    .etat-conseil {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 12px;
+        margin: 15px 0;
+        border-left: 4px solid var(--green-dark);
+    }
+    .etat-conseil p {
+        margin: 5px 0;
+        font-size: 13px;
+    }
+    .etat-stats {
+        display: flex;
+        justify-content: space-around;
+        margin: 15px 0;
+        padding: 10px;
+        background: #e9ecef;
+        border-radius: 12px;
+    }
+    .etat-stat {
+        text-align: center;
+    }
+    .etat-stat-value {
+        font-size: 20px;
+        font-weight: bold;
+        color: var(--green-dark);
+    }
+    .etat-stat-label {
+        font-size: 11px;
+        color: #666;
+    }
+    .modal-footer {
+        padding: 15px 20px;
+        display: flex;
+        justify-content: center;
+        border-top: 1px solid #eee;
+    }
+    .close-modal {
+        background: var(--green-dark);
+        color: white;
+        border: none;
+        padding: 10px 25px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+    .close-modal:hover {
+        background: #1f4012;
+        transform: scale(1.02);
+    }
+
+    /* Stats machine */
+    .stats-grid {
+        display: flex;
+        justify-content: space-around;
+        padding: 15px;
+        background: #f8f9fa;
+        border-top: 1px solid #eee;
+        border-bottom: 1px solid #eee;
+    }
+    .stat {
+        text-align: center;
+    }
+    .stat-value {
+        font-size: 20px;
+        font-weight: bold;
+        color: var(--green-dark);
+    }
+    .stat-label {
+        font-size: 11px;
+        color: #666;
+        text-transform: uppercase;
+        margin-top: 4px;
+    }
+
+    /* Maintenance alert */
+    .maintenance-alert {
+        margin: 10px;
+        padding: 8px 12px;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    .alert-overdue {
+        background: #f8d7da;
+        color: #721c24;
+        border-left: 4px solid #dc3545;
+    }
+    .alert-soon {
+        background: #fff3cd;
+        color: #856404;
+        border-left: 4px solid #ffc107;
+    }
+
+    /* Boutons d'action */
+    .card-actions {
+        padding: 12px;
+        display: flex;
+        gap: 8px;
+        background: white;
+    }
     .action-btn {
-        display: inline-flex; align-items: center; gap: .3rem;
-        padding: .45rem .95rem; border-radius: 20px; font-size: .8rem; font-weight: 600;
-        text-decoration: none; transition: all .16s; border: 1.5px solid transparent;
-        cursor: pointer; white-space: nowrap; background: none; font-family: inherit;
+        flex: 1;
+        padding: 8px;
+        text-align: center;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+        transition: all 0.2s;
+        cursor: pointer;
     }
-    .btn-view { background: #f0f7eb; color: var(--green-dark); border-color: var(--green-border); }
-    .btn-view:hover { background: #dff0d3; }
-    .btn-edit { background: #fff8ee; color: #b96b00; border-color: #ffd9a0; }
-    .btn-edit:hover { background: #ffecd1; border-color: #f0bb70; }
-    .btn-delete { background: #fdf0f0; color: #c53030; border-color: #f5c6cb; padding: .45rem .6rem; }
-    .btn-delete:hover { background: #fde0e0; }
-    .form-inline { display: contents; }
+    .btn-view {
+        background: #e9ecef;
+        color: #495057;
+    }
+    .btn-view:hover {
+        background: #dee2e6;
+    }
+    .btn-edit {
+        background: #fff3cd;
+        color: #856404;
+    }
+    .btn-edit:hover {
+        background: #ffeaa7;
+    }
+    .btn-delete {
+        background: #f8d7da;
+        color: #721c24;
+        border: none;
+        font-family: inherit;
+    }
+    .btn-delete:hover {
+        background: #f5c6cb;
+    }
+    .form-inline {
+        flex: 1;
+    }
 
-    .empty-state { text-align: center; padding: 4rem 2rem; color: var(--text-light); font-size: 1rem; line-height: 2; }
-    .result-count { text-align: center; color: var(--text-light); font-size: .82rem; margin-top: 1.2rem; }
-
-    /* Styles pour la pagination */
+    /* Pagination */
     .pagination-container {
         margin-top: 2rem;
         display: flex;
         justify-content: center;
     }
-    .pagination-wrapper {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
-    }
     .pagination-buttons {
         display: flex;
-        gap: .8rem;
+        gap: 0.8rem;
         align-items: center;
-        justify-content: center;
         flex-wrap: wrap;
     }
     .page-btn {
@@ -128,272 +424,296 @@
         padding: 0.6rem 1.2rem;
         border-radius: 10px;
         font-weight: 700;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: all 0.2s;
         text-decoration: none;
+        transition: all 0.2s;
         border: 2px solid transparent;
     }
     .page-btn-active {
         background: var(--green-dark);
         color: white;
-        box-shadow: 0 2px 8px rgba(45,90,27,0.3);
-        border-color: var(--green-dark);
-    }
-    .page-btn-inactive {
-        background: #f2f7ee;
-        color: var(--text-light);
-        border: 2px solid var(--green-border);
-        cursor: not-allowed;
-        opacity: 0.6;
-    }
-    .page-btn-inactive:hover {
-        transform: none;
-        background: #f2f7ee;
     }
     .page-btn-active:hover {
         background: #1f4012;
         transform: translateY(-2px);
     }
-    .pagination-status {
-        display: flex;
-        gap: 1.5rem;
-        justify-content: center;
-        align-items: center;
-        padding: 0.5rem 1rem;
-        background: var(--cream);
-        border-radius: 50px;
-        border: 1px solid var(--green-border);
-    }
-    .status-item {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 0.85rem;
-        font-weight: 600;
-    }
-    .status-dot {
-        display: inline-block;
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-    }
-    .status-dot-active {
-        background: var(--green-dark);
-        box-shadow: 0 0 0 2px rgba(45,90,27,0.2);
-    }
-    .status-dot-inactive {
-        background: #e0e0e0;
-    }
-    .status-text-active {
-        color: var(--green-dark);
-    }
-    .status-text-inactive {
-        color: var(--text-light);
+    .page-btn-inactive {
+        background: #f2f7ee;
+        color: #999;
+        border: 2px solid #c8e6b0;
+        cursor: not-allowed;
+        opacity: 0.6;
     }
     .page-number {
         font-weight: 700;
-        margin: 0 0.5rem;
-        color: var(--text-dark);
+        color: var(--green-dark);
+    }
+    .result-count {
+        text-align: center;
+        color: #666;
+        font-size: 0.85rem;
+        margin-top: 1.5rem;
+    }
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #999;
     }
 </style>
 
 <div class="page-wrap">
-
+    <!-- Flash messages -->
     {% for label, messages in app.flashes %}
         {% for message in messages %}
-            <div class="flash flash-{{ label == 'success' ? 'success' : 'error' }}">{{ message }}</div>
+            <div class="flash flash-{{ label == 'success' ? 'success' : 'error' }}">
+                {{ message }}
+            </div>
         {% endfor %}
     {% endfor %}
 
+    <!-- Header -->
     <div class="page-header">
-        <h1>⚙️ Mes Machines</h1>
-        <div style="display:flex;gap:.7rem;">
+        <h1>⚙️ Mes Machines Agricoles</h1>
+        <div style="display: flex; gap: 0.7rem;">
             <a href="{{ path('agri_machine_new') }}" class="btn btn-primary">➕ Ajouter</a>
             <a href="{{ path('agri_machine_statistiques') }}" class="btn btn-secondary">📊 Statistiques</a>
+            <a href="{{ path('agri_machine_export_pdf', app.request.query.all) }}" class="btn btn-pdf" target="_blank">📄 Exporter PDF</a>
         </div>
     </div>
 
-    {# ── Barre de filtres ── #}
+    <!-- Filtres -->
     <div class="filters-bar">
         <div class="filters-grid">
             <div class="f-group">
                 <label>🔍 Recherche</label>
                 <input type="text" id="filter-search" placeholder="Nom, marque, modèle..."
-                       value="{{ app.request.query.get('search','') }}">
+                       value="{{ app.request.query.get('search', '') }}">
             </div>
             <div class="f-group">
                 <label>📊 État</label>
                 <select id="filter-etat">
                     <option value="">Tous les états</option>
-                    {% for opt in ['Neuf','Bon','Occasion','En panne'] %}
-                        <option value="{{ opt }}" {{ app.request.query.get('etat','') == opt ? 'selected' : '' }}>{{ opt }}</option>
+                    {% for opt in ['Neuf', 'Bon', 'Occasion', 'En panne'] %}
+                        <option value="{{ opt }}" {{ app.request.query.get('etat', '') == opt ? 'selected' : '' }}>
+                            {{ opt }}
+                        </option>
                     {% endfor %}
                 </select>
             </div>
             <div class="f-group">
                 <label>📋 Trier par</label>
                 <select id="filter-sortBy">
-                    <option value="dateAchat"   {{ app.request.query.get('sortBy','dateAchat') == 'dateAchat'   ? 'selected':'' }}>📅 Date d'achat</option>
-                    <option value="marque"      {{ app.request.query.get('sortBy','dateAchat') == 'marque'      ? 'selected':'' }}>🏭 Marque</option>
-                    <option value="kilometrage" {{ app.request.query.get('sortBy','dateAchat') == 'kilometrage' ? 'selected':'' }}>📊 Kilométrage</option>
+                    <option value="dateAchat" {{ app.request.query.get('sortBy', 'dateAchat') == 'dateAchat' ? 'selected' : '' }}>
+                        📅 Date d'achat
+                    </option>
+                    <option value="marque" {{ app.request.query.get('sortBy', 'dateAchat') == 'marque' ? 'selected' : '' }}>
+                        🏭 Marque
+                    </option>
+                    <option value="kilometrage" {{ app.request.query.get('sortBy', 'dateAchat') == 'kilometrage' ? 'selected' : '' }}>
+                        📊 Kilométrage
+                    </option>
                 </select>
             </div>
             <div class="f-group">
                 <label>⬆⬇ Ordre</label>
                 <select id="filter-sortDir">
-                    <option value="DESC" {{ app.request.query.get('sortDir','DESC') == 'DESC' ? 'selected':'' }}>↓ Décroissant</option>
-                    <option value="ASC"  {{ app.request.query.get('sortDir','DESC') == 'ASC'  ? 'selected':'' }}>↑ Croissant</option>
+                    <option value="DESC" {{ app.request.query.get('sortDir', 'DESC') == 'DESC' ? 'selected' : '' }}>
+                        ↓ Décroissant
+                    </option>
+                    <option value="ASC" {{ app.request.query.get('sortDir', 'DESC') == 'ASC' ? 'selected' : '' }}>
+                        ↑ Croissant
+                    </option>
                 </select>
             </div>
         </div>
         <div class="filters-actions">
-            <button type="button" class="btn btn-primary"   onclick="submitFilters()">🔎 Filtrer</button>
+            <button type="button" class="btn btn-primary" onclick="submitFilters()">🔎 Filtrer</button>
             <button type="button" class="btn btn-secondary" onclick="resetFilters()">⟳ Réinitialiser</button>
         </div>
     </div>
 
-    {% set machinesList = machinesPagination is defined ? machinesPagination : machines %}
-
-    {# ── Grille de cartes ── #}
-    {% if machinesList|length == 0 %}
+    <!-- Grille des machines -->
+    {% if machines|length == 0 %}
         <div class="empty-state">
             🤷 Aucune machine trouvée.<br>
-            <a href="{{ path('agri_machine_new') }}" style="color:var(--green-dark);display:inline-block;margin-top:.5rem;">➕ Ajouter votre première machine</a>
+            <a href="{{ path('agri_machine_new') }}" style="color: var(--green-dark); display: inline-block; margin-top: 0.5rem;">
+                ➕ Ajouter votre première machine
+            </a>
         </div>
     {% else %}
         <div class="cards-grid">
-            {% for machine in machinesList %}
-
-                {% if machine.etatM == 'Neuf' %}         {% set bc = 'badge-neuf' %}
-                {% elseif machine.etatM == 'Bon' %}      {% set bc = 'badge-bon' %}
-                {% elseif machine.etatM == 'Occasion' %} {% set bc = 'badge-occasion' %}
-                {% else %}                                {% set bc = 'badge-panne' %}
-                {% endif %}
-
+            {% for machine in machines %}
                 {% set today = date() %}
                 {% set alertClass = '' %}
-                {% set alertMsg   = '' %}
+                {% set alertMsg = '' %}
                 {% if machine.prochaineMaintenance %}
                     {% if machine.prochaineMaintenance < today %}
                         {% set alertClass = 'alert-overdue' %}
-                        {% set alertMsg   = '🔴 Maintenance dépassée !' %}
+                        {% set alertMsg = '🔴 Maintenance dépassée !' %}
                     {% elseif machine.prochaineMaintenance <= date('+30 days') %}
                         {% set alertClass = 'alert-soon' %}
-                        {% set alertMsg   = '⚠️ Maintenance le ' ~ machine.prochaineMaintenance|date('d/m/Y') %}
+                        {% set alertMsg = '⚠️ Maintenance le ' ~ machine.prochaineMaintenance|date('d/m/Y') %}
                     {% endif %}
                 {% endif %}
-
+                
+                {# Définition des classes et messages pour l'état #}
+                {% if machine.etatM == 'Neuf' %}
+                    {% set badgeClass = 'badge-neuf' %}
+                    {% set modalHeaderClass = 'modal-header-neuf' %}
+                    {% set etatIcon = '✨' %}
+                    {% set etatTitle = 'Machine Neuve' %}
+                    {% set etatDesc = 'Cette machine est en parfait état, comme neuve. Elle n\'a quasiment pas été utilisée ou vient d\'être achetée.' %}
+                    {% set etatConseil = '✓ Respectez la période de rodage\n✓ Effectuez la première révision comme préconisé\n✓ Enregistrez toutes les interventions pour la garantie' %}
+                {% elseif machine.etatM == 'Bon' %}
+                    {% set badgeClass = 'badge-bon' %}
+                    {% set modalHeaderClass = 'modal-header-bon' %}
+                    {% set etatIcon = '👍' %}
+                    {% set etatTitle = 'État Bon' %}
+                    {% set etatDesc = 'La machine est en bon état de fonctionnement. L\'entretien régulier a été respecté.' %}
+                    {% set etatConseil = '✓ Continuez l\'entretien régulier\n✓ Surveillez les signes d\'usure\n✓ Programmez les maintenances préventives' %}
+                {% elseif machine.etatM == 'Occasion' %}
+                    {% set badgeClass = 'badge-occasion' %}
+                    {% set modalHeaderClass = 'modal-header-occasion' %}
+                    {% set etatIcon = '🔄' %}
+                    {% set etatTitle = 'Machine d\'Occasion' %}
+                    {% set etatDesc = 'Cette machine a déjà été utilisée. Elle nécessite une surveillance accrue.' %}
+                    {% set etatConseil = '✓ Faites un contrôle technique complet\n✓ Vérifiez l\'historique d\'entretien\n✓ Prévoyez un budget maintenance plus élevé' %}
+                {% else %}
+                    {% set badgeClass = 'badge-panne' %}
+                    {% set modalHeaderClass = 'modal-header-panne' %}
+                    {% set etatIcon = '🔧' %}
+                    {% set etatTitle = 'Machine en Panne' %}
+                    {% set etatDesc = 'Cette machine est actuellement hors service et nécessite une réparation urgente.' %}
+                    {% set etatConseil = '✓ Diagnostiquez la panne immédiatement\n✓ Commandez les pièces nécessaires\n✓ Contactez le service après-vente\n✓ Estimez le délai de réparation' %}
+                {% endif %}
+                
                 <div class="machine-card">
-                    <div class="card-header">
-                        <div class="card-header-left">
-                            <div class="card-title">{{ machine.nom }}</div>
-                            <div class="card-subtitle">📍 {{ machine.marque }} · {{ machine.modele }}</div>
+                    <!-- En-tête -->
+                    <div class="card-header" style="background: var(--green-dark); padding: 20px; display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div style="flex: 1;">
+                            <h3 style="margin: 0 0 5px; color: white; font-size: 1.2rem;">{{ machine.nom }}</h3>
+                            <p style="margin: 0; opacity: 0.9; font-size: 12px; color: #b5d9a0;">{{ machine.marque }} {{ machine.modele }}</p>
                         </div>
-                        <span class="badge {{ bc }}">{{ machine.etatM }}</span>
+                        <button class="badge-etat {{ badgeClass }}" onclick="showEtatModal(
+                            '{{ etatIcon }}',
+                            '{{ etatTitle }}',
+                            '{{ machine.etatM }}',
+                            '{{ etatDesc }}',
+                            '{{ etatConseil|nl2br }}',
+                            {{ machine.kilometrage|default(0) }},
+                            '{{ machine.dateAchat ? machine.dateAchat|date('Y') : 'N/A' }}',
+                            {{ machine.prochaineMaintenance ? machine.prochaineMaintenance|date('U') : 0 }}
+                        )">
+                            {{ machine.etatM }}
+                        </button>
                     </div>
-
+                    
+                    <!-- Alerte maintenance -->
                     {% if alertClass %}
                         <div class="maintenance-alert {{ alertClass }}">{{ alertMsg }}</div>
                     {% endif %}
-
-                    <div class="card-stats">
-                        <div class="stat-item">
-                            <div class="stat-value">{{ machine.kilometrage|number_format(0,',',' ') }}</div>
+                    
+                    <!-- Statistiques -->
+                    <div class="stats-grid">
+                        <div class="stat">
+                            <div class="stat-value">{{ machine.kilometrage|number_format(0, ',', ' ') }}</div>
                             <div class="stat-label">KM</div>
                         </div>
-                        <div class="stat-item">
-                            <div class="stat-value">{{ machine.dateAchat ? machine.dateAchat|date('Y') : '—' }}</div>
-                            <div class="stat-label">ACHAT</div>
+                        <div class="stat">
+                            <div class="stat-value">{{ machine.dateAchat ? machine.dateAchat|date('Y') : '-' }}</div>
+                            <div class="stat-label">ANNÉE ACHAT</div>
                         </div>
-                        <div class="stat-item">
-                            <div class="stat-value">{{ machine.prochaineMaintenance ? machine.prochaineMaintenance|date('m/Y') : '—' }}</div>
-                            <div class="stat-label">MAINTENANCE</div>
+                        <div class="stat">
+                            <div class="stat-value">{{ machine.prochaineMaintenance ? machine.prochaineMaintenance|date('d/m/Y') : '-' }}</div>
+                            <div class="stat-label">PROCHAINE MAINTENANCE</div>
                         </div>
                     </div>
-
+                    
+                    <!-- Boutons d'action -->
                     <div class="card-actions">
                         <a href="{{ path('agri_machine_show', {id: machine.id}) }}" class="action-btn btn-view">👁 Voir</a>
                         <a href="{{ path('agri_machine_edit', {id: machine.id}) }}" class="action-btn btn-edit">✏️ Modifier</a>
-                        <div style="margin-left:auto;">
-                            <form method="post" action="{{ path('agri_machine_delete', {id: machine.id}) }}" class="form-inline"
-                                  onsubmit="return confirm('⚠️ Supprimer « {{ machine.nom }} » ?\nCette action est irréversible.');">
-                                <input type="hidden" name="_token" value="{{ csrf_token('delete_machine_' ~ machine.id) }}">
-                                <button type="submit" class="action-btn btn-delete" title="Supprimer">
-                                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                        <polyline points="3 6 5 6 21 6"/>
-                                        <path d="M19 6l-1 14H6L5 6"/>
-                                        <path d="M10 11v6M14 11v6"/>
-                                        <path d="M9 6V4h6v2"/>
-                                    </svg>
-                                </button>
-                            </form>
-                        </div>
+                        <form method="post" action="{{ path('agri_machine_delete', {id: machine.id}) }}" class="form-inline"
+                              onsubmit="return confirm('⚠️ Supprimer « {{ machine.nom }} » ?\nCette action est irréversible.');">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete_machine_' ~ machine.id) }}">
+                            <button type="submit" class="action-btn btn-delete" style="width: 100%;">🗑️ Supprimer</button>
+                        </form>
                     </div>
                 </div>
-
             {% endfor %}
         </div>
 
-        {# ── Pagination avec boutons 0 (inactif) et 1 (actif) ── #}
+        <!-- Pagination -->
         {% if machinesPagination is defined and machinesPagination.pageCount > 1 %}
             <div class="pagination-container">
-                <div class="pagination-wrapper">
-                    <div class="pagination-buttons">
-                        {# Bouton 0 (INACTIF) - représente la page précédente #}
-                        {% set prevPage = machinesPagination.getCurrentPageNumber > 1 ? machinesPagination.getCurrentPageNumber - 1 : 1 %}
-                        {% set isPrevActive = machinesPagination.getCurrentPageNumber > 1 %}
-                        
-                        <a href="{{ isPrevActive ? path('agri_machines', app.request.query.all|merge({page: prevPage})) : 'javascript:void(0)' }}" 
-                           class="page-btn {{ isPrevActive ? 'page-btn-active' : 'page-btn-inactive' }}"
-                           {% if not isPrevActive %} onclick="return false;" {% endif %}>
-                            ⬅️ 0
-                        </a>
+                <div class="pagination-buttons">
+                    {% set prevPage = machinesPagination.getCurrentPageNumber > 1 ? machinesPagination.getCurrentPageNumber - 1 : 1 %}
+                    {% set isPrevActive = machinesPagination.getCurrentPageNumber > 1 %}
+                    
+                    <a href="{{ isPrevActive ? path('agri_machines', app.request.query.all|merge({page: prevPage})) : 'javascript:void(0)' }}" 
+                       class="page-btn {{ isPrevActive ? 'page-btn-active' : 'page-btn-inactive' }}"
+                       {% if not isPrevActive %} onclick="return false;" {% endif %}>
+                        ⬅️ Précédent
+                    </a>
 
-                        {# Affichage du numéro de page actuel #}
-                        <span class="page-number">Page {{ machinesPagination.getCurrentPageNumber }} / {{ machinesPagination.pageCount }}</span>
+                    <span class="page-number">Page {{ machinesPagination.getCurrentPageNumber }} / {{ machinesPagination.pageCount }}</span>
 
-                        {# Bouton 1 (ACTIF) - représente la page suivante #}
-                        {% set nextPage = machinesPagination.getCurrentPageNumber < machinesPagination.pageCount ? machinesPagination.getCurrentPageNumber + 1 : machinesPagination.pageCount %}
-                        {% set isNextActive = machinesPagination.getCurrentPageNumber < machinesPagination.pageCount %}
-                        
-                        <a href="{{ isNextActive ? path('agri_machines', app.request.query.all|merge({page: nextPage})) : 'javascript:void(0)' }}" 
-                           class="page-btn {{ isNextActive ? 'page-btn-active' : 'page-btn-inactive' }}"
-                           {% if not isNextActive %} onclick="return false;" {% endif %}>
-                            1 ➡️
-                        </a>
-                    </div>
-
-                    {# Légende des statuts #}
-                    <div class="pagination-status">
-                        <div class="status-item">
-                            <span class="status-dot status-dot-inactive"></span>
-                            <span class="status-text-inactive">0 = Inactif (page précédente non disponible)</span>
-                        </div>
-                        <div class="status-item">
-                            <span class="status-dot status-dot-active"></span>
-                            <span class="status-text-active">1 = Actif (page suivante disponible)</span>
-                        </div>
-                    </div>
+                    {% set nextPage = machinesPagination.getCurrentPageNumber < machinesPagination.pageCount ? machinesPagination.getCurrentPageNumber + 1 : machinesPagination.pageCount %}
+                    {% set isNextActive = machinesPagination.getCurrentPageNumber < machinesPagination.pageCount %}
+                    
+                    <a href="{{ isNextActive ? path('agri_machines', app.request.query.all|merge({page: nextPage})) : 'javascript:void(0)' }}" 
+                       class="page-btn {{ isNextActive ? 'page-btn-active' : 'page-btn-inactive' }}"
+                       {% if not isNextActive %} onclick="return false;" {% endif %}>
+                        Suivant ➡️
+                    </a>
                 </div>
             </div>
         {% endif %}
 
-        {# ── Compteur ── #}
+        <!-- Compteur -->
         <div class="result-count">
-            📊 {{ machinesPagination is defined ? machinesPagination.getTotalItemCount : machinesList|length }} machine(s) trouvée(s)
+            📊 {{ machinesPagination is defined ? machinesPagination.getTotalItemCount : machines|length }} machine(s) trouvée(s)
         </div>
-
     {% endif %}
+</div>
 
+<!-- Modal/Popup pour l'état de la machine -->
+<div id="etatModal" class="modal" onclick="if(event.target===this) closeModal()">
+    <div class="modal-content">
+        <div class="modal-header" id="modalHeader">
+            <div class="modal-icon" id="modalIcon">✨</div>
+            <div class="modal-title" id="modalTitle">Machine Neuve</div>
+            <div class="modal-subtitle" id="modalSubtitle">Neuf</div>
+        </div>
+        <div class="modal-body">
+            <div class="etat-description" id="modalDescription"></div>
+            <div class="etat-stats">
+                <div class="etat-stat">
+                    <div class="etat-stat-value" id="modalKm">0</div>
+                    <div class="etat-stat-label">KILOMÉTRAGE</div>
+                </div>
+                <div class="etat-stat">
+                    <div class="etat-stat-value" id="modalYear">-</div>
+                    <div class="etat-stat-label">ANNÉE ACHAT</div>
+                </div>
+                <div class="etat-stat">
+                    <div class="etat-stat-value" id="modalMaintenance">-</div>
+                    <div class="etat-stat-label">PROCHAINE MAINTENANCE</div>
+                </div>
+            </div>
+            <div class="etat-conseil" id="modalConseil"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="close-modal" onclick="closeModal()">Fermer</button>
+        </div>
+    </div>
 </div>
 
 <script>
 function submitFilters() {
     const params = new URLSearchParams({
-        search:  document.getElementById('filter-search').value,
-        etat:    document.getElementById('filter-etat').value,
-        sortBy:  document.getElementById('filter-sortBy').value,
+        search: document.getElementById('filter-search').value,
+        etat: document.getElementById('filter-etat').value,
+        sortBy: document.getElementById('filter-sortBy').value,
         sortDir: document.getElementById('filter-sortDir').value,
     });
     window.location.href = '{{ path('agri_machines') }}?' + params.toString();
@@ -405,6 +725,66 @@ function resetFilters() {
 
 document.getElementById('filter-search').addEventListener('keydown', function(e) {
     if (e.key === 'Enter') submitFilters();
+});
+
+// Fonction pour afficher le modal avec les détails de l'état
+function showEtatModal(icon, title, etat, description, conseil, km, year, maintenanceDate) {
+    const modal = document.getElementById('etatModal');
+    const modalHeader = document.getElementById('modalHeader');
+    const modalIcon = document.getElementById('modalIcon');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalSubtitle = document.getElementById('modalSubtitle');
+    const modalDescription = document.getElementById('modalDescription');
+    const modalConseil = document.getElementById('modalConseil');
+    const modalKm = document.getElementById('modalKm');
+    const modalYear = document.getElementById('modalYear');
+    const modalMaintenance = document.getElementById('modalMaintenance');
+    
+    // Réinitialiser les classes
+    modalHeader.className = 'modal-header';
+    
+    // Ajouter la classe correspondante
+    if (etat === 'Neuf') {
+        modalHeader.classList.add('modal-header-neuf');
+    } else if (etat === 'Bon') {
+        modalHeader.classList.add('modal-header-bon');
+    } else if (etat === 'Occasion') {
+        modalHeader.classList.add('modal-header-occasion');
+    } else {
+        modalHeader.classList.add('modal-header-panne');
+    }
+    
+    // Mettre à jour le contenu
+    modalIcon.innerHTML = icon;
+    modalTitle.innerHTML = title;
+    modalSubtitle.innerHTML = etat;
+    modalDescription.innerHTML = description;
+    modalConseil.innerHTML = '<strong>💡 RECOMMANDATIONS</strong><br>' + conseil.replace(/\n/g, '<br>');
+    modalKm.innerHTML = km.toLocaleString('fr-FR');
+    modalYear.innerHTML = year;
+    
+    if (maintenanceDate > 0) {
+        const date = new Date(maintenanceDate * 1000);
+        modalMaintenance.innerHTML = date.toLocaleDateString('fr-FR');
+    } else {
+        modalMaintenance.innerHTML = 'Non planifiée';
+    }
+    
+    // Afficher le modal
+    modal.style.display = 'flex';
+}
+
+// Fonction pour fermer le modal
+function closeModal() {
+    const modal = document.getElementById('etatModal');
+    modal.style.display = 'none';
+}
+
+// Fermer le modal avec la touche Echap
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeModal();
+    }
 });
 </script>
 {% endblock %}

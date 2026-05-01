@@ -1,0 +1,1485 @@
+{# templates/maintenances/chatbot.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}AgroBot — Assistant Maintenance Agricole{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    
+    :root {
+        --green: #2e7d32;
+        --green-dark: #1b5e20;
+        --green-light: #e8f5e9;
+        --red: #c62828;
+        --orange: #f57c00;
+        --blue: #1565c0;
+        --gray-light: #f5f5f5;
+        --gray: #9e9e9e;
+        --gray-dark: #616161;
+        --shadow: 0 2px 8px rgba(0,0,0,0.1);
+        --shadow-lg: 0 4px 16px rgba(0,0,0,0.15);
+    }
+    
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: #f0f2f5;
+        overflow: hidden;
+        height: 100vh;
+    }
+    
+    /* LAYOUT PRINCIPAL - CARTE ET CHAT CÔTE À CÔTE */
+    .dashboard {
+        display: flex;
+        height: 100vh;
+        width: 100%;
+        overflow: hidden;
+    }
+    
+    /* SECTION CARTE (GAUCHE) */
+    .map-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: #f8f9fa;
+        border-right: 1px solid #e0e0e0;
+        box-shadow: var(--shadow);
+        z-index: 5;
+        min-width: 420px;
+    }
+    
+    /* SECTION CHAT (DROITE) */
+    .chat-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: #ffffff;
+        min-width: 400px;
+    }
+    
+    /* HEADERS COMMUNS */
+    .section-header {
+        background: linear-gradient(135deg, var(--green-dark), var(--green));
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: var(--shadow);
+        flex-shrink: 0;
+    }
+    
+    .section-header .icon {
+        font-size: 24px;
+    }
+    
+    .section-header h2 {
+        font-size: 18px;
+        margin: 0;
+        flex: 1;
+    }
+    
+    .section-header .badge {
+        background: rgba(255,255,255,0.2);
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 500;
+    }
+    
+    /* ========== CONTENU DE LA CARTE ========== */
+    .machine-selector {
+        padding: 15px 20px;
+        background: white;
+        border-bottom: 1px solid #e0e0e0;
+        flex-shrink: 0;
+    }
+    
+    .machine-selector label {
+        font-size: 11px;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: var(--gray);
+        display: block;
+        margin-bottom: 8px;
+        letter-spacing: 0.5px;
+    }
+    
+    .machine-select {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1.5px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 14px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .machine-select:focus {
+        outline: none;
+        border-color: var(--green);
+        box-shadow: 0 0 0 3px rgba(46,125,50,0.1);
+    }
+    
+    /* SECTION TOUTES LES PANNES */
+    .all-pannes {
+        padding: 12px 20px;
+        background: white;
+        border-bottom: 1px solid #e0e0e0;
+        flex-shrink: 0;
+    }
+    
+    .pannes-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--gray-dark);
+        margin-bottom: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .pannes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .panne-card {
+        background: var(--gray-light);
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 12px 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: left;
+    }
+    
+    .panne-card:hover {
+        background: var(--green-light);
+        border-color: var(--green);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow);
+    }
+    
+    .panne-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 6px;
+    }
+    
+    .panne-emoji {
+        font-size: 22px;
+    }
+    
+    .panne-name {
+        font-size: 13px;
+        font-weight: 700;
+        color: #333;
+        flex: 1;
+    }
+    
+    .panne-desc {
+        font-size: 11px;
+        color: var(--gray);
+        padding-left: 32px;
+        line-height: 1.3;
+    }
+    
+    /* CONTAINER DE LA CARTE */
+    .map-wrapper {
+        flex: 1;
+        position: relative;
+        background: #e8e8e8;
+        min-height: 200px;
+    }
+    
+    #map {
+        width: 100%;
+        height: 100%;
+    }
+    
+    .map-controls {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        z-index: 1000;
+        display: flex;
+        gap: 10px;
+    }
+    
+    .map-btn {
+        background: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 25px;
+        cursor: pointer;
+        box-shadow: var(--shadow);
+        font-size: 13px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s;
+        color: var(--green-dark);
+    }
+    
+    .map-btn:hover {
+        background: var(--green);
+        color: white;
+        transform: scale(1.02);
+    }
+    
+    .radius-control {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        right: 20px;
+        background: white;
+        padding: 10px 15px;
+        border-radius: 30px;
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        z-index: 1000;
+    }
+    
+    .radius-control label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--gray-dark);
+    }
+    
+    .radius-control input {
+        flex: 1;
+        accent-color: var(--green);
+    }
+    
+    .radius-value {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--green);
+        min-width: 50px;
+        text-align: right;
+    }
+    
+    /* LISTE DES MAGASINS */
+    .shops-list {
+        max-height: 200px;
+        overflow-y: auto;
+        background: white;
+        border-top: 1px solid #e0e0e0;
+        flex-shrink: 0;
+    }
+    
+    .shops-list::-webkit-scrollbar {
+        width: 4px;
+    }
+    
+    .shop-item {
+        padding: 12px 20px;
+        border-bottom: 1px solid #f0f0f0;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+    }
+    
+    .shop-item:hover {
+        background: var(--green-light);
+    }
+    
+    .shop-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-top: 3px;
+        flex-shrink: 0;
+        box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+    }
+    
+    .shop-info {
+        flex: 1;
+    }
+    
+    .shop-name {
+        font-weight: 700;
+        font-size: 13px;
+        margin-bottom: 3px;
+        color: #333;
+    }
+    
+    .shop-meta {
+        font-size: 11px;
+        color: var(--gray);
+        margin-bottom: 2px;
+    }
+    
+    .shop-distance {
+        font-weight: 600;
+        color: var(--green);
+        font-size: 11px;
+    }
+    
+    .shop-phone {
+        font-size: 11px;
+        color: var(--blue);
+        margin-top: 3px;
+    }
+    
+    .shops-empty {
+        padding: 20px;
+        text-align: center;
+        color: var(--gray);
+        font-size: 12px;
+    }
+    
+    /* ========== CONTENU DU CHAT ========== */
+    .chat-header-info {
+        padding: 15px 20px;
+        background: white;
+        border-bottom: 1px solid #e0e0e0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-shrink: 0;
+    }
+    
+    .selected-machine-badge {
+        background: var(--green-light);
+        padding: 6px 14px;
+        border-radius: 25px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--green-dark);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        background: #f8f9fa;
+    }
+    
+    /* BULLES DE MESSAGE */
+    .message {
+        display: flex;
+        gap: 12px;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .message.user {
+        flex-direction: row-reverse;
+    }
+    
+    .message-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+        box-shadow: var(--shadow);
+    }
+    
+    .message.user .message-avatar {
+        background: var(--blue);
+        color: white;
+    }
+    
+    .message.bot .message-avatar {
+        background: var(--green);
+        color: white;
+    }
+    
+    .message-content {
+        max-width: 70%;
+        padding: 12px 18px;
+        border-radius: 18px;
+        font-size: 13.5px;
+        line-height: 1.55;
+        box-shadow: var(--shadow);
+    }
+    
+    .message.user .message-content {
+        background: var(--green);
+        color: white;
+        border-bottom-right-radius: 4px;
+    }
+    
+    .message.bot .message-content {
+        background: white;
+        color: #333;
+        border-bottom-left-radius: 4px;
+    }
+    
+    /* MISE EN FORME DES MESSAGES */
+    .diagnostic-title {
+        font-weight: 800;
+        font-size: 14px;
+        margin: 8px 0 6px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--green-dark);
+    }
+    
+    .diagnostic-title:first-child {
+        margin-top: 0;
+    }
+    
+    .message-content ul, 
+    .message-content ol {
+        margin: 8px 0;
+        padding-left: 20px;
+    }
+    
+    .message-content li {
+        margin-bottom: 4px;
+    }
+    
+    .message-content strong {
+        color: var(--green-dark);
+    }
+    
+    .message.user .message-content strong {
+        color: #fff;
+    }
+    
+    /* PIÈCES RECOMMANDÉES */
+    .parts-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-top: 12px;
+    }
+    
+    .part-card {
+        background: var(--green-light);
+        padding: 10px;
+        border-radius: 10px;
+        border-left: 3px solid var(--green);
+    }
+    
+    .part-name {
+        font-weight: 700;
+        font-size: 12px;
+        margin-bottom: 4px;
+        color: var(--green-dark);
+    }
+    
+    .part-ref {
+        font-size: 10px;
+        color: var(--gray);
+        font-family: monospace;
+    }
+    
+    .part-price {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--orange);
+        margin-top: 4px;
+    }
+    
+    /* BADGE URGENCE */
+    .urgency-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        margin-top: 10px;
+    }
+    
+    .urgency-critique {
+        background: #ffebee;
+        color: var(--red);
+    }
+    
+    .urgency-haute {
+        background: #fff3e0;
+        color: var(--orange);
+    }
+    
+    .urgency-moyenne {
+        background: #e8f5e9;
+        color: var(--green);
+    }
+    
+    /* INDICATEUR DE TAPING */
+    .typing-indicator {
+        display: flex;
+        gap: 5px;
+        padding: 8px 0;
+    }
+    
+    .typing-dot {
+        width: 7px;
+        height: 7px;
+        background: var(--gray);
+        border-radius: 50%;
+        animation: typingBounce 1.4s infinite ease-in-out;
+    }
+    
+    .typing-dot:nth-child(1) { animation-delay: 0s; }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    
+    @keyframes typingBounce {
+        0%, 60%, 100% {
+            transform: translateY(0);
+            opacity: 0.4;
+        }
+        30% {
+            transform: translateY(-8px);
+            opacity: 1;
+        }
+    }
+    
+    /* ZONE DE SAISIE */
+    .chat-input-area {
+        padding: 15px 20px;
+        background: white;
+        border-top: 1px solid #e0e0e0;
+        display: flex;
+        gap: 12px;
+        align-items: flex-end;
+        flex-shrink: 0;
+    }
+    
+    .chat-input {
+        flex: 1;
+        border: 1.5px solid #e0e0e0;
+        border-radius: 25px;
+        padding: 12px 18px;
+        font-size: 13px;
+        resize: none;
+        font-family: inherit;
+        max-height: 100px;
+        transition: all 0.2s;
+    }
+    
+    .chat-input:focus {
+        outline: none;
+        border-color: var(--green);
+        box-shadow: 0 0 0 3px rgba(46,125,50,0.1);
+    }
+    
+    .send-btn {
+        background: var(--green);
+        border: none;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 18px;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        box-shadow: var(--shadow);
+    }
+    
+    .send-btn:hover {
+        background: var(--green-dark);
+        transform: scale(1.02);
+    }
+    
+    .send-btn:disabled {
+        background: var(--gray);
+        cursor: not-allowed;
+        transform: none;
+    }
+    
+    /* WELCOME CARD */
+    .welcome-card {
+        background: linear-gradient(135deg, var(--green-dark), var(--green));
+        color: white;
+        padding: 20px;
+        border-radius: 16px;
+        margin-bottom: 10px;
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .welcome-card h2 {
+        font-size: 18px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .welcome-card p {
+        font-size: 13px;
+        opacity: 0.9;
+        line-height: 1.5;
+    }
+    
+    /* BOUTON RETOUR */
+    .back-button {
+        position: fixed;
+        bottom: 25px;
+        left: 25px;
+        background: var(--gray-dark);
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 40px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        z-index: 2000;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-lg);
+        font-family: inherit;
+    }
+    
+    .back-button:hover {
+        background: var(--green-dark);
+        transform: translateX(-5px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    }
+    
+    /* TOAST NOTIFICATION */
+    .toast {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.85);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 30px;
+        font-size: 13px;
+        z-index: 2000;
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+        white-space: nowrap;
+    }
+    
+    .toast.show {
+        opacity: 1;
+    }
+    
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+        .dashboard {
+            flex-direction: column;
+        }
+        
+        .map-section, .chat-section {
+            min-width: auto;
+            height: 50vh;
+        }
+        
+        .toast {
+            white-space: normal;
+            max-width: 90%;
+            text-align: center;
+        }
+        
+        .back-button {
+            bottom: 15px;
+            left: 15px;
+            padding: 8px 16px;
+            font-size: 12px;
+        }
+    }
+    
+    @media (max-width: 600px) {
+        .pannes-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .message-content {
+            max-width: 85%;
+        }
+        
+        .parts-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="dashboard">
+    
+    <!-- SECTION CARTE (GAUCHE) -->
+    <div class="map-section">
+        <div class="section-header">
+            <span class="icon">🗺️</span>
+            <h2>Ateliers & Magasins à proximité</h2>
+            <span class="badge">Tunisie</span>
+        </div>
+        
+        <div class="machine-selector">
+            <label>🚜 SÉLECTIONNEZ VOTRE MATÉRIEL</label>
+            <select class="machine-select" id="machine-select">
+                <option value="">— Tous les matériels —</option>
+                {% for machine in machines %}
+                    <option value="{{ machine.id }}">{{ machine.nom }} ({{ machine.marque }} {{ machine.modele }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <!-- 7 PANNES PRINCIPALES -->
+        <div class="all-pannes">
+            <div class="pannes-title">
+                <span>🔧</span> PANNES PRINCIPALES
+                <span style="font-size: 10px; color: #999;">(cliquez pour diagnostiquer)</span>
+            </div>
+            <div class="pannes-grid" id="pannes-grid">
+                <!-- Les pannes seront générées ici en JavaScript -->
+            </div>
+        </div>
+        
+        <div class="map-wrapper">
+            <div id="map"></div>
+            <div class="map-controls">
+                <button class="map-btn" id="locate-btn">
+                    <span>📍</span> Ma position
+                </button>
+            </div>
+            <div class="radius-control">
+                <label>Rayon de recherche</label>
+                <input type="range" id="radius-slider" min="2" max="30" value="10" step="1">
+                <span class="radius-value" id="radius-value">10 km</span>
+            </div>
+        </div>
+        
+        <div class="shops-list" id="shops-list">
+            <div class="shops-empty">
+                📍 Cliquez sur <strong>"Ma position"</strong> pour voir les ateliers, garages et fournisseurs de pièces agricoles à proximité de chez vous.
+            </div>
+        </div>
+    </div>
+    
+    <!-- SECTION CHAT (DROITE) -->
+    <div class="chat-section">
+        <div class="section-header">
+            <span class="icon">🤖</span>
+            <h2>Assistant IA - Diagnostic</h2>
+            <span class="badge">En ligne</span>
+        </div>
+        
+        <div class="chat-header-info">
+            <div class="selected-machine-badge" id="selected-machine-badge">
+                <span>🚜</span> Aucun matériel
+            </div>
+        </div>
+        
+        <div class="chat-messages" id="chat-messages">
+            <div class="welcome-card">
+                <h2>
+                    <span>🌾</span>
+                    <span>Bienvenue sur AgroBot</span>
+                </h2>
+                <p>
+                    Je suis votre assistant IA spécialisé dans la maintenance agricole.<br><br>
+                    <strong>Comment utiliser AgroBot :</strong><br>
+                    • Sélectionnez votre matériel dans la liste à gauche<br>
+                    • Choisissez une panne dans la liste ci-dessus ou décrivez-la vous-même<br>
+                    • Je vous fournirai un diagnostic complet avec les pièces adaptées à votre machine<br>
+                    • Géolocalisez-vous pour trouver des ateliers à proximité
+                </p>
+            </div>
+        </div>
+        
+        <div class="chat-input-area">
+            <textarea class="chat-input" id="chat-input" rows="1" placeholder="Ex: Mon tracteur perd de la puissance et fume noir..."></textarea>
+            <button class="send-btn" id="send-btn">➤</button>
+        </div>
+    </div>
+</div>
+
+<!-- BOUTON RETOUR -->
+<button class="back-button" id="back-button" onclick="goBack()">
+    <span>◀</span> Retour
+</button>
+
+<div class="toast" id="toast"></div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// Configuration
+const API_GENERAL = '{{ path('agri_chatbot_api_general') }}';
+const API_SHOPS = '{{ path('agri_chatbot_api_nearby_shops') }}';
+
+// 7 PANNES PRINCIPALES
+const ALL_PANNES = [
+    { emoji: "🔋", name: "Problème de démarrage", desc: "Le tracteur ne démarre pas", message: "Mon tracteur ne démarre pas du tout, problème électrique" },
+    { emoji: "🔊", name: "Bruit moteur anormal", desc: "Bruit de grincement ou claquement", message: "Le moteur fait un bruit de grincement ou claquement anormal" },
+    { emoji: "💧", name: "Problème hydraulique", desc: "Perte de puissance du relevage", message: "Perte de puissance hydraulique, problème de relevage" },
+    { emoji: "💨", name: "Fumée excessive", desc: "Fumée noire, bleue ou blanche", message: "Fumée noire ou bleue au pot d'échappement" },
+    { emoji: "⚙️", name: "Problème transmission", desc: "Boîte difficile ou bruit", message: "Problème de transmission, boîte de vitesse difficile ou bruit anormal" },
+    { emoji: "📉", name: "Perte de puissance", desc: "Manque de puissance en charge", message: "Le tracteur perd de la puissance en montée ou en charge" },
+    { emoji: "🔥", name: "Surchauffe moteur", desc: "Température trop élevée", message: "Le moteur surchauffe, la température monte trop vite" }
+];
+
+// Variables globales
+let map = null;
+let userMarker = null;
+let shopMarkers = [];
+let radiusCircle = null;
+let currentLat = 36.8065;
+let currentLng = 10.1815;
+let currentRadius = 10;
+let chatHistory = [];
+let selectedMachineId = null;
+let selectedMachineName = null;
+let isSending = false;
+let typingIndicator = null;
+
+// Couleurs par type
+const typeColors = {
+    garage: '#e74c3c',
+    agricole: '#27ae60',
+    pieces: '#f39c12',
+    autre: '#3498db'
+};
+
+const typeIcons = {
+    garage: '🔧',
+    agricole: '🌾',
+    pieces: '📦',
+    autre: '📍'
+};
+
+//========== FONCTION RETOUR ==========
+function goBack() {
+    if (document.referrer && document.referrer !== '') {
+        window.history.back();
+    } else {
+        window.location.href = '{{ path('app_home') }}';
+    }
+}
+
+//========== GÉNÉRATION DES PANNES ==========
+function generatePannesList() {
+    const container = document.getElementById('pannes-grid');
+    if (!container) return;
+    
+    container.innerHTML = ALL_PANNES.map(panne => `
+        <div class="panne-card" onclick="selectPanne('${escapeHtml(panne.message)}')">
+            <div class="panne-header">
+                <span class="panne-emoji">${panne.emoji}</span>
+                <span class="panne-name">${escapeHtml(panne.name)}</span>
+            </div>
+            <div class="panne-desc">${escapeHtml(panne.desc)}</div>
+        </div>
+    `).join('');
+}
+
+function selectPanne(message) {
+    const input = document.getElementById('chat-input');
+    input.value = message;
+    sendMessage();
+}
+
+//========== INITIALISATION ==========
+document.addEventListener('DOMContentLoaded', () => {
+    initMap();
+    initEventListeners();
+    autoResizeTextarea();
+    generatePannesList();
+});
+
+function initMap() {
+    map = L.map('map').setView([currentLat, currentLng], 12);
+    
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        subdomains: 'abcd',
+        maxZoom: 19,
+        className: 'map-tiles'
+    }).addTo(map);
+}
+
+function initEventListeners() {
+    // Sélection du matériel
+    const machineSelect = document.getElementById('machine-select');
+    machineSelect.addEventListener('change', () => {
+        selectedMachineId = machineSelect.value ? parseInt(machineSelect.value) : null;
+        
+        if (selectedMachineId) {
+            const selectedOption = machineSelect.options[machineSelect.selectedIndex];
+            selectedMachineName = selectedOption.text.split(' (')[0];
+            const badge = document.getElementById('selected-machine-badge');
+            badge.innerHTML = `<span>🚜</span> ${escapeHtml(selectedMachineName)}`;
+            showToast(`Matériel sélectionné : ${selectedMachineName}`);
+        } else {
+            selectedMachineName = null;
+            const badge = document.getElementById('selected-machine-badge');
+            badge.innerHTML = `<span>🚜</span> Aucun matériel`;
+        }
+    });
+    
+    // Envoi de message
+    document.getElementById('send-btn').addEventListener('click', sendMessage);
+    document.getElementById('chat-input').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+    
+    // Géolocalisation
+    document.getElementById('locate-btn').addEventListener('click', locateUser);
+    
+    // Rayon
+    const radiusSlider = document.getElementById('radius-slider');
+    radiusSlider.addEventListener('input', (e) => {
+        currentRadius = parseInt(e.target.value);
+        document.getElementById('radius-value').textContent = currentRadius + ' km';
+        if (currentLat && currentLng && userMarker) {
+            fetchNearbyShops(currentLat, currentLng, currentRadius);
+        }
+    });
+}
+
+function autoResizeTextarea() {
+    const textarea = document.getElementById('chat-input');
+    textarea.addEventListener('input', function() {
+        this.style.height = 'auto';
+        this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+    });
+}
+
+//========== GÉOLOCALISATION ==========
+function locateUser() {
+    if (!navigator.geolocation) {
+        showToast('⚠️ La géolocalisation n\'est pas supportée par votre navigateur');
+        return;
+    }
+    
+    showToast('📍 Recherche de votre position...');
+    
+    navigator.geolocation.getCurrentPosition(
+        (position) => {
+            currentLat = position.coords.latitude;
+            currentLng = position.coords.longitude;
+            
+            showToast('✅ Position trouvée ! Recherche des ateliers...');
+            
+            map.flyTo([currentLat, currentLng], 14, { duration: 1.5 });
+            
+            if (userMarker) userMarker.remove();
+            userMarker = L.circleMarker([currentLat, currentLng], {
+                radius: 12,
+                fillColor: '#2e7d32',
+                color: 'white',
+                weight: 3,
+                fillOpacity: 0.9
+            }).addTo(map);
+            userMarker.bindPopup('<b>📍 Vous êtes ici</b>').openPopup();
+            
+            fetchNearbyShops(currentLat, currentLng, currentRadius);
+        },
+        (error) => {
+            console.error('Erreur GPS:', error);
+            let errorMsg = '';
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                    errorMsg = 'Permission refusée. Activez la localisation.';
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    errorMsg = 'Position indisponible.';
+                    break;
+                case error.TIMEOUT:
+                    errorMsg = 'Délai dépassé.';
+                    break;
+                default:
+                    errorMsg = 'Erreur inconnue.';
+            }
+            showToast(`⚠️ ${errorMsg} Utilisation de Tunis par défaut.`);
+            
+            currentLat = 36.8065;
+            currentLng = 10.1815;
+            map.setView([currentLat, currentLng], 12);
+            fetchNearbyShops(currentLat, currentLng, currentRadius);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
+    );
+}
+
+//========== RECHERCHE ATELIERS ==========
+async function fetchNearbyShops(lat, lng, radius) {
+    try {
+        const response = await fetch(`${API_SHOPS}?lat=${lat}&lng=${lng}&radius=${radius}`);
+        const data = await response.json();
+        
+        if (data.success && data.shops) {
+            displayShopsOnMap(data.shops, lat, lng);
+            displayShopsList(data.shops);
+            
+            if (data.shops.length > 0) {
+                showToast(`✅ ${data.shops.length} atelier(s) trouvé(s) dans un rayon de ${radius} km`);
+            } else {
+                showToast(`ℹ️ Aucun atelier trouvé dans ${radius} km`);
+            }
+        }
+    } catch (error) {
+        console.error('Erreur fetch:', error);
+        showToast('❌ Erreur lors de la recherche des ateliers');
+    }
+}
+
+function displayShopsOnMap(shops, centerLat, centerLng) {
+    shopMarkers.forEach(marker => marker.remove());
+    shopMarkers = [];
+    if (radiusCircle) radiusCircle.remove();
+    
+    radiusCircle = L.circle([centerLat, centerLng], {
+        radius: currentRadius * 1000,
+        color: '#2e7d32',
+        fillColor: '#2e7d32',
+        fillOpacity: 0.05,
+        weight: 1.5,
+        dashArray: '6, 6'
+    }).addTo(map);
+    
+    shops.forEach(shop => {
+        const color = typeColors[shop.type] || typeColors.autre;
+        const icon = L.divIcon({
+            className: 'shop-marker',
+            iconSize: [32, 32],
+            iconAnchor: [16, 32],
+            popupAnchor: [0, -28],
+            html: `<svg width="30" height="30" viewBox="0 0 30 30">
+                <circle cx="15" cy="15" r="13" fill="${color}" stroke="white" stroke-width="2.5"/>
+                <text x="15" y="20" text-anchor="middle" font-size="14" fill="white">${typeIcons[shop.type] || '📍'}</text>
+            </svg>`
+        });
+        
+        const marker = L.marker([shop.lat, shop.lng], { icon })
+            .addTo(map)
+            .bindPopup(`
+                <div style="padding: 8px;">
+                    <strong>${escapeHtml(shop.name)}</strong><br>
+                    ${escapeHtml(shop.typeLabel)}<br>
+                    📍 ${shop.distance} km
+                </div>
+            `);
+        
+        shopMarkers.push(marker);
+    });
+}
+
+function displayShopsList(shops) {
+    const container = document.getElementById('shops-list');
+    
+    if (!shops || shops.length === 0) {
+        container.innerHTML = '<div class="shops-empty">🔍 Aucun atelier trouvé</div>';
+        return;
+    }
+    
+    container.innerHTML = shops.map(shop => `
+        <div class="shop-item" onclick="focusOnShop(${shop.lat}, ${shop.lng})">
+            <div class="shop-dot" style="background: ${typeColors[shop.type] || '#3498db'}"></div>
+            <div class="shop-info">
+                <div class="shop-name">${escapeHtml(shop.name)}</div>
+                <div class="shop-meta">${escapeHtml(shop.typeLabel)}</div>
+                <div class="shop-distance">📍 ${shop.distance} km</div>
+                ${shop.phone ? `<div class="shop-phone">📞 ${escapeHtml(shop.phone)}</div>` : ''}
+            </div>
+        </div>
+    `).join('');
+}
+
+window.focusOnShop = function(lat, lng) {
+    map.flyTo([lat, lng], 16, { duration: 1 });
+};
+
+//========== CHATBOT ==========
+async function sendMessage() {
+    const input = document.getElementById('chat-input');
+    const message = input.value.trim();
+    
+    if (!message || isSending) return;
+    
+    input.value = '';
+    input.style.height = 'auto';
+    
+    addMessage(message, 'user');
+    chatHistory.push({ role: 'user', content: message });
+    
+    isSending = true;
+    const sendBtn = document.getElementById('send-btn');
+    sendBtn.disabled = true;
+    
+    addTypingIndicator();
+    
+    try {
+        const response = await fetch(API_GENERAL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                message: message,
+                history: chatHistory.slice(-10),
+                machineId: selectedMachineId,
+                machineName: selectedMachineName
+            })
+        });
+        
+        const data = await response.json();
+        removeTypingIndicator();
+        
+        if (data.success && data.message) {
+            addMessage(data.message, 'bot', data.compatibleParts);
+            chatHistory.push({ role: 'assistant', content: data.message });
+        } else if (data.error) {
+            addMessage(`❌ ${data.error}`, 'bot');
+        } else {
+            addMessage(getFallbackResponse(message), 'bot');
+        }
+    } catch (error) {
+        console.error('Erreur:', error);
+        removeTypingIndicator();
+        addMessage(getFallbackResponse(message), 'bot');
+    } finally {
+        isSending = false;
+        sendBtn.disabled = false;
+        input.focus();
+    }
+}
+
+// Réponse de secours
+function getFallbackResponse(message) {
+    const msgLower = message.toLowerCase();
+    
+    // Transmission
+    if (msgLower.includes('transmission') || msgLower.includes('boite') || msgLower.includes('vitesse') || msgLower.includes('embrayage')) {
+        return `🔍 **DIAGNOSTIC : Problème de transmission**
+
+⚠️ **CAUSES POSSIBLES**
+• Usure de l'embrayage
+• Niveau d'huile de boîte insuffisant
+• Synchronisateurs fatigués
+• Roulements de transmission endommagés
+
+🔧 **SOLUTION RECOMMANDÉE**
+1. Vérifier le niveau d'huile de la boîte de vitesse
+2. Contrôler l'usure de l'embrayage
+3. Inspecter les synchronisateurs
+4. Faire un diagnostic complet par un professionnel
+
+📦 **PIÈCES NÉCESSAIRES**
+• Kit d'embrayage complet (300-600 DT)
+• Huile de transmission SAE 80W90 (40-80 DT)
+• Roulements de transmission (25-80 DT)
+
+🛡️ **PRÉVENTION**
+• Vidangez l'huile de boîte tous les 1000 heures
+• Évitez les à-coups au démarrage
+• Ne forcez pas les vitesses
+
+⚠️ **URGENCE** : Moyenne — Planifier sous 7 jours`;
+    }
+    
+    // Moteur / Bruit
+    if (msgLower.includes('moteur') || msgLower.includes('bruit')) {
+        return `🔍 **DIAGNOSTIC : Bruit anormal du moteur**
+
+⚠️ **CAUSES POSSIBLES**
+• Injecteurs défectueux
+• Jeu dans les soupapes
+• Problème de distribution
+• Roulement de vilebrequin usé
+
+🔧 **SOLUTION RECOMMANDÉE**
+1. Faire un diagnostic sonore précis
+2. Vérifier les injecteurs
+3. Contrôler le jeu aux soupapes
+4. Inspecter la distribution
+
+📦 **PIÈCES NÉCESSAIRES**
+• Kit injecteurs (150-400 DT)
+• Kit distribution (150-350 DT)
+• Joint de culasse si nécessaire (120-250 DT)
+
+⚠️ **URGENCE** : Haute — Intervention sous 48h`;
+    }
+    
+    // Hydraulique
+    if (msgLower.includes('hydraulique') || msgLower.includes('relevage')) {
+        return `🔍 **DIAGNOSTIC : Problème hydraulique**
+
+⚠️ **CAUSES POSSIBLES**
+• Niveau d'huile hydraulique insuffisant
+• Filtre hydraulique obstrué
+• Pompe hydraulique usée
+• Fuite sur flexible ou joint
+
+🔧 **SOLUTION RECOMMANDÉE**
+1. Vérifier le niveau d'huile hydraulique
+2. Remplacer le filtre hydraulique
+3. Contrôler l'état de la pompe
+4. Inspecter les flexibles pour détecter des fuites
+
+📦 **PIÈCES NÉCESSAIRES**
+• Huile hydraulique ISO 46 (75-110 DT/20L)
+• Filtre hydraulique (30-60 DT)
+• Pompe hydraulique (350-800 DT)
+
+⚠️ **URGENCE** : Haute — Intervention sous 72h`;
+    }
+    
+    // Fumée
+    if (msgLower.includes('fumée') || msgLower.includes('fumee')) {
+        return `🔍 **DIAGNOSTIC : Fumée excessive**
+
+⚠️ **CAUSES POSSIBLES**
+• Fumée noire : excès de carburant, injecteurs encrassés
+• Fumée bleue : consommation d'huile, segmentation usée
+• Filtres obstrués
+• Turbo défaillant
+
+🔧 **SOLUTION RECOMMANDÉE**
+1. Nettoyer ou remplacer les injecteurs
+2. Vérifier les filtres à air et gasoil
+3. Contrôler l'état du turbo
+4. Faire un test de compression
+
+📦 **PIÈCES NÉCESSAIRES**
+• Kit injecteurs (150-400 DT)
+• Turbo (500-1200 DT)
+• Kit de segments (200-500 DT)
+
+⚠️ **URGENCE** : Haute selon la couleur de la fumée`;
+    }
+    
+    // Démarrage
+    if (msgLower.includes('démarre') || msgLower.includes('demarre')) {
+        return `🔍 **DIAGNOSTIC : Problème de démarrage**
+
+⚠️ **CAUSES POSSIBLES**
+• Batterie déchargée ou faible
+• Problème d'alternateur
+• Démarreur défectueux
+• Problème de carburant
+
+🔧 **SOLUTION RECOMMANDÉE**
+1. Vérifier la tension de la batterie
+2. Tester l'alternateur
+3. Contrôler le démarreur
+4. Vérifier l'arrivée de carburant
+
+📦 **PIÈCES NÉCESSAIRES**
+• Batterie 12V/100Ah (180-280 DT)
+• Alternateur (120-250 DT)
+• Démarreur (150-300 DT)
+
+⚠️ **URGENCE** : Haute — Le tracteur ne peut pas fonctionner`;
+    }
+    
+    // Perte de puissance
+    if (msgLower.includes('perte de puissance') || msgLower.includes('manque de puissance')) {
+        return `🔍 **DIAGNOSTIC : Perte de puissance**
+
+⚠️ **CAUSES POSSIBLES**
+• Filtres encrassés
+• Injecteurs obstrués
+• Turbo défaillant
+• Compression basse
+
+🔧 **SOLUTION RECOMMANDÉE**
+1. Remplacer tous les filtres
+2. Nettoyer les injecteurs
+3. Vérifier le turbo
+4. Faire un test de compression
+
+📦 **PIÈCES NÉCESSAIRES**
+• Kit filtres complet (60-120 DT)
+• Turbo (500-1200 DT)
+• Kit injecteurs (150-400 DT)
+
+⚠️ **URGENCE** : Moyenne — Planifier rapidement`;
+    }
+    
+    // Surchauffe
+    if (msgLower.includes('surchauffe') || msgLower.includes('chauffe') || msgLower.includes('température')) {
+        return `🔍 **DIAGNOSTIC : Surchauffe moteur**
+
+⚠️ **CAUSES POSSIBLES**
+• Niveau de liquide de refroidissement insuffisant
+• Thermostat bloqué
+• Pompe à eau défaillante
+• Radiateur obstrué
+
+🔧 **SOLUTION RECOMMANDÉE**
+1. Vérifier le niveau de liquide de refroidissement
+2. Contrôler le thermostat
+3. Inspecter la pompe à eau
+4. Nettoyer le radiateur
+
+📦 **PIÈCES NÉCESSAIRES**
+• Liquide de refroidissement (35-55 DT)
+• Pompe à eau (90-180 DT)
+• Thermostat (20-40 DT)
+
+⚠️ **URGENCE** : CRITIQUE — Arrêter immédiatement le moteur`;
+    }
+    
+    return `🔍 **DIAGNOSTIC EN ATTENTE**
+
+Je n'ai pas pu identifier précisément votre panne.
+
+📝 **Pouvez-vous me donner plus de détails ?**
+• Quel bruit entendez-vous ?
+• Y a-t-il de la fumée ? De quelle couleur ?
+• Depuis quand le problème persiste-t-il ?
+• Quels voyants sont allumés au tableau de bord ?
+
+💡 Plus vous serez précis, plus mon diagnostic sera fiable.`;
+}
+
+function addMessage(content, sender, parts = null) {
+    const container = document.getElementById('chat-messages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}`;
+    
+    const avatar = sender === 'user' ? '👤' : '🌾';
+    const formattedContent = formatMessageContent(content);
+    
+    let partsHtml = '';
+    if (parts && parts.length > 0) {
+        partsHtml = `
+            <div style="margin-top: 15px;">
+                <div style="font-weight: 700; margin-bottom: 10px; color: #2e7d32;">📦 PIÈCES RECOMMANDÉES</div>
+                <div class="parts-grid">
+                    ${parts.slice(0, 4).map(part => `
+                        <div class="part-card">
+                            <div class="part-name">${escapeHtml(part.name)}</div>
+                            <div class="part-ref">Réf: ${escapeHtml(part.ref)}</div>
+                            <div class="part-price">💰 ${escapeHtml(part.prix)}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+    
+    messageDiv.innerHTML = `
+        <div class="message-avatar">${avatar}</div>
+        <div class="message-content">${formattedContent}${partsHtml}</div>
+    `;
+    
+    container.appendChild(messageDiv);
+    container.scrollTop = container.scrollHeight;
+}
+
+function formatMessageContent(text) {
+    if (!text) return '';
+    
+    text = text.replace(/^([🔍⚠️🔧📦🛡️🚜])\s*\*\*(.+?)\*\*/gm, 
+        '<div class="diagnostic-title">$1 $2</div>');
+    text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    text = text.replace(/((?:^[•\-*] .+$\n?)+)/gm, (match) => {
+        const items = match.trim().split('\n').map(line => {
+            return `<li>${line.replace(/^[•\-*]\s*/, '')}</li>`;
+        }).join('');
+        return `<ul>${items}</ul>`;
+    });
+    text = text.replace(/((?:^\d+\. .+$\n?)+)/gm, (match) => {
+        const items = match.trim().split('\n').map(line => {
+            return `<li>${line.replace(/^\d+\.\s*/, '')}</li>`;
+        }).join('');
+        return `<ol>${items}</ol>`;
+    });
+    text = text.replace(/⚠️\s*URGENCE\s*:\s*(.+)/gi, (_, level) => {
+        let urgencyClass = 'urgency-moyenne';
+        if (level.toLowerCase().includes('critique')) urgencyClass = 'urgency-critique';
+        else if (level.toLowerCase().includes('haute')) urgencyClass = 'urgency-haute';
+        return `<span class="urgency-badge ${urgencyClass}">⚠️ Urgence : ${escapeHtml(level)}</span>`;
+    });
+    text = text.replace(/\n\n/g, '<br>').replace(/\n/g, '<br>');
+    
+    return text;
+}
+
+function addTypingIndicator() {
+    const container = document.getElementById('chat-messages');
+    typingIndicator = document.createElement('div');
+    typingIndicator.className = 'message bot';
+    typingIndicator.id = 'typing-indicator';
+    typingIndicator.innerHTML = `
+        <div class="message-avatar">🌾</div>
+        <div class="message-content">
+            <div class="typing-indicator">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        </div>
+    `;
+    container.appendChild(typingIndicator);
+    container.scrollTop = container.scrollHeight;
+}
+
+function removeTypingIndicator() {
+    if (typingIndicator) {
+        typingIndicator.remove();
+        typingIndicator = null;
+    }
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+}
+</script>
+{% endblock %}

@@ -26,10 +26,10 @@
 .btn--calendar:hover { background:#fcebeb; }
 .btn--red-outline { background:#fff; color:#a32d2d; border:1.5px solid #f7c1c1; font-size:.82rem; padding:.55rem 1rem; border-radius:10px; cursor:pointer; }
 .btn--red-outline:hover { background:#fcebeb; }
-.btn--ia-pro { background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:#fff; border:none; }
-.btn--ia-pro:hover { transform:translateY(-1px); box-shadow:0 4px 12px rgba(102,126,234,0.4); }
 .btn--google { background:#fff; color:#4285f4; border:1.5px solid #4285f4; }
 .btn--google:hover { background:#4285f4; color:#fff; }
+.btn--chatbot { background: linear-gradient(135deg, #2d6a2d, #1a451a); color: white; border: none; }
+.btn--chatbot:hover { background: linear-gradient(135deg, #1a451a, #0d2e0d); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(45,106,45,0.3); color: white; }
 
 /* ========== ALERTS ========== */
 .alert { display:flex; align-items:center; justify-content:space-between; padding:.8rem 1.1rem; border-radius:10px; font-size:.9rem; font-weight:500; margin-bottom:1rem; border-left:4px solid; }
@@ -105,11 +105,9 @@
 .act-btn--view{border-color:#b3d4b3;color:#2d6a2d;}.act-btn--view:hover{background:#eaf3de;}
 .act-btn--edit{border-color:#f5c4b3;color:#993c1d;}.act-btn--edit:hover{background:#faece7;}
 .act-btn--del{border-color:#f7c1c1;color:#a32d2d;}.act-btn--del:hover{background:#fcebeb;}
-.act-btn--ia-pro { background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:#fff; border:none; }
-.act-btn--ia-pro:hover { transform:translateY(-1px); }
 
 /* ========== CARDS ========== */
-.cards-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:1.1rem; }
+.cards-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(360px,1fr)); gap:1.1rem; }
 .maint-card-item { background:#fff; border-radius:16px; box-shadow:0 2px 14px rgba(0,0,0,.08); overflow:hidden; transition:box-shadow .2s,transform .15s; display:flex; flex-direction:column; }
 .maint-card-item:hover { box-shadow:0 6px 28px rgba(0,0,0,.13); transform:translateY(-2px); }
 .mci-header { padding:1.1rem 1.2rem .9rem; display:flex; justify-content:space-between; align-items:flex-start; background:#2d6a2d; color:#fff; }
@@ -129,13 +127,13 @@
 .mci-row { display:flex; align-items:center; gap:.5rem; font-size:.83rem; color:#3a5a3a; }
 .mci-row-label { color:#8aaa8a; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.4px; min-width:70px; }
 .mci-desc { font-size:.8rem; color:#5a7a5a; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.ai-reco-section { background:#f0faf7; border-left:3px solid #2d6a2d; border-radius:8px; padding:8px 10px; margin-top:8px; transition:all .2s ease; }
+.ai-reco-section:hover { background:#dcedc8; }
 .mci-actions { display:grid; grid-template-columns:1fr 1fr auto; gap:.4rem; padding:.75rem 1rem; border-top:1px solid #f0f4ef; background:#fafcf8; }
 .mci-btn { display:inline-flex; align-items:center; justify-content:center; gap:.3rem; padding:.42rem .6rem; border-radius:9px; font-size:.78rem; font-weight:600; text-decoration:none; cursor:pointer; border:1.5px solid; background:#fff; transition:all .13s; white-space:nowrap; }
 .mci-btn--view{border-color:#b3d4b3;color:#2d6a2d;}.mci-btn--view:hover{background:#eaf3de;}
 .mci-btn--edit{border-color:#f5c4b3;color:#993c1d;}.mci-btn--edit:hover{background:#faece7;}
 .mci-btn--del{border-color:#f7c1c1;color:#a32d2d;}.mci-btn--del:hover{background:#fcebeb;}
-.mci-btn--ia-pro { background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:#fff; border:none; }
-.mci-btn--ia-pro:hover { transform:translateY(-1px); }
 .empty { text-align:center; padding:4rem 2rem; background:#fff; border-radius:16px; border:1.5px dashed #c8dac8; }
 
 /* ========== PAGINATION ========== */
@@ -147,56 +145,6 @@
 .pg-info { font-size:.82rem; color:#7a9a7a; padding:0 .5rem; }
 .pg-size-select { padding:.35rem .7rem; border:1.5px solid #d4e8d4; border-radius:8px; font-size:.82rem; color:#1a2e1a; background:#f9fcf7; outline:none; cursor:pointer; }
 .pg-size-select:focus { border-color:#2d6a2d; }
-.pagination-wrap .pagination {
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:.45rem;
-  flex-wrap:wrap;
-}
-.pagination-wrap .pagination span,
-.pagination-wrap .pagination a {
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  min-width:38px;
-  height:38px;
-  padding:0 .7rem;
-  border-radius:9px;
-  border:1.5px solid #d4e8d4;
-  text-decoration:none;
-  font-size:.85rem;
-  font-weight:700;
-}
-.pagination-wrap .pagination a { background:#fff; color:#2d6a2d; }
-.pagination-wrap .pagination a:hover { background:#eaf3de; border-color:#2d6a2d; }
-.pagination-wrap .pagination .current { background:#2d6a2d; color:#fff; border-color:#2d6a2d; }
-.pagination-wrap .pagination .disabled { background:#f5f5f5; color:#9aa99a; border-color:#e4edde; }
-.af-pagination {
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:.45rem;
-  flex-wrap:wrap;
-}
-.af-page {
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  min-width:38px;
-  height:38px;
-  padding:0 .7rem;
-  border-radius:9px;
-  border:1.5px solid #d4e8d4;
-  background:#fff;
-  color:#2d6a2d;
-  text-decoration:none;
-  font-size:.85rem;
-  font-weight:700;
-}
-.af-page:hover { background:#eaf3de; border-color:#2d6a2d; }
-.af-current { background:#2d6a2d; color:#fff; border-color:#2d6a2d; }
-.af-disabled { background:#f5f5f5; color:#9aa99a; border-color:#e4edde; }
 
 /* ========== MODALES ========== */
 .modal-loader { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem; gap:.75rem; }
@@ -216,13 +164,51 @@
 .reminder-detail-label { font-weight:600; color:#7a9a7a; font-size:0.8rem; }
 .reminder-detail-value { font-weight:500; color:#1a2e1a; }
 
-/* ========== NOTE DU JOUR ========== */
-.day-note-dot { width:7px; height:7px; background:#2d6a2d; border-radius:50%; display:inline-block; margin-left:3px; vertical-align:middle; }
-.fc-day-note-indicator { position:absolute; bottom:3px; right:4px; width:8px; height:8px; background:#2d6a2d; border-radius:50%; }
+/* Styles pour les notes du calendrier */
+.fc-day-grid-day {
+    transition: background 0.2s ease;
+    position: relative;
+}
+.fc-day-grid-day:hover {
+    background: #f0faf7 !important;
+}
+.note-indicator {
+    position: absolute;
+    bottom: 2px;
+    right: 4px;
+    font-size: 14px;
+    opacity: 0.8;
+    cursor: pointer;
+    z-index: 10;
+    animation: fadeIn 0.2s ease;
+}
+.add-note-btn {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: rgba(45,106,45,0.9);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    padding: 2px 6px;
+    font-size: 10px;
+    cursor: pointer;
+    z-index: 20;
+    transition: all 0.2s ease;
+}
+.add-note-btn:hover {
+    transform: scale(1.1);
+    background: #1a451a !important;
+}
 
 @keyframes spin { to { transform:rotate(360deg); } }
 @keyframes popupSlideIn { from { opacity:0; transform:translateY(-30px) scale(0.95); } to { opacity:1; transform:translateY(0) scale(1); } }
 @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+#noteContent:focus {
+    border-color: #2d6a2d !important;
+    box-shadow: 0 0 0 3px rgba(45,106,45,0.1);
+}
 </style>
 
 <div class="mp">
@@ -242,6 +228,7 @@
       <button type="button" class="btn btn--view-toggle" id="viewTable" onclick="setView('table')">☰ Tableau</button>
       <button type="button" class="btn btn--calendar" id="openCalendarBtn">📅 Rappels annuels</button>
       <button type="button" class="btn btn--stats" id="statsToggle" onclick="toggleStats()">📊 Stats</button>
+      <a href="{{ path('agri_chatbot_index') }}" class="btn btn--chatbot">🤖 Assistant IA</a>
       <a href="{{ path('agri_maintenances_export_pdf') }}" target="_blank" class="btn btn--outline">📄 PDF</a>
       <a href="{{ path('agri_maintenances_export_excel') }}" class="btn btn--outline">📥 Excel</a>
       <a href="{{ path('agri_maintenances_new') }}" class="btn btn--green">+ Nouvelle maintenance</a>
@@ -345,7 +332,9 @@
     <div class="cards-grid" id="cardsGrid">
       {% for item in maintenancesWithAlerts %}
         {% set m = item.maintenance %}
-        {% set alert = item.alert %}
+        {% set alertStatus = item.alertStatus %}
+        {% set alerts = item.alerts|default([]) %}
+        {% set hasCritical = item.hasCritical|default(false) %}
         {% set typeMap = {'Mécanique':'mecanique','Électricité':'electrique','Hydraulique':'hydraulique','Logicielle':'logicielle','Transmission':'transmission','Moteur':'moteur','Vidange & filtres':'vidange','Révision générale':'revision','Pneumatique':'pneumatique'} %}
         {% set bc = typeMap[m.typePanne]|default('default') %}
         {% set prioLabels = {'faible':'🔵 Faible','moyenne':'🟢 Moyenne','haute':'🟠 Haute','urgente':'🔴 Urgente'} %}
@@ -353,6 +342,7 @@
         {% set prioOrder = {'faible':1,'moyenne':2,'haute':3,'urgente':4} %}
         {% set headerCls = m.priorite == 'urgente' ? 'h--urgente' : 'h--' ~ (m.statut|default('planifie')) %}
         {% set machineName = m.nomMateriel is defined and m.nomMateriel is not null ? m.nomMateriel : (m.nom is defined and m.nom is not null ? m.nom : 'Machine non définie') %}
+        {% set aiReco = m.recommandation|default('') %}
 
         <div class="maint-card-item"
              data-id="{{ m.idMain }}"
@@ -379,9 +369,48 @@
             </div>
           </div>
 
-          {% if alert.status == 'overdue' %}<div class="mci-alert alert-danger">⚠️ {{ alert.message }}</div>
-          {% elseif alert.status == 'warning' %}<div class="mci-alert alert-warning">⏰ {{ alert.message }}</div>
-          {% elseif m.dateMain %}<div class="mci-alert" style="background:#f0faf7;border-left-color:#0F6E56;color:#085041;">📅 Maintenance le {{ m.dateMain|date('d/m/Y') }}</div>
+          {# Alerte de statut (overdue/warning/ok) #}
+          {% if alertStatus.status == 'overdue' %}
+            <div class="mci-alert alert-danger">⚠️ {{ alertStatus.message }}</div>
+          {% elseif alertStatus.status == 'warning' %}
+            <div class="mci-alert alert-warning">⏰ {{ alertStatus.message }}</div>
+          {% elseif m.dateMain %}
+            <div class="mci-alert" style="background:#f0faf7;border-left-color:#0F6E56;color:#085041;">📅 Maintenance le {{ m.dateMain|date('d/m/Y') }}</div>
+          {% endif %}
+
+          {# ══ ALERTES IA PRÉVENTION ══ #}
+          {% if alerts|length > 0 %}
+            {% for alert in alerts|slice(0, 2) %}
+              <div class="ai-alert-card {{ alert.priority == 'urgente' ? 'ai-alert-critical' : (alert.priority == 'haute' ? 'ai-alert-high' : (alert.priority == 'moyenne' ? 'ai-alert-medium' : 'ai-alert-low')) }}" style="margin-bottom: 6px;">
+                <div style="display: flex; align-items: flex-start; gap: 10px; width: 100%;">
+                  <span style="font-size: 1.3rem; flex-shrink: 0;">{{ alert.icon }}</span>
+                  <div style="flex: 1;">
+                    <strong style="display: block; font-size: 0.8rem; {{ alert.priority == 'urgente' ? 'color: #a32d2d;' : (alert.priority == 'haute' ? 'color: #e67e22;' : 'color: #2d6a2d;') }}">{{ alert.title }}</strong>
+                    <span style="font-size: 0.7rem; color: #5a7a5a; display: block; margin-top: 2px;">{{ alert.message|slice(0, 100) }}{{ alert.message|length > 100 ? '...' : '' }}</span>
+                    {% if alert.action %}
+                      <button onclick="showAlertAction('{{ alert.action|escape('js') }}', '{{ alert.title|escape('js') }}')" 
+                          style="display: inline-block; margin-top: 6px; background: {{ alert.color }}; color: white; border: none; border-radius: 6px; padding: 3px 12px; font-size: 0.65rem; cursor: pointer; font-weight: 600;">
+                          {{ alert.action }}
+                      </button>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+            
+            {% if alerts|length > 2 %}
+              <div onclick="showAllAlerts({{ m.idMain }})" 
+                  style="background: #f0f0f0; text-align: center; padding: 6px; border-radius: 8px; font-size: 0.7rem; cursor: pointer; margin-top: 4px; color: #2d6a2d;">
+                  +{{ alerts|length - 2 }} alerte(s) supplémentaire(s) ▶
+              </div>
+            {% endif %}
+          {% else %}
+            <div class="ai-alert-card ai-alert-low" style="margin-bottom: 6px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span>✅</span>
+                <span style="font-size: 0.75rem; color: #2d6a2d;">Aucune alerte - Maintenance à jour</span>
+              </div>
+            </div>
           {% endif %}
 
           <div class="mci-stats">
@@ -396,16 +425,36 @@
             <div class="mci-row"><span class="mci-row-label">Statut</span><span class="statut-badge statut--{{ m.statut|default('planifie') }}">{{ statutLabels[m.statut]|default('—') }}</span></div>
             <div class="mci-row"><span class="mci-row-label">Coût</span><strong>{{ m.cout|number_format(2,',',' ') }} DT</strong></div>
             {% if m.description %}<div class="mci-desc" title="{{ m.description }}">{{ m.description }}</div>{% endif %}
-            {% if m.recommandation %}
-              <div class="mci-row" style="margin-top:4px;"><span class="mci-row-label">💡 Reco IA</span><span style="font-size:.75rem;color:#2d6a2d;">{{ m.recommandation|slice(0,80) }}{{ m.recommandation|length > 80 ? '…' : '' }}</span></div>
-            {% endif %}
+            
+            {# ══ RECOMMANDATION IA ══ #}
+            <div class="ai-reco-section">
+              <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+                <span style="font-size:14px;">🧠</span>
+                <span style="font-size:11px; font-weight:700; color:#2d6a2d; text-transform:uppercase; letter-spacing:0.5px;">Recommandation IA</span>
+              </div>
+              {% if aiReco and aiReco|trim is not empty %}
+                <div style="font-size:12px; color:#1a4a1a; line-height:1.4;" id="reco-card-{{ m.idMain }}">
+                  {{ aiReco|slice(0, 120) }}{{ aiReco|length > 120 ? '...' : '' }}
+                </div>
+                {% if aiReco|length > 120 %}
+                  <button onclick="toggleRecoCard({{ m.idMain }}, this)" 
+                          style="background:none; border:none; color:#2d6a2d; font-size:10px; cursor:pointer; margin-top:4px; font-weight:600;">
+                    ▼ Voir plus
+                  </button>
+                {% endif %}
+              {% else %}
+                <div style="font-size:11px; color:#999; margin-bottom:6px;">Aucune recommandation disponible</div>
+                <button onclick="generateRecoForCard({{ m.idMain }})" 
+                        style="background:#2d6a2d; color:white; border:none; border-radius:6px; padding:4px 8px; font-size:10px; cursor:pointer;">
+                  🧠 Générer IA
+                </button>
+              {% endif %}
+            </div>
           </div>
 
           <div class="mci-actions">
             <a href="{{ path('agri_maintenances_show', {id: m.idMain}) }}" class="mci-btn mci-btn--view">👁 Voir</a>
             <a href="{{ path('agri_maintenances_edit', {id: m.idMain}) }}" class="mci-btn mci-btn--edit">✏️ Edit</a>
-            <a href="javascript:void(0)" class="mci-btn mci-btn--ia-pro"
-               onclick="generateAndShowAIRecommendation({{ m.idMain }}, '{{ m.typePanne|e('js') }}', '{{ m.priorite|e('js') }}', '{{ m.kilometrage|default(0) }}', '{{ machineName|e('js') }}', '{{ m.statut|e('js') }}', '{{ m.cout|default(0) }}', '{{ m.description|default('')|e('js') }}')">🧠 IA Pro</a>
             <form method="post" action="{{ path('agri_maintenances_delete', {id: m.idMain}) }}" onsubmit="return confirm('⚠️ Supprimer cette maintenance ?')" style="margin:0;">
               <input type="hidden" name="_token" value="{{ csrf_token('delete_maintenance_' ~ m.idMain) }}">
               <button type="submit" class="mci-btn mci-btn--del" title="Supprimer">🗑</button>
@@ -415,7 +464,6 @@
       {% endfor %}
     </div>
     <div id="noResultsCards" style="display:none;text-align:center;padding:3rem;color:#7a9a7a;">🔍 Aucun résultat.</div>
-    {# ══ PAGINATION CARTES (2 boutons) ══ #}
     <div class="pagination-wrap" id="paginationCards"></div>
   </div>
 
@@ -433,10 +481,14 @@
         <tbody id="maintBody">
           {% for item in maintenancesWithAlerts %}
             {% set m = item.maintenance %}
-            {% set alert = item.alert %}
+            {% set alertStatus = item.alertStatus %}
+            {% set alerts = item.alerts|default([]) %}
+            {% set hasCritical = item.hasCritical|default(false) %}
             {% set typeMap2 = {'Mécanique':'mecanique','Électricité':'electrique','Hydraulique':'hydraulique','Logicielle':'logicielle','Transmission':'transmission','Moteur':'moteur','Vidange & filtres':'vidange','Révision générale':'revision','Pneumatique':'pneumatique'} %}
             {% set bc2 = typeMap2[m.typePanne]|default('default') %}
             {% set machineName2 = m.nomMateriel is defined and m.nomMateriel is not null ? m.nomMateriel : (m.nom is defined and m.nom is not null ? m.nom : '') %}
+            {% set aiReco = m.recommandation|default('') %}
+            
             <tr data-id="{{ m.idMain }}"
                 data-type="{{ m.typePanne|default('')|lower }}"
                 data-desc="{{ m.description|default('')|lower }}"
@@ -454,10 +506,15 @@
               <td><span class="prio-badge prio--{{ m.priorite|default('moyenne') }}">{{ {'faible':'🔵 Faible','moyenne':'🟢 Moyenne','haute':'🟠 Haute','urgente':'🔴 Urgente'}[m.priorite]|default('—') }}</span></td>
               <td style="font-size:.85rem;">{{ m.kilometrage is not null ? m.kilometrage ~ ' km' : '—' }}</td>
               <td>
-                {% if alert.status == 'overdue' %}<span style="color:#a32d2d;font-weight:600;">⚠️ {{ alert.message|slice(0,30) }}</span>
-                {% elseif alert.status == 'warning' %}<span style="color:#856404;">⏰ {{ alert.message|slice(0,30) }}</span>
-                {% elseif alert.status == 'ok' %}<span style="color:#27500a;">✅ {{ alert.message|slice(0,30) }}</span>
-                {% else %}<span style="color:#7a9a7a;">📅 {{ alert.message|slice(0,30) }}</span>{% endif %}
+                {% if alertStatus.status == 'overdue' %}
+                  <span style="color:#a32d2d;font-weight:600;">⚠️ {{ alertStatus.message|slice(0,30) }}</span>
+                {% elseif alertStatus.status == 'warning' %}
+                  <span style="color:#856404;">⏰ {{ alertStatus.message|slice(0,30) }}</span>
+                {% elseif alertStatus.status == 'ok' %}
+                  <span style="color:#27500a;">✅ {{ alertStatus.message|slice(0,30) }}</span>
+                {% else %}
+                  <span style="color:#7a9a7a;">📅 Maintenance à jour</span>
+                {% endif %}
                 </td>
               <td>
                 {% if m.idM and machineName2 %}
@@ -470,15 +527,29 @@
                 {% endif %}
                 </td>
               <td class="td-desc" title="{{ m.description|default('') }}">{{ m.description|default('—')|slice(0,35) }}{{ m.description|length > 35 ? '…' : '' }}</td>
-              <td style="font-size:.75rem;color:#2d6a2d;max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="{{ m.recommandation|default('') }}">
-                {{ m.recommandation|default('—')|slice(0,40) }}{{ m.recommandation|length > 40 ? '…' : '' }}
+              <td style="font-size:.75rem;max-width:200px;">
+                {% if aiReco and aiReco|trim is not empty %}
+                  <div class="td-ai-reco" title="{{ aiReco }}" style="color:#2d6a2d; cursor:pointer;" onclick="showFullReco({{ m.idMain }}, '{{ aiReco|escape('js') }}')">
+                    🧠 {{ aiReco|slice(0, 50) }}{{ aiReco|length > 50 ? '...' : '' }}
+                  </div>
+                  {% if aiReco|length > 50 %}
+                    <button onclick="showFullReco({{ m.idMain }}, '{{ aiReco|escape('js') }}')" 
+                            style="background:none; border:none; color:#2d6a2d; font-size:9px; cursor:pointer; margin-top:2px;">
+                      ▼ voir plus
+                    </button>
+                  {% endif %}
+                {% else %}
+                  <span style="color:#aaa; font-style:italic;">En attente...</span>
+                  <button onclick="generateRecoForTable({{ m.idMain }})" 
+                          style="display:block; margin-top:4px; background:#2d6a2d; color:white; border:none; border-radius:4px; padding:2px 8px; font-size:9px; cursor:pointer;">
+                    Générer
+                  </button>
+                {% endif %}
                 </td>
               <td>
                 <div class="actions">
                   <a href="{{ path('agri_maintenances_show', {id: m.idMain}) }}" class="act-btn act-btn--view">👁</a>
                   <a href="{{ path('agri_maintenances_edit', {id: m.idMain}) }}" class="act-btn act-btn--edit">✏️</a>
-                  <a href="javascript:void(0)" class="act-btn act-btn--ia-pro"
-                     onclick="generateAndShowAIRecommendation({{ m.idMain }}, '{{ m.typePanne|e('js') }}', '{{ m.priorite|e('js') }}', '{{ m.kilometrage|default(0) }}', '{{ machineName2|e('js') }}', '{{ m.statut|e('js') }}', '{{ m.cout|default(0) }}', '{{ m.description|default('')|e('js') }}')">🧠 IA Pro</a>
                   <form method="post" action="{{ path('agri_maintenances_delete', {id: m.idMain}) }}" onsubmit="return confirm('Supprimer ?')" style="display:inline;margin:0;">
                     <input type="hidden" name="_token" value="{{ csrf_token('delete_maintenance_' ~ m.idMain) }}">
                     <button type="submit" class="act-btn act-btn--del">🗑</button>
@@ -491,14 +562,13 @@
       </table>
       <div id="noResultsTable" style="display:none;text-align:center;padding:3rem;color:#7a9a7a;">🔍 Aucun résultat.</div>
     </div>
-    {# ══ PAGINATION TABLEAU (2 boutons) ══ #}
     <div class="pagination-wrap" id="paginationTable"></div>
   </div>
 
   {% endif %}
 </div>
 
-{# ══ MODALES (inchangées) ══ #}
+{# ══ CALENDRIER RAPPELS ANNUELS MODAL ══ #}
 <div id="reminderCalendarModal" style="display:none;position:fixed;z-index:10002;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);justify-content:center;align-items:flex-start;overflow-y:auto;padding:2rem 1rem;">
   <div style="background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 25px 50px rgba(0,0,0,0.25);animation:popupSlideIn 0.3s ease-out;width:95%;max-width:1100px;margin:auto;">
     <div style="background:linear-gradient(135deg,#e74a3b 0%,#c0392b 100%);padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;">
@@ -509,25 +579,22 @@
       </h3>
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
         <button class="btn btn--google" onclick="exportAllRemindersToGoogleCalendar()">📤 Exporter vers Google</button>
-        <button onclick="analyzeAllRemindersWithAI()"
-                style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:white;border:none;padding:.5rem 1rem;border-radius:10px;font-size:.8rem;cursor:pointer;font-weight:600;display:inline-flex;align-items:center;gap:.3rem;">
-          🧠 IA Pro - Analyse globale
-        </button>
+        <button class="btn btn--outline" onclick="exportAllNotes()" style="background:#fff;">📥 Exporter mes notes</button>
         <button id="closeCalendarBtn"
                 style="background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.5);color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1.3rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s;line-height:1;"
-                title="Fermer" onclick="closeReminderCalendar()">×</button>
+                onclick="closeReminderCalendar()">×</button>
       </div>
     </div>
     <div style="padding:20px;background:#f9fcf7;">
       <div style="margin-bottom:15px;background:#fff;border-radius:12px;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;box-shadow:0 1px 6px rgba(0,0,0,.05);">
         <div style="display:flex;align-items:center;gap:10px;">
-          <span style="width:12px;height:12px;background:#e74a3b;border-radius:50%;display:inline-block;flex-shrink:0;"></span>
-          <span style="font-size:13px;color:#5f7a5f;">Dates surlignées = machines nécessitant maintenance · <strong style="color:#2d6a2d;">Cliquez sur un jour pour ajouter une note</strong></span>
+          <span style="width:12px;height:12px;background:#e74a3b;border-radius:50%;display:inline-block;"></span>
+          <span style="font-size:13px;color:#5f7a5f;">Dates surlignées = machines nécessitant maintenance · <strong style="color:#2d6a2d;">Cliquez sur un événement pour voir les détails</strong></span>
         </div>
         <div style="display:flex;gap:15px;flex-wrap:wrap;">
-          <div style="display:flex;align-items:center;gap:5px;"><div style="width:12px;height:12px;background:#e74a3b;border-radius:50%;flex-shrink:0;"></div><span style="font-size:11px;color:#5f7a5f;">Rappel annuel (1+ an)</span></div>
-          <div style="display:flex;align-items:center;gap:5px;"><div style="width:12px;height:12px;background:#a32d2d;border-radius:50%;flex-shrink:0;"></div><span style="font-size:11px;color:#5f7a5f;">Urgent</span></div>
-          <div style="display:flex;align-items:center;gap:5px;"><div style="width:12px;height:12px;background:#2d6a2d;border-radius:50%;flex-shrink:0;"></div><span style="font-size:11px;color:#5f7a5f;">Note personnelle</span></div>
+          <div style="display:flex;align-items:center;gap:5px;"><div style="width:12px;height:12px;background:#e74a3b;border-radius:50%;"></div><span style="font-size:11px;">Rappel annuel (1+ an)</span></div>
+          <div style="display:flex;align-items:center;gap:5px;"><div style="width:12px;height:12px;background:#a32d2d;border-radius:50%;"></div><span style="font-size:11px;">Urgent</span></div>
+          <div style="display:flex;align-items:center;gap:5px;"><span style="font-size:14px;">📝</span><span style="font-size:11px;">Note existante</span></div>
         </div>
       </div>
       <div id="reminderCalendar"></div>
@@ -535,10 +602,45 @@
   </div>
 </div>
 
+{# ══ MODAL POUR LES NOTES ══ #}
+<div id="noteModal" class="reminder-popup" style="display:none;">
+  <div class="reminder-popup-content" style="max-width: 500px;">
+    <div class="reminder-popup-header" style="background: linear-gradient(135deg, #2d6a2d, #1a451a);">
+      <h3><span>📝</span> Ma note</h3>
+      <button class="reminder-popup-close" onclick="closeNoteModal()">×</button>
+    </div>
+    <div class="reminder-popup-body">
+      <div style="margin-bottom: 15px;">
+        <label style="font-size: 14px; font-weight: 600; color: #2d6a2d;">Date : <span id="noteDateDisplay" style="color: #1a2e1a;"></span></label>
+      </div>
+      <textarea id="noteContent" 
+        placeholder="📝 Écrivez votre note ici...&#10;&#10;Exemples :&#10;• Penser à vérifier les niveaux d'huile&#10;• Contacter le garagiste pour la révision&#10;• Commande de pièces détachées&#10;• Programmer la vidange pour la semaine prochaine&#10;• Vérifier la pression des pneus"
+        style="width: 100%; min-height: 200px; padding: 12px; border: 2px solid #d4e8d4; border-radius: 12px; font-size: 14px; font-family: inherit; resize: vertical; outline: none; transition: border-color 0.15s;"></textarea>
+      
+      <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
+        <button onclick="saveNote()" class="btn btn--green" style="flex: 1;">
+          💾 Enregistrer la note
+        </button>
+        <button onclick="deleteNote()" class="btn btn--outline" style="color: #a32d2d; border-color: #f7c1c1;">
+          🗑 Supprimer
+        </button>
+        <button onclick="closeNoteModal()" class="btn btn--outline">
+          ✕ Fermer
+        </button>
+      </div>
+      
+      <div style="margin-top: 15px; font-size: 12px; color: #7a9a7a; text-align: center; padding: 10px; background: #f9fcf7; border-radius: 8px;">
+        💡 Astuce : Les notes sont automatiquement sauvegardées sur votre navigateur
+      </div>
+    </div>
+  </div>
+</div>
+
+{# ══ POPUP DETAIL RAPPEL ══ #}
 <div id="reminderDetailPopup" class="reminder-popup">
   <div class="reminder-popup-content">
     <div class="reminder-popup-header">
-      <h3><span>🧠</span> Analyse IA intelligente</h3>
+      <h3><span>🔔</span> Détail du rappel</h3>
       <button class="reminder-popup-close" onclick="closeReminderDetailPopup()">×</button>
     </div>
     <div class="reminder-popup-body" id="reminderDetailBody">
@@ -546,63 +648,6 @@
         <div class="modal-loader__spinner"></div>
         <div class="modal-loader__text">Chargement...</div>
       </div>
-    </div>
-  </div>
-</div>
-
-<div id="dayNoteModal" style="display:none;position:fixed;z-index:10060;inset:0;background:rgba(0,0,0,.55);justify-content:center;align-items:center;">
-  <div style="background:#fff;border-radius:20px;width:90%;max-width:480px;overflow:hidden;animation:popupSlideIn .25s ease-out;box-shadow:0 25px 50px rgba(0,0,0,.25);">
-    <div style="background:#1a2e1a;padding:1rem 1.4rem;display:flex;align-items:center;justify-content:space-between;">
-      <div>
-        <div style="font-size:15px;font-weight:700;color:#fff;">📝 Note du jour</div>
-        <div style="font-size:11px;color:#8aaa8a;margin-top:2px;" id="dayNoteLabel"></div>
-      </div>
-      <button onclick="closeDayNoteModal()" style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>
-    </div>
-    <div style="padding:1.2rem 1.4rem;">
-      <div style="margin-bottom:.9rem;">
-        <label style="display:block;font-size:11px;font-weight:700;color:#7a9a7a;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">Note / Observation</label>
-        <textarea id="dayNoteText" rows="4" placeholder="Ex : Révision tracteur prévue, pièces commandées, technicien contacté…"
-          style="width:100%;padding:9px 11px;border:1.5px solid #d4e8d4;border-radius:9px;font-size:13px;font-family:inherit;color:#1a2e1a;resize:vertical;outline:none;transition:border-color .15s;"
-          onfocus="this.style.borderColor='#2d6a2d'" onblur="this.style.borderColor='#d4e8d4'"></textarea>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.9rem;">
-        <div>
-          <label style="display:block;font-size:11px;font-weight:700;color:#7a9a7a;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">Type</label>
-          <select id="dayNoteType" style="width:100%;padding:8px 10px;border:1.5px solid #d4e8d4;border-radius:8px;font-size:13px;color:#1a2e1a;background:#fff;outline:none;">
-            <option value="Maintenance">🔧 Maintenance</option>
-            <option value="Inspection">🔍 Inspection</option>
-            <option value="Vidange">🛢 Vidange</option>
-            <option value="Révision">⚙️ Révision</option>
-            <option value="Réparation">🛠 Réparation</option>
-            <option value="Autre">📌 Autre</option>
-          </select>
-        </div>
-        <div>
-          <label style="display:block;font-size:11px;font-weight:700;color:#7a9a7a;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">Priorité</label>
-          <select id="dayNotePriorite" style="width:100%;padding:8px 10px;border:1.5px solid #d4e8d4;border-radius:8px;font-size:13px;color:#1a2e1a;background:#fff;outline:none;">
-            <option value="faible">🔵 Faible</option>
-            <option value="moyenne">🟢 Moyenne</option>
-            <option value="haute">🟠 Haute</option>
-            <option value="urgente">🔴 Urgente</option>
-          </select>
-        </div>
-      </div>
-      <div id="dayNoteOtherDates" style="display:none;margin-bottom:.75rem;">
-        <div style="font-size:11px;font-weight:700;color:#7a9a7a;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">Autres notes récentes</div>
-        <div id="dayNoteOtherList" style="max-height:120px;overflow-y:auto;border:1px solid #e4edde;border-radius:8px;padding:4px 0;"></div>
-      </div>
-    </div>
-    <div style="display:flex;align-items:center;gap:8px;padding:.9rem 1.4rem;border-top:1px solid #e4edde;background:#fafcf8;">
-      <button id="dayNoteDeleteBtn" onclick="deleteDayNote()"
-        style="display:none;background:none;border:1.5px solid #f7c1c1;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:600;cursor:pointer;color:#a32d2d;margin-right:auto;"
-        onmouseover="this.style.background='#fcebeb'" onmouseout="this.style.background='none'">🗑 Supprimer</button>
-      <button onclick="closeDayNoteModal()"
-        style="background:none;border:1.5px solid #d4e8d4;border-radius:8px;padding:7px 14px;font-size:13px;font-weight:600;cursor:pointer;color:#1a2e1a;"
-        onmouseover="this.style.background='#f7faf4'" onmouseout="this.style.background='none'">Annuler</button>
-      <button onclick="saveDayNote()"
-        style="background:#2d6a2d;color:#fff;border:none;border-radius:8px;padding:7px 18px;font-size:13px;font-weight:600;cursor:pointer;"
-        onmouseover="this.style.background='#235223'" onmouseout="this.style.background='#2d6a2d'">💾 Enregistrer</button>
     </div>
   </div>
 </div>
@@ -615,17 +660,13 @@
 // ================================================================
 let currentView = localStorage.getItem('maintView') || 'cards';
 let reminderCalendar = null;
-let reminderEvents   = [];
+let reminderEvents = [];
 let allRemindersData = [];
+let currentNoteDate = null;
 
-// ── Pagination ──
-let pgCards = { page:1, perPage:6,  items:[] };
+// Pagination
+let pgCards = { page:1, perPage:6, items:[] };
 let pgTable = { page:1, perPage:10, items:[] };
-
-// ── Notes par jour ──
-let dayNotes = {};
-try { dayNotes = JSON.parse(localStorage.getItem('agro_day_notes') || '{}'); } catch(e){}
-let _currentNoteDate = null;
 
 // ================================================================
 // VUE TOGGLE
@@ -634,7 +675,7 @@ function setView(v) {
     currentView = v;
     localStorage.setItem('maintView', v);
     document.getElementById('viewCardsContainer').style.display = v === 'cards' ? 'block' : 'none';
-    document.getElementById('viewTableContainer').style.display = v === 'table'  ? 'block' : 'none';
+    document.getElementById('viewTableContainer').style.display = v === 'table' ? 'block' : 'none';
     document.getElementById('viewCards')?.classList.toggle('active', v === 'cards');
     document.getElementById('viewTable')?.classList.toggle('active', v === 'table');
     filterItems();
@@ -670,7 +711,6 @@ function filterItems() {
             && (!prio   || (el.dataset.priorite||'') === prio);
     }
 
-    // ── Cartes ──
     const cardsGrid = document.getElementById('cardsGrid');
     if (cardsGrid) {
         const allCards = Array.from(cardsGrid.children).filter(c => !c.id);
@@ -681,7 +721,6 @@ function filterItems() {
         renderPaginatedCards();
     }
 
-    // ── Tableau ──
     const tbody = document.getElementById('maintBody');
     if (tbody) {
         const allRows = Array.from(tbody.querySelectorAll('tr'));
@@ -733,7 +772,7 @@ function resetFilters() {
 }
 
 // ================================================================
-// PAGINATION — CARTES
+// PAGINATION
 // ================================================================
 function renderPaginatedCards() {
     const grid   = document.getElementById('cardsGrid');
@@ -741,7 +780,6 @@ function renderPaginatedCards() {
     const pgWrap = document.getElementById('paginationCards');
     if (!grid) return;
 
-    // Masquer tous les éléments
     const allOriginal = Array.from(grid.children).filter(c => !c.id);
     allOriginal.forEach(c => c.style.display = 'none');
 
@@ -760,7 +798,6 @@ function renderPaginatedCards() {
     }
     if (noRes) noRes.style.display = 'none';
 
-    // Afficher les items de la page courante
     items.slice(start, end).forEach(c => c.style.display = '');
 
     renderPaginationBar(pgWrap, pgCards.page, pages, perPage, total, (p) => {
@@ -770,16 +807,12 @@ function renderPaginatedCards() {
     });
 }
 
-// ================================================================
-// PAGINATION — TABLEAU
-// ================================================================
 function renderPaginatedTable() {
     const tbody  = document.getElementById('maintBody');
     const noRes  = document.getElementById('noResultsTable');
     const pgWrap = document.getElementById('paginationTable');
     if (!tbody) return;
 
-    // Masquer toutes les lignes
     Array.from(tbody.querySelectorAll('tr')).forEach(r => r.style.display = 'none');
 
     const items   = pgTable.items;
@@ -806,9 +839,6 @@ function renderPaginatedTable() {
     });
 }
 
-// ================================================================
-// PAGINATION — BARRE DE CONTRÔLE COMPLÈTE
-// ================================================================
 function renderPaginationBar(wrap, page, pages, perPage, total, onPage, onPerPage) {
     if (!wrap) return;
     if (pages <= 1) {
@@ -816,131 +846,275 @@ function renderPaginationBar(wrap, page, pages, perPage, total, onPage, onPerPag
         return;
     }
 
-    const canPrev = page > 1;
-    const canNext = page < pages;
-
     wrap.innerHTML = `
-        <button type="button" class="pg-btn ${canNext ? 'active' : ''}" ${!canNext ? 'disabled' : ''} data-page="${page + 1}">1</button>
-        <button type="button" class="pg-btn ${canPrev ? 'active' : ''}" ${!canPrev ? 'disabled' : ''} data-page="${page - 1}">0</button>
+        <button type="button" class="pg-btn ${page > 1 ? '' : 'disabled'}" ${page <= 1 ? 'disabled' : ''} onclick="onPage(${page - 1})">‹ Précédent</button>
+        <span class="pg-info">Page ${page} / ${pages}</span>
+        <button type="button" class="pg-btn ${page < pages ? '' : 'disabled'}" ${page >= pages ? 'disabled' : ''} onclick="onPage(${page + 1})">Suivant ›</button>
+        <select class="pg-size-select" onchange="onPerPage(parseInt(this.value))">
+            <option value="6" ${perPage === 6 ? 'selected' : ''}>6 / page</option>
+            <option value="10" ${perPage === 10 ? 'selected' : ''}>10 / page</option>
+            <option value="20" ${perPage === 20 ? 'selected' : ''}>20 / page</option>
+            <option value="50" ${perPage === 50 ? 'selected' : ''}>50 / page</option>
+        </select>
     `;
-
-    wrap.querySelectorAll('button[data-page]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const target = parseInt(btn.getAttribute('data-page') || '1', 10);
-            if (!Number.isNaN(target)) onPage(target);
-        });
-    });
+    
+    window.onPage = onPage;
+    window.onPerPage = onPerPage;
 }
 
 // ================================================================
-// NOTES PAR JOUR — SAUVEGARDE
+// RECOMMANDATIONS IA
 // ================================================================
-function saveDayNotes() {
-    try { localStorage.setItem('agro_day_notes', JSON.stringify(dayNotes)); } catch(e){}
-}
 
-function openDayNoteModal(dateStr) {
-    _currentNoteDate = dateStr;
-    const existing   = dayNotes[dateStr] || {};
-
-    const d         = new Date(dateStr + 'T12:00:00');
-    const monthsFR  = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
-    const daysFR    = ['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
-    const dayLabel  = `${daysFR[d.getDay()]} ${d.getDate()} ${monthsFR[d.getMonth()]} ${d.getFullYear()}`;
-
-    document.getElementById('dayNoteLabel').textContent    = dayLabel;
-    document.getElementById('dayNoteText').value           = existing.text || '';
-    document.getElementById('dayNoteType').value           = existing.type || 'Maintenance';
-    document.getElementById('dayNotePriorite').value       = existing.priorite || 'moyenne';
-    document.getElementById('dayNoteDeleteBtn').style.display = existing.text ? 'inline-block' : 'none';
-
-    const others = Object.entries(dayNotes)
-        .filter(([k, v]) => k !== dateStr && v.text)
-        .sort(([a], [b]) => b.localeCompare(a))
-        .slice(0, 4);
-
-    const otherWrap = document.getElementById('dayNoteOtherDates');
-    const otherList = document.getElementById('dayNoteOtherList');
-    if (others.length > 0) {
-        otherWrap.style.display = 'block';
-        otherList.innerHTML = others.map(([k, v]) => {
-            const od = new Date(k + 'T12:00:00');
-            const prioColors = { urgente:'#a32d2d', haute:'#854F0B', moyenne:'#27500a', faible:'#0c447c' };
-            return `<div onclick="openDayNoteModal('${k}')"
-                style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;cursor:pointer;border-bottom:1px solid #f0f4ef;font-size:12px;transition:background .1s;"
-                onmouseover="this.style.background='#f7faf4'" onmouseout="this.style.background=''">
-                <span style="color:#1a2e1a;font-weight:500;">${od.getDate()} ${monthsFR[od.getMonth()]} ${od.getFullYear()}</span>
-                <span style="color:#7a9a7a;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(v.text.slice(0,40))}${v.text.length>40?'…':''}</span>
-                <span style="background:${prioColors[v.priorite]||'#27500a'};color:#fff;padding:1px 7px;border-radius:20px;font-size:10px;">${v.type||''}</span>
-            </div>`;
-        }).join('');
-    } else {
-        otherWrap.style.display = 'none';
+function toggleRecoCard(id, btn) {
+    const el = document.getElementById('reco-card-' + id);
+    if (!el) return;
+    const fullText = el.getAttribute('data-full') || el.innerText;
+    if (!el.getAttribute('data-full')) {
+        el.setAttribute('data-full', el.innerText);
     }
+    const expanded = el.classList.toggle('expanded');
+    if (expanded) {
+        el.innerText = fullText;
+        btn.innerHTML = '▲ Voir moins';
+    } else {
+        el.innerText = fullText.slice(0, 120) + '...';
+        btn.innerHTML = '▼ Voir plus';
+    }
+}
 
-    const modal = document.getElementById('dayNoteModal');
+function showFullReco(id, text) {
+    showModal('🧠 Recommandation IA', `
+        <div style="background:#e8f5e9; border-radius:12px; padding:16px;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+                <span style="font-size:24px;">🧠</span>
+                <strong style="color:#2d6a2d;">Recommandation IA</strong>
+            </div>
+            <div style="font-size:14px; line-height:1.6; color:#1a2e1a;">${escapeHtml(text)}</div>
+        </div>
+        <div style="margin-top:16px; text-align:center;">
+            <button onclick="this.closest('.modal-overlay').remove()" 
+                    style="background:#2d6a2d; color:white; border:none; border-radius:8px; padding:8px 20px; cursor:pointer;">
+                Fermer
+            </button>
+        </div>
+    `);
+}
+
+async function generateRecoForCard(id) {
+    const card = document.querySelector(`.maint-card-item[data-id="${id}"]`);
+    if (!card) return;
+    
+    const recoDiv = card.querySelector('.ai-reco-section');
+    if (recoDiv) {
+        recoDiv.innerHTML = `
+            <div style="display:flex; align-items:center; gap:8px;">
+                <div class="modal-loader__spinner" style="width:16px; height:16px;"></div>
+                <span style="font-size:11px; color:#2d6a2d;">Génération en cours...</span>
+            </div>
+        `;
+    }
+    
+    try {
+        const response = await fetch(`/agriculteur/maintenances/api/generate-recommendation/${id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await response.json();
+        
+        if (data.success && data.recommandation) {
+            if (recoDiv) {
+                recoDiv.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+                        <span style="font-size:14px;">🧠</span>
+                        <span style="font-size:11px; font-weight:700; color:#2d6a2d;">Recommandation IA</span>
+                    </div>
+                    <div style="font-size:12px; color:#1a4a1a; line-height:1.4;" id="reco-card-${id}">
+                        ${escapeHtml(data.recommandation.slice(0, 120))}${data.recommandation.length > 120 ? '...' : ''}
+                    </div>
+                    ${data.recommandation.length > 120 ? `<button onclick="toggleRecoCard(${id}, this)" style="background:none; border:none; color:#2d6a2d; font-size:10px; cursor:pointer; margin-top:4px;">▼ Voir plus</button>` : ''}
+                `;
+            }
+            showNotification('✅ Recommandation IA générée avec succès', 'success');
+        } else {
+            showNotification('❌ Erreur lors de la génération', 'danger');
+        }
+    } catch (error) {
+        console.error('Erreur:', error);
+        showNotification('❌ Erreur réseau', 'danger');
+        if (recoDiv) {
+            recoDiv.innerHTML = `
+                <div style="font-size:11px; color:#a32d2d;">
+                    ⚠️ Erreur de génération. Réessayez.
+                </div>
+                <button onclick="generateRecoForCard(${id})" style="margin-top:6px; background:#2d6a2d; color:white; border:none; border-radius:6px; padding:4px 10px; font-size:10px; cursor:pointer;">
+                    🔄 Réessayer
+                </button>
+            `;
+        }
+    }
+}
+
+async function generateRecoForTable(id) {
+    const row = document.querySelector(`#maintBody tr[data-id="${id}"]`);
+    if (!row) return;
+    
+    const td = row.querySelector('td:nth-last-child(2)');
+    if (td) {
+        td.innerHTML = '<span style="color:#2d6a2d;"><div class="modal-loader__spinner" style="width:14px; height:14px; display:inline-block; vertical-align:middle;"></div> Génération...</span>';
+    }
+    
+    try {
+        const response = await fetch(`/agriculteur/maintenances/api/generate-recommendation/${id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await response.json();
+        
+        if (data.success && data.recommandation) {
+            if (td) {
+                td.innerHTML = `
+                    <div class="td-ai-reco" title="${escapeHtml(data.recommandation)}" style="color:#2d6a2d; cursor:pointer;" onclick="showFullReco(${id}, '${escapeHtml(data.recommandation)}')">
+                        🧠 ${escapeHtml(data.recommandation.slice(0, 50))}${data.recommandation.length > 50 ? '...' : ''}
+                    </div>
+                    ${data.recommandation.length > 50 ? `<button onclick="showFullReco(${id}, '${escapeHtml(data.recommandation)}')" style="background:none; border:none; color:#2d6a2d; font-size:9px; cursor:pointer; margin-top:2px;">▼ voir plus</button>` : ''}
+                `;
+            }
+            showNotification('✅ Recommandation IA générée avec succès', 'success');
+        } else {
+            showNotification('❌ Erreur lors de la génération', 'danger');
+        }
+    } catch (error) {
+        console.error('Erreur:', error);
+        showNotification('❌ Erreur réseau', 'danger');
+        if (td) {
+            td.innerHTML = `
+                <span style="color:#a32d2d;">⚠️ Erreur</span>
+                <button onclick="generateRecoForTable(${id})" style="display:block; margin-top:4px; background:#2d6a2d; color:white; border:none; border-radius:4px; padding:2px 8px; font-size:9px; cursor:pointer;">
+                    🔄 Réessayer
+                </button>
+            `;
+        }
+    }
+}
+
+// ================================================================
+// FONCTIONS POUR LES NOTES DU CALENDRIER
+// ================================================================
+function openNoteModal(date) {
+    currentNoteDate = date;
+    const modal = document.getElementById('noteModal');
+    if (!modal) return;
+    
+    const savedNote = localStorage.getItem(`calendar_note_${date}`);
+    const textarea = document.getElementById('noteContent');
+    if (textarea) {
+        textarea.value = savedNote || '';
+    }
+    
+    const dateDisplay = document.getElementById('noteDateDisplay');
+    if (dateDisplay) {
+        const d = new Date(date);
+        dateDisplay.textContent = d.toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    }
+    
     modal.style.display = 'flex';
-    setTimeout(() => document.getElementById('dayNoteText').focus(), 80);
+    document.body.style.overflow = 'hidden';
 }
 
-function closeDayNoteModal() {
-    document.getElementById('dayNoteModal').style.display = 'none';
-    _currentNoteDate = null;
+function closeNoteModal() {
+    const modal = document.getElementById('noteModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+    currentNoteDate = null;
 }
 
-function saveDayNote() {
-    if (!_currentNoteDate) return;
-    const text     = document.getElementById('dayNoteText').value.trim();
-    const type     = document.getElementById('dayNoteType').value;
-    const priorite = document.getElementById('dayNotePriorite').value;
+function saveNote() {
+    const textarea = document.getElementById('noteContent');
+    const note = textarea?.value || '';
+    
+    if (currentNoteDate) {
+        if (note.trim() === '') {
+            localStorage.removeItem(`calendar_note_${currentNoteDate}`);
+            showNotification('🗑 Note supprimée (vide)', 'info');
+        } else {
+            localStorage.setItem(`calendar_note_${currentNoteDate}`, note);
+            showNotification('✅ Note enregistrée avec succès !', 'success');
+        }
+        
+        if (reminderCalendar) {
+            reminderCalendar.refetchEvents();
+        }
+        
+        closeNoteModal();
+    }
+}
 
-    if (!text) {
-        const ta = document.getElementById('dayNoteText');
-        ta.style.borderColor = '#a32d2d';
-        ta.focus();
-        setTimeout(() => ta.style.borderColor = '#d4e8d4', 1500);
+function deleteNote() {
+    if (currentNoteDate && confirm('⚠️ Voulez-vous vraiment supprimer cette note ?')) {
+        localStorage.removeItem(`calendar_note_${currentNoteDate}`);
+        
+        if (reminderCalendar) {
+            reminderCalendar.refetchEvents();
+        }
+        
+        const textarea = document.getElementById('noteContent');
+        if (textarea) textarea.value = '';
+        
+        showNotification('🗑 Note supprimée', 'info');
+        closeNoteModal();
+    }
+}
+
+function exportAllNotes() {
+    const notes = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('calendar_note_')) {
+            const date = key.replace('calendar_note_', '');
+            const note = localStorage.getItem(key);
+            if (note && note.trim()) {
+                notes.push({ date, note });
+            }
+        }
+    }
+    
+    if (notes.length === 0) {
+        showNotification('Aucune note à exporter', 'warning');
         return;
     }
-
-    dayNotes[_currentNoteDate] = { text, type, priorite, updatedAt: new Date().toISOString() };
-    saveDayNotes();
-    closeDayNoteModal();
-
-    if (reminderCalendar) {
-        reminderCalendar.refetchEvents();
-        addNoteEventToCalendar(_currentNoteDate, text, type, priorite);
-    }
-    showNotification('📝 Note enregistrée pour le ' + _currentNoteDate, 'success');
-}
-
-function deleteDayNote() {
-    if (!_currentNoteDate || !confirm('Supprimer cette note ?')) return;
-    delete dayNotes[_currentNoteDate];
-    saveDayNotes();
-    closeDayNoteModal();
-    if (reminderCalendar) reminderCalendar.refetchEvents();
-    showNotification('🗑 Note supprimée', 'info');
-}
-
-function addNoteEventToCalendar(dateStr, text, type, priorite) {
-    if (!reminderCalendar) return;
-    const prioColors = { urgente:'#a32d2d', haute:'#854F0B', moyenne:'#2d6a2d', faible:'#0c447c' };
-    const existing = reminderCalendar.getEventById('note_' + dateStr);
-    if (existing) existing.remove();
-    reminderCalendar.addEvent({
-        id: 'note_' + dateStr,
-        title: '📝 ' + (text.slice(0, 25) + (text.length > 25 ? '…' : '')),
-        start: dateStr,
-        allDay: true,
-        backgroundColor: prioColors[priorite] || '#2d6a2d',
-        borderColor:     prioColors[priorite] || '#2d6a2d',
-        textColor: '#fff',
-        extendedProps: { isNote: true, noteText: text, noteType: type, notePriorite: priorite }
+    
+    notes.sort((a, b) => a.date.localeCompare(b.date));
+    
+    let content = "📝 NOTES DU CALENDRIER DES MAINTENANCES\n";
+    content += `Exporté le : ${new Date().toLocaleString('fr-FR')}\n`;
+    content += "=".repeat(60) + "\n\n";
+    
+    notes.forEach(({date, note}) => {
+        const d = new Date(date);
+        const dateFormatted = d.toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        content += `📅 DATE : ${date} (${dateFormatted})\n`;
+        content += `📝 NOTE :\n${note}\n`;
+        content += "-".repeat(50) + "\n\n";
     });
+    
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    link.download = `notes_calendrier_${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    showNotification(`📥 ${notes.length} note(s) exportée(s)`, 'success');
 }
 
 // ================================================================
-// CALENDRIER — INIT ET EVENTS
+// CALENDRIER RAPPELS ANNUELS
 // ================================================================
 function openReminderCalendar() {
     const modal = document.getElementById('reminderCalendarModal');
@@ -969,54 +1143,86 @@ async function initReminderCalendar() {
         initialView: 'dayGridMonth',
         locale: 'fr',
         headerToolbar: {
-            left:   'prev,next today',
+            left: 'prev,next today',
             center: 'title',
-            right:  'dayGridMonth,dayGridWeek'
+            right: 'dayGridMonth,dayGridWeek'
         },
         buttonText: { today: "Aujourd'hui", month: 'Mois', week: 'Semaine' },
         height: 500,
         selectable: true,
+        select: function(info) {
+            openNoteModal(info.startStr);
+        },
         dateClick: function(info) {
-            openDayNoteModal(info.dateStr);
+            openNoteModal(info.dateStr);
         },
         events: loadReminderEvents,
         eventDidMount: function(info) {
-            info.el.style.cursor        = 'pointer';
-            info.el.style.borderRadius  = '6px';
-            info.el.style.padding       = '2px 4px';
-            info.el.title = info.event.extendedProps?.isNote
-                ? '📝 ' + (info.event.extendedProps.noteText || '')
-                : (info.event.extendedProps?.message || 'Cliquer pour voir les détails');
+            info.el.style.cursor = 'pointer';
+            info.el.style.borderRadius = '6px';
+            info.el.style.padding = '2px 4px';
+            info.el.title = info.event.extendedProps?.message || 'Cliquer pour voir les détails';
         },
         eventClick: function(info) {
-            if (info.event.extendedProps?.isNote) {
-                openDayNoteModal(info.event.startStr);
-            } else {
-                showReminderDetail(info.event.id);
-            }
+            showReminderDetail(info.event.id);
         },
         dayCellDidMount: function(info) {
-            const dateStr    = info.date.toISOString().split('T')[0];
+            const dateStr = info.date.toISOString().split('T')[0];
             const hasReminder = reminderEvents.some(r => r.start === dateStr);
-            const hasNote     = dayNotes[dateStr]?.text;
+            
             if (hasReminder) {
-                info.el.style.background  = 'linear-gradient(135deg, #fff5f5 0%, #fcebeb 100%)';
-                info.el.style.borderLeft  = '3px solid #e74a3b';
+                info.el.style.background = 'linear-gradient(135deg, #fff5f5 0%, #fcebeb 100%)';
+                info.el.style.borderLeft = '3px solid #e74a3b';
             }
-            if (hasNote) {
-                const dot = document.createElement('div');
-                dot.style.cssText = 'position:absolute;bottom:3px;right:4px;width:7px;height:7px;background:#2d6a2d;border-radius:50%;';
-                info.el.style.position = 'relative';
-                info.el.appendChild(dot);
+            
+            const savedNote = localStorage.getItem(`calendar_note_${dateStr}`);
+            if (savedNote && savedNote.trim().length > 0) {
+                const noteIndicator = document.createElement('div');
+                noteIndicator.innerHTML = '📝';
+                noteIndicator.className = 'note-indicator';
+                noteIndicator.title = 'Note existante - Cliquer pour modifier';
+                noteIndicator.onclick = (e) => {
+                    e.stopPropagation();
+                    openNoteModal(dateStr);
+                };
+                
+                if (!info.el.querySelector('.note-indicator')) {
+                    info.el.style.position = 'relative';
+                    info.el.appendChild(noteIndicator);
+                }
             }
+            
+            info.el.addEventListener('mouseenter', function() {
+                if (!info.el.querySelector('.add-note-btn')) {
+                    const addBtn = document.createElement('button');
+                    addBtn.innerHTML = '📝 +';
+                    addBtn.className = 'add-note-btn';
+                    addBtn.title = 'Ajouter/Modifier une note';
+                    addBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        openNoteModal(dateStr);
+                    };
+                    info.el.style.position = 'relative';
+                    info.el.appendChild(addBtn);
+                    
+                    addBtn.addEventListener('mouseleave', function() {
+                        setTimeout(() => {
+                            if (addBtn && addBtn.parentNode && !info.el.matches(':hover')) {
+                                addBtn.remove();
+                            }
+                        }, 100);
+                    });
+                }
+            });
+            
+            info.el.addEventListener('mouseleave', function() {
+                const btn = info.el.querySelector('.add-note-btn');
+                if (btn) btn.remove();
+            });
         }
     });
 
     reminderCalendar.render();
-
-    Object.entries(dayNotes).forEach(([dateStr, note]) => {
-        if (note.text) addNoteEventToCalendar(dateStr, note.text, note.type, note.priorite);
-    });
 }
 
 async function loadReminderEvents(fetchInfo, successCallback, failureCallback) {
@@ -1026,30 +1232,29 @@ async function loadReminderEvents(fetchInfo, successCallback, failureCallback) {
         const data = await response.json();
         if (data.success) {
             allRemindersData = data.reminders;
-            reminderEvents   = data.reminders.map(r => {
-                r.aiRecommendation = generateLocalAIRecommendation(r);
-                return {
-                    id:    r.id,
-                    title: r.machineName,
-                    start: r.date,
-                    allDay: true,
-                    backgroundColor: r.priorite === 'urgente' ? '#a32d2d' : '#e74a3b',
-                    borderColor:     r.priorite === 'urgente' ? '#8b0000' : '#c0392b',
-                    textColor: '#ffffff',
-                    extendedProps: {
-                        isNote: false, message: r.message, machineName: r.machineName,
-                        type: r.type, priorite: r.priorite, yearsSince: r.yearsSince,
-                        monthsSince: r.monthsSince, ageText: r.ageText, km: r.km,
-                        cout: r.cout, description: r.description, dateMain: r.date,
-                        aiRecommendation: r.aiRecommendation
-                    }
-                };
-            });
+            reminderEvents = data.reminders.map(r => ({
+                id: r.id,
+                title: r.machineName,
+                start: r.date,
+                allDay: true,
+                backgroundColor: r.priorite === 'urgente' ? '#a32d2d' : '#e74a3b',
+                borderColor: r.priorite === 'urgente' ? '#8b0000' : '#c0392b',
+                textColor: '#ffffff',
+                extendedProps: {
+                    message: r.message,
+                    machineName: r.machineName,
+                    type: r.type,
+                    priorite: r.priorite,
+                    yearsSince: r.yearsSince,
+                    monthsSince: r.monthsSince,
+                    ageText: r.ageText,
+                    km: r.km,
+                    cout: r.cout,
+                    description: r.description,
+                    dateMain: r.date
+                }
+            }));
             successCallback(reminderEvents);
-
-            Object.entries(dayNotes).forEach(([dateStr, note]) => {
-                if (note.text) addNoteEventToCalendar(dateStr, note.text, note.type, note.priorite);
-            });
         } else {
             failureCallback(data.error || 'Erreur inconnue');
         }
@@ -1059,131 +1264,9 @@ async function loadReminderEvents(fetchInfo, successCallback, failureCallback) {
     }
 }
 
-function generateLocalAIRecommendation(reminder) {
-    const km         = reminder.km || 0;
-    const priorite   = reminder.priorite || 'moyenne';
-    const yearsSince = reminder.yearsSince || 0;
-    const type       = reminder.type || 'Générale';
-    let rec = '';
-
-    if (priorite === 'urgente')      rec += "🚨 URGENCE - Intervention immédiate requise !\n\n";
-    else if (yearsSince >= 2)        rec += "⚠️ CRITIQUE - Plus de 2 ans sans maintenance. Révision majeure obligatoire !\n\n";
-    else if (yearsSince >= 1)        rec += "🔔 RAPPEL ANNUEL - Maintenance préventive recommandée.\n\n";
-
-    if (km >= 15000) {
-        rec += `📊 Kilométrage CRITIQUE (${km.toLocaleString()} km) :\n• Révision majeure OBLIGATOIRE\n• Vidange complète + tous les filtres\n• Contrôle exhaustif moteur et transmission\n\n`;
-    } else if (km >= 10000) {
-        rec += `📊 Kilométrage ÉLEVÉ (${km.toLocaleString()} km) :\n• Révision générale conseillée\n• Vidange moteur et changement filtres\n\n`;
-    } else if (km >= 5000) {
-        rec += `📊 Kilométrage INTERMÉDIAIRE (${km.toLocaleString()} km) :\n• Vidange et entretien courant requis\n• Vérification des niveaux et courroies\n\n`;
-    }
-
-    const typeRecs = {
-        'Moteur':       "🔧 PANNE MOTEUR :\n• Vérifier la compression\n• Contrôler les niveaux d'huile\n• Inspecter les injecteurs\n\n",
-        'Électricité':  "⚡ PANNE ÉLECTRIQUE :\n• Tester batterie et alternateur\n• Vérifier les fusibles\n• Diagnostic OBD\n\n",
-        'Hydraulique':  "💧 PANNE HYDRAULIQUE :\n• Contrôler le niveau de fluide\n• Inspecter les flexibles\n• Rechercher les fuites\n\n",
-        'Transmission': "⚙️ TRANSMISSION :\n• Vérifier niveaux huile boîte\n• Contrôler les courroies\n• Tester l'embrayage\n\n",
-    };
-    if (typeRecs[type]) rec += typeRecs[type];
-
-    rec += "⚠️ SÉCURITÉ :\n• Port des EPI obligatoires\n• Couper le moteur avant intervention\n• Déconnecter la batterie (pôle négatif)\n• Extincteur à portée de main\n\n";
-    rec += "📋 MAINTENANCE PRÉVENTIVE :\n";
-    if (km > 0) {
-        const nextKm = Math.ceil((km + 1) / 5000) * 5000;
-        rec += `• Prochaine vidange : tous les 5000 km (${(nextKm - km).toLocaleString()} km restants)\n`;
-    }
-    rec += "• Contrôle hebdomadaire : niveaux, pression pneus\n• Tenir à jour le carnet de maintenance\n";
-    return rec;
-}
-
-async function generateAndShowAIRecommendation(id, type, priorite, km, nom, statut, cout, description) {
-    const reminder = {
-        id, machineName: nom || 'Machine non définie', type, priorite,
-        km: parseInt(km) || 0, statut,
-        cout: parseFloat(cout) || 0,
-        date: new Date().toISOString().split('T')[0],
-        yearsSince: 1,
-        ageText: priorite === 'urgente' ? 'URGENT - Intervention immédiate' : 'Maintenance planifiée'
-    };
-    reminder.aiRecommendation = generateLocalAIRecommendation(reminder);
-    showReminderDetailWithData(reminder);
-}
-
-function showReminderDetailWithData(reminder) {
-    const modal = document.getElementById('reminderDetailPopup');
-    const body  = document.getElementById('reminderDetailBody');
-    if (!modal || !body) return;
-    modal.style.display = 'flex';
-
-    const riskColors = { critique:'#a32d2d', élevé:'#e67e22', modéré:'#f39c12', faible:'#2d6a2d' };
-    const riskLabels = { critique:'🔴 CRITIQUE', élevé:'🟠 ÉLEVÉ', modéré:'🟡 MODÉRÉ', faible:'🟢 FAIBLE' };
-    const prioLabels = { urgente:'🔴 Urgente', haute:'🟠 Haute', moyenne:'🟢 Moyenne', faible:'🔵 Faible' };
-
-    let riskLevel = 'faible', riskScore = 0;
-    if (reminder.priorite === 'urgente') { riskLevel = 'critique'; riskScore = 85; }
-    else if (reminder.km > 15000)        { riskLevel = 'élevé';   riskScore = 70; }
-    else if (reminder.km > 10000)        { riskLevel = 'modéré';  riskScore = 50; }
-    else if (reminder.km > 5000)         { riskLevel = 'modéré';  riskScore = 35; }
-
-    body.innerHTML = `
-        <div class="reminder-message-box" style="border-left-color:${riskColors[riskLevel]}">
-            <div class="reminder-message-text">🤖 RECOMMANDATION IA — ${escapeHtml(reminder.machineName)}</div>
-            <div style="font-size:12px;color:#7a9a7a;">Générée par intelligence artificielle AgroFlow</div>
-        </div>
-        <div style="background:#f0faf7;border-radius:12px;padding:12px;margin-bottom:15px;">
-            <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-                <span style="font-weight:600;font-size:13px;">📊 État de la maintenance</span>
-                <span style="background:${riskColors[riskLevel]};color:white;padding:2px 10px;border-radius:20px;font-size:11px;">${riskLabels[riskLevel]} (${riskScore}%)</span>
-            </div>
-            <div class="reminder-detail-row"><span class="reminder-detail-label">🚜 Machine</span><span class="reminder-detail-value"><strong>${escapeHtml(reminder.machineName)}</strong></span></div>
-            <div class="reminder-detail-row"><span class="reminder-detail-label">🔧 Type</span><span class="reminder-detail-value">${escapeHtml(reminder.type||'—')}</span></div>
-            <div class="reminder-detail-row"><span class="reminder-detail-label">⚠️ Priorité</span><span class="reminder-detail-value">${prioLabels[reminder.priorite]||reminder.priorite}</span></div>
-            <div class="reminder-detail-row"><span class="reminder-detail-label">📊 Kilométrage</span><span class="reminder-detail-value">${(reminder.km||0).toLocaleString()} km</span></div>
-            ${reminder.cout ? `<div class="reminder-detail-row"><span class="reminder-detail-label">💰 Coût</span><span class="reminder-detail-value">${parseFloat(reminder.cout).toLocaleString()} DT</span></div>` : ''}
-        </div>
-        <div style="background:#eaf3de;border-radius:12px;padding:12px;margin-bottom:15px;">
-            <div style="font-weight:700;color:#2d6a2d;margin-bottom:8px;">📋 RECOMMANDATIONS IA DÉTAILLÉES</div>
-            <div style="white-space:pre-wrap;font-size:12px;line-height:1.6;">${escapeHtml(reminder.aiRecommendation)}</div>
-        </div>
-        <div style="display:flex;gap:10px;margin-top:15px;flex-wrap:wrap;">
-            <a href="/agriculteur/maintenances/${reminder.id}" class="btn btn--green" style="flex:1;text-align:center;">👁 Voir détails</a>
-            <a href="/agriculteur/maintenances/${reminder.id}/edit" class="btn btn--outline" style="flex:1;text-align:center;">✏️ Planifier</a>
-            <button class="btn btn--google" style="flex:1;text-align:center;"
-                onclick="exportSingleReminderToGoogleCalendar(${reminder.id},'${escapeHtml(reminder.machineName)}','${reminder.date}','${escapeHtml(reminder.type||'')}','${reminder.priorite}',${reminder.km||0})">
-                📤 Google
-            </button>
-        </div>`;
-}
-
-function exportToGoogleCalendar(title, startDate, endDate, description) {
-    const fmt = d => `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
-    const url  = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${fmt(startDate)}/${fmt(endDate)}&details=${encodeURIComponent(description)}&sf=true&output=xml`;
-    window.open(url, '_blank');
-    showNotification('📤 Événement exporté vers Google Calendar', 'success');
-}
-
-function exportReminderToGoogleCalendar(reminder) {
-    let startDate = new Date(reminder.date);
-    if (isNaN(startDate.getTime())) startDate = new Date();
-    const endDate = new Date(startDate);
-    endDate.setDate(startDate.getDate() + 1);
-    const desc = `🔔 RAPPEL DE MAINTENANCE\nMachine: ${reminder.machineName}\nType: ${reminder.type||'Maintenance préventive'}\nPriorité: ${reminder.priorite}\nKilométrage: ${reminder.km?reminder.km.toLocaleString()+' km':'Non renseigné'}\n\n✅ Vérifications recommandées par l'IA:\n• Inspection générale\n• Vidange moteur et filtres\n• Contrôle des niveaux\n• Vérification courroies\n• Pression des pneus\n\nGénéré par AgroFlow IA`;
-    exportToGoogleCalendar('Maintenance préventive: ' + reminder.machineName, startDate, endDate, desc);
-}
-
-function exportSingleReminderToGoogleCalendar(id, machineName, dateMain, type, priorite, km) {
-    exportReminderToGoogleCalendar({ id, machineName, date: dateMain, type, priorite, km });
-}
-
-function exportAllRemindersToGoogleCalendar() {
-    if (!allRemindersData || allRemindersData.length === 0) { showNotification('Aucun rappel à exporter', 'warning'); return; }
-    exportReminderToGoogleCalendar(allRemindersData[0]);
-    showNotification(`📤 ${allRemindersData.length} rappel(s) — Le premier exporté vers Google Calendar`, 'info');
-}
-
 async function showReminderDetail(maintenanceId) {
     const modal = document.getElementById('reminderDetailPopup');
-    const body  = document.getElementById('reminderDetailBody');
+    const body = document.getElementById('reminderDetailBody');
     if (!modal || !body) return;
     modal.style.display = 'flex';
     body.innerHTML = '<div class="modal-loader"><div class="modal-loader__spinner"></div><div class="modal-loader__text">Chargement des détails...</div></div>';
@@ -1191,32 +1274,43 @@ async function showReminderDetail(maintenanceId) {
     try {
         const response = await fetch('/agriculteur/maintenances/api/calendar/reminder-detail/' + maintenanceId);
         const data = await response.json();
+
         if (data.success) {
-            if (!data.aiRecommendation) {
-                data.aiRecommendation = generateLocalAIRecommendation({
-                    id: data.id, machineName: data.machineName, type: data.type,
-                    priorite: data.priorite, km: data.km || 0, statut: data.statut,
-                    date: data.dateMain, yearsSince: data.yearsSince || 0
-                });
-            }
-            const riskColors = { critique:'#a32d2d', élevé:'#e67e22', moyen:'#f39c12', faible:'#2d6a2d' };
+            const riskColors = { critique: '#a32d2d', élevé: '#e67e22', moyen: '#f39c12', faible: '#2d6a2d' };
             body.innerHTML = `
                 <div class="reminder-message-box">
                     <div class="reminder-message-text">${escapeHtml(data.message)}</div>
-                    <div style="font-size:12px;color:#7a9a7a;">Dernière maintenance : ${data.dateMain||'Date inconnue'}</div>
+                    <div style="font-size:12px;color:#7a9a7a;">Dernière maintenance : ${data.dateMain || 'Date inconnue'}</div>
                 </div>
-                <div class="reminder-detail-row"><span class="reminder-detail-label">🚜 Machine</span><span class="reminder-detail-value"><strong>${escapeHtml(data.machineName)}</strong></span></div>
-                <div class="reminder-detail-row"><span class="reminder-detail-label">🔧 Type</span><span class="reminder-detail-value">${escapeHtml(data.type||'—')}</span></div>
                 <div class="reminder-detail-row">
-                    <span class="reminder-detail-label">🎯 Urgence</span>
+                    <span class="reminder-detail-label">🚜 Machine</span>
+                    <span class="reminder-detail-value"><strong>${escapeHtml(data.machineName)}</strong></span>
+                </div>
+                <div class="reminder-detail-row">
+                    <span class="reminder-detail-label">🔧 Type</span>
+                    <span class="reminder-detail-value">${escapeHtml(data.type || '—')}</span>
+                </div>
+                <div class="reminder-detail-row">
+                    <span class="reminder-detail-label">⚠️ Priorité</span>
                     <span class="reminder-detail-value">
-                        <span style="background:${riskColors[data.urgenceLevel?.level]||'#2d6a2d'};color:white;padding:2px 10px;border-radius:20px;font-size:11px;">${escapeHtml(data.urgenceLevel?.label||'Normal')}</span>
+                        <span style="background:${riskColors[data.urgenceLevel?.level] || '#2d6a2d'};color:white;padding:2px 10px;border-radius:20px;font-size:11px;">
+                            ${escapeHtml(data.urgenceLevel?.label || 'Normal')}
+                        </span>
                     </span>
                 </div>
-                <div class="reminder-detail-row"><span class="reminder-detail-label">⏰ Temps écoulé</span><span class="reminder-detail-value">${data.yearsSince>0?`${data.yearsSince} an${data.yearsSince>1?'s':''}${data.monthsSince>0?` et ${data.monthsSince} mois`:''}`:'Maintenance récente'}</span></div>
-                <div class="reminder-detail-row"><span class="reminder-detail-label">💰 Coût estimé</span><span class="reminder-detail-value">${data.cout?data.cout.toLocaleString()+' DT':'—'}</span></div>
-                <div class="reminder-detail-row"><span class="reminder-detail-label">📊 Kilométrage</span><span class="reminder-detail-value">${data.km?data.km.toLocaleString()+' km':'—'}</span></div>
-                ${data.description?`<div class="reminder-detail-row"><span class="reminder-detail-label">📝 Description</span><span class="reminder-detail-value">${escapeHtml(data.description)}</span></div>`:''}
+                <div class="reminder-detail-row">
+                    <span class="reminder-detail-label">⏰ Temps écoulé</span>
+                    <span class="reminder-detail-value">${data.yearsSince > 0 ? `${data.yearsSince} an${data.yearsSince > 1 ? 's' : ''}${data.monthsSince > 0 ? ` et ${data.monthsSince} mois` : ''}` : 'Maintenance récente'}</span>
+                </div>
+                <div class="reminder-detail-row">
+                    <span class="reminder-detail-label">💰 Coût estimé</span>
+                    <span class="reminder-detail-value">${data.cout ? data.cout.toLocaleString() + ' DT' : '—'}</span>
+                </div>
+                <div class="reminder-detail-row">
+                    <span class="reminder-detail-label">📊 Kilométrage</span>
+                    <span class="reminder-detail-value">${data.km ? data.km.toLocaleString() + ' km' : '—'}</span>
+                </div>
+                ${data.description ? `<div class="reminder-detail-row"><span class="reminder-detail-label">📝 Description</span><span class="reminder-detail-value">${escapeHtml(data.description)}</span></div>` : ''}
                 <div style="background:#eaf3de;border-radius:12px;padding:12px;margin:15px 0;">
                     <div style="font-weight:700;color:#2d6a2d;margin-bottom:8px;">🤖 RECOMMANDATIONS IA</div>
                     <div style="white-space:pre-wrap;font-size:12px;line-height:1.6;">${escapeHtml(data.aiRecommendation)}</div>
@@ -1224,11 +1318,11 @@ async function showReminderDetail(maintenanceId) {
                 <div style="display:flex;gap:10px;margin-top:15px;flex-wrap:wrap;">
                     <a href="/agriculteur/maintenances/${data.id}" class="btn btn--green" style="flex:1;text-align:center;">👁 Voir détails</a>
                     <a href="/agriculteur/maintenances/${data.id}/edit" class="btn btn--outline" style="flex:1;text-align:center;">✏️ Planifier</a>
-                    <button class="btn btn--google" style="flex:1;text-align:center;"
-                        onclick="exportSingleReminderToGoogleCalendar(${data.id},'${escapeHtml(data.machineName)}','${data.dateMain}','${escapeHtml(data.type||'')}','${data.priorite}',${data.km||0})">
-                        📤 Google
+                    <button class="btn btn--google" style="flex:1;text-align:center;" onclick="exportSingleReminderToGoogleCalendar(${data.id}, '${escapeHtml(data.machineName)}', '${data.dateMain}', '${escapeHtml(data.type || '')}', '${data.priorite}', ${data.km || 0})">
+                        📤 Exporter Google
                     </button>
-                </div>`;
+                </div>
+            `;
         } else {
             body.innerHTML = `<div style="color:#a32d2d;text-align:center;padding:1rem;">❌ Erreur : ${escapeHtml(data.error)}</div>`;
         }
@@ -1242,64 +1336,36 @@ function closeReminderDetailPopup() {
     if (modal) modal.style.display = 'none';
 }
 
-async function analyzeAllRemindersWithAI() {
-    const modal = document.getElementById('reminderDetailPopup');
-    const body  = document.getElementById('reminderDetailBody');
-    if (!modal || !body) return;
-    modal.style.display = 'flex';
-    body.innerHTML = '<div class="modal-loader"><div class="modal-loader__spinner"></div><div class="modal-loader__text">Analyse globale en cours...</div></div>';
+function exportToGoogleCalendar(title, startDate, endDate, description) {
+    const fmt = d => `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${fmt(startDate)}/${fmt(endDate)}&details=${encodeURIComponent(description)}&sf=true&output=xml`;
+    window.open(url, '_blank');
+    showNotification('📤 Événement exporté vers Google Calendar', 'success');
+}
 
-    try {
-        const response = await fetch('{{ path('agri_maintenances_api_reminder_dates') }}');
-        const data = await response.json();
+function exportSingleReminderToGoogleCalendar(id, machineName, dateMain, type, priorite, km) {
+    let startDate = new Date(dateMain);
+    if (isNaN(startDate.getTime())) startDate = new Date();
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 1);
+    const desc = `🔔 RAPPEL DE MAINTENANCE\nMachine: ${machineName}\nType: ${type || 'Maintenance préventive'}\nPriorité: ${priorite}\nKilométrage: ${km ? km.toLocaleString() + ' km' : 'Non renseigné'}\n\n✅ Vérifications recommandées:\n• Inspection générale\n• Vidange moteur et filtres\n• Contrôle des niveaux\n• Vérification courroies\n• Pression des pneus\n\nGénéré par AgroFlow`;
+    exportToGoogleCalendar('Maintenance préventive: ' + machineName, startDate, endDate, desc);
+}
 
-        if (data.success && data.reminders && data.reminders.length > 0) {
-            const reminders   = data.reminders;
-            const urgentCount = reminders.filter(r => r.priorite === 'urgente').length;
-            const highCount   = reminders.filter(r => r.priorite === 'haute').length;
-            const totalCost   = reminders.reduce((s, r) => s + (parseFloat(r.cout)||0), 0);
-            const avgKm       = reminders.reduce((s, r) => s + (parseFloat(r.km)||0), 0) / reminders.length;
-
-            let ga = "📊 ANALYSE IA GLOBALE\n\n🔍 Synthèse de la flotte :\n";
-            ga += `• ${reminders.length} machine(s) nécessitent une attention\n`;
-            if (urgentCount > 0) ga += `• 🔴 ${urgentCount} intervention(s) URGENTE(s) immédiate(s)\n`;
-            if (highCount > 0)   ga += `• 🟠 ${highCount} maintenance(s) haute priorité sous 48h\n`;
-            ga += `• 📊 Kilométrage moyen : ${Math.round(avgKm).toLocaleString()} km\n`;
-            ga += `• 💰 Coût total estimé : ${Math.round(totalCost).toLocaleString()} DT\n\n`;
-            ga += "💡 RECOMMANDATIONS STRATÉGIQUES :\n";
-            if (urgentCount > 0) ga += "1. Priorité ABSOLUE aux interventions urgentes\n";
-            if (avgKm > 10000)   ga += "2. Révisions générales pour machines à haut kilométrage\n";
-            ga += "3. Établir un calendrier de maintenance préventive\n";
-            ga += "4. Former les opérateurs aux inspections quotidiennes\n";
-
-            body.innerHTML = `
-                <div class="reminder-message-box" style="border-left-color:#667eea">
-                    <div class="reminder-message-text">🤖 ANALYSE IA — Synthèse globale</div>
-                    <div style="font-size:12px;color:#7a9a7a;">${reminders.length} machine(s) avec rappel(s)</div>
-                </div>
-                <div style="background:#eaf3de;border-radius:12px;padding:15px;margin-bottom:15px;">
-                    <div style="white-space:pre-wrap;font-size:13px;line-height:1.6;">${escapeHtml(ga)}</div>
-                </div>
-                <div style="margin-bottom:15px;">
-                    <div style="font-weight:700;color:#2d6a2d;margin-bottom:8px;">📋 Machines concernées</div>
-                    <div style="background:#f7faf4;border-radius:12px;padding:12px;max-height:280px;overflow-y:auto;">
-                        ${reminders.map(r => `
-                            <div class="reminder-detail-row" style="cursor:pointer;" onclick="showReminderDetail(${r.id})">
-                                <span class="reminder-detail-label">${escapeHtml(r.machineName)}</span>
-                                <span class="reminder-detail-value">${r.date} — ${r.priorite==='urgente'?'🔴 Urgent':'📅 Rappel annuel'}</span>
-                            </div>`).join('')}
-                    </div>
-                </div>
-                <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                    <button class="btn btn--green" style="flex:1;text-align:center;" onclick="closeReminderDetailPopup();openReminderCalendar();">📅 Voir calendrier</button>
-                    <button class="btn btn--google" style="flex:1;text-align:center;" onclick="exportAllRemindersToGoogleCalendar()">📤 Exporter Google</button>
-                </div>`;
-        } else {
-            body.innerHTML = `<div style="color:#27500a;text-align:center;padding:1rem;">✅ Aucun rappel de maintenance à afficher</div>`;
-        }
-    } catch (error) {
-        body.innerHTML = `<div style="color:#a32d2d;text-align:center;padding:1rem;">❌ Erreur : ${escapeHtml(error.message)}</div>`;
+function exportAllRemindersToGoogleCalendar() {
+    if (!allRemindersData || allRemindersData.length === 0) {
+        showNotification('Aucun rappel à exporter', 'warning');
+        return;
     }
+    exportSingleReminderToGoogleCalendar(
+        allRemindersData[0].id,
+        allRemindersData[0].machineName,
+        allRemindersData[0].date,
+        allRemindersData[0].type,
+        allRemindersData[0].priorite,
+        allRemindersData[0].km || 0
+    );
+    showNotification(`📤 ${allRemindersData.length} rappel(s) — Le premier exporté vers Google Calendar`, 'info');
 }
 
 function escapeHtml(str) {
@@ -1307,15 +1373,85 @@ function escapeHtml(str) {
     return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
 
+function showModal(title, content) {
+    document.querySelectorAll('.modal-overlay').forEach(m => m.remove());
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.style.cssText = 'position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 100000; display: flex; align-items: center; justify-content: center;';
+    modal.innerHTML = `
+        <div style="background: white; border-radius: 24px; max-width: 600px; width: 90%; max-height: 85vh; overflow: auto; animation: popupSlideIn 0.2s ease;">
+            <div style="background: linear-gradient(135deg, #2d6a2d, #1a451a); padding: 1rem 1.5rem; color: white; border-radius: 24px 24px 0 0; display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0;">${escapeHtml(title)}</h3>
+                <button onclick="this.closest('.modal-overlay').remove()" 
+                    style="background: rgba(255,255,255,0.2); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 18px;">✕</button>
+            </div>
+            <div style="padding: 1.5rem;">${content}</div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+}
+
+function showAlertAction(action, title) {
+    showModal(title, `
+        <div style="text-align: center; padding: 20px;">
+            <div style="font-size: 48px; margin-bottom: 15px;">🔧</div>
+            <p style="margin-bottom: 20px; font-size: 16px;">Action recommandée :</p>
+            <strong style="display: block; background: #f0f0f0; padding: 15px; border-radius: 10px; margin-bottom: 20px; font-size: 14px;">${escapeHtml(action)}</strong>
+            <button onclick="this.closest('.modal-overlay').remove()" 
+                style="background: #2d6a2d; color: white; border: none; border-radius: 8px; padding: 10px 24px; cursor: pointer; font-weight: 600;">
+                J'ai compris
+            </button>
+        </div>
+    `);
+}
+
+async function showAllAlerts(maintenanceId) {
+    try {
+        const response = await fetch(`/agriculteur/maintenances/api/alerts/${maintenanceId}`);
+        const data = await response.json();
+        
+        if (data.success && data.alerts) {
+            let html = '<div style="max-height: 500px; overflow-y: auto;">';
+            data.alerts.forEach(alert => {
+                const priorityClass = alert.priority === 'urgente' ? '#a32d2d' : (alert.priority === 'haute' ? '#e67e22' : (alert.priority === 'moyenne' ? '#f39c12' : '#2d6a2d'));
+                html += `
+                    <div style="border-left: 4px solid ${alert.color}; background: ${alert.color}10; padding: 14px; margin-bottom: 12px; border-radius: 10px;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                            <span style="font-size: 28px;">${escapeHtml(alert.icon)}</span>
+                            <strong style="color: ${alert.color};">${escapeHtml(alert.title)}</strong>
+                            <span style="margin-left: auto; background: ${priorityClass}; color: white; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;">${alert.priority}</span>
+                        </div>
+                        <div style="font-size: 14px; margin-bottom: 10px; line-height: 1.5;">${escapeHtml(alert.message)}</div>
+                        <button onclick="alert('${escapeHtml(alert.action)}')" 
+                            style="background: ${alert.color}; color: white; border: none; border-radius: 8px; padding: 6px 16px; cursor: pointer; font-weight: 600;">
+                            ${escapeHtml(alert.action)}
+                        </button>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            showModal('Prévention - Analyse détaillée', html);
+        }
+    } catch (error) {
+        console.error('Erreur:', error);
+        showNotification('Erreur chargement des alertes', 'danger');
+    }
+}
+
 function showNotification(message, type) {
     const n = document.createElement('div');
-    n.className = `alert alert--${type}`;
-    n.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:99999;max-width:380px;box-shadow:0 4px 18px rgba(0,0,0,.15);animation:fadeIn .2s ease;';
-    n.innerHTML = `<span>${escapeHtml(message)}</span><button class="alert__close" onclick="this.parentElement.remove()">✕</button>`;
+    const bgColor = type === 'danger' ? '#a32d2d' : (type === 'warning' ? '#e67e22' : '#2d6a2d');
+    n.style.cssText = `position: fixed; bottom: 20px; right: 20px; z-index: 99999; max-width: 380px; background: ${bgColor}; color: white; padding: 12px 20px; border-radius: 10px; box-shadow: 0 4px 18px rgba(0,0,0,.15); animation: fadeIn .2s ease; font-size: 14px;`;
+    n.innerHTML = `<span>${escapeHtml(message)}</span><button onclick="this.parentElement.remove()" style="background: none; border: none; color: white; margin-left: 15px; cursor: pointer;">✕</button>`;
     document.body.appendChild(n);
     setTimeout(() => n?.remove(), 5000);
 }
 
+// ================================================================
+// INITIALISATION
+// ================================================================
 document.addEventListener('DOMContentLoaded', function() {
     setView(currentView);
 
@@ -1330,9 +1466,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('reminderDetailPopup')?.addEventListener('click', function(e) {
         if (e.target === this) closeReminderDetailPopup();
     });
-    document.getElementById('dayNoteModal')?.addEventListener('click', function(e) {
-        if (e.target === this) closeDayNoteModal();
-    });
 
     const countByType = {{ countByType|json_encode|raw }};
     const coutByMonth = {{ coutByMonth|json_encode|raw }};
@@ -1343,10 +1476,10 @@ document.addEventListener('DOMContentLoaded', function() {
             type: 'bar',
             data: {
                 labels: countByType.map(r => r.type),
-                datasets: [{ label:'Nombre', data:countByType.map(r => r.total),
-                    backgroundColor:['#2d6a2d','#0F6E56','#854F0B','#a32d2d','#0c447c','#7b5200','#1a5276','#4a1d8c','#534AB7','#2c2c2a'] }]
+                datasets: [{ label: 'Nombre', data: countByType.map(r => r.total),
+                    backgroundColor: ['#2d6a2d','#0F6E56','#854F0B','#a32d2d','#0c447c','#7b5200','#1a5276','#4a1d8c','#534AB7','#2c2c2a'] }]
             },
-            options: { responsive:true, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ stepSize:1 } } } }
+            options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
         });
     }
 
@@ -1356,10 +1489,10 @@ document.addEventListener('DOMContentLoaded', function() {
             type: 'line',
             data: {
                 labels: coutByMonth.map(r => r.mois),
-                datasets: [{ label:'Coût (DT)', data:coutByMonth.map(r => r.total),
-                    borderColor:'#2d6a2d', backgroundColor:'rgba(45,106,45,.1)', borderWidth:2, tension:.4, fill:true, pointRadius:4 }]
+                datasets: [{ label: 'Coût (DT)', data: coutByMonth.map(r => r.total),
+                    borderColor: '#2d6a2d', backgroundColor: 'rgba(45,106,45,.1)', borderWidth: 2, tension: .4, fill: true, pointRadius: 4 }]
             },
-            options: { responsive:true, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true } } }
+            options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
         });
     }
 });

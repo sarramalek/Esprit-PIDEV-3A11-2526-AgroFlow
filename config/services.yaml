@@ -9,7 +9,9 @@ parameters:
     gemini_api_key: '%env(default::GEMINI_API_KEY)%'
     gemini_model: '%env(default:gemini_model_default:GEMINI_MODEL)%'
     EXCHANGERATE_API_KEY: '%env(EXCHANGERATE_API_KEY)%'
-
+    mapbox_access_token: '%env(MAPBOX_ACCESS_TOKEN)%'
+    default_lat: '%env(DEFAULT_LAT)%'
+    default_lng: '%env(DEFAULT_LNG)%'
 
 services:
     # default configuration for services in *this* file
@@ -63,7 +65,16 @@ services:
             $httpClient: '@http_client'
             $geminiApiKey: '%gemini_api_key%' 
 
+   
+            
+    App\Service\WebSearchService:
+        arguments: []  # ← Pas d'arguments, recherche gratuite !
     
+ 
+
+
+
+
     App\Service\TaskTranslator:
         arguments:
             $client:     '@http_client'
