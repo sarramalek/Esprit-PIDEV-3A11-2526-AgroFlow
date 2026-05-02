@@ -66,14 +66,7 @@ services:
             $geminiApiKey: '%gemini_api_key%' 
 
    
-            
-    App\Service\WebSearchService:
-        arguments: []  # ← Pas d'arguments, recherche gratuite !
-    
  
-
-
-
 
     App\Service\TaskTranslator:
         arguments:
