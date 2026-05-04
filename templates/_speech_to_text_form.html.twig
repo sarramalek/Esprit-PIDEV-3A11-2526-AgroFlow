@@ -1,0 +1,315 @@
+<style>
+    [data-stt-active="1"] {
+        border-color: #2D5A27 !important;
+        box-shadow: 0 0 0 3px rgba(45, 90, 39, 0.18) !important;
+    }
+
+    label[data-stt-active-label="1"]::after {
+        content: " *";
+        color: #2D5A27;
+        font-weight: 700;
+    }
+
+    #stt-toggle-btn {
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        z-index: 99999;
+        background: rgba(28, 43, 58, 0.92);
+        color: #fff;
+        border-radius: 10px;
+        padding: 8px 10px;
+        font-size: 12px;
+        max-width: 260px;
+        display: none;
+    }
+</style>
+
+<div id="stt-toggle-btn"></div>
+
+<script>
+    (function () {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const sttStatusMsg = document.getElementById('stt-toggle-btn');
+        const cancelUrl = {{ cancel_path|json_encode|raw }};
+        let recognition = null;
+        let activeField = null;
+        let isListening = false;
+        let sttEnabled = true;
+        let lastTranscript = '';
+        let networkRetryCount = 0;
+        let networkFailed = false;
+        const MAX_NETWORK_RETRIES = 3;
+
+        function showStatus(message, isError) {
+            if (!sttStatusMsg) {
+                return;
+            }
+            sttStatusMsg.style.display = 'block';
+            sttStatusMsg.style.background = isError ? 'rgba(180, 35, 24, 0.94)' : 'rgba(28, 43, 58, 0.92)';
+            sttStatusMsg.textContent = message;
+            window.clearTimeout(showStatus._timerId);
+            showStatus._timerId = window.setTimeout(function () {
+                sttStatusMsg.style.display = 'none';
+            }, 2500);
+        }
+
+        function isWritableField(element) {
+            if (!element) {
+                return false;
+            }
+
+            if (element.tagName === 'TEXTAREA') {
+                return !element.readOnly && !element.disabled;
+            }
+
+            if (element.tagName !== 'INPUT') {
+                return false;
+            }
+
+            const type = (element.type || 'text').toLowerCase();
+            const supportedTypes = ['text', 'search', 'email', 'tel', 'url', 'number'];
+
+            return supportedTypes.includes(type) && !element.readOnly && !element.disabled;
+        }
+
+        function startListening() {
+            if (!sttEnabled || isListening || !activeField || !isWritableField(activeField) || networkFailed) {
+                return;
+            }
+
+            if (!recognition) {
+                showStatus('STT non supporté par ce navigateur.', true);
+                return;
+            }
+
+            try {
+                recognition.start();
+                isListening = true;
+                showStatus('Écoute active...');
+            } catch (e) {
+                showStatus('Impossible de démarrer le micro.', true);
+            }
+        }
+
+        function stopListening() {
+            if (!isListening) {
+                return;
+            }
+
+            recognition.stop();
+            isListening = false;
+        }
+
+        function insertTextIntoField(field, text) {
+            if (!field || !text) {
+                return;
+            }
+
+            if (field.tagName === 'INPUT') {
+                const t = (field.type || 'text').toLowerCase();
+                if (t === 'number') {
+                    const numeric = text.replace(/[^\d.,-]/g, '').replace(',', '.');
+                    if (numeric) {
+                        field.value = numeric;
+                        field.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+                    return;
+                }
+            }
+
+            const start = field.selectionStart ?? field.value.length;
+            const end = field.selectionEnd ?? field.value.length;
+            const before = field.value.slice(0, start);
+            const after = field.value.slice(end);
+            const spacer = before && !before.endsWith(' ') ? ' ' : '';
+            const nextValue = (before + spacer + text + after).trimStart();
+
+            field.value = nextValue;
+            const cursorPos = (before + spacer + text).length;
+            if (typeof field.setSelectionRange === 'function') {
+                try {
+                    field.setSelectionRange(cursorPos, cursorPos);
+                } catch (e) {
+                    // Some input types do not support cursor positioning.
+                }
+            }
+            field.dispatchEvent(new Event('input', { bubbles: true }));
+            field.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+
+        function findFieldLabel(field) {
+            if (!field) {
+                return null;
+            }
+
+            if (field.id) {
+                const explicitLabel = document.querySelector('label[for="' + field.id + '"]');
+                if (explicitLabel) {
+                    return explicitLabel;
+                }
+            }
+
+            // Fallback pour les templates où les labels n'ont pas d'attribut "for".
+            const wrapper = field.closest('.form-group, div');
+            if (!wrapper) {
+                return null;
+            }
+
+            return wrapper.querySelector('label');
+        }
+
+        function clearActiveIndicator() {
+            const previous = document.querySelector('[data-stt-active="1"]');
+            if (previous) {
+                previous.removeAttribute('data-stt-active');
+            }
+
+            const previousLabel = document.querySelector('label[data-stt-active-label="1"]');
+            if (previousLabel) {
+                previousLabel.removeAttribute('data-stt-active-label');
+            }
+        }
+
+        function markActiveField(field) {
+            clearActiveIndicator();
+
+            if (!field) {
+                return;
+            }
+
+            field.setAttribute('data-stt-active', '1');
+            const label = findFieldLabel(field);
+            if (label) {
+                label.setAttribute('data-stt-active-label', '1');
+            }
+        }
+
+        document.addEventListener('focusin', function (event) {
+            if (isWritableField(event.target)) {
+                activeField = event.target;
+                markActiveField(activeField);
+                startListening();
+            }
+        });
+
+        document.addEventListener('click', function (event) {
+            if (isWritableField(event.target)) {
+                activeField = event.target;
+                markActiveField(activeField);
+                startListening();
+                return;
+            }
+
+            if (!event.target.closest || !event.target.closest('#stt-toggle-btn')) {
+                activeField = null;
+                clearActiveIndicator();
+                stopListening();
+            }
+        });
+
+        if (!SpeechRecognition) {
+            showStatus('Ce navigateur ne supporte pas la dictée vocale.', true);
+            return;
+        }
+
+        recognition = new SpeechRecognition();
+        recognition.lang = 'fr-FR';
+        recognition.interimResults = false;
+        recognition.continuous = false;
+
+        recognition.onresult = function (event) {
+            networkRetryCount = 0;
+            networkFailed = false;
+
+            let transcript = '';
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const result = event.results[i];
+                if (result[0]) {
+                    transcript += ' ' + result[0].transcript;
+                }
+            }
+            transcript = transcript.trim();
+            if (!transcript) {
+                return;
+            }
+
+           
+
+            if (transcript.toLowerCase().includes('retour')) {
+                window.location.href = cancelUrl;
+                return;
+            }
+
+            let targetField = null;
+            if (activeField && isWritableField(activeField)) {
+                targetField = activeField;
+            } else if (isWritableField(document.activeElement)) {
+                targetField = document.activeElement;
+                activeField = targetField;
+                markActiveField(activeField);
+            }
+
+            if (!targetField) {
+                showStatus('Aucun champ sélectionné.', true);
+                return;
+            }
+
+            try {
+                targetField.focus();
+                insertTextIntoField(targetField, transcript);
+                showStatus('Texte ajouté : ' + transcript.slice(0, 28) + (transcript.length > 28 ? '...' : ''));
+            } catch (e) {
+                showStatus('Échec insertion texte.', true);
+            }
+        };
+
+        recognition.onend = function () {
+            isListening = false;
+            if (sttEnabled && activeField && isWritableField(activeField) && !networkFailed) {
+                startListening();
+            }
+        };
+
+        recognition.onerror = function (event) {
+            isListening = false;
+
+            if (event && event.error === 'not-allowed') {
+                showStatus('Permission micro refusée.', true);
+                return;
+            }
+
+            if (event && event.error === 'no-speech') {
+                showStatus('Aucune voix détectée.', true);
+                return;
+            }
+
+            if (event && event.error === 'network') {
+                if (!navigator.onLine) {
+                    networkFailed = true;
+                    showStatus('Pas de connexion internet.', true);
+                    return;
+                }
+
+                if (networkRetryCount < MAX_NETWORK_RETRIES) {
+                    networkRetryCount++;
+                    showStatus('Reconnexion micro (' + networkRetryCount + '/' + MAX_NETWORK_RETRIES + ')...', false);
+                    window.setTimeout(function () {
+                        if (sttEnabled && activeField && isWritableField(activeField) && !networkFailed) {
+                            startListening();
+                        }
+                    }, 2000 * networkRetryCount);
+                } else {
+                    networkRetryCount = 0;
+                    networkFailed = true;
+                    showStatus('Micro indisponible (réseau).', true);
+                }
+                return;
+            }
+
+            showStatus('Erreur micro : ' + (event && event.error ? event.error : 'inconnue'), true);
+        };
+
+        window.addEventListener('beforeunload', stopListening);
+    })();
+</script>

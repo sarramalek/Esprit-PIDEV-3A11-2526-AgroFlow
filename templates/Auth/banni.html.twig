@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Compte Banni - AgroFlow{% endblock %}
+
+{% block body %}
+<section style="min-height: 100vh; display: flex; align-items: center; justify-content: center; background-color: #FCF8E6;">
+    <div style="background: white; padding: 60px 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 520px; text-align: center;">
+
+        <div style="margin-bottom: 30px;">
+            <i class="fas fa-ban" style="font-size: 70px; color: #c0392b;"></i>
+        </div>
+
+        <h1 style="color: #c0392b; font-size: 28px; margin-bottom: 20px;">
+            Compte Banni
+        </h1>
+
+        <p style="font-size: 18px; color: #333; line-height: 1.6; margin-bottom: 35px;">
+            Ce compte a été banni.<br>
+            Veuillez contacter les services d'AgroFlow pour plus d'informations.
+        </p>
+
+        <!-- Bouton avec redirection immédiate -->
+        <a href="{{ path('app_login') }}" 
+           style="display: inline-block; 
+                  background-color: #2D5A27; 
+                  color: white; 
+                  padding: 14px 40px; 
+                  border-radius: 8px; 
+                  text-decoration: none; 
+                  font-weight: 600; 
+                  font-size: 16px;">
+            Retour à la page de connexion
+        </a>
+
+    </div>
+</section>
+{% endblock %}
