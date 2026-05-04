@@ -11,6 +11,7 @@ use Endroid\QrCode\RoundBlockSizeMode;
 use Endroid\QrCode\Writer\PngWriter;
 use Symfony\Component\HttpFoundation\Response;
 
+use Endroid\QrCode\QrCode;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class QRCodeService
@@ -26,14 +27,14 @@ class QRCodeService
     {
         $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
         
-        if (str_contains($host, 'localhost')) {
+        if (str_contains($host, 'localhost') || str_contains($host, '127.0.0.1')) {
             $qrContent = sprintf(
-                "AgroFlow - Détails Article\n" .
+                "AgroFlow - Details Article\n" .
                 "--------------------------\n" .
                 "Nom: %s\n" .
                 "Prix: %s DT\n" .
                 "Stock: %s %s\n" .
-                "Catégorie: %s",
+                "Categorie: %s",
                 $article->getNom(),
                 number_format($article->getPrixUnitaire(), 3, ',', ' '),
                 $article->getQuantiteEnStock(),
@@ -48,14 +49,15 @@ class QRCodeService
             );
         }
 
-        $result = $this->builder
-            ->data($qrContent)
-            ->encoding(new Encoding('UTF-8'))
-            ->size(300)
-            ->margin(10)
-            ->labelFont(new NotoSans(12))
-            ->labelAlignment(LabelAlignment::Center)
-            ->build();
+        $qrCode = QrCode::create($qrContent)
+            ->setEncoding(new Encoding('UTF-8'))
+            ->setErrorCorrectionLevel(ErrorCorrectionLevel::Low)
+            ->setSize(300)
+            ->setMargin(10)
+            ->setRoundBlockSizeMode(RoundBlockSizeMode::Margin);
+
+        $writer = new PngWriter();
+        $result = $writer->write($qrCode);
 
         return new Response($result->getString(), 200, ['Content-Type' => $result->getMimeType()]);
     }

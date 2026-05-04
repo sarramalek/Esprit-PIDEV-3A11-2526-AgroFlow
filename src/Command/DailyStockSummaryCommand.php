@@ -45,10 +45,11 @@ class DailyStockSummaryCommand extends Command
         $sentCount = 0;
 
         foreach ($agriculteurs as $agri) {
-            $chatId = $agri->getTel();
+            // CORRECTION : On utilise la colonne dédiée au Chat ID Telegram
+            $chatId = $agri->getTelegramChatId();
             
             if (!$chatId) {
-                continue; // Pas d'ID Telegram, on ignore
+                continue; // Pas d'ID Telegram renseigné, on passe au suivant
             }
 
             // Récupérer les mouvements du jour pour cet agriculteur

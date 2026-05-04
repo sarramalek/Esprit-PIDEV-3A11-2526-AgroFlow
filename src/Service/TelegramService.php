@@ -22,17 +22,28 @@ class TelegramService
     public function notifier(string $message, ?string $chatId = null): void
     {
         if (!$chatId) {
-            return; // Si aucun ID n'est fourni, on ne peut pas envoyer le message
+            return;
         }
 
         $url = "https://api.telegram.org/bot{$this->token}/sendMessage";
 
-        $this->httpClient->request('POST', $url, [
-            'json' => [
-                'chat_id' => $chatId,
-                'text' => $message,
-                'parse_mode' => 'HTML'
-            ]
-        ]);
+        try {
+            $response = $this->httpClient->request('POST', $url, [
+                'json' => [
+                    'chat_id' => $chatId,
+                    'text' => $message,
+                    'parse_mode' => 'HTML'
+                ]
+            ]);
+
+            $statusCode = $response->getStatusCode();
+            if ($statusCode !== 200) {
+                $errorData = $response->toArray(false);
+                throw new \Exception("Erreur Telegram ({$statusCode}) : " . ($errorData['description'] ?? 'Inconnue'));
+            }
+        } catch (\Exception $e) {
+            // Vous pouvez logguer l'erreur ou la relancer pour la voir dans la console
+            throw new \Exception("Echec de l'envoi Telegram : " . $e->getMessage());
+        }
     }
 }
