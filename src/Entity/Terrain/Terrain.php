@@ -35,7 +35,7 @@ class Terrain
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $cin = null;
 
-    #[ORM\OneToMany(mappedBy: 'terrain', targetEntity: Rotation::class, cascade: ['remove'])]
+    #[ORM\OneToMany(mappedBy: 'terrain', targetEntity: Rotation::class, cascade: ['remove'], orphanRemoval: true)]
     private Collection $rotations;
  #[ORM\OneToMany(mappedBy: 'terrain', targetEntity: User::class, cascade: ['persist'])]
     private Collection $ouvriers;

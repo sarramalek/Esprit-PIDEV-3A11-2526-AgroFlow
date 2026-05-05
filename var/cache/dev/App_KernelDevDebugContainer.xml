@@ -9,8 +9,8 @@
     <parameter key="kernel.runtime_mode.cli">%env(not:default:kernel.runtime_mode.web:)%</parameter>
     <parameter key="kernel.runtime_mode.worker">%env(bool:default::key:worker:default:kernel.runtime_mode:)%</parameter>
     <parameter key="kernel.debug">true</parameter>
-    <parameter key="kernel.build_dir">C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev</parameter>
-    <parameter key="kernel.cache_dir">C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev</parameter>
+    <parameter key="kernel.build_dir">C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev</parameter>
+    <parameter key="kernel.cache_dir">C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev</parameter>
     <parameter key="kernel.logs_dir">C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\log</parameter>
     <parameter key="kernel.bundles" type="collection">
       <parameter key="FrameworkBundle">Symfony\Bundle\FrameworkBundle\FrameworkBundle</parameter>
@@ -29,6 +29,7 @@
       <parameter key="KnpPaginatorBundle">Knp\Bundle\PaginatorBundle\KnpPaginatorBundle</parameter>
       <parameter key="SchebTwoFactorBundle">Scheb\TwoFactorBundle\SchebTwoFactorBundle</parameter>
       <parameter key="StofDoctrineExtensionsBundle">Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle</parameter>
+      <parameter key="DoctrineDoctorBundle">AhmedBhs\DoctrineDoctor\DoctrineDoctorBundle</parameter>
     </parameter>
     <parameter key="kernel.bundles_metadata" type="collection">
       <parameter key="FrameworkBundle" type="collection">
@@ -95,6 +96,10 @@
         <parameter key="path">C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\vendor\stof\doctrine-extensions-bundle\src</parameter>
         <parameter key="namespace">Stof\DoctrineExtensionsBundle</parameter>
       </parameter>
+      <parameter key="DoctrineDoctorBundle" type="collection">
+        <parameter key="path">C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\vendor\ahmed-bhs\doctrine-doctor</parameter>
+        <parameter key="namespace">AhmedBhs\DoctrineDoctor</parameter>
+      </parameter>
     </parameter>
     <parameter key="kernel.charset">UTF-8</parameter>
     <parameter key="kernel.container_class">App_KernelDevDebugContainer</parameter>
@@ -136,15 +141,15 @@
     <parameter key="translator.logging">false</parameter>
     <parameter key="translator.default_path">C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main/translations</parameter>
     <parameter key="debug.error_handler.throw_at">-1</parameter>
-    <parameter key="debug.container.dump">C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/App_KernelDevDebugContainer.xml</parameter>
+    <parameter key="debug.container.dump">C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/App_KernelDevDebugContainer.xml</parameter>
     <parameter key="router.request_context.host">localhost</parameter>
     <parameter key="router.request_context.scheme">http</parameter>
     <parameter key="router.request_context.base_url"></parameter>
     <parameter key="router.resource">kernel::loadRoutes</parameter>
-    <parameter key="router.cache_dir">C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev</parameter>
+    <parameter key="router.cache_dir">C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev</parameter>
     <parameter key="request_listener.http_port">80</parameter>
     <parameter key="request_listener.https_port">443</parameter>
-    <parameter key="serializer.mapping.cache.file">C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/serialization.php</parameter>
+    <parameter key="serializer.mapping.cache.file">C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/serialization.php</parameter>
     <parameter key="cache.prefix.seed">_C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main.App_KernelDevDebugContainer</parameter>
     <parameter key="session.metadata.storage_key">_sf2_meta</parameter>
     <parameter key="session.storage.options" type="collection">
@@ -159,11 +164,11 @@
     <parameter key="session.metadata.update_threshold">0</parameter>
     <parameter key="form.type_extension.csrf.enabled">true</parameter>
     <parameter key="form.type_extension.csrf.field_name">_token</parameter>
-    <parameter key="validator.mapping.cache.file">C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/validation.php</parameter>
+    <parameter key="validator.mapping.cache.file">C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/validation.php</parameter>
     <parameter key="validator.translation_domain">validators</parameter>
     <parameter key="profiler_listener.only_exceptions">false</parameter>
     <parameter key="profiler_listener.only_main_requests">false</parameter>
-    <parameter key="profiler.storage.dsn">file:C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/profiler</parameter>
+    <parameter key="profiler.storage.dsn">file:C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/profiler</parameter>
     <parameter key="doctrine.dbal.configuration.class">Doctrine\DBAL\Configuration</parameter>
     <parameter key="doctrine.data_collector.class">Doctrine\Bundle\DoctrineBundle\DataCollector\DoctrineDataCollector</parameter>
     <parameter key="doctrine.dbal.connection.event_manager.class">Symfony\Bridge\Doctrine\ContainerAwareEventManager</parameter>
@@ -230,7 +235,7 @@
     <parameter key="doctrine.orm.auto_generate_proxy_classes">true</parameter>
     <parameter key="doctrine.orm.enable_lazy_ghost_objects">true</parameter>
     <parameter key="doctrine.orm.enable_native_lazy_objects">false</parameter>
-    <parameter key="doctrine.orm.proxy_dir">C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/doctrine/orm/Proxies</parameter>
+    <parameter key="doctrine.orm.proxy_dir">C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/doctrine/orm/Proxies</parameter>
     <parameter key="doctrine.orm.proxy_namespace">Proxies</parameter>
     <parameter key="doctrine.migrations.preferred_em">null</parameter>
     <parameter key="doctrine.migrations.preferred_connection">null</parameter>
@@ -300,6 +305,33 @@
     <parameter key="stof_doctrine_extensions.listener.softdeleteable.class">Gedmo\SoftDeleteable\SoftDeleteableListener</parameter>
     <parameter key="stof_doctrine_extensions.listener.uploadable.class">Gedmo\Uploadable\UploadableListener</parameter>
     <parameter key="stof_doctrine_extensions.listener.reference_integrity.class">Gedmo\ReferenceIntegrity\ReferenceIntegrityListener</parameter>
+    <parameter key="doctrine_doctor.enabled">true</parameter>
+    <parameter key="doctrine_doctor.profiler.show_debug_info">false</parameter>
+    <parameter key="doctrine_doctor.analysis.exclude_third_party_entities">true</parameter>
+    <parameter key="doctrine_doctor.analysis.exclude_paths" type="collection">
+      <parameter>vendor/</parameter>
+    </parameter>
+    <parameter key="doctrine_doctor.debug.enabled">false</parameter>
+    <parameter key="doctrine_doctor.debug.internal_logging">false</parameter>
+    <parameter key="doctrine_doctor.analyzers.n_plus_one.threshold">5</parameter>
+    <parameter key="doctrine_doctor.analyzers.slow_query.threshold">100</parameter>
+    <parameter key="doctrine_doctor.analyzers.hydration.row_threshold">99</parameter>
+    <parameter key="doctrine_doctor.analyzers.hydration.critical_threshold">999</parameter>
+    <parameter key="doctrine_doctor.analyzers.eager_loading.join_threshold">4</parameter>
+    <parameter key="doctrine_doctor.analyzers.eager_loading.critical_join_threshold">7</parameter>
+    <parameter key="doctrine_doctor.analyzers.lazy_loading.threshold">10</parameter>
+    <parameter key="doctrine_doctor.analyzers.bulk_operation.threshold">20</parameter>
+    <parameter key="doctrine_doctor.analyzers.partial_object.threshold">5</parameter>
+    <parameter key="doctrine_doctor.analyzers.missing_index.slow_query_threshold">50</parameter>
+    <parameter key="doctrine_doctor.analyzers.missing_index.min_rows_scanned">1000</parameter>
+    <parameter key="doctrine_doctor.analyzers.missing_index.explain_queries">true</parameter>
+    <parameter key="doctrine_doctor.analyzers.find_all.threshold">99</parameter>
+    <parameter key="doctrine_doctor.analyzers.get_reference.threshold">2</parameter>
+    <parameter key="doctrine_doctor.analyzers.entity_manager_clear.batch_size_threshold">20</parameter>
+    <parameter key="doctrine_doctor.analyzers.flush_in_loop.flush_count_threshold">5</parameter>
+    <parameter key="doctrine_doctor.analyzers.flush_in_loop.time_window_ms">1000</parameter>
+    <parameter key="doctrine_doctor.analyzers.join_optimization.max_joins_recommended">5</parameter>
+    <parameter key="doctrine_doctor.analyzers.join_optimization.max_joins_critical">8</parameter>
     <parameter key="data_collector.templates" type="collection">
       <parameter key="data_collector.request" type="collection">
         <parameter>request</parameter>
@@ -368,6 +400,10 @@
       <parameter key="data_collector.doctrine" type="collection">
         <parameter>db</parameter>
         <parameter>@Doctrine/Collector/db.html.twig</parameter>
+      </parameter>
+      <parameter key="AhmedBhs\DoctrineDoctor\Collector\DoctrineDoctorDataCollector" type="collection">
+        <parameter>doctrine_doctor</parameter>
+        <parameter>@doctrine_doctor/profiler/doctrine_doctor.html.twig</parameter>
       </parameter>
       <parameter key="data_collector.dump" type="collection">
         <parameter>dump</parameter>
@@ -984,6 +1020,7 @@
     <service id="App\Service\Animals\RescueGroupsService" class="App\Service\Animals\RescueGroupsService" autowire="true" autoconfigure="true">
       <argument type="service" id="cache.app"/>
     </service>
+    <service id="App\Service\Animals\VeterinaryManager" class="App\Service\Animals\VeterinaryManager" autowire="true" autoconfigure="true"/>
     <service id="App\Service\Animals\WikipediaService" class="App\Service\Animals\WikipediaService" autowire="true" autoconfigure="true">
       <argument type="service" id=".debug.http_client"/>
       <argument type="service" id="cache.app"/>
@@ -1153,7 +1190,7 @@
       </argument>
     </service>
     <service id="http_cache.store" class="Symfony\Component\HttpKernel\HttpCache\Store">
-      <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/http_cache</argument>
+      <argument>C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/http_cache</argument>
     </service>
     <service id="url_helper" class="Symfony\Component\HttpFoundation\UrlHelper">
       <argument type="service" id="request_stack"/>
@@ -1163,7 +1200,7 @@
       <tag name="container.no_preload"/>
       <argument type="tagged_iterator" tag="kernel.cache_warmer"/>
       <argument>true</argument>
-      <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/App_KernelDevDebugContainerDeprecations.log</argument>
+      <argument>C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/App_KernelDevDebugContainerDeprecations.log</argument>
     </service>
     <service id="cache_clearer" class="Symfony\Component\HttpKernel\CacheClearer\ChainCacheClearer">
       <argument type="tagged_iterator" tag="kernel.cache_clearer"/>
@@ -1221,6 +1258,7 @@
         <argument key="debug.security.firewall.authenticator.main" type="service" id="debug.security.firewall.authenticator.main" on-invalid="ignore_uninitialized"/>
         <argument key="monolog.handler.main" type="service" id="monolog.handler.main" on-invalid="ignore_uninitialized"/>
         <argument key="monolog.handler.console" type="service" id="monolog.handler.console" on-invalid="ignore_uninitialized"/>
+        <argument key="AhmedBhs\DoctrineDoctor\Collector\DoctrineDoctorDataCollector" type="service" id="AhmedBhs\DoctrineDoctor\Collector\DoctrineDoctorDataCollector" on-invalid="ignore_uninitialized"/>
         <argument key=".debug.http_client" type="service" id=".debug.http_client" on-invalid="ignore_uninitialized"/>
       </argument>
       <argument type="collection">
@@ -1325,6 +1363,9 @@
           <argument>reset</argument>
         </argument>
         <argument key="monolog.handler.console" type="collection">
+          <argument>reset</argument>
+        </argument>
+        <argument key="AhmedBhs\DoctrineDoctor\Collector\DoctrineDoctorDataCollector" type="collection">
           <argument>reset</argument>
         </argument>
         <argument key=".debug.http_client" type="collection">
@@ -1889,6 +1930,7 @@
         <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\vendor\scheb\2fa-bundle/Resources/translations</argument>
       </argument>
       <argument type="collection">
+        <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main/vendor/ahmed-bhs/doctrine-doctor/templates</argument>
         <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\vendor\symfony\twig-bridge/Resources/views/Email</argument>
         <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\vendor\symfony\twig-bridge/Resources/views/Form</argument>
       </argument>
@@ -1917,6 +1959,7 @@
         <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\vendor\scheb\2fa-bundle/Resources/translations</argument>
       </argument>
       <argument type="collection">
+        <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main/vendor/ahmed-bhs/doctrine-doctor/templates</argument>
         <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\vendor\symfony\twig-bridge/Resources/views/Email</argument>
         <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\vendor\symfony\twig-bridge/Resources/views/Form</argument>
       </argument>
@@ -2186,7 +2229,7 @@
       <argument></argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/pools/system</argument>
+      <argument>C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -2205,7 +2248,7 @@
       <tag name="monolog.logger" channel="cache"/>
       <argument></argument>
       <argument>0</argument>
-      <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/pools/app</argument>
+      <argument>C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/pools/app</argument>
       <argument type="service" id="cache.default_marshaller" on-invalid="ignore"/>
       <call method="setLogger">
         <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
@@ -2374,7 +2417,7 @@
     <service id="asset_mapper.cached_mapped_asset_factory" class="Symfony\Component\AssetMapper\Factory\CachedMappedAssetFactory">
       <tag name="container.decorator" id="asset_mapper.mapped_asset_factory" inner="asset_mapper.cached_mapped_asset_factory.inner"/>
       <argument type="service" id="asset_mapper.cached_mapped_asset_factory.inner"/>
-      <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/asset_mapper</argument>
+      <argument>C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/asset_mapper</argument>
       <argument>true</argument>
     </service>
     <service id="asset_mapper.repository" class="Symfony\Component\AssetMapper\AssetMapperRepository">
@@ -2745,7 +2788,7 @@
         </argument>
       </argument>
       <argument type="collection">
-        <argument key="cache_dir">C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/translations</argument>
+        <argument key="cache_dir">C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/translations</argument>
         <argument key="debug">true</argument>
         <argument key="resource_files" type="collection">
           <argument key="af" type="collection">
@@ -3114,6 +3157,7 @@
           <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\vendor\symfony\maker-bundle/translations</argument>
           <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\vendor\symfony\ux-chartjs/translations</argument>
           <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\vendor\stof\doctrine-extensions-bundle\src/translations</argument>
+          <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\vendor\ahmed-bhs\doctrine-doctor/translations</argument>
         </argument>
         <argument key="cache_vary" type="collection">
           <argument key="scanned_directories" type="collection">
@@ -3137,6 +3181,7 @@
             <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\vendor\symfony\maker-bundle/translations</argument>
             <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\vendor\symfony\ux-chartjs/translations</argument>
             <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\vendor\stof\doctrine-extensions-bundle\src/translations</argument>
+            <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\vendor\ahmed-bhs\doctrine-doctor/translations</argument>
           </argument>
         </argument>
       </argument>
@@ -4278,10 +4323,10 @@
     <service id="router.default" class="Symfony\Bundle\FrameworkBundle\Routing\Router">
       <tag name="monolog.logger" channel="router"/>
       <tag name="container.service_subscriber" id="routing.loader"/>
-      <argument type="service" id=".service_locator.i7B9_Ni.router.default"/>
+      <argument type="service" id=".service_locator.LjVnriP.router.default"/>
       <argument>kernel::loadRoutes</argument>
       <argument type="collection">
-        <argument key="cache_dir">C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev</argument>
+        <argument key="cache_dir">C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev</argument>
         <argument key="debug">true</argument>
         <argument key="generator_class">Symfony\Component\Routing\Generator\CompiledUrlGenerator</argument>
         <argument key="generator_dumper_class">Symfony\Component\Routing\Generator\Dumper\CompiledUrlGeneratorDumper</argument>
@@ -4460,10 +4505,10 @@
           </service>
         </argument>
       </argument>
-      <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/serialization.php</argument>
+      <argument>C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/serialization.php</argument>
     </service>
     <service id="serializer.mapping.cache.symfony" class="Psr\Cache\CacheItemPoolInterface">
-      <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/serialization.php</argument>
+      <argument>C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/serialization.php</argument>
       <argument type="service" id="cache.serializer"/>
       <factory class="Symfony\Component\Cache\Adapter\PhpArrayAdapter" method="create"/>
     </service>
@@ -4601,7 +4646,7 @@
       <argument>true</argument>
     </service>
     <service id="session.storage.factory.mock_file" class="Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorageFactory">
-      <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/sessions</argument>
+      <argument>C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/sessions</argument>
       <argument>MOCKSESSID</argument>
       <argument type="service">
         <service class="Symfony\Component\HttpFoundation\Session\Storage\MetadataBag">
@@ -4807,10 +4852,10 @@
     <service id="validator.mapping.cache_warmer" class="Symfony\Bundle\FrameworkBundle\CacheWarmer\ValidatorCacheWarmer">
       <tag name="kernel.cache_warmer"/>
       <argument type="service" id="validator.builder"/>
-      <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/validation.php</argument>
+      <argument>C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/validation.php</argument>
     </service>
     <service id="validator.mapping.cache.adapter" class="Symfony\Component\Cache\Adapter\PhpArrayAdapter" constructor="create">
-      <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/validation.php</argument>
+      <argument>C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/validation.php</argument>
       <argument type="service" id="cache.validator"/>
     </service>
     <service id="validator.validator_factory" class="Symfony\Component\Validator\ContainerConstraintValidatorFactory">
@@ -5479,6 +5524,9 @@
         <argument type="service" id="data_collector.doctrine"/>
       </call>
       <call method="add">
+        <argument type="service" id="AhmedBhs\DoctrineDoctor\Collector\DoctrineDoctorDataCollector"/>
+      </call>
+      <call method="add">
         <argument type="service" id="data_collector.dump"/>
       </call>
       <call method="add">
@@ -5498,7 +5546,7 @@
       </call>
     </service>
     <service id="profiler.storage" class="Symfony\Component\HttpKernel\Profiler\FileProfilerStorage">
-      <argument>file:C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/profiler</argument>
+      <argument>file:C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/profiler</argument>
     </service>
     <service id="profiler_listener" class="Symfony\Component\HttpKernel\EventListener\ProfilerListener">
       <tag name="kernel.event_subscriber"/>
@@ -5563,7 +5611,7 @@
       <tag name="monolog.logger" channel="profiler"/>
       <tag name="data_collector" template="@WebProfiler/Collector/logger.html.twig" id="logger" priority="300"/>
       <argument type="service" id="monolog.logger.profiler" on-invalid="ignore"/>
-      <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/App_KernelDevDebugContainer</argument>
+      <argument>C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/App_KernelDevDebugContainer</argument>
       <argument type="service" id=".virtual_request_stack" on-invalid="ignore"/>
     </service>
     <service id="data_collector.time" class="Symfony\Component\HttpKernel\DataCollector\TimeDataCollector">
@@ -6209,7 +6257,7 @@
         <argument type="service" id=".doctrine.orm.default_metadata_driver"/>
       </call>
       <call method="setProxyDir">
-        <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/doctrine/orm/Proxies</argument>
+        <argument>C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/doctrine/orm/Proxies</argument>
       </call>
       <call method="setProxyNamespace">
         <argument>Proxies</argument>
@@ -6629,7 +6677,7 @@
       <argument type="service" id="twig.loader.native_filesystem"/>
       <argument type="collection">
         <argument key="autoescape">name</argument>
-        <argument key="cache">C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/twig</argument>
+        <argument key="cache">C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/twig</argument>
         <argument key="charset">UTF-8</argument>
         <argument key="debug">true</argument>
         <argument key="strict_variables">true</argument>
@@ -6759,6 +6807,7 @@
     <service id="twig.template_iterator" class="Symfony\Bundle\TwigBundle\TemplateIterator">
       <argument type="service" id="kernel"/>
       <argument type="collection">
+        <argument key="C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main/vendor/ahmed-bhs/doctrine-doctor/templates">doctrine_doctor</argument>
         <argument key="C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\vendor\symfony\twig-bridge/Resources/views/Email">email</argument>
         <argument key="C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\vendor\symfony\twig-bridge/Resources/views/Form">null</argument>
       </argument>
@@ -6777,6 +6826,10 @@
       <tag name="twig.loader"/>
       <argument type="collection"/>
       <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main</argument>
+      <call method="addPath">
+        <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main/vendor/ahmed-bhs/doctrine-doctor/templates</argument>
+        <argument>doctrine_doctor</argument>
+      </call>
       <call method="addPath">
         <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\vendor\doctrine\doctrine-bundle/templates</argument>
         <argument>Doctrine</argument>
@@ -6848,6 +6901,14 @@
       <call method="addPath">
         <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\vendor\scheb\2fa-bundle/Resources/views</argument>
         <argument>!SchebTwoFactor</argument>
+      </call>
+      <call method="addPath">
+        <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\vendor\ahmed-bhs\doctrine-doctor/templates</argument>
+        <argument>DoctrineDoctor</argument>
+      </call>
+      <call method="addPath">
+        <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\vendor\ahmed-bhs\doctrine-doctor/templates</argument>
+        <argument>!DoctrineDoctor</argument>
       </call>
       <call method="addPath">
         <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main/templates</argument>
@@ -8530,6 +8591,479 @@
       <deprecated package="stof/doctrine-extensions-bundle" version="1.14">The "%service_id%" service is deprecated and will be removed in 2.0. The "stof_doctrine_extensions.tool.locale_synchronizer" service should be used to provide the locale instead.</deprecated>
     </service>
     <service id="stof_doctrine_extensions.metadata_cache" class="Symfony\Component\Cache\Adapter\ArrayAdapter"/>
+    <service id="doctrine_doctor.null_logger" class="Psr\Log\NullLogger" autowire="true" autoconfigure="true"/>
+    <service id="doctrine_doctor.entity_manager_with_filtered_metadata" class="AhmedBhs\DoctrineDoctor\Metadata\EntityManagerMetadataDecorator" autowire="true" autoconfigure="true">
+      <argument type="service" id="doctrine.orm.default_entity_manager"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Metadata\EntityMetadataProvider"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Metadata\EntityMetadataProvider" class="AhmedBhs\DoctrineDoctor\Metadata\EntityMetadataProvider" autowire="true" autoconfigure="true">
+      <argument type="service" id="doctrine.orm.default_entity_manager"/>
+      <argument>true</argument>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface" class="AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface" abstract="true">
+      <tag name="container.excluded" source="in &quot;config/services.yaml&quot;"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Helper" class="AhmedBhs\DoctrineDoctor\Analyzer\Helper" abstract="true">
+      <tag name="container.excluded" source="in &quot;config/services.yaml&quot;"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Parser" class="AhmedBhs\DoctrineDoctor\Analyzer\Parser" abstract="true">
+      <tag name="container.excluded" source="in &quot;config/services.yaml&quot;"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\AutoGenerateProxyClassesAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\AutoGenerateProxyClassesAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main</argument>
+      <argument type="service" id="doctrine_doctor.null_logger"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\CharsetAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\CharsetAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine.dbal.default_connection"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Utils\DatabasePlatformDetector"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\PlatformAnalysisStrategyFactory"/>
+      <argument type="service" id="doctrine_doctor.null_logger"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\CollationAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\CollationAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine.dbal.default_connection"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Utils\DatabasePlatformDetector"/>
+      <argument type="service" id="monolog.logger"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\ConnectionPoolingAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\ConnectionPoolingAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine.dbal.default_connection"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Utils\DatabasePlatformDetector"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\PlatformAnalysisStrategyFactory"/>
+      <argument type="service" id="doctrine_doctor.null_logger"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\DoctrineCacheAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\DoctrineCacheAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument>dev</argument>
+      <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main</argument>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\InnoDBEngineAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\InnoDBEngineAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine.dbal.default_connection"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Utils\DatabasePlatformDetector"/>
+      <argument type="service" id="doctrine_doctor.null_logger"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\StrictModeAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\StrictModeAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine.dbal.default_connection"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Utils\DatabasePlatformDetector"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\PlatformAnalysisStrategyFactory"/>
+      <argument type="service" id="doctrine_doctor.null_logger"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\TimeZoneAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\TimeZoneAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine.dbal.default_connection"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Utils\DatabasePlatformDetector"/>
+      <argument type="service" id="monolog.logger"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\BidirectionalConsistencyAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\BidirectionalConsistencyAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\BlameableTraitAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\BlameableTraitAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\IssueFactoryInterface"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument type="service" id="monolog.logger"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CascadeAllAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CascadeAllAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument type="service" id="doctrine_doctor.null_logger"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CascadeAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CascadeAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument type="service" id="monolog.logger"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CascadeConfigurationAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CascadeConfigurationAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument type="service" id="doctrine_doctor.null_logger"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CascadePersistOnIndependentEntityAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CascadePersistOnIndependentEntityAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CascadeRemoveOnIndependentEntityAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CascadeRemoveOnIndependentEntityAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CollectionEmptyAccessAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CollectionEmptyAccessAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\IssueFactoryInterface"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CollectionInitializationAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CollectionInitializationAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument type="service" id="doctrine_doctor.null_logger"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\ColumnTypeAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\ColumnTypeAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument type="service" id="monolog.logger"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\DecimalPrecisionAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\DecimalPrecisionAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\IssueFactoryInterface"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\DivisionByZeroAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\DivisionByZeroAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\EmbeddableMutabilityAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\EmbeddableMutabilityAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\IssueFactoryInterface"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\EmbeddableWithoutValueObjectAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\EmbeddableWithoutValueObjectAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\IssueFactoryInterface"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\EntityManagerInEntityAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\EntityManagerInEntityAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument type="service" id="monolog.logger"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\EntityStateConsistencyAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\EntityStateConsistencyAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\IssueFactoryInterface"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\FinalEntityAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\FinalEntityAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\IssueFactoryInterface"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\FloatForMoneyAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\FloatForMoneyAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\IssueFactoryInterface"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\FloatInMoneyEmbeddableAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\FloatInMoneyEmbeddableAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\IssueFactoryInterface"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\ForeignKeyMappingAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\ForeignKeyMappingAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\JoinTypeConsistencyAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\JoinTypeConsistencyAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Analyzer\Parser\SqlStructureExtractor"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\MissingEmbeddableOpportunityAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\MissingEmbeddableOpportunityAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\IssueFactoryInterface"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\MissingOrphanRemovalOnCompositionAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\MissingOrphanRemovalOnCompositionAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\NamingConventionAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\NamingConventionAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\NullComparisonAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\NullComparisonAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\OnDeleteCascadeMismatchAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\OnDeleteCascadeMismatchAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\OrphanRemovalWithoutCascadeRemoveAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\OrphanRemovalWithoutCascadeRemoveAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\PartialObjectAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\PartialObjectAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument>5</argument>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\PrimaryKeyStrategyAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\PrimaryKeyStrategyAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\PropertyTypeMismatchAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\PropertyTypeMismatchAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\IssueFactoryInterface"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\QueryBuilderBestPracticesAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\QueryBuilderBestPracticesAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\IssueFactoryInterface"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\SoftDeleteableTraitAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\SoftDeleteableTraitAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\IssueFactoryInterface"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\TimestampableTraitAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\TimestampableTraitAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\IssueFactoryInterface"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\TransactionBoundaryAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\TransactionBoundaryAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\IssueFactoryInterface"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\TypeHintMismatchAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\TypeHintMismatchAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\IssueFactoryInterface"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Performance\BulkOperationAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\BulkOperationAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\IssueFactoryInterface"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument>20</argument>
+      <argument type="service" id="monolog.logger"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Analyzer\Parser\SqlStructureExtractor"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Performance\DTOHydrationAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\DTOHydrationAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Performance\EagerLoadingAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\EagerLoadingAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\IssueFactoryInterface"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument>4</argument>
+      <argument>7</argument>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Performance\EntityManagerClearAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\EntityManagerClearAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\IssueFactoryInterface"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument>20</argument>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Analyzer\Parser\SqlStructureExtractor"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Performance\FindAllAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\FindAllAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\IssueFactoryInterface"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument>99</argument>
+      <argument type="service" id="doctrine_doctor.null_logger"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Analyzer\Parser\SqlStructureExtractor"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Performance\FlushInLoopAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\FlushInLoopAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\IssueFactoryInterface"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument>5</argument>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Performance\FlushInLoopAnalyzerModern" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\FlushInLoopAnalyzerModern" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\IssueFactoryInterface"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Performance\GetReferenceAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\GetReferenceAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\IssueFactoryInterface"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument>2</argument>
+      <argument type="service" id="doctrine_doctor.null_logger"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Analyzer\Parser\SqlStructureExtractor"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Performance\HydrationAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\HydrationAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\IssueFactoryInterface"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument>99</argument>
+      <argument>999</argument>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Analyzer\Parser\SqlStructureExtractor"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Performance\IneffectiveLikeAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\IneffectiveLikeAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Performance\JoinOptimizationAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\JoinOptimizationAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Analyzer\Parser\SqlStructureExtractor"/>
+      <argument>5</argument>
+      <argument>8</argument>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Performance\LazyLoadingAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\LazyLoadingAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\IssueFactoryInterface"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument>10</argument>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Analyzer\Parser\SqlStructureExtractor"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Performance\MissingIndexAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\MissingIndexAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument type="service" id="doctrine.dbal.default_connection"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Analyzer\Performance\MissingIndexAnalyzerConfig"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Utils\DatabasePlatformDetector"/>
+      <argument type="service" id="doctrine_doctor.null_logger"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Performance\MissingIndexAnalyzerConfig" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\MissingIndexAnalyzerConfig" autowire="true" autoconfigure="true">
+      <argument>50</argument>
+      <argument>1000</argument>
+      <argument>10</argument>
+      <argument>true</argument>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Performance\NPlusOneAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\NPlusOneAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\IssueFactoryInterface"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument>5</argument>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Analyzer\Parser\SqlStructureExtractor"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Performance\OrderByWithoutLimitAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\OrderByWithoutLimitAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Analyzer\Parser\SqlStructureExtractor"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Performance\QueryCachingOpportunityAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\QueryCachingOpportunityAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Analyzer\Parser\SqlStructureExtractor"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Performance\SetMaxResultsWithCollectionJoinAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\SetMaxResultsWithCollectionJoinAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\IssueFactoryInterface"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Analyzer\Parser\SqlStructureExtractor"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Performance\SlowQueryAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\SlowQueryAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\IssueFactoryInterface"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument>100</argument>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Analyzer\Parser\SqlStructureExtractor"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Performance\YearFunctionOptimizationAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\YearFunctionOptimizationAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Analyzer\Parser\SqlStructureExtractor"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Security\DQLInjectionAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Security\DQLInjectionAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\IssueFactoryInterface"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Security\InsecureRandomAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Security\InsecureRandomAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument type="service" id="doctrine_doctor.null_logger"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Security\SQLInjectionInRawQueriesAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Security\SQLInjectionInRawQueriesAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument type="service" id="doctrine_doctor.null_logger"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Security\SensitiveDataExposureAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Security\SensitiveDataExposureAnalyzer" autowire="true" autoconfigure="true">
+      <tag name="doctrine_doctor.analyzer"/>
+      <argument type="service" id="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument type="service" id="doctrine_doctor.null_logger"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Collector\Helper\DataCollectorConfig" class="AhmedBhs\DoctrineDoctor\Collector\Helper\DataCollectorConfig" autowire="true" autoconfigure="true">
+      <argument>false</argument>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Collector\Helper\DatabaseInfoCollector" class="AhmedBhs\DoctrineDoctor\Collector\Helper\DatabaseInfoCollector" autowire="true" autoconfigure="true">
+      <argument type="service" id="doctrine_doctor.null_logger"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Collector\Helper\DataCollectorConfig"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Collector\Helper\IssueReconstructor" class="AhmedBhs\DoctrineDoctor\Collector\Helper\IssueReconstructor" autowire="true" autoconfigure="true">
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Template\Renderer\TemplateRendererInterface"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Collector\Helper\QueryStatsCalculator" class="AhmedBhs\DoctrineDoctor\Collector\Helper\QueryStatsCalculator" autowire="true" autoconfigure="true"/>
+    <service id="AhmedBhs\DoctrineDoctor\Collector\Helper\DataCollectorLogger" class="AhmedBhs\DoctrineDoctor\Collector\Helper\DataCollectorLogger" autowire="true" autoconfigure="true">
+      <argument type="service" id="doctrine_doctor.null_logger"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Collector\Helper\DataCollectorConfig"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Collector\DataCollectorHelpers" class="AhmedBhs\DoctrineDoctor\Collector\DataCollectorHelpers" autowire="true" autoconfigure="true">
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Collector\Helper\DatabaseInfoCollector"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Collector\Helper\IssueReconstructor"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Collector\Helper\QueryStatsCalculator"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Collector\Helper\DataCollectorLogger"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Service\IssueDeduplicator"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Collector\DoctrineDoctorDataCollector" class="AhmedBhs\DoctrineDoctor\Collector\DoctrineDoctorDataCollector" autowire="true" autoconfigure="true">
+      <tag name="data_collector" id="doctrine_doctor" template="@doctrine_doctor/profiler/doctrine_doctor.html.twig" priority="249"/>
+      <tag name="data_collector"/>
+      <tag name="kernel.reset" method="reset"/>
+      <argument type="tagged_iterator" tag="doctrine_doctor.analyzer"/>
+      <argument type="service" id="data_collector.doctrine" on-invalid="ignore"/>
+      <argument type="service" id="doctrine.orm.default_entity_manager" on-invalid="ignore"/>
+      <argument type="service" id="debug.stopwatch" on-invalid="ignore"/>
+      <argument>false</argument>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Collector\DataCollectorHelpers"/>
+      <argument>%doctrine_doctor.analysis.exclude_paths%</argument>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Analyzer\Parser\SqlStructureExtractor" class="AhmedBhs\DoctrineDoctor\Analyzer\Parser\CachedSqlStructureExtractor" autowire="true" autoconfigure="true"/>
+    <service id="AhmedBhs\DoctrineDoctor\Factory\IssueFactoryInterface" class="AhmedBhs\DoctrineDoctor\Factory\IssueFactory" autowire="true" autoconfigure="true"/>
+    <service id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory" class="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory" autowire="true" autoconfigure="true">
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Template\Renderer\TemplateRendererInterface"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Factory\PlatformAnalysisStrategyFactory" class="AhmedBhs\DoctrineDoctor\Factory\PlatformAnalysisStrategyFactory" autowire="true" autoconfigure="true">
+      <argument type="service" id="doctrine.dbal.default_connection"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Factory\SuggestionFactory"/>
+      <argument type="service" id="AhmedBhs\DoctrineDoctor\Utils\DatabasePlatformDetector"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Utils\DatabasePlatformDetector" class="AhmedBhs\DoctrineDoctor\Utils\DatabasePlatformDetector" autowire="true" autoconfigure="true">
+      <argument type="service" id="doctrine.dbal.default_connection"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Template\Renderer\TemplateRendererInterface" class="AhmedBhs\DoctrineDoctor\Template\Renderer\PhpTemplateRenderer" autowire="true" autoconfigure="true">
+      <argument>null</argument>
+      <argument type="service" id="monolog.logger"/>
+    </service>
+    <service id="AhmedBhs\DoctrineDoctor\Generator\MigrationGenerator" class="AhmedBhs\DoctrineDoctor\Generator\MigrationGenerator" autowire="true" autoconfigure="true"/>
+    <service id="AhmedBhs\DoctrineDoctor\Generator\RepositoryCodeGenerator" class="AhmedBhs\DoctrineDoctor\Generator\RepositoryCodeGenerator" autowire="true" autoconfigure="true"/>
+    <service id="AhmedBhs\DoctrineDoctor\Service\SeverityCalculator" class="AhmedBhs\DoctrineDoctor\Service\SeverityCalculator" autowire="true" autoconfigure="true"/>
+    <service id="AhmedBhs\DoctrineDoctor\Service\MessageEnhancer" class="AhmedBhs\DoctrineDoctor\Service\MessageEnhancer" autowire="true" autoconfigure="true"/>
+    <service id="AhmedBhs\DoctrineDoctor\Service\IssueDeduplicator" class="AhmedBhs\DoctrineDoctor\Service\IssueDeduplicator" autowire="true" autoconfigure="true"/>
     <service id=".instanceof.Symfony\Component\Console\Command\Command.0.App\Command\Animals\UpdateRemindersCommand" class="App\Command\Animals\UpdateRemindersCommand" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Command\Animals\UpdateRemindersCommand" class="App\Command\Animals\UpdateRemindersCommand" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\Console\Command\Command.0.App\Command\DailyStockSummaryCommand" class="App\Command\DailyStockSummaryCommand" autowire="true" abstract="true"/>
@@ -8758,6 +9292,141 @@
     <service id=".abstract.instanceof.App\Repository\stocks\MouvementStockRepository" class="App\Repository\stocks\MouvementStockRepository" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".instanceof.Symfony\Component\Security\Core\Authorization\Voter\VoterInterface.0.App\Security\TerrainVoter" class="App\Security\TerrainVoter" autowire="true" abstract="true"/>
     <service id=".abstract.instanceof.App\Security\TerrainVoter" class="App\Security\TerrainVoter" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Configuration\AutoGenerateProxyClassesAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\AutoGenerateProxyClassesAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Configuration\AutoGenerateProxyClassesAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\AutoGenerateProxyClassesAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Configuration\CharsetAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\CharsetAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Configuration\CharsetAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\CharsetAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Configuration\CollationAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\CollationAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Configuration\CollationAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\CollationAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Configuration\ConnectionPoolingAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\ConnectionPoolingAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Configuration\ConnectionPoolingAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\ConnectionPoolingAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Configuration\DoctrineCacheAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\DoctrineCacheAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Configuration\DoctrineCacheAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\DoctrineCacheAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Configuration\InnoDBEngineAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\InnoDBEngineAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Configuration\InnoDBEngineAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\InnoDBEngineAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Configuration\StrictModeAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\StrictModeAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Configuration\StrictModeAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\StrictModeAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Configuration\TimeZoneAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\TimeZoneAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Configuration\TimeZoneAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Configuration\TimeZoneAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\BidirectionalConsistencyAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\BidirectionalConsistencyAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\BidirectionalConsistencyAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\BidirectionalConsistencyAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\BlameableTraitAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\BlameableTraitAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\BlameableTraitAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\BlameableTraitAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CascadeAllAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CascadeAllAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CascadeAllAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CascadeAllAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CascadeAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CascadeAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CascadeAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CascadeAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CascadeConfigurationAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CascadeConfigurationAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CascadeConfigurationAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CascadeConfigurationAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CascadePersistOnIndependentEntityAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CascadePersistOnIndependentEntityAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CascadePersistOnIndependentEntityAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CascadePersistOnIndependentEntityAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CascadeRemoveOnIndependentEntityAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CascadeRemoveOnIndependentEntityAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CascadeRemoveOnIndependentEntityAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CascadeRemoveOnIndependentEntityAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CollectionEmptyAccessAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CollectionEmptyAccessAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CollectionEmptyAccessAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CollectionEmptyAccessAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CollectionInitializationAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CollectionInitializationAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CollectionInitializationAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\CollectionInitializationAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\ColumnTypeAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\ColumnTypeAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\ColumnTypeAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\ColumnTypeAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\DecimalPrecisionAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\DecimalPrecisionAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\DecimalPrecisionAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\DecimalPrecisionAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\DivisionByZeroAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\DivisionByZeroAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\DivisionByZeroAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\DivisionByZeroAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\EmbeddableMutabilityAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\EmbeddableMutabilityAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\EmbeddableMutabilityAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\EmbeddableMutabilityAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\EmbeddableWithoutValueObjectAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\EmbeddableWithoutValueObjectAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\EmbeddableWithoutValueObjectAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\EmbeddableWithoutValueObjectAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\EntityManagerInEntityAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\EntityManagerInEntityAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\EntityManagerInEntityAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\EntityManagerInEntityAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\EntityStateConsistencyAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\EntityStateConsistencyAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\EntityStateConsistencyAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\EntityStateConsistencyAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\FinalEntityAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\FinalEntityAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\FinalEntityAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\FinalEntityAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\FloatForMoneyAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\FloatForMoneyAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\FloatForMoneyAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\FloatForMoneyAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\FloatInMoneyEmbeddableAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\FloatInMoneyEmbeddableAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\FloatInMoneyEmbeddableAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\FloatInMoneyEmbeddableAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\ForeignKeyMappingAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\ForeignKeyMappingAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\ForeignKeyMappingAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\ForeignKeyMappingAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\JoinTypeConsistencyAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\JoinTypeConsistencyAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\JoinTypeConsistencyAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\JoinTypeConsistencyAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\MissingEmbeddableOpportunityAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\MissingEmbeddableOpportunityAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\MissingEmbeddableOpportunityAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\MissingEmbeddableOpportunityAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\MissingOrphanRemovalOnCompositionAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\MissingOrphanRemovalOnCompositionAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\MissingOrphanRemovalOnCompositionAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\MissingOrphanRemovalOnCompositionAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\NamingConventionAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\NamingConventionAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\NamingConventionAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\NamingConventionAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\NullComparisonAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\NullComparisonAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\NullComparisonAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\NullComparisonAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\OnDeleteCascadeMismatchAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\OnDeleteCascadeMismatchAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\OnDeleteCascadeMismatchAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\OnDeleteCascadeMismatchAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\OrphanRemovalWithoutCascadeRemoveAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\OrphanRemovalWithoutCascadeRemoveAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\OrphanRemovalWithoutCascadeRemoveAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\OrphanRemovalWithoutCascadeRemoveAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\PartialObjectAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\PartialObjectAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\PartialObjectAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\PartialObjectAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\PrimaryKeyStrategyAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\PrimaryKeyStrategyAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\PrimaryKeyStrategyAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\PrimaryKeyStrategyAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\PropertyTypeMismatchAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\PropertyTypeMismatchAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\PropertyTypeMismatchAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\PropertyTypeMismatchAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\QueryBuilderBestPracticesAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\QueryBuilderBestPracticesAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\QueryBuilderBestPracticesAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\QueryBuilderBestPracticesAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\SoftDeleteableTraitAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\SoftDeleteableTraitAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\SoftDeleteableTraitAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\SoftDeleteableTraitAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\TimestampableTraitAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\TimestampableTraitAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\TimestampableTraitAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\TimestampableTraitAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\TransactionBoundaryAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\TransactionBoundaryAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\TransactionBoundaryAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\TransactionBoundaryAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\TypeHintMismatchAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\TypeHintMismatchAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Integrity\TypeHintMismatchAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Integrity\TypeHintMismatchAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Performance\BulkOperationAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\BulkOperationAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Performance\BulkOperationAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\BulkOperationAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Performance\DTOHydrationAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\DTOHydrationAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Performance\DTOHydrationAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\DTOHydrationAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Performance\EagerLoadingAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\EagerLoadingAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Performance\EagerLoadingAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\EagerLoadingAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Performance\EntityManagerClearAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\EntityManagerClearAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Performance\EntityManagerClearAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\EntityManagerClearAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Performance\FindAllAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\FindAllAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Performance\FindAllAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\FindAllAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Performance\FlushInLoopAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\FlushInLoopAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Performance\FlushInLoopAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\FlushInLoopAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Performance\FlushInLoopAnalyzerModern" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\FlushInLoopAnalyzerModern" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Performance\FlushInLoopAnalyzerModern" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\FlushInLoopAnalyzerModern" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Performance\GetReferenceAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\GetReferenceAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Performance\GetReferenceAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\GetReferenceAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Performance\HydrationAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\HydrationAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Performance\HydrationAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\HydrationAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Performance\IneffectiveLikeAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\IneffectiveLikeAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Performance\IneffectiveLikeAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\IneffectiveLikeAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Performance\JoinOptimizationAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\JoinOptimizationAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Performance\JoinOptimizationAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\JoinOptimizationAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Performance\LazyLoadingAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\LazyLoadingAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Performance\LazyLoadingAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\LazyLoadingAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Performance\MissingIndexAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\MissingIndexAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Performance\MissingIndexAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\MissingIndexAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Performance\NPlusOneAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\NPlusOneAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Performance\NPlusOneAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\NPlusOneAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Performance\OrderByWithoutLimitAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\OrderByWithoutLimitAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Performance\OrderByWithoutLimitAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\OrderByWithoutLimitAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Performance\QueryCachingOpportunityAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\QueryCachingOpportunityAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Performance\QueryCachingOpportunityAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\QueryCachingOpportunityAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Performance\SetMaxResultsWithCollectionJoinAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\SetMaxResultsWithCollectionJoinAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Performance\SetMaxResultsWithCollectionJoinAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\SetMaxResultsWithCollectionJoinAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Performance\SlowQueryAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\SlowQueryAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Performance\SlowQueryAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\SlowQueryAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Performance\YearFunctionOptimizationAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\YearFunctionOptimizationAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Performance\YearFunctionOptimizationAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Performance\YearFunctionOptimizationAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Security\DQLInjectionAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Security\DQLInjectionAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Security\DQLInjectionAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Security\DQLInjectionAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Security\InsecureRandomAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Security\InsecureRandomAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Security\InsecureRandomAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Security\InsecureRandomAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Security\SQLInjectionInRawQueriesAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Security\SQLInjectionInRawQueriesAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Security\SQLInjectionInRawQueriesAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Security\SQLInjectionInRawQueriesAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.AhmedBhs\DoctrineDoctor\Analyzer\AnalyzerInterface.0.AhmedBhs\DoctrineDoctor\Analyzer\Security\SensitiveDataExposureAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Security\SensitiveDataExposureAnalyzer" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Analyzer\Security\SensitiveDataExposureAnalyzer" class="AhmedBhs\DoctrineDoctor\Analyzer\Security\SensitiveDataExposureAnalyzer" autowire="true" autoconfigure="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface.0.AhmedBhs\DoctrineDoctor\Collector\DoctrineDoctorDataCollector" class="AhmedBhs\DoctrineDoctor\Collector\DoctrineDoctorDataCollector" autowire="true" abstract="true"/>
+    <service id=".instanceof.Symfony\Contracts\Service\ResetInterface.0.AhmedBhs\DoctrineDoctor\Collector\DoctrineDoctorDataCollector" class="AhmedBhs\DoctrineDoctor\Collector\DoctrineDoctorDataCollector" autowire="true" abstract="true"/>
+    <service id=".abstract.instanceof.AhmedBhs\DoctrineDoctor\Collector\DoctrineDoctorDataCollector" class="AhmedBhs\DoctrineDoctor\Collector\DoctrineDoctorDataCollector" autowire="true" autoconfigure="true" abstract="true"/>
     <service id=".service_locator.w7.f4fT" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
@@ -11282,17 +11951,17 @@
       <argument type="service" id="service_container"/>
       <factory service=".service_locator.fuYM_Z." method="withContext"/>
     </service>
-    <service id=".service_locator.i7B9_Ni" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.LjVnriP" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
       <argument type="collection">
         <argument key="routing.loader" type="service_closure" id="routing.loader"/>
       </argument>
     </service>
-    <service id=".service_locator.i7B9_Ni.router.default" class="Symfony\Component\DependencyInjection\ServiceLocator">
+    <service id=".service_locator.LjVnriP.router.default" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator_context" id="router.default"/>
       <argument>router.default</argument>
       <argument type="service" id="service_container"/>
-      <factory service=".service_locator.i7B9_Ni" method="withContext"/>
+      <factory service=".service_locator.LjVnriP" method="withContext"/>
     </service>
     <service id=".service_locator.cUcW89y" class="Symfony\Component\DependencyInjection\ServiceLocator">
       <tag name="container.service_locator"/>
@@ -12754,7 +13423,7 @@
     <service id="cache.app.recorder_inner" class="Symfony\Component\Cache\Adapter\FilesystemAdapter">
       <argument>OSVvEEgc-m</argument>
       <argument>0</argument>
-      <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/pools/app</argument>
+      <argument>C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/pools/app</argument>
       <argument type="service" id="cache.default_marshaller" on-invalid="ignore"/>
       <call method="setLogger">
         <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
@@ -12764,7 +13433,7 @@
       <argument>9df2By2iON</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/pools/system</argument>
+      <argument>C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -12772,7 +13441,7 @@
       <argument>0yr-vFtJnv</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/pools/system</argument>
+      <argument>C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -12780,7 +13449,7 @@
       <argument>k8ARBgCDRi</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/pools/system</argument>
+      <argument>C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -12788,7 +13457,7 @@
       <argument>sVPh2dhrWL</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/pools/system</argument>
+      <argument>C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -12796,7 +13465,7 @@
       <argument>tAldQWfR+p</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/pools/system</argument>
+      <argument>C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -12804,14 +13473,14 @@
       <argument>Amnias0Ida</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/pools/system</argument>
+      <argument>C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
     <service id="cache.messenger.restart_workers_signal.recorder_inner" class="Symfony\Component\Cache\Adapter\FilesystemAdapter">
       <argument>USE9s9qXcQ</argument>
       <argument>0</argument>
-      <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/pools/app</argument>
+      <argument>C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/pools/app</argument>
       <argument type="service" id="cache.default_marshaller" on-invalid="ignore"/>
       <call method="setLogger">
         <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
@@ -12821,7 +13490,7 @@
       <argument>UfA5s-66Ni</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/pools/system</argument>
+      <argument>C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -12831,7 +13500,7 @@
       <argument>u04PtETXQR</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/pools/system</argument>
+      <argument>C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -12839,7 +13508,7 @@
       <argument>LKOELfYfo0</argument>
       <argument>0</argument>
       <argument>%container.build_id%</argument>
-      <argument>C:\Users\Yessmine\Downloads\Esprit-PIDEV-3A11-2526-AgroFlow-main (2)\Esprit-PIDEV-3A11-2526-AgroFlow-main\var\cache\dev/pools/system</argument>
+      <argument>C:/Users/Yessmine/Downloads/Esprit-PIDEV-3A11-2526-AgroFlow-main (2)/Esprit-PIDEV-3A11-2526-AgroFlow-main/var/cache/dev/pools/system</argument>
       <argument type="service" id="monolog.logger.cache" on-invalid="ignore"/>
       <factory class="Symfony\Component\Cache\Adapter\AbstractAdapter" method="createSystemCache"/>
     </service>
@@ -13034,6 +13703,8 @@
     <service id="scheb_two_factor.ip_whitelist_provider" alias="scheb_two_factor.default_ip_whitelist_provider"/>
     <service id="scheb_two_factor.token_factory" alias="scheb_two_factor.default_token_factory"/>
     <service id="scheb_two_factor.provider_decider" alias="scheb_two_factor.default_provider_decider"/>
+    <service id="doctrine_doctor.entity_manager" alias="doctrine_doctor.entity_manager_with_filtered_metadata"/>
+    <service id="AhmedBhs\DoctrineDoctor\Suggestion\SuggestionRendererInterface" alias="AhmedBhs\DoctrineDoctor\Template\Renderer\TemplateRendererInterface"/>
     <service id="container.env_var_processors_locator" alias=".service_locator.w7.f4fT" public="true"/>
     <service id="twig.loader.filesystem" alias="twig.loader.native_filesystem"/>
     <service id="argument_resolver.controller_locator" alias=".service_locator.LaXyl8A"/>
@@ -13115,7 +13786,7 @@
     <service id=".service_locator.oIHygA7" alias=".service_locator.xOkKGYY"/>
     <service id=".service_locator.3ijAwyK" alias=".service_locator.vtjw4Bs"/>
     <service id=".service_locator.O24_MAy" alias=".service_locator.yY.p4P7"/>
-    <service id=".service_locator.SZqm8P1" alias=".service_locator.OtkCHKX"/>
+    <service id=".service_locator..BsfuuW" alias=".service_locator.OtkCHKX"/>
     <service id="validator" alias="debug.validator"/>
     <service id="http_client" alias=".debug.http_client"/>
     <service id=".debug.http_client.inner" alias="http_client.uri_template"/>
@@ -13133,6 +13804,7 @@
     <service id="security.access.decision_manager" alias="debug.security.access.decision_manager"/>
     <service id="security.firewall.authenticator.main" alias="debug.security.firewall.authenticator.main"/>
     <service id="security.authentication.trust_resolver" alias="scheb_two_factor.security.authentication.trust_resolver"/>
+    <service id="doctrine_doctor.entity_manager.inner" alias="doctrine.orm.default_entity_manager"/>
     <service id="messenger.bus.default" alias="debug.traced.messenger.bus.default"/>
     <service id="doctrine.orm.default_metadata_driver" alias=".doctrine.orm.default_metadata_driver"/>
     <service id="security.event_dispatcher.main" alias="debug.security.event_dispatcher.main"/>
@@ -13234,7 +13906,7 @@
     <service id=".service_locator.SoFxSjl" alias=".service_locator.uURT18R"/>
     <service id=".service_locator.Odyyg4J" alias=".service_locator.zy9Sz.w"/>
     <service id=".service_locator.18YFTzl" alias=".service_locator.f4l_PHz"/>
-    <service id=".service_locator.m5z18HW" alias=".service_locator.OtkCHKX"/>
+    <service id=".service_locator.JN5mRQu" alias=".service_locator.OtkCHKX"/>
     <service id=".service_locator.dGUCsbe" alias=".service_locator.oR77BOj"/>
     <service id=".service_locator._kIAbz1" alias=".service_locator.TpoC7U9"/>
     <service id=".service_locator.hnz5ZNh" alias=".service_locator.0TACwl3"/>

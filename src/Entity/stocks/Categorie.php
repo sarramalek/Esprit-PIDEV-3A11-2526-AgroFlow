@@ -34,7 +34,7 @@ class Categorie
     #[ORM\JoinColumn(name: "id_user", referencedColumnName: "cin", nullable: false)]
     private ?User $agriculteur = null;
 
-    #[ORM\OneToMany(mappedBy: 'categorie', targetEntity: Article::class)]
+    #[ORM\OneToMany(mappedBy: 'categorie', targetEntity: Article::class, orphanRemoval: true)]
     private Collection $articles;
 
     public function __construct()
