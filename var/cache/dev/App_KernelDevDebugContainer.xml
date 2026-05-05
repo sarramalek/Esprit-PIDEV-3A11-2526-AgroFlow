@@ -1032,6 +1032,7 @@
     <service id="App\Service\SmsService" class="App\Service\SmsService" autowire="true" autoconfigure="true">
       <tag name="container.error" message="Cannot autowire service &quot;App\Service\SmsService&quot;: argument &quot;$twilioSid&quot; of method &quot;__construct()&quot; is type-hinted &quot;string&quot;, you should configure its value explicitly."/>
     </service>
+    <service id="App\Service\StockManager" class="App\Service\StockManager" autowire="true" autoconfigure="true"/>
     <service id="App\Service\TacheIAService" class="App\Service\TacheIAService" autowire="true" autoconfigure="true">
       <tag name="container.error" message="Cannot autowire service &quot;App\Service\TacheIAService&quot;: argument &quot;$groqApiKey&quot; of method &quot;__construct()&quot; is type-hinted &quot;string&quot;, you should configure its value explicitly."/>
     </service>
@@ -5908,7 +5909,9 @@
       </argument>
       <argument type="service" id="doctrine.dbal.default_connection.configuration"/>
       <argument type="service" id="doctrine.dbal.default_connection.event_manager"/>
-      <argument type="collection"/>
+      <argument type="collection">
+        <argument key="enum">string</argument>
+      </argument>
       <call method="setNestTransactionsWithSavepoints">
         <argument>true</argument>
       </call>

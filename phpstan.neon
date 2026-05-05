@@ -1,0 +1,16 @@
+parameters:
+    level: 5
+    paths:
+        - src/Service/StockManager.php
+        - src/Entity/stocks
+        - tests/Service/StockManagerTest.php
+        - tests/Service/SmartVisionServiceTest.php
+        - tests/Unit/ArticleTest.php
+        - tests/Unit/CategorieTest.php
+        - tests/Unit/MouvementStockTest.php
+    reportUnmatchedIgnoredErrors: false
+    ignoreErrors:
+        -
+            identifier: property.unusedType
+        -
+            identifier: method.alreadyNarrowedType
