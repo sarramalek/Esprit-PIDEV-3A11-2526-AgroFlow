@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class VeterinaryManagerTest extends TestCase
 {
-    public function testValidAnimal()
+    public function testValidAnimal() : void
     {
         $animal = new Animaux();
         $animal->setNom('Rex');
@@ -19,7 +19,7 @@ class VeterinaryManagerTest extends TestCase
         $this->assertTrue($manager->validateAnimal($animal));
     }
 
-    public function testAnimalWithNegativeWeight()
+    public function testAnimalWithNegativeWeight() : void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Le poids de l\'animal doit être strictement positif');
@@ -32,7 +32,7 @@ class VeterinaryManagerTest extends TestCase
         $manager->validateAnimal($animal);
     }
 
-    public function testValidExamen()
+    public function testValidExamen() : void
     {
         $animal = new Animaux();
         $animal->setDateNaissance(new \DateTime('2022-01-01'));
@@ -45,7 +45,7 @@ class VeterinaryManagerTest extends TestCase
         $this->assertTrue($manager->validateExamen($examen));
     }
 
-    public function testExamenBeforeBirthDate()
+    public function testExamenBeforeBirthDate() : void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('La date de l\'examen ne peut pas être antérieure à la date de naissance de l\'animal');
