@@ -189,11 +189,12 @@ class Article
     }
 
     public function removeMouvement(MouvementStock $mouvement): static
-    {
-        if ($this->mouvements->removeElement($mouvement)) {
-            // owning side cannot be null (DB nullable=false), keep current link unchanged
-        }
-        return $this;
+    {if ($this->mouvements->removeElement($mouvement)) {
+        // Remplace l'article par un nouvel objet vide pour dissocier
+        // sans setter null (puisque Article est non-nullable)
+        $mouvement->setArticle(new Article());
+    }
+    return $this;
     }
 
     public function getValeurTotaleStock(): float
