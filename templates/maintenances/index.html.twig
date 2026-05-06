@@ -1,14 +1,8 @@
-{% if is_granted('ROLE_OUVRIER') %}
-    {% set layout = 'base_ouvrier.html.twig' %}
-    {% set cancel_route = 'ouvrier_taches' %}
-{% elseif is_granted('ROLE_AGRICULTEUR') %}
-    {% set layout = 'base_agriculteur.html.twig' %}
-    {% set cancel_route = 'agri_maintenances_index' %}
-{% endif %}
-
-{% extends layout %}{% block title %}Maintenances — AgroFlow{% endblock %}
+{% extends 'agriculteur_dashboard.html.twig' %}
+{% block title %}Maintenances — AgroFlow{% endblock %}
 {% block body %}
 <style>
+/* ========== BASE ========== */
 *, *::before, *::after { box-sizing: border-box; }
 .mp { max-width: 1400px; margin: 0 auto; padding: 2rem 1.75rem; font-family: 'Segoe UI', system-ui, sans-serif; }
 .bc { display:flex; align-items:center; gap:.4rem; font-size:.82rem; color:#5f7a5f; margin-bottom:1.5rem; }
@@ -28,100 +22,44 @@
 .btn--stats:hover,.btn--stats.active { background:#CECBF6; border-color:#7F77DD; }
 .btn--view-toggle { background:#fff; color:#5f7a5f; border:1.5px solid #d4e8d4; font-size:.82rem; padding:.55rem .9rem; border-radius:10px; cursor:pointer; }
 .btn--view-toggle.active { background:#eaf3de; color:#2d6a2d; border-color:#2d6a2d; }
+.btn--calendar { background:#fff; color:#a32d2d; border:1.5px solid #f7c1c1; font-size:.82rem; padding:.55rem .9rem; border-radius:10px; cursor:pointer; transition:all .15s; }
+.btn--calendar:hover { background:#fcebeb; }
 .btn--red-outline { background:#fff; color:#a32d2d; border:1.5px solid #f7c1c1; font-size:.82rem; padding:.55rem 1rem; border-radius:10px; cursor:pointer; }
 .btn--red-outline:hover { background:#fcebeb; }
+.btn--google { background:#fff; color:#4285f4; border:1.5px solid #4285f4; }
+.btn--google:hover { background:#4285f4; color:#fff; }
+.btn--chatbot { background: linear-gradient(135deg, #2d6a2d, #1a451a); color: white; border: none; }
+.btn--chatbot:hover { background: linear-gradient(135deg, #1a451a, #0d2e0d); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(45,106,45,0.3); color: white; }
+
+/* ========== ALERTS ========== */
 .alert { display:flex; align-items:center; justify-content:space-between; padding:.8rem 1.1rem; border-radius:10px; font-size:.9rem; font-weight:500; margin-bottom:1rem; border-left:4px solid; }
 .alert--success { background:#eaf3de; color:#27500a; border-color:#3b6d11; }
 .alert--danger  { background:#fcebeb; color:#501313; border-color:#a32d2d; }
 .alert--warning { background:#fff3cd; color:#856404; border-color:#ffc107; }
 .alert--info    { background:#e6f1fb; color:#0c447c; border-color:#185FA5; }
 .alert__close { background:none; border:none; cursor:pointer; font-size:1.1rem; opacity:.6; }
-.alert--success .alert__close { color:#27500a; }
-.alert--danger  .alert__close { color:#501313; }
 .alert__close:hover { opacity:1; }
 
-/* ── Modal IA ── */
-.modal { display:none; position:fixed; z-index:10000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.5); }
-.modal.show { display:flex; align-items:center; justify-content:center; }
-.modal-content { background:#fff; border-radius:20px; width:92%; max-width:620px; box-shadow:0 20px 60px rgba(0,0,0,0.25); animation:slideIn .25s; overflow:hidden; }
-@keyframes slideIn { from { transform:translateY(-40px); opacity:0; } to { transform:translateY(0); opacity:1; } }
-.modal-hdr { padding:1rem 1.5rem; background:#2d6a2d; display:flex; justify-content:space-between; align-items:center; }
-.modal-hdr h3 { margin:0; color:#EAF3DE; font-size:15px; font-weight:600; display:flex; align-items:center; gap:8px; }
-.modal-hdr .badge-ia { background:#EAF3DE; color:#27500A; font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; }
-.modal-close-btn { background:none; border:none; color:#C0DD97; font-size:22px; cursor:pointer; line-height:1; padding:0 4px; }
-.modal-close-btn:hover { color:#fff; }
-.modal-machine-bar { padding:.6rem 1.25rem; background:#f7faf4; border-bottom:1px solid #e4edde; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-.modal-machine-pill { background:#EAF3DE; color:#27500A; font-size:12px; font-weight:600; padding:3px 10px; border-radius:20px; white-space:nowrap; }
-.modal-machine-info { font-size:12px; color:#6b8c6b; }
-.modal-machine-info strong { color:#1a2e1a; font-weight:600; }
-.modal-tabs { display:flex; border-bottom:1px solid #e4edde; background:#f7faf4; }
-.modal-tab { flex:1; padding:.6rem .5rem; font-size:12px; font-weight:600; color:#6b8c6b; cursor:pointer; border:none; background:none; border-bottom:2px solid transparent; transition:all .15s; white-space:nowrap; }
-.modal-tab.active { color:#2d6a2d; border-bottom-color:#2d6a2d; background:#fff; }
-.modal-tab:hover:not(.active) { background:#fff; color:#1a2e1a; }
-.modal-panel { display:none; padding:1.1rem 1.25rem; }
-.modal-panel.active { display:block; }
-.modal-field-label { font-size:11px; font-weight:700; color:#7a9a7a; margin-bottom:6px; text-transform:uppercase; letter-spacing:.5px; }
-.modal-chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:.9rem; }
-.modal-chip { background:#f7faf4; border:1px solid #d4e8d4; color:#5f7a5f; font-size:12px; padding:4px 10px; border-radius:20px; cursor:pointer; transition:all .15s; }
-.modal-chip:hover,.modal-chip.sel { background:#EAF3DE; border-color:#97C459; color:#27500A; }
-.modal-textarea { width:100%; padding:.65rem .9rem; border:1px solid #d4e8d4; border-radius:10px; font-size:13px; font-family:inherit; resize:vertical; min-height:80px; outline:none; }
-.modal-textarea:focus { border-color:#2d6a2d; box-shadow:0 0 0 3px rgba(45,106,45,.1); }
-.modal-result-box { background:#f7faf4; border:1px solid #e4edde; border-radius:10px; padding:.9rem 1rem; font-size:13px; color:#1a2e1a; line-height:1.7; white-space:pre-wrap; max-height:230px; overflow-y:auto; margin-top:.6rem; }
-.modal-section-title { font-size:11px; font-weight:700; color:#7a9a7a; text-transform:uppercase; letter-spacing:.5px; margin-bottom:.4rem; margin-top:.6rem; }
-.modal-alert-info { padding:.55rem .85rem; border-radius:10px; font-size:12px; margin-bottom:.75rem; display:flex; align-items:center; gap:8px; background:#EAF3DE; color:#27500A; border-left:3px solid #3B6D11; }
-.modal-score-row { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:.75rem; }
-.modal-score-card { background:#f7faf4; border:1px solid #e4edde; border-radius:10px; padding:.6rem .75rem; text-align:center; }
-.modal-score-val { font-size:20px; font-weight:700; color:#2d6a2d; }
-.modal-score-lbl { font-size:10px; color:#7a9a7a; text-transform:uppercase; letter-spacing:.4px; margin-top:2px; }
-.modal-progress-bar { height:4px; background:#e4edde; border-radius:2px; overflow:hidden; margin-top:.4rem; }
-.modal-progress-fill { height:100%; background:#2d6a2d; border-radius:2px; transition:width .5s; }
-.modal-cal-nav { display:flex; align-items:center; justify-content:space-between; margin-bottom:.6rem; }
-.modal-cal-nav button { background:#fff; border:1px solid #d4e8d4; border-radius:8px; padding:3px 10px; cursor:pointer; font-size:14px; color:#1a2e1a; }
-.modal-cal-nav button:hover { background:#eaf3de; }
-.modal-cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-bottom:.75rem; }
-.modal-cal-hdr { font-size:10px; font-weight:700; color:#7a9a7a; text-align:center; padding:2px 0; text-transform:uppercase; }
-.modal-cal-cell { aspect-ratio:1; border-radius:8px; border:1px solid #e4edde; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:11px; cursor:pointer; transition:all .15s; background:#fff; }
-.modal-cal-cell:hover { background:#f7faf4; }
-.modal-cal-cell.today { border-color:#2d6a2d; color:#2d6a2d; font-weight:700; }
-.modal-cal-cell.has-event { background:#EAF3DE; border-color:#97C459; }
-.modal-cal-cell.has-event.urgent { background:#FCEBEB; border-color:#F09595; }
-.modal-cal-cell.other-month { opacity:.35; }
-.modal-event-list { display:flex; flex-direction:column; gap:5px; max-height:120px; overflow-y:auto; }
-.modal-event-item { display:flex; align-items:center; gap:8px; padding:.35rem .7rem; border-radius:8px; border:1px solid #e4edde; font-size:12px; background:#fff; }
-.modal-event-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-.modal-event-date { color:#7a9a7a; min-width:60px; font-size:11px; }
-.modal-event-label { font-weight:600; flex:1; color:#1a2e1a; }
-.modal-event-badge { font-size:10px; padding:2px 7px; border-radius:20px; font-weight:600; white-space:nowrap; }
-.eb-green { background:#EAF3DE; color:#27500A; }
-.eb-amber { background:#FAEEDA; color:#633806; }
-.eb-red   { background:#FCEBEB; color:#791F1F; }
-.modal-life-bars { display:flex; flex-direction:column; gap:8px; margin-bottom:.75rem; }
-.modal-life-bar-row { display:grid; grid-template-columns:110px 1fr 40px; align-items:center; gap:8px; font-size:12px; }
-.modal-life-bar-label { color:#7a9a7a; text-align:right; }
-.modal-life-bar-track { height:8px; background:#e4edde; border-radius:4px; overflow:hidden; }
-.modal-life-bar-fill { height:100%; border-radius:4px; transition:width .5s; }
-.modal-footer { padding:.75rem 1.25rem; border-top:1px solid #e4edde; display:flex; align-items:center; justify-content:space-between; background:#f7faf4; }
-
-/* ── Stats panel ── */
+/* ========== STATS PANEL ========== */
 .charts-panel { display:none; background:#fff; border-radius:16px; border:1.5px solid #CECBF6; border-left:4px solid #534AB7; padding:1.5rem; margin-bottom:1.5rem; box-shadow:0 2px 14px rgba(83,74,183,.08); }
 .charts-panel.is-open { display:block; }
 .charts-panel__header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.25rem; padding-bottom:.9rem; border-bottom:1px solid #EEEDFE; }
 .charts-panel__title { margin:0; font-size:.95rem; font-weight:700; color:#3C3489; }
 .charts-panel__close { background:none; border:none; cursor:pointer; color:#7a9a7a; font-size:1.2rem; padding:0 4px; }
 .charts-panel__close:hover { color:#3C3489; }
-.panel-stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:12px; margin-bottom:1.5rem; }
+.panel-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-bottom:1.5rem; }
 .pstat { border-radius:12px; padding:.9rem 1.1rem; }
-.pstat--purple { background:#EEEDFE; } .pstat--green { background:#EAF3DE; } .pstat--teal { background:#E1F5EE; } .pstat--amber { background:#FAEEDA; }
+.pstat--purple{background:#EEEDFE;}.pstat--green{background:#EAF3DE;}.pstat--teal{background:#E1F5EE;}.pstat--amber{background:#FAEEDA;}
 .pstat__label { font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.6px; margin-bottom:.25rem; }
-.pstat--purple .pstat__label { color:#534AB7; } .pstat--green .pstat__label { color:#3B6D11; } .pstat--teal .pstat__label { color:#0F6E56; } .pstat--amber .pstat__label { color:#854F0B; }
+.pstat--purple .pstat__label{color:#534AB7;}.pstat--green .pstat__label{color:#3B6D11;}.pstat--teal .pstat__label{color:#0F6E56;}.pstat--amber .pstat__label{color:#854F0B;}
 .pstat__value { font-size:1.5rem; font-weight:800; }
-.pstat--purple .pstat__value { color:#26215C; } .pstat--green .pstat__value { color:#173404; } .pstat--teal .pstat__value { color:#04342C; font-size:1.1rem; margin-top:.2rem; } .pstat--amber .pstat__value { color:#412402; }
-.charts-row { display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; }
-@media(max-width:700px){ .charts-row { grid-template-columns:1fr; } }
-.chart-card { background:#f9f7ff; border-radius:12px; padding:1.1rem 1.25rem; border:1px solid #EEEDFE; }
+.pstat--purple .pstat__value{color:#26215C;}.pstat--green .pstat__value{color:#173404;}.pstat--teal .pstat__value{color:#04342C;font-size:1.1rem;margin-top:.2rem;}.pstat--amber .pstat__value{color:#412402;}
+.charts-row { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+@media(max-width:700px){.charts-row{grid-template-columns:1fr;}}
+.chart-card { background:#f9f7ff; border-radius:12px; padding:1rem; border:1px solid #EEEDFE; }
 .chart-card h3 { margin:0 0 1rem; font-size:.875rem; font-weight:700; color:#3C3489; }
 
-/* ── Toolbar ── */
+/* ========== TOOLBAR ========== */
 .toolbar { display:flex; gap:.75rem; flex-wrap:wrap; margin-bottom:1.25rem; align-items:center; background:#fff; border-radius:14px; padding:.85rem 1.1rem; box-shadow:0 2px 12px rgba(0,0,0,.06); border:1.5px solid #eaf3de; }
 .toolbar__search { position:relative; flex:1; min-width:220px; }
 .toolbar__search-icon { position:absolute; left:.8rem; top:50%; transform:translateY(-50%); pointer-events:none; color:#7a9a7a; display:flex; align-items:center; }
@@ -137,18 +75,18 @@
 .toolbar select:focus { border-color:#2d6a2d; background-color:#fff; }
 .toolbar__sep { width:1px; height:26px; background:#d4e8d4; flex-shrink:0; }
 
-/* ── Badges ── */
+/* ========== BADGES ========== */
 .badge { display:inline-block; padding:.28rem .85rem; border-radius:50px; font-size:.78rem; font-weight:600; white-space:nowrap; }
-.badge--mecanique { background:#e1f5ee; color:#085041; } .badge--electrique { background:#faeeda; color:#633806; } .badge--hydraulique { background:#eaf3de; color:#27500a; }
-.badge--logicielle { background:#e6f1fb; color:#0c447c; } .badge--transmission { background:#ede8fa; color:#4a1d8c; } .badge--moteur { background:#fde8e8; color:#a32d2d; }
-.badge--vidange { background:#fff8e1; color:#7b5200; } .badge--revision { background:#e8f4fd; color:#1a5276; } .badge--pneumatique { background:#ddeeff; color:#0a3d6b; }
-.badge--autre,.badge--default { background:#f1efe8; color:#2c2c2a; }
+.badge--mecanique{background:#e1f5ee;color:#085041;}.badge--electrique{background:#faeeda;color:#633806;}.badge--hydraulique{background:#eaf3de;color:#27500a;}
+.badge--logicielle{background:#e6f1fb;color:#0c447c;}.badge--transmission{background:#ede8fa;color:#4a1d8c;}.badge--moteur{background:#fde8e8;color:#a32d2d;}
+.badge--vidange{background:#fff8e1;color:#7b5200;}.badge--revision{background:#e8f4fd;color:#1a5276;}.badge--pneumatique{background:#ddeeff;color:#0a3d6b;}
+.badge--autre,.badge--default{background:#f1efe8;color:#2c2c2a;}
 .statut-badge { display:inline-flex; align-items:center; gap:4px; padding:.2rem .7rem; border-radius:50px; font-size:.76rem; font-weight:600; white-space:nowrap; }
-.statut--planifie { background:#e6f1fb; color:#0c447c; } .statut--en_cours { background:#fff8e1; color:#7b5200; } .statut--termine { background:#e1f5ee; color:#085041; }
+.statut--planifie{background:#e6f1fb;color:#0c447c;}.statut--en_cours{background:#fff8e1;color:#7b5200;}.statut--termine{background:#e1f5ee;color:#085041;}
 .prio-badge { display:inline-flex; align-items:center; gap:4px; padding:.2rem .7rem; border-radius:50px; font-size:.76rem; font-weight:700; white-space:nowrap; }
-.prio--faible { background:#e6f1fb; color:#0c447c; } .prio--moyenne { background:#eaf3de; color:#27500a; } .prio--haute { background:#faeeda; color:#854F0B; } .prio--urgente { background:#fde8e8; color:#a32d2d; }
+.prio--faible{background:#e6f1fb;color:#0c447c;}.prio--moyenne{background:#eaf3de;color:#27500a;}.prio--haute{background:#faeeda;color:#854F0B;}.prio--urgente{background:#fde8e8;color:#a32d2d;}
 
-/* ── TABLE ── */
+/* ========== TABLE ========== */
 .maint-card { background:#fff; border-radius:16px; box-shadow:0 2px 18px rgba(0,0,0,.07); overflow-x:auto; }
 .maint-table { width:100%; border-collapse:collapse; font-size:.88rem; min-width:1000px; }
 .maint-table thead tr { background:#f7faf4; border-bottom:1.5px solid #e4edde; }
@@ -164,48 +102,120 @@
 .td-desc { color:#4a6a4a; font-size:.87rem; max-width:180px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .actions { display:flex; align-items:center; gap:.35rem; flex-wrap:wrap; }
 .act-btn { display:inline-flex; align-items:center; gap:.3rem; padding:.3rem .7rem; border-radius:8px; font-size:.78rem; font-weight:600; text-decoration:none; cursor:pointer; border:1.5px solid; background:#fff; transition:all .13s; white-space:nowrap; }
-.act-btn--view { border-color:#b3d4b3; color:#2d6a2d; } .act-btn--view:hover { background:#eaf3de; }
-.act-btn--edit { border-color:#f5c4b3; color:#993c1d; } .act-btn--edit:hover { background:#faece7; }
-.act-btn--del  { border-color:#f7c1c1; color:#a32d2d; } .act-btn--del:hover  { background:#fcebeb; }
-.act-btn--magic { border-color:#b3d4b3; color:#2d6a2d; } .act-btn--magic:hover { background:#eaf3de; }
+.act-btn--view{border-color:#b3d4b3;color:#2d6a2d;}.act-btn--view:hover{background:#eaf3de;}
+.act-btn--edit{border-color:#f5c4b3;color:#993c1d;}.act-btn--edit:hover{background:#faece7;}
+.act-btn--del{border-color:#f7c1c1;color:#a32d2d;}.act-btn--del:hover{background:#fcebeb;}
 
-/* ── CARDS ── */
-.cards-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(340px,1fr)); gap:1.1rem; }
+/* ========== CARDS ========== */
+.cards-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(360px,1fr)); gap:1.1rem; }
 .maint-card-item { background:#fff; border-radius:16px; box-shadow:0 2px 14px rgba(0,0,0,.08); overflow:hidden; transition:box-shadow .2s,transform .15s; display:flex; flex-direction:column; }
 .maint-card-item:hover { box-shadow:0 6px 28px rgba(0,0,0,.13); transform:translateY(-2px); }
 .mci-header { padding:1.1rem 1.2rem .9rem; display:flex; justify-content:space-between; align-items:flex-start; background:#2d6a2d; color:#fff; }
-.mci-header.h--planifie { background:#0c447c; } .mci-header.h--en_cours { background:#7b5200; } .mci-header.h--termine { background:#2d6a2d; } .mci-header.h--urgente { background:#a32d2d; }
+.mci-header.h--planifie{background:#0c447c;}.mci-header.h--en_cours{background:#7b5200;}.mci-header.h--termine{background:#2d6a2d;}.mci-header.h--urgente{background:#a32d2d;}
 .mci-title { font-size:1rem; font-weight:700; margin-bottom:.15rem; }
-.mci-sub   { font-size:.78rem; opacity:.85; display:flex; align-items:center; gap:.35rem; }
+.mci-sub { font-size:.78rem; opacity:.85; display:flex; align-items:center; gap:.35rem; }
 .mci-status-pill { background:rgba(255,255,255,.22); border-radius:20px; padding:.2rem .75rem; font-size:.78rem; font-weight:700; color:#fff; white-space:nowrap; border:1.5px solid rgba(255,255,255,.4); }
 .mci-alert { background:#fffbe6; border-left:4px solid #f5a623; padding:.55rem 1rem; font-size:.8rem; font-weight:600; color:#7b4f00; display:flex; align-items:center; gap:.4rem; }
-.mci-alert.alert-danger  { background:#fcebeb; border-left-color:#a32d2d; color:#501313; }
-.mci-alert.alert-warning { background:#fff3cd; border-left-color:#ffc107; color:#856404; }
+.mci-alert.alert-danger{background:#fcebeb;border-left-color:#a32d2d;color:#501313;}
+.mci-alert.alert-warning{background:#fff3cd;border-left-color:#ffc107;color:#856404;}
 .mci-stats { display:grid; grid-template-columns:1fr 1fr 1fr; gap:0; border-bottom:1px solid #f0f4ef; }
 .mci-stat { padding:.75rem .6rem; text-align:center; border-right:1px solid #f0f4ef; }
 .mci-stat:last-child { border-right:none; }
 .mci-stat__val { font-size:1.15rem; font-weight:800; color:#1a2e1a; line-height:1; }
 .mci-stat__lbl { font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#8aaa8a; margin-top:.2rem; }
 .mci-body { padding:.9rem 1.2rem; flex:1; display:flex; flex-direction:column; gap:.55rem; }
-.mci-row  { display:flex; align-items:center; gap:.5rem; font-size:.83rem; color:#3a5a3a; }
+.mci-row { display:flex; align-items:center; gap:.5rem; font-size:.83rem; color:#3a5a3a; }
 .mci-row-label { color:#8aaa8a; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.4px; min-width:70px; }
 .mci-desc { font-size:.8rem; color:#5a7a5a; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-.mci-actions { display:grid; grid-template-columns:1fr 1fr 1fr auto; gap:.4rem; padding:.75rem 1rem; border-top:1px solid #f0f4ef; background:#fafcf8; }
+.ai-reco-section { background:#f0faf7; border-left:3px solid #2d6a2d; border-radius:8px; padding:8px 10px; margin-top:8px; transition:all .2s ease; }
+.ai-reco-section:hover { background:#dcedc8; }
+.mci-actions { display:grid; grid-template-columns:1fr 1fr auto; gap:.4rem; padding:.75rem 1rem; border-top:1px solid #f0f4ef; background:#fafcf8; }
 .mci-btn { display:inline-flex; align-items:center; justify-content:center; gap:.3rem; padding:.42rem .6rem; border-radius:9px; font-size:.78rem; font-weight:600; text-decoration:none; cursor:pointer; border:1.5px solid; background:#fff; transition:all .13s; white-space:nowrap; }
-.mci-btn--view { border-color:#b3d4b3; color:#2d6a2d; } .mci-btn--view:hover { background:#eaf3de; }
-.mci-btn--edit { border-color:#f5c4b3; color:#993c1d; } .mci-btn--edit:hover { background:#faece7; }
-.mci-btn--magic { border-color:#b3d4b3; color:#2d6a2d; } .mci-btn--magic:hover { background:#eaf3de; }
-.mci-btn--del  { border-color:#f7c1c1; color:#a32d2d; } .mci-btn--del:hover  { background:#fcebeb; }
+.mci-btn--view{border-color:#b3d4b3;color:#2d6a2d;}.mci-btn--view:hover{background:#eaf3de;}
+.mci-btn--edit{border-color:#f5c4b3;color:#993c1d;}.mci-btn--edit:hover{background:#faece7;}
+.mci-btn--del{border-color:#f7c1c1;color:#a32d2d;}.mci-btn--del:hover{background:#fcebeb;}
 .empty { text-align:center; padding:4rem 2rem; background:#fff; border-radius:16px; border:1.5px dashed #c8dac8; }
-.loading-spinner { display:inline-block; width:13px; height:13px; border:2px solid rgba(255,255,255,.3); border-radius:50%; border-top-color:#fff; animation:spin .6s linear infinite; }
+
+/* ========== PAGINATION ========== */
+.pagination-wrap { display:flex; justify-content:center; align-items:center; gap:.5rem; margin-top:1.5rem; flex-wrap:wrap; }
+.pg-btn { display:inline-flex; align-items:center; justify-content:center; min-width:42px; height:42px; padding:0 .8rem; border-radius:10px; font-size:.95rem; font-weight:700; cursor:pointer; border:1.5px solid #d4e8d4; background:#fff; color:#2d6a2d; transition:all .13s; }
+.pg-btn:hover:not(:disabled) { background:#eaf3de; border-color:#2d6a2d; }
+.pg-btn.active { background:#2d6a2d; color:#fff; border-color:#2d6a2d; box-shadow:0 2px 8px rgba(45,90,27,.25); }
+.pg-btn:disabled { cursor:not-allowed; opacity:.65; background:#fff; color:#2d6a2d; }
+.pg-info { font-size:.82rem; color:#7a9a7a; padding:0 .5rem; }
+.pg-size-select { padding:.35rem .7rem; border:1.5px solid #d4e8d4; border-radius:8px; font-size:.82rem; color:#1a2e1a; background:#f9fcf7; outline:none; cursor:pointer; }
+.pg-size-select:focus { border-color:#2d6a2d; }
+
+/* ========== MODALES ========== */
+.modal-loader { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:2rem; gap:.75rem; }
+.modal-loader__spinner { width:32px; height:32px; border:3px solid #e4edde; border-top-color:#2d6a2d; border-radius:50%; animation:spin .7s linear infinite; }
+.modal-loader__text { font-size:13px; color:#7a9a7a; }
+.reminder-popup { display:none; position:fixed; z-index:10050; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.6); backdrop-filter:blur(4px); justify-content:center; align-items:center; }
+.reminder-popup.show { display:flex; }
+.reminder-popup-content { background:white; border-radius:24px; width:90%; max-width:550px; max-height:85vh; overflow-y:auto; animation:popupSlideIn 0.3s ease-out; box-shadow:0 25px 50px -12px rgba(0,0,0,0.25); }
+.reminder-popup-header { background:linear-gradient(135deg, #e74a3b 0%, #c0392b 100%); padding:1.25rem 1.5rem; color:white; display:flex; justify-content:space-between; align-items:center; border-radius:24px 24px 0 0; }
+.reminder-popup-header h3 { margin:0; font-size:1.2rem; display:flex; align-items:center; gap:10px; }
+.reminder-popup-close { background:rgba(255,255,255,0.2); border:none; color:white; width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:1.2rem; display:flex; align-items:center; justify-content:center; transition:background .15s; }
+.reminder-popup-close:hover { background:rgba(255,255,255,0.35); }
+.reminder-popup-body { padding:1.5rem; }
+.reminder-message-box { background:#fef3e8; border-left:4px solid #e74a3b; padding:1rem; border-radius:12px; margin-bottom:1.5rem; }
+.reminder-message-text { font-size:1rem; font-weight:700; color:#a32d2d; margin-bottom:8px; }
+.reminder-detail-row { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #e4edde; }
+.reminder-detail-label { font-weight:600; color:#7a9a7a; font-size:0.8rem; }
+.reminder-detail-value { font-weight:500; color:#1a2e1a; }
+
+/* Styles pour les notes du calendrier */
+.fc-day-grid-day {
+    transition: background 0.2s ease;
+    position: relative;
+}
+.fc-day-grid-day:hover {
+    background: #f0faf7 !important;
+}
+.note-indicator {
+    position: absolute;
+    bottom: 2px;
+    right: 4px;
+    font-size: 14px;
+    opacity: 0.8;
+    cursor: pointer;
+    z-index: 10;
+    animation: fadeIn 0.2s ease;
+}
+.add-note-btn {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: rgba(45,106,45,0.9);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    padding: 2px 6px;
+    font-size: 10px;
+    cursor: pointer;
+    z-index: 20;
+    transition: all 0.2s ease;
+}
+.add-note-btn:hover {
+    transform: scale(1.1);
+    background: #1a451a !important;
+}
+
 @keyframes spin { to { transform:rotate(360deg); } }
+@keyframes popupSlideIn { from { opacity:0; transform:translateY(-30px) scale(0.95); } to { opacity:1; transform:translateY(0) scale(1); } }
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+#noteContent:focus {
+    border-color: #2d6a2d !important;
+    box-shadow: 0 0 0 3px rgba(45,106,45,0.1);
+}
 </style>
 
 <div class="mp">
   <nav class="bc">
-    <a href="#">Matériels</a>
+    <a href="{{ path('agri_maintenances_index') }}">Maintenances</a>
     <span class="bc__sep">›</span>
-    <span>Maintenances</span>
+    <span>Liste</span>
   </nav>
 
   <div class="mh">
@@ -216,7 +226,9 @@
     <div class="mh__right">
       <button type="button" class="btn btn--view-toggle active" id="viewCards" onclick="setView('cards')">⊞ Cartes</button>
       <button type="button" class="btn btn--view-toggle" id="viewTable" onclick="setView('table')">☰ Tableau</button>
+      <button type="button" class="btn btn--calendar" id="openCalendarBtn">📅 Rappels annuels</button>
       <button type="button" class="btn btn--stats" id="statsToggle" onclick="toggleStats()">📊 Stats</button>
+      <a href="{{ path('agri_chatbot_index') }}" class="btn btn--chatbot">🤖 Assistant IA</a>
       <a href="{{ path('agri_maintenances_export_pdf') }}" target="_blank" class="btn btn--outline">📄 PDF</a>
       <a href="{{ path('agri_maintenances_export_excel') }}" class="btn btn--outline">📥 Excel</a>
       <a href="{{ path('agri_maintenances_new') }}" class="btn btn--green">+ Nouvelle maintenance</a>
@@ -229,7 +241,7 @@
     {% endfor %}
   {% endfor %}
 
-  {# Stats panel #}
+  {# ══ STATS PANEL ══ #}
   <div class="charts-panel" id="chartsPanel">
     <div class="charts-panel__header">
       <p class="charts-panel__title">📊 Statistiques des maintenances</p>
@@ -252,7 +264,7 @@
     </div>
   </div>
 
-  {# Toolbar #}
+  {# ══ TOOLBAR ══ #}
   <div class="toolbar">
     <div class="toolbar__search">
       <span class="toolbar__search-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
@@ -320,14 +332,17 @@
     <div class="cards-grid" id="cardsGrid">
       {% for item in maintenancesWithAlerts %}
         {% set m = item.maintenance %}
-        {% set alert = item.alert %}
+        {% set alertStatus = item.alertStatus %}
+        {% set alerts = item.alerts|default([]) %}
+        {% set hasCritical = item.hasCritical|default(false) %}
         {% set typeMap = {'Mécanique':'mecanique','Électricité':'electrique','Hydraulique':'hydraulique','Logicielle':'logicielle','Transmission':'transmission','Moteur':'moteur','Vidange & filtres':'vidange','Révision générale':'revision','Pneumatique':'pneumatique'} %}
         {% set bc = typeMap[m.typePanne]|default('default') %}
         {% set prioLabels = {'faible':'🔵 Faible','moyenne':'🟢 Moyenne','haute':'🟠 Haute','urgente':'🔴 Urgente'} %}
         {% set statutLabels = {'planifie':'📅 Planifié','en_cours':'⚙️ En cours','termine':'✅ Terminé'} %}
         {% set prioOrder = {'faible':1,'moyenne':2,'haute':3,'urgente':4} %}
         {% set headerCls = m.priorite == 'urgente' ? 'h--urgente' : 'h--' ~ (m.statut|default('planifie')) %}
-        {% set machineName = m.nomMateriel ?? m.nom ?? 'Machine non définie' %}
+        {% set machineName = m.nomMateriel is defined and m.nomMateriel is not null ? m.nomMateriel : (m.nom is defined and m.nom is not null ? m.nom : 'Machine non définie') %}
+        {% set aiReco = m.recommandation|default('') %}
 
         <div class="maint-card-item"
              data-id="{{ m.idMain }}"
@@ -344,7 +359,7 @@
           <div class="mci-header {{ headerCls }}">
             <div>
               <div class="mci-title">{{ machineName }}</div>
-              <div class="mci-sub"><span>📍</span><span>{{ m.typePanne|default('—') }}</span>{% if m.idM %}&nbsp;·&nbsp;#{{ m.idM.id }}{% endif %}</div>
+              <div class="mci-sub"><span>📍</span><span>{{ m.typePanne|default('—') }}</span>{% if m.idM %}&nbsp;·&nbsp;#{{ m.idM }}{% endif %}</div>
             </div>
             <div class="mci-status-pill">
               {% if m.priorite == 'urgente' %}🔴 Urgente
@@ -354,9 +369,48 @@
             </div>
           </div>
 
-          {% if alert.status == 'overdue' %}<div class="mci-alert alert-danger">⚠️ {{ alert.message }}</div>
-          {% elseif alert.status == 'warning' %}<div class="mci-alert alert-warning">⏰ {{ alert.message }}</div>
-          {% elseif m.dateMain %}<div class="mci-alert" style="background:#f0faf7;border-left-color:#0F6E56;color:#085041;">📅 Maintenance le {{ m.dateMain|date('d/m/Y') }}</div>
+          {# Alerte de statut (overdue/warning/ok) #}
+          {% if alertStatus.status == 'overdue' %}
+            <div class="mci-alert alert-danger">⚠️ {{ alertStatus.message }}</div>
+          {% elseif alertStatus.status == 'warning' %}
+            <div class="mci-alert alert-warning">⏰ {{ alertStatus.message }}</div>
+          {% elseif m.dateMain %}
+            <div class="mci-alert" style="background:#f0faf7;border-left-color:#0F6E56;color:#085041;">📅 Maintenance le {{ m.dateMain|date('d/m/Y') }}</div>
+          {% endif %}
+
+          {# ══ ALERTES IA PRÉVENTION ══ #}
+          {% if alerts|length > 0 %}
+            {% for alert in alerts|slice(0, 2) %}
+              <div class="ai-alert-card {{ alert.priority == 'urgente' ? 'ai-alert-critical' : (alert.priority == 'haute' ? 'ai-alert-high' : (alert.priority == 'moyenne' ? 'ai-alert-medium' : 'ai-alert-low')) }}" style="margin-bottom: 6px;">
+                <div style="display: flex; align-items: flex-start; gap: 10px; width: 100%;">
+                  <span style="font-size: 1.3rem; flex-shrink: 0;">{{ alert.icon }}</span>
+                  <div style="flex: 1;">
+                    <strong style="display: block; font-size: 0.8rem; {{ alert.priority == 'urgente' ? 'color: #a32d2d;' : (alert.priority == 'haute' ? 'color: #e67e22;' : 'color: #2d6a2d;') }}">{{ alert.title }}</strong>
+                    <span style="font-size: 0.7rem; color: #5a7a5a; display: block; margin-top: 2px;">{{ alert.message|slice(0, 100) }}{{ alert.message|length > 100 ? '...' : '' }}</span>
+                    {% if alert.action %}
+                      <button onclick="showAlertAction('{{ alert.action|escape('js') }}', '{{ alert.title|escape('js') }}')" 
+                          style="display: inline-block; margin-top: 6px; background: {{ alert.color }}; color: white; border: none; border-radius: 6px; padding: 3px 12px; font-size: 0.65rem; cursor: pointer; font-weight: 600;">
+                          {{ alert.action }}
+                      </button>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+            
+            {% if alerts|length > 2 %}
+              <div onclick="showAllAlerts({{ m.idMain }})" 
+                  style="background: #f0f0f0; text-align: center; padding: 6px; border-radius: 8px; font-size: 0.7rem; cursor: pointer; margin-top: 4px; color: #2d6a2d;">
+                  +{{ alerts|length - 2 }} alerte(s) supplémentaire(s) ▶
+              </div>
+            {% endif %}
+          {% else %}
+            <div class="ai-alert-card ai-alert-low" style="margin-bottom: 6px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span>✅</span>
+                <span style="font-size: 0.75rem; color: #2d6a2d;">Aucune alerte - Maintenance à jour</span>
+              </div>
+            </div>
           {% endif %}
 
           <div class="mci-stats">
@@ -371,16 +425,36 @@
             <div class="mci-row"><span class="mci-row-label">Statut</span><span class="statut-badge statut--{{ m.statut|default('planifie') }}">{{ statutLabels[m.statut]|default('—') }}</span></div>
             <div class="mci-row"><span class="mci-row-label">Coût</span><strong>{{ m.cout|number_format(2,',',' ') }} DT</strong></div>
             {% if m.description %}<div class="mci-desc" title="{{ m.description }}">{{ m.description }}</div>{% endif %}
-            {% if m.recommandation %}
-              <div class="mci-row" style="margin-top:4px;"><span class="mci-row-label">💡 Reco</span><span style="font-size:.75rem;color:#2d6a2d;">{{ m.recommandation|slice(0,60) }}{{ m.recommandation|length > 60 ? '…' : '' }}</span></div>
-            {% endif %}
+            
+            {# ══ RECOMMANDATION IA ══ #}
+            <div class="ai-reco-section">
+              <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+                <span style="font-size:14px;">🧠</span>
+                <span style="font-size:11px; font-weight:700; color:#2d6a2d; text-transform:uppercase; letter-spacing:0.5px;">Recommandation IA</span>
+              </div>
+              {% if aiReco and aiReco|trim is not empty %}
+                <div style="font-size:12px; color:#1a4a1a; line-height:1.4;" id="reco-card-{{ m.idMain }}">
+                  {{ aiReco|slice(0, 120) }}{{ aiReco|length > 120 ? '...' : '' }}
+                </div>
+                {% if aiReco|length > 120 %}
+                  <button onclick="toggleRecoCard({{ m.idMain }}, this)" 
+                          style="background:none; border:none; color:#2d6a2d; font-size:10px; cursor:pointer; margin-top:4px; font-weight:600;">
+                    ▼ Voir plus
+                  </button>
+                {% endif %}
+              {% else %}
+                <div style="font-size:11px; color:#999; margin-bottom:6px;">Aucune recommandation disponible</div>
+                <button onclick="generateRecoForCard({{ m.idMain }})" 
+                        style="background:#2d6a2d; color:white; border:none; border-radius:6px; padding:4px 8px; font-size:10px; cursor:pointer;">
+                  🧠 Générer IA
+                </button>
+              {% endif %}
+            </div>
           </div>
 
           <div class="mci-actions">
             <a href="{{ path('agri_maintenances_show', {id: m.idMain}) }}" class="mci-btn mci-btn--view">👁 Voir</a>
             <a href="{{ path('agri_maintenances_edit', {id: m.idMain}) }}" class="mci-btn mci-btn--edit">✏️ Edit</a>
-            <a href="javascript:void(0)" class="mci-btn mci-btn--magic"
-               onclick="openAIPrompt({{ m.idMain }},'{{ m.typePanne|e('js') }}','{{ m.priorite|e('js') }}','{{ m.kilometrage|default(0) }}','{{ machineName|e('js') }}','{{ m.statut|e('js') }}','{{ m.cout|default(0) }}','{{ m.description|default('')|e('js')|slice(0,100) }}')">🤖 IA</a>
             <form method="post" action="{{ path('agri_maintenances_delete', {id: m.idMain}) }}" onsubmit="return confirm('⚠️ Supprimer cette maintenance ?')" style="margin:0;">
               <input type="hidden" name="_token" value="{{ csrf_token('delete_maintenance_' ~ m.idMain) }}">
               <button type="submit" class="mci-btn mci-btn--del" title="Supprimer">🗑</button>
@@ -390,6 +464,7 @@
       {% endfor %}
     </div>
     <div id="noResultsCards" style="display:none;text-align:center;padding:3rem;color:#7a9a7a;">🔍 Aucun résultat.</div>
+    <div class="pagination-wrap" id="paginationCards"></div>
   </div>
 
   {# ══ TABLE VIEW ══ #}
@@ -397,20 +472,33 @@
     <div class="maint-card">
       <table class="maint-table">
         <thead>
-          <tr><th>Type</th><th>Coût (DT)</th><th>Date</th><th>Statut</th><th>Priorité</th><th>Km</th><th>Alerte</th><th>Machine</th><th>Description</th><th>Actions</th></tr>
+          <tr>
+            <th>Type</th><th>Coût (DT)</th><th>Date</th><th>Statut</th>
+            <th>Priorité</th><th>Km</th><th>Alerte</th><th>Machine</th>
+            <th>Description</th><th>Reco IA</th><th>Actions</th>
+          </tr>
         </thead>
         <tbody id="maintBody">
           {% for item in maintenancesWithAlerts %}
             {% set m = item.maintenance %}
-            {% set alert = item.alert %}
+            {% set alertStatus = item.alertStatus %}
+            {% set alerts = item.alerts|default([]) %}
+            {% set hasCritical = item.hasCritical|default(false) %}
             {% set typeMap2 = {'Mécanique':'mecanique','Électricité':'electrique','Hydraulique':'hydraulique','Logicielle':'logicielle','Transmission':'transmission','Moteur':'moteur','Vidange & filtres':'vidange','Révision générale':'revision','Pneumatique':'pneumatique'} %}
             {% set bc2 = typeMap2[m.typePanne]|default('default') %}
-            {% set machineName2 = m.nomMateriel ?? m.nom ?? '' %}
-            <tr data-id="{{ m.idMain }}" data-type="{{ m.typePanne|default('')|lower }}" data-desc="{{ m.description|default('')|lower }}"
-                data-cout="{{ m.cout|default(0) }}" data-date="{{ m.dateMain ? m.dateMain|date('Y-m-d') : '0000-00-00' }}"
-                data-statut="{{ m.statut|default('planifie') }}" data-priorite="{{ m.priorite|default('moyenne') }}"
+            {% set machineName2 = m.nomMateriel is defined and m.nomMateriel is not null ? m.nomMateriel : (m.nom is defined and m.nom is not null ? m.nom : '') %}
+            {% set aiReco = m.recommandation|default('') %}
+            
+            <tr data-id="{{ m.idMain }}"
+                data-type="{{ m.typePanne|default('')|lower }}"
+                data-desc="{{ m.description|default('')|lower }}"
+                data-cout="{{ m.cout|default(0) }}"
+                data-date="{{ m.dateMain ? m.dateMain|date('Y-m-d') : '0000-00-00' }}"
+                data-statut="{{ m.statut|default('planifie') }}"
+                data-priorite="{{ m.priorite|default('moyenne') }}"
                 data-prio-order="{{ {'faible':1,'moyenne':2,'haute':3,'urgente':4}[m.priorite]|default(2) }}"
-                data-km="{{ m.kilometrage|default(0) }}" data-nom="{{ machineName2|lower }}">
+                data-km="{{ m.kilometrage|default(0) }}"
+                data-nom="{{ machineName2|lower }}">
               <td><span class="badge badge--{{ bc2 }}">{{ m.typePanne|default('—') }}</span></td>
               <td class="td-cost">{{ m.cout|number_format(2,',',' ') }} DT</td>
               <td class="td-date">{{ m.dateMain ? m.dateMain|date('d/m/Y') : '—' }}</td>
@@ -418,437 +506,233 @@
               <td><span class="prio-badge prio--{{ m.priorite|default('moyenne') }}">{{ {'faible':'🔵 Faible','moyenne':'🟢 Moyenne','haute':'🟠 Haute','urgente':'🔴 Urgente'}[m.priorite]|default('—') }}</span></td>
               <td style="font-size:.85rem;">{{ m.kilometrage is not null ? m.kilometrage ~ ' km' : '—' }}</td>
               <td>
-                {% if alert.status == 'overdue' %}<span style="color:#a32d2d;font-weight:600;">⚠️ {{ alert.message }}</span>
-                {% elseif alert.status == 'warning' %}<span style="color:#856404;">⏰ {{ alert.message }}</span>
-                {% elseif alert.status == 'ok' %}<span style="color:#27500a;">✅ {{ alert.message }}</span>
-                {% else %}<span style="color:#7a9a7a;">📅 {{ alert.message }}</span>{% endif %}
-              </td>
+                {% if alertStatus.status == 'overdue' %}
+                  <span style="color:#a32d2d;font-weight:600;">⚠️ {{ alertStatus.message|slice(0,30) }}</span>
+                {% elseif alertStatus.status == 'warning' %}
+                  <span style="color:#856404;">⏰ {{ alertStatus.message|slice(0,30) }}</span>
+                {% elseif alertStatus.status == 'ok' %}
+                  <span style="color:#27500a;">✅ {{ alertStatus.message|slice(0,30) }}</span>
+                {% else %}
+                  <span style="color:#7a9a7a;">📅 Maintenance à jour</span>
+                {% endif %}
+                </td>
               <td>
-                {% if m.idM and machineName2 %}<div class="machine-badge">🚜 #{{ m.idM.id }}</div><div class="machine-name" style="margin-top:4px;">{{ machineName2 }}</div>
-{% elseif m.idM %}<div class="machine-badge">🚜 #{{ m.idM.id }}</div>
-                {% else %}<span class="machine-badge machine-badge--none">—</span>{% endif %}
-              </td>
-              <td class="td-desc" title="{{ m.description|default('') }}">{{ m.description|default('—')|slice(0,40) }}{{ m.description|length > 40 ? '…' : '' }}</td>
+                {% if m.idM and machineName2 %}
+                  <div class="machine-badge">🚜 #{{ m.idM }}</div>
+                  <div class="machine-name" style="margin-top:4px;">{{ machineName2 }}</div>
+                {% elseif m.idM %}
+                  <div class="machine-badge">🚜 #{{ m.idM }}</div>
+                {% else %}
+                  <span class="machine-badge machine-badge--none">—</span>
+                {% endif %}
+                </td>
+              <td class="td-desc" title="{{ m.description|default('') }}">{{ m.description|default('—')|slice(0,35) }}{{ m.description|length > 35 ? '…' : '' }}</td>
+              <td style="font-size:.75rem;max-width:200px;">
+                {% if aiReco and aiReco|trim is not empty %}
+                  <div class="td-ai-reco" title="{{ aiReco }}" style="color:#2d6a2d; cursor:pointer;" onclick="showFullReco({{ m.idMain }}, '{{ aiReco|escape('js') }}')">
+                    🧠 {{ aiReco|slice(0, 50) }}{{ aiReco|length > 50 ? '...' : '' }}
+                  </div>
+                  {% if aiReco|length > 50 %}
+                    <button onclick="showFullReco({{ m.idMain }}, '{{ aiReco|escape('js') }}')" 
+                            style="background:none; border:none; color:#2d6a2d; font-size:9px; cursor:pointer; margin-top:2px;">
+                      ▼ voir plus
+                    </button>
+                  {% endif %}
+                {% else %}
+                  <span style="color:#aaa; font-style:italic;">En attente...</span>
+                  <button onclick="generateRecoForTable({{ m.idMain }})" 
+                          style="display:block; margin-top:4px; background:#2d6a2d; color:white; border:none; border-radius:4px; padding:2px 8px; font-size:9px; cursor:pointer;">
+                    Générer
+                  </button>
+                {% endif %}
+                </td>
               <td>
                 <div class="actions">
                   <a href="{{ path('agri_maintenances_show', {id: m.idMain}) }}" class="act-btn act-btn--view">👁</a>
                   <a href="{{ path('agri_maintenances_edit', {id: m.idMain}) }}" class="act-btn act-btn--edit">✏️</a>
-                  <a href="javascript:void(0)" class="act-btn act-btn--magic"
-                     onclick="openAIPrompt({{ m.idMain }},'{{ m.typePanne|e('js') }}','{{ m.priorite|e('js') }}','{{ m.kilometrage|default(0) }}','{{ machineName2|e('js') }}','{{ m.statut|e('js') }}','{{ m.cout|default(0) }}','{{ m.description|default('')|e('js')|slice(0,100) }}')">🤖 IA</a>
                   <form method="post" action="{{ path('agri_maintenances_delete', {id: m.idMain}) }}" onsubmit="return confirm('Supprimer ?')" style="display:inline;margin:0;">
                     <input type="hidden" name="_token" value="{{ csrf_token('delete_maintenance_' ~ m.idMain) }}">
                     <button type="submit" class="act-btn act-btn--del">🗑</button>
                   </form>
                 </div>
-              </td>
-            </tr>
+                </td>
+              </tr>
           {% endfor %}
         </tbody>
       </table>
       <div id="noResultsTable" style="display:none;text-align:center;padding:3rem;color:#7a9a7a;">🔍 Aucun résultat.</div>
     </div>
+    <div class="pagination-wrap" id="paginationTable"></div>
   </div>
+
   {% endif %}
 </div>
 
-{# ══ MODAL IA — 3 onglets ══ #}
-<div id="aiModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-hdr">
-      <h3>
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-        Assistant IA — Maintenance
-        <span class="badge-ia">AgroFlow AI</span>
+{# ══ CALENDRIER RAPPELS ANNUELS MODAL ══ #}
+<div id="reminderCalendarModal" style="display:none;position:fixed;z-index:10002;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);justify-content:center;align-items:flex-start;overflow-y:auto;padding:2rem 1rem;">
+  <div style="background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 25px 50px rgba(0,0,0,0.25);animation:popupSlideIn 0.3s ease-out;width:95%;max-width:1100px;margin:auto;">
+    <div style="background:linear-gradient(135deg,#e74a3b 0%,#c0392b 100%);padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;">
+      <h3 style="margin:0;font-size:1rem;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Calendrier des rappels annuels
+        <span style="display:inline-block;padding:.2rem .7rem;border-radius:50px;font-size:.75rem;font-weight:700;background:#fff;color:#a32d2d;white-space:nowrap;">🔔 Maintenance préventive</span>
       </h3>
-      <button class="modal-close-btn" onclick="closeAIModal()">×</button>
-    </div>
-
-    <div class="modal-machine-bar">
-      <span class="modal-machine-pill" id="aiMachinePill">—</span>
-      <span class="modal-machine-info" id="aiMachineInfo"></span>
-    </div>
-
-    <div class="modal-tabs">
-      <button class="modal-tab active" id="aitab-prompt" onclick="switchAITab('prompt')">💬 Prompt libre</button>
-      <button class="modal-tab" id="aitab-cal" onclick="switchAITab('cal')">📅 Calendrier</button>
-      <button class="modal-tab" id="aitab-life" onclick="switchAITab('life')">⏳ Durée de vie</button>
-    </div>
-
-    {# ── Onglet Prompt libre ── #}
-    <div id="aipanel-prompt" class="modal-panel active">
-      <div class="modal-field-label">Suggestions rapides</div>
-      <div class="modal-chips">
-        <span class="modal-chip" onclick="setAISug(this,'Quelles vérifications étape par étape pour cette panne ?')">Vérifications</span>
-        <span class="modal-chip" onclick="setAISug(this,'Quelles pièces contrôler et remplacer en priorité ?')">Pièces</span>
-        <span class="modal-chip" onclick="setAISug(this,'Précautions de sécurité pour cette intervention')">Sécurité</span>
-        <span class="modal-chip" onclick="setAISug(this,'Temps estimé et outils nécessaires')">Temps & outils</span>
-        <span class="modal-chip" onclick="setAISug(this,'Coût estimé et pièces détachées recommandées')">Estimation coût</span>
-      </div>
-      <div class="modal-field-label">Votre demande</div>
-      <textarea id="aiPromptTxt" class="modal-textarea" rows="3" placeholder="Ex : Décris les étapes pour réparer cette panne…"></textarea>
-      <div id="aiPromptRes" style="display:none;">
-        <div class="modal-section-title">Réponse générée</div>
-        <div class="modal-result-box" id="aiPromptResTxt"></div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+        <button class="btn btn--google" onclick="exportAllRemindersToGoogleCalendar()">📤 Exporter vers Google</button>
+        <button class="btn btn--outline" onclick="exportAllNotes()" style="background:#fff;">📥 Exporter mes notes</button>
+        <button id="closeCalendarBtn"
+                style="background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.5);color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:1.3rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s;line-height:1;"
+                onclick="closeReminderCalendar()">×</button>
       </div>
     </div>
-
-    {# ── Onglet Calendrier ── #}
-    <div id="aipanel-cal" class="modal-panel">
-      <div class="modal-alert-info">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
-        Calendrier d'interventions personnalisé selon votre machine
+    <div style="padding:20px;background:#f9fcf7;">
+      <div style="margin-bottom:15px;background:#fff;border-radius:12px;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;box-shadow:0 1px 6px rgba(0,0,0,.05);">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="width:12px;height:12px;background:#e74a3b;border-radius:50%;display:inline-block;"></span>
+          <span style="font-size:13px;color:#5f7a5f;">Dates surlignées = machines nécessitant maintenance · <strong style="color:#2d6a2d;">Cliquez sur un événement pour voir les détails</strong></span>
+        </div>
+        <div style="display:flex;gap:15px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:5px;"><div style="width:12px;height:12px;background:#e74a3b;border-radius:50%;"></div><span style="font-size:11px;">Rappel annuel (1+ an)</span></div>
+          <div style="display:flex;align-items:center;gap:5px;"><div style="width:12px;height:12px;background:#a32d2d;border-radius:50%;"></div><span style="font-size:11px;">Urgent</span></div>
+          <div style="display:flex;align-items:center;gap:5px;"><span style="font-size:14px;">📝</span><span style="font-size:11px;">Note existante</span></div>
+        </div>
       </div>
-      <div class="modal-cal-nav">
-        <button onclick="aiCalNav(-1)">‹</button>
-        <span id="aiCalTitle" style="font-size:13px;font-weight:600;color:#1a2e1a;"></span>
-        <button onclick="aiCalNav(1)">›</button>
-      </div>
-      <div id="aiCalGrid" class="modal-cal-grid"></div>
-      <div class="modal-section-title">Interventions planifiées</div>
-      <div id="aiEventList" class="modal-event-list"></div>
-      <div id="aiCalRes" style="display:none;margin-top:.6rem;">
-        <div class="modal-section-title">Suggestion IA</div>
-        <div class="modal-result-box" id="aiCalResTxt"></div>
-      </div>
+      <div id="reminderCalendar"></div>
     </div>
+  </div>
+</div>
 
-    {# ── Onglet Durée de vie ── #}
-    <div id="aipanel-life" class="modal-panel">
-      <div class="modal-alert-info">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>
-        Prévision basée sur le kilométrage, le type de panne et la priorité
-      </div>
-      <div class="modal-score-row">
-        <div class="modal-score-card"><div class="modal-score-val" id="aiLifeScore">—</div><div class="modal-score-lbl">Vie restante</div><div class="modal-progress-bar"><div class="modal-progress-fill" id="aiLifeBar" style="width:0%"></div></div></div>
-        <div class="modal-score-card"><div class="modal-score-val" id="aiLifeYears">—</div><div class="modal-score-lbl">Années est.</div></div>
-        <div class="modal-score-card"><div class="modal-score-val" id="aiLifeRisk">—</div><div class="modal-score-lbl">Risque panne</div></div>
-      </div>
-      <div class="modal-field-label">Usure par composant</div>
-      <div id="aiLifeBars" class="modal-life-bars"></div>
-      <div id="aiLifeRes" style="display:none;">
-        <div class="modal-section-title">Recommandations</div>
-        <div class="modal-result-box" id="aiLifeResTxt"></div>
-      </div>
+{# ══ MODAL POUR LES NOTES ══ #}
+<div id="noteModal" class="reminder-popup" style="display:none;">
+  <div class="reminder-popup-content" style="max-width: 500px;">
+    <div class="reminder-popup-header" style="background: linear-gradient(135deg, #2d6a2d, #1a451a);">
+      <h3><span>📝</span> Ma note</h3>
+      <button class="reminder-popup-close" onclick="closeNoteModal()">×</button>
     </div>
-
-    <div class="modal-footer">
-      <span style="font-size:12px;color:#6b8c6b;" id="aiFooterMsg">Prêt</span>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn--outline" style="font-size:.82rem;padding:.45rem .9rem;" onclick="resetAITab()">Réinitialiser</button>
-        <button class="btn btn--green" style="font-size:.82rem;padding:.45rem 1.1rem;" id="aiGenBtn" onclick="generateAI()">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          Générer
+    <div class="reminder-popup-body">
+      <div style="margin-bottom: 15px;">
+        <label style="font-size: 14px; font-weight: 600; color: #2d6a2d;">Date : <span id="noteDateDisplay" style="color: #1a2e1a;"></span></label>
+      </div>
+      <textarea id="noteContent" 
+        placeholder="📝 Écrivez votre note ici...&#10;&#10;Exemples :&#10;• Penser à vérifier les niveaux d'huile&#10;• Contacter le garagiste pour la révision&#10;• Commande de pièces détachées&#10;• Programmer la vidange pour la semaine prochaine&#10;• Vérifier la pression des pneus"
+        style="width: 100%; min-height: 200px; padding: 12px; border: 2px solid #d4e8d4; border-radius: 12px; font-size: 14px; font-family: inherit; resize: vertical; outline: none; transition: border-color 0.15s;"></textarea>
+      
+      <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
+        <button onclick="saveNote()" class="btn btn--green" style="flex: 1;">
+          💾 Enregistrer la note
         </button>
+        <button onclick="deleteNote()" class="btn btn--outline" style="color: #a32d2d; border-color: #f7c1c1;">
+          🗑 Supprimer
+        </button>
+        <button onclick="closeNoteModal()" class="btn btn--outline">
+          ✕ Fermer
+        </button>
+      </div>
+      
+      <div style="margin-top: 15px; font-size: 12px; color: #7a9a7a; text-align: center; padding: 10px; background: #f9fcf7; border-radius: 8px;">
+        💡 Astuce : Les notes sont automatiquement sauvegardées sur votre navigateur
+      </div>
+    </div>
+  </div>
+</div>
+
+{# ══ POPUP DETAIL RAPPEL ══ #}
+<div id="reminderDetailPopup" class="reminder-popup">
+  <div class="reminder-popup-content">
+    <div class="reminder-popup-header">
+      <h3><span>🔔</span> Détail du rappel</h3>
+      <button class="reminder-popup-close" onclick="closeReminderDetailPopup()">×</button>
+    </div>
+    <div class="reminder-popup-body" id="reminderDetailBody">
+      <div class="modal-loader">
+        <div class="modal-loader__spinner"></div>
+        <div class="modal-loader__text">Chargement...</div>
       </div>
     </div>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 <script>
-// ══ VUE TOGGLE ══
+// ================================================================
+// VARIABLES GLOBALES
+// ================================================================
 let currentView = localStorage.getItem('maintView') || 'cards';
+let reminderCalendar = null;
+let reminderEvents = [];
+let allRemindersData = [];
+let currentNoteDate = null;
+
+// Pagination
+let pgCards = { page:1, perPage:6, items:[] };
+let pgTable = { page:1, perPage:10, items:[] };
+
+// ================================================================
+// VUE TOGGLE
+// ================================================================
 function setView(v) {
     currentView = v;
     localStorage.setItem('maintView', v);
-    document.getElementById('viewCardsContainer').style.display = v === 'cards' ? '' : 'none';
-    document.getElementById('viewTableContainer').style.display = v === 'table'  ? '' : 'none';
-    document.getElementById('viewCards').classList.toggle('active', v === 'cards');
-    document.getElementById('viewTable').classList.toggle('active', v === 'table');
+    document.getElementById('viewCardsContainer').style.display = v === 'cards' ? 'block' : 'none';
+    document.getElementById('viewTableContainer').style.display = v === 'table' ? 'block' : 'none';
+    document.getElementById('viewCards')?.classList.toggle('active', v === 'cards');
+    document.getElementById('viewTable')?.classList.toggle('active', v === 'table');
     filterItems();
 }
-setView(currentView);
 
+// ================================================================
+// STATS PANEL
+// ================================================================
 function toggleStats() {
-    document.getElementById('chartsPanel').classList.toggle('is-open');
-    document.getElementById('statsToggle').classList.toggle('active');
+    document.getElementById('chartsPanel')?.classList.toggle('is-open');
+    document.getElementById('statsToggle')?.classList.toggle('active');
 }
 
-// ══ MODAL IA ══
-let aiActiveTab   = 'prompt';
-let aiCalYear     = new Date().getFullYear();
-let aiCalMonth    = new Date().getMonth();
-let aiMachineData = {};
-let aiEvents      = [];
-
-function openAIPrompt(id, type, priorite, km, nom, statut, cout, description) {
-    aiMachineData = { id, type: type||'—', priorite: priorite||'moyenne', km: parseInt(km)||0,
-                      nom: nom||'Machine', statut: statut||'planifie', cout: parseFloat(cout)||0,
-                      description: description||'' };
-    document.getElementById('aiMachinePill').textContent = nom || 'Machine';
-    document.getElementById('aiMachineInfo').innerHTML =
-        `Panne <strong>${type}</strong> · priorité <strong>${priorite}</strong> · ${km} km`;
-    aiCalYear  = new Date().getFullYear();
-    aiCalMonth = new Date().getMonth();
-    aiEvents   = [];
-    document.getElementById('aiModal').classList.add('show');
-    switchAITab('prompt');
-    renderAICal();
-    renderAILifeLocal();
-}
-
-function closeAIModal() {
-    document.getElementById('aiModal').classList.remove('show');
-}
-
-function switchAITab(t) {
-    aiActiveTab = t;
-    ['prompt','cal','life'].forEach(tab => {
-        document.getElementById('aitab-'  + tab)?.classList.toggle('active', tab === t);
-        document.getElementById('aipanel-'+ tab).style.display = tab === t ? 'block' : 'none';
-    });
-}
-
-function setAISug(chip, txt) {
-    document.querySelectorAll('.modal-chip').forEach(c => c.classList.remove('sel'));
-    chip.classList.add('sel');
-    document.getElementById('aiPromptTxt').value = txt;
-}
-
-// ── Calendrier ──
-function aiCalNav(d) {
-    aiCalMonth += d;
-    if (aiCalMonth > 11) { aiCalMonth = 0; aiCalYear++; }
-    if (aiCalMonth <  0) { aiCalMonth = 11; aiCalYear--; }
-    renderAICal();
-}
-
-function renderAICal() {
-    const months = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
-    document.getElementById('aiCalTitle').textContent = months[aiCalMonth] + ' ' + aiCalYear;
-    const grid = document.getElementById('aiCalGrid');
-    grid.innerHTML = '';
-    ['Lu','Ma','Me','Je','Ve','Sa','Di'].forEach(d => {
-        const c = document.createElement('div'); c.className = 'modal-cal-hdr'; c.textContent = d; grid.appendChild(c);
-    });
-    const first    = new Date(aiCalYear, aiCalMonth, 1);
-    const startDay = (first.getDay() + 6) % 7;
-    const daysInM  = new Date(aiCalYear, aiCalMonth + 1, 0).getDate();
-    const daysInP  = new Date(aiCalYear, aiCalMonth, 0).getDate();
-    const today    = new Date();
-    for (let i = 0; i < startDay; i++) {
-        const c = document.createElement('div'); c.className = 'modal-cal-cell other-month';
-        c.textContent = daysInP - startDay + 1 + i; grid.appendChild(c);
-    }
-    for (let d = 1; d <= daysInM; d++) {
-        const c   = document.createElement('div'); c.className = 'modal-cal-cell';
-        c.textContent = d;
-        const evs = aiEvents.filter(e => e.day === d && e.month === aiCalMonth && e.year === aiCalYear);
-        if (evs.length) {
-            c.classList.add('has-event');
-            if (evs.some(e => e.color === 'red')) c.classList.add('urgent');
-            const dot = document.createElement('div');
-            dot.style.cssText = `width:5px;height:5px;border-radius:50%;margin-top:2px;background:${evs[0].color==='red'?'#A32D2D':evs[0].color==='amber'?'#854F0B':'#3B6D11'}`;
-            c.appendChild(dot);
-        }
-        if (d === today.getDate() && aiCalMonth === today.getMonth() && aiCalYear === today.getFullYear())
-            c.classList.add('today');
-        grid.appendChild(c);
-    }
-    const rem = (7 - (startDay + daysInM) % 7) % 7;
-    for (let i = 1; i <= rem; i++) {
-        const c = document.createElement('div'); c.className = 'modal-cal-cell other-month'; c.textContent = i; grid.appendChild(c);
-    }
-    const list = document.getElementById('aiEventList');
-    list.innerHTML = '';
-    const visible = aiEvents.filter(e => e.month === aiCalMonth && e.year === aiCalYear).sort((a,b) => a.day - b.day);
-    if (!visible.length) {
-        list.innerHTML = '<div style="font-size:12px;color:#7a9a7a;padding:.3rem 0;">Aucune intervention ce mois — cliquez Générer pour planifier.</div>';
-        return;
-    }
-    visible.forEach(e => {
-        const item = document.createElement('div'); item.className = 'modal-event-item';
-        const bc   = e.color === 'red' ? 'eb-red' : e.color === 'amber' ? 'eb-amber' : 'eb-green';
-        const bg   = e.color === 'red' ? '#A32D2D' : e.color === 'amber' ? '#854F0B' : '#3B6D11';
-        const lab  = e.prio  === 'urgente' ? 'Urgente' : e.prio === 'haute' ? 'Haute' : 'Normale';
-        item.innerHTML = `<div class="modal-event-dot" style="background:${bg}"></div>
-            <span class="modal-event-date">${String(e.day).padStart(2,'0')}/${String(e.month+1).padStart(2,'0')}/${e.year}</span>
-            <span class="modal-event-label">${e.label}</span>
-            <span class="modal-event-badge ${bc}">${lab}</span>`;
-        list.appendChild(item);
-    });
-}
-
-// ── Durée de vie (calcul local) ──
-function renderAILifeLocal() {
-    const km  = aiMachineData.km || 0;
-    const maxKm = 20000;
-    const penalite = {urgente:25,haute:15,moyenne:8,faible:3}[aiMachineData.priorite] || 8;
-    const vie = Math.max(0, Math.min(100, Math.round(((maxKm - km) / maxKm) * 100)) - penalite);
-    const ans = Math.max(0, ((maxKm - km) / 3000)).toFixed(1);
-    const risque = (aiMachineData.priorite === 'urgente' || km > 15000) ? 'Élevé'
-                 : (aiMachineData.priorite === 'haute'   || km > 10000) ? 'Moyen' : 'Faible';
-    document.getElementById('aiLifeScore').textContent = vie + '%';
-    document.getElementById('aiLifeBar').style.width   = vie + '%';
-    document.getElementById('aiLifeYears').textContent  = ans + ' ans';
-    document.getElementById('aiLifeRisk').textContent   = risque;
-    const composants = [
-        {nom:'Moteur',       usure: Math.min(100, Math.round(km/200)),  color:'#A32D2D'},
-        {nom:'Transmission', usure: Math.min(100, Math.round(km/300)),  color:'#854F0B'},
-        {nom:'Hydraulique',  usure: Math.min(100, Math.round(km/400)),  color:'#0C447C'},
-        {nom:'Électricité',  usure: Math.min(100, Math.round(km/600)),  color:'#3B6D11'},
-        {nom:'Pneumatique',  usure: Math.min(100, Math.round(km/250)),  color:'#4a1d8c'},
-    ];
-    const bars = document.getElementById('aiLifeBars');
-    bars.innerHTML = '';
-    composants.forEach(c => {
-        const row = document.createElement('div'); row.className = 'modal-life-bar-row';
-        row.innerHTML = `<div class="modal-life-bar-label">${c.nom}</div>
-            <div class="modal-life-bar-track"><div class="modal-life-bar-fill" style="width:${c.usure}%;background:${c.color}"></div></div>
-            <div style="font-size:11px;font-weight:600;color:#1a2e1a;">${c.usure}%</div>`;
-        bars.appendChild(row);
-    });
-}
-
-// ── Génération (appels Symfony) ──
-function setAIStatus(m) { document.getElementById('aiFooterMsg').textContent = m; }
-function setAILoading(on) {
-    const btn = document.getElementById('aiGenBtn');
-    if (on) { btn.disabled = true; btn.innerHTML = '<span class="loading-spinner"></span> Génération…'; }
-    else    { btn.disabled = false; btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Générer'; }
-}
-
-async function generateAI() {
-    setAILoading(true);
-    try {
-        if      (aiActiveTab === 'prompt') await aiRunPrompt();
-        else if (aiActiveTab === 'cal')    await aiRunCal();
-        else                               await aiRunLife();
-    } catch(e) {
-        setAIStatus('Erreur: ' + e.message);
-        showNotification('❌ Erreur: ' + e.message, 'danger');
-    }
-    setAILoading(false);
-}
-
-async function aiRunPrompt() {
-    const prompt = document.getElementById('aiPromptTxt').value.trim();
-    if (!prompt) { setAIStatus('Entrez une demande'); setAILoading(false); return; }
-    setAIStatus('Appel API…');
-    const res  = await fetch(`/agriculteur/maintenances/api/generate-custom-prompt/${aiMachineData.id}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt })
-    });
-    const data = await res.json();
-    if (data.success) {
-        document.getElementById('aiPromptResTxt').textContent = data.response;
-        document.getElementById('aiPromptRes').style.display  = 'block';
-        setAIStatus('Réponse générée');
-    } else {
-        setAIStatus('Erreur serveur');
-        showNotification('❌ ' + (data.error || 'Erreur'), 'danger');
-    }
-}
-
-async function aiRunCal() {
-    setAIStatus('Chargement du calendrier…');
-    const res  = await fetch(`/agriculteur/maintenances/api/calendar/${aiMachineData.id}`);
-    const data = await res.json();
-    if (data.success) {
-        aiEvents = [];
-        (data.suggestions || []).forEach(s => {
-            const parts = s.date.split('/');
-            if (parts.length === 3) {
-                aiEvents.push({
-                    day: parseInt(parts[0]), month: parseInt(parts[1]) - 1, year: parseInt(parts[2]),
-                    label: s.intervention, prio: s.priorite, color: s.color || 'green'
-                });
-            }
-        });
-        renderAICal();
-        const txt = (data.suggestions || []).map(s =>
-            `📅 ${s.date} — ${s.intervention}\n   Durée: ${s.duree} · ${s.technicien}`
-        ).join('\n\n');
-        document.getElementById('aiCalResTxt').textContent = txt || '—';
-        document.getElementById('aiCalRes').style.display  = 'block';
-        setAIStatus('Calendrier généré');
-    } else {
-        setAIStatus('Erreur calendrier');
-    }
-}
-
-async function aiRunLife() {
-    setAIStatus('Analyse durée de vie…');
-    const res  = await fetch(`/agriculteur/maintenances/api/lifetime/${aiMachineData.id}`);
-    const data = await res.json();
-    if (data.success) {
-        document.getElementById('aiLifeScore').textContent = data.vieRestante + '%';
-        document.getElementById('aiLifeBar').style.width   = data.vieRestante + '%';
-        document.getElementById('aiLifeYears').textContent = data.anneesEstimees + ' ans';
-        document.getElementById('aiLifeRisk').textContent  = data.risquePanne;
-        if (data.composants?.length) {
-            const colors = ['#A32D2D','#854F0B','#0C447C','#3B6D11','#4a1d8c'];
-            const bars   = document.getElementById('aiLifeBars');
-            bars.innerHTML = '';
-            data.composants.forEach((c, i) => {
-                const row = document.createElement('div'); row.className = 'modal-life-bar-row';
-                row.innerHTML = `<div class="modal-life-bar-label">${c.nom}</div>
-                    <div class="modal-life-bar-track"><div class="modal-life-bar-fill" style="width:${c.usure}%;background:${colors[i % colors.length]}"></div></div>
-                    <div style="font-size:11px;font-weight:600;color:#1a2e1a;">${c.usure}%</div>`;
-                bars.appendChild(row);
-            });
-        }
-        const recs = (data.recommandations || []).map((r, i) => `${i+1}. ${r}`).join('\n');
-        document.getElementById('aiLifeResTxt').textContent = recs;
-        document.getElementById('aiLifeRes').style.display  = 'block';
-        setAIStatus('Analyse terminée');
-    } else {
-        setAIStatus('Erreur analyse');
-    }
-}
-
-function resetAITab() {
-    ['aiPromptRes','aiCalRes','aiLifeRes'].forEach(id => {
-        const el = document.getElementById(id); if (el) el.style.display = 'none';
-    });
-    document.getElementById('aiPromptTxt').value = '';
-    aiEvents = [];
-    renderAICal();
-    renderAILifeLocal();
-    setAIStatus('Réinitialisé');
-}
-
-document.getElementById('aiModal').addEventListener('click', function(e) {
-    if (e.target === this) closeAIModal();
-});
-
-// ══ FILTRES ══
+// ================================================================
+// FILTRES
+// ================================================================
 function filterItems() {
-    const search = (document.getElementById('searchInput').value || '').toLowerCase();
-    const type   = (document.getElementById('typeFilter').value   || '').toLowerCase();
-    const statut = (document.getElementById('statutFilter').value || '').toLowerCase();
-    const prio   = (document.getElementById('prioriteFilter').value || '').toLowerCase();
-    const sort   = document.getElementById('sortFilter').value;
-    const dir    = document.getElementById('dirFilter').value;
-    document.getElementById('resetBtn').style.display = (search||type||statut||prio) ? 'inline-flex' : 'none';
+    const search = (document.getElementById('searchInput')?.value || '').toLowerCase();
+    const type   = (document.getElementById('typeFilter')?.value || '').toLowerCase();
+    const statut = (document.getElementById('statutFilter')?.value || '').toLowerCase();
+    const prio   = (document.getElementById('prioriteFilter')?.value || '').toLowerCase();
+    const sort   = document.getElementById('sortFilter')?.value || 'date';
+    const dir    = document.getElementById('dirFilter')?.value || 'desc';
+
+    const resetBtn = document.getElementById('resetBtn');
+    if (resetBtn) resetBtn.style.display = (search || type || statut || prio) ? 'inline-flex' : 'none';
 
     function matches(el) {
-        return (!search || (el.dataset.type||'').toLowerCase().includes(search) || (el.dataset.desc||'').toLowerCase().includes(search) || (el.dataset.nom||'').toLowerCase().includes(search))
-            && (!type   || (el.dataset.type  ||'').toLowerCase().includes(type))
-            && (!statut || (el.dataset.statut||'').toLowerCase() === statut)
-            && (!prio   || (el.dataset.priorite||'').toLowerCase() === prio);
+        if (!el || !el.dataset) return false;
+        return (!search || (el.dataset.type||'').includes(search) || (el.dataset.desc||'').includes(search) || (el.dataset.nom||'').includes(search))
+            && (!type   || (el.dataset.type||'').includes(type))
+            && (!statut || (el.dataset.statut||'') === statut)
+            && (!prio   || (el.dataset.priorite||'') === prio);
     }
 
     const cardsGrid = document.getElementById('cardsGrid');
     if (cardsGrid) {
-        const cards = Array.from(cardsGrid.children);
-        cards.forEach(c => { c.style.display = matches(c) ? '' : 'none'; });
-        const vis = cards.filter(c => c.style.display !== 'none');
-        sortItems(vis, sort, dir, cardsGrid);
-        document.getElementById('noResultsCards').style.display = vis.length === 0 ? 'block' : 'none';
+        const allCards = Array.from(cardsGrid.children).filter(c => !c.id);
+        const matched  = allCards.filter(c => matches(c));
+        sortItems(matched, sort, dir);
+        pgCards.items = matched;
+        pgCards.page  = 1;
+        renderPaginatedCards();
     }
+
     const tbody = document.getElementById('maintBody');
     if (tbody) {
-        const rows = Array.from(tbody.querySelectorAll('tr'));
-        rows.forEach(tr => { tr.style.display = matches(tr) ? '' : 'none'; });
-        const vis = rows.filter(r => r.style.display !== 'none');
-        sortItems(vis, sort, dir, tbody);
-        document.getElementById('noResultsTable').style.display = vis.length === 0 ? 'block' : 'none';
+        const allRows = Array.from(tbody.querySelectorAll('tr'));
+        const matched  = allRows.filter(r => matches(r));
+        sortItems(matched, sort, dir);
+        pgTable.items = matched;
+        pgTable.page  = 1;
+        renderPaginatedTable();
     }
 }
 
-function sortItems(items, sort, dir, container) {
+function sortItems(items, sort, dir) {
     items.sort((a, b) => {
         let va, vb;
         switch (sort) {
@@ -863,53 +747,752 @@ function sortItems(items, sort, dir, container) {
         if (va > vb) return dir === 'asc' ?  1 : -1;
         return 0;
     });
-    items.forEach(el => container.appendChild(el));
 }
 
 function onSearchInput(input) {
-    document.getElementById('clearSearch').classList.toggle('visible', input.value.length > 0);
+    document.getElementById('clearSearch')?.classList.toggle('visible', input.value.length > 0);
     filterItems();
 }
+
 function clearSearch() {
-    const input = document.getElementById('searchInput'); input.value = ''; input.focus();
-    document.getElementById('clearSearch').classList.remove('visible');
+    const input = document.getElementById('searchInput');
+    if (input) { input.value = ''; input.focus(); }
+    document.getElementById('clearSearch')?.classList.remove('visible');
     filterItems();
 }
+
 function resetFilters() {
-    document.getElementById('searchInput').value = '';
-    document.getElementById('clearSearch').classList.remove('visible');
+    const si = document.getElementById('searchInput');
+    if (si) si.value = '';
+    document.getElementById('clearSearch')?.classList.remove('visible');
     ['typeFilter','statutFilter','prioriteFilter','sortFilter','dirFilter'].forEach(id => {
         const el = document.getElementById(id); if (el) el.selectedIndex = 0;
     });
     filterItems();
 }
 
-// ══ NOTIFICATIONS ══
-function showNotification(message, type) {
-    const n = document.createElement('div');
-    n.className = `alert alert--${type}`;
-    n.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;max-width:350px;';
-    n.innerHTML = `<span>${message}</span><button class="alert__close" onclick="this.parentElement.remove()">✕</button>`;
-    document.body.appendChild(n);
-    setTimeout(() => n.remove(), 5000);
+// ================================================================
+// PAGINATION
+// ================================================================
+function renderPaginatedCards() {
+    const grid   = document.getElementById('cardsGrid');
+    const noRes  = document.getElementById('noResultsCards');
+    const pgWrap = document.getElementById('paginationCards');
+    if (!grid) return;
+
+    const allOriginal = Array.from(grid.children).filter(c => !c.id);
+    allOriginal.forEach(c => c.style.display = 'none');
+
+    const items   = pgCards.items;
+    const total   = items.length;
+    const perPage = pgCards.perPage;
+    const pages   = Math.ceil(total / perPage);
+    pgCards.page  = Math.min(pgCards.page, pages || 1);
+    const start   = (pgCards.page - 1) * perPage;
+    const end     = start + perPage;
+
+    if (total === 0) {
+        if (noRes) noRes.style.display = 'block';
+        if (pgWrap) pgWrap.innerHTML = '';
+        return;
+    }
+    if (noRes) noRes.style.display = 'none';
+
+    items.slice(start, end).forEach(c => c.style.display = '');
+
+    renderPaginationBar(pgWrap, pgCards.page, pages, perPage, total, (p) => {
+        pgCards.page = p; renderPaginatedCards();
+    }, (pp) => {
+        pgCards.perPage = pp; pgCards.page = 1; renderPaginatedCards();
+    });
 }
 
-// ══ CHARTS ══
+function renderPaginatedTable() {
+    const tbody  = document.getElementById('maintBody');
+    const noRes  = document.getElementById('noResultsTable');
+    const pgWrap = document.getElementById('paginationTable');
+    if (!tbody) return;
+
+    Array.from(tbody.querySelectorAll('tr')).forEach(r => r.style.display = 'none');
+
+    const items   = pgTable.items;
+    const total   = items.length;
+    const perPage = pgTable.perPage;
+    const pages   = Math.ceil(total / perPage);
+    pgTable.page  = Math.min(pgTable.page, pages || 1);
+    const start   = (pgTable.page - 1) * perPage;
+    const end     = start + perPage;
+
+    if (total === 0) {
+        if (noRes) noRes.style.display = 'block';
+        if (pgWrap) pgWrap.innerHTML = '';
+        return;
+    }
+    if (noRes) noRes.style.display = 'none';
+
+    items.slice(start, end).forEach(r => r.style.display = '');
+
+    renderPaginationBar(pgWrap, pgTable.page, pages, perPage, total, (p) => {
+        pgTable.page = p; renderPaginatedTable();
+    }, (pp) => {
+        pgTable.perPage = pp; pgTable.page = 1; renderPaginatedTable();
+    });
+}
+
+function renderPaginationBar(wrap, page, pages, perPage, total, onPage, onPerPage) {
+    if (!wrap) return;
+    if (pages <= 1) {
+        wrap.innerHTML = '';
+        return;
+    }
+
+    wrap.innerHTML = `
+        <button type="button" class="pg-btn ${page > 1 ? '' : 'disabled'}" ${page <= 1 ? 'disabled' : ''} onclick="onPage(${page - 1})">‹ Précédent</button>
+        <span class="pg-info">Page ${page} / ${pages}</span>
+        <button type="button" class="pg-btn ${page < pages ? '' : 'disabled'}" ${page >= pages ? 'disabled' : ''} onclick="onPage(${page + 1})">Suivant ›</button>
+        <select class="pg-size-select" onchange="onPerPage(parseInt(this.value))">
+            <option value="6" ${perPage === 6 ? 'selected' : ''}>6 / page</option>
+            <option value="10" ${perPage === 10 ? 'selected' : ''}>10 / page</option>
+            <option value="20" ${perPage === 20 ? 'selected' : ''}>20 / page</option>
+            <option value="50" ${perPage === 50 ? 'selected' : ''}>50 / page</option>
+        </select>
+    `;
+    
+    window.onPage = onPage;
+    window.onPerPage = onPerPage;
+}
+
+// ================================================================
+// RECOMMANDATIONS IA
+// ================================================================
+
+function toggleRecoCard(id, btn) {
+    const el = document.getElementById('reco-card-' + id);
+    if (!el) return;
+    const fullText = el.getAttribute('data-full') || el.innerText;
+    if (!el.getAttribute('data-full')) {
+        el.setAttribute('data-full', el.innerText);
+    }
+    const expanded = el.classList.toggle('expanded');
+    if (expanded) {
+        el.innerText = fullText;
+        btn.innerHTML = '▲ Voir moins';
+    } else {
+        el.innerText = fullText.slice(0, 120) + '...';
+        btn.innerHTML = '▼ Voir plus';
+    }
+}
+
+function showFullReco(id, text) {
+    showModal('🧠 Recommandation IA', `
+        <div style="background:#e8f5e9; border-radius:12px; padding:16px;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+                <span style="font-size:24px;">🧠</span>
+                <strong style="color:#2d6a2d;">Recommandation IA</strong>
+            </div>
+            <div style="font-size:14px; line-height:1.6; color:#1a2e1a;">${escapeHtml(text)}</div>
+        </div>
+        <div style="margin-top:16px; text-align:center;">
+            <button onclick="this.closest('.modal-overlay').remove()" 
+                    style="background:#2d6a2d; color:white; border:none; border-radius:8px; padding:8px 20px; cursor:pointer;">
+                Fermer
+            </button>
+        </div>
+    `);
+}
+
+async function generateRecoForCard(id) {
+    const card = document.querySelector(`.maint-card-item[data-id="${id}"]`);
+    if (!card) return;
+    
+    const recoDiv = card.querySelector('.ai-reco-section');
+    if (recoDiv) {
+        recoDiv.innerHTML = `
+            <div style="display:flex; align-items:center; gap:8px;">
+                <div class="modal-loader__spinner" style="width:16px; height:16px;"></div>
+                <span style="font-size:11px; color:#2d6a2d;">Génération en cours...</span>
+            </div>
+        `;
+    }
+    
+    try {
+        const response = await fetch(`/agriculteur/maintenances/api/generate-recommendation/${id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await response.json();
+        
+        if (data.success && data.recommandation) {
+            if (recoDiv) {
+                recoDiv.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px;">
+                        <span style="font-size:14px;">🧠</span>
+                        <span style="font-size:11px; font-weight:700; color:#2d6a2d;">Recommandation IA</span>
+                    </div>
+                    <div style="font-size:12px; color:#1a4a1a; line-height:1.4;" id="reco-card-${id}">
+                        ${escapeHtml(data.recommandation.slice(0, 120))}${data.recommandation.length > 120 ? '...' : ''}
+                    </div>
+                    ${data.recommandation.length > 120 ? `<button onclick="toggleRecoCard(${id}, this)" style="background:none; border:none; color:#2d6a2d; font-size:10px; cursor:pointer; margin-top:4px;">▼ Voir plus</button>` : ''}
+                `;
+            }
+            showNotification('✅ Recommandation IA générée avec succès', 'success');
+        } else {
+            showNotification('❌ Erreur lors de la génération', 'danger');
+        }
+    } catch (error) {
+        console.error('Erreur:', error);
+        showNotification('❌ Erreur réseau', 'danger');
+        if (recoDiv) {
+            recoDiv.innerHTML = `
+                <div style="font-size:11px; color:#a32d2d;">
+                    ⚠️ Erreur de génération. Réessayez.
+                </div>
+                <button onclick="generateRecoForCard(${id})" style="margin-top:6px; background:#2d6a2d; color:white; border:none; border-radius:6px; padding:4px 10px; font-size:10px; cursor:pointer;">
+                    🔄 Réessayer
+                </button>
+            `;
+        }
+    }
+}
+
+async function generateRecoForTable(id) {
+    const row = document.querySelector(`#maintBody tr[data-id="${id}"]`);
+    if (!row) return;
+    
+    const td = row.querySelector('td:nth-last-child(2)');
+    if (td) {
+        td.innerHTML = '<span style="color:#2d6a2d;"><div class="modal-loader__spinner" style="width:14px; height:14px; display:inline-block; vertical-align:middle;"></div> Génération...</span>';
+    }
+    
+    try {
+        const response = await fetch(`/agriculteur/maintenances/api/generate-recommendation/${id}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await response.json();
+        
+        if (data.success && data.recommandation) {
+            if (td) {
+                td.innerHTML = `
+                    <div class="td-ai-reco" title="${escapeHtml(data.recommandation)}" style="color:#2d6a2d; cursor:pointer;" onclick="showFullReco(${id}, '${escapeHtml(data.recommandation)}')">
+                        🧠 ${escapeHtml(data.recommandation.slice(0, 50))}${data.recommandation.length > 50 ? '...' : ''}
+                    </div>
+                    ${data.recommandation.length > 50 ? `<button onclick="showFullReco(${id}, '${escapeHtml(data.recommandation)}')" style="background:none; border:none; color:#2d6a2d; font-size:9px; cursor:pointer; margin-top:2px;">▼ voir plus</button>` : ''}
+                `;
+            }
+            showNotification('✅ Recommandation IA générée avec succès', 'success');
+        } else {
+            showNotification('❌ Erreur lors de la génération', 'danger');
+        }
+    } catch (error) {
+        console.error('Erreur:', error);
+        showNotification('❌ Erreur réseau', 'danger');
+        if (td) {
+            td.innerHTML = `
+                <span style="color:#a32d2d;">⚠️ Erreur</span>
+                <button onclick="generateRecoForTable(${id})" style="display:block; margin-top:4px; background:#2d6a2d; color:white; border:none; border-radius:4px; padding:2px 8px; font-size:9px; cursor:pointer;">
+                    🔄 Réessayer
+                </button>
+            `;
+        }
+    }
+}
+
+// ================================================================
+// FONCTIONS POUR LES NOTES DU CALENDRIER
+// ================================================================
+function openNoteModal(date) {
+    currentNoteDate = date;
+    const modal = document.getElementById('noteModal');
+    if (!modal) return;
+    
+    const savedNote = localStorage.getItem(`calendar_note_${date}`);
+    const textarea = document.getElementById('noteContent');
+    if (textarea) {
+        textarea.value = savedNote || '';
+    }
+    
+    const dateDisplay = document.getElementById('noteDateDisplay');
+    if (dateDisplay) {
+        const d = new Date(date);
+        dateDisplay.textContent = d.toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    }
+    
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeNoteModal() {
+    const modal = document.getElementById('noteModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+    currentNoteDate = null;
+}
+
+function saveNote() {
+    const textarea = document.getElementById('noteContent');
+    const note = textarea?.value || '';
+    
+    if (currentNoteDate) {
+        if (note.trim() === '') {
+            localStorage.removeItem(`calendar_note_${currentNoteDate}`);
+            showNotification('🗑 Note supprimée (vide)', 'info');
+        } else {
+            localStorage.setItem(`calendar_note_${currentNoteDate}`, note);
+            showNotification('✅ Note enregistrée avec succès !', 'success');
+        }
+        
+        if (reminderCalendar) {
+            reminderCalendar.refetchEvents();
+        }
+        
+        closeNoteModal();
+    }
+}
+
+function deleteNote() {
+    if (currentNoteDate && confirm('⚠️ Voulez-vous vraiment supprimer cette note ?')) {
+        localStorage.removeItem(`calendar_note_${currentNoteDate}`);
+        
+        if (reminderCalendar) {
+            reminderCalendar.refetchEvents();
+        }
+        
+        const textarea = document.getElementById('noteContent');
+        if (textarea) textarea.value = '';
+        
+        showNotification('🗑 Note supprimée', 'info');
+        closeNoteModal();
+    }
+}
+
+function exportAllNotes() {
+    const notes = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('calendar_note_')) {
+            const date = key.replace('calendar_note_', '');
+            const note = localStorage.getItem(key);
+            if (note && note.trim()) {
+                notes.push({ date, note });
+            }
+        }
+    }
+    
+    if (notes.length === 0) {
+        showNotification('Aucune note à exporter', 'warning');
+        return;
+    }
+    
+    notes.sort((a, b) => a.date.localeCompare(b.date));
+    
+    let content = "📝 NOTES DU CALENDRIER DES MAINTENANCES\n";
+    content += `Exporté le : ${new Date().toLocaleString('fr-FR')}\n`;
+    content += "=".repeat(60) + "\n\n";
+    
+    notes.forEach(({date, note}) => {
+        const d = new Date(date);
+        const dateFormatted = d.toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        content += `📅 DATE : ${date} (${dateFormatted})\n`;
+        content += `📝 NOTE :\n${note}\n`;
+        content += "-".repeat(50) + "\n\n";
+    });
+    
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    link.download = `notes_calendrier_${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    showNotification(`📥 ${notes.length} note(s) exportée(s)`, 'success');
+}
+
+// ================================================================
+// CALENDRIER RAPPELS ANNUELS
+// ================================================================
+function openReminderCalendar() {
+    const modal = document.getElementById('reminderCalendarModal');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    if (!reminderCalendar) {
+        setTimeout(initReminderCalendar, 50);
+    } else {
+        reminderCalendar.refetchEvents();
+    }
+}
+
+function closeReminderCalendar() {
+    const modal = document.getElementById('reminderCalendarModal');
+    if (modal) modal.style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+async function initReminderCalendar() {
+    const calendarEl = document.getElementById('reminderCalendar');
+    if (!calendarEl) return;
+    if (typeof FullCalendar === 'undefined') { setTimeout(initReminderCalendar, 300); return; }
+
+    reminderCalendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'fr',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,dayGridWeek'
+        },
+        buttonText: { today: "Aujourd'hui", month: 'Mois', week: 'Semaine' },
+        height: 500,
+        selectable: true,
+        select: function(info) {
+            openNoteModal(info.startStr);
+        },
+        dateClick: function(info) {
+            openNoteModal(info.dateStr);
+        },
+        events: loadReminderEvents,
+        eventDidMount: function(info) {
+            info.el.style.cursor = 'pointer';
+            info.el.style.borderRadius = '6px';
+            info.el.style.padding = '2px 4px';
+            info.el.title = info.event.extendedProps?.message || 'Cliquer pour voir les détails';
+        },
+        eventClick: function(info) {
+            showReminderDetail(info.event.id);
+        },
+        dayCellDidMount: function(info) {
+            const dateStr = info.date.toISOString().split('T')[0];
+            const hasReminder = reminderEvents.some(r => r.start === dateStr);
+            
+            if (hasReminder) {
+                info.el.style.background = 'linear-gradient(135deg, #fff5f5 0%, #fcebeb 100%)';
+                info.el.style.borderLeft = '3px solid #e74a3b';
+            }
+            
+            const savedNote = localStorage.getItem(`calendar_note_${dateStr}`);
+            if (savedNote && savedNote.trim().length > 0) {
+                const noteIndicator = document.createElement('div');
+                noteIndicator.innerHTML = '📝';
+                noteIndicator.className = 'note-indicator';
+                noteIndicator.title = 'Note existante - Cliquer pour modifier';
+                noteIndicator.onclick = (e) => {
+                    e.stopPropagation();
+                    openNoteModal(dateStr);
+                };
+                
+                if (!info.el.querySelector('.note-indicator')) {
+                    info.el.style.position = 'relative';
+                    info.el.appendChild(noteIndicator);
+                }
+            }
+            
+            info.el.addEventListener('mouseenter', function() {
+                if (!info.el.querySelector('.add-note-btn')) {
+                    const addBtn = document.createElement('button');
+                    addBtn.innerHTML = '📝 +';
+                    addBtn.className = 'add-note-btn';
+                    addBtn.title = 'Ajouter/Modifier une note';
+                    addBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        openNoteModal(dateStr);
+                    };
+                    info.el.style.position = 'relative';
+                    info.el.appendChild(addBtn);
+                    
+                    addBtn.addEventListener('mouseleave', function() {
+                        setTimeout(() => {
+                            if (addBtn && addBtn.parentNode && !info.el.matches(':hover')) {
+                                addBtn.remove();
+                            }
+                        }, 100);
+                    });
+                }
+            });
+            
+            info.el.addEventListener('mouseleave', function() {
+                const btn = info.el.querySelector('.add-note-btn');
+                if (btn) btn.remove();
+            });
+        }
+    });
+
+    reminderCalendar.render();
+}
+
+async function loadReminderEvents(fetchInfo, successCallback, failureCallback) {
+    try {
+        const response = await fetch('{{ path('agri_maintenances_api_reminder_dates') }}');
+        if (!response.ok) throw new Error('Erreur ' + response.status);
+        const data = await response.json();
+        if (data.success) {
+            allRemindersData = data.reminders;
+            reminderEvents = data.reminders.map(r => ({
+                id: r.id,
+                title: r.machineName,
+                start: r.date,
+                allDay: true,
+                backgroundColor: r.priorite === 'urgente' ? '#a32d2d' : '#e74a3b',
+                borderColor: r.priorite === 'urgente' ? '#8b0000' : '#c0392b',
+                textColor: '#ffffff',
+                extendedProps: {
+                    message: r.message,
+                    machineName: r.machineName,
+                    type: r.type,
+                    priorite: r.priorite,
+                    yearsSince: r.yearsSince,
+                    monthsSince: r.monthsSince,
+                    ageText: r.ageText,
+                    km: r.km,
+                    cout: r.cout,
+                    description: r.description,
+                    dateMain: r.date
+                }
+            }));
+            successCallback(reminderEvents);
+        } else {
+            failureCallback(data.error || 'Erreur inconnue');
+        }
+    } catch (error) {
+        console.error('Erreur chargement rappels:', error);
+        failureCallback(error);
+    }
+}
+
+async function showReminderDetail(maintenanceId) {
+    const modal = document.getElementById('reminderDetailPopup');
+    const body = document.getElementById('reminderDetailBody');
+    if (!modal || !body) return;
+    modal.style.display = 'flex';
+    body.innerHTML = '<div class="modal-loader"><div class="modal-loader__spinner"></div><div class="modal-loader__text">Chargement des détails...</div></div>';
+
+    try {
+        const response = await fetch('/agriculteur/maintenances/api/calendar/reminder-detail/' + maintenanceId);
+        const data = await response.json();
+
+        if (data.success) {
+            const riskColors = { critique: '#a32d2d', élevé: '#e67e22', moyen: '#f39c12', faible: '#2d6a2d' };
+            body.innerHTML = `
+                <div class="reminder-message-box">
+                    <div class="reminder-message-text">${escapeHtml(data.message)}</div>
+                    <div style="font-size:12px;color:#7a9a7a;">Dernière maintenance : ${data.dateMain || 'Date inconnue'}</div>
+                </div>
+                <div class="reminder-detail-row">
+                    <span class="reminder-detail-label">🚜 Machine</span>
+                    <span class="reminder-detail-value"><strong>${escapeHtml(data.machineName)}</strong></span>
+                </div>
+                <div class="reminder-detail-row">
+                    <span class="reminder-detail-label">🔧 Type</span>
+                    <span class="reminder-detail-value">${escapeHtml(data.type || '—')}</span>
+                </div>
+                <div class="reminder-detail-row">
+                    <span class="reminder-detail-label">⚠️ Priorité</span>
+                    <span class="reminder-detail-value">
+                        <span style="background:${riskColors[data.urgenceLevel?.level] || '#2d6a2d'};color:white;padding:2px 10px;border-radius:20px;font-size:11px;">
+                            ${escapeHtml(data.urgenceLevel?.label || 'Normal')}
+                        </span>
+                    </span>
+                </div>
+                <div class="reminder-detail-row">
+                    <span class="reminder-detail-label">⏰ Temps écoulé</span>
+                    <span class="reminder-detail-value">${data.yearsSince > 0 ? `${data.yearsSince} an${data.yearsSince > 1 ? 's' : ''}${data.monthsSince > 0 ? ` et ${data.monthsSince} mois` : ''}` : 'Maintenance récente'}</span>
+                </div>
+                <div class="reminder-detail-row">
+                    <span class="reminder-detail-label">💰 Coût estimé</span>
+                    <span class="reminder-detail-value">${data.cout ? data.cout.toLocaleString() + ' DT' : '—'}</span>
+                </div>
+                <div class="reminder-detail-row">
+                    <span class="reminder-detail-label">📊 Kilométrage</span>
+                    <span class="reminder-detail-value">${data.km ? data.km.toLocaleString() + ' km' : '—'}</span>
+                </div>
+                ${data.description ? `<div class="reminder-detail-row"><span class="reminder-detail-label">📝 Description</span><span class="reminder-detail-value">${escapeHtml(data.description)}</span></div>` : ''}
+                <div style="background:#eaf3de;border-radius:12px;padding:12px;margin:15px 0;">
+                    <div style="font-weight:700;color:#2d6a2d;margin-bottom:8px;">🤖 RECOMMANDATIONS IA</div>
+                    <div style="white-space:pre-wrap;font-size:12px;line-height:1.6;">${escapeHtml(data.aiRecommendation)}</div>
+                </div>
+                <div style="display:flex;gap:10px;margin-top:15px;flex-wrap:wrap;">
+                    <a href="/agriculteur/maintenances/${data.id}" class="btn btn--green" style="flex:1;text-align:center;">👁 Voir détails</a>
+                    <a href="/agriculteur/maintenances/${data.id}/edit" class="btn btn--outline" style="flex:1;text-align:center;">✏️ Planifier</a>
+                    <button class="btn btn--google" style="flex:1;text-align:center;" onclick="exportSingleReminderToGoogleCalendar(${data.id}, '${escapeHtml(data.machineName)}', '${data.dateMain}', '${escapeHtml(data.type || '')}', '${data.priorite}', ${data.km || 0})">
+                        📤 Exporter Google
+                    </button>
+                </div>
+            `;
+        } else {
+            body.innerHTML = `<div style="color:#a32d2d;text-align:center;padding:1rem;">❌ Erreur : ${escapeHtml(data.error)}</div>`;
+        }
+    } catch (error) {
+        body.innerHTML = `<div style="color:#a32d2d;text-align:center;padding:1rem;">❌ Erreur réseau : ${escapeHtml(error.message)}</div>`;
+    }
+}
+
+function closeReminderDetailPopup() {
+    const modal = document.getElementById('reminderDetailPopup');
+    if (modal) modal.style.display = 'none';
+}
+
+function exportToGoogleCalendar(title, startDate, endDate, description) {
+    const fmt = d => `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${fmt(startDate)}/${fmt(endDate)}&details=${encodeURIComponent(description)}&sf=true&output=xml`;
+    window.open(url, '_blank');
+    showNotification('📤 Événement exporté vers Google Calendar', 'success');
+}
+
+function exportSingleReminderToGoogleCalendar(id, machineName, dateMain, type, priorite, km) {
+    let startDate = new Date(dateMain);
+    if (isNaN(startDate.getTime())) startDate = new Date();
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 1);
+    const desc = `🔔 RAPPEL DE MAINTENANCE\nMachine: ${machineName}\nType: ${type || 'Maintenance préventive'}\nPriorité: ${priorite}\nKilométrage: ${km ? km.toLocaleString() + ' km' : 'Non renseigné'}\n\n✅ Vérifications recommandées:\n• Inspection générale\n• Vidange moteur et filtres\n• Contrôle des niveaux\n• Vérification courroies\n• Pression des pneus\n\nGénéré par AgroFlow`;
+    exportToGoogleCalendar('Maintenance préventive: ' + machineName, startDate, endDate, desc);
+}
+
+function exportAllRemindersToGoogleCalendar() {
+    if (!allRemindersData || allRemindersData.length === 0) {
+        showNotification('Aucun rappel à exporter', 'warning');
+        return;
+    }
+    exportSingleReminderToGoogleCalendar(
+        allRemindersData[0].id,
+        allRemindersData[0].machineName,
+        allRemindersData[0].date,
+        allRemindersData[0].type,
+        allRemindersData[0].priorite,
+        allRemindersData[0].km || 0
+    );
+    showNotification(`📤 ${allRemindersData.length} rappel(s) — Le premier exporté vers Google Calendar`, 'info');
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+function showModal(title, content) {
+    document.querySelectorAll('.modal-overlay').forEach(m => m.remove());
+    
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.style.cssText = 'position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 100000; display: flex; align-items: center; justify-content: center;';
+    modal.innerHTML = `
+        <div style="background: white; border-radius: 24px; max-width: 600px; width: 90%; max-height: 85vh; overflow: auto; animation: popupSlideIn 0.2s ease;">
+            <div style="background: linear-gradient(135deg, #2d6a2d, #1a451a); padding: 1rem 1.5rem; color: white; border-radius: 24px 24px 0 0; display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0;">${escapeHtml(title)}</h3>
+                <button onclick="this.closest('.modal-overlay').remove()" 
+                    style="background: rgba(255,255,255,0.2); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 18px;">✕</button>
+            </div>
+            <div style="padding: 1.5rem;">${content}</div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+}
+
+function showAlertAction(action, title) {
+    showModal(title, `
+        <div style="text-align: center; padding: 20px;">
+            <div style="font-size: 48px; margin-bottom: 15px;">🔧</div>
+            <p style="margin-bottom: 20px; font-size: 16px;">Action recommandée :</p>
+            <strong style="display: block; background: #f0f0f0; padding: 15px; border-radius: 10px; margin-bottom: 20px; font-size: 14px;">${escapeHtml(action)}</strong>
+            <button onclick="this.closest('.modal-overlay').remove()" 
+                style="background: #2d6a2d; color: white; border: none; border-radius: 8px; padding: 10px 24px; cursor: pointer; font-weight: 600;">
+                J'ai compris
+            </button>
+        </div>
+    `);
+}
+
+async function showAllAlerts(maintenanceId) {
+    try {
+        const response = await fetch(`/agriculteur/maintenances/api/alerts/${maintenanceId}`);
+        const data = await response.json();
+        
+        if (data.success && data.alerts) {
+            let html = '<div style="max-height: 500px; overflow-y: auto;">';
+            data.alerts.forEach(alert => {
+                const priorityClass = alert.priority === 'urgente' ? '#a32d2d' : (alert.priority === 'haute' ? '#e67e22' : (alert.priority === 'moyenne' ? '#f39c12' : '#2d6a2d'));
+                html += `
+                    <div style="border-left: 4px solid ${alert.color}; background: ${alert.color}10; padding: 14px; margin-bottom: 12px; border-radius: 10px;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                            <span style="font-size: 28px;">${escapeHtml(alert.icon)}</span>
+                            <strong style="color: ${alert.color};">${escapeHtml(alert.title)}</strong>
+                            <span style="margin-left: auto; background: ${priorityClass}; color: white; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;">${alert.priority}</span>
+                        </div>
+                        <div style="font-size: 14px; margin-bottom: 10px; line-height: 1.5;">${escapeHtml(alert.message)}</div>
+                        <button onclick="alert('${escapeHtml(alert.action)}')" 
+                            style="background: ${alert.color}; color: white; border: none; border-radius: 8px; padding: 6px 16px; cursor: pointer; font-weight: 600;">
+                            ${escapeHtml(alert.action)}
+                        </button>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            showModal('Prévention - Analyse détaillée', html);
+        }
+    } catch (error) {
+        console.error('Erreur:', error);
+        showNotification('Erreur chargement des alertes', 'danger');
+    }
+}
+
+function showNotification(message, type) {
+    const n = document.createElement('div');
+    const bgColor = type === 'danger' ? '#a32d2d' : (type === 'warning' ? '#e67e22' : '#2d6a2d');
+    n.style.cssText = `position: fixed; bottom: 20px; right: 20px; z-index: 99999; max-width: 380px; background: ${bgColor}; color: white; padding: 12px 20px; border-radius: 10px; box-shadow: 0 4px 18px rgba(0,0,0,.15); animation: fadeIn .2s ease; font-size: 14px;`;
+    n.innerHTML = `<span>${escapeHtml(message)}</span><button onclick="this.parentElement.remove()" style="background: none; border: none; color: white; margin-left: 15px; cursor: pointer;">✕</button>`;
+    document.body.appendChild(n);
+    setTimeout(() => n?.remove(), 5000);
+}
+
+// ================================================================
+// INITIALISATION
+// ================================================================
 document.addEventListener('DOMContentLoaded', function() {
+    setView(currentView);
+
+    document.getElementById('openCalendarBtn')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        openReminderCalendar();
+    });
+
+    document.getElementById('reminderCalendarModal')?.addEventListener('click', function(e) {
+        if (e.target === this) closeReminderCalendar();
+    });
+    document.getElementById('reminderDetailPopup')?.addEventListener('click', function(e) {
+        if (e.target === this) closeReminderDetailPopup();
+    });
+
     const countByType = {{ countByType|json_encode|raw }};
     const coutByMonth = {{ coutByMonth|json_encode|raw }};
-    if (document.getElementById('barChart') && countByType?.length) {
-        new Chart(document.getElementById('barChart'), {
+
+    const barCanvas = document.getElementById('barChart');
+    if (barCanvas && countByType && countByType.length) {
+        new Chart(barCanvas, {
             type: 'bar',
-            data: { labels: countByType.map(r => r.type), datasets: [{ label: 'Nombre', data: countByType.map(r => r.total), backgroundColor: ['#2d6a2d','#0F6E56','#854F0B','#a32d2d','#0c447c','#7b5200','#1a5276','#4a1d8c','#534AB7','#2c2c2a'] }] },
-            options: { responsive:true, plugins:{ legend:{display:false} }, scales:{ y:{ beginAtZero:true, ticks:{stepSize:1} } } }
+            data: {
+                labels: countByType.map(r => r.type),
+                datasets: [{ label: 'Nombre', data: countByType.map(r => r.total),
+                    backgroundColor: ['#2d6a2d','#0F6E56','#854F0B','#a32d2d','#0c447c','#7b5200','#1a5276','#4a1d8c','#534AB7','#2c2c2a'] }]
+            },
+            options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
         });
     }
-    if (document.getElementById('lineChart') && coutByMonth?.length) {
-        new Chart(document.getElementById('lineChart'), {
+
+    const lineCanvas = document.getElementById('lineChart');
+    if (lineCanvas && coutByMonth && coutByMonth.length) {
+        new Chart(lineCanvas, {
             type: 'line',
-            data: { labels: coutByMonth.map(r => r.mois), datasets: [{ label: 'Coût (DT)', data: coutByMonth.map(r => r.total), borderColor:'#2d6a2d', backgroundColor:'rgba(45,106,45,.1)', borderWidth:2, tension:.4, fill:true, pointRadius:4 }] },
-            options: { responsive:true, plugins:{ legend:{display:false} }, scales:{ y:{ beginAtZero:true } } }
+            data: {
+                labels: coutByMonth.map(r => r.mois),
+                datasets: [{ label: 'Coût (DT)', data: coutByMonth.map(r => r.total),
+                    borderColor: '#2d6a2d', backgroundColor: 'rgba(45,106,45,.1)', borderWidth: 2, tension: .4, fill: true, pointRadius: 4 }]
+            },
+            options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
         });
     }
 });

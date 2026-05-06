@@ -150,11 +150,11 @@
         display: inline-flex; align-items: center; justify-content: center;
         width: 32px; height: 32px; border-radius: 7px;
         text-decoration: none; border: none; cursor: pointer;
-        transition: opacity .15s, transform .15s;
+        transition: all 0.2s ease;
     }
-    .action-btn:hover { opacity: .8; transform: scale(1.08); }
-    .action-btn-view   { background: #E6F1FB; color: #185FA5; }
-    .action-btn-edit   { background: #FAEEDA; color: #854F0B; }
+    .action-btn:hover { opacity: 0.8; transform: scale(1.08); }
+    .action-btn-view { background: #E6F1FB; color: #185FA5; }
+    .action-btn-edit { background: #FAEEDA; color: #854F0B; }
     .action-btn-delete { background: #FCEBEB; color: #A32D2D; }
 
     /* ── Result count ── */
@@ -180,16 +180,58 @@
         padding: 12px 18px; border-radius: 8px; margin-bottom: 16px;
         display: flex; align-items: center; gap: 10px;
     }
-    
-    /* Info tooltip */
-    .info-badge {
-        background: #f0f0f0;
-        color: #666;
-        font-size: 10px;
-        padding: 2px 6px;
-        border-radius: 10px;
-        margin-left: 5px;
-        cursor: help;
+
+    /* ── Pagination ── */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        margin-top: 20px;
+        padding: 15px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.06);
+        flex-wrap: wrap;
+    }
+    .pagination button {
+        background: white;
+        border: 1.5px solid #ddd;
+        color: #555;
+        padding: 8px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 500;
+        transition: all .2s;
+    }
+    .pagination button:hover:not(:disabled) {
+        background: #EAF3DE;
+        border-color: #3B6D11;
+        color: #3B6D11;
+    }
+    .pagination button.active {
+        background: #2D5A27;
+        border-color: #2D5A27;
+        color: white;
+    }
+    .pagination button:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+    .pagination-info {
+        font-size: 12px;
+        color: #888;
+        margin-right: 15px;
+    }
+    .items-per-page {
+        margin-left: 15px;
+        padding: 6px 10px;
+        border: 1.5px solid #ddd;
+        border-radius: 6px;
+        background: white;
+        cursor: pointer;
+        font-size: 13px;
     }
 </style>
 {% endblock %}
@@ -288,7 +330,7 @@
     </span>
 </div>
 
-{# ── Tableau avec tous les attributs ── #}
+{# ── Tableau ── #}
 <div class="table-container">
     <div id="resultCount"></div>
     <table id="machinesTable">
@@ -305,7 +347,7 @@
                 <th>Km Dernière Visite</th>
                 <th>Prochaine Maintenance</th>
                 <th onclick="sortTable(10)">Propriétaire</th>
-                <th style="text-align:center; width:100px;">Actions</th>
+                <th style="text-align:center; width:120px;">Actions</th>
             </tr>
             <tr style="background:#f5f5f5; font-size:11px;">
                 <th colspan="12" style="text-align:center; font-weight:normal; color:#888; padding:8px;">
@@ -317,9 +359,26 @@
     </table>
 </div>
 
+{# ── Pagination ── #}
+<div class="pagination" id="pagination">
+    <div class="pagination-info" id="paginationInfo"></div>
+    <button id="firstPageBtn" onclick="goToPage(1)">« Première</button>
+    <button id="prevPageBtn" onclick="changePage(-1)">‹ Précédent</button>
+    <span id="pageNumbers"></span>
+    <button id="nextPageBtn" onclick="changePage(1)">Suivant ›</button>
+    <button id="lastPageBtn" onclick="goToPage(totalPagesValue)">Dernière »</button>
+    <select id="itemsPerPage" class="items-per-page" onchange="changeItemsPerPage()">
+        <option value="10">10 par page</option>
+        <option value="25" selected>25 par page</option>
+        <option value="50">50 par page</option>
+        <option value="100">100 par page</option>
+    </select>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
     const MACHINES_DATA = {{ machinesJson|raw }};
+    const BASE_URL = "{{ path('admin_machines_index') }}";
 </script>
 
 <script>
@@ -331,6 +390,13 @@ let currentSort  = { col: -1, dir: 'asc' };
 let dateSort     = 'desc';
 let statsOpen    = false;
 let pieChartInstance = null;
+
+// Pagination variables
+let currentPage = 1;
+let itemsPerPage = 25;
+let totalItems = 0;
+let totalPagesValue = 1;
+let currentData = [];
 
 /* ═══════════════════════════════════════════════════
    Utilitaires
@@ -350,7 +416,9 @@ function fmtDate(d) {
 }
 
 function parseDate(d) {
-    return d ? new Date(d).getTime() : 0;
+    if (!d) return 0;
+    const timestamp = new Date(d).getTime();
+    return isNaN(timestamp) ? 0 : timestamp;
 }
 
 function escHtml(str) {
@@ -363,8 +431,8 @@ function escHtml(str) {
 }
 
 function formatKm(km) {
-    if (km === null || km === undefined) return '—';
-    return km.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " km/h";
+    if (km === null || km === undefined || km === 0) return '—';
+    return km.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " km";
 }
 
 /* ═══════════════════════════════════════════════════
@@ -432,25 +500,93 @@ function sortData(rows) {
 }
 
 /* ═══════════════════════════════════════════════════
-   Rendu tableau avec tous les attributs
+   Pagination
 ═══════════════════════════════════════════════════ */
-function render() {
-    const filtered = sortData(getFiltered());
-    const tbody    = document.getElementById('tableBody');
+function updatePagination() {
+    totalItems = currentData.length;
+    totalPagesValue = Math.ceil(totalItems / itemsPerPage);
+    
+    if (currentPage > totalPagesValue && totalPagesValue > 0) {
+        currentPage = totalPagesValue;
+    }
+    if (currentPage < 1) currentPage = 1;
+    
+    // Mise à jour des infos
+    const start = totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+    const end = Math.min(currentPage * itemsPerPage, totalItems);
+    const infoText = totalItems === 0 ? '0 machine' : `${start} - ${end} sur ${totalItems} machine${totalItems !== 1 ? 's' : ''}`;
+    document.getElementById('paginationInfo').innerHTML = infoText;
+    
+    // Mise à jour des boutons
+    document.getElementById('firstPageBtn').disabled = currentPage === 1 || totalItems === 0;
+    document.getElementById('prevPageBtn').disabled = currentPage === 1 || totalItems === 0;
+    document.getElementById('nextPageBtn').disabled = currentPage === totalPagesValue || totalItems === 0;
+    document.getElementById('lastPageBtn').disabled = currentPage === totalPagesValue || totalItems === 0;
+    
+    // Génération des numéros de page
+    const pageNumbers = document.getElementById('pageNumbers');
+    pageNumbers.innerHTML = '';
+    
+    if (totalItems === 0) return;
+    
+    let startPage = Math.max(1, currentPage - 2);
+    let endPage = Math.min(totalPagesValue, currentPage + 2);
+    
+    if (endPage - startPage < 4) {
+        if (startPage === 1) endPage = Math.min(totalPagesValue, startPage + 4);
+        if (endPage === totalPagesValue) startPage = Math.max(1, endPage - 4);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+        const btn = document.createElement('button');
+        btn.textContent = i;
+        btn.onclick = (function(page) {
+            return function() { goToPage(page); };
+        })(i);
+        if (i === currentPage) btn.classList.add('active');
+        pageNumbers.appendChild(btn);
+    }
+}
 
-    document.getElementById('resultCount').textContent =
-        `${filtered.length} machine${filtered.length !== 1 ? 's' : ''} trouvée${filtered.length !== 1 ? 's' : ''}`;
+function goToPage(page) {
+    if (page < 1 || page > totalPagesValue || totalItems === 0) return;
+    currentPage = page;
+    renderTable();
+}
 
-    if (!filtered.length) {
+function changePage(delta) {
+    goToPage(currentPage + delta);
+}
+
+function changeItemsPerPage() {
+    itemsPerPage = parseInt(document.getElementById('itemsPerPage').value);
+    currentPage = 1;
+    renderTable();
+}
+
+/* ═══════════════════════════════════════════════════
+   Rendu tableau avec pagination
+═══════════════════════════════════════════════════ */
+function renderTable() {
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    const paginatedItems = currentData.slice(start, end);
+    const tbody = document.getElementById('tableBody');
+
+    document.getElementById('resultCount').textContent = 
+        `${totalItems} machine${totalItems !== 1 ? 's' : ''} trouvée${totalItems !== 1 ? 's' : ''}`;
+
+    if (!paginatedItems.length) {
         tbody.innerHTML = `<tr class="empty-row"><td colspan="12">
             <i class="fa fa-inbox" style="font-size:28px;display:block;margin-bottom:10px;"></i>
             Aucune machine trouvée
-         </td></tr>`;
+        </tr>`;
         renderStats([]);
+        updatePagination();
         return;
     }
 
-    tbody.innerHTML = filtered.map(r => `
+    tbody.innerHTML = paginatedItems.map(r => `
         <tr>
             <td style="font-weight:600; color:#2C3E50;">${escHtml(r.nom)}</td>
             <td>${escHtml(r.marque)}</td>
@@ -469,26 +605,38 @@ function render() {
                     : `<span style="color:#999; font-style:italic;">Non assigné</span>`
                 }
             </td>
-            <td>
-                <div style="display:flex; gap:6px; justify-content:center;">
-                    <a href="/admin/machines/${r.id}"
-                       class="action-btn action-btn-view" title="Voir">
+            <td style="text-align:center;">
+                <div style="display:flex; gap:8px; justify-content:center;">
+                    <a href="${BASE_URL}/${r.id}"
+                       class="action-btn action-btn-view"
+                       title="Voir les détails">
                         <i class="fa fa-eye"></i>
                     </a>
-                    <a href="/admin/machines/${r.id}/edit"
-                       class="action-btn action-btn-edit" title="Modifier">
+                    <a href="${BASE_URL}/${r.id}/edit"
+                       class="action-btn action-btn-edit"
+                       title="Modifier la machine">
                         <i class="fa fa-pen"></i>
                     </a>
-                    <a href="/admin/machines/${r.id}/delete-confirm"
-                       class="action-btn action-btn-delete" title="Supprimer">
+                    <a href="${BASE_URL}/${r.id}/delete-confirm"
+                       class="action-btn action-btn-delete"
+                       title="Supprimer la machine">
                         <i class="fa fa-trash"></i>
                     </a>
                 </div>
             </td>
-        </tr>
+        <table>
     `).join('');
 
-    renderStats(filtered);
+    updatePagination();
+    renderStats(currentData);
+}
+
+function render() {
+    const filtered = sortData(getFiltered());
+    currentData = filtered;
+    totalItems = currentData.length;
+    currentPage = 1;
+    renderTable();
 }
 
 /* ═══════════════════════════════════════════════════
@@ -562,9 +710,6 @@ function updateAdvancedStats(stats) {
     const total = stats.total;
     const avgAge = stats.avgAge;
     const avgKm = stats.avgKilometrage;
-    const mostCommonBrand = stats.mostCommonBrand || '—';
-    const brandCount = stats.brandCount;
-    const topBrand = mostCommonBrand !== '—' ? `${mostCommonBrand} (${brandCount[mostCommonBrand]})` : '—';
     const available = (stats.etatCount['Bon'] || 0) + (stats.etatCount['Neuf'] || 0);
     const occupancyRate = total > 0 ? Math.round(available / total * 100) : 0;
     
@@ -579,7 +724,7 @@ function updateAdvancedStats(stats) {
         </div>
         <div class="stat-card" style="border-top:4px solid #854F0B;">
             <div class="stat-label"><i class="fa fa-tachometer"></i> Kilométrage moyen</div>
-            <div class="stat-number" style="font-size:24px; color:#854F0B;">${avgKm.toLocaleString()} km/h</div>
+            <div class="stat-number" style="font-size:24px; color:#854F0B;">${avgKm.toLocaleString()} km</div>
         </div>
         <div class="stat-card" style="border-top:4px solid #3B6D11;">
             <div class="stat-label"><i class="fa fa-chart-line"></i> Taux disponibilité</div>
@@ -588,9 +733,6 @@ function updateAdvancedStats(stats) {
     `;
 }
 
-/* ═══════════════════════════════════════════════════
-   Graphique et légende
-═══════════════════════════════════════════════════ */
 const ETAT_COLORS = {
     'Neuf':        { bg: '#2D5A27', light: '#EAF3DE', text: '#3B6D11' },
     'Bon':         { bg: '#3B6D11', light: '#EAF3DE', text: '#3B6D11' },
@@ -755,19 +897,34 @@ function resetAll() {
     document.getElementById('sortDateDesc').classList.add('sort-active');
     document.querySelectorAll('#machinesTable thead th').forEach(t => t.classList.remove('sorted-asc', 'sorted-desc'));
     
-    if (statsOpen) toggleStats();
+    if (statsOpen) {
+        toggleStats();
+    }
     render();
 }
 
 function toggleStats() {
     statsOpen = !statsOpen;
-    document.getElementById('statsPanel').classList.toggle('open', statsOpen);
+    const panel = document.getElementById('statsPanel');
+    if (panel) {
+        panel.classList.toggle('open', statsOpen);
+    }
 }
 
 /* ═══════════════════════════════════════════════════
    Initialisation
 ═══════════════════════════════════════════════════ */
 document.addEventListener('DOMContentLoaded', function() {
+    if (!MACHINES_DATA || !Array.isArray(MACHINES_DATA)) {
+        console.error('Erreur: MACHINES_DATA non défini ou invalide');
+        const tbody = document.getElementById('tableBody');
+        if (tbody) {
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="12">Erreur de chargement des données</td></tr>';
+        }
+        return;
+    }
+    
+    console.log(`✓ ${MACHINES_DATA.length} machines chargées`);
     buildAlphaBar();
     document.getElementById('sortDateDesc').classList.add('sort-active');
     render();

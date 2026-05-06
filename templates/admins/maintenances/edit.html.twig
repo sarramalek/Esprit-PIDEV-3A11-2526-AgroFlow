@@ -309,15 +309,15 @@
                     <div class="select-wrap">
                         <select name="typePanne" id="typePanne" class="form-select" required>
                             <option value="">— Choisir un type —</option>
-                            <option value="Électrique" {{ maintenance.typePanne == 'Électrique' ? 'selected' : '' }}>⚡ Électrique</option>
-                            <option value="Mécanique" {{ maintenance.typePanne == 'Mécanique' ? 'selected' : '' }}>⚙️ Mécanique</option>
-                            <option value="Hydraulique" {{ maintenance.typePanne == 'Hydraulique' ? 'selected' : '' }}>💧 Hydraulique</option>
-                            <option value="Pneumatique" {{ maintenance.typePanne == 'Pneumatique' ? 'selected' : '' }}>🌬️ Pneumatique</option>
-                            <option value="Moteur" {{ maintenance.typePanne == 'Moteur' ? 'selected' : '' }}>🔩 Moteur</option>
-                            <option value="Transmission" {{ maintenance.typePanne == 'Transmission' ? 'selected' : '' }}>🔄 Transmission</option>
+                            <option value="Électrique"      {{ maintenance.typePanne == 'Électrique'      ? 'selected' : '' }}>⚡ Électrique</option>
+                            <option value="Mécanique"       {{ maintenance.typePanne == 'Mécanique'       ? 'selected' : '' }}>⚙️ Mécanique</option>
+                            <option value="Hydraulique"     {{ maintenance.typePanne == 'Hydraulique'     ? 'selected' : '' }}>💧 Hydraulique</option>
+                            <option value="Pneumatique"     {{ maintenance.typePanne == 'Pneumatique'     ? 'selected' : '' }}>🌬️ Pneumatique</option>
+                            <option value="Moteur"          {{ maintenance.typePanne == 'Moteur'          ? 'selected' : '' }}>🔩 Moteur</option>
+                            <option value="Transmission"    {{ maintenance.typePanne == 'Transmission'    ? 'selected' : '' }}>🔄 Transmission</option>
                             <option value="Vidange &amp; filtres" {{ maintenance.typePanne == 'Vidange & filtres' ? 'selected' : '' }}>🛢️ Vidange &amp; Filtres</option>
-                            <option value="Logicielle" {{ maintenance.typePanne == 'Logicielle' ? 'selected' : '' }}>💻 Logicielle</option>
-                            <option value="Autre" {{ maintenance.typePanne == 'Autre' ? 'selected' : '' }}>🔧 Autre</option>
+                            <option value="Logicielle"      {{ maintenance.typePanne == 'Logicielle'      ? 'selected' : '' }}>💻 Logicielle</option>
+                            <option value="Autre"           {{ maintenance.typePanne == 'Autre'           ? 'selected' : '' }}>🔧 Autre</option>
                         </select>
                     </div>
                     <div class="field-error" id="typeError">
@@ -350,8 +350,8 @@
                         <label class="form-label" for="cout">Coût <span class="req">*</span></label>
                         <div class="input-addon">
                             <span class="input-addon-text"><i class="bi bi-cash-coin"></i></span>
-                            <input type="number" name="cout" id="cout" class="form-input" 
-                                   step="0.01" min="0.01" max="999999.99" 
+                            <input type="number" name="cout" id="cout" class="form-input"
+                                   step="0.01" min="0.01" max="999999.99"
                                    placeholder="0,00" value="{{ maintenance.cout }}" required>
                             <span class="input-addon-text">DT</span>
                         </div>
@@ -390,7 +390,7 @@
                             <select name="statut" id="statut" class="form-select" required>
                                 <option value="planifie" {{ maintenance.statut == 'planifie' ? 'selected' : '' }}>📋 Planifié</option>
                                 <option value="en_cours" {{ maintenance.statut == 'en_cours' ? 'selected' : '' }}>⚙️ En cours</option>
-                                <option value="termine" {{ maintenance.statut == 'termine' ? 'selected' : '' }}>✅ Terminé</option>
+                                <option value="termine"  {{ maintenance.statut == 'termine'  ? 'selected' : '' }}>✅ Terminé</option>
                             </select>
                         </div>
                         <div class="field-error" id="statutError">
@@ -403,9 +403,9 @@
                         <label class="form-label" for="priorite">Priorité <span class="req">*</span></label>
                         <div class="select-wrap">
                             <select name="priorite" id="priorite" class="form-select" required>
-                                <option value="faible" {{ maintenance.priorite == 'faible' ? 'selected' : '' }}>⬇️ Faible</option>
+                                <option value="faible"  {{ maintenance.priorite == 'faible'  ? 'selected' : '' }}>⬇️ Faible</option>
                                 <option value="moyenne" {{ maintenance.priorite == 'moyenne' ? 'selected' : '' }}>➡️ Moyenne</option>
-                                <option value="haute" {{ maintenance.priorite == 'haute' ? 'selected' : '' }}>⬆️ Haute</option>
+                                <option value="haute"   {{ maintenance.priorite == 'haute'   ? 'selected' : '' }}>⬆️ Haute</option>
                                 <option value="urgente" {{ maintenance.priorite == 'urgente' ? 'selected' : '' }}>⚠️ Urgente</option>
                             </select>
                         </div>
@@ -461,9 +461,8 @@
                     <div class="select-wrap">
                         <select name="idM" id="idM" class="form-select">
                             <option value="">— Aucun matériel —</option>
-                            {% for machine in machines %}{{ maintenance.idM and maintenance.idM.id == machine.id ? 'selected' : '' }}
-
-                                <option value="{{ machine.id }}" >
+                            {% for machine in machines %}
+                                <option value="{{ machine.id }}" {{ maintenance.idM == machine.id ? 'selected' : '' }}>
                                     {{ machine.nom }} (ID : {{ machine.id }})
                                 </option>
                             {% endfor %}
@@ -495,254 +494,138 @@
 <script>
 (function() {
     'use strict';
-    
-    const form = document.getElementById('maintenanceForm');
-    const typeEl = document.getElementById('typePanne');
-    const coutEl = document.getElementById('cout');
-    const dateEl = document.getElementById('dateMain');
-    const descEl = document.getElementById('description');
-    const statutEl = document.getElementById('statut');
-    const prioriteEl = document.getElementById('priorite');
-    const kmEl = document.getElementById('kilometrage');
-    const recoEl = document.getElementById('recommandation');
-    const descCtr = document.getElementById('descCount');
-    const recoCtr = document.getElementById('recoCount');
-    const banner = document.getElementById('errorBanner');
-    const today = new Date().toISOString().split('T')[0];
-    
-    // Initialisation
+
+    const form      = document.getElementById('maintenanceForm');
+    const typeEl    = document.getElementById('typePanne');
+    const coutEl    = document.getElementById('cout');
+    const dateEl    = document.getElementById('dateMain');
+    const descEl    = document.getElementById('description');
+    const statutEl  = document.getElementById('statut');
+    const prioriteEl= document.getElementById('priorite');
+    const kmEl      = document.getElementById('kilometrage');
+    const recoEl    = document.getElementById('recommandation');
+    const descCtr   = document.getElementById('descCount');
+    const recoCtr   = document.getElementById('recoCount');
+    const banner    = document.getElementById('errorBanner');
+    const today     = new Date().toISOString().split('T')[0];
+
     dateEl.setAttribute('max', today);
-    
-    // Helper functions
-    function valid(el) { 
-        el.classList.remove('is-invalid'); 
-        el.classList.add('is-valid'); 
-    }
-    
-    function invalid(el) { 
-        el.classList.remove('is-valid'); 
-        el.classList.add('is-invalid'); 
-    }
-    
+
+    function valid(el)   { el.classList.remove('is-invalid'); el.classList.add('is-valid'); }
+    function invalid(el) { el.classList.remove('is-valid');   el.classList.add('is-invalid'); }
+
     function showErr(id, sid, msg) {
-        const s = document.getElementById(sid); 
-        if (s) s.textContent = msg;
-        const d = document.getElementById(id); 
-        if (d) d.classList.add('visible');
+        const s = document.getElementById(sid); if (s) s.textContent = msg;
+        const d = document.getElementById(id);  if (d) d.classList.add('visible');
     }
-    
-    function hideErr(id) { 
-        const d = document.getElementById(id); 
-        if (d) d.classList.remove('visible'); 
+    function hideErr(id) {
+        const d = document.getElementById(id);  if (d) d.classList.remove('visible');
     }
-    
-    // Validation functions
+
     function validateType() {
-        if (!typeEl.value) {
-            invalid(typeEl);
-            showErr('typeError', 'typeErrorMsg', 'Veuillez sélectionner un type de panne.');
-            return false;
-        }
-        valid(typeEl);
-        hideErr('typeError');
-        return true;
+        if (!typeEl.value) { invalid(typeEl); showErr('typeError','typeErrorMsg','Veuillez sélectionner un type de panne.'); return false; }
+        valid(typeEl); hideErr('typeError'); return true;
     }
-    
+
     function validateCost() {
         const raw = coutEl.value.trim();
         const val = parseFloat(raw);
-        
-        if (raw === '' || isNaN(val)) {
-            invalid(coutEl);
-            showErr('coutError', 'coutErrorMsg', 'Le coût est obligatoire.');
-            return false;
-        }
-        if (val <= 0) {
-            invalid(coutEl);
-            showErr('coutError', 'coutErrorMsg', 'Le coût doit être supérieur à 0.');
-            return false;
-        }
-        if (val > 999999.99) {
-            invalid(coutEl);
-            showErr('coutError', 'coutErrorMsg', 'Le coût ne peut pas dépasser 999 999,99 DT.');
-            return false;
-        }
-        valid(coutEl);
-        hideErr('coutError');
-        return true;
+        if (raw === '' || isNaN(val)) { invalid(coutEl); showErr('coutError','coutErrorMsg','Le coût est obligatoire.'); return false; }
+        if (val <= 0)       { invalid(coutEl); showErr('coutError','coutErrorMsg','Le coût doit être supérieur à 0.'); return false; }
+        if (val > 999999.99){ invalid(coutEl); showErr('coutError','coutErrorMsg','Le coût ne peut pas dépasser 999 999,99 DT.'); return false; }
+        valid(coutEl); hideErr('coutError'); return true;
     }
-    
+
     function validateDate() {
-        if (!dateEl.value) {
-            invalid(dateEl);
-            showErr('dateError', 'dateErrorMsg', 'La date est obligatoire.');
-            return false;
-        }
-        if (dateEl.value > today) {
-            invalid(dateEl);
-            showErr('dateError', 'dateErrorMsg', 'La date ne peut pas être dans le futur.');
-            return false;
-        }
-        valid(dateEl);
-        hideErr('dateError');
-        return true;
+        if (!dateEl.value)        { invalid(dateEl); showErr('dateError','dateErrorMsg','La date est obligatoire.'); return false; }
+        if (dateEl.value > today) { invalid(dateEl); showErr('dateError','dateErrorMsg','La date ne peut pas être dans le futur.'); return false; }
+        valid(dateEl); hideErr('dateError'); return true;
     }
-    
+
     function validateDescription() {
-        const v = descEl.value;
-        const l = v.length;
-        
-        if (l === 0) {
-            invalid(descEl);
-            showErr('descError', 'descErrorMsg', 'La description est obligatoire.');
-            return false;
-        }
-        if (l < 5) {
-            invalid(descEl);
-            showErr('descError', 'descErrorMsg', 'Minimum 5 caractères.');
-            return false;
-        }
-        if (l > 1000) {
-            invalid(descEl);
-            showErr('descError', 'descErrorMsg', 'Maximum 1000 caractères.');
-            return false;
-        }
-        if (/[<>{}]/.test(v)) {
-            invalid(descEl);
-            showErr('descError', 'descErrorMsg', 'Caractères < > { } interdits.');
-            return false;
-        }
-        valid(descEl);
-        hideErr('descError');
-        return true;
+        const v = descEl.value, l = v.length;
+        if (l === 0) { invalid(descEl); showErr('descError','descErrorMsg','La description est obligatoire.'); return false; }
+        if (l < 5)   { invalid(descEl); showErr('descError','descErrorMsg','Minimum 5 caractères.'); return false; }
+        if (l > 1000){ invalid(descEl); showErr('descError','descErrorMsg','Maximum 1000 caractères.'); return false; }
+        if (/[<>{}]/.test(v)) { invalid(descEl); showErr('descError','descErrorMsg','Caractères < > { } interdits.'); return false; }
+        valid(descEl); hideErr('descError'); return true;
     }
-    
+
     function validateStatut() {
-        if (!statutEl.value) {
-            invalid(statutEl);
-            showErr('statutError', 'statutErrorMsg', 'Veuillez sélectionner un statut.');
-            return false;
-        }
-        valid(statutEl);
-        hideErr('statutError');
-        return true;
+        if (!statutEl.value) { invalid(statutEl); showErr('statutError','statutErrorMsg','Veuillez sélectionner un statut.'); return false; }
+        valid(statutEl); hideErr('statutError'); return true;
     }
-    
+
     function validatePriorite() {
-        if (!prioriteEl.value) {
-            invalid(prioriteEl);
-            showErr('prioriteError', 'prioriteErrorMsg', 'Veuillez sélectionner une priorité.');
-            return false;
-        }
-        valid(prioriteEl);
-        hideErr('prioriteError');
-        return true;
+        if (!prioriteEl.value) { invalid(prioriteEl); showErr('prioriteError','prioriteErrorMsg','Veuillez sélectionner une priorité.'); return false; }
+        valid(prioriteEl); hideErr('prioriteError'); return true;
     }
-    
+
     function validateKilometrage() {
         const raw = kmEl.value.trim();
-        if (raw === '') {
-            valid(kmEl);
-            hideErr('kmError');
-            return true;
-        }
+        if (raw === '') { valid(kmEl); hideErr('kmError'); return true; }
         const val = parseInt(raw);
-        if (isNaN(val) || val < 0) {
-            invalid(kmEl);
-            showErr('kmError', 'kmErrorMsg', 'Le kilométrage doit être positif ou nul.');
-            return false;
-        }
-        if (val > 9999999) {
-            invalid(kmEl);
-            showErr('kmError', 'kmErrorMsg', 'Kilométrage trop élevé (max 9 999 999).');
-            return false;
-        }
-        valid(kmEl);
-        hideErr('kmError');
-        return true;
+        if (isNaN(val) || val < 0) { invalid(kmEl); showErr('kmError','kmErrorMsg','Le kilométrage doit être positif ou nul.'); return false; }
+        if (val > 9999999)         { invalid(kmEl); showErr('kmError','kmErrorMsg','Kilométrage trop élevé (max 9 999 999).'); return false; }
+        valid(kmEl); hideErr('kmError'); return true;
     }
-    
+
     function validateRecommandation() {
-        const v = recoEl.value;
-        const l = v.length;
-        if (l > 2000) {
-            invalid(recoEl);
-            showErr('recoError', 'recoErrorMsg', 'Maximum 2000 caractères.');
-            return false;
-        }
-        valid(recoEl);
-        hideErr('recoError');
-        return true;
+        const l = recoEl.value.length;
+        if (l > 2000) { invalid(recoEl); showErr('recoError','recoErrorMsg','Maximum 2000 caractères.'); return false; }
+        valid(recoEl); hideErr('recoError'); return true;
     }
-    
+
     function updateDescCounter() {
         const l = descEl.value.length;
         descCtr.textContent = l + ' / 1000';
         descCtr.className = 'char-counter' + ((l > 0 && l < 5) || l > 1000 ? ' danger' : '');
     }
-    
+
     function updateRecoCounter() {
         const l = recoEl.value.length;
         recoCtr.textContent = l + ' / 2000';
         recoCtr.className = 'char-counter' + (l > 2000 ? ' danger' : '');
     }
-    
-    // Event listeners
+
     typeEl.addEventListener('change', validateType);
     coutEl.addEventListener('input', validateCost);
     dateEl.addEventListener('change', validateDate);
-    descEl.addEventListener('input', function() { 
-        updateDescCounter(); 
-        if (this.classList.contains('is-valid') || this.classList.contains('is-invalid')) {
-            validateDescription();
-        }
+    descEl.addEventListener('input', function() {
+        updateDescCounter();
+        if (this.classList.contains('is-valid') || this.classList.contains('is-invalid')) validateDescription();
     });
     descEl.addEventListener('blur', validateDescription);
     statutEl.addEventListener('change', validateStatut);
     prioriteEl.addEventListener('change', validatePriorite);
     kmEl.addEventListener('input', validateKilometrage);
-    recoEl.addEventListener('input', function() { 
-        updateRecoCounter(); 
-        if (this.classList.contains('is-valid') || this.classList.contains('is-invalid')) {
-            validateRecommandation();
-        }
+    recoEl.addEventListener('input', function() {
+        updateRecoCounter();
+        if (this.classList.contains('is-valid') || this.classList.contains('is-invalid')) validateRecommandation();
     });
     recoEl.addEventListener('blur', validateRecommandation);
-    
-    // Validation initiale au chargement
+
     window.addEventListener('DOMContentLoaded', function() {
-        if (typeEl.value) validateType();
-        if (coutEl.value) validateCost();
-        if (dateEl.value) validateDate();
-        if (descEl.value) {
-            validateDescription();
-            updateDescCounter();
-        }
-        if (statutEl.value) validateStatut();
-        if (prioriteEl.value) validatePriorite();
-        if (kmEl.value) validateKilometrage();
-        if (recoEl.value) {
-            validateRecommandation();
-            updateRecoCounter();
-        }
+        if (typeEl.value)    validateType();
+        if (coutEl.value)    validateCost();
+        if (dateEl.value)    validateDate();
+        if (descEl.value)    { validateDescription(); updateDescCounter(); }
+        if (statutEl.value)  validateStatut();
+        if (prioriteEl.value)validatePriorite();
+        if (kmEl.value)      validateKilometrage();
+        if (recoEl.value)    { validateRecommandation(); updateRecoCounter(); }
     });
-    
-    // Form submission
+
     form.addEventListener('submit', function(e) {
-        const isValid = validateType() & validateCost() & validateDate() & 
-                       validateDescription() & validateStatut() & validatePriorite() & 
-                       validateKilometrage() & validateRecommandation();
-        
+        const isValid = validateType() & validateCost() & validateDate() &
+                        validateDescription() & validateStatut() & validatePriorite() &
+                        validateKilometrage() & validateRecommandation();
         if (!isValid) {
             e.preventDefault();
             e.stopPropagation();
             banner.classList.add('visible');
-            
             const firstInvalid = form.querySelector('.is-invalid');
-            if (firstInvalid) {
-                firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                firstInvalid.focus();
-            }
+            if (firstInvalid) { firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' }); firstInvalid.focus(); }
         } else {
             banner.classList.remove('visible');
         }

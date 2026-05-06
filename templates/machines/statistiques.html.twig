@@ -20,64 +20,42 @@
 
     .stats-page { max-width: 1300px; margin: 0 auto; padding: 1.5rem; }
 
-    /* ── Header ── */
     .page-header {
         display: flex; justify-content: space-between; align-items: center;
         margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;
     }
     .page-header h1 { margin: 0; font-size: 1.8rem; font-weight: 700; color: var(--text-dark); }
 
-    /* ── Buttons ── */
     .btn {
         display: inline-flex; align-items: center; gap: .45rem;
         padding: .6rem 1.3rem; border-radius: 10px; font-weight: 600;
         font-size: .88rem; text-decoration: none; cursor: pointer;
         border: none; font-family: inherit; transition: all .18s;
     }
-    .btn-primary   { background: var(--green-dark); color: #fff; }
-    .btn-primary:hover { background: #1f4012; transform: translateY(-1px); box-shadow: 0 3px 10px rgba(45,90,27,.25); }
     .btn-secondary { background: var(--green-light); color: var(--green-dark); border: 1px solid var(--green-border); }
     .btn-secondary:hover { background: #dff0d3; }
 
-    /* ── KPI cards row ── */
     .kpi-row {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 1.2rem;
         margin-bottom: 1.8rem;
     }
-    .kpi-card {
-        background: var(--white);
-        border-radius: 16px;
-        box-shadow: var(--shadow);
-        overflow: hidden;
-    }
-    .kpi-header {
-        background: var(--green-dark);
-        padding: .7rem 1.1rem .55rem;
-    }
-    .kpi-header-label {
-        font-size: .7rem; font-weight: 700; text-transform: uppercase;
-        letter-spacing: .5px; color: #b5d9a0;
-    }
+    .kpi-card { background: var(--white); border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; }
+    .kpi-header { background: var(--green-dark); padding: .7rem 1.1rem .55rem; }
+    .kpi-header-label { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #b5d9a0; }
     .kpi-body { padding: .9rem 1.1rem 1rem; text-align: center; }
     .kpi-value { font-size: 2.2rem; font-weight: 800; color: var(--text-dark); line-height: 1; }
     .kpi-sub   { font-size: .78rem; color: var(--text-light); margin-top: .3rem; }
     .kpi-extra { font-size: .8rem; color: var(--text-mid); margin-top: .5rem; font-weight: 600; }
 
-    /* ── Charts grid ── */
     .charts-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
         gap: 1.4rem;
         margin-bottom: 1.8rem;
     }
-    .chart-card {
-        background: var(--white);
-        border-radius: 16px;
-        box-shadow: var(--shadow);
-        overflow: hidden;
-    }
+    .chart-card { background: var(--white); border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; }
     .chart-card-header {
         background: var(--green-dark);
         padding: .75rem 1.2rem .6rem;
@@ -87,19 +65,13 @@
     .chart-card-body { padding: 1.2rem; }
     canvas { max-height: 260px; width: 100% !important; }
 
-    /* ── Maintenance tables ── */
     .maint-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         gap: 1.4rem;
         margin-bottom: 1.8rem;
     }
-    .maint-card {
-        background: var(--white);
-        border-radius: 16px;
-        box-shadow: var(--shadow);
-        overflow: hidden;
-    }
+    .maint-card { background: var(--white); border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; }
     .maint-header {
         padding: .75rem 1.2rem .6rem;
         font-size: .75rem; font-weight: 700;
@@ -107,33 +79,24 @@
     }
     .maint-header-danger  { background: #8b1a1a; }
     .maint-header-warning { background: #7a5700; }
-    .maint-header-ok      { background: var(--green-dark); }
-
     .maint-body { padding: 0; }
     .maint-row {
         display: flex; justify-content: space-between; align-items: center;
         padding: .7rem 1.2rem; border-bottom: 1px solid #eef5e8; font-size: .88rem;
     }
     .maint-row:last-child { border-bottom: none; }
-    .maint-name  { font-weight: 600; color: var(--text-dark); }
-    .maint-date  { font-weight: 700; color: var(--green-dark); }
+    .maint-name { font-weight: 600; color: var(--text-dark); }
+    .maint-date { font-weight: 700; color: var(--green-dark); }
     .maint-date-danger { color: #c53030; }
     .maint-empty { text-align: center; padding: 1.4rem; color: var(--text-light); font-size: .88rem; }
 
-    /* ── State badges ── */
     .badge { padding: .28rem .85rem; border-radius: 50px; font-size: .78rem; font-weight: 700; white-space: nowrap; }
     .badge-neuf     { background: #d4edda; color: #155724; }
     .badge-bon      { background: #cce5ff; color: #004085; }
     .badge-occasion { background: #fff3cd; color: #856404; }
     .badge-panne    { background: #f8d7da; color: #721c24; }
 
-    /* ── Etat / marque breakdown ── */
-    .breakdown-card {
-        background: var(--white);
-        border-radius: 16px;
-        box-shadow: var(--shadow);
-        overflow: hidden;
-    }
+    .breakdown-card { background: var(--white); border-radius: 16px; box-shadow: var(--shadow); overflow: hidden; }
     .breakdown-row {
         display: flex; justify-content: space-between; align-items: center;
         padding: .65rem 1.2rem; border-bottom: 1px solid #eef5e8; font-size: .88rem;
@@ -152,14 +115,7 @@
     {# ── Header ── #}
     <div class="page-header">
         <h1>📊 Statistiques des machines</h1>
-        <div style="display:flex;gap:.7rem;flex-wrap:wrap;">
-            <a href="{{ path('agri_machine_statistiques_pdf') }}" class="btn btn-primary" target="_blank">
-                📄 Exporter en PDF
-            </a>
-            <a href="{{ path('agri_machines') }}" class="btn btn-secondary">
-                ← Retour aux machines
-            </a>
-        </div>
+        <a href="{{ path('agri_machines') }}" class="btn btn-secondary">← Retour aux machines</a>
     </div>
 
     {# ── KPI cards ── #}
@@ -173,15 +129,16 @@
         </div>
 
         <div class="kpi-card">
-            <div class="kpi-header"><span class="kpi-header-label">📊 Kilométrage total</span></div>
+            <div class="kpi-header"><span class="kpi-header-label">📊 Kilométrage moyen</span></div>
             <div class="kpi-body">
-                <div class="kpi-value">{{ stats.totalKm|default(0)|number_format(0,',',' ') }}</div>
-                <div class="kpi-sub">km parcourus</div>
-                <div class="kpi-extra">Moy. {{ stats.moyenneKm|default(0)|number_format(0,',',' ') }} km / machine</div>
+                <div class="kpi-value">{{ stats.statsKm.avgKm|default(0)|number_format(0,',',' ') }}</div>
+                <div class="kpi-sub">km / machine</div>
+                <div class="kpi-extra">
+                    Max : {{ stats.statsKm.maxKm|default(0)|number_format(0,',',' ') }} km
+                </div>
             </div>
         </div>
 
-        {# Compteur par état #}
         {% for etat, nb in stats.parEtat %}
             {% if loop.index <= 2 %}
             <div class="kpi-card">
@@ -189,11 +146,13 @@
                 <div class="kpi-body">
                     <div class="kpi-value">{{ nb }}</div>
                     <div class="kpi-sub">machine{{ nb > 1 ? 's' : '' }}</div>
-                    {% if etat == 'Neuf' %}     <div style="margin-top:.5rem;"><span class="badge badge-neuf">Neuf</span></div>
-                    {% elseif etat == 'Bon' %}  <div style="margin-top:.5rem;"><span class="badge badge-bon">Bon</span></div>
-                    {% elseif etat == 'Occasion' %} <div style="margin-top:.5rem;"><span class="badge badge-occasion">Occasion</span></div>
-                    {% else %}                  <div style="margin-top:.5rem;"><span class="badge badge-panne">{{ etat }}</span></div>
-                    {% endif %}
+                    <div style="margin-top:.5rem;">
+                        {% if etat == 'Neuf' %}         <span class="badge badge-neuf">Neuf</span>
+                        {% elseif etat == 'Bon' %}      <span class="badge badge-bon">Bon</span>
+                        {% elseif etat == 'Occasion' %} <span class="badge badge-occasion">Occasion</span>
+                        {% else %}                      <span class="badge badge-panne">{{ etat }}</span>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
             {% endif %}
@@ -232,10 +191,10 @@
             {% if stats.parEtat|length > 0 %}
                 {% for etat, nb in stats.parEtat %}
                 <div class="breakdown-row">
-                    {% if etat == 'Neuf' %}     <span class="badge badge-neuf">Neuf</span>
-                    {% elseif etat == 'Bon' %}  <span class="badge badge-bon">Bon</span>
+                    {% if etat == 'Neuf' %}         <span class="badge badge-neuf">Neuf</span>
+                    {% elseif etat == 'Bon' %}      <span class="badge badge-bon">Bon</span>
                     {% elseif etat == 'Occasion' %} <span class="badge badge-occasion">Occasion</span>
-                    {% else %}                  <span class="badge badge-panne">{{ etat }}</span>
+                    {% else %}                      <span class="badge badge-panne">{{ etat }}</span>
                     {% endif %}
                     <span class="breakdown-val">{{ nb }} machine{{ nb > 1 ? 's' : '' }}</span>
                 </div>

@@ -1,4 +1,5 @@
 <?php
+// src/Service/MaintenanceAlertService.php
 
 namespace App\Service;
 
@@ -22,8 +23,6 @@ class MaintenanceAlertService
     /**
      * Calcule le statut d'alerte d'une maintenance
      * Retourne : 'overdue' (dépassé), 'warning' (proche), 'ok' (dans les temps)
-     *
-     * @return array{status: string, message: string, class: string, days?: int}
      */
     public function getAlertStatus(Maintenance $maintenance): array
     {
@@ -34,7 +33,7 @@ class MaintenanceAlertService
 
         $now = new \DateTime();
         $interval = $now->diff($dateMain);
-        $daysLeft = (int) $interval->format('%r%a'); // jours restants (négatif si dépassé)
+        $daysLeft = (int) $interval->format('%r%a');
 
         if ($daysLeft < 0) {
             $daysOverdue = abs($daysLeft);
@@ -62,9 +61,190 @@ class MaintenanceAlertService
     }
 
     /**
-     * Génère une description enrichie + recommandations via API (Gemini ou fallback)
-     *
-     * @return array{description: string, recommandation: string, criticite: int, raw: string|null}
+     * Génère des alertes IA intelligentes pour une maintenance
+     * @return array<int, array<string, mixed>>
+     */
+    public function generateIntelligentAlerts(Maintenance $maintenance): array
+    {
+        $alerts = [];
+        
+        // 1. Alerte de base selon le statut
+        $statusAlert = $this->getAlertStatus($maintenance);
+        if ($statusAlert['status'] !== 'ok') {
+            $alerts[] = [
+                'icon' => $statusAlert['status'] === 'overdue' ? '🚨' : '⏰',
+                'title' => $statusAlert['status'] === 'overdue' ? 'INTERVENTION DÉPASSÉE' : 'ÉCHÉANCE PROCHE',
+                'message' => $statusAlert['message'],
+                'priority' => $statusAlert['status'] === 'overdue' ? 'urgente' : 'haute',
+                'action' => $statusAlert['status'] === 'overdue' ? 'Intervention immédiate requise' : 'Planifier sous 48h',
+                'color' => $statusAlert['class'] === 'danger' ? '#a32d2d' : '#e67e22'
+            ];
+        }
+        
+        // 2. Alerte basée sur la priorité
+        $priorite = $maintenance->getPriorite();
+        if ($priorite === 'urgente') {
+            $alerts[] = [
+                'icon' => '🔴',
+                'title' => 'PRIORITÉ URGENTE',
+                'message' => 'Cette maintenance nécessite une intervention immédiate pour éviter une panne critique.',
+                'priority' => 'urgente',
+                'action' => 'Contacter un technicien d\'urgence',
+                'color' => '#a32d2d'
+            ];
+        } elseif ($priorite === 'haute') {
+            $alerts[] = [
+                'icon' => '🟠',
+                'title' => 'PRIORITÉ HAUTE',
+                'message' => 'Planifier cette maintenance rapidement pour prévenir toute dégradation.',
+                'priority' => 'haute',
+                'action' => 'Planifier sous 7 jours',
+                'color' => '#e67e22'
+            ];
+        }
+        
+        // 3. Alerte kilométrage
+        $km = $maintenance->getKilometrage();
+        if ($km && $km >= 15000) {
+            $alerts[] = [
+                'icon' => '⚠️',
+                'title' => 'KILOMÉTRAGE CRITIQUE',
+                'message' => "La machine a atteint {$km} km. Une révision majeure est obligatoire pour éviter la casse moteur.",
+                'priority' => 'urgente',
+                'action' => 'Révision générale immédiate',
+                'color' => '#a32d2d'
+            ];
+        } elseif ($km && $km >= 10000) {
+            $alerts[] = [
+                'icon' => '📊',
+                'title' => 'KILOMÉTRAGE ÉLEVÉ',
+                'message' => "Kilométrage élevé ({$km} km). Maintenance préventive recommandée.",
+                'priority' => 'haute',
+                'action' => 'Vidange et contrôle général',
+                'color' => '#e67e22'
+            ];
+        } elseif ($km && $km >= 5000) {
+            $alerts[] = [
+                'icon' => '📈',
+                'title' => 'KILOMÉTRAGE INTERMÉDIAIRE',
+                'message' => "Vidange et entretien courant recommandés à {$km} km.",
+                'priority' => 'moyenne',
+                'action' => 'Planifier vidange',
+                'color' => '#f39c12'
+            ];
+        }
+        
+        // 4. Alerte spécifique au type de panne
+        $typeAlert = $this->getTypeSpecificAlert($maintenance);
+        if ($typeAlert) {
+            $alerts[] = $typeAlert;
+        }
+        
+        // 5. Alerte basée sur la date de dernière maintenance
+        $dateMain = $maintenance->getDateMain();
+        if ($dateMain) {
+            $now = new \DateTime();
+            $yearsSince = $now->diff($dateMain)->y;
+            $daysSince = $now->diff($dateMain)->days;
+            
+            if ($yearsSince >= 2) {
+                $alerts[] = [
+                    'icon' => '🔴',
+                    'title' => 'ALERTE MAJEURE - 2 ANS SANS MAINTENANCE',
+                    'message' => "La dernière maintenance date de plus de 2 ans. Risque de défaillance sévère.",
+                    'priority' => 'urgente',
+                    'action' => 'Révision complète immédiate',
+                    'color' => '#a32d2d'
+                ];
+            } elseif ($yearsSince >= 1) {
+                $alerts[] = [
+                    'icon' => '📅',
+                    'title' => 'RAPPEL ANNUEL',
+                    'message' => "Plus d'un an sans maintenance. Inspection vivement conseillée.",
+                    'priority' => 'haute',
+                    'action' => 'Planifier inspection',
+                    'color' => '#e67e22'
+                ];
+            } elseif ($daysSince > 180) {
+                $alerts[] = [
+                    'icon' => '⏰',
+                    'title' => 'MAINTENANCE À PRÉVOIR',
+                    'message' => "Plus de 6 mois sans maintenance. La performance pourrait se dégrader.",
+                    'priority' => 'moyenne',
+                    'action' => 'Effectuer inspection',
+                    'color' => '#f39c12'
+                ];
+            }
+        }
+        
+        // 6. Génération d'alerte IA avancée (si pas assez d'alertes)
+        if (count($alerts) < 2 && !empty($this->geminiApiKey)) {
+            $iaAlert = $this->generateGeminiAlert($maintenance);
+            if ($iaAlert) {
+                $alerts[] = $iaAlert;
+            }
+        }
+        
+        // 7. Alerte par défaut si aucune alerte
+        if (empty($alerts)) {
+            $alerts[] = [
+                'icon' => '✅',
+                'title' => 'MAINTENANCE À JOUR',
+                'message' => 'Aucune alerte critique. Surveillance normale recommandée.',
+                'priority' => 'faible',
+                'action' => 'Programmer prochaine révision dans 6 mois',
+                'color' => '#2d6a2d'
+            ];
+        }
+        
+        return $alerts;
+    }
+
+    /**
+     * Compte les alertes par niveau de criticité
+     */
+    public function countAlertsByLevel(Maintenance $maintenance): array
+    {
+        $alerts = $this->generateIntelligentAlerts($maintenance);
+        return [
+            'urgente' => count(array_filter($alerts, fn($a) => $a['priority'] === 'urgente')),
+            'haute' => count(array_filter($alerts, fn($a) => $a['priority'] === 'haute')),
+            'moyenne' => count(array_filter($alerts, fn($a) => $a['priority'] === 'moyenne')),
+            'faible' => count(array_filter($alerts, fn($a) => $a['priority'] === 'faible')),
+            'total' => count($alerts)
+        ];
+    }
+
+    /**
+     * Vérifie si des alertes critiques existent
+     */
+    public function hasCriticalAlerts(Maintenance $maintenance): bool
+    {
+        $alerts = $this->generateIntelligentAlerts($maintenance);
+        return !empty(array_filter($alerts, fn($a) => in_array($a['priority'], ['urgente', 'haute'])));
+    }
+
+    /**
+     * Génère un résumé textuel des alertes
+     */
+    public function getAlertSummary(Maintenance $maintenance): string
+    {
+        $alerts = $this->generateIntelligentAlerts($maintenance);
+        $critical = array_filter($alerts, fn($a) => in_array($a['priority'], ['urgente', 'haute']));
+        
+        if (empty($critical)) {
+            return "✅ Aucune alerte critique";
+        }
+        
+        $summary = "⚠️ " . count($critical) . " alerte(s) : ";
+        foreach ($critical as $alert) {
+            $summary .= " • {$alert['title']}";
+        }
+        return $summary;
+    }
+
+    /**
+     * Génère une description enrichie + recommandations via API
      */
     public function generateEnhancedContent(Maintenance $maintenance): array
     {
@@ -72,9 +252,8 @@ class MaintenanceAlertService
         $priorite = $maintenance->getPriorite();
         $statut = $maintenance->getStatut();
         $km = $maintenance->getKilometrage();
-        $nomMachine = $maintenance->getNom() ?? 'Machine';
+        $nomMachine = $this->getMachineName($maintenance);
 
-        // 1. Construction du prompt
         $prompt = "Tu es un expert en maintenance agricole. Pour une intervention de type '{$type}' (priorité {$priorite}, statut {$statut}, kilométrage {$km} km) sur la machine '{$nomMachine}', génère :
         - Une **description détaillée** des actions à réaliser (max 150 mots).
         - Une **liste de recommandations** (3 points) : pièces à vérifier, tests à faire, niveau d'urgence.
@@ -84,7 +263,6 @@ class MaintenanceAlertService
         RECOMMANDATIONS: - point1\n- point2\n- point3
         CRITICITE: [X/10]";
 
-        // 2. Appel à Gemini (si clé dispo) sinon fallback local
         $content = $this->callGeminiApi($prompt);
         if (!$content) {
             if ($this->logger) {
@@ -93,7 +271,6 @@ class MaintenanceAlertService
             $content = $this->getFallbackContent($type, $priorite, $km, $nomMachine);
         }
 
-        // 3. Parser la réponse
         $description = "Maintenance {$type} sur {$nomMachine}";
         $recommandations = "Suivre le planning préventif.";
         $criticite = 5;
@@ -116,12 +293,116 @@ class MaintenanceAlertService
         ];
     }
 
+    /**
+     * Génère une alerte via l'API Gemini
+     */
+    private function generateGeminiAlert(Maintenance $maintenance): ?array
+    {
+        if (empty($this->geminiApiKey)) {
+            return null;
+        }
+        
+        $type = $maintenance->getTypePanne() ?? 'Général';
+        $nomMachine = $this->getMachineName($maintenance);
+        $km = $maintenance->getKilometrage() ?? 0;
+        
+        $prompt = "Génère une alerte de maintenance agricole en français pour: Type={$type}, Machine={$nomMachine}, Km={$km}. Format JSON: {\"title\":\"titre alerte\",\"message\":\"message alerte\",\"action\":\"action recommandée\"}";
+        
+        try {
+            $response = $this->httpClient->request('POST', 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=' . $this->geminiApiKey, [
+                'json' => [
+                    'contents' => [['parts' => [['text' => $prompt]]]],
+                    'generationConfig' => ['temperature' => 0.7, 'maxOutputTokens' => 300]
+                ],
+                'timeout' => 15
+            ]);
+            
+            $data = $response->toArray();
+            $text = $data['candidates'][0]['content']['parts'][0]['text'] ?? '';
+            
+            if (preg_match('/\{[^}]+\}/', $text, $matches)) {
+                $alertData = json_decode($matches[0], true);
+                if ($alertData && isset($alertData['title'], $alertData['message'])) {
+                    return [
+                        'icon' => '🤖',
+                        'title' => $alertData['title'],
+                        'message' => $alertData['message'],
+                        'priority' => 'moyenne',
+                        'action' => $alertData['action'] ?? 'Consulter technicien',
+                        'color' => '#534AB7'
+                    ];
+                }
+            }
+        } catch (\Exception $e) {
+            if ($this->logger) {
+                $this->logger->error('Erreur Gemini alert', ['error' => $e->getMessage()]);
+            }
+        }
+        
+        return null;
+    }
+
+    /**
+     * Alerte spécifique au type de panne
+     */
+    private function getTypeSpecificAlert(Maintenance $maintenance): ?array
+    {
+        $type = mb_strtolower($maintenance->getTypePanne() ?? '');
+        $nomMachine = $this->getMachineName($maintenance);
+        
+        if (str_contains($type, 'moteur')) {
+            return [
+                'icon' => '🔧',
+                'title' => 'ALERTE MOTEUR',
+                'message' => "Problème moteur sur {$nomMachine}. Risque de surchauffe ou perte de puissance.",
+                'priority' => 'haute',
+                'action' => 'Diagnostic moteur immédiat',
+                'color' => '#e67e22'
+            ];
+        }
+        
+        if (str_contains($type, 'hydraulique')) {
+            return [
+                'icon' => '💧',
+                'title' => 'RISQUE HYDRAULIQUE',
+                'message' => "Circuit hydraulique à surveiller sur {$nomMachine}. Baisse de pression possible.",
+                'priority' => 'haute',
+                'action' => 'Vérifier flexibles et raccords',
+                'color' => '#e67e22'
+            ];
+        }
+        
+        if (str_contains($type, 'electrique') || str_contains($type, 'électrique')) {
+            return [
+                'icon' => '⚡',
+                'title' => 'ALERTE ÉLECTRIQUE',
+                'message' => "Circuit électrique à contrôler sur {$nomMachine}. Risque de dysfonctionnement.",
+                'priority' => 'moyenne',
+                'action' => 'Diagnostic électrique',
+                'color' => '#f39c12'
+            ];
+        }
+        
+        if (str_contains($type, 'transmission')) {
+            return [
+                'icon' => '🔄',
+                'title' => 'USURE TRANSMISSION',
+                'message' => "Transmission à vérifier sur {$nomMachine}. Bruits anormaux possibles.",
+                'priority' => 'haute',
+                'action' => 'Contrôle boîte de vitesses',
+                'color' => '#e67e22'
+            ];
+        }
+        
+        return null;
+    }
+
+    /**
+     * Appel à l'API Gemini
+     */
     private function callGeminiApi(string $prompt): ?string
     {
         if (empty($this->geminiApiKey)) {
-            if ($this->logger) {
-                $this->logger->warning('Clé API Gemini non configurée');
-            }
             return null;
         }
 
@@ -163,9 +444,11 @@ class MaintenanceAlertService
         }
     }
 
+    /**
+     * Contenu de fallback local
+     */
     private function getFallbackContent(string $type, string $priorite, ?int $km, string $nomMachine): string
     {
-        // Description selon le type de maintenance (plus complète)
         $baseDesc = match($type) {
             'Mécanique' => "Vérifier l'usure des pièces mobiles, contrôler les jeux et lubrifier les roulements. Inspecter les courroies et chaînes de transmission.",
             'Électricité' => "Tester la batterie, l'alternateur et les faisceaux. Rechercher des courts-circuits et vérifier le fonctionnement des capteurs.",
@@ -178,7 +461,6 @@ class MaintenanceAlertService
             default => "Inspection générale et entretien préventif selon les recommandations constructeur. Vérifier les niveaux et l'état général."
         };
 
-        // Ajout de la priorité
         if ($priorite === 'urgente') {
             $baseDesc .= " INTERVENTION URGENTE REQUISE. La machine ne doit pas être utilisée avant réparation.";
         } elseif ($priorite === 'haute') {
@@ -187,7 +469,6 @@ class MaintenanceAlertService
             $baseDesc .= " À planifier dans les prochaines semaines.";
         }
 
-        // Recommandations
         $rec = [];
         $rec[] = "- Vérifier les niveaux et l'absence de fuites avant toute intervention.";
         
@@ -201,7 +482,6 @@ class MaintenanceAlertService
         $rec[] = "- Tester le fonctionnement à vide avant remise en service.";
         $rec[] = "- Documenter toutes les interventions dans le carnet de maintenance.";
         
-        // Criticité
         $criticite = match($priorite) {
             'urgente' => 9,
             'haute' => 7,
@@ -213,5 +493,22 @@ class MaintenanceAlertService
         if ($km && $km > 15000) $criticite = min(10, $criticite + 2);
 
         return "DESCRIPTION: {$baseDesc}\nRECOMMANDATIONS:\n" . implode("\n", $rec) . "\nCRITICITE: {$criticite}/10";
+    }
+
+    /**
+     * Récupère le nom de la machine
+     */
+    private function getMachineName(Maintenance $m): string
+    {
+        if (method_exists($m, 'getNomMateriel') && $m->getNomMateriel()) {
+            return $m->getNomMateriel();
+        }
+        if (method_exists($m, 'getNom') && $m->getNom()) {
+            return $m->getNom();
+        }
+        if (method_exists($m, 'getIdM') && $m->getIdM()) {
+            return "Machine #{$m->getIdM()}";
+        }
+        return 'Machine';
     }
 }

@@ -1,5 +1,4 @@
 <?php
-// src/Repository/Materiels/MachineRepository.php
 
 namespace App\Repository\Materiels;
 
@@ -18,17 +17,17 @@ class MachineRepository extends ServiceEntityRepository
     }
 
     // =========================================================================
-    // Recherche filtrée pour l'index
+    // Recherche filtrée — retourne un array (sans paginator)
     // =========================================================================
     /**
-     * @param array<string, mixed> $filters
-     * @return array<int, Machine>
+     * @param array{cin?:mixed,search?:mixed,etat?:mixed,sortBy?:mixed,sortDir?:mixed} $filters
+     * @return list<Machine>
      */
     public function search(array $filters = []): array
     {
-        $cin = isset($filters['cin']) ? (int) $filters['cin'] : 0;
+        $cinRaw = $filters['cin'] ?? null;
+        $cin = is_numeric($cinRaw) ? (int) $cinRaw : 0;
 
-        // Sans CIN valide on ne retourne rien (sécurité)
         if ($cin <= 0) {
             return [];
         }
@@ -39,45 +38,58 @@ class MachineRepository extends ServiceEntityRepository
             ->andWhere('u.cin = :cin')
             ->setParameter('cin', $cin);
 
-        // Recherche textuelle (nom, marque, modèle, numéro de série)
-        if (!empty($filters['search'])) {
-            $search = '%' . mb_strtolower(trim($filters['search'])) . '%';
+        // Recherche textuelle
+        $searchRaw = $filters['search'] ?? '';
+        $search = trim(is_string($searchRaw) ? $searchRaw : '');
+        if ($search !== '') {
+            $like = '%' . mb_strtolower($search) . '%';
             $qb->andWhere(
                 $qb->expr()->orX(
-                    $qb->expr()->like('LOWER(m.nom)', ':search'),
-                    $qb->expr()->like('LOWER(m.marque)', ':search'),
-                    $qb->expr()->like('LOWER(m.modele)', ':search'),
+                    $qb->expr()->like('LOWER(m.nom)',         ':search'),
+                    $qb->expr()->like('LOWER(m.marque)',      ':search'),
+                    $qb->expr()->like('LOWER(m.modele)',      ':search'),
                     $qb->expr()->like('LOWER(m.numeroSerie)', ':search')
                 )
-            )->setParameter('search', $search);
+            )->setParameter('search', $like);
         }
 
-        // Filtre par état
-        if (!empty($filters['etat'])) {
+        // Filtre état
+        $etatRaw = $filters['etat'] ?? '';
+        $etat = trim(is_string($etatRaw) ? $etatRaw : '');
+        if ($etat !== '') {
             $qb->andWhere('m.etatM = :etat')
-               ->setParameter('etat', $filters['etat']);
+               ->setParameter('etat', $etat);
         }
 
         // Tri
-        $allowedSortFields = ['nom', 'marque', 'modele', 'etatM', 'dateAchat', 'kilometrage', 'id'];
-        $sortBy  = in_array($filters['sortBy'] ?? '', $allowedSortFields, true)
-                     ? $filters['sortBy']
+        $allowed = ['nom', 'marque', 'modele', 'etatM', 'dateAchat', 'kilometrage', 'id'];
+        $sortByInput = $filters['sortBy'] ?? '';
+        $sortBy  = is_string($sortByInput) && in_array($sortByInput, $allowed, true)
+                     ? $sortByInput
                      : 'dateAchat';
-        $sortDir = strtoupper($filters['sortDir'] ?? 'DESC') === 'ASC' ? 'ASC' : 'DESC';
+        $sortDirInput = $filters['sortDir'] ?? 'DESC';
+        $sortDir = is_string($sortDirInput) && strtoupper($sortDirInput) === 'ASC' ? 'ASC' : 'DESC';
 
         $qb->orderBy('m.' . $sortBy, $sortDir);
         if ($sortBy !== 'id') {
             $qb->addOrderBy('m.id', 'DESC');
         }
 
-        return $qb->getQuery()->getResult();
+        /** @var list<Machine> $results */
+        $results = $qb->getQuery()->getResult();
+        return $results;
     }
 
     // =========================================================================
-    // Statistiques globales (admin)
+    // Statistiques globales
     // =========================================================================
     /**
-     * @return array{total:int, parEtat:array<string,int>, parMarque:array<string,int>, statsKm:mixed}
+     * @return array{
+     *   total:int,
+     *   parEtat:array<string,int>,
+     *   parMarque:array<string,int>,
+     *   statsKm:array<string,mixed>
+     * }
      */
     public function getStatistiques(): array
     {
@@ -86,6 +98,7 @@ class MachineRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
 
+        /** @var list<array<string,mixed>> $rawEtat */
         $rawEtat = $this->createQueryBuilder('m')
             ->select('m.etatM AS etat, COUNT(m.id) AS nb')
             ->groupBy('m.etatM')
@@ -95,9 +108,12 @@ class MachineRepository extends ServiceEntityRepository
 
         $parEtat = [];
         foreach ($rawEtat as $row) {
-            $parEtat[$row['etat']] = (int) $row['nb'];
+            $etat = isset($row['etat']) && is_string($row['etat']) ? $row['etat'] : 'inconnu';
+            $nb = $row['nb'] ?? 0;
+            $parEtat[$etat] = is_numeric($nb) ? (int) $nb : 0;
         }
 
+        /** @var list<array<string,mixed>> $rawMarque */
         $rawMarque = $this->createQueryBuilder('m')
             ->select('m.marque AS marque, COUNT(m.id) AS nb')
             ->groupBy('m.marque')
@@ -107,10 +123,12 @@ class MachineRepository extends ServiceEntityRepository
 
         $parMarque = [];
         foreach ($rawMarque as $row) {
-            $parMarque[$row['marque']] = (int) $row['nb'];
+            $marque = isset($row['marque']) && is_string($row['marque']) ? $row['marque'] : 'inconnue';
+            $nb = $row['nb'] ?? 0;
+            $parMarque[$marque] = is_numeric($nb) ? (int) $nb : 0;
         }
 
-        // Statistiques kilométrage
+        /** @var array{avgKm:mixed,maxKm:mixed,minKm:mixed} $statsKm */
         $statsKm = $this->createQueryBuilder('m')
             ->select(
                 'AVG(m.kilometrage) AS avgKm',
@@ -126,12 +144,11 @@ class MachineRepository extends ServiceEntityRepository
     // =========================================================================
     // Machines d'un agriculteur par CIN
     // =========================================================================
-    /**
-     * @return array<int, Machine>
-     */
+    /** @return list<Machine> */
     public function findByCin(int $cin): array
     {
-        return $this->createQueryBuilder('m')
+        /** @var list<Machine> $results */
+        $results = $this->createQueryBuilder('m')
             ->leftJoin('m.agriculteur', 'u')
             ->addSelect('u')
             ->andWhere('u.cin = :cin')
@@ -140,17 +157,17 @@ class MachineRepository extends ServiceEntityRepository
             ->addOrderBy('m.id', 'DESC')
             ->getQuery()
             ->getResult();
+        return $results;
     }
 
     // =========================================================================
-    // Machines dont la prochaine maintenance arrive bientôt
+    // Machines dont la maintenance arrive bientôt
     // =========================================================================
-    /**
-     * @return array<int, Machine>
-     */
+    /** @return list<Machine> */
     public function findMachinesWithMaintenanceSoon(\DateTimeInterface $dateLimit): array
     {
-        return $this->createQueryBuilder('m')
+        /** @var list<Machine> $results */
+        $results = $this->createQueryBuilder('m')
             ->leftJoin('m.agriculteur', 'u')
             ->addSelect('u')
             ->where('m.prochaineMaintenance IS NOT NULL')
@@ -159,5 +176,6 @@ class MachineRepository extends ServiceEntityRepository
             ->orderBy('m.prochaineMaintenance', 'ASC')
             ->getQuery()
             ->getResult();
+        return $results;
     }
 }

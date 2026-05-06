@@ -22,9 +22,9 @@
             <option value="Autre" {{ maintenance.typePanne == 'Autre' ? 'selected' : '' }}>🔧 Autre</option>
         </select>
     </div>
-    <div class="field-error" id="typeError">
-        <i class="bi bi-exclamation-circle-fill"></i>
-        <span id="typeErrorMsg">Veuillez sélectionner un type de panne.</span>
+    <div class="field-error" id="typeError" style="color: #dc2626; background: #fef2f2; border-left: 3px solid #dc2626;">
+        <i class="bi bi-exclamation-circle-fill" style="color: #dc2626;"></i>
+        <span id="typeErrorMsg" style="color: #991b1b;"></span>
     </div>
 </div>
 
@@ -32,13 +32,13 @@
     <label class="form-label" for="description">Description <span class="req">*</span></label>
     <textarea name="description" id="description" class="form-textarea"
               placeholder="Ex : Remplacement du filtre à huile moteur et vidange complète…"
-              required>{{ maintenance.description }}</textarea>
+              required maxlength="1000">{{ maintenance.description }}</textarea>
     <div class="desc-footer">
-        <div class="field-error" id="descError" style="flex:1;">
-            <i class="bi bi-exclamation-circle-fill"></i>
-            <span id="descErrorMsg">La description est obligatoire (5-1000 caractères).</span>
+        <div class="field-error" id="descError" style="flex:1; color: #dc2626; background: #fef2f2; border-left: 3px solid #dc2626;">
+            <i class="bi bi-exclamation-circle-fill" style="color: #dc2626;"></i>
+            <span id="descErrorMsg" style="color: #991b1b;"></span>
         </div>
-        <span class="char-counter" id="descCount">{{ maintenance.description|length|default(0) }} / 1000</span>
+        <span class="char-counter" id="descCount">0 / 1000</span>
     </div>
 </div>
 
@@ -56,9 +56,9 @@
                    placeholder="0,00" value="{{ maintenance.cout }}" required>
             <span class="input-addon-text">DT</span>
         </div>
-        <div class="field-error" id="coutError">
-            <i class="bi bi-exclamation-circle-fill"></i>
-            <span id="coutErrorMsg">Le coût est obligatoire et doit être supérieur à 0.</span>
+        <div class="field-error" id="coutError" style="color: #dc2626; background: #fef2f2; border-left: 3px solid #dc2626;">
+            <i class="bi bi-exclamation-circle-fill" style="color: #dc2626;"></i>
+            <span id="coutErrorMsg" style="color: #991b1b;"></span>
         </div>
         <div class="help-text">Maximum 999 999,99 DT</div>
     </div>
@@ -71,9 +71,9 @@
                    value="{{ maintenance.dateMain ? maintenance.dateMain|date('Y-m-d') : 'now'|date('Y-m-d') }}"
                    max="{{ 'now'|date('Y-m-d') }}" required>
         </div>
-        <div class="field-error" id="dateError">
-            <i class="bi bi-exclamation-circle-fill"></i>
-            <span id="dateErrorMsg">La date ne peut pas être dans le futur.</span>
+        <div class="field-error" id="dateError" style="color: #dc2626; background: #fef2f2; border-left: 3px solid #dc2626;">
+            <i class="bi bi-exclamation-circle-fill" style="color: #dc2626;"></i>
+            <span id="dateErrorMsg" style="color: #991b1b;"></span>
         </div>
         <div class="help-text">Date ≤ aujourd'hui</div>
     </div>
@@ -93,9 +93,9 @@
                 <option value="termine" {{ maintenance.statut == 'termine' ? 'selected' : '' }}>✅ Terminé</option>
             </select>
         </div>
-        <div class="field-error" id="statutError">
-            <i class="bi bi-exclamation-circle-fill"></i>
-            <span id="statutErrorMsg">Veuillez sélectionner un statut.</span>
+        <div class="field-error" id="statutError" style="color: #dc2626; background: #fef2f2; border-left: 3px solid #dc2626;">
+            <i class="bi bi-exclamation-circle-fill" style="color: #dc2626;"></i>
+            <span id="statutErrorMsg" style="color: #991b1b;"></span>
         </div>
     </div>
 
@@ -109,27 +109,27 @@
                 <option value="urgente" {{ maintenance.priorite == 'urgente' ? 'selected' : '' }}>⚠️ Urgente</option>
             </select>
         </div>
-        <div class="field-error" id="prioriteError">
-            <i class="bi bi-exclamation-circle-fill"></i>
-            <span id="prioriteErrorMsg">Veuillez sélectionner une priorité.</span>
+        <div class="field-error" id="prioriteError" style="color: #dc2626; background: #fef2f2; border-left: 3px solid #dc2626;">
+            <i class="bi bi-exclamation-circle-fill" style="color: #dc2626;"></i>
+            <span id="prioriteErrorMsg" style="color: #991b1b;"></span>
         </div>
     </div>
 </div>
 
 <div class="form-group">
-    <label class="form-label" for="kilometrage">Kilométrage</label>
+    <label class="form-label" for="kilometrage">Kilométrage <span class="req">*</span></label>
     <div class="input-addon">
         <span class="input-addon-text"><i class="bi bi-speedometer2"></i></span>
         <input type="number" name="kilometrage" id="kilometrage" class="form-input"
                step="1" min="0" max="9999999" placeholder="0"
-               value="{{ maintenance.kilometrage }}">
+               value="{{ maintenance.kilometrage is not null ? maintenance.kilometrage : 0 }}" required>
         <span class="input-addon-text">km</span>
     </div>
-    <div class="field-error" id="kmError">
-        <i class="bi bi-exclamation-circle-fill"></i>
-        <span id="kmErrorMsg">Le kilométrage doit être positif ou nul.</span>
+    <div class="field-error" id="kmError" style="color: #dc2626; background: #fef2f2; border-left: 3px solid #dc2626;">
+        <i class="bi bi-exclamation-circle-fill" style="color: #dc2626;"></i>
+        <span id="kmErrorMsg" style="color: #991b1b;"></span>
     </div>
-    <div class="help-text">Optionnel - Kilométrage au moment de la maintenance</div>
+    <div class="help-text">Kilométrage au moment de la maintenance (0 si non applicable)</div>
 </div>
 
 <div class="section-title" style="margin-top:8px;">
@@ -137,16 +137,22 @@
 </div>
 
 <div class="form-group">
-    <label class="form-label" for="recommandation">Recommandation</label>
+    <label class="form-label" for="recommandation">
+        Recommandation 
+        <span style="font-weight:400;color:#9e9d95;">(optionnel - sera générée automatiquement si vide)</span>
+    </label>
     <textarea name="recommandation" id="recommandation" class="form-textarea"
               placeholder="Ex : À surveiller tous les 5000 km, remplacer le filtre à air…"
-              rows="3">{{ maintenance.recommandation }}</textarea>
+              rows="4" maxlength="2000">{{ maintenance.recommandation }}</textarea>
     <div class="reco-footer">
-        <div class="field-error" id="recoError" style="flex:1;">
-            <i class="bi bi-exclamation-circle-fill"></i>
-            <span id="recoErrorMsg">Maximum 2000 caractères.</span>
+        <div class="field-error" id="recoError" style="flex:1; color: #dc2626; background: #fef2f2; border-left: 3px solid #dc2626;">
+            <i class="bi bi-exclamation-circle-fill" style="color: #dc2626;"></i>
+            <span id="recoErrorMsg" style="color: #991b1b;"></span>
         </div>
-        <span class="char-counter" id="recoCount">{{ maintenance.recommandation|length|default(0) }} / 2000</span>
+        <span class="char-counter" id="recoCount">0 / 2000</span>
+    </div>
+    <div class="help-text">
+        <i class="bi bi-robot"></i> Laissez vide pour une recommandation générée automatiquement par l'intelligence artificielle
     </div>
 </div>
 
@@ -160,20 +166,453 @@
         <select name="idM" id="idM" class="form-select">
             <option value="">— Aucun matériel —</option>
             {% for machine in machines %}
-                <option value="{{ machine.id }}" {{ maintenance.idM and maintenance.idM.id == machine.id ? 'selected' : '' }}>
-                    {{ machine.nom }} (ID : {{ machine.id }})
+                <option value="{{ machine.id }}" {{ maintenance.idM == machine.id ? 'selected' : '' }}>
+                    {{ machine.nom }} (ID : {{ machine.id }}) - {{ machine.marque }} {{ machine.modele }}
                 </option>
             {% endfor %}
         </select>
     </div>
-    <div class="help-text">Sélectionnez le matériel concerné par cette maintenance</div>
+    <div class="help-text">
+        <i class="bi bi-info-circle"></i> Sélectionnez le matériel concerné par cette maintenance
+    </div>
 </div>
 
 <div class="form-actions" style="margin-top:28px;">
-    <button type="submit" class="btn-submit">
+    <button type="submit" class="btn-submit" id="submitBtn">
         <i class="bi bi-check-lg"></i> {{ submit_label|default('Enregistrer') }}
     </button>
     <a href="{{ cancel_path|default(path('admin_maintenances_index')) }}" class="btn-cancel">
         <i class="bi bi-x-lg"></i> Annuler
     </a>
 </div>
+
+<style>
+/* Styles pour les messages d'erreur en rouge */
+.field-error {
+    display: none;
+    padding: 8px 12px;
+    margin-top: 6px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    align-items: center;
+    gap: 8px;
+    background: #fef2f2 !important;
+    border-left: 3px solid #dc2626 !important;
+    color: #dc2626 !important;
+}
+
+.field-error i {
+    color: #dc2626 !important;
+    font-size: 14px;
+}
+
+.field-error span {
+    color: #991b1b !important;
+    flex: 1;
+}
+
+.field-error.visible {
+    display: flex;
+}
+
+.is-invalid {
+    border-color: #dc2626 !important;
+    background-color: #fef2f2 !important;
+    box-shadow: 0 0 0 1px #dc2626 !important;
+}
+
+.is-invalid:focus {
+    border-color: #dc2626 !important;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
+}
+
+.is-valid {
+    border-color: #16a34a !important;
+    background-color: #f0fdf4 !important;
+}
+
+.is-valid:focus {
+    border-color: #16a34a !important;
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1) !important;
+}
+
+.char-counter.danger {
+    color: #dc2626 !important;
+    font-weight: 600;
+}
+
+.error-banner {
+    display: none;
+    background: #fef2f2 !important;
+    border: 1px solid #fecaca !important;
+    border-left: 4px solid #dc2626 !important;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    align-items: center;
+    gap: 10px;
+    color: #991b1b !important;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.error-banner i {
+    color: #dc2626 !important;
+    font-size: 18px;
+}
+
+.error-banner.visible {
+    display: flex;
+}
+
+.btn-submit:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid #c8e6b0;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    margin-right: 6px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+</style>
+
+<script>
+(function() {
+    const form = document.getElementById('maintenanceForm') || document.querySelector('form');
+    const typeEl = document.getElementById('typePanne');
+    const descEl = document.getElementById('description');
+    const coutEl = document.getElementById('cout');
+    const dateEl = document.getElementById('dateMain');
+    const statutEl = document.getElementById('statut');
+    const prioriteEl = document.getElementById('priorite');
+    const kmEl = document.getElementById('kilometrage');
+    const recoEl = document.getElementById('recommandation');
+    const descCount = document.getElementById('descCount');
+    const recoCount = document.getElementById('recoCount');
+    const submitBtn = document.getElementById('submitBtn');
+    const today = new Date().toISOString().split('T')[0];
+    
+    if (dateEl) dateEl.setAttribute('max', today);
+    
+    function valid(el) {
+        if (el) {
+            el.classList.remove('is-invalid');
+            el.classList.add('is-valid');
+        }
+    }
+    
+    function invalid(el) {
+        if (el) {
+            el.classList.remove('is-valid');
+            el.classList.add('is-invalid');
+        }
+    }
+    
+    function showError(errorId, message) {
+        const errorDiv = document.getElementById(errorId);
+        if (errorDiv) {
+            const msgSpan = errorDiv.querySelector('span');
+            if (msgSpan) msgSpan.textContent = message;
+            errorDiv.classList.add('visible');
+        }
+    }
+    
+    function hideError(errorId) {
+        const errorDiv = document.getElementById(errorId);
+        if (errorDiv) errorDiv.classList.remove('visible');
+    }
+    
+    // Validation du type de panne
+    function validateType() {
+        if (!typeEl || !typeEl.value) {
+            if (typeEl) invalid(typeEl);
+            showError('typeError', '❌ Veuillez sélectionner un type de panne.');
+            return false;
+        }
+        if (typeEl) valid(typeEl);
+        hideError('typeError');
+        return true;
+    }
+    
+    // Validation de la description
+    function validateDescription() {
+        if (!descEl) return true;
+        const value = descEl.value.trim();
+        const length = value.length;
+        
+        if (length === 0) {
+            invalid(descEl);
+            showError('descError', '❌ La description est obligatoire.');
+            return false;
+        }
+        if (length < 5) {
+            invalid(descEl);
+            showError('descError', '❌ La description doit contenir au moins 5 caractères.');
+            return false;
+        }
+        if (length > 1000) {
+            invalid(descEl);
+            showError('descError', '❌ La description ne peut pas dépasser 1000 caractères.');
+            return false;
+        }
+        if (/[<>{}]/.test(value)) {
+            invalid(descEl);
+            showError('descError', '❌ Les caractères < > { } sont interdits.');
+            return false;
+        }
+        valid(descEl);
+        hideError('descError');
+        return true;
+    }
+    
+    // Validation du coût
+    function validateCost() {
+        if (!coutEl) return true;
+        const raw = coutEl.value.trim();
+        const value = parseFloat(raw);
+        
+        if (raw === '') {
+            invalid(coutEl);
+            showError('coutError', '❌ Le coût est obligatoire.');
+            return false;
+        }
+        if (isNaN(value)) {
+            invalid(coutEl);
+            showError('coutError', '❌ Veuillez entrer un montant valide.');
+            return false;
+        }
+        if (value <= 0) {
+            invalid(coutEl);
+            showError('coutError', '❌ Le coût doit être supérieur à 0 DT.');
+            return false;
+        }
+        if (value > 999999.99) {
+            invalid(coutEl);
+            showError('coutError', '❌ Le coût ne peut pas dépasser 999 999,99 DT.');
+            return false;
+        }
+        valid(coutEl);
+        hideError('coutError');
+        return true;
+    }
+    
+    // Validation de la date
+    function validateDate() {
+        if (!dateEl) return true;
+        if (!dateEl.value) {
+            invalid(dateEl);
+            showError('dateError', '❌ La date est obligatoire.');
+            return false;
+        }
+        if (dateEl.value > today) {
+            invalid(dateEl);
+            showError('dateError', '❌ La date ne peut pas être dans le futur.');
+            return false;
+        }
+        valid(dateEl);
+        hideError('dateError');
+        return true;
+    }
+    
+    // Validation du statut
+    function validateStatus() {
+        if (!statutEl) return true;
+        if (!statutEl.value) {
+            invalid(statutEl);
+            showError('statutError', '❌ Veuillez sélectionner un statut.');
+            return false;
+        }
+        valid(statutEl);
+        hideError('statutError');
+        return true;
+    }
+    
+    // Validation de la priorité
+    function validatePriority() {
+        if (!prioriteEl) return true;
+        if (!prioriteEl.value) {
+            invalid(prioriteEl);
+            showError('prioriteError', '❌ Veuillez sélectionner une priorité.');
+            return false;
+        }
+        valid(prioriteEl);
+        hideError('prioriteError');
+        return true;
+    }
+    
+    // Validation du kilométrage (OBLIGATOIRE maintenant)
+    function validateKilometrage() {
+        if (!kmEl) return true;
+        const raw = kmEl.value.trim();
+        
+        if (raw === '') {
+            invalid(kmEl);
+            showError('kmError', '❌ Le kilométrage est obligatoire.');
+            return false;
+        }
+        
+        const value = parseInt(raw);
+        if (isNaN(value)) {
+            invalid(kmEl);
+            showError('kmError', '❌ Veuillez entrer un kilométrage valide.');
+            return false;
+        }
+        if (value < 0) {
+            invalid(kmEl);
+            showError('kmError', '❌ Le kilométrage doit être positif ou nul.');
+            return false;
+        }
+        if (value > 9999999) {
+            invalid(kmEl);
+            showError('kmError', '❌ Le kilométrage ne peut pas dépasser 9 999 999 km.');
+            return false;
+        }
+        valid(kmEl);
+        hideError('kmError');
+        return true;
+    }
+    
+    // Validation de la recommandation
+    function validateRecommendation() {
+        if (!recoEl) return true;
+        const value = recoEl.value;
+        const length = value.length;
+        
+        if (length > 2000) {
+            invalid(recoEl);
+            showError('recoError', '❌ La recommandation ne peut pas dépasser 2000 caractères.');
+            return false;
+        }
+        valid(recoEl);
+        hideError('recoError');
+        return true;
+    }
+    
+    function updateDescCounter() {
+        if (!descEl || !descCount) return;
+        const length = descEl.value.length;
+        descCount.textContent = length + ' / 1000';
+        if (length > 1000 || (length > 0 && length < 5)) {
+            descCount.classList.add('danger');
+        } else {
+            descCount.classList.remove('danger');
+        }
+    }
+    
+    function updateRecoCounter() {
+        if (!recoEl || !recoCount) return;
+        const length = recoEl.value.length;
+        recoCount.textContent = length + ' / 2000';
+        if (length > 2000) {
+            recoCount.classList.add('danger');
+        } else {
+            recoCount.classList.remove('danger');
+        }
+    }
+    
+    // Écouteurs d'événements
+    if (typeEl) {
+        typeEl.addEventListener('change', validateType);
+        typeEl.addEventListener('blur', validateType);
+    }
+    
+    if (descEl) {
+        descEl.addEventListener('input', function() {
+            updateDescCounter();
+            validateDescription();
+        });
+        descEl.addEventListener('blur', validateDescription);
+    }
+    
+    if (coutEl) {
+        coutEl.addEventListener('input', validateCost);
+        coutEl.addEventListener('blur', validateCost);
+    }
+    
+    if (dateEl) {
+        dateEl.addEventListener('change', validateDate);
+        dateEl.addEventListener('blur', validateDate);
+    }
+    
+    if (statutEl) {
+        statutEl.addEventListener('change', validateStatus);
+        statutEl.addEventListener('blur', validateStatus);
+    }
+    
+    if (prioriteEl) {
+        prioriteEl.addEventListener('change', validatePriority);
+        prioriteEl.addEventListener('blur', validatePriority);
+    }
+    
+    if (kmEl) {
+        kmEl.addEventListener('input', validateKilometrage);
+        kmEl.addEventListener('blur', validateKilometrage);
+    }
+    
+    if (recoEl) {
+        recoEl.addEventListener('input', function() {
+            updateRecoCounter();
+            validateRecommendation();
+        });
+        recoEl.addEventListener('blur', validateRecommendation);
+    }
+    
+    updateDescCounter();
+    updateRecoCounter();
+    
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const isValid = validateType() && validateDescription() && 
+                           validateCost() && validateDate() && 
+                           validateStatus() && validatePriority() && 
+                           validateKilometrage() && validateRecommendation();
+            
+            if (!isValid) {
+                e.preventDefault();
+                
+                let banner = document.getElementById('errorBanner');
+                if (!banner) {
+                    banner = document.createElement('div');
+                    banner.id = 'errorBanner';
+                    banner.className = 'error-banner';
+                    banner.innerHTML = '<i class="bi bi-exclamation-triangle-fill"></i><span>⚠️ Veuillez corriger les erreurs en rouge avant d\'enregistrer.</span>';
+                    const formContainer = form.querySelector('.form-body') || form;
+                    formContainer.insertBefore(banner, form.firstChild);
+                }
+                banner.classList.add('visible');
+                
+                const firstError = form.querySelector('.is-invalid');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstError.focus();
+                }
+            } else if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="loading-spinner"></span> Enregistrement en cours...';
+            }
+        });
+    }
+    
+    const inputs = [typeEl, descEl, coutEl, dateEl, statutEl, prioriteEl, kmEl, recoEl];
+    inputs.forEach(input => {
+        if (input) {
+            input.addEventListener('input', function() {
+                const banner = document.getElementById('errorBanner');
+                if (banner) banner.classList.remove('visible');
+            });
+        }
+    });
+})();
+</script>

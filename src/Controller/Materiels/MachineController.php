@@ -8,40 +8,34 @@ use App\Form\Materiels\MachineType;
 use App\Repository\Materiels\MachineRepository;
 use App\Repository\User\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Dompdf\Dompdf;
+use Dompdf\Options;
 
 #[Route('/agriculteur/materiels/machines', name: 'agri_')]
 final class MachineController extends AbstractController
 {
-    private HttpClientInterface $httpClient;
-
-    public function __construct(HttpClientInterface $httpClient)
-    {
-        $this->httpClient = $httpClient;
-    }
-
-    // ── Helper privé : récupère l'entité User complète depuis la BDD ─────────
     private function getFullUser(UserRepository $userRepo): ?User
     {
         $sessionUser = $this->getUser();
         if (!$sessionUser) {
             return null;
         }
-
-        return $userRepo->findOneBy(['email' => $sessionUser->getUserIdentifier()]);
+        $user = $userRepo->findOneBy(['email' => $sessionUser->getUserIdentifier()]);
+        return $user instanceof User ? $user : null;
     }
 
-    // ── Liste ────────────────────────────────────────────────────────────────
+    // ── Liste ──────────────────────────────────────────────
     #[Route('', name: 'machines', methods: ['GET'])]
     public function machineIndex(
-        Request $request,
+        Request           $request,
         MachineRepository $repo,
-        UserRepository $userRepo
+        UserRepository    $userRepo,
+        PaginatorInterface $paginator
     ): Response {
         $user = $this->getFullUser($userRepo);
 
@@ -50,253 +44,195 @@ final class MachineController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
+        // search() retourne un array
         $machines = $repo->search([
             'cin'     => $user->getCin(),
-            'search'  => trim($request->query->get('search',  '')),
-            'etat'    => trim($request->query->get('etat',    '')),
+            'search'  => trim((string) $request->query->get('search',  '')),
+            'etat'    => trim((string) $request->query->get('etat',    '')),
             'sortBy'  => $request->query->get('sortBy',  'dateAchat'),
             'sortDir' => $request->query->get('sortDir', 'DESC'),
         ]);
 
+        $pagination = $paginator->paginate(
+            $machines,
+            $request->query->getInt('page', 1),
+            9
+        );
+
         return $this->render('machines/index.html.twig', [
-            'machines' => $machines,
+            'machines' => $pagination,
+            'machinesPagination' => $pagination,
         ]);
     }
 
-    // ── Recherche Wikipedia ─────────────────────────────────────────────────
-    #[Route('/wikipedia-search', name: 'wikipedia_search', methods: ['POST'])]
-    public function wikipediaSearch(Request $request): JsonResponse
-    {
-        $data = json_decode($request->getContent(), true);
+    // ── Statistiques ─────────────────────────────────────────────────────────
+    #[Route('/statistiques', name: 'machine_statistiques', methods: ['GET'])]
+    public function machineStatistiques(
+        MachineRepository $repo,
+        UserRepository $userRepo
+    ): Response {
+        $user = $this->getFullUser($userRepo);
         
-        // Récupérer les paramètres
-        $nom = trim($data['nom'] ?? '');
-        $marque = trim($data['marque'] ?? '');
-        $modele = trim($data['modele'] ?? '');
-        $query = trim($data['query'] ?? '');
-        
-        // Construire la requête de recherche
-        $searchTerms = [];
-        
-        if (!empty($query)) {
-            // Recherche directe
-            $searchTerms[] = $query;
-        } else {
-            // Recherche par nom d'abord
-            if (!empty($nom)) {
-                $searchTerms[] = $nom;
-            }
-            // Recherche par marque + nom
-            if (!empty($marque) && !empty($nom)) {
-                $searchTerms[] = $marque . ' ' . $nom;
-            }
-            // Recherche par marque seule
-            if (!empty($marque)) {
-                $searchTerms[] = $marque;
-            }
-            // Recherche par marque + modèle
-            if (!empty($marque) && !empty($modele)) {
-                $searchTerms[] = $marque . ' ' . $modele;
-            }
-            // Recherche par modèle
-            if (!empty($modele)) {
-                $searchTerms[] = $modele;
-            }
+        if (!$user) {
+            $this->addFlash('error', 'Veuillez vous connecter.');
+            return $this->redirectToRoute('app_login');
         }
         
-        // Supprimer les doublons et les termes vides
-        $searchTerms = array_values(array_unique($searchTerms));
+        // Récupérer toutes les machines de l'utilisateur
+        $machines = $repo->findBy(['agriculteur' => $user]);
         
-        // Tenter chaque terme de recherche
-        foreach ($searchTerms as $term) {
-            $result = $this->searchWikipediaTerm($term);
-            if ($result['exists']) {
-                return $this->json($result);
-            }
-        }
-        
-        // Si aucun résultat, retourner les suggestions
-        $suggestions = $this->getSuggestions($nom, $marque, $modele);
-        
-        return $this->json([
-            'exists' => false,
-            'error' => 'Aucune information trouvée pour cette machine',
-            'suggestions' => $suggestions
-        ], Response::HTTP_NOT_FOUND);
-    }
-    
-    /**
-     * @return array<string, mixed>
-     */
-    private function searchWikipediaTerm(string $query): array
-    {
-        try {
-            $query = trim($query);
-            if (empty($query)) {
-                return ['exists' => false];
-            }
-            
-            // Nettoyer la requête pour l'URL
-            $encodedQuery = urlencode($query);
-            
-            // Tentative 1: API REST Wikipedia
-            $url = 'https://fr.wikipedia.org/api/rest_v1/page/summary/' . $encodedQuery;
-            
-            $response = $this->httpClient->request('GET', $url, [
-                'timeout' => 10,
-                'headers' => [
-                    'User-Agent' => 'AgroFlow/1.0 (https://agroflow.com; contact@agroflow.com)'
-                ]
-            ]);
-            
-            if ($response->getStatusCode() === 200) {
-                $content = $response->toArray();
-                
-                // Vérifier que c'est une page valide
-                if (isset($content['title']) && !isset($content['missing']) && isset($content['extract'])) {
-                    return [
-                        'exists' => true,
-                        'title' => $content['title'],
-                        'description' => $content['extract'],
-                        'image' => $content['originalimage']['source'] ?? $content['thumbnail']['source'] ?? null,
-                        'url' => $content['content_urls']['desktop']['page'] ?? 'https://fr.wikipedia.org/wiki/' . $encodedQuery
-                    ];
-                }
-            }
-            
-            // Tentative 2: API de recherche Wikipedia
-            return $this->searchWikipediaApi($query);
-            
-        } catch (\Exception $e) {
-            return ['exists' => false];
-        }
-    }
-    
-    /**
-     * @return array<string, mixed>
-     */
-    private function searchWikipediaApi(string $query): array
-    {
-        try {
-            $url = 'https://fr.wikipedia.org/w/api.php';
-            
-            $response = $this->httpClient->request('GET', $url, [
-                'query' => [
-                    'action' => 'query',
-                    'list' => 'search',
-                    'srsearch' => $query,
-                    'format' => 'json',
-                    'origin' => '*',
-                    'srlimit' => 3
-                ],
-                'timeout' => 10,
-                'headers' => [
-                    'User-Agent' => 'AgroFlow/1.0'
-                ]
-            ]);
-            
-            $searchResult = $response->toArray();
-            
-            if (!empty($searchResult['query']['search'])) {
-                $firstResult = $searchResult['query']['search'][0];
-                $title = $firstResult['title'];
-                $encodedTitle = urlencode($title);
-                
-                // Récupérer le résumé
-                $summaryUrl = 'https://fr.wikipedia.org/api/rest_v1/page/summary/' . $encodedTitle;
-                $summaryResponse = $this->httpClient->request('GET', $summaryUrl, [
-                    'timeout' => 10,
-                    'headers' => ['User-Agent' => 'AgroFlow/1.0']
-                ]);
-                $summary = $summaryResponse->toArray();
-                
-                // Suggestions
-                $suggestions = [];
-                foreach (array_slice($searchResult['query']['search'], 1, 2) as $result) {
-                    $suggestions[] = $result['title'];
-                }
-                
-                return [
-                    'exists' => true,
-                    'title' => $summary['title'] ?? $title,
-                    'description' => $summary['extract'] ?? strip_tags($firstResult['snippet'] ?? 'Aucune description disponible'),
-                    'image' => $summary['originalimage']['source'] ?? $summary['thumbnail']['source'] ?? null,
-                    'url' => $summary['content_urls']['desktop']['page'] ?? 'https://fr.wikipedia.org/wiki/' . $encodedTitle,
-                    'suggestions' => $suggestions
-                ];
-            }
-            
-            return ['exists' => false];
-            
-        } catch (\Exception $e) {
-            return ['exists' => false];
-        }
-    }
-    
-    /**
-     * @return array<int, string>
-     */
-    private function getSuggestions(string $nom, string $marque, string $modele): array
-    {
-        $suggestions = [];
-        
-        if (!empty($nom)) {
-            $suggestions[] = $nom;
-        }
-        if (!empty($marque)) {
-            $suggestions[] = $marque;
-        }
-        if (!empty($modele)) {
-            $suggestions[] = $modele;
-        }
-        
-        // Suggestions générales agricoles
-        $agriculturalTerms = [
-            'Tracteur agricole',
-            'Machine agricole',
-            'Matériel agricole',
-            'Engin agricole'
+        // Statistiques globales
+        $stats = [
+            'total' => count($machines),
+            'parEtat' => [],
+            'parMarque' => [],
+            'statsKm' => [
+                'totalKm' => 0,
+                'avgKm' => 0,
+                'maxKm' => 0,
+                'minKm' => 0
+            ]
         ];
         
-        foreach ($agriculturalTerms as $term) {
-            $suggestions[] = $term;
-            if (!empty($marque)) {
-                $suggestions[] = $marque . ' ' . $term;
+        // Calcul des statistiques
+        $totalKm = 0;
+        $kmList = [];
+        
+        foreach ($machines as $machine) {
+            // Par état
+            $etat = $machine->getEtatM();
+            if (!isset($stats['parEtat'][$etat])) {
+                $stats['parEtat'][$etat] = 0;
+            }
+            $stats['parEtat'][$etat]++;
+            
+            // Par marque
+            $marque = $machine->getMarque();
+            if (!isset($stats['parMarque'][$marque])) {
+                $stats['parMarque'][$marque] = 0;
+            }
+            $stats['parMarque'][$marque]++;
+            
+            // Kilométrage
+            $km = $machine->getKilometrage();
+            if ($km !== null) {
+                $totalKm += $km;
+                $kmList[] = $km;
             }
         }
         
-        // Marques connues
-        $knownBrands = ['John Deere', 'Massey Ferguson', 'New Holland', 'Fendt', 'Case IH', 'Claas', 'Kubota'];
-        foreach ($knownBrands as $brand) {
-            if (!empty($marque) && stripos($brand, $marque) === false) {
-                $suggestions[] = $brand;
+        // Statistiques kilométrage
+        if (count($kmList) > 0) {
+            $stats['statsKm']['totalKm'] = $totalKm;
+            $stats['statsKm']['avgKm'] = $totalKm / count($kmList);
+            $stats['statsKm']['maxKm'] = max($kmList);
+            $stats['statsKm']['minKm'] = min($kmList);
+        }
+        
+        // Trier les états par ordre décroissant
+        arsort($stats['parEtat']);
+        
+        // Trier les marques par ordre décroissant
+        arsort($stats['parMarque']);
+        
+        // Récupérer les maintenances dépassées
+        $maintenancesDepassees = [];
+        $maintenancesAVenir = [];
+        $today = new \DateTime();
+        $thirtyDaysLater = (new \DateTime())->modify('+30 days');
+        
+        foreach ($machines as $machine) {
+            $maintenanceDate = $machine->getProchaineMaintenance();
+            if ($maintenanceDate) {
+                if ($maintenanceDate < $today) {
+                    $maintenancesDepassees[] = $machine;
+                } elseif ($maintenanceDate <= $thirtyDaysLater) {
+                    $maintenancesAVenir[] = $machine;
+                }
             }
         }
         
-        return array_unique(array_slice($suggestions, 0, 8));
-    }
-
-    // ── Statistiques ────────────────────────────────────────────────────────
-    #[Route('/statistiques', name: 'machine_statistiques', methods: ['GET'])]
-    public function machineStatistiques(MachineRepository $repo): Response
-    {
-        $stats = $repo->getStatistiques();
-
+        // Trier les maintenances par date
+        usort($maintenancesDepassees, function($a, $b) {
+            return $a->getProchaineMaintenance() <=> $b->getProchaineMaintenance();
+        });
+        
+        usort($maintenancesAVenir, function($a, $b) {
+            return $a->getProchaineMaintenance() <=> $b->getProchaineMaintenance();
+        });
+        
         return $this->render('machines/statistiques.html.twig', [
-            'stats'        => $stats,
-            'etatLabels'   => array_keys($stats['parEtat']),
-            'etatValues'   => array_values($stats['parEtat']),
+            'stats' => $stats,
+            'etatLabels' => array_keys($stats['parEtat']),
+            'etatValues' => array_values($stats['parEtat']),
             'marqueLabels' => array_keys($stats['parMarque']),
             'marqueValues' => array_values($stats['parMarque']),
+            'maintenancesDepassees' => $maintenancesDepassees,
+            'maintenancesAVenir' => $maintenancesAVenir,
         ]);
     }
 
-    // ── Nouvelle machine ────────────────────────────────────────────────────
-    #[Route('/new', name: 'machine_new', methods: ['GET', 'POST'])]
+    // ── Export PDF ──────────────────────────────────────────────────────────
+    #[Route('/export-pdf', name: 'machine_export_pdf', methods: ['GET'])]
+    public function exportPDF(
+        MachineRepository $repo,
+        UserRepository $userRepo,
+        Request $request
+    ): Response {
+        $user = $this->getFullUser($userRepo);
+        
+        if (!$user) {
+            $this->addFlash('error', 'Veuillez vous connecter.');
+            return $this->redirectToRoute('app_login');
+        }
+        
+        // Récupérer les machines avec les mêmes filtres que la liste
+        $machines = $repo->search([
+            'cin'     => $user->getCin(),
+            'search'  => trim((string) $request->query->get('search',  '')),
+            'etat'    => trim((string) $request->query->get('etat',    '')),
+            'sortBy'  => $request->query->get('sortBy',  'dateAchat'),
+            'sortDir' => $request->query->get('sortDir', 'DESC'),
+        ]);
+        
+        // Configurer Dompdf
+        $pdfOptions = new Options();
+        $pdfOptions->set('defaultFont', 'Arial');
+        $pdfOptions->set('isHtml5ParserEnabled', true);
+        $pdfOptions->set('isRemoteEnabled', true);
+        
+        $dompdf = new Dompdf($pdfOptions);
+        
+        // Rendre le template PDF
+        $html = $this->renderView('machines/export_pdf.html.twig', [
+            'machines' => $machines,
+            'user' => $user,
+            'date' => new \DateTime(),
+            'filters' => [
+                'search' => $request->query->get('search', ''),
+                'etat' => $request->query->get('etat', ''),
+            ]
+        ]);
+        
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+        
+        // Générer le nom du fichier
+        $filename = 'machines_' . date('Y-m-d_H-i-s') . '.pdf';
+        
+        return new Response($dompdf->output(), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"'
+        ]);
+    }
+
+    // ── Nouvelle machine ──────────────────────────────────────────────────────
+    #[Route('/new', name: 'agri_machine_new', methods: ['GET', 'POST'])]
     public function machineNew(
-        Request $request,
+        Request                $request,
         EntityManagerInterface $em,
-        UserRepository $userRepo
+        UserRepository         $userRepo
     ): Response {
         $user = $this->getFullUser($userRepo);
 
@@ -324,23 +260,42 @@ final class MachineController extends AbstractController
         ]);
     }
 
-    // ── Détail ──────────────────────────────────────────────────────────────
-    #[Route('/{id}', name: 'machine_show', methods: ['GET'], requirements: ['id' => '\d+'])]
-    public function machineShow(Machine $machine): Response
-    {
+    // ── Détail ────────────────────────────────────────────────────────────────
+    #[Route('/{id}', name: 'agri_machine_show', methods: ['GET'], requirements: ['id' => '\d+'])]
+    public function machineShow(
+        Machine $machine,
+        UserRepository $userRepo
+    ): Response {
+        $user = $this->getFullUser($userRepo);
+        
+        // Vérifier que l'utilisateur est propriétaire de la machine
+        if (!$user || $machine->getAgriculteur()->getCin() !== $user->getCin()) {
+            $this->addFlash('error', 'Vous n\'avez pas accès à cette machine.');
+            return $this->redirectToRoute('agri_machines');
+        }
+        
         return $this->render('machines/show.html.twig', [
-            'machine'        => $machine,
+            'machine'    => $machine,
             'nomAgriculteur' => $machine->getNomAgriculteur(),
         ]);
     }
 
-    // ── Édition ─────────────────────────────────────────────────────────────
-    #[Route('/{id}/edit', name: 'machine_edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
+    // ── Édition ───────────────────────────────────────────────────────────────
+    #[Route('/{id}/edit', name: 'agri_machine_edit', methods: ['GET', 'POST'], requirements: ['id' => '\d+'])]
     public function machineEdit(
-        Request $request,
-        Machine $machine,
-        EntityManagerInterface $em
+        Request                $request,
+        Machine                $machine,
+        EntityManagerInterface $em,
+        UserRepository         $userRepo
     ): Response {
+        $user = $this->getFullUser($userRepo);
+        
+        // Vérifier que l'utilisateur est propriétaire de la machine
+        if (!$user || $machine->getAgriculteur()->getCin() !== $user->getCin()) {
+            $this->addFlash('error', 'Vous n\'avez pas accès à cette machine.');
+            return $this->redirectToRoute('agri_machines');
+        }
+        
         $form = $this->createForm(MachineType::class, $machine);
         $form->handleRequest($request);
 
@@ -356,14 +311,26 @@ final class MachineController extends AbstractController
         ]);
     }
 
-    // ── Suppression ─────────────────────────────────────────────────────────
-    #[Route('/{id}/delete', name: 'machine_delete', methods: ['POST'], requirements: ['id' => '\d+'])]
+    // ── Suppression ───────────────────────────────────────────────────────────
+    #[Route('/{id}/delete', name: 'agri_machine_delete', methods: ['POST'], requirements: ['id' => '\d+'])]
     public function machineDelete(
-        Request $request,
-        Machine $machine,
-        EntityManagerInterface $em
+        Request                $request,
+        Machine                $machine,
+        EntityManagerInterface $em,
+        UserRepository         $userRepo
     ): Response {
-        if ($this->isCsrfTokenValid('delete_machine_' . $machine->getId(), $request->getPayload()->getString('_token'))) {
+        $user = $this->getFullUser($userRepo);
+        
+        // Vérifier que l'utilisateur est propriétaire de la machine
+        if (!$user || $machine->getAgriculteur()->getCin() !== $user->getCin()) {
+            $this->addFlash('error', 'Vous n\'avez pas accès à cette machine.');
+            return $this->redirectToRoute('agri_machines');
+        }
+        
+        if ($this->isCsrfTokenValid(
+            'delete_machine_' . $machine->getId(),
+            $request->getPayload()->getString('_token')
+        )) {
             $em->remove($machine);
             $em->flush();
             $this->addFlash('success', '🗑️ Machine supprimée.');

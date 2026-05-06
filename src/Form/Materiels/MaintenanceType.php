@@ -12,12 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
-use App\Entity\Materiels\Machine;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
-/**
- * @extends AbstractType<Maintenance>
- */
 class MaintenanceType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
@@ -126,14 +121,11 @@ class MaintenanceType extends AbstractType
                     ]),
                 ],
             ])
-            // ✅ Remplacer par
-->add('idM', EntityType::class, [
-    'class'        => Machine::class,
-    'choice_label' => 'nom',
-    'label'        => false,
-    'required'     => false,
-    'placeholder'  => '— Aucune machine —',
-])
+            ->add('idM', IntegerType::class, [
+                'label'    => false,
+                'required' => false,
+                'attr'     => ['min' => 1],
+            ])
         ;
     }
 

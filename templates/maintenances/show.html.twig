@@ -1,12 +1,5 @@
-{% if is_granted('ROLE_OUVRIER') %}
-    {% set layout = 'base_ouvrier.html.twig' %}
-    {% set cancel_route = 'ouvrier_taches' %}
-{% elseif is_granted('ROLE_AGRICULTEUR') %}
-    {% set layout = 'base_agriculteur.html.twig' %}
-    {% set cancel_route = 'agri_maintenances_index' %}
-{% endif %}
-
-{% extends layout %}{% block title %}Maintenance #{{ maintenance.idMain }} — AgroFlow{% endblock %}
+{% extends 'agriculteur_dashboard.html.twig' %}
+{% block title %}Maintenance #{{ maintenance.idMain }} — AgroFlow{% endblock %}
 {% block body %}
 <style>
 .ms-page { max-width: 1000px; margin: 0 auto; padding: 2rem 1.75rem; font-family: 'Segoe UI', system-ui, sans-serif; }
@@ -57,21 +50,19 @@
 .btn-delete:hover { background: #fcebeb; border-color: #a32d2d; }
 .btn-api-plan { display: inline-flex; align-items: center; gap: .4rem; padding: .65rem 1.4rem; border-radius: 10px; background: #534AB7; color: #fff; font-size: .9rem; font-weight: 600; text-decoration: none; border: none; cursor: pointer; transition: background .15s; }
 .btn-api-plan:hover { background: #3C3489; }
-.btn-api-diag { display: inline-flex; align-items: center; gap: .4rem; padding: .65rem 1.4rem; border-radius: 10px; background: #0F6E56; color: #fff; font-size: .9rem; font-weight: 600; text-decoration: none; border: none; cursor: pointer; transition: background .15s; }
-.btn-api-diag:hover { background: #085041; }
 </style>
 
 <div class="ms-page">
 
     <nav class="ms-breadcrumb">
-        <a href="{{ path(cancel_route) }}">Maintenances</a>
+        <a href="{{ path('agri_maintenances_index') }}">Maintenances</a>
         <span class="ms-breadcrumb__sep">›</span>
         <span>#{{ maintenance.idMain }}</span>
     </nav>
 
     <div class="ms-header">
         <h1>🔧 Maintenance #{{ maintenance.idMain }}</h1>
-        <a href="{{ path(cancel_route) }}" class="btn-back">← Retour à la liste</a>
+        <a href="{{ path('agri_maintenances_index') }}" class="btn-back">← Retour à la liste</a>
     </div>
 
     <div class="ms-card">
@@ -132,11 +123,10 @@
                 </span>
             </div>
 
-            {# ✅ ID Machine — corrigé : maintenance.idM est un objet Machine #}
             <div class="ms-info-item">
                 <span class="ms-label">ID Machine</span>
                 {% if maintenance.idM %}
-                    <span class="machine-badge">🚜 #{{ maintenance.idM.id }}</span>
+                    <span class="machine-badge">🚜 #{{ maintenance.idM }}</span>
                 {% else %}
                     <span class="machine-badge machine-badge--none">Non assigné</span>
                 {% endif %}
@@ -167,14 +157,9 @@
 
         <div class="ms-actions">
             <a href="{{ path('agri_maintenances_edit', {id: maintenance.idMain}) }}" class="btn-edit">✏️ Modifier</a>
-
             <a href="{{ path('agri_maintenances_api_schedule', {id: maintenance.idMain}) }}" class="btn-api-plan" target="_blank">
                 🤖 Plan de maintenance IA
             </a>
-            <a href="{{ path('agri_maintenances_api_diagnostics', {id: maintenance.idMain}) }}" class="btn-api-diag" target="_blank">
-                🔍 Diagnostics IA
-            </a>
-
             <form method="post"
                   action="{{ path('agri_maintenances_delete', {id: maintenance.idMain}) }}"
                   onsubmit="return confirm('⚠️ Voulez-vous vraiment supprimer cette maintenance ?')"
@@ -187,4 +172,3 @@
 
 </div>
 {% endblock %}
-

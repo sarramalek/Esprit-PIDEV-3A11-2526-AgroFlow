@@ -15,7 +15,7 @@ class Machine
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
     #[ORM\Column(name: 'idM', type: 'integer')]
-    private ?int $id = null;
+    private int $idM;
 
     /**
      * La relation ManyToOne gère la colonne `cin` en base.
@@ -23,22 +23,22 @@ class Machine
      */
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'cin', referencedColumnName: 'cin', nullable: false, onDelete: 'CASCADE')]
-    private User $agriculteur;
+    private ?User $agriculteur = null;
 
     #[ORM\Column(name: 'nom', type: 'string', length: 255)]
     #[Assert\NotBlank(message: 'Le nom est obligatoire')]
     #[Assert\Length(min: 2, max: 255)]
-    private string $nom = '';
+    private ?string $nom = null;
 
     #[ORM\Column(name: 'marque', type: 'string', length: 255)]
     #[Assert\NotBlank(message: 'La marque est obligatoire')]
     #[Assert\Length(min: 2, max: 255)]
-    private string $marque = '';
+    private ?string $marque = null;
 
     #[ORM\Column(name: 'modele', type: 'string', length: 255)]
     #[Assert\NotBlank(message: 'Le modèle est obligatoire')]
     #[Assert\Length(min: 1, max: 255)]
-    private string $modele = '';
+    private ?string $modele = null;
 
     #[ORM\Column(name: 'numeroSerie', type: 'string', length: 255, nullable: true)]
     #[Assert\Length(max: 255)]
@@ -47,7 +47,7 @@ class Machine
     #[ORM\Column(name: 'etatM', type: 'string', length: 255)]
     #[Assert\NotBlank(message: "L'état est obligatoire")]
     #[Assert\Choice(choices: ['Neuf', 'Bon', 'Occasion', 'En panne'], message: 'État invalide')]
-    private string $etatM = '';
+    private ?string $etatM = null;
 
     #[ORM\Column(name: 'dateAchat', type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $dateAchat = null;
@@ -55,7 +55,7 @@ class Machine
     #[ORM\Column(name: 'kilometrage', type: 'integer')]
     #[Assert\NotBlank(message: 'Le kilométrage est obligatoire')]
     #[Assert\PositiveOrZero(message: 'Le kilométrage ne peut pas être négatif')]
-    private int $kilometrage = 0;
+    private ?int $kilometrage = null;
 
     #[ORM\Column(name: 'dateLastVisite', type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $dateLastVisite = null;
@@ -63,16 +63,22 @@ class Machine
     #[ORM\Column(name: 'kmLastVisite', type: 'integer')]
     #[Assert\NotBlank(message: 'Le kilométrage de dernière visite est obligatoire')]
     #[Assert\PositiveOrZero(message: 'Le kilométrage ne peut pas être négatif')]
-    private int $kmLastVisite = 0;
+    private ?int $kmLastVisite = null;
 
     #[ORM\Column(name: 'prochaineMaintenance', type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $prochaineMaintenance = null;
 
     // ==================== Getters & Setters ====================
 
-    public function getId(): ?int
+    public function getId(): int
     {
-        return $this->id;
+        return $this->idM;
+    }
+
+    public function setId(int $idM): static
+    {
+        $this->idM = $idM;
+        return $this;
     }
 
     // ── Relation Agriculteur ──────────────────────────────────────────────────
@@ -82,7 +88,7 @@ class Machine
         return $this->agriculteur;
     }
 
-    public function setAgriculteur(User $agriculteur): static
+    public function setAgriculteur(?User $agriculteur): static
     {
         $this->agriculteur = $agriculteur;
         return $this;
@@ -93,7 +99,7 @@ class Machine
      */
     public function getCin(): ?int
     {
-        return $this->agriculteur->getCin();
+        return $this->agriculteur?->getCin();
     }
 
     /**
@@ -101,7 +107,7 @@ class Machine
      */
     public function getCinAgriculteur(): ?int
     {
-        return $this->agriculteur->getCin();
+        return $this->agriculteur?->getCin();
     }
 
     /**
@@ -109,6 +115,9 @@ class Machine
      */
     public function getNomAgriculteur(): string
     {
+        if (!$this->agriculteur) {
+            return '—';
+        }
         $nom    = $this->agriculteur->getNom()    ?? '';
         $prenom = $this->agriculteur->getPrenom() ?? '';
         $nomComplet = trim($nom . ' ' . $prenom);
@@ -122,7 +131,7 @@ class Machine
         return $this->nom;
     }
 
-    public function setNom(string $nom): static
+    public function setNom(?string $nom): static
     {
         $this->nom = $nom;
         return $this;
@@ -135,7 +144,7 @@ class Machine
         return $this->marque;
     }
 
-    public function setMarque(string $marque): static
+    public function setMarque(?string $marque): static
     {
         $this->marque = $marque;
         return $this;
@@ -148,7 +157,7 @@ class Machine
         return $this->modele;
     }
 
-    public function setModele(string $modele): static
+    public function setModele(?string $modele): static
     {
         $this->modele = $modele;
         return $this;
@@ -174,7 +183,7 @@ class Machine
         return $this->etatM;
     }
 
-    public function setEtatM(string $etatM): static
+    public function setEtatM(?string $etatM): static
     {
         $this->etatM = $etatM;
         return $this;
@@ -195,12 +204,12 @@ class Machine
 
     // ── Kilométrage ──────────────────────────────────────────────────────────
 
-    public function getKilometrage(): int
+    public function getKilometrage(): ?int
     {
         return $this->kilometrage;
     }
 
-    public function setKilometrage(int $kilometrage): static
+    public function setKilometrage(?int $kilometrage): static
     {
         $this->kilometrage = $kilometrage;
         return $this;
@@ -221,12 +230,12 @@ class Machine
 
     // ── Kilométrage dernière visite ───────────────────────────────────────────
 
-    public function getKmLastVisite(): int
+    public function getKmLastVisite(): ?int
     {
         return $this->kmLastVisite;
     }
 
-    public function setKmLastVisite(int $kmLastVisite): static
+    public function setKmLastVisite(?int $kmLastVisite): static
     {
         $this->kmLastVisite = $kmLastVisite;
         return $this;

@@ -4,7 +4,6 @@ namespace App\Entity\Materiels;
 
 use App\Repository\Materiels\MaintenanceRepository;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Materiels\Machine;
 
 #[ORM\Entity(repositoryClass: MaintenanceRepository::class)]
 #[ORM\Table(name: 'maintenance')]
@@ -16,10 +15,10 @@ class Maintenance
     private ?int $idMain = null;
 
     #[ORM\Column(name: 'typePanne', length: 255)]
-    private string $typePanne = '';
+    private ?string $typePanne = null;
 
     #[ORM\Column(name: 'cout', type: 'float')]
-    private float $cout = 0.0;
+    private ?float $cout = null;
 
     #[ORM\Column(name: 'dateMain', type: 'date', nullable: true)]
     private ?\DateTimeInterface $dateMain = null;
@@ -27,9 +26,8 @@ class Maintenance
     #[ORM\Column(name: 'description', length: 255, nullable: true)]
     private ?string $description = null;
 
-    #[ORM\ManyToOne(targetEntity: Machine::class)]
-#[ORM\JoinColumn(name: 'idM', referencedColumnName: 'idM', nullable: true)]
-private ?Machine $idM = null;
+    #[ORM\Column(name: 'idM', type: 'integer', nullable: true)]
+    private ?int $idM = null;
 
     #[ORM\Column(name: 'statut', type: 'string', columnDefinition: "ENUM('en_cours','termine','planifie')", options: ['default' => 'planifie'])]
     private string $statut = 'planifie';
@@ -108,18 +106,18 @@ private ?Machine $idM = null;
         return $this;
     }
 
-    public function getIdM(): ?Machine
+    public function getIdM(): ?int
     {
         return $this->idM;
     }
 
-    public function setIdM(?Machine $idM): static
+    public function setIdM(?int $idM): static
     {
         $this->idM = $idM;
         return $this;
     }
 
-    public function getStatut(): ?string
+    public function getStatut(): string
     {
         return $this->statut;
     }
@@ -141,7 +139,13 @@ private ?Machine $idM = null;
         return $this;
     }
 
-    public function getPriorite(): ?string
+    // Alias anglais pour compatibilité MaintenanceChatbotService
+    public function getRecommendation(): ?string
+    {
+        return $this->recommandation;
+    }
+
+    public function getPriorite(): string
     {
         return $this->priorite;
     }

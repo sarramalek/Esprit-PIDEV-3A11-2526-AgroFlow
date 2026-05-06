@@ -4,6 +4,149 @@
 {% block page_title %}Gestion des Machines{% endblock %}
 {% block breadcrumb %}Matériels / Machines / Nouvelle{% endblock %}
 
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    /* Styles additionnels pour la validation */
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    label {
+        font-weight: 600;
+        font-size: 13px;
+        color: #333;
+        margin-bottom: 6px;
+        display: block;
+    }
+    
+    label .required {
+        color: #dc3545;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1.5px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.2s;
+        font-family: inherit;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: #2D5A27;
+        box-shadow: 0 0 0 3px rgba(45, 90, 39, 0.1);
+    }
+    
+    .form-control.is-valid {
+        border-color: #28a745;
+        background-color: #f0fdf4;
+    }
+    
+    .form-control.is-invalid {
+        border-color: #dc3545;
+        background-color: #fef2f2;
+    }
+    
+    .invalid-feedback {
+        display: none;
+        color: #dc3545;
+        font-size: 11px;
+        margin-top: 5px;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .invalid-feedback.visible {
+        display: flex;
+    }
+    
+    .valid-feedback {
+        display: none;
+        color: #28a745;
+        font-size: 11px;
+        margin-top: 5px;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .valid-feedback.visible {
+        display: flex;
+    }
+    
+    .help-text {
+        font-size: 11px;
+        color: #6c757d;
+        margin-top: 4px;
+    }
+    
+    .error-banner {
+        display: none;
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-radius: 8px;
+        padding: 12px 16px;
+        color: #dc2626;
+        font-size: 13px;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .error-banner.visible {
+        display: flex;
+    }
+    
+    .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+    
+    @media (max-width: 600px) {
+        .row {
+            grid-template-columns: 1fr;
+            gap: 0;
+        }
+        .form-body {
+            padding: 20px;
+        }
+    }
+    
+    select.form-control {
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 32px;
+    }
+    
+    button:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+    
+    .loading {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border: 2px solid white;
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+        margin-right: 6px;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+</style>
+{% endblock %}
+
 {% block body %}
 <div style="max-width: 680px; margin: 0 auto;">
 
@@ -51,12 +194,177 @@
         </div>
 
         <div style="padding:28px 32px;">
+            <div class="error-banner" id="errorBanner">
+                <i class="fa fa-exclamation-circle"></i>
+                <span>Veuillez corriger les erreurs avant d'enregistrer.</span>
+            </div>
+
             <form method="post" novalidate id="machineForm">
-                {{ include('admin/machines/_form.html.twig', {agriculteurs: agriculteurs}) }}
-                
+                <div class="form-group">
+                    <label for="agriculteur">
+                        <i class="fa fa-user"></i> Agriculteur <span class="required">*</span>
+                    </label>
+                    <select name="agriculteur" id="agriculteur" class="form-control" required>
+                        <option value="">— Sélectionnez un agriculteur —</option>
+                        {% for agriculteur in agriculteurs %}
+                            <option value="{{ agriculteur.cin }}" 
+                                    {% if machine.agriculteur and machine.agriculteur.cin == agriculteur.cin %}selected{% endif %}>
+                                {{ agriculteur.nom }} {{ agriculteur.prenom }} (CIN: {{ agriculteur.cin }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <div class="invalid-feedback" id="agriculteurError">
+                        <i class="fa fa-exclamation-circle"></i>
+                        <span id="agriculteurErrorMsg"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label for="nom">
+                            <i class="fa fa-tractor"></i> Nom de la machine <span class="required">*</span>
+                        </label>
+                        <input type="text" name="nom" id="nom" class="form-control" 
+                               value="{{ machine.nom }}" required maxlength="100">
+                        <div class="invalid-feedback" id="nomError">
+                            <i class="fa fa-exclamation-circle"></i>
+                            <span id="nomErrorMsg"></span>
+                        </div>
+                        <div class="help-text">Entre 2 et 100 caractères</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="marque">
+                            <i class="fa fa-industry"></i> Marque <span class="required">*</span>
+                        </label>
+                        <input type="text" name="marque" id="marque" class="form-control" 
+                               value="{{ machine.marque }}" required maxlength="100">
+                        <div class="invalid-feedback" id="marqueError">
+                            <i class="fa fa-exclamation-circle"></i>
+                            <span id="marqueErrorMsg"></span>
+                        </div>
+                        <div class="help-text">Entre 2 et 100 caractères</div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label for="modele">
+                            <i class="fa fa-cog"></i> Modèle <span class="required">*</span>
+                        </label>
+                        <input type="text" name="modele" id="modele" class="form-control" 
+                               value="{{ machine.modele }}" required maxlength="100">
+                        <div class="invalid-feedback" id="modeleError">
+                            <i class="fa fa-exclamation-circle"></i>
+                            <span id="modeleErrorMsg"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="numeroSerie">
+                            <i class="fa fa-barcode"></i> Numéro de série
+                        </label>
+                        <input type="text" name="numeroSerie" id="numeroSerie" class="form-control" 
+                               value="{{ machine.numeroSerie }}" maxlength="100">
+                        <div class="invalid-feedback" id="serieError">
+                            <i class="fa fa-exclamation-circle"></i>
+                            <span id="serieErrorMsg"></span>
+                        </div>
+                        <div class="help-text">Optionnel - Caractères alphanumériques uniquement</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="etatM">
+                        <i class="fa fa-chart-line"></i> État <span class="required">*</span>
+                    </label>
+                    <select name="etatM" id="etatM" class="form-control" required>
+                        <option value="">— Sélectionnez un état —</option>
+                        <option value="Neuf" {% if machine.etatM == 'Neuf' %}selected{% endif %}>🌟 Neuf</option>
+                        <option value="Bon" {% if machine.etatM == 'Bon' %}selected{% endif %}>👍 Bon</option>
+                        <option value="Occasion" {% if machine.etatM == 'Occasion' %}selected{% endif %}>🔄 Occasion</option>
+                        <option value="En panne" {% if machine.etatM == 'En panne' %}selected{% endif %}>⚠️ En panne</option>
+                        <option value="En maintenance" {% if machine.etatM == 'En maintenance' %}selected{% endif %}>🔧 En maintenance</option>
+                        <option value="Hors service" {% if machine.etatM == 'Hors service' %}selected{% endif %}>❌ Hors service</option>
+                    </select>
+                    <div class="invalid-feedback" id="etatError">
+                        <i class="fa fa-exclamation-circle"></i>
+                        <span id="etatErrorMsg"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label for="kilometrage">
+                            <i class="fa fa-tachometer"></i> Kilométrage <span class="required">*</span>
+                        </label>
+                        <input type="number" name="kilometrage" id="kilometrage" class="form-control" 
+                               value="{{ machine.kilometrage }}" required min="0" max="9999999" step="1">
+                        <div class="invalid-feedback" id="kmError">
+                            <i class="fa fa-exclamation-circle"></i>
+                            <span id="kmErrorMsg"></span>
+                        </div>
+                        <div class="help-text">Minimum 0, maximum 9 999 999 km</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="kmLastVisite">
+                            <i class="fa fa-calendar-check"></i> Km dernière visite <span class="required">*</span>
+                        </label>
+                        <input type="number" name="kmLastVisite" id="kmLastVisite" class="form-control" 
+                               value="{{ machine.kmLastVisite }}" required min="0" max="9999999" step="1">
+                        <div class="invalid-feedback" id="kmLastError">
+                            <i class="fa fa-exclamation-circle"></i>
+                            <span id="kmLastErrorMsg"></span>
+                        </div>
+                        <div class="help-text">Doit être ≤ kilométrage actuel</div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label for="dateAchat">
+                            <i class="fa fa-calendar-alt"></i> Date d'achat
+                        </label>
+                        <input type="date" name="dateAchat" id="dateAchat" class="form-control"
+                               value="{{ machine.dateAchat ? machine.dateAchat|date('Y-m-d') : '' }}">
+                        <div class="invalid-feedback" id="dateAchatError">
+                            <i class="fa fa-exclamation-circle"></i>
+                            <span id="dateAchatErrorMsg"></span>
+                        </div>
+                        <div class="help-text">Optionnelle - Ne peut pas être dans le futur</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dateLastVisite">
+                            <i class="fa fa-tools"></i> Date dernière visite
+                        </label>
+                        <input type="date" name="dateLastVisite" id="dateLastVisite" class="form-control"
+                               value="{{ machine.dateLastVisite ? machine.dateLastVisite|date('Y-m-d') : '' }}">
+                        <div class="invalid-feedback" id="dateLastError">
+                            <i class="fa fa-exclamation-circle"></i>
+                            <span id="dateLastErrorMsg"></span>
+                        </div>
+                        <div class="help-text">Optionnelle - Doit être ≥ date d'achat</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="prochaineMaintenance">
+                        <i class="fa fa-clock"></i> Prochaine maintenance
+                    </label>
+                    <input type="date" name="prochaineMaintenance" id="prochaineMaintenance" class="form-control"
+                           value="{{ machine.prochaineMaintenance ? machine.prochaineMaintenance|date('Y-m-d') : '' }}">
+                    <div class="invalid-feedback" id="prochainError">
+                        <i class="fa fa-exclamation-circle"></i>
+                        <span id="prochainErrorMsg"></span>
+                    </div>
+                    <div class="help-text">Optionnelle - Recommandée pour le suivi préventif</div>
+                </div>
+
                 <div style="display:flex; gap:12px; margin-top:28px; padding-top:20px;
                             border-top:1px solid #f0f0f0;">
-                    <button type="submit"
+                    <button type="submit" id="submitBtn"
                             style="flex:1; background:#2D5A27; color:white; padding:12px 20px;
                                    border:none; border-radius:8px; font-size:14px; font-weight:600;
                                    cursor:pointer; display:flex; align-items:center;
@@ -76,4 +384,347 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+(function() {
+    const form = document.getElementById('machineForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const banner = document.getElementById('errorBanner');
+    
+    // Éléments du formulaire
+    const agriculteurEl = document.getElementById('agriculteur');
+    const nomEl = document.getElementById('nom');
+    const marqueEl = document.getElementById('marque');
+    const modeleEl = document.getElementById('modele');
+    const serieEl = document.getElementById('numeroSerie');
+    const etatEl = document.getElementById('etatM');
+    const kmEl = document.getElementById('kilometrage');
+    const kmLastEl = document.getElementById('kmLastVisite');
+    const dateAchatEl = document.getElementById('dateAchat');
+    const dateLastEl = document.getElementById('dateLastVisite');
+    const prochainEl = document.getElementById('prochaineMaintenance');
+    
+    const today = new Date().toISOString().split('T')[0];
+    
+    function valid(el) {
+        el.classList.remove('is-invalid');
+        el.classList.add('is-valid');
+    }
+    
+    function invalid(el) {
+        el.classList.remove('is-valid');
+        el.classList.add('is-invalid');
+    }
+    
+    function showErr(id, msg) {
+        const errDiv = document.getElementById(id);
+        const msgSpan = document.getElementById(id + 'Msg');
+        if (msgSpan) msgSpan.textContent = msg;
+        if (errDiv) errDiv.classList.add('visible');
+    }
+    
+    function hideErr(id) {
+        const errDiv = document.getElementById(id);
+        if (errDiv) errDiv.classList.remove('visible');
+    }
+    
+    // Validation de l'agriculteur
+    function vAgriculteur() {
+        if (!agriculteurEl.value) {
+            invalid(agriculteurEl);
+            showErr('agriculteurError', 'Veuillez sélectionner un agriculteur.');
+            return false;
+        }
+        valid(agriculteurEl);
+        hideErr('agriculteurError');
+        return true;
+    }
+    
+    // Validation du nom
+    function vNom() {
+        const val = nomEl.value.trim();
+        if (val === '') {
+            invalid(nomEl);
+            showErr('nomError', 'Le nom est obligatoire.');
+            return false;
+        }
+        if (val.length < 2) {
+            invalid(nomEl);
+            showErr('nomError', 'Le nom doit contenir au moins 2 caractères.');
+            return false;
+        }
+        if (val.length > 100) {
+            invalid(nomEl);
+            showErr('nomError', 'Le nom ne peut pas dépasser 100 caractères.');
+            return false;
+        }
+        if (!/^[a-zA-Z0-9\s\-_\'àáâãäåçèéêëìíîïðòóôõöùúûüýÿ]+$/u.test(val)) {
+            invalid(nomEl);
+            showErr('nomError', 'Caractères non autorisés.');
+            return false;
+        }
+        valid(nomEl);
+        hideErr('nomError');
+        return true;
+    }
+    
+    // Validation de la marque
+    function vMarque() {
+        const val = marqueEl.value.trim();
+        if (val === '') {
+            invalid(marqueEl);
+            showErr('marqueError', 'La marque est obligatoire.');
+            return false;
+        }
+        if (val.length < 2) {
+            invalid(marqueEl);
+            showErr('marqueError', 'La marque doit contenir au moins 2 caractères.');
+            return false;
+        }
+        if (val.length > 100) {
+            invalid(marqueEl);
+            showErr('marqueError', 'La marque ne peut pas dépasser 100 caractères.');
+            return false;
+        }
+        if (!/^[a-zA-Z0-9\s\-_\'àáâãäåçèéêëìíîïðòóôõöùúûüýÿ]+$/u.test(val)) {
+            invalid(marqueEl);
+            showErr('marqueError', 'Caractères non autorisés.');
+            return false;
+        }
+        valid(marqueEl);
+        hideErr('marqueError');
+        return true;
+    }
+    
+    // Validation du modèle
+    function vModele() {
+        const val = modeleEl.value.trim();
+        if (val === '') {
+            invalid(modeleEl);
+            showErr('modeleError', 'Le modèle est obligatoire.');
+            return false;
+        }
+        if (val.length > 100) {
+            invalid(modeleEl);
+            showErr('modeleError', 'Le modèle ne peut pas dépasser 100 caractères.');
+            return false;
+        }
+        valid(modeleEl);
+        hideErr('modeleError');
+        return true;
+    }
+    
+    // Validation du numéro de série
+    function vSerie() {
+        const val = serieEl.value.trim();
+        if (val !== '') {
+            if (val.length > 100) {
+                invalid(serieEl);
+                showErr('serieError', 'Le numéro de série ne peut pas dépasser 100 caractères.');
+                return false;
+            }
+            if (!/^[a-zA-Z0-9\-_\s]+$/.test(val)) {
+                invalid(serieEl);
+                showErr('serieError', 'Caractères non autorisés.');
+                return false;
+            }
+        }
+        valid(serieEl);
+        hideErr('serieError');
+        return true;
+    }
+    
+    // Validation de l'état
+    function vEtat() {
+        const val = etatEl.value;
+        const allowed = ['Neuf', 'Bon', 'Occasion', 'En panne', 'En maintenance', 'Hors service'];
+        if (!val || !allowed.includes(val)) {
+            invalid(etatEl);
+            showErr('etatError', 'Veuillez sélectionner un état valide.');
+            return false;
+        }
+        valid(etatEl);
+        hideErr('etatError');
+        return true;
+    }
+    
+    // Validation du kilométrage
+    function vKilometrage() {
+        const val = parseInt(kmEl.value);
+        if (isNaN(val) || kmEl.value === '') {
+            invalid(kmEl);
+            showErr('kmError', 'Le kilométrage est obligatoire.');
+            return false;
+        }
+        if (val < 0) {
+            invalid(kmEl);
+            showErr('kmError', 'Le kilométrage ne peut pas être négatif.');
+            return false;
+        }
+        if (val > 9999999) {
+            invalid(kmEl);
+            showErr('kmError', 'Le kilométrage ne peut pas dépasser 9 999 999 km.');
+            return false;
+        }
+        valid(kmEl);
+        hideErr('kmError');
+        return true;
+    }
+    
+    // Validation du kilométrage dernière visite
+    function vKmLastVisite() {
+        const val = parseInt(kmLastEl.value);
+        const km = parseInt(kmEl.value);
+        
+        if (isNaN(val) || kmLastEl.value === '') {
+            invalid(kmLastEl);
+            showErr('kmLastError', 'Le kilométrage de dernière visite est obligatoire.');
+            return false;
+        }
+        if (val < 0) {
+            invalid(kmLastEl);
+            showErr('kmLastError', 'Le kilométrage de dernière visite ne peut pas être négatif.');
+            return false;
+        }
+        if (val > 9999999) {
+            invalid(kmLastEl);
+            showErr('kmLastError', 'Le kilométrage ne peut pas dépasser 9 999 999 km.');
+            return false;
+        }
+        if (!isNaN(km) && val > km) {
+            invalid(kmLastEl);
+            showErr('kmLastError', 'Le km dernière visite ne peut pas dépasser le kilométrage actuel.');
+            return false;
+        }
+        valid(kmLastEl);
+        hideErr('kmLastError');
+        return true;
+    }
+    
+    // Validation date d'achat
+    function vDateAchat() {
+        const val = dateAchatEl.value;
+        if (val) {
+            if (val > today) {
+                invalid(dateAchatEl);
+                showErr('dateAchatError', 'La date d\'achat ne peut pas être dans le futur.');
+                return false;
+            }
+            const dateObj = new Date(val);
+            const minDate = new Date();
+            minDate.setFullYear(minDate.getFullYear() - 100);
+            if (dateObj < minDate) {
+                invalid(dateAchatEl);
+                showErr('dateAchatError', 'Date trop ancienne (plus de 100 ans).');
+                return false;
+            }
+        }
+        valid(dateAchatEl);
+        hideErr('dateAchatError');
+        return true;
+    }
+    
+    // Validation date dernière visite
+    function vDateLastVisite() {
+        const val = dateLastEl.value;
+        const dateAchat = dateAchatEl.value;
+        if (val) {
+            if (val > today) {
+                invalid(dateLastEl);
+                showErr('dateLastError', 'La date de dernière visite ne peut pas être dans le futur.');
+                return false;
+            }
+            if (dateAchat && val < dateAchat) {
+                invalid(dateLastEl);
+                showErr('dateLastError', 'La date de dernière visite ne peut pas être antérieure à la date d\'achat.');
+                return false;
+            }
+        }
+        valid(dateLastEl);
+        hideErr('dateLastError');
+        return true;
+    }
+    
+    // Validation prochaine maintenance
+    function vProchaineMaintenance() {
+        const val = prochainEl.value;
+        const dateLast = dateLastEl.value;
+        const dateAchat = dateAchatEl.value;
+        if (val) {
+            const valDate = new Date(val);
+            const oneMonthAgo = new Date();
+            oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+            if (valDate < oneMonthAgo && valDate < new Date()) {
+                invalid(prochainEl);
+                showErr('prochainError', 'La date ne peut pas être dans le passé lointain.');
+                return false;
+            }
+            if (dateLast && val < dateLast) {
+                invalid(prochainEl);
+                showErr('prochainError', 'La date ne peut pas être antérieure à la dernière visite.');
+                return false;
+            }
+            if (dateAchat && val < dateAchat) {
+                invalid(prochainEl);
+                showErr('prochainError', 'La date ne peut pas être antérieure à la date d\'achat.');
+                return false;
+            }
+        }
+        valid(prochainEl);
+        hideErr('prochainError');
+        return true;
+    }
+    
+    // Événements en temps réel
+    agriculteurEl.addEventListener('change', vAgriculteur);
+    nomEl.addEventListener('input', vNom);
+    nomEl.addEventListener('blur', vNom);
+    marqueEl.addEventListener('input', vMarque);
+    marqueEl.addEventListener('blur', vMarque);
+    modeleEl.addEventListener('input', vModele);
+    modeleEl.addEventListener('blur', vModele);
+    serieEl.addEventListener('input', vSerie);
+    serieEl.addEventListener('blur', vSerie);
+    etatEl.addEventListener('change', vEtat);
+    kmEl.addEventListener('input', function() { 
+        vKilometrage(); 
+        if (kmLastEl.value) vKmLastVisite();
+    });
+    kmLastEl.addEventListener('input', vKmLastVisite);
+    dateAchatEl.addEventListener('change', function() {
+        vDateAchat();
+        if (dateLastEl.value) vDateLastVisite();
+        if (prochainEl.value) vProchaineMaintenance();
+    });
+    dateLastEl.addEventListener('change', function() {
+        vDateLastVisite();
+        if (prochainEl.value) vProchaineMaintenance();
+    });
+    prochainEl.addEventListener('change', vProchaineMaintenance);
+    
+    function showLoading() {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="loading"></span> Enregistrement en cours...';
+    }
+    
+    form.addEventListener('submit', function(e) {
+        const isValid = vAgriculteur() && vNom() && vMarque() && vModele() && 
+                        vSerie() && vEtat() && vKilometrage() && vKmLastVisite() &&
+                        vDateAchat() && vDateLastVisite() && vProchaineMaintenance();
+        
+        if (!isValid) {
+            e.preventDefault();
+            banner.classList.add('visible');
+            const firstInvalid = form.querySelector('.is-invalid');
+            if (firstInvalid) firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+            banner.classList.remove('visible');
+            showLoading();
+        }
+    });
+})();
+</script>
 {% endblock %}
