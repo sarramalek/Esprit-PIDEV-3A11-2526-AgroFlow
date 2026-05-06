@@ -25,10 +25,10 @@ class PlanteTest extends TestCase
         self::assertSame('Tomate', $this->plante->getNomP());
     }
 
-    public function testNomPEstNullParDefaut(): void
-    {
-        self::assertNull($this->plante->getNomP());
-    }
+    public function testNomPEstVideParDefaut(): void
+{
+    self::assertSame('', $this->plante->getNomP());
+}
 
     public function testSetNomPRetourneStaticPourChaining(): void
     {
