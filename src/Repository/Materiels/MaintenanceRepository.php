@@ -266,12 +266,19 @@ class MaintenanceRepository extends ServiceEntityRepository
 
 public function findByAgriculteurCin(string $cin): array
 {
-    return $this->createQueryBuilder('m')
-        ->join('m.machine', 'mac')
-        ->join('mac.agriculteur', 'u')
-        ->where('u.cin = :cin')
-        ->setParameter('cin', $cin)
-        ->getQuery()
-        ->getResult();
-}
-}
+    $conn = $this->getEntityManager()->getConnection();
+
+    $sql = "
+        SELECT 
+            m.idMain, m.typePanne, m.cout, m.dateMain,
+            m.description, m.idM,
+            m.statut, m.recommandation, m.priorite, m.kilometrage,
+            mac.nom
+        FROM maintenance m
+        LEFT JOIN machine mac ON mac.idM = m.idM
+        WHERE mac.cin = :cin
+    ";
+
+    $results = $conn->executeQuery($sql, ['cin' => $cin])->fetchAllAssociative();
+    return array_map(fn($row) => $this->hydrate($row), $results);
+}}

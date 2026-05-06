@@ -1,4 +1,12 @@
-{% extends 'agriculteur_dashboard.html.twig' %}
+{% if is_granted('ROLE_OUVRIER') %}
+    {% set layout = 'base_ouvrier.html.twig' %}
+    {% set cancel_route = 'ouvrier_taches' %}
+{% elseif is_granted('ROLE_AGRICULTEUR') %}
+    {% set layout = 'base_agriculteur.html.twig' %}
+    {% set cancel_route = 'agri_maintenances_index' %}
+{% endif %}
+
+{% extends layout %}
 {% block title %}Maintenances — AgroFlow{% endblock %}
 {% block body %}
 <style>
