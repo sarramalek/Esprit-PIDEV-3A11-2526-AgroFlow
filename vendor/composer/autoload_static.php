@@ -23,6 +23,7 @@ class ComposerStaticInit392c2fee464d64f3ee9e8c2f1c58f9b4
         '9d2b9fc6db0f153a0a149fefb182415e' => __DIR__ . '/..' . '/symfony/polyfill-php84/bootstrap.php',
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
         '9b38cf48e83f5d8f60375221cd213eee' => __DIR__ . '/..' . '/phpstan/phpstan/bootstrap.php',
+        'e39a8b23c42d4e1452234d762b03835a' => __DIR__ . '/..' . '/ramsey/uuid/src/functions.php',
         '72243e5536b63e298acb6476f01f1aff' => __DIR__ . '/..' . '/thecodingmachine/safe/lib/special_cases.php',
         '3f648889e687f31c52f949ba8a9d0873' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/apache.php',
         'eeb4581d958421a4244aaa4167c6a575' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/apcu.php',
@@ -222,9 +223,13 @@ class ComposerStaticInit392c2fee464d64f3ee9e8c2f1c58f9b4
             'Symfony\\Bridge\\Doctrine\\' => 24,
             'Svg\\' => 4,
             'Stof\\DoctrineExtensionsBundle\\' => 30,
-            'StellaMaris\\Clock\\' => 18,
             'Scheb\\TwoFactorBundle\\' => 22,
             'Sabberworm\\CSS\\' => 15,
+        ),
+        'R' => 
+        array (
+            'Ramsey\\Uuid\\' => 12,
+            'Ramsey\\Collection\\' => 18,
         ),
         'P' => 
         array (
@@ -258,7 +263,6 @@ class ComposerStaticInit392c2fee464d64f3ee9e8c2f1c58f9b4
         'L' => 
         array (
             'Lcobucci\\JWT\\' => 13,
-            'Lcobucci\\Clock\\' => 15,
             'Laminas\\Diactoros\\' => 18,
         ),
         'K' => 
@@ -311,6 +315,7 @@ class ComposerStaticInit392c2fee464d64f3ee9e8c2f1c58f9b4
         ),
         'B' => 
         array (
+            'Brick\\Math\\' => 11,
             'BaconQrCode\\' => 12,
         ),
         'A' => 
@@ -343,6 +348,7 @@ class ComposerStaticInit392c2fee464d64f3ee9e8c2f1c58f9b4
         'Vonage\\' => 
         array (
             0 => __DIR__ . '/..' . '/vonage/client-core/src',
+            1 => __DIR__ . '/..' . '/vonage/jwt/src',
         ),
         'Twilio\\' => 
         array (
@@ -656,10 +662,6 @@ class ComposerStaticInit392c2fee464d64f3ee9e8c2f1c58f9b4
         array (
             0 => __DIR__ . '/..' . '/stof/doctrine-extensions-bundle/src',
         ),
-        'StellaMaris\\Clock\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/stella-maris/clock/src',
-        ),
         'Scheb\\TwoFactorBundle\\' => 
         array (
             0 => __DIR__ . '/..' . '/scheb/2fa-totp',
@@ -670,6 +672,14 @@ class ComposerStaticInit392c2fee464d64f3ee9e8c2f1c58f9b4
         'Sabberworm\\CSS\\' => 
         array (
             0 => __DIR__ . '/..' . '/sabberworm/php-css-parser/src',
+        ),
+        'Ramsey\\Uuid\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/ramsey/uuid/src',
+        ),
+        'Ramsey\\Collection\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/ramsey/collection/src',
         ),
         'Psr\\SimpleCache\\' => 
         array (
@@ -756,10 +766,6 @@ class ComposerStaticInit392c2fee464d64f3ee9e8c2f1c58f9b4
         'Lcobucci\\JWT\\' => 
         array (
             0 => __DIR__ . '/..' . '/lcobucci/jwt/src',
-        ),
-        'Lcobucci\\Clock\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/lcobucci/clock/src',
         ),
         'Laminas\\Diactoros\\' => 
         array (
@@ -885,6 +891,10 @@ class ComposerStaticInit392c2fee464d64f3ee9e8c2f1c58f9b4
         'Complex\\' => 
         array (
             0 => __DIR__ . '/..' . '/markbaker/complex/classes/src',
+        ),
+        'Brick\\Math\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/brick/math/src',
         ),
         'BaconQrCode\\' => 
         array (
