@@ -1,4 +1,5 @@
 Esprit-PIDEV-3A11-2526-AgroFlow
+
 Overview
 This project was developed as part of the PIDEV – 3rd Year Engineering Program at Esprit School of Engineering (Academic Year 2025–2026).
 It consists of a full-stack web application that enables agricultural cooperatives and agribusinesses to manage farming operations, track field activities, and facilitate collaboration between administrators, agricultural experts, and field employees.
