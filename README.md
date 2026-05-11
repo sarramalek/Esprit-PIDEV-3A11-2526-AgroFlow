@@ -7,7 +7,8 @@ It consists of a full-stack web application that enables agricultural cooperativ
 
 Features
 
-User Module - Sarra Malek 
+User Module - Sarra Malek  : 
+
 Two-Factor Authentication (2FA) – Enhanced account security requiring a second verification step during login 
 
 Speech-to-Text – Voice input support allowing users to interact with the platform via spoken commands
