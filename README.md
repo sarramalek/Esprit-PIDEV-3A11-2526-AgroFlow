@@ -8,13 +8,21 @@ It consists of a full-stack web application that enables agricultural cooperativ
 Features
 
 User Module - Sarra Malek 
-Two-Factor Authentication (2FA) – Enhanced account security requiring a second verification step during login
+Two-Factor Authentication (2FA) – Enhanced account security requiring a second verification step during login 
+
 Speech-to-Text – Voice input support allowing users to interact with the platform via spoken commands
+
 Text-to-Speech – Audio output functionality that reads content aloud for improved accessibility
-Employee Repartition by Terrain – Visual mapping and assignment of employees to specific fields/terrains based on workload and proximity
-Role-Based Access Control – Three distinct roles: Super Admin, Agriculture, and Employee 
-User Management Dashboard – CRUD operations for users, role assignment, and profile management
+
+Employee Repartition by Terrain – Visual mapping and assignment of employees to specific fields based on workload and disponibility . 
+
+Role-Based Access Control – Three distinct roles: Super Admin, Agriculture, and Employee
+
+User Management Dashboard – CRUD operations for users, role assignment, and profile 
+management
+
 Subscription & Offers Management – Farmers can subscribe to one or multiple subscription plans simultaneously, with flexible offer management for different service tiers
+
 Alert System – Automated notifications and alerts for important events, task reminders, subscription renewals, and critical updates
 
 Tech Stack
@@ -58,4 +66,4 @@ Docker (optional)
 
 Acknowledgment
 
-We would like to express our sincere gratitude to our instructors and supervisors at Esprit School of Engineering for their guidance, support, and valuable feedback throughout the development of this project. We also thank our team members for their collaboration and dedication, as well as the open-source community for providing the tools and frameworks that made this project possible.
+We would like to express our sincere gratitude to our instructors and supervisors at Esprit School of Engineering for their guidance, support, and valuable feedback throughout the development of this project. We also thank our team members for their collaboration and dedication .
