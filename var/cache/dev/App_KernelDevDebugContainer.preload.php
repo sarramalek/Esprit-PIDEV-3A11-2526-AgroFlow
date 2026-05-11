@@ -476,7 +476,10 @@ $classes[] = 'Symfony\Component\HttpClient\UriTemplateHttpClient';
 $classes[] = 'Symfony\Contracts\HttpClient\HttpClientInterface';
 $classes[] = 'Symfony\Component\Security\Core\Authorization\Voter\TraceableVoter';
 $classes[] = 'App\Security\TerrainVoter';
+<<<<<<< HEAD
 $classes[] = 'Scheb\TwoFactorBundle\Security\Authorization\Voter\TwoFactorInProgressVoter';
+=======
+>>>>>>> 620418c7 (frontoffice terrain)
 $classes[] = 'Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter';
 $classes[] = 'Symfony\Component\Security\Core\Authorization\Voter\ExpressionVoter';
 $classes[] = 'Symfony\Component\Security\Core\Authorization\ExpressionLanguage';
