@@ -1,6 +1,6 @@
 {
   "php": {
-    "version": "8.2",
+    "version": "8.2.0",
     "extensions": ["gd", "pdo", "pdo_mysql", "mbstring", "xml", "curl", "zip", "intl"]
   }
 }
