@@ -127,10 +127,6 @@ class ComposerStaticInit392c2fee464d64f3ee9e8c2f1c58f9b4
         array (
             'phpDocumentor\\Reflection\\' => 25,
         ),
-        'Z' => 
-        array (
-            'ZipStream\\' => 10,
-        ),
         'W' => 
         array (
             'Webmozart\\Assert\\' => 17,
@@ -233,7 +229,6 @@ class ComposerStaticInit392c2fee464d64f3ee9e8c2f1c58f9b4
         ),
         'P' => 
         array (
-            'Psr\\SimpleCache\\' => 16,
             'Psr\\Log\\' => 8,
             'Psr\\Link\\' => 9,
             'Psr\\Http\\Message\\' => 17,
@@ -243,7 +238,6 @@ class ComposerStaticInit392c2fee464d64f3ee9e8c2f1c58f9b4
             'Psr\\Clock\\' => 10,
             'Psr\\Cache\\' => 10,
             'PhpParser\\' => 10,
-            'PhpOffice\\PhpSpreadsheet\\' => 25,
             'ParagonIE\\ConstantTime\\' => 23,
             'PHPStan\\PhpDocParser\\' => 21,
             'PHPStan\\ExtensionInstaller\\' => 27,
@@ -257,7 +251,6 @@ class ComposerStaticInit392c2fee464d64f3ee9e8c2f1c58f9b4
         'M' => 
         array (
             'Monolog\\' => 8,
-            'Matrix\\' => 7,
             'Masterminds\\' => 12,
         ),
         'L' => 
@@ -310,8 +303,6 @@ class ComposerStaticInit392c2fee464d64f3ee9e8c2f1c58f9b4
         'C' => 
         array (
             'Composer\\Semver\\' => 16,
-            'Composer\\Pcre\\' => 14,
-            'Complex\\' => 8,
         ),
         'B' => 
         array (
@@ -332,10 +323,6 @@ class ComposerStaticInit392c2fee464d64f3ee9e8c2f1c58f9b4
             0 => __DIR__ . '/..' . '/phpdocumentor/reflection-docblock/src',
             1 => __DIR__ . '/..' . '/phpdocumentor/type-resolver/src',
             2 => __DIR__ . '/..' . '/phpdocumentor/reflection-common/src',
-        ),
-        'ZipStream\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/maennchen/zipstream-php/src',
         ),
         'Webmozart\\Assert\\' => 
         array (
@@ -681,10 +668,6 @@ class ComposerStaticInit392c2fee464d64f3ee9e8c2f1c58f9b4
         array (
             0 => __DIR__ . '/..' . '/ramsey/collection/src',
         ),
-        'Psr\\SimpleCache\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/psr/simple-cache/src',
-        ),
         'Psr\\Log\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/log/src',
@@ -722,10 +705,6 @@ class ComposerStaticInit392c2fee464d64f3ee9e8c2f1c58f9b4
         array (
             0 => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser',
         ),
-        'PhpOffice\\PhpSpreadsheet\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/phpoffice/phpspreadsheet/src/PhpSpreadsheet',
-        ),
         'ParagonIE\\ConstantTime\\' => 
         array (
             0 => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src',
@@ -754,10 +733,6 @@ class ComposerStaticInit392c2fee464d64f3ee9e8c2f1c58f9b4
         'Monolog\\' => 
         array (
             0 => __DIR__ . '/..' . '/monolog/monolog/src/Monolog',
-        ),
-        'Matrix\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/markbaker/matrix/classes/src',
         ),
         'Masterminds\\' => 
         array (
@@ -883,14 +858,6 @@ class ComposerStaticInit392c2fee464d64f3ee9e8c2f1c58f9b4
         'Composer\\Semver\\' => 
         array (
             0 => __DIR__ . '/..' . '/composer/semver/src',
-        ),
-        'Composer\\Pcre\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/composer/pcre/src',
-        ),
-        'Complex\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/markbaker/complex/classes/src',
         ),
         'Brick\\Math\\' => 
         array (
