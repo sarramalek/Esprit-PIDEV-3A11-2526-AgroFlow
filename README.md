@@ -66,7 +66,6 @@ Twig – Symfony's templating engine for dynamic views
 Bootstrap – Responsive CSS framework
 JavaScript – Client-side interactivity
 HTML5 / CSS3 – Standard web technologies
-
 Backend
 
 PHP 8.x – Core programming language
