@@ -144,7 +144,7 @@ if ($user->getTel()) {
             $mail->Host       = 'smtp.gmail.com';
             $mail->SMTPAuth   = true;
             $mail->Username   = 'maleksarra362@gmail.com';
-            $mail->Password   = 'dwxqvewsbormytyn';
+            $mail->Password   = 'plkcjwhpqlgsetrh';
             $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
             $mail->Port       = 465; // ← changed from 587
         $mail->Timeout    = 5;   // ← ADD THIS
