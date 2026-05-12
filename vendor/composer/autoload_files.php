@@ -21,6 +21,7 @@ return array(
     'f598d06aa772fa33d905e87be6398fb1' => $vendorDir . '/symfony/polyfill-intl-idn/bootstrap.php',
     '9d2b9fc6db0f153a0a149fefb182415e' => $vendorDir . '/symfony/polyfill-php84/bootstrap.php',
     '7b11c4dc42b3b3023073cb14e519683c' => $vendorDir . '/ralouphie/getallheaders/src/getallheaders.php',
+    '37a3dc5111fe8f707ab4c132ef1dbc62' => $vendorDir . '/guzzlehttp/guzzle/src/functions_include.php',
     '9b38cf48e83f5d8f60375221cd213eee' => $vendorDir . '/phpstan/phpstan/bootstrap.php',
     'e39a8b23c42d4e1452234d762b03835a' => $vendorDir . '/ramsey/uuid/src/functions.php',
     '72243e5536b63e298acb6476f01f1aff' => $vendorDir . '/thecodingmachine/safe/lib/special_cases.php',
@@ -103,7 +104,6 @@ return array(
     '4af1dca6db8c527c6eed27bff85ff0e5' => $vendorDir . '/thecodingmachine/safe/generated/yaz.php',
     'fe43ca06499ac37bc2dedd823af71eb5' => $vendorDir . '/thecodingmachine/safe/generated/zip.php',
     '356736db98a6834f0a886b8d509b0ecd' => $vendorDir . '/thecodingmachine/safe/generated/zlib.php',
-    '37a3dc5111fe8f707ab4c132ef1dbc62' => $vendorDir . '/guzzlehttp/guzzle/src/functions_include.php',
     '07d7f1a47144818725fd8d91a907ac57' => $vendorDir . '/laminas/laminas-diactoros/src/functions/create_uploaded_file.php',
     'da94ac5d3ca7d2dbab84ce561ce72bfd' => $vendorDir . '/laminas/laminas-diactoros/src/functions/marshal_headers_from_sapi.php',
     '3d97c8dcdfba8cb85d3b34f116bb248b' => $vendorDir . '/laminas/laminas-diactoros/src/functions/marshal_method_from_sapi.php',
@@ -117,6 +117,7 @@ return array(
     '6124b4c8570aa390c21fafd04a26c69f' => $vendorDir . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
     '6a47392539ca2329373e0d33e1dba053' => $vendorDir . '/symfony/polyfill-intl-icu/bootstrap.php',
     'ec07570ca5a812141189b1fa81503674' => $vendorDir . '/phpunit/phpunit/src/Framework/Assert/Functions.php',
+    '0754989a10baadda533479884b399278' => $vendorDir . '/resend/resend-php/src/Resend.php',
     '92c8763cd6170fce6fcfe7e26b4e8c10' => $vendorDir . '/symfony/phpunit-bridge/bootstrap.php',
     'a1105708a18b76903365ca1c4aa61b02' => $vendorDir . '/symfony/translation/Resources/functions.php',
 );

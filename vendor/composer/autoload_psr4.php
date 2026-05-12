@@ -90,6 +90,7 @@ return array(
     'Stof\\DoctrineExtensionsBundle\\' => array($vendorDir . '/stof/doctrine-extensions-bundle/src'),
     'Scheb\\TwoFactorBundle\\' => array($vendorDir . '/scheb/2fa-totp', $vendorDir . '/scheb/2fa-google-authenticator', $vendorDir . '/scheb/2fa-backup-code', $vendorDir . '/scheb/2fa-bundle'),
     'Sabberworm\\CSS\\' => array($vendorDir . '/sabberworm/php-css-parser/src'),
+    'Resend\\' => array($vendorDir . '/resend/resend-php/src'),
     'Ramsey\\Uuid\\' => array($vendorDir . '/ramsey/uuid/src'),
     'Ramsey\\Collection\\' => array($vendorDir . '/ramsey/collection/src'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log/src'),

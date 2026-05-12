@@ -136,25 +136,16 @@ if ($user->getTel()) {
         };
     }
 
-    private function sendCodeByEmail(string $email, string $code): void
-    {
-        try {
-            $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
-            $mail->isSMTP();
-            $mail->Host       = 'smtp.gmail.com';
-            $mail->SMTPAuth   = true;
-            $mail->Username   = 'maleksarra362@gmail.com';
-            $mail->Password   = 'plkcjwhpqlgsetrh';
-            $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
-            $mail->Port       = 465; // ← changed from 587
-        $mail->Timeout    = 5;   // ← ADD THIS
-            $mail->CharSet    = 'UTF-8';
+   private function sendCodeByEmail(string $email, string $code): void
+{
+    try {
+        $resend = \Resend::client($_ENV['RESEND_API_KEY']);
 
-            $mail->setFrom('maleksarra362@gmail.com', 'AgroFlow');
-            $mail->addAddress($email);
-            $mail->isHTML(true);
-            $mail->Subject = 'AgroFlow – Code de vérification 2FA';
-            $mail->Body    = "
+        $resend->emails->send([
+            'from'    => 'AgroFlow <noreply@ton-domaine.com>', // ← ton domaine vérifié sur Resend
+            'to'      => [$email],
+            'subject' => 'AgroFlow – Code de vérification 2FA',
+            'html'    => "
                 <div style='font-family:DM Sans,sans-serif;max-width:480px;margin:0 auto;
                             padding:32px;background:#FCF8E6;border-radius:12px;'>
                     <h2 style='color:#2D5A27;'>Vérification en deux étapes</h2>
@@ -168,30 +159,47 @@ if ($user->getTel()) {
                         Expire dans <strong>5 minutes</strong>.
                     </p>
                 </div>
-            ";
-            $mail->send();
-        } catch (\Exception $e) {
-            error_log('EMAIL ERROR: ' . $e->getMessage()); // ← ADD THIS
+            ",
+        ]);
+    } catch (\Exception $e) {
+        error_log('RESEND EMAIL ERROR: ' . $e->getMessage());
         throw $e;
-        }
     }
+}
 
-    private function sendCodeBySms(string $tel, string $code): void
-    {
-        try {
-            $twilio = new \Twilio\Rest\Client(
-                $_ENV['TWILIO_ACCOUNT_SID'],
-                $_ENV['TWILIO_AUTH_TOKEN']
-            );
-            if (!str_starts_with($tel, '+')) {
-                $tel = '+216' . ltrim($tel, '0');
-            }
-            $twilio->messages->create($tel, [
-                'from' => $_ENV['TWILIO_FROM'],
-                'body' => "AgroFlow – Code 2FA : {$code} (valable 5 min)",
-            ]);
-        } catch (\Exception $e) {
-            // silencieux
+   private function sendCodeBySms(string $tel, string $code): void
+{
+    try {
+        if (!str_starts_with($tel, '+')) {
+            $tel = '+216' . ltrim($tel, '0');
         }
+
+        $sid   = $_ENV['TWILIO_ACCOUNT_SID'];
+        $token = $_ENV['TWILIO_AUTH_TOKEN'];
+        $from  = $_ENV['TWILIO_FROM'];
+
+        $ch = curl_init("https://api.twilio.com/2010-04-01/Accounts/{$sid}/Messages.json");
+        curl_setopt_array($ch, [
+            CURLOPT_POST           => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_USERPWD        => "{$sid}:{$token}",
+            CURLOPT_POSTFIELDS     => http_build_query([
+                'From' => $from,
+                'To'   => $tel,
+                'Body' => "AgroFlow – Code 2FA : {$code} (valable 5 min)",
+            ]),
+        ]);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode >= 400) {
+            error_log('SMS ERROR HTTP ' . $httpCode . ': ' . $response);
+        }
+
+    } catch (\Exception $e) {
+        error_log('SMS ERROR: ' . $e->getMessage());
     }
+}
 }
