@@ -176,21 +176,70 @@ public function twoFactorVerify(
 #[Route('/2fa/resend', name: 'app_2fa_resend')]
 public function twoFactorResend(
     SessionInterface $session,
-    UserRepository $userRepo,
-    TwoFactorCodeSender $sender
+    UserRepository $userRepo
 ): Response {
-    $userId = $session->get('2fa_pending_user_id');
-    if (!$userId) return $this->redirectToRoute('app_login');
+    $userCin = $session->get('2fa_pending_user_id');
+    if (!$userCin) {
+        return $this->redirectToRoute('app_login');
+    }
 
-    $user = $userRepo->find($userId);
+    $user = $userRepo->findOneBy(['cin' => $userCin]);
     if (!$user instanceof User) {
         return $this->redirectToRoute('app_login');
     }
-    $sender->send($user, $session);
+
+    // Générer un nouveau code
+    $code = str_pad((string)random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+
+    // Écraser la session avec le nouveau code
+    $session->set('2fa_code',       $code);
+    $session->set('2fa_expires_at', time() + 300);
+
+    error_log('2FA RESEND CODE: ' . $code . ' pour CIN: ' . $userCin);
+
+    // Envoyer par SMS via curl (sans SDK)
+    if ($user->getTel()) {
+        try {
+            $tel = $user->getTel();
+            if (!str_starts_with($tel, '+')) {
+                $tel = '+216' . ltrim($tel, '0');
+            }
+
+            $sid   = $_ENV['TWILIO_ACCOUNT_SID'] ?? getenv('TWILIO_ACCOUNT_SID');
+            $token = $_ENV['TWILIO_AUTH_TOKEN']  ?? getenv('TWILIO_AUTH_TOKEN');
+            $from  = $_ENV['TWILIO_FROM']        ?? getenv('TWILIO_FROM');
+
+            $ch = curl_init("https://api.twilio.com/2010-04-01/Accounts/{$sid}/Messages.json");
+            curl_setopt_array($ch, [
+                CURLOPT_POST           => true,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_TIMEOUT        => 10,
+                CURLOPT_USERPWD        => "{$sid}:{$token}",
+                CURLOPT_POSTFIELDS     => http_build_query([
+                    'From' => $from,
+                    'To'   => $tel,
+                    'Body' => "AgroFlow – Code 2FA : {$code} (valable 5 min)",
+                ]),
+            ]);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if ($httpCode >= 400) {
+                error_log('2FA RESEND SMS FAILED: ' . $response);
+            } else {
+                error_log('2FA RESEND SMS OK → ' . $tel);
+            }
+
+        } catch (\Exception $e) {
+            error_log('2FA RESEND SMS ERROR: ' . $e->getMessage());
+        }
+    }
+
     $this->addFlash('success', 'Nouveau code envoyé.');
     return $this->redirectToRoute('app_2fa_verify');
 }
-
 #[Route('/profil/2fa/toggle', name: 'app_2fa_toggle', methods: ['POST'])]
 public function toggle2fa(
     Request $request,
