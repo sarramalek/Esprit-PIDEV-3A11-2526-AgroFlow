@@ -14,86 +14,62 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-use App\Service\TwoFactorCodeSender;
-use App\Service\SmsService;
-use Symfony\Component\Mailer\MailerInterface;
-
-
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
-
-use Twilio\Rest\Client as TwilioClient;
-
+use Symfony\Component\Mailer\MailerInterface;
+use App\Service\SmsService;
 
 class AuthController extends AbstractController
 {
     // ==================== LOGIN ====================
     #[Route('/login', name: 'app_login')]
-public function login(
-    AuthenticationUtils $authenticationUtils,
-    Request $request,
-    SessionInterface $session,
-    UserRepository $userRepo,
-    UserPasswordHasherInterface $hasher
-): Response {
-    // Si déjà connecté normalement → rediriger
-    $currentUser = $this->getUser();
-    if ($currentUser instanceof User && !$session->get('2fa_pending_user_id')) {
-        return $this->redirectByRole($currentUser);
+    public function login(
+        AuthenticationUtils $authenticationUtils,
+        Request $request,
+        SessionInterface $session,
+        UserRepository $userRepo,
+        UserPasswordHasherInterface $hasher
+    ): Response {
+        $currentUser = $this->getUser();
+        if ($currentUser instanceof User && !$session->get('2fa_pending_user_id')) {
+            return $this->redirectByRole($currentUser);
+        }
+
+        $error        = $authenticationUtils->getLastAuthenticationError();
+        $lastUsername = $authenticationUtils->getLastUsername();
+
+        if ($session->get('2fa_pending_user_id')) {
+            return $this->redirectToRoute('app_2fa_verify');
+        }
+
+        $loginForm = $this->createForm(LoginFormType::class, ['_username' => $lastUsername]);
+
+        return $this->render('Auth/login.html.twig', [
+            'loginForm' => $loginForm->createView(),
+            'error'     => $error,
+        ]);
     }
 
-    $error        = $authenticationUtils->getLastAuthenticationError();
-    $lastUsername = $authenticationUtils->getLastUsername();
-
-    // Symfony a authentifié l'utilisateur → on intercepte avant la session finale
-    // On passe par un CustomAuthenticator (voir étape 3) qui positionne '2fa_pending_user_id'
-    // Si 2FA en attente → rediriger vers la page de vérification
-    if ($session->get('2fa_pending_user_id')) {
-        return $this->redirectToRoute('app_2fa_verify');
-    }
-
-    $loginForm = $this->createForm(LoginFormType::class, ['_username' => $lastUsername]);
-
-    return $this->render('Auth/login.html.twig', [
-        'loginForm' => $loginForm->createView(),
-        'error'     => $error,
-    ]);
-}
-
-
- #[Route('/send-code', name: 'send_code', methods: ['POST'])]
+    // ==================== SEND/VERIFY CODE (inscription) ====================
+    #[Route('/send-code', name: 'send_code', methods: ['POST'])]
     public function sendCode(
         Request $request,
         SmsService $smsService,
         SessionInterface $session
     ): JsonResponse {
         $phone = $request->request->get('phone');
-
         try {
             $result = $smsService->sendVerificationCode($phone);
-
-            // 💾 Stocker le code en session pour vérification
-            $session->set('verification_code', $result['code']);
-            $session->set('verification_expires', time() + 600); // 10 min
-
-            return $this->json([
-                'success' => true,
-                'channel' => $result['channel'], // 'twilio' ou 'vonage'
-                'message' => 'Code envoyé par SMS.',
-            ]);
-
+            $session->set('verification_code',   $result['code']);
+            $session->set('verification_expires', time() + 600);
+            return $this->json(['success' => true, 'channel' => $result['channel'], 'message' => 'Code envoyé par SMS.']);
         } catch (\Exception $e) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Impossible d\'envoyer le SMS.',
-            ], 500);
+            return $this->json(['success' => false, 'message' => 'Impossible d\'envoyer le SMS.'], 500);
         }
     }
 
     #[Route('/verify-code', name: 'verify_code', methods: ['POST'])]
-    public function verifyCode(
-        Request $request,
-        SessionInterface $session
-    ): JsonResponse {
+    public function verifyCode(Request $request, SessionInterface $session): JsonResponse
+    {
         $inputCode = $request->request->get('code');
         $savedCode = $session->get('verification_code');
         $expires   = $session->get('verification_expires');
@@ -101,395 +77,224 @@ public function login(
         if (!$savedCode || time() > $expires) {
             return $this->json(['success' => false, 'message' => 'Code expiré.'], 400);
         }
-
         if ($inputCode !== $savedCode) {
             return $this->json(['success' => false, 'message' => 'Code incorrect.'], 400);
         }
 
-        // ✅ Code valide → nettoyer la session
         $session->remove('verification_code');
         $session->remove('verification_expires');
-
         return $this->json(['success' => true, 'message' => 'Code vérifié avec succès.']);
     }
-// Dans AuthController.php — ajouter ces routes :
 
-#[Route('/2fa/verify', name: 'app_2fa_verify')]
-public function twoFactorVerify(
-    Request $request,
-    SessionInterface $session,
-    UserRepository $userRepo,
-    EntityManagerInterface $em
-): Response {
-    $userCin = $session->get('2fa_pending_user_id');
-    if (!$userCin) {
-        return $this->redirectToRoute('app_login');
-    }
+    // ==================== 2FA ====================
+    #[Route('/2fa/verify', name: 'app_2fa_verify')]
+    public function twoFactorVerify(
+        Request $request,
+        SessionInterface $session,
+        UserRepository $userRepo,
+        EntityManagerInterface $em
+    ): Response {
+        $userCin = $session->get('2fa_pending_user_id');
+        if (!$userCin) {
+            return $this->redirectToRoute('app_login');
+        }
 
-    $error = null;
+        $error = null;
 
-    if ($request->isMethod('POST')) {
-        $entered   = trim($request->request->get('code', ''));
-        $stored    = $session->get('2fa_code');
-        $expiresAt = $session->get('2fa_expires_at');
+        if ($request->isMethod('POST')) {
+            $entered   = trim($request->request->get('code', ''));
+            $stored    = $session->get('2fa_code');
+            $expiresAt = $session->get('2fa_expires_at');
 
-        // Debug temporaire → à supprimer après vérification
-        error_log('CIN: ' . $userCin);
-        error_log('STORED: "' . $stored . '"');
-        error_log('ENTERED: "' . $entered . '"');
-        error_log('EXPIRED: ' . (time() > $expiresAt ? 'OUI' : 'NON'));
+            error_log('CIN: ' . $userCin);
+            error_log('STORED: "' . $stored . '"');
+            error_log('ENTERED: "' . $entered . '"');
+            error_log('EXPIRED: ' . (time() > $expiresAt ? 'OUI' : 'NON'));
 
-        if (!$stored) {
-            $error = 'Session expirée. Veuillez vous reconnecter.';
-            $session->remove('2fa_pending_user_id');
-        } elseif (time() > $expiresAt) {
-            $session->remove('2fa_pending_user_id');
-            $session->remove('2fa_code');
-            $error = 'Le code a expiré. Veuillez vous reconnecter.';
-        } elseif ($entered !== $stored) {
-            $error = 'Code incorrect. Vérifiez votre email ou SMS.';
-        } else {
-            // ✅ Code valide → chercher par CIN, pas par ID
-            $user = $userRepo->findOneBy(['cin' => $userCin]);
-
-            if (!$user instanceof User) {
+            if (!$stored) {
+                $error = 'Session expirée. Veuillez vous reconnecter.';
                 $session->remove('2fa_pending_user_id');
-                return $this->redirectToRoute('app_login');
-            }
-
-            $session->remove('2fa_pending_user_id');
-            $session->remove('2fa_code');
-            $session->remove('2fa_expires_at');
-
-            $token = new \Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken(
-                $user, 'main', $user->getRoles()
-            );
-            $this->container->get('security.token_storage')->setToken($token);
-
-            return $this->redirectByRole($user);
-        }
-    }
-
-    return $this->render('Auth/2fa_verify.html.twig', ['error' => $error]);
-}
-
-#[Route('/2fa/resend', name: 'app_2fa_resend')]
-public function twoFactorResend(
-    SessionInterface $session,
-    UserRepository $userRepo
-): Response {
-    $userCin = $session->get('2fa_pending_user_id');
-    if (!$userCin) {
-        return $this->redirectToRoute('app_login');
-    }
-
-    $user = $userRepo->findOneBy(['cin' => $userCin]);
-    if (!$user instanceof User) {
-        return $this->redirectToRoute('app_login');
-    }
-
-    // Générer un nouveau code
-    $code = str_pad((string)random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-
-    // Écraser la session avec le nouveau code
-    $session->set('2fa_code',       $code);
-    $session->set('2fa_expires_at', time() + 300);
-
-    error_log('2FA RESEND CODE: ' . $code . ' pour CIN: ' . $userCin);
-
-    // Envoyer par SMS via curl (sans SDK)
-    if ($user->getTel()) {
-        try {
-            $tel = $user->getTel();
-            if (!str_starts_with($tel, '+')) {
-                $tel = '+216' . ltrim($tel, '0');
-            }
-
-            $sid   = $_ENV['TWILIO_ACCOUNT_SID'] ?? getenv('TWILIO_ACCOUNT_SID');
-            $token = $_ENV['TWILIO_AUTH_TOKEN']  ?? getenv('TWILIO_AUTH_TOKEN');
-            $from  = $_ENV['TWILIO_FROM']        ?? getenv('TWILIO_FROM');
-
-            $ch = curl_init("https://api.twilio.com/2010-04-01/Accounts/{$sid}/Messages.json");
-            curl_setopt_array($ch, [
-                CURLOPT_POST           => true,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_TIMEOUT        => 10,
-                CURLOPT_USERPWD        => "{$sid}:{$token}",
-                CURLOPT_POSTFIELDS     => http_build_query([
-                    'From' => $from,
-                    'To'   => $tel,
-                    'Body' => "AgroFlow – Code 2FA : {$code} (valable 5 min)",
-                ]),
-            ]);
-
-            $response = curl_exec($ch);
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            curl_close($ch);
-
-            if ($httpCode >= 400) {
-                error_log('2FA RESEND SMS FAILED: ' . $response);
+            } elseif (time() > $expiresAt) {
+                $session->remove('2fa_pending_user_id');
+                $session->remove('2fa_code');
+                $error = 'Le code a expiré. Veuillez vous reconnecter.';
+            } elseif ($entered !== $stored) {
+                $error = 'Code incorrect. Vérifiez votre email ou SMS.';
             } else {
-                error_log('2FA RESEND SMS OK → ' . $tel);
-            }
+                $user = $userRepo->findOneBy(['cin' => $userCin]);
+                if (!$user instanceof User) {
+                    $session->remove('2fa_pending_user_id');
+                    return $this->redirectToRoute('app_login');
+                }
 
-        } catch (\Exception $e) {
-            error_log('2FA RESEND SMS ERROR: ' . $e->getMessage());
+                $session->remove('2fa_pending_user_id');
+                $session->remove('2fa_code');
+                $session->remove('2fa_expires_at');
+
+                $token = new \Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken(
+                    $user, 'main', $user->getRoles()
+                );
+                $this->container->get('security.token_storage')->setToken($token);
+
+                return $this->redirectByRole($user);
+            }
         }
+
+        return $this->render('Auth/2fa_verify.html.twig', ['error' => $error]);
     }
 
-    $this->addFlash('success', 'Nouveau code envoyé.');
-    return $this->redirectToRoute('app_2fa_verify');
-}
-#[Route('/profil/2fa/toggle', name: 'app_2fa_toggle', methods: ['POST'])]
-public function toggle2fa(
-    Request $request,
-    EntityManagerInterface $em
-): Response {
-    $user = $this->getUser();
-    if (!$user instanceof User) return $this->json(['success' => false], 401);
+    #[Route('/2fa/resend', name: 'app_2fa_resend')]
+    public function twoFactorResend(SessionInterface $session, UserRepository $userRepo): Response
+    {
+        $userCin = $session->get('2fa_pending_user_id');
+        if (!$userCin) return $this->redirectToRoute('app_login');
 
-    $enabled = (int) $request->request->get('enabled', 0);
-    $user->setTwoFactorEnabled($enabled ? 1 : 0);
-    $em->flush();
+        $user = $userRepo->findOneBy(['cin' => $userCin]);
+        if (!$user instanceof User) return $this->redirectToRoute('app_login');
 
-    return $this->json(['success' => true, 'enabled' => $user->getTwoFactorEnabled()]);
-}
-    // ==================== REGISTER ====================
-   #[Route('/register', name: 'app_register')]
-public function register(
-    Request $request,
-    UserPasswordHasherInterface $passwordHasher,
-    EntityManagerInterface $em,
-): Response {
-    $user = new User();
-    $form = $this->createForm(RegistrationFormType::class, $user);
-    $form->handleRequest($request);
+        $code = str_pad((string)random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        $session->set('2fa_code',       $code);
+        $session->set('2fa_expires_at', time() + 300);
 
-    if ($form->isSubmitted() && $form->isValid()) {
+        error_log('2FA RESEND CODE: ' . $code . ' pour CIN: ' . $userCin);
 
-        $user->setRole(2); // Agriculteur par défaut
+        if ($user->getTel()) {
+            $this->sendSms($user->getTel(), "AgroFlow – Code 2FA : {$code} (valable 5 min)");
+        }
 
-        $user->setMdp(
-            $passwordHasher->hashPassword($user, $form->get('plainPassword')->getData())
-        );
+        $this->addFlash('success', 'Nouveau code envoyé.');
+        return $this->redirectToRoute('app_2fa_verify');
+    }
 
-        $user->setDateCreationcpt(new \DateTime());
-        $user->setDateDernierchg(new \DateTime());
+    #[Route('/profil/2fa/toggle', name: 'app_2fa_toggle', methods: ['POST'])]
+    public function toggle2fa(Request $request, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+        if (!$user instanceof User) return $this->json(['success' => false], 401);
 
-        $em->persist($user);
+        $enabled = (int) $request->request->get('enabled', 0);
+        $user->setTwoFactorEnabled($enabled ? 1 : 0);
         $em->flush();
 
-        return $this->redirectByRole($user);
+        return $this->json(['success' => true, 'enabled' => $user->getTwoFactorEnabled()]);
     }
 
-    return $this->render('Auth/register.html.twig', [
-        'registrationForm' => $form->createView(),
-    ]);
-}
+    // ==================== REGISTER ====================
+    #[Route('/register', name: 'app_register')]
+    public function register(
+        Request $request,
+        UserPasswordHasherInterface $passwordHasher,
+        EntityManagerInterface $em
+    ): Response {
+        $user = new User();
+        $form = $this->createForm(RegistrationFormType::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user->setRole(2);
+            $user->setMdp($passwordHasher->hashPassword($user, $form->get('plainPassword')->getData()));
+            $user->setDateCreationcpt(new \DateTime());
+            $user->setDateDernierchg(new \DateTime());
+            $em->persist($user);
+            $em->flush();
+            return $this->redirectByRole($user);
+        }
+
+        return $this->render('Auth/register.html.twig', ['registrationForm' => $form->createView()]);
+    }
 
     // ==================== LOGOUT ====================
     #[Route('/logout', name: 'app_logout')]
-    public function logout(): void
+    public function logout(): void {}
+
+    // ==================== PAGE COMPTE BANNI ====================
+    #[Route('/banni', name: 'app_bann')]
+    public function banni(
+        \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage,
+        \Symfony\Component\HttpFoundation\RequestStack $requestStack
+    ): Response {
+        $tokenStorage->setToken(null);
+        $requestStack->getSession()->invalidate();
+        return $this->render('Auth/banni.html.twig');
+    }
+
+    // ==================== CHECK SESSION ====================
+    #[Route('/check-session', name: 'app_check_session')]
+    public function checkSession(): Response
     {
-    }
-// ==================== PAGE COMPTE BANNI ====================
-#[Route('/banni', name: 'app_bann')]
-public function banni(
-    \Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface $tokenStorage,
-    \Symfony\Component\HttpFoundation\RequestStack $requestStack
-): Response
-{
-    // Déconnecter l'utilisateur
-    $tokenStorage->setToken(null);
-
-    // Invalider la session
-    $session = $requestStack->getSession();
-    $session->invalidate();
-
-    return $this->render('Auth/banni.html.twig');
-}
-
-    // ==================== REDIRECTION PAR ROLE ====================
-    private function redirectByRole(User $user): Response
-    {
-        return match((int)$user->getRole()) {
-            0       => $this->redirectToRoute('app_bann'),
-            1       => $this->redirectToRoute('ouvrier_home'),   // ← corrigé
-            2       => $this->redirectToRoute('agri_home'),
-            3       => $this->redirectToRoute('admin_dashboard'),
-            default => $this->redirectToRoute('ouvrier_home'),   // ← corrigé
-        };
-    }
-    // ── CHECK SESSION (appelé par JS toutes les 2s) ───────────────────────────
-#[Route('/check-session', name: 'app_check_session')]
-public function checkSession(): Response
-{
-    if (!$this->getUser()) {
-        return new Response('Unauthorized', 401);
-    }
-    return new Response('OK', 200);
-}
-//------------------------------------------------------------------------
-#[Route('/api/terrains/{cinAgriculteur}', name: 'api_terrains_by_agriculteur')]
-public function terrainsByAgriculteur(
-    int $cinAgriculteur,
-    \App\Repository\Terrain\TerrainRepository $terrainRepo
-): Response {
-    $terrains = $terrainRepo->findByAgriculteur($cinAgriculteur);
-
-    $data = array_map(fn($t) => [
-        'id'  => $t->getId(),
-        'nom' => $t->getNomTerrain(),
-    ], $terrains);
-
-    return $this->json($data);
-}
-
-
-
-
-
-//--------------------API RESET PASSWOR - TWILIO - -------------------------------
- // ──────────────────────────────────────────────────────────────
-    // ÉTAPE 1 : Saisie de l'email + choix du canal (email ou SMS)
-    // ──────────────────────────────────────────────────────────────
-  #[Route('/reset-password', name: 'app_reset_password')]
-public function request(
-    Request $request,
-    UserRepository $userRepo,
-    SessionInterface $session
-): Response {
-    $error = null;
-
-    if ($request->isMethod('POST')) {
-        $email = trim($request->request->get('email', ''));
-        $canal = $request->request->get('canal', 'email');
-        $user  = $userRepo->findOneBy(['email' => $email]);
-
-        if (!$user) {
-            $error = 'Aucun compte trouvé avec cet email.';
-        } elseif ($canal === 'sms' && !$user->getTel()) {
-            $error = 'Aucun numéro de téléphone associé à ce compte.';
-        } else {
-            $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-
-            $session->set('reset_code',       $code);
-            $session->set('reset_email',      $email);
-            $session->set('reset_canal',      $canal);
-            $session->set('reset_expires_at', time() + 600);
-
-           if ($canal === 'sms') {
-    $sent = false;
-
-    // ── Tentative 1 : Twilio ──
-    try {
-        $twilio = new TwilioClient(
-            $_ENV['TWILIO_ACCOUNT_SID'],
-            $_ENV['TWILIO_AUTH_TOKEN']
-        );
-        $tel = $user->getTel();
-        if (!str_starts_with($tel, '+')) {
-            $tel = '+216' . ltrim($tel, '0');
-        }
-        $twilio->messages->create($tel, [
-            'from' => $_ENV['TWILIO_FROM'],
-            'body' => "AgroFlow – Votre code : $code (valable 10 min)"
-        ]);
-        $sent = true;
-
-    } catch (\Twilio\Exceptions\RestException $e) {
-
-        // ── Fallback : Vonage si Twilio dépasse la limite (429) ──
-        if ($e->getStatusCode() === 429) {
-            try {
-                $vonage = new \Vonage\Client(
-                    new \Vonage\Client\Credentials\Basic(
-                        $_ENV['VONAGE_API_KEY'],
-                        $_ENV['VONAGE_API_SECRET']
-                    )
-                );
-                $tel = $user->getTel();
-                if (!str_starts_with($tel, '+')) {
-                    $tel = '+216' . ltrim($tel, '0');
-                }
-                $message  = new \Vonage\SMS\Message\SMS(
-                    $tel,
-                    $_ENV['VONAGE_FROM'],
-                    "AgroFlow – Votre code : $code (valable 10 min)"
-                );
-                $response = $vonage->sms()->send($message);
-
-                if ($response->current()->getStatus() === 0) {
-                    $sent = true;
-                }
-            } catch (\Exception $vonageEx) {
-                $error = 'SMS indisponible. Veuillez choisir l\'envoi par email.';
-                goto renderForm;
-            }
-        } else {
-            $error = 'Impossible d\'envoyer le SMS : ' . $e->getMessage();
-            goto renderForm;
-        }
+        return $this->getUser()
+            ? new Response('OK', 200)
+            : new Response('Unauthorized', 401);
     }
 
-    if (!$sent) {
-        $error = 'L\'envoi du SMS a échoué. Veuillez réessayer.';
-        goto renderForm;
-    }
-            } else {
-                // ── PHPMailer ──
-                try {
-                    $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
-                    $mail->isSMTP();
-                    $mail->Host       = 'smtp.gmail.com';
-                    $mail->SMTPAuth   = true;
-                    $mail->Username   = 'maleksarra362@gmail.com';
-                    $mail->Password   = 'dwxqvewsbormytyn'; // ← ici
-                    $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
-                    $mail->Port       = 587;
-                    $mail->CharSet    = 'UTF-8';
-
-                    $mail->setFrom('maleksarra362@gmail.com', 'AgroFlow');
-                    $mail->addAddress($email);
-                    $mail->isHTML(true);
-                    $mail->Subject = 'AgroFlow – Code de réinitialisation';
-                    $mail->Body    = "
-                        <div style='font-family:DM Sans,sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#FCF8E6;border-radius:12px;'>
-                            <h2 style='color:#2D5A27;margin-bottom:8px;'>Réinitialisation du mot de passe</h2>
-                            <p style='color:#555;margin-bottom:24px;'>Utilisez ce code pour réinitialiser votre mot de passe AgroFlow :</p>
-                            <div style='background:white;border:2px solid #c8e6c0;border-radius:10px;padding:20px;text-align:center;letter-spacing:0.3em;font-size:32px;font-weight:700;color:#2D5A27;'>
-                                $code
-                            </div>
-                            <p style='color:#888;font-size:13px;margin-top:20px;'>Ce code expire dans <strong>10 minutes</strong>.</p>
-                        </div>
-                    ";
-
-                    $mail->send();
-
-                } catch (\Exception $e) {
-                    $error = 'Erreur email : ' . $e->getMessage();
-                    goto renderForm;
-                }
-            }
-
-            return $this->redirectToRoute('app_reset_verify');
-        }
+    // ==================== API TERRAINS ====================
+    #[Route('/api/terrains/{cinAgriculteur}', name: 'api_terrains_by_agriculteur')]
+    public function terrainsByAgriculteur(
+        int $cinAgriculteur,
+        \App\Repository\Terrain\TerrainRepository $terrainRepo
+    ): Response {
+        $terrains = $terrainRepo->findByAgriculteur($cinAgriculteur);
+        $data = array_map(fn($t) => ['id' => $t->getId(), 'nom' => $t->getNomTerrain()], $terrains);
+        return $this->json($data);
     }
 
-    renderForm:
-    return $this->render('Auth/reset_password_request.html.twig', [
-        'error' => $error,
-    ]);
-}
-    // ──────────────────────────────────────────────────────────────
-    // ÉTAPE 2 : Saisie du code de vérification
-    // ──────────────────────────────────────────────────────────────
-    #[Route('/reset-password/verify', name: 'app_reset_verify')]
-    public function verify(
+    // ==================== RESET PASSWORD ====================
+    #[Route('/reset-password', name: 'app_reset_password')]
+    public function request(
         Request $request,
+        UserRepository $userRepo,
         SessionInterface $session
     ): Response {
-        // Sécurité : ne pas accéder directement sans avoir fait l'étape 1
+        $error = null;
+
+        if ($request->isMethod('POST')) {
+            $email = trim($request->request->get('email', ''));
+            $canal = $request->request->get('canal', 'email');
+            $user  = $userRepo->findOneBy(['email' => $email]);
+
+            if (!$user) {
+                $error = 'Aucun compte trouvé avec cet email.';
+            } elseif ($canal === 'sms' && !$user->getTel()) {
+                $error = 'Aucun numéro de téléphone associé à ce compte.';
+            } else {
+                $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+                $session->set('reset_code',       $code);
+                $session->set('reset_email',      $email);
+                $session->set('reset_canal',      $canal);
+                $session->set('reset_expires_at', time() + 600);
+
+                if ($canal === 'sms') {
+                    $sent = $this->sendSms(
+                        $user->getTel(),
+                        "AgroFlow – Votre code : {$code} (valable 10 min)"
+                    );
+                    if (!$sent) {
+                        $error = 'Impossible d\'envoyer le SMS. Veuillez choisir l\'envoi par email.';
+                        goto renderForm;
+                    }
+                } else {
+                    $sent = $this->sendEmail(
+                        $email,
+                        'AgroFlow – Code de réinitialisation',
+                        $this->resetEmailHtml($code)
+                    );
+                    if (!$sent) {
+                        $error = 'Erreur lors de l\'envoi de l\'email.';
+                        goto renderForm;
+                    }
+                }
+
+                return $this->redirectToRoute('app_reset_verify');
+            }
+        }
+
+        renderForm:
+        return $this->render('Auth/reset_password_request.html.twig', ['error' => $error]);
+    }
+
+    #[Route('/reset-password/verify', name: 'app_reset_verify')]
+    public function verify(Request $request, SessionInterface $session): Response
+    {
         if (!$session->get('reset_email')) {
             return $this->redirectToRoute('app_reset_password');
         }
@@ -498,34 +303,24 @@ public function request(
         $canal = $session->get('reset_canal', 'email');
 
         if ($request->isMethod('POST')) {
-            $entered    = trim($request->request->get('code', ''));
-            $stored     = $session->get('reset_code');
-            $expiresAt  = $session->get('reset_expires_at');
+            $entered   = trim($request->request->get('code', ''));
+            $stored    = $session->get('reset_code');
+            $expiresAt = $session->get('reset_expires_at');
 
             if (time() > $expiresAt) {
-                $session->remove('reset_code');
-                $session->remove('reset_email');
-                $session->remove('reset_canal');
-                $session->remove('reset_expires_at');
+                foreach (['reset_code','reset_email','reset_canal','reset_expires_at'] as $k) $session->remove($k);
                 $error = 'Le code a expiré. Veuillez recommencer.';
             } elseif ($entered !== $stored) {
                 $error = 'Code incorrect. Vérifiez et réessayez.';
             } else {
-                // Code valide → passe à l'étape 3
                 $session->set('reset_verified', true);
                 return $this->redirectToRoute('app_reset_new_password');
             }
         }
 
-        return $this->render('Auth/reset_password_verify.html.twig', [
-            'error' => $error,
-            'canal' => $canal,
-        ]);
+        return $this->render('Auth/reset_password_verify.html.twig', ['error' => $error, 'canal' => $canal]);
     }
 
-    // ──────────────────────────────────────────────────────────────
-    // ÉTAPE 3 : Saisie du nouveau mot de passe
-    // ──────────────────────────────────────────────────────────────
     #[Route('/reset-password/new', name: 'app_reset_new_password')]
     public function newPassword(
         Request $request,
@@ -534,7 +329,6 @@ public function request(
         EntityManagerInterface $em,
         UserPasswordHasherInterface $hasher
     ): Response {
-        // Sécurité : code doit avoir été vérifié
         if (!$session->get('reset_verified')) {
             return $this->redirectToRoute('app_reset_password');
         }
@@ -550,122 +344,191 @@ public function request(
             } elseif ($pwd1 !== $pwd2) {
                 $error = 'Les mots de passe ne correspondent pas.';
             } else {
-                $email = $session->get('reset_email');
-                $user  = $userRepo->findOneBy(['email' => $email]);
-
+                $user = $userRepo->findOneBy(['email' => $session->get('reset_email')]);
                 if ($user) {
                     $user->setMdp($hasher->hashPassword($user, $pwd1));
                     $em->flush();
                 }
-
-                // Nettoie la session
-                foreach (['reset_code','reset_email','reset_canal','reset_expires_at','reset_verified'] as $key) {
-                    $session->remove($key);
+                foreach (['reset_code','reset_email','reset_canal','reset_expires_at','reset_verified'] as $k) {
+                    $session->remove($k);
                 }
-
                 $this->addFlash('success', 'Mot de passe réinitialisé avec succès !');
                 return $this->redirectToRoute('app_login');
             }
         }
 
-        return $this->render('Auth/reset_password_new.html.twig', [
-            'error' => $error,
-        ]);
+        return $this->render('Auth/reset_password_new.html.twig', ['error' => $error]);
     }
 
-    // ──────────────────────────────────────────────────────────────
-    // BONUS : Renvoyer le code
-    // ──────────────────────────────────────────────────────────────
     #[Route('/reset-password/resend', name: 'app_reset_resend')]
-    public function resend(
-        SessionInterface $session,
-        UserRepository $userRepo,
-        MailerInterface $mailer
-    ): Response {
+    public function resend(SessionInterface $session, UserRepository $userRepo, MailerInterface $mailer): Response
+    {
         $email = $session->get('reset_email');
         $canal = $session->get('reset_canal', 'email');
 
-        if (!$email) {
-            return $this->redirectToRoute('app_reset_password');
-        }
+        if (!$email) return $this->redirectToRoute('app_reset_password');
 
         $user = $userRepo->findOneBy(['email' => $email]);
-        if (!$user) {
-            return $this->redirectToRoute('app_reset_password');
-        }
+        if (!$user) return $this->redirectToRoute('app_reset_password');
 
         $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
         $session->set('reset_code',       $code);
         $session->set('reset_expires_at', time() + 600);
-if ($canal === 'sms') {
-    $tel = $user->getTel();
-    if (!str_starts_with($tel, '+')) {
-        $tel = '+216' . ltrim($tel, '0');
-    }
 
-    $smsSent = false;
-
-    // ── Tentative 1 : Twilio ──
-    
-    // ── Tentative 2 : Vonage (fallback) ──
-    try {
-        $vonage = new \Vonage\Client(
-            new \Vonage\Client\Credentials\Basic(
-                $_ENV['VONAGE_API_KEY'],
-                $_ENV['VONAGE_API_SECRET']
-            )
-        );
-        $response = $vonage->sms()->send(
-            new \Vonage\SMS\Message\SMS(
-                $tel,
-                $_ENV['VONAGE_FROM'],
-                "AgroFlow – Votre code : $code (valable 10 min)"
-            )
-        );
-        if ($response->current()->getStatus() === 0) {
-            $smsSent = true;
+        if ($canal === 'sms') {
+            $this->sendSms($user->getTel(), "AgroFlow – Votre code : {$code} (valable 10 min)");
+        } else {
+            $this->sendEmail($email, 'AgroFlow – Nouveau code', $this->resetEmailHtml($code));
         }
-    } catch (\Exception $vonageEx) {
-        $smsSent = false;
-    }
-
-    if (!$smsSent) {
-        $error = 'Impossible d\'envoyer le SMS. Veuillez choisir l\'envoi par email.';
-        return $this->render('Auth/reset_password_request.html.twig', [
-        'error' => $error,
-    ]);
-    }
-    } else {
-    try {
-        $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
-        $mail->isSMTP();
-        $mail->Host       = 'smtp.gmail.com';
-        $mail->SMTPAuth   = true;
-        $mail->Username   = 'maleksarra362@gmail.com';
-        $mail->Password   = 'dwxqvewsbormytyn'; // ← ici
-        $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port       = 587;
-        $mail->CharSet    = 'UTF-8';
-
-        $mail->setFrom('maleksarra362@gmail.com', 'AgroFlow');
-        $mail->addAddress($email);
-        $mail->isHTML(true);
-        $mail->Subject = 'AgroFlow – Nouveau code';
-        $mail->Body    = "
-            <div style='font-family:DM Sans,sans-serif;padding:32px;'>
-                <h2 style='color:#2D5A27;'>Nouveau code</h2>
-                <div style='font-size:32px;font-weight:700;color:#2D5A27;letter-spacing:0.3em;padding:20px;background:white;border:2px solid #c8e6c0;border-radius:10px;text-align:center;'>$code</div>
-                <p style='color:#888;font-size:13px;margin-top:16px;'>Valable 10 minutes.</p>
-            </div>
-        ";
-
-        $mail->send();
-    } catch (\Exception $e) {
-        // log silencieux
-    }
-}
 
         $this->addFlash('success', 'Un nouveau code a été envoyé.');
         return $this->redirectToRoute('app_reset_verify');
+    }
+
+    // ==================== HELPERS PRIVÉS ====================
+
+    private function redirectByRole(User $user): Response
+    {
+        return match((int)$user->getRole()) {
+            0       => $this->redirectToRoute('app_bann'),
+            1       => $this->redirectToRoute('ouvrier_home'),
+            2       => $this->redirectToRoute('agri_home'),
+            3       => $this->redirectToRoute('admin_dashboard'),
+            default => $this->redirectToRoute('ouvrier_home'),
+        };
+    }
+
+    /**
+     * Envoi SMS via Twilio REST API (curl, sans SDK)
+     * Retourne true si succès, false sinon
+     */
+    private function sendSms(string $tel, string $body): bool
+    {
+        try {
+            $sid   = $_ENV['TWILIO_ACCOUNT_SID'] ?? getenv('TWILIO_ACCOUNT_SID');
+            $token = $_ENV['TWILIO_AUTH_TOKEN']  ?? getenv('TWILIO_AUTH_TOKEN');
+            $from  = $_ENV['TWILIO_FROM']        ?? getenv('TWILIO_FROM');
+
+            if (!$sid || !$token || !$from) {
+                error_log('SMS ERROR: Variables Twilio manquantes');
+                return false;
+            }
+
+            if (!str_starts_with($tel, '+')) {
+                $tel = '+216' . ltrim($tel, '0');
+            }
+
+            $ch = curl_init("https://api.twilio.com/2010-04-01/Accounts/{$sid}/Messages.json");
+            curl_setopt_array($ch, [
+                CURLOPT_POST           => true,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_TIMEOUT        => 10,
+                CURLOPT_USERPWD        => "{$sid}:{$token}",
+                CURLOPT_POSTFIELDS     => http_build_query([
+                    'From' => $from,
+                    'To'   => $tel,
+                    'Body' => $body,
+                ]),
+            ]);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlErr  = curl_error($ch);
+            curl_close($ch);
+
+            if ($curlErr) {
+                error_log('SMS CURL ERROR: ' . $curlErr);
+                return false;
+            }
+
+            if ($httpCode >= 400) {
+                error_log('SMS HTTP ERROR ' . $httpCode . ': ' . $response);
+                return false;
+            }
+
+            error_log('SMS OK → ' . $tel);
+            return true;
+
+        } catch (\Exception $e) {
+            error_log('SMS EXCEPTION: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Envoi email via Resend REST API (curl, sans SDK)
+     * Retourne true si succès, false sinon
+     */
+    private function sendEmail(string $to, string $subject, string $html): bool
+    {
+        try {
+            $apiKey = $_ENV['RESEND_API_KEY'] ?? getenv('RESEND_API_KEY');
+            $from   = $_ENV['RESEND_FROM_EMAIL'] ?? getenv('RESEND_FROM_EMAIL') ?: 'onboarding@resend.dev';
+
+            if (!$apiKey) {
+                error_log('EMAIL ERROR: RESEND_API_KEY manquante');
+                return false;
+            }
+
+            $payload = json_encode([
+                'from'    => 'AgroFlow <' . $from . '>',
+                'to'      => [$to],
+                'subject' => $subject,
+                'html'    => $html,
+            ]);
+
+            $ch = curl_init('https://api.resend.com/emails');
+            curl_setopt_array($ch, [
+                CURLOPT_POST           => true,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_TIMEOUT        => 10,
+                CURLOPT_HTTPHEADER     => [
+                    'Authorization: Bearer ' . $apiKey,
+                    'Content-Type: application/json',
+                ],
+                CURLOPT_POSTFIELDS => $payload,
+            ]);
+
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlErr  = curl_error($ch);
+            curl_close($ch);
+
+            if ($curlErr) {
+                error_log('EMAIL CURL ERROR: ' . $curlErr);
+                return false;
+            }
+
+            if ($httpCode >= 400) {
+                error_log('EMAIL HTTP ERROR ' . $httpCode . ': ' . $response);
+                return false;
+            }
+
+            error_log('EMAIL OK → ' . $to);
+            return true;
+
+        } catch (\Exception $e) {
+            error_log('EMAIL EXCEPTION: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    private function resetEmailHtml(string $code): string
+    {
+        return "
+            <div style='font-family:DM Sans,sans-serif;max-width:480px;margin:0 auto;
+                        padding:32px;background:#FCF8E6;border-radius:12px;'>
+                <h2 style='color:#2D5A27;margin-bottom:8px;'>Réinitialisation du mot de passe</h2>
+                <p style='color:#555;margin-bottom:24px;'>Utilisez ce code pour réinitialiser votre mot de passe AgroFlow :</p>
+                <div style='background:white;border:2px solid #c8e6c0;border-radius:10px;
+                            padding:20px;text-align:center;letter-spacing:0.3em;
+                            font-size:32px;font-weight:700;color:#2D5A27;'>
+                    {$code}
+                </div>
+                <p style='color:#888;font-size:13px;margin-top:20px;'>
+                    Ce code expire dans <strong>10 minutes</strong>.
+                </p>
+            </div>
+        ";
     }
 }
