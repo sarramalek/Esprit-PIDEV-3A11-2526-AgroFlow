@@ -160,7 +160,7 @@ public function twoFactorVerify(
         }
     }
 
-    return $this->render('auth/2fa_verify.html.twig', ['error' => $error]);
+    return $this->render('Auth/2fa_verify.html.twig', ['error' => $error]);
 }
 
 #[Route('/2fa/resend', name: 'app_2fa_resend')]
