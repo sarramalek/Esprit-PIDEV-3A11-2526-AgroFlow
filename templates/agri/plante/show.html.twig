@@ -1,13 +1,6 @@
-{% if is_granted('ROLE_OUVRIER') %}
-    {% set layout = 'base_ouvrier.html.twig' %}
-    {% set cancel_route = 'ouvrier_taches' %}
-{% elseif is_granted('ROLE_AGRICULTEUR') %}
-    {% set layout = 'base_agriculteur.html.twig' %}
-    {% set cancel_route = 'agri_plantes' %}
+{% extends is_granted('ROLE_OUVRIER') ? 'base_ouvrier.html.twig' : 'base_agriculteur.html.twig' %}
 
-{% endif %}
-
-{% extends layout %}
+{% set cancel_route = is_granted('ROLE_OUVRIER') ? 'ouvrier_taches' : 'agri_plantes' %}
 
 {% block title %}{{ plante.nomP }} — AgroFlow{% endblock %}
 
