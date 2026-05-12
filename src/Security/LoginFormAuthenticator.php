@@ -155,64 +155,61 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
      *  Pour vérifier ton domaine : https://resend.com/domains
      */
     private function sendCodeByEmail(string $email, string $code): void
-    {
-        $apiKey = $_ENV['RESEND_API_KEY'] ?? getenv('RESEND_API_KEY');
+{
+    $apiKey = $_ENV['BREVO_API_KEY'] ?? getenv('BREVO_API_KEY');
 
-        if (!$apiKey) {
-            throw new \RuntimeException('RESEND_API_KEY manquante');
-        }
-
-        // ─── Change ces deux lignes selon ton cas (voir commentaire ci-dessus) ───
-        $from      = $_ENV['RESEND_FROM_EMAIL'] ?? getenv('RESEND_FROM_EMAIL') ?: 'onboarding@resend.dev';
-        $recipient = $email; // en mode test sans domaine → remplace par ton email Resend
-        // ─────────────────────────────────────────────────────────────────────────
-
-        $payload = json_encode([
-            'from'    => 'AgroFlow <' . $from . '>',
-            'to'      => [$recipient],
-            'subject' => 'AgroFlow – Code de vérification 2FA',
-            'html'    => "
-                <div style='font-family:DM Sans,sans-serif;max-width:480px;margin:0 auto;
-                            padding:32px;background:#FCF8E6;border-radius:12px;'>
-                    <h2 style='color:#2D5A27;'>Vérification en deux étapes</h2>
-                    <p style='color:#555;'>Votre code de connexion AgroFlow :</p>
-                    <div style='background:white;border:2px solid #c8e6c0;border-radius:10px;
-                                padding:20px;text-align:center;letter-spacing:0.3em;
-                                font-size:32px;font-weight:700;color:#2D5A27;'>
-                        {$code}
-                    </div>
-                    <p style='color:#888;font-size:13px;margin-top:20px;'>
-                        Expire dans <strong>5 minutes</strong>.
-                    </p>
-                </div>
-            ",
-        ]);
-
-        $ch = curl_init('https://api.resend.com/emails');
-        curl_setopt_array($ch, [
-            CURLOPT_POST           => true,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT        => 10,
-            CURLOPT_HTTPHEADER     => [
-                'Authorization: Bearer ' . $apiKey,
-                'Content-Type: application/json',
-            ],
-            CURLOPT_POSTFIELDS => $payload,
-        ]);
-
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $curlErr  = curl_error($ch);
-        curl_close($ch);
-
-        if ($curlErr) {
-            throw new \RuntimeException('cURL error: ' . $curlErr);
-        }
-
-        if ($httpCode >= 400) {
-            throw new \RuntimeException('Resend HTTP ' . $httpCode . ': ' . $response);
-        }
+    if (!$apiKey) {
+        throw new \RuntimeException('BREVO_API_KEY manquante');
     }
+
+    $payload = json_encode([
+        'sender'      => ['name' => 'AgroFlow', 'email' => 'maleksarra362@gmail.com'],
+        'to'          => [['email' => $email]],
+        'subject'     => 'AgroFlow – Code de vérification 2FA',
+        'htmlContent' => "
+            <div style='font-family:DM Sans,sans-serif;max-width:480px;margin:0 auto;
+                        padding:32px;background:#FCF8E6;border-radius:12px;'>
+                <h2 style='color:#2D5A27;'>Vérification en deux étapes</h2>
+                <p style='color:#555;'>Votre code de connexion AgroFlow :</p>
+                <div style='background:white;border:2px solid #c8e6c0;border-radius:10px;
+                            padding:20px;text-align:center;letter-spacing:0.3em;
+                            font-size:32px;font-weight:700;color:#2D5A27;'>
+                    {$code}
+                </div>
+                <p style='color:#888;font-size:13px;margin-top:20px;'>
+                    Expire dans <strong>5 minutes</strong>.
+                </p>
+            </div>
+        ",
+    ]);
+
+    $ch = curl_init('https://api.brevo.com/v3/smtp/email');
+    curl_setopt_array($ch, [
+        CURLOPT_POST           => true,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT        => 10,
+        CURLOPT_HTTPHEADER     => [
+            'api-key: ' . $apiKey,
+            'Content-Type: application/json',
+        ],
+        CURLOPT_POSTFIELDS => $payload,
+    ]);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlErr  = curl_error($ch);
+    curl_close($ch);
+
+    if ($curlErr) {
+        throw new \RuntimeException('cURL error: ' . $curlErr);
+    }
+
+    if ($httpCode >= 400) {
+        throw new \RuntimeException('Brevo HTTP ' . $httpCode . ': ' . $response);
+    }
+
+    error_log('2FA EMAIL OK → ' . $email);
+}
 
     /**
      * Envoi SMS via Twilio REST API (pur curl, sans SDK)
