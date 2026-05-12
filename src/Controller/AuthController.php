@@ -223,7 +223,7 @@ public function register(
         return $this->redirectByRole($user);
     }
 
-    return $this->render('auth/register.html.twig', [
+    return $this->render('Auth/register.html.twig', [
         'registrationForm' => $form->createView(),
     ]);
 }
@@ -247,7 +247,7 @@ public function banni(
     $session = $requestStack->getSession();
     $session->invalidate();
 
-    return $this->render('auth/banni.html.twig');
+    return $this->render('Auth/banni.html.twig');
 }
 
     // ==================== REDIRECTION PAR ROLE ====================
