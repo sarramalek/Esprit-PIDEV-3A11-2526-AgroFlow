@@ -53,7 +53,7 @@ public function login(
 
     $loginForm = $this->createForm(LoginFormType::class, ['_username' => $lastUsername]);
 
-    return $this->render('auth/login.html.twig', [
+    return $this->render('security/login.html.twig', [
         'loginForm' => $loginForm->createView(),
         'error'     => $error,
     ]);
