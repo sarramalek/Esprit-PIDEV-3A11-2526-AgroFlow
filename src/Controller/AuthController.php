@@ -121,8 +121,8 @@ public function twoFactorVerify(
     UserRepository $userRepo,
     EntityManagerInterface $em
 ): Response {
-    $userId = $session->get('2fa_pending_user_id');
-    if (!$userId) {
+    $userCin = $session->get('2fa_pending_user_id');
+    if (!$userCin) {
         return $this->redirectToRoute('app_login');
     }
 
@@ -133,24 +133,34 @@ public function twoFactorVerify(
         $stored    = $session->get('2fa_code');
         $expiresAt = $session->get('2fa_expires_at');
 
-        if (time() > $expiresAt) {
+        // Debug temporaire → à supprimer après vérification
+        error_log('CIN: ' . $userCin);
+        error_log('STORED: "' . $stored . '"');
+        error_log('ENTERED: "' . $entered . '"');
+        error_log('EXPIRED: ' . (time() > $expiresAt ? 'OUI' : 'NON'));
+
+        if (!$stored) {
+            $error = 'Session expirée. Veuillez vous reconnecter.';
+            $session->remove('2fa_pending_user_id');
+        } elseif (time() > $expiresAt) {
             $session->remove('2fa_pending_user_id');
             $session->remove('2fa_code');
             $error = 'Le code a expiré. Veuillez vous reconnecter.';
         } elseif ($entered !== $stored) {
             $error = 'Code incorrect. Vérifiez votre email ou SMS.';
         } else {
-            // Code valide → connecter l'utilisateur manuellement
-            $user = $userRepo->find($userId);
+            // ✅ Code valide → chercher par CIN, pas par ID
+            $user = $userRepo->findOneBy(['cin' => $userCin]);
+
             if (!$user instanceof User) {
                 $session->remove('2fa_pending_user_id');
                 return $this->redirectToRoute('app_login');
             }
+
             $session->remove('2fa_pending_user_id');
             $session->remove('2fa_code');
             $session->remove('2fa_expires_at');
 
-            // Authentification manuelle via le token
             $token = new \Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken(
                 $user, 'main', $user->getRoles()
             );
