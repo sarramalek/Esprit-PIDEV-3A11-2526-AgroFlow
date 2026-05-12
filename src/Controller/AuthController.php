@@ -460,58 +460,57 @@ class AuthController extends AbstractController
      * Retourne true si succès, false sinon
      */
     private function sendEmail(string $to, string $subject, string $html): bool
-    {
-        try {
-            $apiKey = $_ENV['RESEND_API_KEY'] ?? getenv('RESEND_API_KEY');
-            $from   = $_ENV['RESEND_FROM_EMAIL'] ?? getenv('RESEND_FROM_EMAIL') ?: 'onboarding@resend.dev';
+{
+    try {
+        $apiKey = $_ENV['BREVO_API_KEY'] ?? getenv('BREVO_API_KEY');
 
-            if (!$apiKey) {
-                error_log('EMAIL ERROR: RESEND_API_KEY manquante');
-                return false;
-            }
-
-            $payload = json_encode([
-                'from'    => 'AgroFlow <' . $from . '>',
-                'to'      => [$to],
-                'subject' => $subject,
-                'html'    => $html,
-            ]);
-
-            $ch = curl_init('https://api.resend.com/emails');
-            curl_setopt_array($ch, [
-                CURLOPT_POST           => true,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_TIMEOUT        => 10,
-                CURLOPT_HTTPHEADER     => [
-                    'Authorization: Bearer ' . $apiKey,
-                    'Content-Type: application/json',
-                ],
-                CURLOPT_POSTFIELDS => $payload,
-            ]);
-
-            $response = curl_exec($ch);
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            $curlErr  = curl_error($ch);
-            curl_close($ch);
-
-            if ($curlErr) {
-                error_log('EMAIL CURL ERROR: ' . $curlErr);
-                return false;
-            }
-
-            if ($httpCode >= 400) {
-                error_log('EMAIL HTTP ERROR ' . $httpCode . ': ' . $response);
-                return false;
-            }
-
-            error_log('EMAIL OK → ' . $to);
-            return true;
-
-        } catch (\Exception $e) {
-            error_log('EMAIL EXCEPTION: ' . $e->getMessage());
+        if (!$apiKey) {
+            error_log('EMAIL ERROR: BREVO_API_KEY manquante');
             return false;
         }
+
+        $payload = json_encode([
+            'sender'      => ['name' => 'AgroFlow', 'email' => 'maleksarra362@gmail.com'],
+            'to'          => [['email' => $to]],
+            'subject'     => $subject,
+            'htmlContent' => $html,
+        ]);
+
+        $ch = curl_init('https://api.brevo.com/v3/smtp/email');
+        curl_setopt_array($ch, [
+            CURLOPT_POST           => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 10,
+            CURLOPT_HTTPHEADER     => [
+                'api-key: ' . $apiKey,
+                'Content-Type: application/json',
+            ],
+            CURLOPT_POSTFIELDS => $payload,
+        ]);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlErr  = curl_error($ch);
+        curl_close($ch);
+
+        if ($curlErr) {
+            error_log('EMAIL CURL ERROR: ' . $curlErr);
+            return false;
+        }
+
+        if ($httpCode >= 400) {
+            error_log('EMAIL HTTP ERROR ' . $httpCode . ': ' . $response);
+            return false;
+        }
+
+        error_log('EMAIL OK → ' . $to);
+        return true;
+
+    } catch (\Exception $e) {
+        error_log('EMAIL EXCEPTION: ' . $e->getMessage());
+        return false;
     }
+}
 
     private function resetEmailHtml(string $code): string
     {
