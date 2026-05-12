@@ -73,17 +73,23 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
             $session->set('2fa_pending_user_id', $user->getCin());
             $session->set('2fa_code',            $code);
             $session->set('2fa_expires_at',      time() + 300); // 5 min
+// ── Envoyer le code par email ──
+if ($user->getEmail()) {
+    try {
+        $this->sendCodeByEmail($user->getEmail(), $code);
+    } catch (\Exception $e) {
+        // email failed silently
+    }
+}
 
-            // ── Envoyer le code par email ──
-            if ($user->getEmail()) {
-                $this->sendCodeByEmail($user->getEmail(), $code);
-            }
-
-            // ── Envoyer aussi par SMS si numéro présent ──
-            if ($user->getTel()) {
-                $this->sendCodeBySms($user->getTel(), $code);
-            }
-
+// ── Envoyer aussi par SMS si numéro présent ──
+if ($user->getTel()) {
+    try {
+        $this->sendCodeBySms($user->getTel(), $code);
+    } catch (\Exception $e) {
+        // sms failed silently
+    }
+}
             // ⚠️ CRUCIAL : invalider le token Symfony
             // → l'utilisateur n'est PAS encore connecté
             $this->tokenStorage->setToken(null);

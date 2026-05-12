@@ -60,7 +60,7 @@ class TerrainController extends AbstractController
             return $this->redirectToRoute('admin_terrains');
         }
 
-        return $this->render('terrain/form.html.twig', [
+        return $this->render('Terrain/form.html.twig', [
             'form'  => $form->createView(),
             'title' => 'Nouveau terrain',
             'edit'  => false,
@@ -79,7 +79,7 @@ class TerrainController extends AbstractController
             return $this->redirectToRoute('admin_terrains');
         }
 
-        return $this->render('terrain/form.html.twig', [
+        return $this->render('Terrain/form.html.twig', [
             'form'    => $form->createView(),
             'title'   => 'Modifier le terrain',
             'terrain' => $terrain,
@@ -107,7 +107,7 @@ class TerrainController extends AbstractController
             $cinToName[(string)$u['cin']] = $u['nom'] . ' ' . $u['prenom'];
         }
 
-        return $this->render('terrain/show.html.twig', [
+        return $this->render('Terrain/show.html.twig', [
             'terrain'   => $terrain,
             'cinToName' => $cinToName,
         ]);
