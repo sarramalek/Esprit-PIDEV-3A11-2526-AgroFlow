@@ -171,7 +171,8 @@ if ($user->getTel()) {
             ";
             $mail->send();
         } catch (\Exception $e) {
-            // Logger l'erreur en production
+            error_log('EMAIL ERROR: ' . $e->getMessage()); // ← ADD THIS
+        throw $e;
         }
     }
 
