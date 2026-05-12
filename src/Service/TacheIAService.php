@@ -137,43 +137,59 @@ if (!empty($tachesParTerrain)) {
         $prompt .= "Réponds UNIQUEMENT en JSON valide sans markdown :\n";
         $prompt .= '{"nom_tache":"...","description":"...","priorite":"basse|normale|haute|urgente","etat":"à faire","date_echeancee":"YYYY-MM-DD","raison":"..."}';
         $prompt .= "\ndate_echeancee dans les 7 prochains jours. Description max 200 caractères. Raison max 150 caractères.";
+        error_log('GROQ KEY: ' . substr($this->groqApiKey, 0, 10) . '...');
 
-        // ── 6. Appel Groq ────────────────────────────────────────────────────
-        $response = $this->httpClient->request('POST', 'https://api.groq.com/openai/v1/chat/completions', [
-            'headers' => [
-                'Authorization' => 'Bearer ' . $this->groqApiKey,
-                'Content-Type'  => 'application/json',
-            ],
-            'json' => [
-                'model'       => 'llama-3.3-70b-versatile',
-                'temperature' => 0.9,
-                'max_tokens'  => 300,
-                'messages'    => [
-                    [
-                        'role'    => 'system',
-                        'content' => 'Tu es un assistant agricole tunisien expert. Tu réponds UNIQUEMENT en JSON valide, sans texte autour, sans balises markdown.',
-                    ],
-                    [
-                        'role'    => 'user',
-                        'content' => $prompt,
-                    ],
+// ── 6. Appel Groq ────────────────────────────────────────────────────
+try {
+    $response = $this->httpClient->request('POST', 'https://api.groq.com/openai/v1/chat/completions', [
+        'headers' => [
+            'Authorization' => 'Bearer ' . $this->groqApiKey,
+            'Content-Type'  => 'application/json',
+        ],
+        'json' => [
+            'model'       => 'llama-3.3-70b-versatile',
+            'temperature' => 0.9,
+            'max_tokens'  => 300,
+            'messages'    => [
+                [
+                    'role'    => 'system',
+                    'content' => 'Tu es un assistant agricole tunisien expert. Tu réponds UNIQUEMENT en JSON valide, sans texte autour, sans balises markdown.',
+                ],
+                [
+                    'role'    => 'user',
+                    'content' => $prompt,
                 ],
             ],
-        ]);
+        ],
+    ]);
 
-        $data = $response->toArray();
-        $text = $data['choices'][0]['message']['content'] ?? '{}';
-        $text = preg_replace('/```json\s*|\s*```/', '', trim($text));
+    $statusCode = $response->getStatusCode();
+    $rawBody    = $response->getContent(false); // false = ne throw pas sur erreur
+    error_log('GROQ STATUS: ' . $statusCode);
+    error_log('GROQ BODY: ' . $rawBody);
 
-        $suggestion = json_decode($text, true);
-
-        if (!$suggestion || !isset($suggestion['nom_tache'])) {
-            return $this->fallback();
-        }
-
-        return $suggestion;
+    if ($statusCode >= 400) {
+        error_log('GROQ ERROR: ' . $rawBody);
+        return $this->fallback();
     }
 
+    $data = json_decode($rawBody, true);
+    $text = $data['choices'][0]['message']['content'] ?? '{}';
+    $text = preg_replace('/```json\s*|\s*```/', '', trim($text));
+
+    $suggestion = json_decode($text, true);
+
+    if (!$suggestion || !isset($suggestion['nom_tache'])) {
+        return $this->fallback();
+    }
+
+    return $suggestion;
+
+} catch (\Exception $e) {
+    error_log('GROQ EXCEPTION: ' . $e->getMessage());
+    return $this->fallback();
+}
+    }
     // ── Saison tunisienne ────────────────────────────────────────────────────
     private function getSaison(): string
     {
