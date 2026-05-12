@@ -154,7 +154,7 @@ class MachineRepository extends ServiceEntityRepository
             ->andWhere('u.cin = :cin')
             ->setParameter('cin', $cin)
             ->orderBy('m.dateAchat', 'DESC')
-            ->addOrderBy('m.id', 'DESC')
+            ->addOrderBy('m.idM', 'DESC')  // ← idM au lieu de id
             ->getQuery()
             ->getResult();
         return $results;
