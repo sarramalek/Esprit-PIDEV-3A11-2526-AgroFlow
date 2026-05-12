@@ -22,7 +22,7 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
     public function __construct(
         private RouterInterface       $router,
         private UserRepository        $userRepo,
-        private TokenStorageInterface $tokenStorage,  // ← pour invalider le token
+        private TokenStorageInterface $tokenStorage,
     ) {}
 
     // ──────────────────────────────────────────────
@@ -48,7 +48,7 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
         string         $firewallName
     ): Response {
         $user = $token->getUser();
-        
+
         if (!$user instanceof User) {
             return new RedirectResponse($this->router->generate('app_login'));
         }
@@ -57,7 +57,6 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 
         // ── Compte banni ──
         if ((int) $user->getRole() === 0) {
-            // Invalider immédiatement
             $this->tokenStorage->setToken(null);
             $session->invalidate();
             return new RedirectResponse($this->router->generate('app_bann'));
@@ -66,32 +65,33 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
         // ── 2FA activée ──
         if ($user->getTwoFactorEnabled()) {
 
-            // Générer le code OTP
             $code = str_pad((string)random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
-            // Stocker en session
             $session->set('2fa_pending_user_id', $user->getCin());
             $session->set('2fa_code',            $code);
-            $session->set('2fa_expires_at',      time() + 300); // 5 min
-// ── Envoyer le code par email ──
-if ($user->getEmail()) {
-    try {
-        $this->sendCodeByEmail($user->getEmail(), $code);
-    } catch (\Exception $e) {
-        // email failed silently
-    }
-}
+            $session->set('2fa_expires_at',      time() + 300);
 
-// ── Envoyer aussi par SMS si numéro présent ──
-if ($user->getTel()) {
-    try {
-        $this->sendCodeBySms($user->getTel(), $code);
-    } catch (\Exception $e) {
-        // sms failed silently
-    }
-}
-            // ⚠️ CRUCIAL : invalider le token Symfony
-            // → l'utilisateur n'est PAS encore connecté
+            // ── Email ──
+            if ($user->getEmail()) {
+                try {
+                    $this->sendCodeByEmail($user->getEmail(), $code);
+                    error_log('2FA EMAIL OK → ' . $user->getEmail());
+                } catch (\Exception $e) {
+                    error_log('2FA EMAIL FAILED: ' . $e->getMessage());
+                }
+            }
+
+            // ── SMS ──
+            if ($user->getTel()) {
+                try {
+                    $this->sendCodeBySms($user->getTel(), $code);
+                    error_log('2FA SMS OK → ' . $user->getTel());
+                } catch (\Exception $e) {
+                    error_log('2FA SMS FAILED: ' . $e->getMessage());
+                }
+            }
+
+            // ⚠️ Invalider le token → user pas encore connecté
             $this->tokenStorage->setToken(null);
 
             return new RedirectResponse($this->router->generate('app_2fa_verify'));
@@ -136,14 +136,37 @@ if ($user->getTel()) {
         };
     }
 
-   private function sendCodeByEmail(string $email, string $code): void
-{
-    try {
-        $resend = \Resend::client($_ENV['RESEND_API_KEY']);
+    /**
+     * Envoi email via Resend REST API (pur curl, sans SDK, aucune dépendance)
+     * 
+     * ⚠️  IMPORTANT — deux cas selon ton compte Resend :
+     *
+     *  • Sans domaine vérifié (tests) :
+     *      - from  → obligatoirement "onboarding@resend.dev"
+     *      - to    → obligatoirement l'email avec lequel tu t'es inscrit sur resend.com
+     *
+     *  • Avec domaine vérifié (production) :
+     *      - from  → "AgroFlow <noreply@ton-domaine.com>"
+     *      - to    → n'importe quel email
+     *
+     *  Pour vérifier ton domaine : https://resend.com/domains
+     */
+    private function sendCodeByEmail(string $email, string $code): void
+    {
+        $apiKey = $_ENV['RESEND_API_KEY'] ?? getenv('RESEND_API_KEY');
 
-        $resend->emails->send([
-            'from'    => 'AgroFlow <noreply@ton-domaine.com>', // ← ton domaine vérifié sur Resend
-            'to'      => [$email],
+        if (!$apiKey) {
+            throw new \RuntimeException('RESEND_API_KEY manquante');
+        }
+
+        // ─── Change ces deux lignes selon ton cas (voir commentaire ci-dessus) ───
+        $from      = $_ENV['RESEND_FROM_EMAIL'] ?? getenv('RESEND_FROM_EMAIL') ?: 'onboarding@resend.dev';
+        $recipient = $email; // en mode test sans domaine → remplace par ton email Resend
+        // ─────────────────────────────────────────────────────────────────────────
+
+        $payload = json_encode([
+            'from'    => 'AgroFlow <' . $from . '>',
+            'to'      => [$recipient],
             'subject' => 'AgroFlow – Code de vérification 2FA',
             'html'    => "
                 <div style='font-family:DM Sans,sans-serif;max-width:480px;margin:0 auto;
@@ -161,27 +184,56 @@ if ($user->getTel()) {
                 </div>
             ",
         ]);
-    } catch (\Exception $e) {
-        error_log('RESEND EMAIL ERROR: ' . $e->getMessage());
-        throw $e;
-    }
-}
 
-   private function sendCodeBySms(string $tel, string $code): void
-{
-    try {
+        $ch = curl_init('https://api.resend.com/emails');
+        curl_setopt_array($ch, [
+            CURLOPT_POST           => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 10,
+            CURLOPT_HTTPHEADER     => [
+                'Authorization: Bearer ' . $apiKey,
+                'Content-Type: application/json',
+            ],
+            CURLOPT_POSTFIELDS => $payload,
+        ]);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlErr  = curl_error($ch);
+        curl_close($ch);
+
+        if ($curlErr) {
+            throw new \RuntimeException('cURL error: ' . $curlErr);
+        }
+
+        if ($httpCode >= 400) {
+            throw new \RuntimeException('Resend HTTP ' . $httpCode . ': ' . $response);
+        }
+    }
+
+    /**
+     * Envoi SMS via Twilio REST API (pur curl, sans SDK)
+     * Twilio utilise HTTPS → fonctionne sur tous les plans Railway
+     */
+    private function sendCodeBySms(string $tel, string $code): void
+    {
+        $sid   = $_ENV['TWILIO_ACCOUNT_SID'] ?? getenv('TWILIO_ACCOUNT_SID');
+        $token = $_ENV['TWILIO_AUTH_TOKEN']  ?? getenv('TWILIO_AUTH_TOKEN');
+        $from  = $_ENV['TWILIO_FROM']        ?? getenv('TWILIO_FROM');
+
+        if (!$sid || !$token || !$from) {
+            throw new \RuntimeException('Variables Twilio manquantes (SID/TOKEN/FROM)');
+        }
+
         if (!str_starts_with($tel, '+')) {
             $tel = '+216' . ltrim($tel, '0');
         }
-
-        $sid   = $_ENV['TWILIO_ACCOUNT_SID'];
-        $token = $_ENV['TWILIO_AUTH_TOKEN'];
-        $from  = $_ENV['TWILIO_FROM'];
 
         $ch = curl_init("https://api.twilio.com/2010-04-01/Accounts/{$sid}/Messages.json");
         curl_setopt_array($ch, [
             CURLOPT_POST           => true,
             CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 10,
             CURLOPT_USERPWD        => "{$sid}:{$token}",
             CURLOPT_POSTFIELDS     => http_build_query([
                 'From' => $from,
@@ -192,14 +244,15 @@ if ($user->getTel()) {
 
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlErr  = curl_error($ch);
         curl_close($ch);
 
-        if ($httpCode >= 400) {
-            error_log('SMS ERROR HTTP ' . $httpCode . ': ' . $response);
+        if ($curlErr) {
+            throw new \RuntimeException('cURL error: ' . $curlErr);
         }
 
-    } catch (\Exception $e) {
-        error_log('SMS ERROR: ' . $e->getMessage());
+        if ($httpCode >= 400) {
+            throw new \RuntimeException('Twilio HTTP ' . $httpCode . ': ' . $response);
+        }
     }
-}
 }
