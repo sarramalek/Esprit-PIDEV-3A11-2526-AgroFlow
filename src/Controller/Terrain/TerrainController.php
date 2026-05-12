@@ -36,7 +36,7 @@ class TerrainController extends AbstractController
             $typeSolStats[$type] = ($typeSolStats[$type] ?? 0) + 1;
         }
 
-        return $this->render('terrain/index.html.twig', [
+        return $this->render('Terrain/index.html.twig', [
             'terrains'      => $terrains,
             'cinToName'     => $cinToName,
             'totalTerrains' => $totalTerrains,
