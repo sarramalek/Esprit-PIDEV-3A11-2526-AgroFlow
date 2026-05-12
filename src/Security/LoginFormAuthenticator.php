@@ -43,65 +43,68 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
     // 2. Succès → 2FA ou dashboard selon rôle
     // ──────────────────────────────────────────────
     public function onAuthenticationSuccess(
-        Request        $request,
-        TokenInterface $token,
-        string         $firewallName
-    ): Response {
-        $user = $token->getUser();
+    Request        $request,
+    TokenInterface $token,
+    string         $firewallName
+): Response {
+    $user = $token->getUser();
 
-        if (!$user instanceof User) {
-            return new RedirectResponse($this->router->generate('app_login'));
-        }
-
-        $session = $request->getSession();
-
-        // ── Compte banni ──
-        if ((int) $user->getRole() === 0) {
-            $this->tokenStorage->setToken(null);
-            $session->invalidate();
-            return new RedirectResponse($this->router->generate('app_bann'));
-        }
-
-        // ── 2FA activée ──
-        if ($user->getTwoFactorEnabled()) {
-
-            $code = str_pad((string)random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-
-            $session->set('2fa_pending_user_id', $user->getCin());
-            $session->set('2fa_code',            $code);
-            $session->set('2fa_expires_at',      time() + 300);
-
-            // ── Email ──
-            if ($user->getEmail()) {
-                try {
-                    $this->sendCodeByEmail($user->getEmail(), $code);
-                    error_log('2FA EMAIL OK → ' . $user->getEmail());
-                } catch (\Exception $e) {
-                    error_log('2FA EMAIL FAILED: ' . $e->getMessage());
-                }
-            }
-
-            // ── SMS ──
-            if ($user->getTel()) {
-                try {
-                    $this->sendCodeBySms($user->getTel(), $code);
-                    error_log('2FA SMS OK → ' . $user->getTel());
-                } catch (\Exception $e) {
-                    error_log('2FA SMS FAILED: ' . $e->getMessage());
-                }
-            }
-
-            // ⚠️ Invalider le token → user pas encore connecté
-            $this->tokenStorage->setToken(null);
-
-            return new RedirectResponse($this->router->generate('app_2fa_verify'));
-        }
-
-        // ── Pas de 2FA → redirection selon rôle ──
-        return new RedirectResponse(
-            $this->router->generate($this->getRouteByRole($user))
-        );
+    if (!$user instanceof User) {
+        return new RedirectResponse($this->router->generate('app_login'));
     }
+
+    $session = $request->getSession();
+
+    // ── Compte banni ──
+    if ((int) $user->getRole() === 0) {
+        $this->tokenStorage->setToken(null);
+        $session->invalidate();
+        return new RedirectResponse($this->router->generate('app_bann'));
+    }
+
+    // ── 2FA activée ──
+    if ($user->getTwoFactorEnabled()) {
+
+        $code = str_pad((string)random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+
+        // ⚠️ CRUCIAL : invalider le token EN PREMIER
+        // avant de stocker en session, sinon la session est régénérée
+        // et les données sont perdues
+        $this->tokenStorage->setToken(null);
+
+        // Stocker APRÈS l'invalidation du token
+        $session->set('2fa_pending_user_id', $user->getCin());
+        $session->set('2fa_code',            $code);
+        $session->set('2fa_expires_at',      time() + 300);
+
+        // ── Email ──
+        if ($user->getEmail()) {
+            try {
+                $this->sendCodeByEmail($user->getEmail(), $code);
+                error_log('2FA EMAIL OK → ' . $user->getEmail());
+            } catch (\Exception $e) {
+                error_log('2FA EMAIL FAILED: ' . $e->getMessage());
+            }
+        }
+
+        // ── SMS ──
+        if ($user->getTel()) {
+            try {
+                $this->sendCodeBySms($user->getTel(), $code);
+                error_log('2FA SMS OK → ' . $user->getTel());
+            } catch (\Exception $e) {
+                error_log('2FA SMS FAILED: ' . $e->getMessage());
+            }
+        }
+
+        return new RedirectResponse($this->router->generate('app_2fa_verify'));
+    }
+
+    // ── Pas de 2FA → redirection selon rôle ──
+    return new RedirectResponse(
+        $this->router->generate($this->getRouteByRole($user))
+    );
+}
 
     // ──────────────────────────────────────────────
     // 3. Échec d'authentification
