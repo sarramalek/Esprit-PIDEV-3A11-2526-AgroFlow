@@ -59,7 +59,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, TwoFact
     /**
      * @var string[]
      */
-    #[ORM\Column(type: 'json', nullable: false, options: ['default' => '[]'])]
+    #[ORM\Column(type: 'json', nullable: true )]
     private array $backupCodes = [];
 
     #[ORM\Column(type: 'string', length: 255, nullable: false, options: ['default' => 'default.png'])]
