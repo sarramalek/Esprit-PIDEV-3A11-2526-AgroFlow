@@ -30,7 +30,7 @@ Soil Analysis Algorithm – Scores each terrain out of 100 based on pH, surface 
 Smart Irrigation Advisor – Computes the net adjusted water requirement per plant by combining base water needs with live weather data (temperature, humidity, precipitation, wind)
 Best Rotation Suggestion Algorithm – Scores every rotation out of 100 using 5 weighted criteria (soil pH, active status, rotation duration, water needs vs. live weather, soil type) and displays the top 3 with detailed reasoning
 ---
-health & Animal Care Module — [Votre Nom]
+health & Animal Care Module — Yessmine rezgui
 Partner CRUD – Full management of partners and veterinary contacts (name, specialty, location, contact details, availability)
 Geolocation with OpenStreetMap + Gemini AI – Interactive map powered by Leaflet.js and OpenStreetMap that displays partners and veterinarians on the map; integrated with Google Gemini to provide intelligent location context and recommendations
 Nearest Veterinarian / Partner Finder – Automatically detects the user's current position and calculates the closest available veterinarian or partner using GPS distance algorithms
